@@ -153,10 +153,10 @@ class OrdersPaymentsController extends Controller
 
         $promiseDate = $request->input('promise_date') ?: '';
 
-        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('declared_sum', '0'),
+        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('declared_sum', '0'), $request->input('payer'),
             $masterPaymentId, $promise,
             $chooseOrder, $promiseDate,
-            $type, $isWarehousePayment
+            $type, $isWarehousePayment,
         );
 
 
@@ -1972,7 +1972,7 @@ class OrdersPaymentsController extends Controller
 
         return redirect()->route('orders.edit', ['order_id' => $order->id]);
     }
-      
+
     /**
      * @param OrderPayment $orderPayment
      *

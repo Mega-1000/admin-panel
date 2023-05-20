@@ -46,6 +46,7 @@ class OrderPaymentService
     public function payOrder(
         int     $orderId,
         string  $amount,
+        string  $payer,
         ?string $masterPaymentId,
         string  $promise,
                 $chooseOrder,
@@ -92,6 +93,7 @@ class OrderPaymentService
             'type' => $type,
             'status' => $isWarehousePayment ? OrderPaymentStatus::PENDING : null,
             'token' => $token ?: null,
+            'payer' => $payer,
         ]);
 
         if ($promise == OrderPaymentPromiseType::BOOKED) {

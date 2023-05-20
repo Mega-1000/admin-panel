@@ -2001,7 +2001,7 @@
                             let returnedValue = 0;
 
                             payments.forEach(payment => {
-                                if (payment.operation_type) {
+                                if (payment.operation_type === "zwrot towaru") {
                                     returnedValue += parseFloat(payment.amount);
                                 }
 
@@ -2034,7 +2034,7 @@
                             text += `<p> ZW: ${totalOfReturns} </p>`;
                             text += `<p> D: ${totalOfDeclaredPayments} </p>`
                             text += `<p> BI: ${bilans} </p>`;
-                            text += `<p> WZT: ${returnedValue} </p>`
+                            text += `<p> ZT: ${returnedValue} </p>`
 
                             settledDeclared.forEach((amount) => {
                                 text += `<p> ZD: ${amount} </p>`;
