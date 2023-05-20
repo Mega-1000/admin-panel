@@ -19,6 +19,7 @@ use App\Entities\ProductStock;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\Warehouse;
+use App\Enums\OrderPaymentsEnum;
 use App\Helpers\Helper;
 use App\Helpers\LabelsHelper;
 use App\Helpers\MessagesHelper;
@@ -524,6 +525,9 @@ class AllegroOrderSynchro implements ShouldQueue
             'order_id' => $order->id,
             'promise' => true,
             'promise_date' => $allegroPayment['finishedAt'],
+            'payer' => $order->customer->email,
+            'operation_type' => OrderPaymentsEnum::DECLARED_FROM_ALLEGRO,
+            'operation_id' => $allegroPayment['id'],
         ]);
         $order->labels()->attach(Label::BOOKED_FIRST_PAYMENT);
     }
