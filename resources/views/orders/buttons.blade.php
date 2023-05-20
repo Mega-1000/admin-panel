@@ -482,7 +482,8 @@
     </div>
     <div class="col-md-3">
         <h4>Drukuj paczki z grupy:</h4>
-        @foreach($couriersTasks as $courierCode => $tasksInDay)
+        @foreach($couriersTasks as $courierCode => $tasksInDay) 
+            @if(isset(\App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode]))
             <div class="row">
                 <div class="col-lg-12 print-group">
                         {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
@@ -507,6 +508,7 @@
                     </div>
 </div>
             </div>
+            @endif
         @endforeach
         <div class="row">
             <button class="btn btn-info" id="create-new-task-button" name="custom">Dodatkowe Zadanie</button>
