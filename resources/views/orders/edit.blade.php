@@ -1302,6 +1302,7 @@
                 <th>@lang('order_payments.table.operation_type')</th>
                 <th>@lang('order_payments.table.status')</th>
                 <th>@lang('order_payments.table.comments')</th>
+                <th>@lang('order_payments.table.freight_bill_status_local')</th>
                 <th>@lang('order_payments.table.actions')</th>
             </tr>
             </thead>
@@ -3268,6 +3269,13 @@
                 {
                     data: 'comments',
                     name: 'comments',
+                },
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id, type, row) {
+                        return row?.order_package?.status ?? '';
+                    }
                 },
                 {
                     data: 'id',

@@ -18,7 +18,7 @@
     <form action="{{ route('order_payments.create_return_post', ['order' => $id]) }}" method="POST">
         @csrf
         <div class="firms-general" id="orderPayment">
-            <div class="form-group">
+            <div class="hidden">
                 <label for="payment-type">Typ płatności</label>
                 <select class="form-control" id="payment-type" name="payment-type">
                     <option value="CLIENT">@lang('order_payments.form.client')</option>

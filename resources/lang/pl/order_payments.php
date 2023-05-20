@@ -37,6 +37,7 @@ return [
         'external_payment_id' => 'ID zewnetrznych płatności',
         'payer' => 'Płatnik',
         'operation_date' => 'Data operacji',
+        'freight_bill_status_local' => 'status listu przewozowego w naszym systemie',
         'tracking_number' => 'Numer listu przewozowego firmy spedycyjnej',
         'operation_id' => 'ID platnosci',
         'declared_sum' => 'Kwota deklarowana',

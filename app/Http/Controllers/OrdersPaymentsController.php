@@ -1897,8 +1897,7 @@ class OrdersPaymentsController extends Controller
      */
     public function prepareCollection($id)
     {
-        $collection = $this->repository->findWhere(['order_id' => $id]);
-        return $collection;
+        return OrderPayment::where('order_id', $id)->with('orderPackage')->get();
     }
 
     public function warehousePaymentConfirmation($token)

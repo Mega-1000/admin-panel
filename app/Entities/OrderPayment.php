@@ -54,6 +54,11 @@ class OrderPayment extends Model implements Transformable
         return $this->belongsTo(Order::class);
     }
 
+    public function orderPackage(): BelongsTo
+    {
+        return $this->belongsTo(OrderPackage::class);
+    }
+
     public function getPackageStatus(): string
     {
         return $this->order->packages->first()->status;

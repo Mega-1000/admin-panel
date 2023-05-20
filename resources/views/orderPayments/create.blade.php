@@ -31,7 +31,7 @@
     <form action="{{ action('OrdersPaymentsController@store') }}" method="POST">
         {{ csrf_field() }}
         <div class="firms-general" id="orderPayment">
-            <div class="form-group">
+            <div class="hidden">
                 <label for="payment-type">Typ płatności</label>
                 <select class="form-control" id="payment-type" name="payment-type">
                     <option value="CLIENT">@lang('order_payments.form.client')</option>

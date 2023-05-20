@@ -416,7 +416,8 @@ class OrdersController extends Controller
      */
     public function edit(int $id)
     {
-        $order = $this->orderRepository->with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
+        $order = Order::with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
+
         $orderId = $id;
         WorkingEvents::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $order->id);
 
