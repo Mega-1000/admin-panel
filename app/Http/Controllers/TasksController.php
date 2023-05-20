@@ -404,7 +404,8 @@ class TasksController extends Controller
                 $warehouseNotice = $task->order?->warehouse_notice ?? $task->taskSalaryDetail->warehouse_notice;
                 $text = 'ID Zadania: ' . $task->id . ', Nazwa zadania: ' . $task->name . ', Wykonuje: ' . $task->user->name . ', Rozpoczęcie: ' . $start->toDateTimeString() . ', Zakończenie: ' . $end->toDateTimeString() . ', Koszt obsługi konsultanta: ' . $task->taskSalaryDetail->consultant_value . ', Uwagi konsultanta: ' . $consultantNotice . ', Koszt obsługi magazynu: ' . $task->taskSalaryDetail->warehouse_value . ', Uwagi magazynu: ' . $warehouseNotice;
                 if ($task->order !== null) {
-                    $text .= ', Data rozpoczęcia nadawania przesyłki: ' . $task->order?->shipment_date->toDateString();
+                    $drnp = new Carbon($task->order->shipment_date);
+                    $text .= ', Data rozpoczęcia nadawania przesyłki: ' . $drnp->toDateString();
                 }
             } else {
                 $text = 'ID Zadania: ' . $task->id . ', Nazwa zadania: ' . $task->name . ', Wykonuje: ' . $task->user->name . ', Rozpoczęcie: ' . $start->toDateTimeString() . ', Zakończenie: ' . $end->toDateTimeString();
