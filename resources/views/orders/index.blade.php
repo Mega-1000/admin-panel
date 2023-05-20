@@ -2182,10 +2182,9 @@
                                 }
                             });
 
-                            bilans = (row['values_data']['sum_of_gross_values'] * -1) + totalOfReturns + totalOfDeclaredPayments;
-                            let offerFinanceBilans = (row['values_data']['sum_of_gross_values'] * -1) - bilans + returnedValue;
+                            bilans = totalOfPayments - totalOfReturns + totalOfDeclaredPayments;
+                            let offerFinanceBilans = row['values_data']['sum_of_gross_values'] - bilans + returnedValue;
 
-                            text += `<p> WZ: ${row['values_data']['sum_of_gross_values']} </p>`
                             text += `<p> Z: ${totalOfPayments} </p>`;
                             text += `<p> ZW: ${totalOfReturns} </p>`;
                             text += `<p> D: ${totalOfDeclaredPayments} </p>`
