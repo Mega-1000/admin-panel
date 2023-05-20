@@ -3209,13 +3209,15 @@ class OrdersController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
+     * @throws Exception
      */
-    public function datatable(Request $request)
+    public function datatable(Request $request): JsonResponse
     {
         $data = $request->all();
         [$collection, $countFiltred] = $this->prepareCollection($data);
-        $count = $this->orderRepository->all();
+        $count = Order::with('payments')->get();
         $count = count($count);
         $collection = $this->prepareAdditionalOrderData($collection);
 
