@@ -178,7 +178,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
                     <button type="submit" form="finish-task-form" id="check-finish-task" class="btn btn-success pull-right">Zakończ</button>
-                    <button id="check-finish-task-refresh" class="btn btn-primary pull-right">Odświez</button>  
+                    <button id="check-finish-task-refresh" class="btn btn-primary pull-right">Odświez</button>
                 </div>
             </div>
         </div>
@@ -797,7 +797,7 @@
             </div>
         </div>
     </div>
-    
+
 
 
     @include('orders.buttons')
@@ -2174,7 +2174,7 @@
                                 }
 
                                 if (parsedAmount < 0 || payment.operation_type !== "zwrot towaru") {
-                                    totalOfReturns -= parsedAmount;
+                                    totalOfReturns -= parsedAmount ?? parsedDeclaredAmount;
                                 } else if (parsedAmount) {
                                     totalOfPayments += parsedAmount;
                                 } else if (!parsedAmount && parsedDeclaredAmount > 0) {
@@ -2845,7 +2845,7 @@
                     }
                 });
             };
-            
+
             function addingTaskToPlanner(orderId,delivery_warehouse) {
                 $.ajax({
                     method: 'post',
@@ -2880,7 +2880,7 @@
                                     table.ajax.reload(null, false);
                                     return false;
                                 });
-                                
+
                                 clickCount++;
                             }
                         })
@@ -2888,7 +2888,7 @@
                         window.open('/admin/planning/timetable', '_blank');
                     }
                 });
-            } 
+            }
 
             const showSelectWarehouseTemplate = (modal, orderId) => {
                 const row = $('#id-' + orderId);
