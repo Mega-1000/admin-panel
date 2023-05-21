@@ -10,6 +10,7 @@ use App\Enums\OrderTransactionEnum;
 use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Repositories\FileInvoiceRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
@@ -249,9 +250,22 @@ class ImportBankPayIn implements ShouldQueue
             }
         }
 
-        $allegoIdPattern = '/^Platnosc za zamowienie\s+([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/';
+        $allegoIdPattern = '/^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/';
         if (preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
             $order = Order::query()->where('allegro_transaction_id', $matches[0])->first();
+
+            if (!empty($order)) {
+                return PayInDTOFactory::createPayInDTO([
+                    'orderId' => (int)$order->id,
+                    'data' => $payIn,
+                ]);
+            }
+        }
+
+        $invoicePattern = '/\b(?:\d{1,6}\/(?:STA|MAG|TRA|KOS)\/\d{2}\/\d{4})\b/';
+        if (preg_match($invoicePattern, $payIn['tytul'], $matches)) {
+            $orderId = FileInvoiceRepository::getInvoiceIdFromNumber(str_replace($matches[0], '/', '_'));
+            $order = Order::query()->find($orderId);
 
             if (!empty($order)) {
                 return PayInDTOFactory::createPayInDTO([
