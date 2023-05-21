@@ -35,8 +35,8 @@ class MessagesController extends Controller
     /**
      * @param bool $all
      * @param int $orderId
-     * @param int $userId
-     * @return array|Chat[]
+     * @param int|null $userId
+     * @return array|Chat
      */
     public static function getChatView(bool $all, int $orderId, int $userId = null)
     {

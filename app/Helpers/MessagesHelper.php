@@ -284,6 +284,13 @@ class MessagesHelper
             $chat->users()->attach($user);
         }
 
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+
+        $content = "Witamy!
+                        Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
+                        Zajmuje to zwykle do kilku minut.";
+        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+
         $this->cache['chat'] = $chat;
         $this->chatId = $chat->id;
         return $chat;
@@ -564,7 +571,7 @@ class MessagesHelper
 
     private function setChatLabel(Chat $chat, bool $clearDanger = false, int $area = 0): void
     {
-        
+
         if ($clearDanger) {
             $total = Chat::where('order_id', $chat->order->id)->where('need_intervention', true)->count();
             if ($total <= 1 && $chat->need_intervention) {
@@ -692,7 +699,7 @@ class MessagesHelper
         }
 
         $employee = Employee::where('email', $email)->first();
-        
+
         if($employee === null) {
             throw new ChatException('Brak pracownika dla danego adresu Email');
         }
