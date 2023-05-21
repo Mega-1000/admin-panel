@@ -46,7 +46,7 @@ class CourierController extends Controller
         $courier->fill($request->all());
         $courier->save();
 
-        return redirect()->route('courier.index')->with([
+        return redirect()->route('courier.courier.index')->with([
             'message' => 'Ustawienia kuriera zapisane poprawnie!',
             'alert-type' => 'success'
         ]);
