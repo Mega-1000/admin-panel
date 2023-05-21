@@ -228,7 +228,7 @@ class ImportBankPayIn implements ShouldQueue
             }
         }
 
-        preg_match_all('/^\s*(\d(?:\s*\d)*)\s*$/', $fileLine, $matches);
+        preg_match_all('/^\d{5}$/', $fileLine, $matches);
 
         if (count($matches)) {
             foreach ($matches[0] as $orderId) {
