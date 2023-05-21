@@ -1193,10 +1193,12 @@
                 $('#print-package-group').modal('hide');
             }, 5000);
         });
-        $('.print-group .print-list').click(event => {
-            $('#print-package-type').val(event.currentTarget.name);
-            let opt = $(event.currentTarget).data('couriertasks');
+        
+        $('.print-group .print-list').click(function(){
+            $('#print-package-type').val($(this).attr('name'));
+            let opt = $(this).data('couriertasks');
             let select = $('#print-package-group').find('[name="task_id"]');
+            alert(opt);
             select.find('optgroup').remove();
             $.each(opt, function (key, value) {
                 if (value.length > 0) {
