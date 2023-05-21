@@ -2131,7 +2131,7 @@
                         name: 'values_data',
                         render: function (data, type, row) {
 
-                            return '<p><span title="Wartość Zamówienia">WZ: ' + row['values_data']['sum_of_gross_values'] + '</p>\n\
+                            return '<p><span title="Wartość Zamówienia">WO: ' + row['values_data']['sum_of_gross_values'] + '</p>\n\
                         <p><span title="Wartość Towaru">WT: ' + row['values_data']['products_value_gross'] + '</p>\n\
                         <p><span title="Koszt Transportu Dla Klienta">KT: ' + row['values_data']['shipment_price_for_client'] + '</p>\n\
                         <p><span title="Dodatkowy Koszt Pobrania">DKP: ' + row['values_data']['additional_cash_on_delivery_cost'] + '</p>\n\
