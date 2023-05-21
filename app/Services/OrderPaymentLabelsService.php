@@ -14,7 +14,6 @@ class OrderPaymentLabelsService
         protected LabelService $labelService,
     ) {
     }
-
     /**
      * @param Order $order
      *
@@ -39,5 +38,14 @@ class OrderPaymentLabelsService
         }
         $this->labelService->removeLabel($order->id, [133]);
         AddLabelService::addLabels($order, [134], $arr, [], Auth::user()?->id);
+
+
+        $labels = $order->labels()->get()->pluck('id')->toArray();
+        $labelsToCheck = [52, 53, 54, 114, 47, 48, 96, 149, 49, 50];
+        $labelsToCheck = array_diff($labelsToCheck, $labels);
+
+        if (count($labelsToCheck) === 10) {
+            AddLabelService::addLabels($order, [45, 68], $arr, [], Auth::user()?->id);
+        }
     }
 }
