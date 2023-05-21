@@ -109,10 +109,15 @@
                             @endif
                             <div class="row">
                                 <div class="form-group">
-                                    <label for="value_of_items_gross" class="col-sm-4 control-label">Towar nieuszkodzony
-                                        (max ilość: {{$item->quantity}})</label>
+                                    <label
+                                        for="value_of_items_gross"
+                                        class="col-sm-4 control-label"
+                                    >Towar nieuszkodzony
+                                        (max ilość: {{$item->quantity}})
+                                    </label>
+
                                     <div class="col-sm-2">
-                                        <input type="number" class="form-control" id="undamaged"
+                                        <input type="number" class="form-control" id="undamaged-{{$loop->iteration}}"
                                                name="return[{{$loop->iteration}}][undamaged]"
                                                @if(
                                                    count($item->realProductPositions()) &&
@@ -164,7 +169,12 @@
                             <div class="row">
                                 <div class="form-group">
                                     Wartość sumy zwrotu
-                                    <input class="form-control" placeholder="Wartość sumy zwrotu" name="return[{{$loop->iteration}}][sum_of_return]">
+                                    <input
+                                        class="form-control"
+                                        placeholder="Wartość sumy zwrotu"
+                                        name="return[{{$loop->iteration}}][sum_of_return]"
+                                        id="sum-of-return-{{$loop->iteration}}"
+                                    >
 
                                     <label for="value_of_items_gross" class="col-sm-2 control-label">Zdjęcie
                                         uszkodzenia</label>
@@ -204,6 +214,16 @@
 @endsection
 @section('datatable-scripts')
     <script>
+        // undamaged-$loop->iteration event listener
+        @foreach($order->items as $item)
+        $('#undamaged-{{$loop->iteration}}').on('change', function () {
+            const undamaged = $(this).val();
+            const sum = undamaged * {{$item->gross_selling_price_commercial_unit}};
+
+            $('#sum-of-return-{{$loop->iteration}}').val(sum);
+        });
+        @endforeach
+
         $('.return-check').change(function () {
             if (this.checked) {
                 $('#form-box' + this.value).show();
