@@ -252,7 +252,7 @@ class ImportBankPayIn implements ShouldQueue
 
         $allegoIdPattern = '/^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/';
         if (preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
-            $order = Order::query()->where('allegro_transaction_id', $matches[0])->first();
+            $order = Order::query()->where('allegro_form_id', $matches[0])->first();
 
             if (!empty($order)) {
                 return PayInDTOFactory::createPayInDTO([
