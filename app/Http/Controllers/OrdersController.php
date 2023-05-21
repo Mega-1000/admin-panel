@@ -1745,9 +1745,9 @@ class OrdersController extends Controller
      * @param $labelId
      * @return JsonResponse
      */
-    public function swapLabelsAfterLabelRemoval(Request $request, $orderId, $labelId)
+    public function swapLabelsAfterLabelRemoval(Request $request, $orderId, $labelId): JsonResponse
     {
-        $order = $this->orderRepository->find($orderId);
+        $order = Order::findOrFail($orderId);
         $labelsToAddAfterRemoval = [];
         $preventionArray = [];
 
@@ -1763,7 +1763,13 @@ class OrdersController extends Controller
         }
 
         $time = $request->input('time', null) !== null ? Carbon::parse($request->input('time')) : null;
+
+        if (in_array($labelId, LabelsHelper::LABELS_NOT_DELETABLE)) {
+            return new JsonResponse(['status' => false, 'message' => 'Label is not deletable'], 400);
+        }
+
         RemoveLabelService::removeLabels($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval, Auth::user()->id, $time);
+
         return new JsonResponse(['status' => true, 'message' => 'Label remove started'], 200);
     }
 

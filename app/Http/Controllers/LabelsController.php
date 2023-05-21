@@ -28,22 +28,15 @@ use Yajra\DataTables\Facades\DataTables;
 class LabelsController extends Controller
 {
     /**
-     * @var LabelRepository
-     */
-    protected $repository;
-
-    /** @var LabelGroupRepository */
-    protected $labelGroupRepository;
-
-    /**
      * LabelsController constructor.
      * @param LabelRepository $repository
      * @param LabelGroupRepository $labelGroupRepository
      */
-    public function __construct(LabelRepository $repository, LabelGroupRepository $labelGroupRepository)
+    public function __construct(
+        readonly protected LabelRepository $repository,
+        readonly protected LabelGroupRepository $labelGroupRepository
+    )
     {
-        $this->repository = $repository;
-        $this->labelGroupRepository = $labelGroupRepository;
     }
 
     /**
@@ -218,11 +211,7 @@ class LabelsController extends Controller
      */
     public function destroy($id)
     {
-        $label = $this->repository->find($id);
-
-        if (empty($label)) {
-            abort(404);
-        }
+        $label = Label::query()->findOrFail($id);
 
         $this->repository->delete($label->id);
 
@@ -241,6 +230,7 @@ class LabelsController extends Controller
 
     /**
      * @return JsonResponse
+     * @throws Exception
      */
     public function datatable()
     {

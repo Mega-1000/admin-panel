@@ -26,6 +26,11 @@ class OrderPaymentLabelsService
         $relatedOrdersValue = $this->orderRepository->getAllRelatedOrdersValue($order);
         $arr = [];
 
+        if ($relatedPaymentsValue == 0) {
+            $this->labelService->removeLabel($order->id, [134]);
+            return;
+        }
+
         if ($relatedPaymentsValue === $relatedOrdersValue) {
             $this->labelService->removeLabel($order->id, [134]);
             AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
