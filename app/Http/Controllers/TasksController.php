@@ -1098,7 +1098,6 @@ class TasksController extends Controller
                 }
                 if ($task->color == '008000') {
                     RemoveLabelService::removeLabels($task->order, [74], $prev, [], Auth::user()->id);
-                    AddLabelService::addLabels($task->order, [41], $prev, [], Auth::user()->id);
                 }
                 $dateTime = new Carbon($request->start);
                 $title = $task->order_id . ' - ' . $dateTime->format('d-m') . ' - ' . $task->order->warehouse_value;

@@ -52,7 +52,6 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFiveMinutes();
         $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFiveMinutes();
 
-        $schedule->job(Jobs\CheckPromisePaymentsDates::class)->everyThirtyMinutes(); // @TODO this task is very slow, for now
         // i am changing it from everyMinute to everyThirtyMinutes as rewriting would take some time, this should solve
         // queue overload issues
         $schedule->job(Jobs\ValidateSubiekt::class)->everyFiveMinutes();
@@ -82,7 +81,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\EmailSendingJob::class)->everyTenMinutes()->between('18:00', '8:00');
 
         $schedule->job(Jobs\TaskTransfersJob::class)->dailyAt("01:00");
-        
+
         $schedule->command('schenker:pull_package_dictionary')->daily();
 
     }
