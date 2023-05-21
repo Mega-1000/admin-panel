@@ -16,7 +16,7 @@ class FileInvoiceRepository
      */
     public static function getInvoiceIdFromNumber(array|string $invoiceNumber): ?int
     {
-        $invoiceFolder = 'public/invoices/';
+        $invoiceFolder = 'public/order-invoices/';
         $files = Storage::files($invoiceFolder);
 
         foreach ($files as $file) {
