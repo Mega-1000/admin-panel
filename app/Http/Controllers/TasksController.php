@@ -734,7 +734,8 @@ class TasksController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param $task
+     * @return bool
      */
     private function markTaskAsProduced($task): bool
     {
