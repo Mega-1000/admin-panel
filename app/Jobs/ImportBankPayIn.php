@@ -214,13 +214,13 @@ class ImportBankPayIn implements ShouldQueue
 
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $fileLine, $matches)) {
-                if (preg_match('/\s/', $matches[1]) || preg_match('/[a-zA-Z]/', $matches[1])) {
-                    $matches[1] = preg_replace('/\s/', '', $matches[1]);
-                    $matches[1] = preg_replace('/[a-zA-Z]/', '', $matches[1]);
+                if (preg_match('/\s/', $matches[0]) || preg_match('/[a-zA-Z]/', $matches[0])) {
+                    $matches[0] = preg_replace('/\s/', '', $matches[0]);
+                    $matches[0] = preg_replace('/[a-zA-Z]/', '', $matches[0]);
                 }
 
                 return new PayInDTO(
-                    orderId: (int)$matches[1],
+                    orderId: (int)$matches[0],
                     data: $payIn,
                     message: $pattern
                 );
