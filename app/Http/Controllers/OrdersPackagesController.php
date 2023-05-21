@@ -368,14 +368,6 @@ class OrdersPackagesController extends Controller
         }
 
         $this->saveOrderPackage($data);
-        $prev = [];
-        AddLabelService::addLabels(
-            $order,
-            ($toCheck != 0 ? [134] : [133]),
-            $prev,
-            [],
-            Auth::user()->id,
-        );
 
         if (empty($request->input('quantity')) || $request->input('quantity') <= 1) {
             return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
