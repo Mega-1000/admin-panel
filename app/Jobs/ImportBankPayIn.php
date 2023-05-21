@@ -229,8 +229,8 @@ class ImportBankPayIn implements ShouldQueue
 
         preg_match_all('/^\s*(\d(?:\s*\d)*)\s*$/', $fileLine, $matches);
 
-        if (count($matches[1])) {
-            foreach ($matches[1] as $orderId) {
+        if (count($matches[0])) {
+            foreach ($matches[0] as $orderId) {
                 $order = Order::query()->find($orderId);
 
                 if (!empty($order) && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
