@@ -209,7 +209,7 @@ class LabelsController extends Controller
      * @param $id
      * @return RedirectResponse
      */
-    public function destroy($id)
+    public function destroy($id): RedirectResponse
     {
         $label = Label::query()->findOrFail($id);
 

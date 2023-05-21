@@ -119,7 +119,7 @@ class OrderBuilder
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
             throw new Exception('missing_products');
         }
-        $order = null;
+        
         $orderExists = false;
         if (!empty($data['cart_token'])) {
             $order = Order::where('token', $data['cart_token'])->first();

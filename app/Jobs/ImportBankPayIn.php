@@ -3,17 +3,13 @@
 namespace App\Jobs;
 
 use App\DTO\PayInDTO;
-use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Transaction;
-use App\Enums\LabelEventName;
 use App\Enums\OrderTransactionEnum;
 use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
-use App\Integrations\Pocztex\paczkaPocztowaPLUSType;
-use App\Repositories\FileInvoiceRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
@@ -22,7 +18,6 @@ use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -42,19 +37,19 @@ class ImportBankPayIn implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Transaction
+     * @var TransactionRepository
      */
-    protected $transactionRepository;
+    protected TransactionRepository $transactionRepository;
 
     /**
      * @var LabelService
      */
-    protected $labelService;
+    protected LabelService $labelService;
 
     /**
      * @var UploadedFile
      */
-    protected $file;
+    protected UploadedFile $file;
 
     /**
      * ImportBankPayIn constructor.
@@ -218,6 +213,11 @@ class ImportBankPayIn implements ShouldQueue
 
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $fileLine, $matches)) {
+                if (preg_match('/\s/', $matches[1]) || preg_match('/[a-zA-Z]/', $matches[1])) {
+                    $matches[1] = preg_replace('/\s/', '', $matches[1]);
+                    $matches[1] = preg_replace('/[a-zA-Z]/', '', $matches[1]);
+                }
+
                 return new PayInDTO(
                     orderId: (int)$matches[1],
                     data: $payIn,
@@ -250,7 +250,7 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         $allegoIdPattern = '/^Platnosc za zamowienie\s+([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/';
-        if (str_contains($fileLine, 'PRAGMAGO') || preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
+        if (preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
             $order = Order::query()->where('allegro_transaction_id', $matches[0])->first();
 
             if (!empty($order)) {
