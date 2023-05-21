@@ -183,6 +183,7 @@ class ImportBankPayIn implements ShouldQueue
 
         $notPossibleOperationDescriptions = [
             'WYPŁATA PAYPRO',
+            'Wyplata PayPro',
             'Wypłata PayU',
             'INFODEMOS',
         ];
@@ -229,7 +230,7 @@ class ImportBankPayIn implements ShouldQueue
 
         preg_match_all('/^\s*(\d(?:\s*\d)*)\s*$/', $fileLine, $matches);
 
-        if (count($matches[0])) {
+        if (count($matches)) {
             foreach ($matches[0] as $orderId) {
                 $order = Order::query()->find($orderId);
 
@@ -250,7 +251,7 @@ class ImportBankPayIn implements ShouldQueue
             }
         }
 
-        $allegoIdPattern = '/^([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/';
+        $allegoIdPattern = '/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/';
         if (preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
             $order = Order::query()->where('allegro_form_id', $matches[0])->first();
 
