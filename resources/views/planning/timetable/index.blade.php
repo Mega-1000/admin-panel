@@ -344,7 +344,8 @@
                 aspectRatio: 1.8,
                 scrollTime: '7:00',
                 slotDuration: slot,
-                timeZone: 'UTC',
+                slotLabelInterval: slot,
+                timeZone: 'Europe/Warsaw',
                 minTime: minTime,
                 maxTime: maxTime,
                 locale: 'PL',
@@ -367,7 +368,7 @@
                     center: 'title changeTimeLine wholeDay twoMins fiveMins fifteenMins',
                     right: 'resourceTimelineDay,resourceTimelineThreeDays,timeGridWeek,dayGridMonth'
                 },
-                slotWidth: 15,
+                slotWidth: 50,
                 resourceAreaWidth: "5%",
                 customButtons: {
                     promptResource: {
@@ -408,7 +409,7 @@
                     },
                     wholeDay: {
                         text: 'Cała doba',
-                        click: () => renderCalendar("00:00:00", "23:59:59", document.calendarSlot)
+                        click: () => renderCalendar("00:00:00", "23:59:59", "01:00")
                     },
                     twoMins: {text: '2 minuty', click: () => renderCalendarMins("00:02")},
                     fifteenMins: {text: '15 minut', click: () => renderCalendarMins("00:15")},
