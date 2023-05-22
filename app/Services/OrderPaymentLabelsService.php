@@ -21,8 +21,8 @@ class OrderPaymentLabelsService
      */
     public function calculateLabels(Order $order): void
     {
-        $relatedPaymentsValue = $this->orderRepository->getAllRelatedOrderPaymentsValue($order);
-        $relatedOrdersValue = $this->orderRepository->getAllRelatedOrdersValue($order);
+        $relatedPaymentsValue = round($this->orderRepository->getAllRelatedOrderPaymentsValue($order), 2);
+        $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
         $arr = [];
 
         if ($relatedPaymentsValue == 0) {
