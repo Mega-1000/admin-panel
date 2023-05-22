@@ -114,7 +114,7 @@ class Orders
      *
      * @return int
      */
-    public function getOrderReturnGoods(Order $order): int
+    public function getOrderReturnGoods(Order $order): float
     {
         $payments = self::getAllRelatedOrderPayments($order);
 
