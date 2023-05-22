@@ -25,7 +25,7 @@ class OrderPaymentLabelsService
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
         $orderReturnGoods = $this->orderRepository->getOrderReturnGoods($order);
 
-        $relatedPaymentsValue += $orderReturnGoods;
+        $relatedPaymentsValue -= $orderReturnGoods;
         $arr = [];
 
         if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
