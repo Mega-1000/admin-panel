@@ -384,7 +384,9 @@ class TasksController extends Controller
 
     public function prepareCollection()
     {
-        return Task::all();
+        $collection = $this->repository->with(['user', 'warehouse', 'taskTime'])->all();
+
+        return $collection;
     }
 
     public function getTasks(GetTaskRequest $request, $id)
