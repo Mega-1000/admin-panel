@@ -23,9 +23,12 @@ class OrderPaymentLabelsService
     {
         $relatedPaymentsValue = round($this->orderRepository->getAllRelatedOrderPaymentsValue($order), 2);
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
+        $orderReturnGoods = $this->orderRepository->getOrderReturnGoods($order);
+
+        $relatedPaymentsValue += $orderReturnGoods;
         $arr = [];
 
-        if ($relatedPaymentsValue == 0) {
+        if ($this->orderRepository->getAllRelatedOrderPayments($order)->count() === 0) {
             $this->labelService->removeLabel($order->id, [134]);
             return;
         }

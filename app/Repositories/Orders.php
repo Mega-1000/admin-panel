@@ -2,8 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Entities\OrderPackage;
 use Illuminate\Support\Collection;
 use App\Entities\Order;
+use Illuminate\Support\Str;
 
 class Orders
 {
@@ -80,7 +82,7 @@ class Orders
      *
      * @return array
      */
-    private function getAllRelatedOrderPayments(Order $order): array
+    public function getAllRelatedOrderPayments(Order $order): array
     {
         $orders = self::getAllRelatedOrders($order);
 
@@ -97,10 +99,30 @@ class Orders
     }
 
     /**
-     * @param Order $order
+     * @param int $order_id
+     * @return Order
      */
     public function getOrderWithCustomer(int $order_id): Order
     {
         return Order::with(['customer','labels'])->where('id',$order_id)->first();
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return int
+     */
+    public function getOrderReturnGoods(Order $order): int
+    {
+        $payments = self::getAllRelatedOrderPayments($order);
+
+        $paymentsValue = 0;
+        foreach ($payments as $payment) {
+            if ($payment->operation_type == "Zwrot towaru") {
+                $paymentsValue += $payment->amount ?? 0;
+            }
+        }
+
+        return $paymentsValue;
     }
 }
