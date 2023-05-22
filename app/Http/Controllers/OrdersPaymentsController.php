@@ -2006,7 +2006,7 @@ class OrdersPaymentsController extends Controller
 
         DB::table('order_payments_logs')->where('id', '>', 0)->delete();
         DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');
-        DB::statement('DELETE FROM order_payments WHERE id > 0');
+        DB::statement('DELETE FROM order_payments WHERE id > 0 AND order_package_id IS NULL');
         DB::statement('ALTER TABLE order_payments AUTO_INCREMENT = 1');
         return redirect()->route('payments.index')->with(['message' => 'Płatności poprawnie wyczyszczone', 'alert-type' => 'success']);
     }
