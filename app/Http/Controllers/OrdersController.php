@@ -389,8 +389,6 @@ class OrdersController extends Controller
         $deliverers = Deliverer::all();
         $couriersTasks = $this->taskService->groupTaskByShipmentDate();
 
-
-        //return $couriersTasks;
         $customerId = $request->get('customer_id');
 
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'customerId', 'allWarehousesString'))
