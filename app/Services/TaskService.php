@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\DTO\Task\SeparatorDTO;
+use App\Entities\Label;
 use App\Entities\Task;
 use App\Entities\TaskTime;
 use App\Enums\CourierName;
@@ -12,10 +13,12 @@ use App\Repositories\TaskRepository;
 use App\Repositories\Tasks;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\TaskTimes;
+use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class TaskService
 {
@@ -264,5 +267,56 @@ class TaskService
         }
 
         return $moveTasksTime;
+    }
+
+
+    /**
+     * @param $task
+     * @return bool
+     */
+    public function markTaskAsProduced($task): bool
+    {
+        $response = null;
+        if ($task->childs->count()) {
+            $task->childs->map(function ($child) use (&$response) {
+                if ($child->order_id) {
+                    $preventionArray = [];
+                    $response = RemoveLabelService::removeLabels(
+                        $child->order,
+                        [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
+                        $preventionArray,
+                        [],
+                        Auth::user()->id
+                    );
+                }
+            });
+        } else if ($task->order_id) {
+            $preventionArray = [];
+            $response = RemoveLabelService::removeLabels(
+                $task->order,
+                [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
+                $preventionArray,
+                [],
+                Auth::user()->id
+            );
+        }
+        return array_key_exists('success', $response);
+    }
+
+    /**
+     * @param $task
+     * @return bool
+     */
+    private function closeTask(int $task_id): bool
+    {
+        $task = Task::findOrFail($open->id);
+        $end = Carbon::now();
+        $end->second = 0;
+        $task->taskTime->date_end = $end;
+        $task->status = Task::FINISHED;
+        $task->taskTime->save();
+        $task->save();
+
+        return true;
     }
 }
