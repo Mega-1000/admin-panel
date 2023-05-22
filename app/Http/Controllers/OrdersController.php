@@ -891,18 +891,23 @@ class OrdersController extends Controller
         $skip = $data['skip'] ?? 0;
 
         $user = Auth::user();
-
         $open = $this->taskService->getOpenUserTask($user->id);
-
-        $task = $this->taskService->prepareTask($data['package_type'], $skip);
-
-        if ($open->count()) {
-            $this->unlinkLockFile();
-            return redirect()->back()->with([
-                'message' => 'Ostatnie pobrane zadanie to numer: ' . $open->first()->order_id . ' i nie zostało zamkniete. Zamknij zadanie aby pobrać kolejne',
-                'alert-type' => 'error',
-            ]);
+        
+        if ($open->count() > 0)
+        {
+            $response = $this->taskService->markTaskAsProduced($open->first());
+            if ($response === false)
+            {
+                $this->unlinkLockFile();
+                return redirect()->back()->with([
+                    'message' => 'Brak pozycji lub stanu magazynowego dla produktu w zamówieniu: ' . $open->first()->order_id,
+                    'alert-type' => 'error',
+                    'stock-response' => [],
+                ]);
+            }
+            $this->taskService->closeTask($open->first()->id);
         }
+        $task = $this->taskService->prepareTask($data['package_type'], $skip);
 
         if ($task === null) {
             $this->unlinkLockFile();

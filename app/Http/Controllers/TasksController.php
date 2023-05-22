@@ -703,7 +703,7 @@ class TasksController extends Controller
             $task->status = Task::FINISHED;
             $task->taskTime->save();
 
-            $response = $this->markTaskAsProduced($task);
+            $response = $this->taskService->markTaskAsProduced($task);
             if ($response === false) {
                 return redirect()->back()->with([
                     'message' => __('tasks.messages.stocks_invalid'),
@@ -731,39 +731,6 @@ class TasksController extends Controller
             'message' => __('tasks.messages.update'),
             'alert-type' => 'success'
         ]);
-    }
-
-    /**
-     * @param $task
-     * @return bool
-     */
-    private function markTaskAsProduced($task): bool
-    {
-        $response = null;
-        if ($task->childs->count()) {
-            $task->childs->map(function ($child) use (&$response) {
-                if ($child->order_id) {
-                    $preventionArray = [];
-                    $response = RemoveLabelService::removeLabels(
-                        $child->order,
-                        [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
-                        $preventionArray,
-                        [],
-                        Auth::user()->id
-                    );
-                }
-            });
-        } else if ($task->order_id) {
-            $preventionArray = [];
-            $response = RemoveLabelService::removeLabels(
-                $task->order,
-                [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
-                $preventionArray,
-                [],
-                Auth::user()->id
-            );
-        }
-        return array_key_exists('success', $response);
     }
 
     public function deny(DenyTaskRequest $request)
@@ -841,7 +808,7 @@ class TasksController extends Controller
         if ($request->id) {
             try {
                 $task = Task::findOrFail($request->id);
-                $this->markTaskAsProduced($task);
+                $this->taskService->markTaskAsProduced($task);
             } catch (Exception $e) {
                 return response(['error' => true, 'message' => 'Nie znaleziono zadania']);
             }
