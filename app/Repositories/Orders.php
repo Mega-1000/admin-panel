@@ -71,7 +71,9 @@ class Orders
 
         $paymentsValue = 0;
         foreach ($payments as $order) {
-            $paymentsValue += $order->amount ?? $order->declared_sum ?? 0;
+            if ($order->operation_type != "Zwrot towaru") {
+                $paymentsValue += $order->amount ?? $order->declared_sum ?? 0;
+            }
         }
 
         return $paymentsValue;
