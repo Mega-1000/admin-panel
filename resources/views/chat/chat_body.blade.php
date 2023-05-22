@@ -9,8 +9,6 @@
                     @include ('chat/single_message', ['message' => $message])
                 @endif
             @endforeach
-        @else
-            Brak wiadomości...
         @endif
     </div>
 </div>

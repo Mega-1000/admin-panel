@@ -24,6 +24,7 @@ return [
     'name' => env('APP_NAME', 'EPH Polska'),
     'domain_name' => env('DOMAIN_NAME', 'https://admin.mega1000.pl/'),
     'debug_query' => env('DEBUG_QUERY', false),
+    'allegro_login' => env('ALLEGRO_LOGIN', 'ephpolska'),
     /*
     |--------------------------------------------------------------------------
     | Application Environment
