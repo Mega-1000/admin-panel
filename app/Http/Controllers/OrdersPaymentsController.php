@@ -117,7 +117,7 @@ class OrdersPaymentsController extends Controller
      */
     public function edit(int $id)
     {
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
+//        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $customerOrders = $orderPayment->order->customer->orders;
         $firms = Firm::all();
