@@ -891,12 +891,13 @@ class OrdersController extends Controller
         $skip = $data['skip'] ?? 0;
 
         $user = Auth::user();
-
         $open = $this->taskService->getOpenUserTask($user->id);
-
-        if($open){
+        
+        if ($open->count() > 0)
+        {
             $response = $this->taskService->markTaskAsProduced($open->first());
-            if ($response === false) {
+            if ($response === false)
+            {
                 $this->unlinkLockFile();
                 return redirect()->back()->with([
                     'message' => 'Brak pozycji lub stanu magazynowego dla produktu w zamówieniu: ' . $open->first()->order_id,
