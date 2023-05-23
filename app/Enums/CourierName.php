@@ -40,13 +40,17 @@ final class CourierName extends Enum
      * Deliveries types for task grouping
      */
     const DELIVERY_TYPE_FOR_TASKS = [
-        self::GLS => [self::GLS],
-        self::DPD => [self::DPD],
-        self::POCZTEX => [self::POCZTEX],
         self::INPOST => [self::INPOST, self::ALLEGRO_INPOST],
+        self::ALLEGRO_INPOST => [self::ALLEGRO_INPOST],
+        self::DPD => [self::DPD],
+        self::APACZKA => [self::APACZKA],
+        self::POCZTEX => [self::POCZTEX],
+        self::JAS => [self::JAS],
+        self::GLS => [self::GLS],
         self::ODBIOR_OSOBISTY => [self::ODBIOR_OSOBISTY],
         self::GIELDA => [self::GIELDA],
         self::DB_SCHENKER => [self::DB_SCHENKER],
+        self::PACZKOMAT => [self::PACZKOMAT],
     ];
 
     const DELIVERY_TYPE_TO_SEND_PACKAGE = [

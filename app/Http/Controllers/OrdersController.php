@@ -834,7 +834,7 @@ class OrdersController extends Controller
 
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
         if ($this->putLockFile() === false) {
-            return response(['error' => 'file_exist']);
+            // return response(['error' => 'file_exist']);
         }
 
         try {
@@ -886,7 +886,7 @@ class OrdersController extends Controller
 
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
         if ($this->putLockFile() === false) {
-            return response(['error' => 'file_exist']);
+            // return response(['error' => 'file_exist']);
         }
         $skip = $data['skip'] ?? 0;
 
@@ -2623,7 +2623,7 @@ class OrdersController extends Controller
         $lockName = 'file.lock';
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
         if (File::exists(public_path($lockName))) {
-            return response(['error' => 'file_exist']);
+            // return response(['error' => 'file_exist']);
         }
         file_put_contents($lockName, '');
         $data = $request->all();
