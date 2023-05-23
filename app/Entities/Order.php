@@ -285,7 +285,7 @@ class Order extends Model implements Transformable
         if (floatval($this->payments()->where('promise', '=', '')->sum("amount")) > 2) {
             $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
         } else {
-            $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '1')->sum("amount"));
+            $totalPaymentAmount = floatval($this->payments()->where('declared_sum', '!=', null)->sum("declared_sum"));
         }
         if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
             return 0;
