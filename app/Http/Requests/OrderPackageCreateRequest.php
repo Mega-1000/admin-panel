@@ -50,6 +50,7 @@ class OrderPackageCreateRequest extends FormRequest
             'toCheck' => 'nullable',
             'protection_method' => 'required|max:20',
             'services' => 'nullable',
+            'additional_cash_on_delivery_cost' => 'required|integer',
         ];
     }
 }
