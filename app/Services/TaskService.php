@@ -309,7 +309,7 @@ class TaskService
      */
     public function closeTask(int $task_id): bool
     {
-        $task = Task::findOrFail($open->id);
+        $task = Task::findOrFail($task_id);
         $end = Carbon::now();
         $end->second = 0;
         $task->taskTime->date_end = $end;
