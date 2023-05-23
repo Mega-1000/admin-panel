@@ -77,8 +77,15 @@ class Helper
 
     public static function phoneIsCorrect($number): bool
     {
-        $number = str_replace(' ', '', $number);
+        // Usuń spacje, myślniki i inne znaki specjalne z numeru telefonu
+        $number = preg_replace('/\D/', '', $number);
         $number = str_replace('+48', '', $number);
+
+        // Sprawdź, czy numer telefonu składa się tylko z cyfr 
+        if (!preg_match('/^\d+$/', $number)) 
+        {
+            return false; 
+        }
 
         $len = strlen($number);
 
