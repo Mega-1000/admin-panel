@@ -207,7 +207,11 @@ class TasksController extends Controller
             }
             $task->update($dataToStore);
             $task->taskTime->update($request->all());
-            $task->taskSalaryDetail->update($request->all());
+            if ($task->taskSalaryDetail == null) {
+                $task->taskSalaryDetail()->create($request->all());
+            } else {
+                $task->taskSalaryDetail->update($request->all());
+            }
             if ($request->order_id !== null) {
                 $orderItemKMD = 0;
                 $totalPrice = $task->order->total_price;
@@ -713,12 +717,12 @@ class TasksController extends Controller
             }
             $task->save();
             if ($request->warehouse_notice) {
-                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user_id, $request->warehouse_notice);
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
                 $task->taskSalaryDetail->save();
             }
 
             if ($request->description !== '') {
-                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user_id, $request->description);
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->description);
                 $task->taskSalaryDetail->save();
             }
         } catch (Exception $e) {
