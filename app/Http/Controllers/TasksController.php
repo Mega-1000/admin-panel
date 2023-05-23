@@ -713,12 +713,12 @@ class TasksController extends Controller
             }
             $task->save();
             if ($request->warehouse_notice) {
-                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user_id, $request->warehouse_notice);
                 $task->taskSalaryDetail->save();
             }
 
             if ($request->description !== '') {
-                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->description);
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user_id, $request->description);
                 $task->taskSalaryDetail->save();
             }
         } catch (Exception $e) {
