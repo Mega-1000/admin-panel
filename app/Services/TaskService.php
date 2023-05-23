@@ -307,7 +307,7 @@ class TaskService
      * @param $task
      * @return bool
      */
-    private function closeTask(int $task_id): bool
+    public function closeTask(int $task_id): bool
     {
         $task = Task::findOrFail($open->id);
         $end = Carbon::now();
