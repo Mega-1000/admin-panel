@@ -894,11 +894,14 @@ class OrdersController extends Controller
         $skip = $data['skip'] ?? 0;
 
         $user = Auth::user();
+        $user = User::find(2);
         $open = $this->taskService->getOpenUserTask($user->id);
         
         Log::info("start automat");
+        
         if ($open->count() > 0)
         {
+            
             $response = $this->taskService->markTaskAsProduced($open->first());
             if ($response === false)
             {
@@ -911,8 +914,9 @@ class OrdersController extends Controller
             }
             $this->taskService->closeTask($open->first()->id);
         }
-        $task = $this->taskService->prepareTask($data['package_type'], $skip);
-
+        
+        $task = $this->taskService->prepareAutoTask($data['package_type'], $skip);
+        
         if ($task === null) {
             $this->unlinkLockFile();
             return redirect()->back()->with([

@@ -94,6 +94,41 @@ class TaskService
     }
 
     /**
+     * Prepare Auto task for handling
+     *
+     * @param $package_type
+     * @param $skip
+     * @return Task|null
+     * @throws Exception
+     */
+    public function prepareAutoTask($package_type, $skip)//: ?Task
+    {
+        $courierArray = CourierName::DELIVERY_TYPE_FOR_TASKS[$package_type] ?? [];
+        if (empty($courierArray)) {
+            throw new Exception(__('order_packages.message.package_error'));
+        }
+        
+        $groupTask = $this->groupTaskByShipmentDate()[$package_type];
+        $past = $groupTask['past'];
+        $future = $groupTask['future'];
+        if(count($past)>0){
+            return $past[0];
+        }
+        unset($groupTask['past']);
+        unset($groupTask['future']);
+        foreach($groupTask as $date => $tasks){
+            if(count($tasks)>0){
+                return $tasks[0];
+            }
+        }
+
+        if(count($future)>0){
+            return $future[0];
+        }
+
+        return null;
+    }
+    /**
      * Prepare task for handling
      *
      * @return SeparatorDTO[]
