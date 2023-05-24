@@ -218,7 +218,7 @@
         @foreach($order->items as $item)
         $('#undamaged-{{$loop->iteration}}').on('change', function () {
             const undamaged = $(this).val();
-            const sum = Math.round((undamaged * {{$item->gross_selling_price_commercial_unit}}) * 100) / 100;
+            const sum = undamaged * {{$item->gross_selling_price_commercial_unit}};
 
             $('#sum-of-return-{{$loop->iteration}}').val(sum);
         });
