@@ -114,11 +114,6 @@ class EmailSendingService
 
     public function getEmail(Order $order): string
     {
-        if($order->allegro_form_id){
-            $allegroOrder = AllegroOrder::where('order_id',$order->allegro_form_id)->get();
-            return $allegroOrder->first()->buyer_email;
-        }
-
         return $order->customer->login;
     }
 
