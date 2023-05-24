@@ -193,7 +193,7 @@ class OrdersController extends Controller
     public function newOrder(StoreOrderRequest $request, ProductService $productService): JsonResponse
     {
         $data = $request->all();
-        $customer = Customer::query()->where('login', $data['customer_login'])->first();
+        $customer = Customer::where('login', $data['customer_login'])->first();
         $customer = $customer ?? auth()->guard('api')->user();
 
         if ($customer === null && array_key_exists('customer_login', $data)) {
