@@ -14,13 +14,13 @@ use App\Repositories\TaskRepository;
 use App\Repositories\Tasks;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\TaskTimes;
+use App\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
 class TaskTimeService
 {
-    const USER_ID = 37;
 
     public function __construct(
         protected readonly TaskRepository     $taskRepository,
@@ -41,13 +41,13 @@ class TaskTimeService
     public function saveTaskToPlanner(Order $order, int $warehouse_id): int
     {
         $date = Carbon::today();
-        $start_date = $this->getTimeLastNowTask(self::USER_ID);
+        $start_date = $this->getTimeLastNowTask(USER::MAGAZYN_OLAWA_ID);
         $start = Carbon::parse($date->format('Y-m-d') . ' ' . $start_date);
         $end = Carbon::parse($date->format('Y-m-d') . ' ' . $start_date)->addMinutes(2);
 
         $task = Task::create([
             'warehouse_id' => $warehouse_id,
-            'user_id' => self::USER_ID,
+            'user_id' => USER::MAGAZYN_OLAWA_ID,
             'name' => $order->id !== null ? $order->id : null,
             'created_by' => Auth::user()->id,
             'color' => '194775',

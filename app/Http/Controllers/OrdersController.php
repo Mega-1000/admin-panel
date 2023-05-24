@@ -900,7 +900,6 @@ class OrdersController extends Controller
         
         if ($open->count() > 0)
         {
-            
             $response = $this->taskService->markTaskAsProduced($open->first());
             if ($response === false)
             {
