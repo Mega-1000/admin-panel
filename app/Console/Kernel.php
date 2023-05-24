@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        
         $schedule->job(Jobs\CheckStatusInpostPackagesJob::class)->everyFiveMinutes();
 
         $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFiveMinutes()->between('13:00', '16:00');

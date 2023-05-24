@@ -182,7 +182,7 @@ class TaskService
     /**
      * Transfers Task
      */
-    public function transfersTask(): void
+    public function transfersTask(): bool
     {
         $today = Carbon::today();
         foreach (self::USERS_SEPARATOR as $user_id) {
@@ -192,6 +192,8 @@ class TaskService
                 $time_start = $this->prepareTransfersTask($user_id, $color, $time_start);
             }
         }
+
+        return true;
     }
 
     /**
@@ -242,7 +244,7 @@ class TaskService
         $taskTime = TaskTimes::getTimeLastTask($user_id, $date);
         $firstTaskTime = $taskTime->first();
 
-        return $firstTaskTime?->date_end?->format('H:i:s') ?? TaskTime::TIME_START;
+        return ($firstTaskTime) ? Carbon::parse($firstTaskTime->date_end)->format('H:i:s') : TaskTime::TIME_START;
     }
 
     /**

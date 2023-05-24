@@ -14,20 +14,13 @@ class TaskTransfersJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $taskService;
-
-    public function __construct(TaskService $taskService)
-    {
-        $this->taskService = $taskService;
-    }
-
     /**
      * Execute the job.
      *
      * @return void
      */
-    public function handle()
+    public function handle(TaskService $taskService)
     {
-       $this->taskService->transfersTask();
+       $taskService->transfersTask();
     }
 }
