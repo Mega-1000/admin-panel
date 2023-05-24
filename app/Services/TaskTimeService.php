@@ -44,11 +44,11 @@ class TaskTimeService
         $end = Carbon::parse($date->format('Y-m-d') . ' ' . $start_date)->addMinutes(2);
 
         $task = Task::create([
-            'user_id' => $user_id,
+            'warehouse_id' => $user_id,
+            'user_id' => 37,
             'name' => $order->id !== null ? $order->id : null,
             'created_by' => Auth::user()->id,
             'color' => '194775',
-            'warehouse_id' => 16,
             'status' => 'WAITING_FOR_ACCEPT',
             'order_id' => $order->id !== null ? $order->id : null
         ]);
