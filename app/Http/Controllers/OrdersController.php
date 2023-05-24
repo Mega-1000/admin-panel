@@ -894,7 +894,6 @@ class OrdersController extends Controller
         $skip = $data['skip'] ?? 0;
 
         $user = Auth::user();
-        $user = User::find(2);
         $open = $this->taskService->getOpenUserTask($user->id);
         
         Log::info("start automat");
@@ -916,7 +915,7 @@ class OrdersController extends Controller
         }
         
         $task = $this->taskService->prepareAutoTask($data['package_type'], $skip);
-        
+
         if ($task === null) {
             $this->unlinkLockFile();
             return redirect()->back()->with([
