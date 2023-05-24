@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-
 use App\DTO\Task\SeparatorDTO;
 use App\Entities\Label;
 use App\Entities\Task;
@@ -23,9 +22,9 @@ use Illuminate\Support\Facades\Log;
 
 class TaskService
 {
-    const USERS_SEPARATOR = [36, 37, 38];
+    public const USERS_SEPARATOR = [36, 37, 38];
 
-    const COLOR_SEPARATOR = ['FF0000', 'E6C74D', '194775'];
+    public const COLOR_SEPARATOR = ['FF0000', 'E6C74D', '194775'];
 
     public function __construct(
         protected readonly TaskRepository     $taskRepository,
@@ -34,8 +33,7 @@ class TaskService
         protected readonly TaskTimeService    $taskTimeService,
         protected readonly TaskTimes          $taskTimesRepository,
         protected readonly Couriers           $couriersRepository
-    )
-    {
+    ) {
     }
 
     /**
@@ -96,8 +94,8 @@ class TaskService
     /**
      * Prepare Auto task for handling
      *
-     * @param $package_type
-     * @param $skip
+     * @param string $package_type
+     * @param int $skip
      * @return Task|null
      * @throws Exception
      */
@@ -107,24 +105,25 @@ class TaskService
         if (empty($courierArray)) {
             throw new Exception(__('order_packages.message.package_error'));
         }
-        
+
         $groupTask = $this->groupTaskByShipmentDate()[$package_type];
 
         $past = $groupTask['past'];
         $future = $groupTask['future'];
-        if(count($past)>0){
+        if (count($past)>0) {
             return $past[0];
         }
         unset($groupTask['past']);
         unset($groupTask['future']);
-        foreach($groupTask as $date => $tasks){
-            if(count($tasks)>0){
+        foreach ($groupTask as $date => $tasks) {
+            if (count($tasks)>0) {
                 return $tasks[0];
             }
         }
 
         return count($future) > 0 ? $future[0] : null;
     }
+
     /**
      * Prepare task for handling
      *
@@ -251,7 +250,6 @@ class TaskService
         $separatorDate = $this->getUserSeparator($user_id, $date);
 
         if ($time >= $separatorDate) {
-
             $taskTimes = TaskTimes::getMoveTask($user_id, $date);
 
             foreach ($taskTimes as $taskTime) {
@@ -323,7 +321,7 @@ class TaskService
                     );
                 }
             });
-        } else if ($task->order_id) {
+        } elseif ($task->order_id) {
             $preventionArray = [];
             $response = RemoveLabelService::removeLabels(
                 $task->order,
@@ -342,7 +340,6 @@ class TaskService
      */
     public function closeTask(int $task_id): bool
     {
-
         $task = Task::findOrFail($task_id);
         $end = Carbon::now();
         $end->second = 0;
