@@ -101,7 +101,7 @@ class TaskService
      * @return Task|null
      * @throws Exception
      */
-    public function prepareAutoTask($package_type, $skip)//: ?Task
+    public function prepareAutoTask($package_type, $skip): ?Task
     {
         $courierArray = CourierName::DELIVERY_TYPE_FOR_TASKS[$package_type] ?? [];
         if (empty($courierArray)) {
@@ -109,6 +109,7 @@ class TaskService
         }
         
         $groupTask = $this->groupTaskByShipmentDate()[$package_type];
+
         $past = $groupTask['past'];
         $future = $groupTask['future'];
         if(count($past)>0){
