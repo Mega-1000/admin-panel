@@ -19,6 +19,7 @@ use Carbon\CarbonPeriod;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TaskService
 {
@@ -309,6 +310,7 @@ class TaskService
      */
     public function closeTask(int $task_id): bool
     {
+
         $task = Task::findOrFail($task_id);
         $end = Carbon::now();
         $end->second = 0;
@@ -317,6 +319,7 @@ class TaskService
         $task->taskTime->save();
         $task->save();
 
+        Log::info("Zadanie ". $task_id ." zostało zamknięte: ". $end);
         return true;
     }
 }

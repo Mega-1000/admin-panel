@@ -805,6 +805,9 @@ class OrdersController extends Controller
             'id' => $user_id,
             'user_id' => $user_id
         ];
+
+        Log::info('Zadanie: '. $task->id .', ustawionie start: '.$dt->toDateTimeString());
+
         foreach ($similar as $order_id) {
             $prev = [];
             /** @var Order $order */
@@ -893,6 +896,7 @@ class OrdersController extends Controller
         $user = Auth::user();
         $open = $this->taskService->getOpenUserTask($user->id);
         
+        Log::info("start automat");
         if ($open->count() > 0)
         {
             $response = $this->taskService->markTaskAsProduced($open->first());
@@ -921,7 +925,7 @@ class OrdersController extends Controller
 
         if (!$user->can_decline) {
             $this->attachTaskForUser($task, $user->id, $ordersSimilar);
-            $this->taskService->movingTasksBackward($task);
+            //$this->taskService->movingTasksBackward($task);
         }
         $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
@@ -932,6 +936,7 @@ class OrdersController extends Controller
             ]);
         }
 
+        Log::info("stop automat");
         $view = view('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
         return response($views . $view, 200);
 

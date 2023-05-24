@@ -1193,7 +1193,7 @@ class TasksController extends Controller
     public function getTask(int $id): JsonResponse
     {
         $task = Tasks::getTaskLabel($id);
-
+        
         if ($task === null) {
             abort(404);
         }
