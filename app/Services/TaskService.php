@@ -101,7 +101,7 @@ class TaskService
      * @return Task|null
      * @throws Exception
      */
-    public function prepareAutoTask($package_type, $skip): ?Task
+    public function prepareAutoTask(string $package_type, int $skip): ?Task
     {
         $courierArray = CourierName::DELIVERY_TYPE_FOR_TASKS[$package_type] ?? [];
         if (empty($courierArray)) {
@@ -123,11 +123,7 @@ class TaskService
             }
         }
 
-        if(count($future)>0){
-            return $future[0];
-        }
-
-        return null;
+        return count($future) > 0 ? $future[0] : null;
     }
     /**
      * Prepare task for handling
@@ -182,7 +178,7 @@ class TaskService
     /**
      * Transfers Task
      */
-    public function transfersTask(): bool
+    public function transfersTask(): void
     {
         $today = Carbon::today();
         foreach (self::USERS_SEPARATOR as $user_id) {
@@ -192,8 +188,6 @@ class TaskService
                 $time_start = $this->prepareTransfersTask($user_id, $color, $time_start);
             }
         }
-
-        return true;
     }
 
     /**
