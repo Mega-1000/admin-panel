@@ -277,7 +277,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return bool
+     * @return float|int
      */
     public function toPay()
     {
