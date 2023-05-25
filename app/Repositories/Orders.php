@@ -45,10 +45,16 @@ class Orders
      */
     public static function getAllRelatedOrders(Order $order): Collection
     {
-        return Order::where('master_order_id', $order->id)
-            ->orWhere('id', $order->id)
-            ->with('payments')
-            ->get();
+        if (Order::where('master_order_id', $order->id)->orWhere('id', $order->master_order_id)->get()->count() > 0) {
+            return Order::where('master_order_id', $order->id)
+                ->orWhere('id', $order->master_order_id)
+                ->orWhere('master_order_id', $order->master_order_id)
+                ->orWhere('id', $order->id)
+                ->with('payments')
+                ->get();
+        }
+
+        return new Collection([$order]);
     }
 
     public static function getAllRelatedOrdersValue(Order $order): float

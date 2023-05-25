@@ -1193,7 +1193,7 @@
                 $('#print-package-group').modal('hide');
             }, 5000);
         });
-        
+
         $('.print-group .print-list').click(function(){
             $('#print-package-type').val($(this).attr('name'));
             let opt = $(this).data('couriertasks');
@@ -2172,7 +2172,7 @@
 
                                 if (parsedAmount < 0 && payment.operation_type !== "Zwrot towaru") {
                                     totalOfReturns -= parsedAmount ?? parsedDeclaredAmount;
-                                } else if (parsedAmount) {
+                                } else if (parsedAmount && parsedAmount > 0) {
                                     totalOfPayments += parsedAmount;
                                 } else if (!parsedAmount && parsedDeclaredAmount > 0) {
                                     totalOfDeclaredPayments += status === 'Rozliczona deklarowana' ? 0 : parsedDeclaredAmount;
