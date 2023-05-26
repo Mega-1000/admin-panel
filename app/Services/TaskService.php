@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-
 use App\DTO\Task\SeparatorDTO;
 use App\Entities\Label;
 use App\Entities\Task;
@@ -19,12 +18,13 @@ use Carbon\CarbonPeriod;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TaskService
 {
-    const USERS_SEPARATOR = [36, 37, 38];
+    public const USERS_SEPARATOR = [36, 37, 38];
 
-    const COLOR_SEPARATOR = ['FF0000', 'E6C74D', '194775'];
+    public const COLOR_SEPARATOR = ['FF0000', 'E6C74D', '194775'];
 
     public function __construct(
         protected readonly TaskRepository     $taskRepository,
@@ -33,8 +33,7 @@ class TaskService
         protected readonly TaskTimeService    $taskTimeService,
         protected readonly TaskTimes          $taskTimesRepository,
         protected readonly Couriers           $couriersRepository
-    )
-    {
+    ) {
     }
 
     /**
@@ -90,6 +89,39 @@ class TaskService
             throw new Exception(__('order_packages.message.package_error'));
         }
         return Tasks::getWarehouseUserWithBlueHammerLabelQuery($courierArray)->offset($skip)->first();
+    }
+
+    /**
+     * Prepare Auto task for handling
+     *
+     * @param string $package_type
+     * @param int $skip
+     * @return Task|null
+     * @throws Exception
+     */
+    public function prepareAutoTask(string $package_type, int $skip): ?Task
+    {
+        $courierArray = CourierName::DELIVERY_TYPE_FOR_TASKS[$package_type] ?? [];
+        if (empty($courierArray)) {
+            throw new Exception(__('order_packages.message.package_error'));
+        }
+
+        $groupTask = $this->groupTaskByShipmentDate()[$package_type];
+
+        $past = $groupTask['past'];
+        $future = $groupTask['future'];
+        if (count($past)>0) {
+            return $past[0];
+        }
+        unset($groupTask['past']);
+        unset($groupTask['future']);
+        foreach ($groupTask as $date => $tasks) {
+            if (count($tasks)>0) {
+                return $tasks[0];
+            }
+        }
+
+        return count($future) > 0 ? $future[0] : null;
     }
 
     /**
@@ -205,7 +237,7 @@ class TaskService
         $taskTime = TaskTimes::getTimeLastTask($user_id, $date);
         $firstTaskTime = $taskTime->first();
 
-        return $firstTaskTime?->date_end?->format('H:i:s') ?? TaskTime::TIME_START;
+        return ($firstTaskTime) ? Carbon::parse($firstTaskTime->date_end)->format('H:i:s') : TaskTime::TIME_START;
     }
 
     /**
@@ -218,7 +250,6 @@ class TaskService
         $separatorDate = $this->getUserSeparator($user_id, $date);
 
         if ($time >= $separatorDate) {
-
             $taskTimes = TaskTimes::getMoveTask($user_id, $date);
 
             foreach ($taskTimes as $taskTime) {
@@ -290,7 +321,7 @@ class TaskService
                     );
                 }
             });
-        } else if ($task->order_id) {
+        } elseif ($task->order_id) {
             $preventionArray = [];
             $response = RemoveLabelService::removeLabels(
                 $task->order,
@@ -317,6 +348,7 @@ class TaskService
         $task->taskTime->save();
         $task->save();
 
+        Log::info("Zadanie ". $task_id ." zostało zamknięte: ". $end);
         return true;
     }
 }

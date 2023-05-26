@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
+use Carbon\Carbon;
+
 /**
  * Class TaskTime.
  *
@@ -44,4 +46,13 @@ class TaskTime extends Model implements Transformable
         return $this->belongsTo(Task::class);
     }
 
+    public function getDateStartAttribute($value)
+    {
+        return Carbon::parse($value)->timezone('Europe/Warsaw')->format('Y-m-d H:i:s');
+    }
+
+    public function getDateEndAttribute($value)
+    {
+        return Carbon::parse($value)->timezone('Europe/Warsaw')->format('Y-m-d H:i:s');
+    }
 }

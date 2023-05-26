@@ -14,12 +14,14 @@ use App\Repositories\TaskRepository;
 use App\Repositories\Tasks;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\TaskTimes;
+use App\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
 class TaskTimeService
 {
+
     public function __construct(
         protected readonly TaskRepository     $taskRepository,
         protected readonly TaskTimeRepository $taskTimeRepository,
@@ -33,22 +35,22 @@ class TaskTimeService
      * add task to planer
      *
      * @param Order $order
-     * @param int $user_id
+     * @param int $warehouse_id
      * @return int
      */
-    public function saveTaskToPlanner(Order $order, int $user_id): int
+    public function saveTaskToPlanner(Order $order, int $warehouse_id): int
     {
         $date = Carbon::today();
-        $start_date = $this->getTimeLastNowTask($user_id);
+        $start_date = $this->getTimeLastNowTask(USER::MAGAZYN_OLAWA_ID);
         $start = Carbon::parse($date->format('Y-m-d') . ' ' . $start_date);
         $end = Carbon::parse($date->format('Y-m-d') . ' ' . $start_date)->addMinutes(2);
 
         $task = Task::create([
-            'user_id' => $user_id,
+            'warehouse_id' => $warehouse_id,
+            'user_id' => USER::MAGAZYN_OLAWA_ID,
             'name' => $order->id !== null ? $order->id : null,
             'created_by' => Auth::user()->id,
             'color' => '194775',
-            'warehouse_id' => 16,
             'status' => 'WAITING_FOR_ACCEPT',
             'order_id' => $order->id !== null ? $order->id : null
         ]);
