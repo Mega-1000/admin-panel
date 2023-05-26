@@ -1830,7 +1830,9 @@ class OrdersPaymentsController extends Controller
             false
         );
 
-        $deleted = $this->repository->delete($id);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $deleted = DB::table('order_payments')->where('id', $id)->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         if (empty($deleted)) {
             return redirect()->back()->with([
