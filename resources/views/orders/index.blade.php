@@ -2166,7 +2166,7 @@
                                     returnedValue += parsedAmount;
                                 }
 
-                                if (payment.deleted_at[0] !== '-') {
+                                if (payment.deleted_at[0] !== null) {
                                     return;
                                 }
 
