@@ -38,6 +38,9 @@
                 <span class="icon voyager-info-circled"></span>
                 <strong class="chat-icon-wrapper-counter need-support-icon-counter hidden">0</strong>
             </div>
+            <div class="mt-4">
+                {{ DB::table('jobs')->count() }}
+            </div>
             <div class="chat-icon-wrapper allegro-dispute-icon-wrapper">
                 <span class="icon voyager-bell"></span>
                 <strong class="chat-icon-wrapper-counter allegro-dispute-icon-counter hidden">0</strong>
