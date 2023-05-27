@@ -287,8 +287,7 @@ class MessagesHelper
         $blankChatUser = $this->createOrGetBlankUser($chat);
 
         $content = "Witamy!
-                        Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
-                        Zajmuje to zwykle do kilku minut.";
+                        W czym możemy pomóc?";
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
 
         $this->cache['chat'] = $chat;
@@ -383,10 +382,10 @@ class MessagesHelper
                 $singleUser->save();
             }
         }
-
         if ($chat->order) {
-            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null) {
+            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null && $chatUser->customer_id !== null) {
                 $chat->order->need_support = true;
+                $this->sendWaitingMessage($chat);
                 $chat->order->save();
             }
             if ($chatUser->user) {
@@ -414,8 +413,10 @@ class MessagesHelper
             }
             WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
         } else {
-            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null) {
+            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null && $chatUser->customer_id !== null) {
+
                 $chat->need_intervention = true;
+                $this->sendWaitingMessage($chat);
                 $chat->save();
             }
         }
@@ -431,6 +432,22 @@ class MessagesHelper
         (new ChatNotificationJob($chat->id, $email, $chatUser->id))->handle();
 
         return $msg;
+    }
+
+    /**
+     * Send waiting message on chat
+     *
+     * @param  Chat $chat
+     *
+     * @return void
+     */
+    private function sendWaitingMessage(Chat $chat)
+    {
+        $content = "Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
+                    Zajmuje to zwykle do kilku minut.";
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+        
+        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
 
     private function getAdminChatUser($secondTry = false)
@@ -597,12 +614,6 @@ class MessagesHelper
             return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
         }
         return 'Chat ogólny z administracją EPH POLSKA';
-    }
-
-    private function clearIntervention($chat)
-    {
-        $chat->need_intervention = false;
-        $chat->save();
     }
 
     /**

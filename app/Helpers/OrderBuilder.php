@@ -167,7 +167,6 @@ class OrderBuilder
                 $helper->addMessage($data['customer_notices']);
             }
             $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
-            $order->need_support = true;
         }
         $this->assignItemsToOrder($order, $data['order_items']);
 
