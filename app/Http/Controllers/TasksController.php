@@ -1290,11 +1290,12 @@ class TasksController extends Controller
     /**
      * @param AddingTaskToPlanerRequest $request
      */
-    public function saveTaskToPlanner(AddingTaskToPlanerRequest $request): RedirectResponse
+    public function saveTaskToPlanner(AddingTaskToPlanerRequest $request)//: RedirectResponse
     {
         $data = $request->validated();
         $order = $this->ordersRepository->getOrderWithCustomer($data['order_id']);
-        $firm = Firm::where('name', $data['delivery_warehouse'])->first();
+        $firm = Firm::where('id', $data['delivery_warehouse'])->first();
+
         $this->taskTimeService->saveTaskToPlanner($order, $firm->id);
 
         return redirect()->route('planning.tasks.index')->with([

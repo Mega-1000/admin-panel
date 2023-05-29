@@ -73,7 +73,7 @@ class TaskTimeService
         $taskTime = TaskTimes::getTimeLastNowTask($user_id, $date);
         $firstTaskTime = $taskTime->first();
 
-        return $firstTaskTime?->date_end?->format('H:i:s') ?? Carbon::now()->format('H:i:s');
+        return ($firstTaskTime) ? Carbon::parse($firstTaskTime->date_end)->format('H:i:s') : Carbon::now()->format('H:i:s');
     }
 
     /**
