@@ -222,13 +222,13 @@ class Order extends Model implements Transformable
     /**
      * @return float
      */
-    public function getSumOfGrossValues()
+    public function getSumOfGrossValues(): float
     {
         $totalOfProductsPrices = 0;
 
         if (count($this->items)) {
             foreach ($this->items as $item) {
-                $totalOfProductsPrices += $item->gross_selling_price_commercial_unit * intval($item->quantity);
+                $totalOfProductsPrices += $item->gross_selling_price_commercial_unit * $item->quantity;
             }
         }
 
@@ -246,7 +246,7 @@ class Order extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function payments()
+    public function payments(): HasMany
     {
         return $this->hasMany(OrderPayment::class);
     }
@@ -267,7 +267,7 @@ class Order extends Model implements Transformable
     /**
      * @return bool
      */
-    public function isPaymentRegulated()
+    public function isPaymentRegulated(): bool
     {
         $valueRange = config('orders.plus-minus-regulation-amount');
         $orderTotalPrice = $this->getSumOfGrossValues();
@@ -279,7 +279,7 @@ class Order extends Model implements Transformable
     /**
      * @return float|int
      */
-    public function toPay()
+    public function toPay(): float|int
     {
         $orderTotalPrice = $this->getSumOfGrossValues();
         if (floatval($this->payments()->where('promise', '=', '')->sum("amount")) > 2) {
@@ -294,7 +294,7 @@ class Order extends Model implements Transformable
         }
     }
 
-    public function isDeliveryDataComplete()
+    public function isDeliveryDataComplete(): bool
     {
         $deliveryAddress = $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
         return (!(
@@ -312,7 +312,7 @@ class Order extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function addresses()
+    public function addresses(): HasMany
     {
         return $this->hasMany(OrderAddress::class);
     }
@@ -332,17 +332,17 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return OrderAddress
+     * @return object|HasMany
      */
-    public function getDeliveryAddress()
+    public function getDeliveryAddress(): Model|HasMany
     {
         return $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
     }
 
     /**
-     * @return OrderAddress
+     * @return Model|HasMany|null
      */
-    public function getInvoiceAddress()
+    public function getInvoiceAddress(): Model|HasMany|null
     {
         return $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
     }
@@ -359,7 +359,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsToMany
      */
-    public function labels()
+    public function labels(): BelongsToMany
     {
         return $this->belongsToMany(Label::class, 'order_labels')->withPivot(['added_type', 'created_at']);
     }
@@ -446,7 +446,7 @@ class Order extends Model implements Transformable
         return $sum;
     }
 
-    public function hasOrderSentLP()
+    public function hasOrderSentLP(): bool
     {
         $LPs = $this->packages()->where('status', '!=', 'NEW')->first();
 
@@ -460,7 +460,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsTo
      */
-    public function customer()
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }

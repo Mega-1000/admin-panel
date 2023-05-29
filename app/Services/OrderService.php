@@ -209,11 +209,14 @@ class OrderService
             $orderBuilder->assignItemsToOrder($order, [
                 [
                     'amount' => 1,
+                    'gross_selling_price_commercial_unit' => $fromRequest->getPurchaseValue(),
+                    'recalculate' => true,
                 ] + $product->toArray()
             ]);
 
             $item = $order->items()->first();
-            $item->gross_selling_price_commercial_unit = $fromRequest->getPurchaseValue();
+            $item->gross_purchase_price_commercial_unit = $fromRequest->getPurchaseValue();
+            $item->net_selling_price_commercial_unit = $fromRequest->getPurchaseValue() / 1.23;
             $item->save();
         });
 

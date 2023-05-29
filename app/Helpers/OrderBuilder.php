@@ -31,64 +31,70 @@ class OrderBuilder
     /**
      * @var iDividable
      */
-    private $packageGenerator;
+    private iDividable $packageGenerator;
+
     /**
      * @var iOrderTotalPriceCalculator
      */
-    private $priceCalculator;
+    private iOrderTotalPriceCalculator $priceCalculator;
+
     /**
      * @var iOrderPriceOverrider
      */
     private $priceOverrider;
+
     /**
      * @var iSumable
      */
-    private $totalTransportSumCalculator;
+    private iSumable $totalTransportSumCalculator;
 
     /**
      * @var iGetUser
      */
-    private $userSelector;
+    private iGetUser $userSelector;
 
     /**
      * @var iPostOrderAction
      */
-    private $postOrderActions;
+    private iPostOrderAction $postOrderActions;
 
-    private $productService;
+    /**
+     * @var ProductService
+     */
+    private ProductService $productService;
 
 
-    public function setPackageGenerator(iDividable $generator)
+    public function setPackageGenerator(iDividable $generator): static
     {
         $this->packageGenerator = $generator;
         return $this;
     }
 
-    public function setPriceCalculator(iOrderTotalPriceCalculator $priceCalculator)
+    public function setPriceCalculator(iOrderTotalPriceCalculator $priceCalculator): static
     {
         $this->priceCalculator = $priceCalculator;
         return $this;
     }
 
-    public function setPriceOverrider(iOrderPriceOverrider $priceOverrider)
+    public function setPriceOverrider(iOrderPriceOverrider $priceOverrider): static
     {
         $this->priceOverrider = $priceOverrider;
         return $this;
     }
 
-    public function setTotalTransportSumCalculator(iSumable $calculator)
+    public function setTotalTransportSumCalculator(iSumable $calculator): static
     {
         $this->totalTransportSumCalculator = $calculator;
         return $this;
     }
 
-    public function setUserSelector(iGetUser $userSelector)
+    public function setUserSelector(iGetUser $userSelector): static
     {
         $this->userSelector = $userSelector;
         return $this;
     }
 
-    public function setPostOrderActions(iPostOrderAction $postOrderActions)
+    public function setPostOrderActions(iPostOrderAction $postOrderActions): static
     {
         $this->postOrderActions = $postOrderActions;
         return $this;
@@ -119,15 +125,12 @@ class OrderBuilder
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
             throw new Exception('missing_products');
         }
-        
+
         $orderExists = false;
         if (!empty($data['cart_token'])) {
             $order = Order::where('token', $data['cart_token'])->first();
             $order->clearPackages();
             $orderExists = true;
-            if (!$order) {
-                throw new Exception('wrong_cart_token');
-            }
         } else {
             $order = new Order();
         }
@@ -211,7 +214,10 @@ class OrderBuilder
         return ['id' => $order->id, 'canPay' => $canPay ?? false, 'chatUserToken' => $chatUserToken];
     }
 
-    private static function setEmptyOrderData(&$data)
+    /**
+     * @throws Exception
+     */
+    private static function setEmptyOrderData(&$data): void
     {
         if (!empty($data['want_contact'])) {
             $data = [
@@ -234,17 +240,17 @@ class OrderBuilder
         }
     }
 
-    private static function getDefaultProduct()
+    /**
+     * @throws Exception
+     */
+    private static function getDefaultProduct(): array
     {
         $product = Product::getDefaultProduct();
-        if (!$product) {
-            throw new Exception('wrong_product_id');
-        }
 
         return [['id' => $product->id, 'amount' => 1]];
     }
 
-    private static function assignEmployeeToOrder($order, $customer)
+    private static function assignEmployeeToOrder($order, $customer): void
     {
         $orderCustomerOpenExists = Order::where('customer_id', $customer->id)
             ->whereNotIn('status_id', [6, 8])
@@ -261,7 +267,7 @@ class OrderBuilder
      * @param $file
      * @param Order $order
      */
-    protected function attachFileToOrder($file, Order $order)
+    protected function attachFileToOrder($file, Order $order): void
     {
         $data = explode(',', $file['base64'])[1];
         $fileDecoded = base64_decode($data);
@@ -278,7 +284,10 @@ class OrderBuilder
         ]);
     }
 
-    public function assignItemsToOrder($order, $items)
+    /**
+     * @throws Exception
+     */
+    public function assignItemsToOrder($order, $items): void
     {
         $weight = 0;
         $orderItems = $order->items;
@@ -296,8 +305,9 @@ class OrderBuilder
             if (empty($product)) {
                 throw new Exception('product_not_found');
             }
+
             $price = $product->price;
-            if (!$product || !$price) {
+            if (!$price) {
                 throw new Exception('wrong_product_id');
             }
 
@@ -305,9 +315,11 @@ class OrderBuilder
 
             $orderItem = new OrderItem();
             $orderItem->quantity = $item['amount'];
+
             if (!empty($item['type'])) {
                 $orderItem->type = $item['type'];
             }
+
             $orderItem->product_id = $getStockProduct ? $getStockProduct->id : $product->id;
             Log::info('Bazowe id produktu: ' . $product->id . ' oraz symbol' . $product->symbol . '. Wynikowe id produktu: ' . $orderItem->product_id);
             foreach (OrderBuilder::getPriceColumns() as $column) {
@@ -315,15 +327,17 @@ class OrderBuilder
                     $orderItem->$column = $oldPrices[$product->id][$column];
                 } else {
                     if ($column === "gross_selling_price_commercial_unit") {
-                        $orderItem->$column = $price->gross_price_of_packing;
+                        $orderItem->$column = !empty($item['gross_selling_price_commercial_unit']) ? $item['gross_selling_price_commercial_unit'] : $price->gross_price_of_packing;
                     } else {
                         $orderItem->$column = $price->$column;
                     }
                 }
             }
+
             if ($this->priceOverrider) {
                 $orderItem = $this->priceOverrider->override($orderItem);
             }
+
             unset($orderItem->type);
             $this->priceCalculator->addItem($product->price->gross_price_of_packing, $orderItem->quantity);
 
@@ -338,7 +352,7 @@ class OrderBuilder
         $order->save();
     }
 
-    public static function getPriceColumns()
+    public static function getPriceColumns(): array
     {
         return [
             'net_purchase_price_commercial_unit',
@@ -364,13 +378,12 @@ class OrderBuilder
         ];
     }
 
-    public static function updateOrderAddress($order, $adressArray, $type, $phone, $relation, $login = '', $forceUpdateEmail = false, $forceUpdateCustomer = false)
+    /**
+     * @throws Exception
+     */
+    public static function updateOrderAddress($order, $adressArray, $type, $phone, $relation, $login = '', $forceUpdateEmail = false, $forceUpdateCustomer = false): void
     {
-        if ($type == CustomerAddress::ADDRESS_TYPE_STANDARD) {
-            $phone = $phone ?? $adressArray['phone'];
-        } else {
-            $phone = $phone ?? $adressArray['phone'];
-        }
+        $phone = $phone ?? $adressArray['phone'];
         $phone = preg_replace('/[^0-9]/', '', $phone);
         if (!is_array($adressArray)) {
             $adressArray = [];
@@ -414,15 +427,15 @@ class OrderBuilder
         }
 
         foreach ([
-                     'firstname',
-                     'lastname',
-                     'firmname',
-                     'nip',
-                     'address',
-                     'flat_number',
-                     'city',
-                     'postal_code'
-                 ] as $column) {
+             'firstname',
+             'lastname',
+             'firmname',
+             'nip',
+             'address',
+             'flat_number',
+             'city',
+             'postal_code'
+        ] as $column) {
             if (!empty($adressArray[$column])) {
                 $address->$column = $adressArray[$column];
             }
@@ -430,5 +443,4 @@ class OrderBuilder
 
         $obj->addresses()->save($address);
     }
-
 }

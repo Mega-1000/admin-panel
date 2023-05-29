@@ -30,9 +30,9 @@
         </select>
 
         <label for="client_email">
-            Email klienta
+            Login klienta (email)
         </label>
-        <input name="client_email" id="client_email" type="text" class="form-control">
+        <input name="client_email" value="info@ephpolska.pl" id="client_email" type="text" class="form-control">
 
         <label for="purchase_value">
             Wartość zakupu brutto
