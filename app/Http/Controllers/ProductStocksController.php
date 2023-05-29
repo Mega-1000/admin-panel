@@ -410,7 +410,7 @@ class ProductStocksController extends Controller
      */
     public function createTWSOAdminOrders(): View
     {
-        return view('OrderPayments.TWSO_orders_create', [
+        return view('orderPayments.TWSO_orders_create', [
             'warehousesSymbols' => Warehouses::getAllWarehousesSymbols(),
         ]);
     }
