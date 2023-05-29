@@ -7,7 +7,8 @@ use App\Entities\Label;
 
 class OrderLabelHelper {
 
-    public static function setRedLabel(Chat $chat) {
+    public static function setRedLabel(Chat $chat): void
+    {
         $hasRed = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_RED_LABEL_ID)->count() > 0;
         $hasYellow = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_YELLOW_LABEL_ID)->count() > 0;
         if ($hasRed) {
@@ -21,7 +22,8 @@ class OrderLabelHelper {
         $chat->save();
     }
 
-    public static function setYellowLabel(Chat $chat) {
+    public static function setYellowLabel(Chat $chat): void
+    {
         $hasRed = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_RED_LABEL_ID)->count() > 0;
         $hasYellow = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_YELLOW_LABEL_ID)->count() > 0;
         if ($hasRed || $hasYellow) {
@@ -32,7 +34,7 @@ class OrderLabelHelper {
         $chat->save();
     }
 
-    public static function setBlueLabel(Chat $chat)
+    public static function setBlueLabel(Chat $chat): void
     {
         $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
         if ($chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_BLUE_LABEL_ID)->count() == 0) {

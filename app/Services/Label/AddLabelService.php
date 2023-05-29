@@ -9,6 +9,7 @@ use App\Entities\OrderLabelSchedulerAwait;
 use App\Entities\ShipmentGroup;
 use App\Entities\Task;
 use App\Entities\WorkingEvents;
+use App\Services\AllegroPaymentsReturnService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\TimedLabelJob;
@@ -138,6 +139,8 @@ class AddLabelService
                 }
             }
         }
+
+        AllegroPaymentsReturnService::checkAllegroReturn($order);
     }
 
     private static function setScheduledLabelsAfterAddition(Order $order, Label $label, ?int $userId): void
