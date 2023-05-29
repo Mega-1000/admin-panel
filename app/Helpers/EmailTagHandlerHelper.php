@@ -14,7 +14,7 @@ class EmailTagHandlerHelper
 {
     /** @var Order */
     protected $order;
-    
+
     protected $email;
 
     public function setOrder($order)
@@ -337,7 +337,7 @@ class EmailTagHandlerHelper
      */
 	public function faqLink(): string {
 
-        $url = config('app.front_url') . "/faq";
+        $url = config('app.front_url') . "/faqAllegro";
         $faqAttr = 'showFaq=true';
 
         if($this->order === null && $this->email !== null) {
@@ -374,7 +374,7 @@ class EmailTagHandlerHelper
      * @return string $message
      */
 	public function parseTags(?Order $order, string $message, ?string $email = null): string {
-        
+
         $this->order = $order;
         $this->email = $email;
         $matchedTagsCount = preg_match_all('/\[.*\]/', $message, $matchedTags);
