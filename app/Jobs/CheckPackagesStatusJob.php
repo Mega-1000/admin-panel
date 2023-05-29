@@ -297,8 +297,8 @@ class CheckPackagesStatusJob
                     break;
                 case GlsPackageStatus::INTRANSIT:
                 case GlsPackageStatus::INWAREHOUSE:
-                case GlsPackageStatus::PREADVICE:
                 case GlsPackageStatus::INDELIVERY:
+                case GlsPackageStatus::PREADVICE:
                     $package->status = PackageStatus::SENDING;
                     break;
             }

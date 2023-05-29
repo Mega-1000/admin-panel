@@ -1830,7 +1830,9 @@ class OrdersPaymentsController extends Controller
             false
         );
 
-        $deleted = $this->repository->delete($id);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $deleted = DB::table('order_payments')->where('id', $id)->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         if (empty($deleted)) {
             return redirect()->back()->with([
@@ -2007,7 +2009,6 @@ class OrdersPaymentsController extends Controller
         DB::table('order_payments_logs')->where('id', '>', 0)->delete();
         DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');
         DB::statement('DELETE FROM order_payments WHERE id > 0 AND order_package_id IS NULL');
-        DB::statement('ALTER TABLE order_payments AUTO_INCREMENT = 1');
         return redirect()->route('payments.index')->with(['message' => 'Płatności poprawnie wyczyszczone', 'alert-type' => 'success']);
     }
 }

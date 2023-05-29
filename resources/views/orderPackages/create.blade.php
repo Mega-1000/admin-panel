@@ -362,7 +362,15 @@
                                style="border: 1px solid green;" name="cash_on_delivery"
                                value="{{ number_format($toPaySum, 2, '.', '') }}">
                         Automatycznie wpisana kwota jest kwotą sugerowaną, która zamyka bilans wszystkich zleceń
-                        (głównego i połączonych)<br><br>
+                        (głównego i połączonych)
+
+                        <label for="additional_cash_on_delivery_cost">Dodatkowy koszt pobrania</label>
+                        <input type="number" step=".01" class="form-control" id="additional_cash_on_delivery_cost"
+                               style="border: 1px solid green;" name="additional_cash_on_delivery_cost"
+                               value="20">
+                        Dodatkowy koszt pobrania
+
+                        <br><br>
                         Koszt pobrania u wybranego kuriera: <span id="cod_cost"></span> zł
                     </td>
 

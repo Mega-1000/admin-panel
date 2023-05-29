@@ -204,8 +204,7 @@ class Order extends Model implements Transformable
         }
         $orderTotalPrice = $this->getSumOfGrossValues();
         $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
-        $totalPromisePaymentAmount = floatval($this->payments()->where('promise', '=', '1')->sum("amount"));
-        //dd($orderTotalPrice - $totalPromisePaymentAmount - $sum);
+        $totalPromisePaymentAmount = floatval($this->payments()->where('declared_sum', '!=', null)->sum("declared_sum"));
         if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
             return 0;
         } else if ($totalPaymentAmount < 2 && $totalPromisePaymentAmount > 2) {
@@ -278,7 +277,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return bool
+     * @return float|int
      */
     public function toPay()
     {
@@ -286,7 +285,7 @@ class Order extends Model implements Transformable
         if (floatval($this->payments()->where('promise', '=', '')->sum("amount")) > 2) {
             $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
         } else {
-            $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '1')->sum("amount"));
+            $totalPaymentAmount = floatval($this->payments()->where('declared_sum', '!=', null)->sum("declared_sum"));
         }
         if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
             return 0;
@@ -385,10 +384,10 @@ class Order extends Model implements Transformable
     public function promisePaymentsSum()
     {
         $sum = 0;
-        $promisePayments = $this->payments()->where('promise', 'like', '1')->get();
+        $promisePayments = $this->payments()->where('declared_sum', '!=', null)->get();
 
         foreach ($promisePayments as $promisePayment) {
-            $sum += $promisePayment->amount;
+            $sum += $promisePayment->declared_sum;
         }
 
         return $sum;

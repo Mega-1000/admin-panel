@@ -1193,7 +1193,7 @@
                 $('#print-package-group').modal('hide');
             }, 5000);
         });
-        
+
         $('.print-group .print-list').click(function(){
             $('#print-package-type').val($(this).attr('name'));
             let opt = $(this).data('couriertasks');
@@ -2172,7 +2172,7 @@
 
                                 if (parsedAmount < 0 && payment.operation_type !== "Zwrot towaru") {
                                     totalOfReturns -= parsedAmount ?? parsedDeclaredAmount;
-                                } else if (parsedAmount) {
+                                } else if (parsedAmount && parsedAmount > 0) {
                                     totalOfPayments += parsedAmount;
                                 } else if (!parsedAmount && parsedDeclaredAmount > 0) {
                                     totalOfDeclaredPayments += status === 'Rozliczona deklarowana' ? 0 : parsedDeclaredAmount;
@@ -2907,7 +2907,7 @@
                 <p>Magazyn nie został przypisany, przypisz magazyn przed wysłaniem</p>
                 <div class="form-group" style="width: 15%; padding: 5px;">
                     <label for="delivery_warehouse2">Magazyn obsługujący</label>
-                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}" readonly>
+                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}">
                 </div><br>
                 </div>`;
 

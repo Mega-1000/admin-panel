@@ -17,7 +17,7 @@
             </div>
             <div class="col-sm-6">
                 <label>Klucz:</label>
-                <input type="text" class="form-control" id="courier_key" name="courier_key" value="{{$courier->courier_key}}" readonly />
+                <input type="text" class="form-control" id="courier_key" name="courier_key" value="{{$courier->courier_key}}" />
             </div>
         </div>
         <div class="form-group">

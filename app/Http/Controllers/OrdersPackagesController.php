@@ -109,8 +109,9 @@ class OrdersPackagesController extends Controller
      * @param                           $id
      *
      * @return RedirectResponse
+     * @throws Exception
      */
-    public function update(OrderPackageUpdateRequest $request, $id)
+    public function update(OrderPackageUpdateRequest $request, $id): RedirectResponse
     {
         $orderPackage = OrderPackage::find($id);
 
@@ -316,6 +317,9 @@ class OrdersPackagesController extends Controller
             ->withisAllegro($isAllegro);
     }
 
+    /**
+     * @throws Exception
+     */
     public function store(OrderPackageCreateRequest $request)
     {
         $order_id = $request->input('order_id');
@@ -359,11 +363,16 @@ class OrdersPackagesController extends Controller
                     $isAdditionalDKPExists = true;
                 }
             }
-            if ($order->toPay() > 5 && $isAdditionalDKPExists === false) {
+
+            if($data['cash_on_delivery'] < 0) {
+                $data['cash_on_delivery'] = 0;
+            }
+
+            if ($order->toPay() > 2) {
                 $this->orderRepository->update([
-                    'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost + 50,
+                    'additional_cash_on_delivery_cost' => (float)$data['additional_cash_on_delivery_cost'],
                 ], $order->id);
-                $data['cash_on_delivery'] = $data['cash_on_delivery'] + 50;
+                $data['cash_on_delivery'] = $data['cash_on_delivery'] + (float)$data['additional_cash_on_delivery_cost'];
             }
         }
 

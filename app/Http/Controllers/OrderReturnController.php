@@ -18,10 +18,9 @@ use App\Entities\ProductStockLog;
 
 class OrderReturnController extends Controller
 {
-    protected $orderReturnService;
-
-    public function __construct(OrderReturnService $orderReturnService) {
-        $this->orderReturnService = $orderReturnService;
+    public function __construct(
+        protected readonly OrderReturnService $orderReturnService
+    ) {
     }
 
     /**
@@ -51,14 +50,14 @@ class OrderReturnController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $files = $request->file('photo');
-        foreach($request->return as $v=>$return){
+        foreach($request->return as $v => $return){
             if($return['sum_of_return']) {
                 $order = Order::find($request->get('order_id'));
 
                 OrderPayment::create([
-                    'value' => $return['sum_of_return'] * -1,
+                    'amount' => $return['sum_of_return'] * -1,
                     'order_id' => $order->id,
-                    'operation_type' => 'zwrot towaru',
+                    'operation_type' => 'Zwrot towaru',
                     'payer' => $order->customer->login,
                 ]);
             }
@@ -114,7 +113,8 @@ class OrderReturnController extends Controller
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function print($id){
+    public function print($id): \Illuminate\Contracts\View\View
+    {
         $order = Order::where('id',$id)->orWhere('token',$id)->first();
         if (empty($order)) {
             abort(404);

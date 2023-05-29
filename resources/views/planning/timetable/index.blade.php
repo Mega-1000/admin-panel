@@ -423,14 +423,15 @@
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
-                        let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
+                        let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getHours() + ':' + startMinutes;
+                        
                         const newDate = new Date(info.dateStr);
-                        let endDate = new Date(newDate.setUTCHours(newDate.getUTCHours() + 1));
+                        let endDate = new Date(newDate.setHours(newDate.getHours() + 1));
                         let minutes = endDate.getUTCMinutes();
                         if (minutes < 10) {
                             minutes = '0' + minutes;
                         }
-                        let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
+                        let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
                         let warehouse = null;
                         if ($('#warehouseSelect').is(':selected')) {
                             warehouse = $('#warehouseSelect').val();
@@ -533,7 +534,7 @@
                             if (startMinutes < 10) {
                                 startMinutes = '0' + startMinutes;
                             }
-                            let dateTime = end.getUTCFullYear() + '-' + ('0' + (end.getUTCMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getUTCHours() + ':' + startMinutes;
+                            let dateTime = end.getUTCFullYear() + '-' + ('0' + (end.getUTCMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getHours() + ':' + startMinutes;
                             $(".time-to-finish-task").val(dateTime);
                         })
                         $('#name').val((endDate.getUTCDate() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2)) + ' - ' + $('#warehouse_value').val());
@@ -571,18 +572,18 @@
                             $('#acceptTask').modal();
                             $.each(data, function (index, value) {
                                 if (value.status === 'WAITING_FOR_ACCEPT') {
-                                    let startDate = new Date(value.start);
+                                    let startDate = new Date(value.start).toLocaleString("pl-PL", {timeZone: 'Europe/Warsaw'});
                                     let startMinutes = startDate.getUTCMinutes();
                                     if (startMinutes < 10) {
                                         startMinutes = '0' + startMinutes;
                                     }
-                                    let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
-                                    let endDate = new Date(value.end);
+                                    let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getHours() + ':' + startMinutes;
+                                    let endDate = new Date(value.end).toLocaleString("pl-PL", {timeZone: 'Europe/Warsaw'});
                                     let minutes = endDate.getUTCMinutes();
                                     if (minutes < 10) {
                                         minutes = '0' + minutes;
                                     }
-                                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
+                                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
                                     let html = '<tr class="appendRow">';
                                     html += '<td>' + value.id + '</td>';
                                     html += '<td>' + value.title + '</td>';
@@ -722,7 +723,6 @@
                             ` | <a href="javascript:void(0);" class="penalty" data-order="` +
                             item.order.id + `">Potrącenie</a>` + duplicates;
                     }
-
                     $.ajax({
                         url: '/admin/planning/tasks/' + info.event.id + '/getTask',
                         type: "GET"
