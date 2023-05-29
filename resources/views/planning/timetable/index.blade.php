@@ -1085,12 +1085,11 @@
             };
 
             let selectTaskId = window.localStorage.getItem('selectId');
+            if (getUrlParameter('id')) {
+                let idFromUrl = getUrlParameter('id');
+            }
             if (selectTaskId) {
                 let idFromUrl = 'task-' + selectTaskId;
-            } else {
-                if (getUrlParameter('id')) {
-                    let idFromUrl = getUrlParameter('id');
-                }
             }
             let mins = window.localStorage.getItem('mins') ?? '00:05';
             if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
