@@ -1290,7 +1290,7 @@ class TasksController extends Controller
     /**
      * @param AddingTaskToPlanerRequest $request
      */
-    public function saveTaskToPlanner(AddingTaskToPlanerRequest $request)//: RedirectResponse
+    public function saveTaskToPlanner(AddingTaskToPlanerRequest $request): RedirectResponse
     {
         $data = $request->validated();
         $order = $this->ordersRepository->getOrderWithCustomer($data['order_id']);

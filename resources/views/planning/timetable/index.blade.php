@@ -275,18 +275,12 @@
 @endsection
 
 @section('javascript')
-
-    @if($selectId)
-    <script>
-        window.localStorage.setItem('selectId', {{$selectId}});
+    <script> 
+        @if($selectId || $activeDay) 
+            window.localStorage.setItem('selectId', {{$selectId ?? 'null'}}); 
+            window.localStorage.setItem('activeDay', {{$activeDay ?? 'null'}}); 
+        @endif
     </script>
-    @endif
-
-    @if($activeDay)
-    <script>
-        window.localStorage.setItem('activeDay', {{$activeDay}});
-    </script>
-    @endif
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         @can('create-bonus')
@@ -348,7 +342,7 @@
             document.calendarMaxTime = maxTime;
             document.calendarMinTime = minTime;
             document.calendarSlot = slot;
-            var activeDay = window.localStorage.getItem('activeDay');
+            let activeDay = window.localStorage.getItem('activeDay');
             $('#calendar').empty();
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar(calendarEl, {
@@ -1055,10 +1049,6 @@
                 $('#errorUpdate').modal();
             });
         }
-
-        $('.modal').on('hidden.bs.modal', function () {
-            //location.reload();
-        });
     </script>
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
@@ -1094,12 +1084,12 @@
                 }
             };
 
-            var selectTaskId = window.localStorage.getItem('selectId');
+            let selectTaskId = window.localStorage.getItem('selectId');
             if(selectTaskId){
-                var idFromUrl = 'task-' + selectTaskId;
+                let idFromUrl = 'task-' + selectTaskId;
             }else{
                 if(getUrlParameter('id')){
-                    var idFromUrl = getUrlParameter('id');
+                    let idFromUrl = getUrlParameter('id');
                 }
             }
             let mins = window.localStorage.getItem('mins') ?? '00:05';
@@ -1115,7 +1105,7 @@
 
                 setTimeout(function () {
                     $('#' + idFromUrl).toggleClass('active-task');
-                    var positionLeft = $('#' + idFromUrl).position();
+                    let positionLeft = $('#' + idFromUrl).position();
                     if(positionLeft){
                         $(".fc-scroller").animate({
                             scrollLeft: positionLeft.left - 600
