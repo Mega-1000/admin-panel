@@ -1085,10 +1085,10 @@
             };
 
             let selectTaskId = window.localStorage.getItem('selectId');
-            if(selectTaskId){
+            if (selectTaskId) {
                 let idFromUrl = 'task-' + selectTaskId;
-            }else{
-                if(getUrlParameter('id')){
+            } else {
+                if (getUrlParameter('id')) {
                     let idFromUrl = getUrlParameter('id');
                 }
             }
@@ -1106,7 +1106,7 @@
                 setTimeout(function () {
                     $('#' + idFromUrl).toggleClass('active-task');
                     let positionLeft = $('#' + idFromUrl).position();
-                    if(positionLeft){
+                    if (positionLeft) {
                         $(".fc-scroller").animate({
                             scrollLeft: positionLeft.left - 600
                         }, 100);
