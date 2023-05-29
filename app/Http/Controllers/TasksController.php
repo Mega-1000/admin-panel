@@ -187,8 +187,10 @@ class TasksController extends Controller
 
     public function update(TaskUpdateRequest $request, $id)
     {
-        $task = $this->repository->find($id);
+        $data = $request->validated();
 
+        $task = $this->repository->find($id);
+        
         if (empty($task)) {
             abort(404);
         }
@@ -201,16 +203,16 @@ class TasksController extends Controller
         ];
         $allow = TaskTimeHelper::allowTaskMove($dataToStore);
         if ($allow === true) {
-            $dataToStore = $request->all();
+            $dataToStore = $data;
             if ($request->color == '008000' || $request->color == '32CD32') {
                 $dataToStore['status'] = Task::FINISHED;
             }
             $task->update($dataToStore);
-            $task->taskTime->update($request->all());
+            $task->taskTime->update($data);
             if ($task->taskSalaryDetail == null) {
-                $task->taskSalaryDetail()->create($request->all());
+                $task->taskSalaryDetail()->create($data);
             } else {
-                $task->taskSalaryDetail->update($request->all());
+                $task->taskSalaryDetail->update($data);
             }
             if ($request->order_id !== null) {
                 $orderItemKMD = 0;
@@ -236,7 +238,7 @@ class TasksController extends Controller
                     'warehouse_value' => $request->warehouse_value,
                     'total_price' => $totalPrice
                 ]);
-                $task->taskSalaryDetail()->create($request->all());
+                $task->taskSalaryDetail()->create($data);
                 $prev = [];
                 $order = Order::query()->findOrFail($request->order_id);
                 AddLabelService::addLabels($order, [47], $prev, [], Auth::user()->id);
