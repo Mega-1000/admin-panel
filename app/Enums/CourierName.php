@@ -76,6 +76,7 @@ final class CourierName extends Enum
         self::GLS => 'Gls',
         self::GIELDA => 'Giełda',
         self::DB_SCHENKER => 'DB Schenker',
+        self::ALLEGRO_INPOST => 'ALLEGRO-INPOST',
         'all' => 'Wszystkie',
     ];
 }
