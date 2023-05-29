@@ -187,8 +187,10 @@ class TasksController extends Controller
 
     public function update(TaskUpdateRequest $request, $id)
     {
-        $task = $this->repository->find($id);
+        $data = $request->validated();
 
+        $task = $this->repository->find($id);
+        
         if (empty($task)) {
             abort(404);
         }
@@ -201,16 +203,16 @@ class TasksController extends Controller
         ];
         $allow = TaskTimeHelper::allowTaskMove($dataToStore);
         if ($allow === true) {
-            $dataToStore = $request->all();
+            $dataToStore = $data;
             if ($request->color == '008000' || $request->color == '32CD32') {
                 $dataToStore['status'] = Task::FINISHED;
             }
             $task->update($dataToStore);
-            $task->taskTime->update($request->all());
+            $task->taskTime->update($data);
             if ($task->taskSalaryDetail == null) {
-                $task->taskSalaryDetail()->create($request->all());
+                $task->taskSalaryDetail()->create($data);
             } else {
-                $task->taskSalaryDetail->update($request->all());
+                $task->taskSalaryDetail->update($data);
             }
             if ($request->order_id !== null) {
                 $orderItemKMD = 0;
@@ -236,7 +238,7 @@ class TasksController extends Controller
                     'warehouse_value' => $request->warehouse_value,
                     'total_price' => $totalPrice
                 ]);
-                $task->taskSalaryDetail()->create($request->all());
+                $task->taskSalaryDetail()->create($data);
                 $prev = [];
                 $order = Order::query()->findOrFail($request->order_id);
                 AddLabelService::addLabels($order, [47], $prev, [], Auth::user()->id);
@@ -717,12 +719,12 @@ class TasksController extends Controller
             }
             $task->save();
             if ($request->warehouse_notice) {
-                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user_id, $request->warehouse_notice);
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
                 $task->taskSalaryDetail->save();
             }
 
             if ($request->description !== '') {
-                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user_id, $request->description);
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->description);
                 $task->taskSalaryDetail->save();
             }
         } catch (Exception $e) {
@@ -1294,7 +1296,8 @@ class TasksController extends Controller
     {
         $data = $request->validated();
         $order = $this->ordersRepository->getOrderWithCustomer($data['order_id']);
-        $firm = Firm::where('name', $data['delivery_warehouse'])->first();
+        $firm = Firm::where('id', $data['delivery_warehouse'])->first();
+
         $this->taskTimeService->saveTaskToPlanner($order, $firm->id);
 
         return redirect()->route('planning.tasks.index')->with([

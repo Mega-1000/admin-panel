@@ -1340,8 +1340,8 @@ class OrdersController extends Controller
         $orderObj->save();
         $task = $this->taskRepository->findByField(['order_id' => $order->id]);
 
-        if ($task->first->id != null) {
-            $task->first->id->taskSalaryDetail->update([
+        if ($task->first->taskSalaryDetail != null) {
+            $task->first->taskSalaryDetail->update([
                 'consultant_notice' => $request->input('consultant_notice'),
                 'warehouse_notice' => $request->input('warehouse_notice'),
                 'consultant_value' => $request->input('consultant_value'),
