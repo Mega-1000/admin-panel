@@ -6,7 +6,6 @@ use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
 use App\Entities\ColumnVisibility;
-use App\Entities\Firm;
 use App\Entities\OrderReturn;
 use App\Entities\Product;
 use App\Entities\ProductStock;
@@ -17,24 +16,21 @@ use App\Http\Requests\CalculateMultipleAdminOrder;
 use App\Http\Requests\CreateAdminOrderRequest;
 use App\Http\Requests\CreateMultipleAdminOrdersRequest;
 use App\Http\Requests\ProductStockUpdateRequest;
+use App\Http\Requests\StoreTWSOAdminOrdersRequest;
 use App\Repositories\Firms;
 use App\Repositories\ProductRepository;
 use App\Repositories\Products;
 use App\Repositories\ProductStockLogRepository;
-use App\Repositories\ProductStockLogs;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
+use App\Repositories\Warehouses;
 use App\Services\OrderService;
 use App\Services\ProductService;
-use App\User;
-use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Contracts\View\View;
 
@@ -52,9 +48,9 @@ class ProductStocksController extends Controller
     }
 
     /**
-     * @return Factory|\Illuminate\View\View
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stocks'));
         foreach ($visibilities as $key => $row) {
@@ -66,9 +62,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param $id
-     * @return Factory|\Illuminate\View\View
+     * @return View
      */
-    public function edit($id)
+    public function edit($id): View
     {
         $productStocks = ProductStock::where('product_id', $id)->first();
         $similarProducts = $this->productService->checkForSimilarProducts($id);
@@ -78,18 +74,23 @@ class ProductStocksController extends Controller
             $row->show = json_decode($row->show, true);
             $row->hidden = json_decode($row->hidden, true);
         }
+
         $visibilitiesPosition = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stock_positions'));
+
         foreach ($visibilitiesPosition as $key => $row) {
             $row->show = json_decode($row->show, true);
             $row->hidden = json_decode($row->hidden, true);
         }
+
         return view('product_stocks.edit', compact('visibilitiesLogs', 'visibilitiesPosition', 'productStocks', 'id', 'similarProducts'));
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
+     * @throws Exception
      */
-    public function datatable(Request $request)
+    public function datatable(Request $request): JsonResponse
     {
         $data = $request->all();
         $collection = $this->prepareCollection($data);
@@ -99,9 +100,10 @@ class ProductStocksController extends Controller
     }
 
     /**
-     * @return mixed
+     * @param $data
+     * @return array
      */
-    public function prepareCollection($data)
+    public function prepareCollection($data): array
     {
         $query = DB::table('product_stocks')
             ->distinct()
@@ -205,7 +207,7 @@ class ProductStocksController extends Controller
      * @param $id
      * @return RedirectResponse
      */
-    public function changeStatus($id)
+    public function changeStatus($id): RedirectResponse
     {
         $productStocks = $this->repository->find($id);
 
@@ -227,7 +229,7 @@ class ProductStocksController extends Controller
      * @param ProductStockUpdateRequest $request
      * @return RedirectResponse
      */
-    public function update(ProductStockUpdateRequest $request)
+    public function update(ProductStockUpdateRequest $request): RedirectResponse
     {
         if ($request->select_position !== null) {
 
@@ -271,7 +273,11 @@ class ProductStocksController extends Controller
         ]);
     }
 
-    public function productsStocksChanges(Request $request)
+    /**
+     * @param Request $request
+     * @return View
+     */
+    public function productsStocksChanges(Request $request): View
     {
         $startDate = $request->input('products-stocks-changes-start-date');
         $endDate = $request->input('products-stocks-changes-end-date');
@@ -306,7 +312,7 @@ class ProductStocksController extends Controller
     public function calculateAdminOrder(CalculateAdminOrderRequest $request, ProductStock $productStock): JsonResponse
     {
         return response()->json([
-            'orderQuantity' =>  $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
+            'orderQuantity' => $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
         ]);
     }
 
@@ -394,6 +400,35 @@ class ProductStocksController extends Controller
     {
         return view('product_stocks.interval_chart', [
             'intervals' => $data,
+        ]);
+    }
+
+    /**
+     * Create TWSO admin orders
+     *
+     * @return View
+     */
+    public function createTWSOAdminOrders(): View
+    {
+        return view('OrderPayments.TWSO_orders_create', [
+            'warehousesSymbols' => Warehouses::getAllWarehousesSymbols(),
+        ]);
+    }
+
+    /**
+     * Store TWSO admin orders
+     *
+     * @param StoreTWSOAdminOrdersRequest $request
+     * @param ProductService $productService
+     * @return RedirectResponse
+     */
+    public function storeTWSOAdminOrders(StoreTWSOAdminOrdersRequest $request, ProductService $productService): RedirectResponse
+    {
+        $order = $this->orderService->createTWSOUrders(CreateTWSOUrdersDTO::fromRequest($request->validated()), $productService);
+
+        return redirect()->route('orders.edit', $order)->with([
+            'message' => 'Zamówienie zostało utworzone',
+            'alert-type' => 'success'
         ]);
     }
 }

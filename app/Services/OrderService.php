@@ -16,10 +16,12 @@ use App\Enums\OrderPaymentsEnum;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
+use App\Http\Controllers\CreateTWSOUrdersDTO;
 use App\Repositories\Customers;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\ProductStockLogs;
+use App\Repositories\Warehouses;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -184,5 +186,37 @@ class OrderService
                 $payment
             );
         });
+    }
+
+    public function createTWSOUrders(CreateTWSOUrdersDTO $fromRequest, ProductService $productService): string
+    {
+        $customer = Customers::getFirstCustomerWithLogin($fromRequest->getClientEmail());
+
+        DB::transaction(function () use ($fromRequest, $customer, $productService, &$order) {
+            $order = Order::query()->create([
+                'customer_id' => $customer->id,
+                'status_id' => 1,
+                'last_status_update_date' => Carbon::now(),
+                'customer_notices' => 'Zamówienie stworzone przez administratora',
+                'warehouse_id' => Warehouses::getIdFromSymbol($fromRequest->getWarehouseSymbol()),
+            ]);
+
+            $orderBuilder = (new OrderBuilder())
+                ->setPackageGenerator(new BackPackPackageDivider())
+                ->setPriceCalculator(new OrderPriceCalculator())
+                ->setProductService($productService);
+            $product = Product::query()->where('symbol', 'TWSU')->first();
+            $orderBuilder->assignItemsToOrder($order, [
+                [
+                    'amount' => 1,
+                ] + $product->toArray()
+            ]);
+
+            $item = $order->items()->first();
+            $item->gross_selling_price_commercial_unit = $fromRequest->getPurchaseValue();
+            $item->save();
+        });
+
+        return $order->id;
     }
 }

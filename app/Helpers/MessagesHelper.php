@@ -56,6 +56,9 @@ class MessagesHelper
     const MESSAGE_YELLOW_LABEL_ID = 57;
     const MESSAGE_GREEN_LABEL_ID = 58;
 
+    /**
+     * @throws ChatException
+     */
     public function __construct($token = null)
     {
         if ($token) {
@@ -99,7 +102,7 @@ class MessagesHelper
         return encrypt($dataToEncrypt);
     }
 
-    public function decrypt($token)
+    public function decrypt($token): static
     {
         $data = decrypt($token);
         $this->chatId = $data['cId'] ?? '';
@@ -112,7 +115,7 @@ class MessagesHelper
         return $this;
     }
 
-    private function setChatId()
+    private function setChatId(): void
     {
         if ($this->chatId) {
             return;
@@ -144,7 +147,7 @@ class MessagesHelper
         }
     }
 
-    private function setUsers()
+    private function setUsers(): void
     {
         $this->users = [];
         if ($this->currentUserType == self::TYPE_CUSTOMER) {
@@ -296,30 +299,27 @@ class MessagesHelper
         return $chat;
     }
 
-    public function canUserSendMessage()
+    public function canUserSendMessage(): bool
     {
         $chat = $this->getChat();
-        switch ($this->currentUserType) {
-            case self::TYPE_CUSTOMER:
-                return $chat->customers()->where('customers.id', $this->currentUserId)->first() != null;
-            case self::TYPE_EMPLOYEE:
-                return $chat->employees()->where('employees.id', $this->currentUserId)->first() != null;
-            case self::TYPE_USER:
-                return $this->getAdminChatUser() != null;
-            default:
-                return false;
-        }
+        return match ($this->currentUserType) {
+            self::TYPE_CUSTOMER => $chat->customers()->where('customers.id', $this->currentUserId)->first() != null,
+            self::TYPE_EMPLOYEE => $chat->employees()->where('employees.id', $this->currentUserId)->first() != null,
+            self::TYPE_USER => $this->getAdminChatUser() != null,
+            default => false,
+        };
     }
 
     /**
      * Handle add message to Chat
      *
-     * @param string             $message
-     * @param string             $area
-     * @param UploadedFile|null  $file
-     * @param ChatUser|null      $customChatUser
+     * @param string $message
+     * @param int $area
+     * @param UploadedFile|null $file
+     * @param ChatUser|null $customChatUser
      *
      * @return Message      $msg
+     * @throws ChatException
      */
     public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null, ?ChatUser $customChatUser = null): Message
     {

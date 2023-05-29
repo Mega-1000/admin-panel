@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmailSettingsController;
+use App\Http\Controllers\ProductStocksController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -506,8 +507,8 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::post('/adding-task-to-planner', 'TasksController@addingTaskToPlanner')->name('addingTaskToPlanner');
                     Route::post('/store/planner', 'TasksController@saveTaskToPlanner')->name('storePlanner');
 
-                    Route::get('/{taskId}/checkQuantityInStock', 'TasksController@checkQuantityInStock')->name('checkQuantityInStock');  
-                    
+                    Route::get('/{taskId}/checkQuantityInStock', 'TasksController@checkQuantityInStock')->name('checkQuantityInStock');
+
                 });
             Route::prefix('reports')->as('reports.')
                 ->group(function () {
@@ -591,15 +592,18 @@ Route::group(['prefix' => 'admin'], function () {
     Route::delete('/email/settings/{emailSetting}/destroy', [EmailSettingsController::class, 'destroy'])->name('emailSettings.destroy');
 
     Route::prefix('courier')->as('courier.')->group(function () {
-        Route::get('/', 'CourierController@index')->name('courier.index');           
+        Route::get('/', 'CourierController@index')->name('courier.index');
         Route::get('/{courier}/edit', 'CourierController@edit')->name('courier.edit');
-        Route::put('/{courier}/update', 'CourierController@update')->name('courier.update');     
+        Route::put('/{courier}/update', 'CourierController@update')->name('courier.update');
     });
-  
+
     Route::get('/transactions/rebook/{orderPayment}', 'OrdersPaymentsController@rebook')->name('orderPayments.rebook');
     Route::post('/transactions/rebook/{order}/{payment}', 'OrdersPaymentsController@rebookStore')->name('orderPayments.rebookStore');
 
     Route::post('/upload-invoice', 'InvoicesController@uploadInvoice')->name('uploadInvoice');
+
+    Route::get('/twsu/create', [ProductStocksController::class, 'createTWSOAdminOrders'])->name('admin-order-TWSU.create');
+    Route::post('/twsu/create', [ProductStocksController::class, 'storeTWSOAdminOrders'])->name('admin-order-TWSU.create');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

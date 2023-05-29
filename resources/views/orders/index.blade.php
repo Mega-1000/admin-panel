@@ -873,6 +873,9 @@
                                                                            id="columnSearch-orderId"/></span>
                 </div>
             </th>
+            <a href="{{ route('admin-order-TWSU.create') }}" class="btn btn-primary">
+                Stwórz zamówienie TWSU
+            </a>
             <th>
                 <span id="columnSearch-actions">@lang('orders.table.actions')</span>
             </th>
