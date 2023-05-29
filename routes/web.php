@@ -603,7 +603,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/upload-invoice', 'InvoicesController@uploadInvoice')->name('uploadInvoice');
 
     Route::get('/twsu/create', [ProductStocksController::class, 'createTWSOAdminOrders'])->name('admin-order-TWSU.create');
-    Route::post('/twsu/create', [ProductStocksController::class, 'storeTWSOAdminOrders'])->name('admin-order-TWSU.create');
+    Route::post('/twsu/create', [ProductStocksController::class, 'storeTWSOAdminOrders']);
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
