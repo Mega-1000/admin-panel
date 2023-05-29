@@ -301,6 +301,9 @@ class MessagesController extends Controller
         $complaintForm = $request->validated();
         $customer = $request->user();
 
+        $arr = [];
+        AddLabelService::addLabels($order,[59], $arr, []);
+
         try {
             $helper = new MessagesHelper();
 
