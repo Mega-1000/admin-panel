@@ -1296,7 +1296,8 @@ class TasksController extends Controller
     {
         $data = $request->validated();
         $order = $this->ordersRepository->getOrderWithCustomer($data['order_id']);
-        $firm = Firm::where('name', $data['delivery_warehouse'])->first();
+        $firm = Firm::where('id', $data['delivery_warehouse'])->first();
+
         $this->taskTimeService->saveTaskToPlanner($order, $firm->id);
 
         return redirect()->route('planning.tasks.index')->with([

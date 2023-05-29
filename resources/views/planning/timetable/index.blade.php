@@ -17,6 +17,7 @@
                 <option id="warehouseSelect" value="{{$warehouse->id}}">{{$warehouse->symbol}}</option>
             @endforeach
         </select>
+        
     </div>
     <link rel="stylesheet" href="{{ URL::asset('css/views/timetable/timetable.css') }}">
 @endsection
@@ -274,6 +275,12 @@
 @endsection
 
 @section('javascript')
+    <script> 
+        @if($selectId || $activeDay) 
+            window.localStorage.setItem('selectId', {{$selectId ?? 'null'}}); 
+            window.localStorage.setItem('activeDay', {{$activeDay ?? 'null'}}); 
+        @endif
+    </script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         @can('create-bonus')
@@ -335,11 +342,12 @@
             document.calendarMaxTime = maxTime;
             document.calendarMinTime = minTime;
             document.calendarSlot = slot;
+            let activeDay = window.localStorage.getItem('activeDay');
             $('#calendar').empty();
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid', 'timeGrid', 'resourceTimeline'],
-                now: '{{$activeDay != null ? $activeDay : new Carbon\Carbon()}}',
+                now: activeDay,
                 editable: true,
                 aspectRatio: 1.8,
                 scrollTime: '7:00',
@@ -413,9 +421,10 @@
                     },
                     twoMins: {text: '2 minuty', click: () => renderCalendarMins("00:02")},
                     fifteenMins: {text: '15 minut', click: () => renderCalendarMins("00:15")},
-                    fiveMins: {text: '5 minut', click: () => renderCalendarMins("00:05")},
+                    fiveMins: {text: '5 minut', click: () => renderCalendarMins("00:05")}
                 },
                 dateClick: function (info) {
+                    window.localStorage.setItem('activeDay', info.view.activeStart);
                     if (info.view.type !== 'timeGridWeek' && info.view.type !== 'dayGridMonth') {
                         $('#addNewTask').modal();
                         const startDate = new Date(info.dateStr);
@@ -529,7 +538,7 @@
                             event.preventDefault();
                             let start = new Date($("#start_new").val());
                             let end = new Date(start.getTime() + event.target.value * 60000);
-                            end.setHours(end.getHours() + (end.getTimezoneOffset() * -1) / 60);
+                            end.setHours(end.getUTCHours() + (end.getTimezoneOffset() * -1) / 60);
                             let startMinutes = end.getUTCMinutes();
                             if (startMinutes < 10) {
                                 startMinutes = '0' + startMinutes;
@@ -623,6 +632,8 @@
                     $(info.el).attr('title', info.event.extendedProps.text);
                 },
                 eventDrop: function (info) {
+                    window.localStorage.setItem('selectId', info.event.id);
+                    window.localStorage.setItem('activeDay', info.view.activeStart);
                     let firstDate = new Date(info.event.start);
                     let startMinutes = firstDate.getUTCMinutes();
                     if (startMinutes < 10) {
@@ -650,6 +661,8 @@
                     $('#moveTask').modal();
                 },
                 eventResize: function (info) {
+                    window.localStorage.setItem('selectId', info.event.id);
+                    window.localStorage.setItem('activeDay', info.view.activeStart);
                     $('#editTask').modal();
                     let firstDate = new Date(info.event.start);
                     let startMinutes = firstDate.getUTCMinutes();
@@ -700,6 +713,8 @@
 
                 },
                 eventClick: function (info) {
+                    window.localStorage.setItem('selectId', info.event.id);
+                    window.localStorage.setItem('activeDay', info.view.activeStart);
                     let warehouse = null;
                     if ($('#warehouseSelect').is(':selected')) {
                         warehouse = $('#warehouseSelect').val();
@@ -1034,10 +1049,6 @@
                 $('#errorUpdate').modal();
             });
         }
-
-        $('.modal').on('hidden.bs.modal', function () {
-            location.reload();
-        });
     </script>
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
@@ -1072,17 +1083,19 @@
                     }
                 }
             };
-            var idFromUrl = 'task-{{ $selectId }}';
-            let mins = '00:15';
+
+            let selectTaskId = window.localStorage.getItem('selectId');
+            if (getUrlParameter('id')) {
+                let idFromUrl = getUrlParameter('id');
+            }
+            if (selectTaskId) {
+                let idFromUrl = 'task-' + selectTaskId;
+            }
+            let mins = window.localStorage.getItem('mins') ?? '00:05';
             if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
                 let taskDiffInMins = {{ $taskDiffInMins ?? 'undefined'}};
                 let taskHour = {{ $taskHour ?? 'undefined'}};
-                if (taskDiffInMins < 5) {
-                    mins = '00:02';
-                } else if (taskDiffInMins < 20) {
-                    mins = '00:05';
-                }
-
+                
                 if (7 > taskHour || taskHour > 18) {
                     renderCalendar("06:00:00", "23:00:00", mins);
                 } else if (window.localStorage.getItem('mins') !== mins) {
@@ -1091,10 +1104,13 @@
 
                 setTimeout(function () {
                     $('#' + idFromUrl).toggleClass('active-task');
-                    $(".fc-scroller").animate({
-                        scrollLeft: $('#' + idFromUrl).position().left - 600
-                    }, 500);
-                }, 2000);
+                    let positionLeft = $('#' + idFromUrl).position();
+                    if (positionLeft) {
+                        $(".fc-scroller").animate({
+                            scrollLeft: positionLeft.left - 600
+                        }, 100);
+                    }
+                }, 500);
             }
         });
     </script>
