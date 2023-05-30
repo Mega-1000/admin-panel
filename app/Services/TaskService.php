@@ -195,7 +195,7 @@ class TaskService
      */
     public function prepareTransfersTask(int $userId, string $color, string $timeStart): string
     {
-        $date = Carbon::today()->addDay();;
+        $date = Carbon::today()->addDay();
 
         $tasks = Tasks::getTransfersTask($userId, $color, $date);
         foreach ($tasks as $task) {
@@ -232,7 +232,7 @@ class TaskService
      */
     public function getTimeLastTask(int $user_id): string
     {
-        $date = Carbon::today()->addDay();;
+        $date = Carbon::today()->addDay();
         $taskTime = TaskTimes::getTimeLastTask($user_id, $date);
         $firstTaskTime = $taskTime->first();
 
@@ -245,7 +245,7 @@ class TaskService
      */
     public function moveTask(int $user_id, string $time): void
     {
-        $date = Carbon::today()->addDay();;
+        $date = Carbon::today()->addDay();
         $separatorDate = $this->getUserSeparator($user_id, $date);
 
         if ($time >= $separatorDate) {
