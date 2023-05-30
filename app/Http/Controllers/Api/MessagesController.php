@@ -25,6 +25,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class MessagesController extends Controller
 {
@@ -321,6 +322,17 @@ class MessagesController extends Controller
             if ($chat === null) {
                 $chat = $helper->createNewChat();
             }
+
+            if ($complaintForm['image'] !== null) {
+                $originalFileName = $complaintForm['image']->getClientOriginalName();
+                $hashedFileName = Hash::make($originalFileName);
+                $path = $complaintForm['image']->storeAs('chat_files/' . $chat->id, $hashedFileName, 'public');
+                if ($path) {
+                    $complaintForm['image'] = $path;
+                    $complaintForm['image_name'] = $originalFileName;
+                }
+            }
+
             $chat->complaint_form = json_encode($complaintForm);
             $chat->need_intervention = true;
             $chat->save();

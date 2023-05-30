@@ -264,6 +264,7 @@
             $('#new-message').removeClass('loader-2');
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
+            const storagePath = '{{ asset("storage") }}';
             const documentTitle = document.title;
 
             let usersHistoryFilter = new Set();
@@ -475,6 +476,12 @@
                     <div>Data: ${complaintForm.date}</div>
                     <div>Numer kontaktowy do kierowcy: ${complaintForm?.driverPhone}</div>
                     <div>Numer śledzenia: ${complaintForm?.trackingNumber}</div>
+                    <div>Załącznik:
+                        <a class="attachment-path" style="display: block; margin-top: 10px; color: #000;"
+                            href="${storagePath}/${complaintForm.image}" target="_blank" download="${complaintForm.image_name}">
+                            załącznik: ${complaintForm.image_name}
+                        </a>
+                    </div>
                 `;
                 let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
                 width=700,height=450,left=100,top=100`;
