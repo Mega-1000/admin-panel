@@ -15,7 +15,7 @@ class AllegroPaymentsReturnService
     public static function checkAllegroReturn(Order $order): void
     {
         /** @var $orderLabels */
-        $orderLabels = $order->labels()->pluck('labels.id')->toArray();
+        $orderLabels = $order->labels()->pluck('order_labels.id')->toArray();
 
         if (in_array(Label::RETURN_ALLEGRO_PAYMENTS, $orderLabels) && !in_array(Label::ORDER_ITEMS_REDEEMED_LABEL, $orderLabels)) {
             $order->payments()->create([
