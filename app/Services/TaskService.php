@@ -168,8 +168,8 @@ class TaskService
         $separatorDate = '';
         $separators = $this->getSeparator(16, $date->format('Y-m-d') . ' 00:00:00', $date->format('Y-m-d') . ' 23:59:59');
         foreach ($separators as $separator) {
-            if (isset($separator['resourceId']) && $separator['resourceId'] == $user_id) {
-                $separatorDate = Carbon::parse($separator['end'])->format('Y-m-d H:i:s');
+            if (isset($separator->resourceId) && $separator->resourceId == $user_id) {
+                $separatorDate = Carbon::parse($separator->end)->format('Y-m-d H:i:s');
             }
         }
         return $separatorDate;
