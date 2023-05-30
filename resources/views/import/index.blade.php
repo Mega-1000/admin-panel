@@ -106,17 +106,17 @@
             <div class="panel panel-bordered">
                 <div class="panel-heading">
                     <div class="panel-title">
-                        {{ \App\ChatStatus::first()->is_active === 0 ? 'Czat dostępny' : 'Chat nie jest dostępny' }}
+                        {{ \App\ChatStatus::first()->is_active === 0 ? 'Konsultanci dla czatu/duskusja są dostępni' : 'Konsultanci dla czatu/duskusja są nie dostępni' }}
                     </div>
                 </div>
                 <div class="panel-body">
                     <form method="post" action="{{ route('change-chat-visibility') }}">
                         @csrf
                         tekst na czacie
-                        <input type="text" class="form-control" name="message-value" value="{{ \App\ChatStatus::first()->message }}">
+                        <textarea type="text" class="form-control" name="message-value">{{ \App\ChatStatus::first()->message }}</textarea>
 
                         <button class="{{ \App\ChatStatus::first()->is_active === 0 ? 'btn btn-success' : 'btn btn-danger' }}">
-                            Zmień dostępność czatu
+                            Zmień informację o dostępności konsultantów
                         </button>
                     </form>
                 </div>
