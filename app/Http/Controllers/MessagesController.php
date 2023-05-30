@@ -180,6 +180,10 @@ class MessagesController extends Controller
         $token = $helper->encrypt();
 
         $currentChatUser = $helper->getCurrentChatUser();
+        
+        if($currentChatUser === null) {
+            abort(401);
+        }
         $currentChatUser->is_online = true;
 
         $assignedMessagesIds = [];

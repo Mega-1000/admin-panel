@@ -34,7 +34,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
     Route::get('invoices/get/{id}', 'Api\InvoicesController@getInvoice')->name('api.invoices.get');
     Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
-    Route::post('createCustomerComplaintChat/{order_id}', 'Api\MessagesController@createCustomerComplaintChat')->name('api.orders.createCustomerComplaintChat');
+    Route::post('createCustomerComplaintChat/{order}', 'Api\MessagesController@createCustomerComplaintChat')->name('api.orders.createCustomerComplaintChat');
 
     Route::middleware('staff.api')->group(function () {
         Route::group(['prefix' => 'faqs'], function () {

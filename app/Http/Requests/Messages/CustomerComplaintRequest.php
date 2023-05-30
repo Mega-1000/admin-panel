@@ -33,9 +33,10 @@ class CustomerComplaintRequest extends FormRequest
             'productValue'         => 'nullable|string',
             'damagedProductsValue' => 'nullable|string',
             'accountNumber'        => 'nullable|min:10',
+            'offerId'              => 'integer',
             'date'                 => 'required|date|date_format:Y-m-d\TH:i',
             'image'                => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
-            'driverPhone'          => 'nullable|regex:/[\+0-9]{9,12}/',
+            'driverPhone'          => 'nullable|regex:/[\+0-9]{8,15}/',
             'trackingNumber'       => 'nullable|string',
         ];
     }
