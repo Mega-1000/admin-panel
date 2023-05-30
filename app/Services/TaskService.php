@@ -196,7 +196,7 @@ class TaskService
      */
     public function prepareTransfersTask(int $userId, string $color, string $timeStart): string
     {
-        $date = Carbon::yesterday();
+        $date = Carbon::today();
 
         $tasks = Tasks::getTransfersTask($userId, $color, $date);
 
@@ -337,7 +337,7 @@ class TaskService
 
     /**
      * Close the task
-     * 
+     *
      * @param $task
      * @return bool
      */
@@ -345,7 +345,7 @@ class TaskService
     {
         $this->saveClosedTask($task);
 
-        if ($task->childs->count() > 0) 
+        if ($task->childs->count() > 0)
         {
             foreach ($task->childs as $child)
             {
@@ -358,7 +358,7 @@ class TaskService
 
     /**
      * Write down the date of completion of the task
-     * 
+     *
      * @param $task
      * @return void
      */
