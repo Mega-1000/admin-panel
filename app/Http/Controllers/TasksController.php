@@ -1321,8 +1321,4 @@ class TasksController extends Controller
             'data' => $lists
         ]);
     }
-
-    public function test(){
-        $this->taskService->transfersTask();
-    }
 }

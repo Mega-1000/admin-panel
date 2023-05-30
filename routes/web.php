@@ -480,7 +480,6 @@ Route::group(['prefix' => 'admin'], function () {
                 });
             Route::prefix('tasks')->as('tasks.')
                 ->group(function () {
-                    Route::get('/test', 'TasksController@test')->name('test');
                     Route::get('/', 'TasksController@index')->name('index');
                     Route::get('/user/{id}', 'TasksController@getForUser')->name('getForUser');
                     Route::get('/datatable', 'TasksController@datatable')->name('datatable');
