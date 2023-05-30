@@ -273,7 +273,6 @@ class MessagesController extends Controller
                 $chat = $helper->createNewChat();
             }
             $chat->questions_tree = $questionsTree;
-            $chat->need_intervention = true;
             $chat->save();
 
             return response()->json([
@@ -322,7 +321,6 @@ class MessagesController extends Controller
                 $chat = $helper->createNewChat();
             }
             $chat->complaint_form = json_encode($complaintForm);
-            $chat->need_intervention = true;
             $chat->save();
 
             return response()->json([

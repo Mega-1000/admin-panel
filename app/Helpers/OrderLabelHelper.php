@@ -17,7 +17,6 @@ class OrderLabelHelper {
             $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
         }
         $chat->order->labels()->attach(MessagesHelper::MESSAGE_RED_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
-        $chat->need_intervention = true;
         $chat->save();
     }
 
@@ -28,7 +27,6 @@ class OrderLabelHelper {
             return;
         }
         $chat->order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
-        $chat->need_intervention = true;
         $chat->save();
     }
 
