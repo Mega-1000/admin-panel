@@ -1085,12 +1085,12 @@
             };
 
             let selectTaskId = window.localStorage.getItem('selectId');
-
+            let idFromUrl = null;
             if (getUrlParameter('id')) {
-                var idFromUrl = getUrlParameter('id');
+                idFromUrl = getUrlParameter('id');
             }
             if (selectTaskId !== 'undefined') {
-                var idFromUrl = 'task-' + selectTaskId;
+                idFromUrl = 'task-' + selectTaskId;
             }
             let mins = window.localStorage.getItem('mins') ?? '00:05';
             if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
