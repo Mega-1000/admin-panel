@@ -2,10 +2,9 @@
 
 namespace App\Observers\Entities;
 
-use App\Entities\Order;
 use App\Entities\OrderPayment;
-use App\Repositories\OrderPayments;
 use App\Repositories\Orders;
+use App\Services\AllegroPaymentsReturnService;
 use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
 use App\Services\OrderAddressService;
@@ -25,6 +24,8 @@ class OrderPaymentObserver
     {
         $this->addLabelIfManualCheckIsRequired($orderPayment);
         $this->orderPaymentLabelsService->calculateLabels($orderPayment->order);
+
+        AllegroPaymentsReturnService::checkAllegroReturn($orderPayment->order);
     }
 
     protected function addLabelIfManualCheckIsRequired(OrderPayment $orderPayment): void
