@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\ChatStatus;
 use App\Entities\Chat;
 use App\Entities\Customer;
 use App\Entities\CustomerAddress;
@@ -289,7 +290,8 @@ class MessagesHelper
 
         $blankChatUser = $this->createOrGetBlankUser($chat);
 
-        $content = "Witamy!
+        $chatStatus = ChatStatus::first();
+        $content = $chatStatus->is_active ? $chatStatus->message : "Witamy!
                         W czym możemy pomóc?";
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
 
@@ -446,7 +448,7 @@ class MessagesHelper
         $content = "Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
                     Zajmuje to zwykle do kilku minut.";
         $blankChatUser = $this->createOrGetBlankUser($chat);
-        
+
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
 

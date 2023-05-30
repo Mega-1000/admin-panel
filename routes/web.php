@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmailSettingsController;
+use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\ProductStocksController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
@@ -604,6 +605,8 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::get('/twsu/create', [ProductStocksController::class, 'createTWSOAdminOrders'])->name('admin-order-TWSU.create');
     Route::post('/twsu/create', [ProductStocksController::class, 'storeTWSOAdminOrders']);
+
+    Route::post('change-chat-visibility', [OrdersMessagesController::class, 'changeChatVisibility'])->name('change-chat-visibility');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

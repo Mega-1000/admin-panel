@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\ChatStatus;
+use App\Http\Requests\changeChatVisibilityRequest;
 use App\Http\Requests\OrderCreateRequest;
 use App\Http\Requests\OrderMessageCreateRequest;
 use App\Http\Requests\OrderMessageUpdateRequest;
@@ -266,5 +268,18 @@ class OrdersMessagesController extends Controller
         $messages = $this->repository->orderBy('type')->findWhere(["order_id" => $orderId]);
 
         return view('orderMessages.user.communication', compact('order', 'messages'));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function changeChatVisibility(changeChatVisibilityRequest $request): RedirectResponse
+    {
+        ChatStatus::first()->update([
+            'is_active' => !ChatStatus::first()->is_active,
+            'message' => $request->validated('message-value'),
+        ]);
+
+        return redirect()->back();
     }
 }

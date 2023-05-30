@@ -101,5 +101,27 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-bordered">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        {{ \App\ChatStatus::first()->is_active === 0 ? 'Czat dostępny' : 'Chat nie jest dostępny' }}
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form method="post" action="{{ route('change-chat-visibility') }}">
+                        @csrf
+                        tekst na czacie
+                        <input type="text" class="form-control" name="message-value" value="{{ \App\ChatStatus::first()->message }}">
+
+                        <button class="{{ \App\ChatStatus::first()->is_active === 0 ? 'btn btn-success' : 'btn btn-danger' }}">
+                            Zmień dostępność czatu
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
