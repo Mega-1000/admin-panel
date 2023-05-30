@@ -13,6 +13,7 @@ use App\Repositories\Tasks;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\TaskTimes;
 use App\Services\Label\RemoveLabelService;
+use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
@@ -335,20 +336,49 @@ class TaskService
     }
 
     /**
+     * Close the task
+     * 
      * @param $task
      * @return bool
      */
-    public function closeTask(int $task_id): bool
+    public function closeTask(Task $task): bool
     {
-        $task = Task::findOrFail($task_id);
+        $this->saveClosedTask($task);
+
+        if ($task->childs->count() > 0) 
+        {
+            foreach ($task->childs as $child)
+            {
+                $this->saveClosedTask($child);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Write down the date of completion of the task
+     * 
+     * @param $task
+     * @return void
+     */
+    public function saveClosedTask(Task $task): void
+    {
         $end = Carbon::now();
         $end->second = 0;
+
         $task->taskTime->date_end = $end;
-        $task->status = Task::FINISHED;
+        if($task->taskTime->date_start >= $end){
+            $task->taskTime->date_end = Carbon::parse($task->taskTime->date_start)->addMinutes(2);
+        }
+        $task->taskTime->date_end = $end;
         $task->taskTime->save();
+        $task->status = Task::FINISHED;
+        $task->color = Task::LIGHT_GREEN_COLOR;
         $task->save();
 
-        Log::info("Zadanie ". $task_id ." zostało zamknięte: ". $end);
-        return true;
+        $prev = [];
+        AddLabelService::addLabels($task->order, [Label::ORDER_ITEMS_CONSTRUCTED], $prev, [], Auth::user()->id);
+        Log::info("Zadanie ". $task->id ." zostało zamknięte: ". $end);
     }
 }

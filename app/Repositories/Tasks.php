@@ -113,7 +113,11 @@ class Tasks
                 })->whereHas('dates', function ($query) {
                     $query->orderBy('consultant_shipment_date_to');
                 });
-            })->get();
+            })
+            ->whereHas('taskTime', function ($query) {
+                $query->where('date_start', '<=', Carbon::now()->format('Y-m-d H:i:s'));
+            })
+            ->get();
     }
 
     /**
