@@ -323,7 +323,7 @@ class MessagesController extends Controller
                 $chat = $helper->createNewChat();
             }
 
-            if (array_key_exists('image', $complaintForm)) {
+            if ( array_key_exists('image', $complaintForm) && !empty($complaintForm['image']) ) {
                 $originalFileName = $complaintForm['image']->getClientOriginalName();
                 $hashedFileName = Hash::make($originalFileName);
                 $path = $complaintForm['image']->storeAs('chat_files/' . $chat->id, $hashedFileName, 'public');
