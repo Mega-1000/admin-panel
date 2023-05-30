@@ -910,9 +910,9 @@ class OrdersController extends Controller
                     'stock-response' => [],
                 ]);
             }
-            $this->taskService->closeTask($open->first()->id);
+            $this->taskService->closeTask($open->first());
+            
         }
-        
         $task = $this->taskService->prepareAutoTask($data['package_type'], $skip);
 
         if ($task === null) {
