@@ -20,6 +20,7 @@ class Task extends Model implements Transformable
     use TransformableTrait;
 
     public const WAITING_FOR_ACCEPT = 'WAITING_FOR_ACCEPT';
+    public const LIGHT_GREEN_COLOR = '32CD32';
     public const DEFAULT_COLOR = '194775';
     public const DISABLED_COLOR = 'd7d7d7';
     public const TO_CONFIRM_USER_ID = 36;
