@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ChatStatus;
-use App\Http\Requests\changeChatVisibilityRequest;
+use App\Http\Requests\ChangeChatVisibilityRequest;
 use App\Http\Requests\OrderCreateRequest;
 use App\Http\Requests\OrderMessageCreateRequest;
 use App\Http\Requests\OrderMessageUpdateRequest;
