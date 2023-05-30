@@ -56,7 +56,7 @@ class OrderBuilder
     /**
      * @var iPostOrderAction
      */
-    private iPostOrderAction $postOrderActions;
+    private $postOrderActions;
 
     /**
      * @var ProductService
