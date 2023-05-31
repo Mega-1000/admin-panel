@@ -364,12 +364,13 @@ class TaskService
     {
         $end = Carbon::now();
         $end->second = 0;
+        $start = Carbon::parse($task->taskTime->date_start);
+        $start->second = 0;
 
         $task->taskTime->date_end = $end;
-        if($task->taskTime->date_start >= $end){
-            $task->taskTime->date_end = Carbon::parse($task->taskTime->date_start)->addMinutes(2);
+        if($start >= $end){
+            $task->taskTime->date_end = $start->addMinutes(2);
         }
-        $task->taskTime->date_end = $end;
         $task->taskTime->save();
         $task->status = Task::FINISHED;
         $task->color = Task::LIGHT_GREEN_COLOR;
@@ -377,6 +378,6 @@ class TaskService
 
         $prev = [];
         AddLabelService::addLabels($task->order, [Label::ORDER_ITEMS_CONSTRUCTED], $prev, [], Auth::user()->id);
-        Log::info("Zadanie ". $task->id ." zostało zamknięte: ". $end);
+        Log::info("Zadanie ". $task->id ." zostało zamknięte: ". $task->taskTime->date_end);
     }
 }

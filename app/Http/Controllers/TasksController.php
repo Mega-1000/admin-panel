@@ -422,6 +422,7 @@ class TasksController extends Controller
                 'title' => $task->name,
                 'start' => $start->format('Y-m-d\TH:i'),
                 'end' => $end->format('Y-m-d\TH:i'),
+                'transfer' => $task->taskTime->transfer_date,
                 'color' => '#' . $task->color,
                 'text' => $text,
                 'customOrderId' => $task->order_id != null ? 'taskOrder-' . $task->order_id : null,
@@ -749,16 +750,21 @@ class TasksController extends Controller
             'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
             'user_id' => $task->user_id,
             'created_by' => $task->user_id,
-            'name' => 'odrzucone zadanie',
+            'name' => 'odrzucone zadanie ' . $task->order_id,
             'color' => Task::DISABLED_COLOR,
             'status' => Task::FINISHED
         ]);
-
         $end = Carbon::now();
         $end->second = 0;
+
+        $start = $time->date_start;
+        if ($start >= $end) {
+            $start = Carbon::now()->subMinutes(2);
+        }
+
         TaskTime::create([
             'task_id' => $newTask->id,
-            'date_start' => $time->date_start,
+            'date_start' => $start,
             'date_end' => $end
         ]);
         TaskSalaryDetails::create([

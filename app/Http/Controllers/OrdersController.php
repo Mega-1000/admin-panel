@@ -801,7 +801,7 @@ class OrdersController extends Controller
         $dt->second = 0;
         $data = [
             'start' => $dt->toDateTimeString(),
-            'end' => $dt->addMinutes(self::DURATION)->toDateTimeString(),
+            'end' => Carbon::now()->addMinutes(self::DURATION)->toDateTimeString(),
             'id' => $user_id,
             'user_id' => $user_id
         ];
