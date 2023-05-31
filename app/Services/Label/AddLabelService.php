@@ -10,6 +10,7 @@ use App\Entities\ShipmentGroup;
 use App\Entities\Task;
 use App\Entities\WorkingEvents;
 use App\Services\AllegroPaymentsReturnService;
+use App\Services\WorkingEventsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\TimedLabelJob;
@@ -27,7 +28,7 @@ class AddLabelService
             'added_type' => null,
         ], $options);
 
-        WorkingEvents::createEvent(WorkingEvents::LABEL_ADD_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::LABEL_ADD_EVENT, $order->id);
         if (count($labelIdsToAdd) < 1) {
             return;
         }

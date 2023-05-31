@@ -31,6 +31,7 @@ use App\Services\Label\RemoveLabelService;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use App\Services\OrderService;
+use App\Services\WorkingEventsService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\View\Factory;
@@ -117,7 +118,7 @@ class OrdersPaymentsController extends Controller
      */
     public function edit(int $id)
     {
-//        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
+//        WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $customerOrders = $orderPayment->order->customer->orders;
         $firms = Firm::all();
@@ -138,7 +139,7 @@ class OrdersPaymentsController extends Controller
             $orderId = $order_id;
         }
 
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order_id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order_id);
         $promise = $request->input('promise');
 
         if ($promise == 'on') {
@@ -188,7 +189,7 @@ class OrdersPaymentsController extends Controller
      */
     public function create($id)
     {
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
         return view('orderPayments.create', compact('id'), [
             'order' => Order::query()->findorFail($id),
             'firms' => Firm::all()
@@ -1627,7 +1628,7 @@ class OrdersPaymentsController extends Controller
      */
     public function update(OrderPaymentUpdateRequest $request, $id)
     {
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT, $id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $oldOrderId = $orderPayment->order_id;
 

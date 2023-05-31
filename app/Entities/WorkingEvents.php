@@ -181,35 +181,6 @@ class WorkingEvents extends Model
     ];
 
     /**
-     * Create event.
-     *
-     * @param string $event
-     * @param int|null $orderId
-     * @return WorkingEvents|null
-     */
-    public static function createEvent(string $event, int $orderId = null): ?WorkingEvents
-    {
-        $now = new \DateTime();
-        if (empty(Auth::user()) || !(Auth::user() instanceof User)) {
-            return null;
-        }
-
-        if (!($latest = WorkingEvents::latest()->first())) {
-            return null;
-        }
-
-        if ($now->diff($latest->created_at)->i < 2 && $latest->event == $event) {
-            return null;
-        }
-
-        return self::create([
-            'user_id' => Auth::user()->id,
-            'event' => $event,
-            'order_id' => $orderId
-        ]);
-    }
-
-    /**
      * Return event title.
      *
      * @return string
