@@ -723,7 +723,7 @@
 
                 <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
                 <div class="form-group" style="widht: 100%; float: left;">
-                    <a target="_blank" href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
+                    <a target="_blank" class="btn btn-primary" href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
                        for="add-item">
                         Edytuj zamówienie w koszyku
                     </a>

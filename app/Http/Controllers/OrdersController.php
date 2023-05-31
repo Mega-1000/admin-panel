@@ -83,6 +83,7 @@ use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
 use App\Services\TaskService;
+use App\Services\WorkingEventsService;
 use App\User;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -317,7 +318,7 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
-        WorkingEvents::createEvent(WorkingEvents::ORDER_LIST_EVENT);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_LIST_EVENT);
         $labelGroups = $this->labelGroupRepository->get()->sortBy('order');
         $labels = $this->labelRepository->where('status', 'ACTIVE')->orderBy('order')->get();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
@@ -419,7 +420,7 @@ class OrdersController extends Controller
         $order = Order::with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
 
         $orderId = $id;
-        WorkingEvents::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $order->id);
 
         $customerInfo = $this->customerAddressRepository->findWhere([
             "customer_id" => $order->customer->id,
@@ -895,9 +896,9 @@ class OrdersController extends Controller
 
         $user = Auth::user();
         $open = $this->taskService->getOpenUserTask($user->id);
-        
+
         Log::info("start automat");
-        
+
         if ($open->count() > 0)
         {
             $response = $this->taskService->markTaskAsProduced($open->first());
@@ -911,7 +912,7 @@ class OrdersController extends Controller
                 ]);
             }
             $this->taskService->closeTask($open->first());
-            
+
         }
         $task = $this->taskService->prepareAutoTask($data['package_type'], $skip);
 
@@ -1042,7 +1043,7 @@ class OrdersController extends Controller
             return response(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
         }
         $order = Order::find($request->order_id);
-        WorkingEvents::createEvent(WorkingEvents::NOTICE_MAPPER[$request->type], $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::NOTICE_MAPPER[$request->type], $order->id);
         switch ($request->type) {
             case Order::COMMENT_SHIPPING_TYPE:
                 $order->spedition_comment .= Order::formatMessage($user, $request->message);
@@ -1257,7 +1258,7 @@ class OrdersController extends Controller
                 $this->store($request->all());
                 break;
         }
-        WorkingEvents::createEvent(WorkingEvents::ORDER_UPDATE_EVENT, $id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_UPDATE_EVENT, $id);
 
         $order = $this->orderRepository->find($id);
         if (empty($order)) {
@@ -1636,7 +1637,7 @@ class OrdersController extends Controller
             'city' => $data['order_invoice_address_city'],
             'phone' => $data['order_invoice_address_phone'],
         ]);
-        WorkingEvents::createEvent(WorkingEvents::ORDER_STORE_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_STORE_EVENT, $order->id);
 
         return redirect()->route('orders.index')->with([
             'message' => __('orders.message.store'),

@@ -49,6 +49,7 @@ use App\Services\Label\AddLabelService;
 use App\Services\OrderAddressesService;
 use App\Services\OrderPackageService;
 use App\Services\ProductService;
+use App\Services\WorkingEventsService;
 use Carbon\Carbon;
 use Exception;
 use Http\Discovery\Exception\NotFoundException;
@@ -709,7 +710,7 @@ class OrdersController extends Controller
     public function acceptDates(Order $order, Request $request)
     {
         $result = null;
-        WorkingEvents::createEvent(WorkingEvents::ACCEPT_DATES_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::ACCEPT_DATES_EVENT, $order->id);
         if ($request->has('type') && $request->has('userType')) {
             /** @var OrderDates $dates */
             $dates = $order->dates;
@@ -749,7 +750,7 @@ class OrdersController extends Controller
     public function updateDates(Order $order, Request $request)
     {
         $result = null;
-        WorkingEvents::createEvent(WorkingEvents::UPDATE_DATES_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::UPDATE_DATES_EVENT, $order->id);
         if ($request->has('type')) {
             $order->dates->resetAcceptance();
             $result = $order->dates()->update([

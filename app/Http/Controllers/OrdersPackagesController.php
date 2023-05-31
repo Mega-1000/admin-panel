@@ -36,6 +36,7 @@ use App\Repositories\PackageTemplateRepository;
 use App\Repositories\ShipmentGroupRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\OrderPackageService;
+use App\Services\WorkingEventsService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use DateTime;
@@ -120,7 +121,7 @@ class OrdersPackagesController extends Controller
         }
 
         $orderId = $orderPackage->order_id;
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_UPDATE_EVENT, $orderId);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_PACKAGES_UPDATE_EVENT, $orderId);
         $data = $request->validated();
         $data['packing_type'] = $request->input('packing_type');
         $data['delivery_date'] = new DateTime($data['delivery_date']);
@@ -205,7 +206,7 @@ class OrdersPackagesController extends Controller
         $promisedPayments = [];
         $payments = [];
         $isAllegro = !empty($order->sello_id);
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_CREATE_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_PACKAGES_CREATE_EVENT, $order->id);
 
         $cashOnDeliverySum = 0;
 
@@ -301,7 +302,7 @@ class OrdersPackagesController extends Controller
     {
         $orderPackage = OrderPackage::find($id);
         $order = Order::find($orderPackage->order_id);
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_EDIT_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_PACKAGES_EDIT_EVENT, $order->id);
         $isAllegro = !empty($order->sello_id);
 
         $contentTypes = ContentType::all();
@@ -354,7 +355,7 @@ class OrdersPackagesController extends Controller
         }
 
         $order = $this->orderRepository->find($order_id);
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_STORE_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_PACKAGES_STORE_EVENT, $order->id);
         if (empty($packageNumber)) {
             $isAdditionalDKPExists = false;
             $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);

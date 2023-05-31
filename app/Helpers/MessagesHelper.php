@@ -20,6 +20,7 @@ use App\Http\Requests\NoticesRequest;
 use App\Jobs\ChatNotificationJob;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
+use App\Services\WorkingEventsService;
 use App\User;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -413,7 +414,7 @@ class MessagesHelper
                     Auth::user()->id
                 );
             }
-            WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
+            WorkingEventsService::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
         } else {
             if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null && $chatUser->customer_id !== null) {
 

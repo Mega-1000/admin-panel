@@ -11,6 +11,7 @@ use App\Entities\ProductStockPosition;
 use App\Entities\WorkingEvents;
 use App\Enums\ProductStockLogActionEnum;
 use App\Jobs\TimedLabelJob;
+use App\Services\WorkingEventsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class RemoveLabelService
     public static function removeLabels(Order $order, array $labelIdsToRemove, array &$loopPreventionArray, array $customLabelIdsToAddAfterRemoval, ?int $userId, ?string $time = null): array
     {
 
-        WorkingEvents::createEvent(WorkingEvents::LABEL_REMOVE_EVENT, $order->id);
+        WorkingEventsService::createEvent(WorkingEvents::LABEL_REMOVE_EVENT, $order->id);
 
         if (count($labelIdsToRemove) < 1) {
             return [];
