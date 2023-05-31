@@ -168,8 +168,8 @@ class TaskService
         $separatorDate = '';
         $separators = $this->getSeparator(16, $date->format('Y-m-d') . ' 00:00:00', $date->format('Y-m-d') . ' 23:59:59');
         foreach ($separators as $separator) {
-            if ($separator['resourceId'] == $user_id) {
-                $separatorDate = Carbon::parse($separator['end'])->format('Y-m-d H:i:s');
+            if (isset($separator->resourceId) && $separator->resourceId == $user_id) {
+                $separatorDate = Carbon::parse($separator->end)->format('Y-m-d H:i:s');
             }
         }
         return $separatorDate;
@@ -180,10 +180,9 @@ class TaskService
      */
     public function transfersTask(): void
     {
-        $today = Carbon::today();
+        $today = Carbon::today()->addDay();
         foreach (self::USERS_SEPARATOR as $user_id) {
             $time_start = Carbon::parse($today->format('Y-m-d') . ' ' . $this->getTimeLastTask($user_id));
-
             foreach (self::COLOR_SEPARATOR as $color) {
                 $time_start = $this->prepareTransfersTask($user_id, $color, $time_start);
             }
@@ -196,10 +195,9 @@ class TaskService
      */
     public function prepareTransfersTask(int $userId, string $color, string $timeStart): string
     {
-        $date = Carbon::today();
+        $date = Carbon::today()->addDay();
 
         $tasks = Tasks::getTransfersTask($userId, $color, $date);
-
         foreach ($tasks as $task) {
             $timeStart = $this->updateTransfersTask($task->taskTime->id, $timeStart);
             $this->moveTask($userId, $timeStart);
@@ -234,7 +232,7 @@ class TaskService
      */
     public function getTimeLastTask(int $user_id): string
     {
-        $date = Carbon::today();
+        $date = Carbon::today()->addDay();
         $taskTime = TaskTimes::getTimeLastTask($user_id, $date);
         $firstTaskTime = $taskTime->first();
 
@@ -247,7 +245,7 @@ class TaskService
      */
     public function moveTask(int $user_id, string $time): void
     {
-        $date = Carbon::today();
+        $date = Carbon::today()->addDay();
         $separatorDate = $this->getUserSeparator($user_id, $date);
 
         if ($time >= $separatorDate) {

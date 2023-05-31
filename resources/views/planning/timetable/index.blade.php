@@ -277,8 +277,8 @@
 @section('javascript')
     <script> 
         @if($selectId || $activeDay) 
-            window.localStorage.setItem('selectId', {{$selectId ?? 'null'}}); 
-            window.localStorage.setItem('activeDay', {{$activeDay ?? 'null'}}); 
+            window.localStorage.setItem('selectId', '{{$selectId ?? 'null'}}'); 
+            window.localStorage.setItem('activeDay', '{{$activeDay ?? 'null'}}');
         @endif
     </script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -1085,11 +1085,12 @@
             };
 
             let selectTaskId = window.localStorage.getItem('selectId');
+            let idFromUrl = null;
             if (getUrlParameter('id')) {
-                let idFromUrl = getUrlParameter('id');
+                idFromUrl = getUrlParameter('id');
             }
-            if (selectTaskId) {
-                let idFromUrl = 'task-' + selectTaskId;
+            if (selectTaskId !== 'undefined') {
+                idFromUrl = 'task-' + selectTaskId;
             }
             let mins = window.localStorage.getItem('mins') ?? '00:05';
             if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
