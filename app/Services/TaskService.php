@@ -341,15 +341,21 @@ class TaskService
      */
     public function closeTask(Task $task): bool
     {
-        $this->saveClosedTask($task);
-
-        if ($task->childs->count() > 0)
+        if ($task->parent_id !== null)
         {
-            foreach ($task->childs as $child)
+            $parentTask = Task::find($task->parent_id);
+            $this->saveClosedTask($parentTask);
+            if ($parentTask->childs->count() > 0)
             {
-                $this->saveClosedTask($child);
+                foreach ($parentTask->childs as $child)
+                {
+                    $this->saveClosedTask($child);
+                }
             }
+            return true;
         }
+
+        $this->saveClosedTask($task);
 
         return true;
     }
@@ -368,7 +374,8 @@ class TaskService
         $start->second = 0;
 
         $task->taskTime->date_end = $end;
-        if($start >= $end){
+        if ($start >= $end)
+        {
             $task->taskTime->date_end = $start->addMinutes(2);
         }
         $task->taskTime->save();
@@ -377,7 +384,10 @@ class TaskService
         $task->save();
 
         $prev = [];
-        AddLabelService::addLabels($task->order, [Label::ORDER_ITEMS_CONSTRUCTED], $prev, [], Auth::user()->id);
+        if ($task->order_id!==null)
+        {
+            AddLabelService::addLabels($task->order, [Label::ORDER_ITEMS_CONSTRUCTED], $prev, [], Auth::user()->id);
+        }
         Log::info("Zadanie ". $task->id ." zostało zamknięte: ". $task->taskTime->date_end);
     }
 }
