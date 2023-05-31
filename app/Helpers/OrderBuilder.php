@@ -46,7 +46,7 @@ class OrderBuilder
     /**
      * @var iSumable
      */
-    private iSumable $totalTransportSumCalculator;
+    private $totalTransportSumCalculator;
 
     /**
      * @var iGetUser
