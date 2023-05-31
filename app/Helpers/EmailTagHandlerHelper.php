@@ -337,7 +337,7 @@ class EmailTagHandlerHelper
      */
 	public function faqLink(): string {
 
-        $url = config('app.front_url') . "/faqAllegro";
+        $url = config('app.front_url') . "/faqA";
         $faqAttr = 'showFaq=true';
 
         if($this->order === null && $this->email !== null) {
