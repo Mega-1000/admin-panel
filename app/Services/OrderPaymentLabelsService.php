@@ -47,6 +47,8 @@ class OrderPaymentLabelsService
         $labelsToCheck = [52, 53, 54, 114, 47, 48, 96, 149, 49, 50, 195, 121];
         $labelsToCheck = array_diff($labelsToCheck, $labels);
 
+        $this->labelService->removeLabel($order->id, [45]);
+
         if (count($labelsToCheck) === 12) {
             AddLabelService::addLabels($order, [45, 68], $arr, [], Auth::user()?->id);
         }
