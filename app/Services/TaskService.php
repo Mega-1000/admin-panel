@@ -343,7 +343,7 @@ class TaskService
     {
         if ($task->parent_id !== null)
         {
-            $parentTask = Task::find($task->parent_id);
+            $parentTask = $task->parent->first();
             $this->saveClosedTask($parentTask);
             if ($parentTask->childs->count() > 0)
             {
