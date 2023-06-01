@@ -13,20 +13,18 @@ class DispatchLabelEventByNameJob extends Job implements ShouldQueue
 {
     use IsMonitored;
 
-    protected Order $order;
-    protected $eventName;
     protected ?int $userId;
 
     /**
      * DispatchLabelEventByNameJob constructor.
-     * @param $order
+     * @param Order $order
      * @param $eventName
      */
-    public function __construct(Order $order, $eventName)
+    public function __construct(
+        protected Order $order,
+        protected $eventName)
     {
         $this->userId = Auth::user()?->id;
-        $this->order = $order;
-        $this->eventName = $eventName;
     }
 
     /**
