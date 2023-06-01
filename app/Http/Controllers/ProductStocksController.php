@@ -27,12 +27,14 @@ use App\Repositories\Warehouses;
 use App\Services\OrderService;
 use App\Services\ProductService;
 use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\View;
 
 class ProductStocksController extends Controller
 {
@@ -157,7 +159,7 @@ class ProductStocksController extends Controller
     }
 
     /**
-     * @return View
+     * @return \Illuminate\Contracts\View\View
      */
     public function print()
     {
@@ -261,7 +263,7 @@ class ProductStocksController extends Controller
             abort(404);
         }
         $request->merge([
-            'stock_product' => $request->get('stock_product') ? true : false,
+            'stock_product' => (bool)$request->get('stock_product'),
         ]);
 
         $this->repository->update($request->all(), $productStock->id);
@@ -275,9 +277,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param Request $request
-     * @return View
+     * @return \Illuminate\Contracts\View\View|Application|Factory
      */
-    public function productsStocksChanges(Request $request): View
+    public function productsStocksChanges(Request $request): Application|Factory|\Illuminate\Contracts\View\View
     {
         $startDate = $request->input('products-stocks-changes-start-date');
         $endDate = $request->input('products-stocks-changes-end-date');
@@ -295,9 +297,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param ProductStock $productStock
-     * @return View
+     * @return \Illuminate\Contracts\View\View|Application|Factory
      */
-    public function placeAdminSideOrder(ProductStock $productStock): View
+    public function placeAdminSideOrder(ProductStock $productStock): Application|Factory|\Illuminate\Contracts\View\View
     {
         return view('product_stocks.place_admin_side_order', compact('productStock'));
     }
@@ -337,9 +339,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param Request $request
-     * @return View
+     * @return \Illuminate\Contracts\View\View|Application|Factory
      */
-    public function placeMultipleAdminSideOrders(Request $request): View
+    public function placeMultipleAdminSideOrders(Request $request): Application|Factory|\Illuminate\Contracts\View\View
     {
         return view('product_stocks.place_multiple_admin_orders', [
             'productStocks' => ProductStock::all(),
@@ -394,9 +396,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param string $data
-     * @return View
+     * @return Application|Factory|\Illuminate\Contracts\View\View
      */
-    public function getProductStockIntervals(string $data): View
+    public function getProductStockIntervals(string $data): Application|Factory|\Illuminate\Contracts\View\View
     {
         return view('product_stocks.interval_chart', [
             'intervals' => $data,
@@ -406,9 +408,9 @@ class ProductStocksController extends Controller
     /**
      * Create TWSO admin orders
      *
-     * @return View
+     * @return Application|Factory|\Illuminate\Contracts\View\View
      */
-    public function createTWSOAdminOrders(): View
+    public function createTWSOAdminOrders(): Application|Factory|\Illuminate\Contracts\View\View
     {
         return view('orderPayments.TWSO_orders_create', [
             'warehousesSymbols' => Warehouses::getAllWarehousesSymbols(),
