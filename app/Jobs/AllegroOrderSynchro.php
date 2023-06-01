@@ -462,9 +462,11 @@ class AllegroOrderSynchro implements ShouldQueue
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
             RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT], Auth::user()?->id);
             $order->createNewTask(5);
-        } else {
-            RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION], Auth::user()?->id);
+
+            return;
         }
+
+        RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION], Auth::user()?->id);
     }
 
     /**
