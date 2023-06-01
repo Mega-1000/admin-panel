@@ -640,12 +640,18 @@
                         startMinutes = '0' + startMinutes;
                     }
                     let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
+                    
                     let endDate = new Date(info.event.end);
                     let minutes = endDate.getUTCMinutes();
+                    if(info.event.end === null){
+                        endDate = new Date(info.event.start);
+                        minutes = endDate.getUTCMinutes() + 2;
+                    }
                     if (minutes < 10) {
                         minutes = '0' + minutes;
                     }
                     let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
+                    
                     $('input[name="view_type"]').val(info.view.type);
                     $('input[name="active_start"]').val(info.view.activeStart);
                     $('#moveTaskForm').attr('action', '/admin/planning/tasks/' + info.event.id + '/moveTask');

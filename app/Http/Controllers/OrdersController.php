@@ -798,11 +798,9 @@ class OrdersController extends Controller
         $newGroup = Task::whereIn('order_id', $similar)->get();
         $newGroup = $newGroup->concat([$task]);
 
-        $dt = Carbon::now();
-        $dt->second = 0;
         $data = [
-            'start' => $dt->toDateTimeString(),
-            'end' => $dt->addMinutes(self::DURATION)->toDateTimeString(),
+            'start' => Carbon::now()->toDateTimeString(),
+            'end' => Carbon::now()->addMinutes(self::DURATION)->toDateTimeString(),
             'id' => $user_id,
             'user_id' => $user_id
         ];

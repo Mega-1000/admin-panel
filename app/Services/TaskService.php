@@ -340,15 +340,21 @@ class TaskService
      */
     public function closeTask(Task $task): bool
     {
-        $this->saveClosedTask($task);
-
-        if ($task->childs->count() > 0)
+        if ($task->parent_id !== null)
         {
-            foreach ($task->childs as $child)
+            $parentTask = $task->parent->first();
+            $this->saveClosedTask($parentTask);
+            if ($parentTask->childs->count() > 0)
             {
-                $this->saveClosedTask($child);
+                foreach ($parentTask->childs as $child)
+                {
+                    $this->saveClosedTask($child);
+                }
             }
+            return true;
         }
+
+        $this->saveClosedTask($task);
 
         return true;
     }
@@ -363,19 +369,24 @@ class TaskService
     {
         $end = Carbon::now();
         $end->second = 0;
+        $start = Carbon::parse($task->taskTime->date_start);
+        $start->second = 0;
 
         $task->taskTime->date_end = $end;
-        if($task->taskTime->date_start >= $end){
-            $task->taskTime->date_end = Carbon::parse($task->taskTime->date_start)->addMinutes(2);
+        if ($start >= $end)
+        {
+            $task->taskTime->date_end = $start->addMinutes(2);
         }
-        $task->taskTime->date_end = $end;
         $task->taskTime->save();
         $task->status = Task::FINISHED;
         $task->color = Task::LIGHT_GREEN_COLOR;
         $task->save();
 
         $prev = [];
-        AddLabelService::addLabels($task->order, [Label::ORDER_ITEMS_CONSTRUCTED], $prev, [], Auth::user()->id);
-        Log::info("Zadanie ". $task->id ." zostało zamknięte: ". $end);
+        if ($task->order_id!==null)
+        {
+            AddLabelService::addLabels($task->order, [Label::ORDER_ITEMS_CONSTRUCTED], $prev, [], Auth::user()->id);
+        }
+        Log::info("Zadanie ". $task->id ." zostało zamknięte: ". $task->taskTime->date_end);
     }
 }
