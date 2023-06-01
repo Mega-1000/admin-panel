@@ -11,9 +11,9 @@ class ChatAuctionFirms
      * Get all products for firm
      *
      * @param $token
-     * @return ChatAuctionFirm
+     * @return Collection
      */
-    public static function getItemsByToken($token): ChatAuctionFirm
+    public static function getItemsByToken($token): Collection
     {
         return ChatAuctionFirm::where('token', $token)->first()->chatAuction->chat->order->items;
     }
