@@ -50,9 +50,9 @@ class ProductStocksController extends Controller
     }
 
     /**
-     * @return View
+     * @return \Illuminate\Contracts\View\View|Application|Factory
      */
-    public function index(): View
+    public function index(): Application|Factory|\Illuminate\Contracts\View\View
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stocks'));
         foreach ($visibilities as $key => $row) {
@@ -64,9 +64,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param $id
-     * @return View
+     * @return \Illuminate\Contracts\View\View|Application|Factory
      */
-    public function edit($id): View
+    public function edit($id): Application|Factory|\Illuminate\Contracts\View\View
     {
         $productStocks = ProductStock::where('product_id', $id)->first();
         $similarProducts = $this->productService->checkForSimilarProducts($id);
