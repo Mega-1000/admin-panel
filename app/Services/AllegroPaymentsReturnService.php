@@ -23,7 +23,7 @@ class AllegroPaymentsReturnService
             !self::checkIfOrderHasKwonPayment($order)
         ) {
             $order->payments()->create([
-                'amount' => $order->getValue(),
+                'amount' => $order->getValue() * -1,
                 'operation_type' => OrderPaymentsEnum::KWON_STATUS,
                 'payer' => $order->customer->login,
             ]);
