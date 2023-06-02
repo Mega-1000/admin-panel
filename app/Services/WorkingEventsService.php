@@ -28,8 +28,8 @@ class WorkingEventsService
                 WorkingEvents::ORDER_PACKAGES_CREATE_EVENT => 'Dodano paczkę',
                 WorkingEvents::LABEL_ADD_EVENT => 'Dodano etykietę',
                 WorkingEvents::LABEL_REMOVE_EVENT => 'Usunięto etykietę',
-                WorkingEvents::ORDER_PAYMENT_STORE_EVENT => ['log' => 'payments_log', 'message' => 'Dodano płatność'],
-                WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT => ['log' => 'payments_log', 'message' => 'Zaktualizowano płatność']
+                WorkingEvents::ORDER_PAYMENT_STORE_EVENT => ['log' => 'labels_log', 'message' => 'Dodano płatność'],
+                WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT => ['log' => 'labels_log', 'message' => 'Zaktualizowano płatność']
             ];
 
             if (array_key_exists($event, $eventMap)) {
