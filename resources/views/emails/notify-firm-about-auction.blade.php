@@ -1,6 +1,8 @@
 W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na dostawę styropianu.
 Prosimy kliknąć poniższy link który przeniesie Was do modułu na którym prowadzony jest przetarg.
-<a href="{{ route('auctions.offer.store', ['token' => $token]) }}">{{ route('auctions.offer.store', ['token' => $token]) }}</a>
+
+<a href="{{ route('auctions.offer.create', ['token' => $token]) }}">{{ route('auctions.offer.create', ['token' => $token]) }}</a>
+
 Podane tam będą wszystkie parametry oraz asortyment dotyczący przetargu oraz możliwość wprowadzenie swoich cen w m3 lub w opakowaniach.
 Ze względu na fakt że do przetargu jest zaproszonych wielu sprzedawców i producentów prosimy podać najniższe możliwe ceny aby zwiększyć prawdopodobieństwo wyboru waszej oferty.
 Nie będzie widoczne kto dokonuje propozycji ofertowej tylko jedynie najniższa cena zaproponowana przez któregoś z oferentów.

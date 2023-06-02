@@ -53,7 +53,7 @@
             <div class="alert alert-success"  style="width: 50%; margin: 0 auto; padding: 10px; margin-top: 30px">
                 <h4>
                     Najniższa cena na ten moment:
-                    {{ $chat_auction_firm->chatAuction->offers->min('commercial_price_net') }} PLN
+                    {{ $chat_auction_firm->chatAuction->offers->where('order_item_id', $product->id)->min('commercial_price_net') }} PLN
                 </h4>
             </div>
             <div class="product">

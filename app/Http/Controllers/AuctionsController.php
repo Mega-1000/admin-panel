@@ -8,10 +8,12 @@ use App\Entities\Chat;
 use App\Entities\ChatAuction;
 use App\Entities\ChatAuctionFirm;
 use App\Exceptions\DeliverAddressNotFoundException;
+use App\Helpers\Exceptions\ChatException;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Repositories\ChatAuctionFirms;
 use App\Services\ChatAuctionsService;
+use App\Services\ProductService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -21,7 +23,8 @@ use Illuminate\Http\Request;
 class AuctionsController extends Controller
 {
     public function __construct(
-        private readonly ChatAuctionsService $chatAuctionsService
+        private readonly ChatAuctionsService $chatAuctionsService,
+        private readonly ProductService      $productService,
     )
     {
     }
@@ -89,10 +92,10 @@ class AuctionsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param $token
+     * @param string $token
      * @return View
      */
-    public function createOffer($token): View
+    public function createOffer(string $token): View
     {
         return view('auctions.create-offer', [
             'chat_auction_firm' => ChatAuctionFirms::getChatAuctionFirmByToken($token),
@@ -103,11 +106,11 @@ class AuctionsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param $token
+     * @param string $token
      * @param CreateChatAuctionOfferRequest $request
      * @return RedirectResponse
      */
-    public function storeOffer($token, CreateChatAuctionOfferRequest $request): RedirectResponse
+    public function storeOffer(string $token, CreateChatAuctionOfferRequest $request): RedirectResponse
     {
         $firm = ChatAuctionFirm::query()->where('token', $token)->firstorfail();
 
@@ -117,5 +120,38 @@ class AuctionsController extends Controller
         ]));
 
         return redirect()->back()->with('success', 'Pomyślnie dodano ofertę');
+    }
+
+    /**
+     * @param ChatAuction $auction
+     * @return View
+     */
+    public function end(ChatAuction $auction): View
+    {
+        $order = $auction->chat->order;
+        $firms = ChatAuctionFirm::query()->where('chat_auction_id', $auction->id)->distinct('firm_id')->get();
+
+        return view('chat.auction-end', [
+            'auction' => $auction,
+            'products' => $order->items,
+            'order' => $order,
+            'firms' => $firms,
+            'offers' => $auction->offers,
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @param ChatAuction $auction
+     * @return RedirectResponse
+     * @throws ChatException
+     */
+    public function endCreateOrders(Request $request, ChatAuction $auction): RedirectResponse
+    {
+        $customer = $auction->chat->customers()->first();
+
+        $this->chatAuctionsService->endAuction($auction, $request->get('order'), $customer);
+
+        return redirect()->route('success');
     }
 }
