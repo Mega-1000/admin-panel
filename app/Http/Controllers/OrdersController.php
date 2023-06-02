@@ -805,8 +805,6 @@ class OrdersController extends Controller
             'user_id' => $user_id
         ];
 
-        Log::info('Zadanie: '. $task->id .', ustawionie start: '.$dt->toDateTimeString());
-
         foreach ($similar as $order_id) {
             $prev = [];
             /** @var Order $order */
