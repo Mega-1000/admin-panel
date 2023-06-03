@@ -12,7 +12,7 @@
         <th class="{{ $class }}" style="height: 90px;">
             {!! ChatHelper::formatChatUser($user, $userType) !!}
         </th>
-        @if ($currentUserType == MessagesHelper::TYPE_USER && $userType != MessagesHelper::TYPE_USER)
+        @if ($currentUserType == MessagesHelper::TYPE_USER && $userType != MessagesHelper::TYPE_USER || $title === 'Pracownicy firm uczestniczących w przetargu:')
             @if ($arePossibleUsers)
                 <th>
                     <button name="{{ get_class($user) }}" class="btn btn-success add-user"

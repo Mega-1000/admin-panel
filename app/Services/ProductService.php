@@ -16,37 +16,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ProductService
+readonly class ProductService
 {
-    protected $productRepository;
-
-    /**
-     * @var OrderAddressRepository
-     */
-    private $orderAddressRepository;
-
-    /**
-     * @var FirmRepository
-     */
-    private $firmRepository;
-
-    /**
-     * @var WarehouseRepository
-     */
-    private $warehouseRepository;
-
     public function __construct(
-        ProductRepository      $productRepository,
-        OrderAddressRepository $orderAddressRepository,
-        FirmRepository         $firmRepository,
-        WarehouseRepository    $warehouseRepository
-    )
-    {
-        $this->productRepository = $productRepository;
-        $this->orderAddressRepository = $orderAddressRepository;
-        $this->firmRepository = $firmRepository;
-        $this->warehouseRepository = $warehouseRepository;
-    }
+        protected ProductRepository    $productRepository,
+        private OrderAddressRepository $orderAddressRepository,
+        private FirmRepository         $firmRepository,
+        private WarehouseRepository    $warehouseRepository
+    ) {}
 
     public function checkForSimilarProducts(int $productId): ?Collection
     {
@@ -65,6 +42,29 @@ class ProductService
         return $similarProducts->first(function ($similarProduct) {
             return $similarProduct->stock_product === true;
         });
+    }
+
+    /**
+     * Get users based of all order variations for auction
+     *
+     * @param Order $order
+     * @return \Illuminate\Support\Collection
+     * @throws DeliverAddressNotFoundException
+     */
+    public function getUsersFromVariations(Order $order): \Illuminate\Support\Collection
+    {
+        $orders = collect($this->getVariations($order))->first();
+        $users = new Collection();
+
+        foreach ($orders as $order) {
+            $order = Product::find($order['id']);
+            $order->firm->employees->each(function ($employee) use (&$users) {
+                $users[] = $employee;
+            });
+        }
+
+
+        return $users->unique('email');
     }
 
 

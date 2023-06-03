@@ -10,6 +10,7 @@ use App\Entities\Employee;
 use App\Entities\Label;
 use App\Entities\Message;
 use App\Entities\Order;
+use App\Entities\OrderItem;
 use App\Entities\Product;
 use App\Entities\ProductMedia;
 use App\Entities\WorkingEvents;
@@ -18,8 +19,12 @@ use App\Helpers\Exceptions\ChatException;
 use App\Http\Controllers\OrdersController;
 use App\Http\Requests\NoticesRequest;
 use App\Jobs\ChatNotificationJob;
+use App\Repositories\OrderAddressRepository;
+use App\Repositories\ProductRepository;
+use App\Repositories\WarehouseRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
+use App\Services\ProductService;
 use App\Services\WorkingEventsService;
 use App\User;
 use Exception;
@@ -213,7 +218,7 @@ class MessagesHelper
             ->find($this->chatId);
     }
 
-    public function getTitle($withBold = false)
+    public function getTitle($withBold = false): string
     {
         $title = $this->prepareTitleText();
         if (!$withBold) {
@@ -242,6 +247,9 @@ class MessagesHelper
         return $chatUser;
     }
 
+    /**
+     * @throws ChatException
+     */
     public function createNewChat()
     {
         $chat = new Chat();
@@ -369,9 +377,6 @@ class MessagesHelper
                 $messageObj->attachment_name = $originalFileName;
             }
         }
-        if (!$chatUser) {
-            throw new ChatException('Cannot save message');
-        }
         $msg = $chatUser->messages()->save($messageObj);
 
         // assign messages if area is default (0)
@@ -440,9 +445,10 @@ class MessagesHelper
     /**
      * Send waiting message on chat
      *
-     * @param  Chat $chat
+     * @param Chat $chat
      *
      * @return void
+     * @throws ChatException
      */
     private function sendWaitingMessage(Chat $chat)
     {
@@ -482,7 +488,7 @@ class MessagesHelper
         return $chatUser;
     }
 
-    public function setLastRead()
+    public function setLastRead(): void
     {
         $chatUser = $this->getCurrentChatUser();
         if (!$chatUser) {
@@ -492,7 +498,7 @@ class MessagesHelper
         $chatUser->save();
     }
 
-    public function hasNewMessage()
+    public function hasNewMessage(): bool
     {
         return self::hasNewMessageStatic($this->getChat(), $this->getCurrentChatUser());
     }
@@ -500,9 +506,9 @@ class MessagesHelper
     /**
      * Get encrypted chat token for given data
      *
-     * @param  int      $orderId
-     * @param  int      $userId
-     * @param  string   $userType
+     * @param int|null $orderId
+     * @param int $userId
+     * @param string $userType
      *
      * @return string   $chatUserToken
      */
@@ -534,6 +540,9 @@ class MessagesHelper
         return false;
     }
 
+    /**
+     * @throws ChatException
+     */
     public static function getToken(int $mediaId, string $postCode, string $email, string $phone): string
     {
         $customer = self::getCustomer($email, $phone, $postCode);
@@ -558,6 +567,9 @@ class MessagesHelper
         return $helper->encrypt();
     }
 
+    /**
+     * @throws ChatException
+     */
     private static function getCustomer(string $email, string $phone, string $postCode): Customer
     {
         $customer = Customer::where('login', $email)->first();
@@ -685,36 +697,36 @@ class MessagesHelper
         // remove already existed as chat users employees
         $employeesIdsFiltered = $employeesIdsFiltered->diff($currentEmployeesOnChat);
 
-        $possibleUsers = Employee::findMany($employeesIdsFiltered);
-
-        return $possibleUsers;
+        return Employee::findMany($employeesIdsFiltered);
     }
 
     /**
      * Send complaint email to employee with given chat token
      *
-     * @param  string $email
+     * @param string $email
      *
      * @return void
+     * @throws ChatException
      */
-    public function sendComplaintEmail(string $email) {
+    public function sendComplaintEmail(string $email): void
+    {
 
         $chat = $this->getChat();
         $complaintForm = $chat->complaint_form;
 
-        if($chat === null) {
+        if ($chat === null) {
             throw new ChatException('Nieprawidłowy token chatu');
         }
-        if($complaintForm === '') {
+        if ($complaintForm === '') {
             throw new ChatException('Czat nie posiada uzupełnionego formularza reklamacji');
         }
-        if($this->currentUserType !== self::TYPE_USER) {
+        if ($this->currentUserType !== self::TYPE_USER) {
             throw new ChatException('Nie masz uprawnień do wysłania wiadomości');
         }
 
         $employee = Employee::where('email', $email)->first();
 
-        if($employee === null) {
+        if ($employee === null) {
             throw new ChatException('Brak pracownika dla danego adresu Email');
         }
 
@@ -723,7 +735,7 @@ class MessagesHelper
             'employee_id' => $employee->id,
         ])->first();
 
-        if($chatUser === null) {
+        if ($chatUser === null) {
             $chatUser = new ChatUser();
             $chatUser->chat()->associate($chat);
             $chatUser->employee()->associate($employee);
@@ -736,7 +748,7 @@ class MessagesHelper
 
         $complaintForm = json_decode($complaintForm);
 
-        if( isset($complaintForm->trackingNumber) ) {
+        if (isset($complaintForm->trackingNumber)) {
             $subject .= ', numer listu przewozowego: '.$complaintForm->trackingNumber;
         }
         Helper::sendEmail(

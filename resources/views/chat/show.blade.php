@@ -177,6 +177,17 @@
                             'arePossibleUsers' => true,
                             'class'            => 'bg-info alert alert-info',
                         ])
+                        @if($chat->auctions()->count() > 0)
+                            @include('chat/users', [
+                                'title'            => 'Pracownicy firm uczestniczących w przetargu:',
+                                'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
+                                'users'            => $allEmployeesFromRelatedOrders,
+                                'userType'         => MessagesHelper::TYPE_EMPLOYEE,
+                                'currentUserType'  => $userType,
+                                'arePossibleUsers' => true,
+                                'class'            => 'bg-info alert alert-info',
+                            ])
+                        @endif
                     </table>
                 </div>
                 @if ($userType == MessagesHelper::TYPE_USER)

@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Entities\Chat;
 use App\Entities\Firm;
 use App\Enums\UserRole;
+use App\Exceptions\DeliverAddressNotFoundException;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
+use App\Services\ProductService;
 use App\Services\StyrofoarmAuctionService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -18,16 +21,19 @@ use App\Repositories\Chats;
 
 class MessagesController extends Controller
 {
+    public function __construct(
+        private readonly ProductService $productService,
+    ) {}
 
     /**
      * Display a listing of the resource.
      *
      * @param Request $request
      * @param bool $all
-     * @param bool $orderId
+     * @param int $orderId
      * @return Response
      */
-    public static function index(Request $request, $all = false, $orderId = 0)
+    public static function index(Request $request, bool $all = false, int $orderId = 0): Response
     {
         $chats = self::getChatView($all, $orderId, $request->user()->id);
         return view('chat.index')->withChats($chats)->withShowAll($all);
@@ -39,7 +45,7 @@ class MessagesController extends Controller
      * @param int|null $userId
      * @return array|Chat
      */
-    public static function getChatView(bool $all, int $orderId, int $userId = null)
+    public static function getChatView(bool $all, int $orderId, int $userId = null): array|Chat
     {
         if ($all) {
             $chats = Chat::where('id', '>', 0);
@@ -75,17 +81,18 @@ class MessagesController extends Controller
         return $chats;
     }
 
-    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone)
+    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone): RedirectResponse
     {
         $url = self::getChatUrl($mediaId, $postCode, $email, $phone);
+
         return redirect($url);
     }
 
     public static function getChatUrl($mediaId, $postCode, $email, $phone): string
     {
         $token = MessagesHelper::getToken($mediaId, $postCode, $email, $phone);
-        $url = route('chat.show', ['token' => $token]);
-        return $url;
+
+        return route('chat.show', ['token' => $token]);
     }
 
     public function show($token)
@@ -107,6 +114,7 @@ class MessagesController extends Controller
      * @param string $token
      * @return View
      * @throws ChatException
+     * @throws DeliverAddressNotFoundException
      */
     private function prepareChatView(string $token): View
     {
@@ -207,7 +215,9 @@ class MessagesController extends Controller
 
         StyrofoarmAuctionService::updateAuction($chat, $products);
 
-        return view('chat.show')->with([
+        $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
+
+        return view('chat.show', [
             'isStyropian' => $isStyrofoarm,
             'product_list' => $productList,
             'faq' => $this->prepareFaq($chatUsers),
@@ -235,7 +245,7 @@ class MessagesController extends Controller
             'routeCallComplaint' => route('api.messages.callComplaint', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
             'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
-        ]);
+        ], compact('allEmployeesFromRelatedOrders'));
     }
 
     private function prepareFaq(Collection $users): array

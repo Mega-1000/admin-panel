@@ -66,7 +66,6 @@ class ChatHelper
             $lastname  = $chatUser->lastname_visibility ? $chatUser->lastname : '';
             $phone     = $chatUser->phone_visibility ? $chatUser->phone : '';
             $email     = $chatUser->email_visibility ? $chatUser->email : '';
-            $email     = $chatUser->email_visibility ? $chatUser->email : '';
             $roles     = $chatUser->employeeRoles->pluck('name')->join('<br>');
             $userData  = "$roles</br>$firstname $lastname </br>$phone $email";
 
@@ -78,6 +77,7 @@ class ChatHelper
             $userData = $chatUser->name .' '. $chatUser->firstname
                         .' '. $chatUser->lastname.'<br>'.$chatUser->email.'<br>'. $chatUser->phone;
         }
+
         return $userData;
     }
 
@@ -129,7 +129,7 @@ class ChatHelper
             if (!$product->product_name_supplier) {
                 continue;
             }
-            
+
             $firm = Firm::where('symbol', 'like', $product->product_name_supplier)->first();
             if (empty($firm)) {
                 continue;

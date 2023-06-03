@@ -14,6 +14,7 @@ use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Repositories\ChatAuctionFirms;
 use App\Services\ChatAuctionsService;
 use App\Services\ProductService;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -144,7 +145,7 @@ class AuctionsController extends Controller
      * @param Request $request
      * @param ChatAuction $auction
      * @return RedirectResponse
-     * @throws ChatException
+     * @throws ChatException|Exception
      */
     public function endCreateOrders(Request $request, ChatAuction $auction): RedirectResponse
     {
