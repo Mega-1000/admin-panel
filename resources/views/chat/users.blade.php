@@ -10,6 +10,9 @@
 @foreach ($users as $user)
     <tr>
         <th class="{{ $class }}" style="height: 90px;">
+            @if($title === "Pracownicy firm uczestniczących w przetargu:")
+                Odległość: {{ $user->radius }} km
+            @endif
             {!! ChatHelper::formatChatUser($user, $userType) !!}
         </th>
         @if ($currentUserType == MessagesHelper::TYPE_USER && $userType != MessagesHelper::TYPE_USER || $title === 'Pracownicy firm uczestniczących w przetargu:')

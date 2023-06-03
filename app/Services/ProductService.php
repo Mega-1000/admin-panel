@@ -58,14 +58,16 @@ readonly class ProductService
 
         foreach ($orders as $order) {
             $order = Product::find($order['id']);
-            $order->firm->employees->each(function ($employee) use (&$users) {
+            $order->firm->employees->each(function ($employee) use ($order, &$users) {
                 if ($employee->status !== 'PENDING') {
                     $users[] = $employee;
+
+                    $user = $users->last();
+                    $user->radius = $order->radius;
                 }
             });
         }
-
-
+        
         return $users->unique('email');
     }
 
