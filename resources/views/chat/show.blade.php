@@ -50,7 +50,7 @@
                             </a>
                         @else
                             <!-- if auction->end_of_auction is in past show message  -->
-                            @if(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)->gt(\Carbon\Carbon::now()))
+                            @if(\Carbon\Carbon::parse(\Carbon\Carbon::now())->gt(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)))
                             <h3>
                                     Przetarg zakończony
                                 </h3>
