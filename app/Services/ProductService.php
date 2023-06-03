@@ -63,7 +63,7 @@ readonly class ProductService
                     $users[] = $employee;
 
                     $user = $users->last();
-                    $user->radius = $order['radius'];
+                    $user->distance = $order['radius'];
                 }
             });
         }
