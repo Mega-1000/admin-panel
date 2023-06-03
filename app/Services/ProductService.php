@@ -59,7 +59,7 @@ readonly class ProductService
         foreach ($orders as $order) {
             $order = Product::find($order['id']);
             $order->firm->employees->each(function ($employee) use (&$users) {
-                if ($employee->status == 'PENDING') {
+                if ($employee->status !== 'PENDING') {
                     $users[] = $employee;
                 }
             });
