@@ -48,10 +48,10 @@ readonly class ProductService
      * Get users based of all order variations for auction
      *
      * @param Order $order
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      * @throws DeliverAddressNotFoundException
      */
-    public function getUsersFromVariations(Order $order): \Illuminate\Support\Collection
+    public function getUsersFromVariations(Order $order): Collection
     {
         $orders = collect($this->getVariations($order))->first();
         $users = new Collection();
@@ -59,7 +59,9 @@ readonly class ProductService
         foreach ($orders as $order) {
             $order = Product::find($order['id']);
             $order->firm->employees->each(function ($employee) use (&$users) {
-                $users[] = $employee;
+                if ($employee->status == 'PENDING') {
+                    $users[] = $employee;
+                }
             });
         }
 
