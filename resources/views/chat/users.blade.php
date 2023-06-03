@@ -11,7 +11,10 @@
     <tr>
         <th class="{{ $class }}" style="height: 90px;">
             @if(isset($user->radius))
-                Odległość: {{ $user->radius }} km
+                Odległość: {{ $user->radius }} km <br>
+            @endif
+            @if(isset($user->firm?->symbol))
+                Symbol firmy: {{ $user->firm->symbol }} <br>
             @endif
             {!! ChatHelper::formatChatUser($user, $userType) !!}
         </th>
