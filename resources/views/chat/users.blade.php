@@ -1,5 +1,5 @@
 <tr>
-    <th colspan="2" style="height: {{ $users->isEmpty() ? '40px' : '20px'}}; padding-top: 15px;">{{ $title }}
+{{--    <th colspan="2" style="height: {{ $users->isEmpty() ? '40px' : '20px'}}; padding-top: 15px;">{{ $title }}--}}
         @if ($users->isEmpty())
             <p colspan="2" style="font-weight: 400;">
                 {{ $isEmptyMsg }}
@@ -10,7 +10,7 @@
 @foreach ($users as $user)
     <tr>
         <th class="{{ $class }}" style="height: 90px;">
-            @if($title === "Pracownicy firm uczestniczących w przetargu:")
+            @if(isset($user->radius))
                 Odległość: {{ $user->radius }} km
             @endif
             {!! ChatHelper::formatChatUser($user, $userType) !!}
