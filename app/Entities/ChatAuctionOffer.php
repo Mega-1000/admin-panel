@@ -5,6 +5,7 @@ namespace App\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class ChatAuctionOffer extends Model
 {
@@ -29,8 +30,18 @@ class ChatAuctionOffer extends Model
         return $this->belongsTo(ChatAuction::class);
     }
 
-    public function firm(): BelongsTo
+    public function auctionFirm(): BelongsTo
     {
-        return $this->belongsTo(Firm::class);
+        return $this->belongsTo(ChatAuctionFirm::class);
+    }
+
+    public function firm(): HasOneThrough
+    {
+        return $this->hasOneThrough(Firm::class, ChatAuctionFirm::class, 'id', 'id', 'auction_firm_id', 'firm_id');
+    }
+
+    public function orderItem(): BelongsTo
+    {
+        return $this->belongsTo(OrderItem::class);
     }
 }

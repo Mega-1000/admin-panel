@@ -7,6 +7,7 @@ use App\Entities\Firm;
 use App\Enums\UserRole;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
+use App\Services\StyrofoarmAuctionService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -180,7 +181,7 @@ class MessagesController extends Controller
         $token = $helper->encrypt();
 
         $currentChatUser = $helper->getCurrentChatUser();
-        
+
         if($currentChatUser === null) {
             abort(401);
         }
@@ -203,6 +204,8 @@ class MessagesController extends Controller
                 break;
             }
         }
+
+        StyrofoarmAuctionService::updateAuction($chat, $products);
 
         return view('chat.show')->with([
             'isStyropian' => $isStyrofoarm,

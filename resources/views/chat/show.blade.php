@@ -49,19 +49,30 @@
                                 Rozpocznij przetarg
                             </a>
                         @else
-                            <h3>
-                                Aktywny przetarg
-                            </h3>
-                            <br>
-                            Koniec: {{ $chat->auctions->first()->end_of_auction }}
-                            <br>
-                            data do wysyłki: {{ $chat->auctions->first()->date_of_delivery }}
-                            <br>
-                            Cena: {{ $chat->auctions->first()->price }} %
-                            <br>
-                            Jakość: {{ $chat->auctions->first()->quality }} %
-                            <br>
-                            Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
+                            <!-- if auction->end_of_auction is in past show message  -->
+                            @if(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)->format('d-m-Y') > now()->format('d-m-Y'))
+                                <h3>
+                                    Przetarg zakończony
+                                </h3>
+                                <br>
+                                <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
+                                    Zobacz wyniki przetargu
+                                </a>
+                            @else
+                                <h3>
+                                    Aktywny przretarg
+                                </h3>
+                                <br>
+                                Koniec: {{ $chat->auctions->first()->end_of_auction }}
+                                <br>
+                                data do wysyłki: {{ $chat->auctions->first()->date_of_delivery }}
+                                <br>
+                                Cena: {{ $chat->auctions->first()->price }} %
+                                <br>
+                                Jakość: {{ $chat->auctions->first()->quality }} %
+                                <br>
+                                Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
+                            @endif
                         @endif
 
                         @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
@@ -364,7 +375,7 @@
                 nextRefresh = 0;
                 running = false;
             });
-            
+
             setInterval(getMessages, 500);
             scrollBottom();
 

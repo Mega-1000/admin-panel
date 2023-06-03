@@ -16,9 +16,7 @@ readonly class CreateChatAuctionOfferDTO
         public int $order_item_id,
         public int $chat_auction_id,
         public int $firm_id,
-    )
-    {
-    }
+    ) {}
 
     public static function fromRequest($data): CreateChatAuctionOfferDTO
     {

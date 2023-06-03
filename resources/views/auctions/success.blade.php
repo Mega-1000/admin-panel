@@ -10,6 +10,6 @@
 
 <body>
     <div class="container">
-        Pomyślnie rozpoczęto przetarg. Możesz zamknąć stronę.
+        Akcja została wykonana pomyślnie. Możesz zamknąć stronę.
     </div>
 </body>

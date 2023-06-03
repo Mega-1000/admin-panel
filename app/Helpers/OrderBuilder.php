@@ -61,7 +61,7 @@ class OrderBuilder
     /**
      * @var ProductService
      */
-    private ProductService $productService;
+    private $productService;
 
 
     public function setPackageGenerator(iDividable $generator): static
@@ -285,8 +285,9 @@ class OrderBuilder
 
     /**
      * @throws Exception
+     *
      */
-    public function assignItemsToOrder($order, $items): void
+    public function assignItemsToOrder($order, $items): Order
     {
         $weight = 0;
         $orderItems = $order->items;
@@ -349,6 +350,8 @@ class OrderBuilder
         $order->total_price = $this->priceCalculator->getTotal();
         $order->weight = round($weight, 2);
         $order->save();
+
+        return $order;
     }
 
     public static function getPriceColumns(): array
