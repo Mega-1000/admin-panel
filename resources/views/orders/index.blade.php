@@ -2189,12 +2189,12 @@
                             bilans = totalOfPayments - totalOfReturns + totalOfDeclaredPayments;
                             let offerFinanceBilans = row['values_data']['sum_of_gross_values'] - bilans + returnedValue;
 
-                            text += `<p> Z: ${totalOfPayments} </p>`;
-                            text += `<p> ZW: ${totalOfReturns} </p>`;
-                            text += `<p> D: ${totalOfDeclaredPayments} </p>`
-                            text += `<p> ZT: ${returnedValue} </p>`
-                            text += `<p> BIF: ${bilans} </p>`;
-                            text += `<p> CBO: ${offerFinanceBilans} </p>`
+                            text += `<p> Z: ${Math.round(totalOfPayments * 100) / 100} </p>`;
+                            text += `<p> ZW: ${Math.round(totalOfReturns * 100) / 100} </p>`;
+                            text += `<p> D: ${Math.round(totalOfDeclaredPayments * 100) / 100} </p>`
+                            text += `<p> ZT: ${Math.round(returnedValue * 100) / 100} </p>`
+                            text += `<p> BIF: ${Math.round(bilans * 100) / 100} </p>`;
+                            text += `<p> CBO: ${Math.round(offerFinanceBilans * 100) / 100} </p>`
 
                             settledDeclared.forEach((amount) => {
                                 text += `<p> ZD: ${amount} </p>`;
