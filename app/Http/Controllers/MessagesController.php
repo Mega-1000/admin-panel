@@ -100,6 +100,7 @@ class MessagesController extends Controller
         if (config('app.env') == 'production') {
             Debugbar::disable();
         }
+
         try {
             return $this->prepareChatView($token);
         } catch (ChatException $e) {
@@ -190,9 +191,10 @@ class MessagesController extends Controller
 
         $currentChatUser = $helper->getCurrentChatUser();
 
-        if($currentChatUser === null) {
+        if ($currentChatUser === null) {
             abort(401);
         }
+
         $currentChatUser->is_online = true;
 
         $assignedMessagesIds = [];
@@ -213,7 +215,7 @@ class MessagesController extends Controller
             }
         }
 
-        if (isset($order)) {
+        if ($order) {
             StyrofoarmAuctionService::updateAuction($chat, $products);
 
             $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
@@ -261,22 +263,20 @@ class MessagesController extends Controller
         return $faqs;
     }
 
-    public function showOrNew(int $orderId, int $userId)
+    public function showOrNew(int $orderId, int $userId): RedirectResponse
     {
         $chat = Chat::where('order_id', '=', $orderId)->first();
+        $helper = new MessagesHelper();
+
         if (!$chat) {
-            $helper = new MessagesHelper();
             $helper->orderId = $orderId;
-            $helper->currentUserId = $userId;
-            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
-            $userToken = $helper->encrypt();
         } else {
-            $helper = new MessagesHelper();
             $helper->chatId = $chat->id;
-            $helper->currentUserId = $userId;
-            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
-            $userToken = $helper->encrypt();
         }
+
+        $helper->currentUserId = $userId;
+        $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+        $userToken = $helper->encrypt();
 
         return redirect()->route('chat.show', ['token' => $userToken]);
     }
