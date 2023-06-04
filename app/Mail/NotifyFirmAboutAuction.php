@@ -22,19 +22,17 @@ class NotifyFirmAboutAuction extends Mailable
      * @return void
      */
     public function __construct(
-        public ChatAuction $auction,
-        public Firm $firm,
-        public string $token,
-    )
-    {
-    }
+        public readonly ChatAuction $auction,
+        public readonly Firm        $firm,
+        public readonly string      $token,
+    ) {}
 
     /**
      * Get the message envelope.
      *
-     * @return \Illuminate\Mail\Mailables\Envelope
+     * @return Envelope
      */
-    public function envelope()
+    public function envelope(): Envelope
     {
         return new Envelope(
             subject: 'Powiadomienie o przetargu',
@@ -44,9 +42,9 @@ class NotifyFirmAboutAuction extends Mailable
     /**
      * Get the message content definition.
      *
-     * @return \Illuminate\Mail\Mailables\Content
+     * @return Content
      */
-    public function content()
+    public function content(): Content
     {
         return new Content(
             view: 'emails.notify-firm-about-auction',
@@ -58,7 +56,7 @@ class NotifyFirmAboutAuction extends Mailable
      *
      * @return array
      */
-    public function attachments()
+    public function attachments(): array
     {
         return [];
     }

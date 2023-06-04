@@ -4,6 +4,9 @@ namespace App\Entities;
 
 use App\Helpers\ChatHelper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -47,37 +50,37 @@ class Employee extends Model implements Transformable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function firm()
+    public function firm(): BelongsTo
     {
         return $this->belongsTo(Firm::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsToMany
      */
-    public function warehouses()
+    public function warehouses(): BelongsToMany
     {
         return $this->belongsToMany(Warehouse::class, 'employee_warehouse')->withTimestamps();
     }
 
-    public function employeeRoles()
+    public function employeeRoles(): BelongsToMany
     {
         return $this->belongsToMany(EmployeeRole::class, 'employeerole_employee')->withTimestamps();
     }
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function messages()
+    public function messages(): HasMany
     {
         return $this->hasMany(OrderMessage::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function tasks()
+    public function tasks(): BelongsToMany
     {
         return $this->belongsToMany(OrderTask::class);
     }

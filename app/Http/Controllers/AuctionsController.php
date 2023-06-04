@@ -12,8 +12,8 @@ use App\Helpers\Exceptions\ChatException;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Repositories\ChatAuctionFirms;
+use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
-use App\Services\ProductService;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -24,11 +24,10 @@ use Illuminate\Http\Request;
 class AuctionsController extends Controller
 {
     public function __construct(
-        private readonly ChatAuctionsService $chatAuctionsService,
-        private readonly ProductService      $productService,
-    )
-    {
-    }
+        private readonly ChatAuctionsService     $chatAuctionsService,
+        private readonly ChatAuctionOfferService $chatAuctionOfferService,
+        private readonly ChatAuctionFirms        $chatAuctionFirmsRepository,
+    ) {}
 
     /**
      * Show the form for creating a new resource.
@@ -115,7 +114,7 @@ class AuctionsController extends Controller
     {
         $firm = ChatAuctionFirm::query()->where('token', $token)->firstorfail();
 
-        $this->chatAuctionsService->createOffer(CreateChatAuctionOfferDTO::fromRequest($request->validated() + [
+        $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($request->validated() + [
             'firm_id' => $firm->id,
             'chat_auction_id' => $firm->chat_auction_id
         ]));
@@ -130,15 +129,12 @@ class AuctionsController extends Controller
     public function end(ChatAuction $auction): View
     {
         $order = $auction->chat->order;
-        $firms = ChatAuctionFirm::query()->where('chat_auction_id', $auction->id)->distinct('firm_id')->get();
+        $firms = $this->chatAuctionFirmsRepository->getFirmsByChatAuction($auction->id);
 
         return view('chat.auction-end', [
-            'auction' => $auction,
             'products' => $order->items,
-            'order' => $order,
-            'firms' => $firms,
             'offers' => $auction->offers,
-        ]);
+        ], compact('order', 'firms', 'auction'));
     }
 
     /**
