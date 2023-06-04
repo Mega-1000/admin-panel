@@ -74,17 +74,17 @@
                                 Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
                             @endif
                         @endif
-
+                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0)
+                            <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
+                                Zobacz wyniki przetargu
+                            </a>
+                        @endif
                         @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
                             <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
                                 @csrf
                                 <button class="btn btn-success">
                                     Rozpocznij przetarg
                                 </button>
-
-                                <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
-                                    Zobacz wyniki przetargu
-                                </a>
                             </form>
                         @endif
                     </div>
