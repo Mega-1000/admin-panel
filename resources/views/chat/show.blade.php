@@ -81,6 +81,10 @@
                                 <button class="btn btn-success">
                                     Rozpocznij przetarg
                                 </button>
+
+                                <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
+                                    Zobacz wyniki przetargu
+                                </a>
                             </form>
                         @endif
                     </div>
