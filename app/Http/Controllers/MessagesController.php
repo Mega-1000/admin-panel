@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Chat;
 use App\Entities\Firm;
+use App\Entities\Order;
 use App\Enums\UserRole;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Helpers\Exceptions\ChatException;
@@ -215,7 +216,7 @@ class MessagesController extends Controller
             }
         }
 
-        if ($order) {
+        if (get_class($order) === Order::class) {
             StyrofoarmAuctionService::updateAuction($chat, $products);
 
             $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
