@@ -213,9 +213,11 @@ class MessagesController extends Controller
             }
         }
 
-        StyrofoarmAuctionService::updateAuction($chat, $products);
+        if (isset($order)) {
+            StyrofoarmAuctionService::updateAuction($chat, $products);
 
-        $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
+            $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
+        }
 
         return view('chat.show', [
             'isStyropian' => $isStyrofoarm,
