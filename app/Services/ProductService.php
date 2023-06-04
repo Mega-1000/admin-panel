@@ -56,6 +56,10 @@ readonly class ProductService
         $orders = collect($this->getVariations($order))->first();
         $users = new Collection();
 
+        if ($orders === null) {
+            return $order->firm->employees;
+        }
+
         foreach ($orders as $order) {
             $orderObj = Product::find($order['id']);
             $orderObj->firm->employees->each(function ($employee) use ($order, &$users) {
