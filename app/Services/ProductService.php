@@ -57,7 +57,7 @@ readonly class ProductService
         $users = new Collection();
 
         if ($orders === null) {
-            return $order->firm->employees;
+            return  Product::find($order['id'])->firm->employees;
         }
 
         foreach ($orders as $order) {
