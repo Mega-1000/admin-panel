@@ -2791,9 +2791,12 @@
             }
 
             if (labelId == '49') {
-                var checkQuantity = checkOrderQuantityInStock(39043);
-                $('#quantity-in-stock-list').modal('show');
-                return;
+                var checkQuantity = checkOrderQuantityInStock(orderId);
+
+                if (checkQuantity==1) {
+                    $('#quantity-in-stock-list').modal('show');
+                    return;
+                }
             }
 
             let removeLabelRequest = function () {
