@@ -183,6 +183,23 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="quantity-in-stock-list" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.task_realized')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="error-finish-task-form"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="mark-as-created-desc" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
@@ -2772,6 +2789,13 @@
                 })
                 return;
             }
+
+            if (labelId == '49') {
+                var checkQuantity = checkOrderQuantityInStock(39043);
+                $('#quantity-in-stock-list').modal('show');
+                return;
+            }
+
             let removeLabelRequest = function () {
                 $.ajax({
                     url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
@@ -3920,7 +3944,7 @@
 
         function checkQuantityInStock(task) {
             html = '';
-            status = 0;
+            let status = 0;
             $.ajax({
                 type: "GET",
                 url: '/admin/planning/tasks/' + task + '/checkQuantityInStock',
@@ -3953,6 +3977,51 @@
                         html += '</table>';
                     });
                     $('#error-finish-task-form').html(html);
+                }else{
+                    status = 1;
+                }
+            }).fail(function () {
+                status = 1;
+            });
+
+            return status;
+        }
+
+        function checkOrderQuantityInStock(orderId) {
+            html = '';
+            let status = 0;
+            $.ajax({
+                type: "GET",
+                url: '/admin/planning/tasks/' + orderId + '/checkOrderQuantityInStock',
+                async: false
+            }).done(function (data) {
+                if(data.status == 200){
+                    if(Object.keys(data.data).length>0){
+                        status = 1;
+                    }
+                    $.each(data.data, function (index, value) {
+
+                        html += '<h3>oferta '+ index +'</h3>';
+                        html += '<table class="table">';
+                            html += '<tr class="appendRow">';
+                            html += '<td style="width: 200px;">Nazwa</td>';
+                            html += '<td style="width: 100px;">Symbol</td>';
+                            html += '<td style="width: 50px;">Ilość potrzebna</td>';
+                            html += '<td style="width: 50px;">Na magazynie/Ilość na pozycji</td>';
+                            html += '<td>#</td>';
+                            html += '</tr>';
+                        $.each(value, function (index, value) {
+                            html += '<tr class="appendRow">';
+                            html += '<td>' + value.product_name + '</td>';
+                            html += '<td>' + value.product_symbol + '</td>';
+                            html += '<td>' + value.quantity + '</td>';
+                            html += '<td>' + value.stock_quantity + '/' + value.first_position_quantity + '</td>';
+                            html += '<td><a href="/admin/products/stocks/' + value.product_stock_id + '/edit" target="_blank">Przenieś</a></td>';
+                            html += '</tr>';
+                        });
+                        html += '</table>';
+                    });
+                    $('#quantity-in-stock-list .error-finish-task-form').html(html);
                 }else{
                     status = 1;
                 }

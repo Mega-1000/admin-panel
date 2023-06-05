@@ -112,7 +112,7 @@ class TaskTimeService
     /**
      * @return StockListDTO[]
      */
-    public function getQuantityInStockList(Collection $tasks): array
+    public function getQuantityInStockList(Collection $tasks)//: array
     {
         $stockLists = [];
         foreach ($tasks as $task) {
@@ -121,8 +121,11 @@ class TaskTimeService
                 foreach ($orderItems as $orderItem) {
                     // TODO Obstawiam że to miejsce będzie waliło błędami BW 20.05.2023 10:58
                     if (
-                        $orderItem->quantity > $orderItem->product->getPositions()->first()->position_quantity ||
-                        $orderItem->quantity > $orderItem->product->stock->quantity
+                            (
+                                $orderItem->product->getPositions()->count() > 0 &&
+                                $orderItem->quantity > $orderItem->product->getPositions()->first()->position_quantity
+                            ) ||
+                            $orderItem->quantity > $orderItem->product->stock->quantity
                     ) {
                         $stockLists[$orderItem->order_id][] = new StockListDTO(
                             $orderItem->product->id,
@@ -130,7 +133,7 @@ class TaskTimeService
                             $orderItem->product->symbol,
                             $orderItem->quantity,
                             ($orderItem->product->stock->count() ? $orderItem->product->stock->quantity : 0),
-                            $orderItem->product->getPositions()->first()->position_quantity
+                            ($orderItem->product->getPositions()->count() ? $orderItem->product->getPositions()->first()->position_quantity : 0)
                         );
                     }
                 }
