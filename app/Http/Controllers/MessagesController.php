@@ -250,7 +250,7 @@ class MessagesController extends Controller
             'routeCallComplaint' => route('api.messages.callComplaint', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
             'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
-        ], compact('allEmployeesFromRelatedOrders'));
+        ], compact('allEmployeesFromRelatedOrders') ?? []);
     }
 
     private function prepareFaq(Collection $users): array

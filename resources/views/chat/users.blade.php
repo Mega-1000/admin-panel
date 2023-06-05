@@ -1,6 +1,6 @@
 <tr>
 {{--    <th colspan="2" style="height: {{ $users->isEmpty() ? '40px' : '20px'}}; padding-top: 15px;">{{ $title }}--}}
-        @if (empty($users))
+        @if ($users->isEmpty())
             <p colspan="2" style="font-weight: 400;">
                 {{ $isEmptyMsg }}
             </p>
