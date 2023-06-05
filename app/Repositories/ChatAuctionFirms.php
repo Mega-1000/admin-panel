@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Entities\ChatAuctionFirm;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class ChatAuctionFirms
 {
@@ -35,6 +36,32 @@ class ChatAuctionFirms
      */
     public static function getFirmsByChatAuction($chat_auction_id): Collection
     {
-        return ChatAuctionFirm::query()->where('chat_auction_id', $chat_auction_id)->distinct('firm_id')->get();
+        return ChatAuctionFirm::query()
+            ->where('chat_auction_id', $chat_auction_id)
+            ->with('firm')
+            ->get()
+            ->unique(function ($q) {
+                return $q->firm->name;
+            });// distinc by firm email;
+    }
+
+    /**
+     * Create chat auction firm
+     *
+     * @param $auction
+     * @param $firm
+     * @return string
+     */
+    public function createWithToken($auction, $firm): string
+    {
+        $token = Str::random(60);
+
+        ChatAuctionFirm::create([
+            'chat_auction_id' => $auction->id,
+            'firm_id' => $firm->id,
+            'token' => $token,
+        ]);
+
+        return $token;
     }
 }
