@@ -2791,7 +2791,7 @@
             }
 
             if (labelId == '49') {
-                var checkQuantity = checkOrderQuantityInStock(orderId);
+                let checkQuantity = checkOrderQuantityInStock(orderId);
 
                 if (checkQuantity==1) {
                     $('#quantity-in-stock-list').modal('show');
