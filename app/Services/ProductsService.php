@@ -230,7 +230,7 @@ class ProductsService
         $mediaData = explode('|', $mediaValue['url']);
         if (count($mediaData) == 3) {
             if (str_contains($mediaData[2], MessagesHelper::SHOW_FRONT)) {
-                $products->data->$productKey->media->$mediaKey->url = null;
+                $products->data[$productKey]->media[$mediaKey]->url = null;
             } else {
                 unset($products->data->$productKey->media->$mediaKey);
             }
