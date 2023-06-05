@@ -183,7 +183,7 @@
                             @include('chat/users', [
                                 'title'            => 'Pracownicy firm uczestniczących w przetargu:',
                                 'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
-                                'users'            => $allEmployeesFromRelatedOrders,
+                                'users'            => $allEmployeesFromRelatedOrders ?? new \Illuminate\Support\Collection(),
                                 'userType'         => MessagesHelper::TYPE_EMPLOYEE,
                                 'currentUserType'  => $userType,
                                 'arePossibleUsers' => true,
