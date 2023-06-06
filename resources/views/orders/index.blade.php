@@ -2157,7 +2157,7 @@
                             let totalOfReturns = 0;
                             let text = '';
                             const settledDeclared = [];
-                            var payments = row['payments'];
+                            const payments = row['payments'];
                             let returnedValue = 0;
 
                             payments.forEach(payment => {
@@ -2175,7 +2175,7 @@
 
                                 if (parsedAmount < 0 && payment.operation_type !== "Zwrot towaru") {
                                     totalOfReturns -= parsedAmount ?? parsedDeclaredAmount;
-                                } else if (parsedAmount && parsedAmount > 0) {
+                                } else if (parsedAmount && parsedAmount > 0 && payment.operation_type !== '{{ \App\Enums\OrderPaymentsEnum::KWON_STATUS }}') {
                                     totalOfPayments += parsedAmount;
                                 } else if (!parsedAmount && parsedDeclaredAmount > 0) {
                                     totalOfDeclaredPayments += status === 'Rozliczona deklarowana' ? 0 : parsedDeclaredAmount;
