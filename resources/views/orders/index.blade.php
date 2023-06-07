@@ -2198,9 +2198,9 @@
                             text += `<p> ZW: ${Math.round(totalOfReturns * 100) / 100} </p>`;
                             text += `<p> D: ${Math.round(totalOfDeclaredPayments * 100) / 100} </p>`;
                             text += `<p> ZT: ${Math.round(returnedValue * 100) / 100} </p>`;
+                            text += `<p> KWON: ${Math.round(kwonPayments * 100) / 100} </p>`;
                             text += `<p> BIF: ${Math.round(bilans * 100) / 100} </p>`;
                             text += `<p> CBO: ${Math.round(offerFinanceBilans * 100) / 100} </p>`;
-                            text += `<p> KWON: ${Math.round(kwonPayments * 100) / 100} </p>`;
 
                             settledDeclared.forEach((amount) => {
                                 text += `<p> RD: ${amount} </p>`;
