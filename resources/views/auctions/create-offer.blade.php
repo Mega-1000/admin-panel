@@ -32,6 +32,16 @@
 </head>
 
 <body>
+    <div class="text-center mt-2">
+        <h3>
+            Prosimy o skorygowanie ceny za m3 i zatwierdzenie poprzez użycie przycisku "Aktualizuj" przy każdym produkcie oddzielnie.
+            <br>
+            <br>
+            Miejscowość: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->city }}
+            <br>
+            Kod pocztowy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}
+        </h3>
+    </div>
     @foreach($products as $product)
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -60,7 +70,7 @@
                 <img class="image-product" src="{{$product->product->getImageUrl()}}"
                      onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
                 <div class="product-description">
-                    <h4>
+                        <h4>
                         Najniższa cena na ten moment:
                         {{ $product->chatAuctionOffers->min('price') }} PLN
                     </h4>
