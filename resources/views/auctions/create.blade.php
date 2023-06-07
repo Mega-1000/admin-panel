@@ -38,28 +38,4 @@
             Anuluj
         </a>
     </form>
-
-    <script>
-        document.getElementById("quality-input").addEventListener("input", sumTo100);
-        document.getElementById("price-input").addEventListener("input", sumTo100);
-
-        function sumTo100() {
-            let a = parseInt(document.getElementById("quality-input").value);
-            let b = parseInt(document.getElementById("price-input").value);
-            if (isNaN(a) || isNaN(b)) {
-                // If either input is not a number, reset both inputs to 50
-                a = 50;
-                b = 50;
-            } else {
-                // Compute new values of a and b that sum to 100
-                if (a + b > 100) {
-                    a = 100 - b;
-                } else {
-                    b = 100 - a;
-                }
-            }
-            document.getElementById("quality-input").value = a;
-            document.getElementById("price-input").value = b;
-        }
-    </script>
 </body>
