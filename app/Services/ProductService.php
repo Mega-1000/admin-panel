@@ -53,7 +53,8 @@ readonly class ProductService
      */
     public function getUsersFromVariations(Order $order): ?Collection
     {
-        $orders = collect($this->getVariations($order))->flatten()->toArray();
+        $orders = collect($this->getVariations($order))->toArray();
+        $orders = array_merge(...$orders);
         $users = new Collection();
 
         if ($orders === null) {
