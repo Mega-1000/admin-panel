@@ -61,15 +61,18 @@ readonly class ProductService
         }
 
         foreach ($orders as $order) {
-            $orderObj = Product::find($order['id']);
-            $orderObj->firm->employees->each(function ($employee) use ($order, &$users) {
-                if ($employee->status !== 'PENDING') {
-                    $users[] = $employee;
+            // if order is array
+            if (is_array($order)) {
+                $orderObj = Product::find($order['id']);
+                $orderObj->firm->employees->each(function ($employee) use ($order, &$users) {
+                    if ($employee->status !== 'PENDING') {
+                        $users[] = $employee;
 
-                    $user = $users->last();
-                    $user->distance = $order['radius'];
-                }
-            });
+                        $user = $users->last();
+                        $user->distance = $order['radius'];
+                    }
+                });
+            }
         }
 
         return $users->unique('email');
