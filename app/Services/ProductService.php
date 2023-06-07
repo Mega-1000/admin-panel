@@ -53,7 +53,7 @@ readonly class ProductService
      */
     public function getUsersFromVariations(Order $order): ?Collection
     {
-        $orders = collect($this->getVariations($order))->flatten();
+        $orders = collect($this->getVariations($order))->first();
         $users = new Collection();
 
         if ($orders === null) {
