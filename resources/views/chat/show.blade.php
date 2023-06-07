@@ -51,8 +51,8 @@
                         @else
                             <!-- if auction->end_of_auction is in past show message  -->
                             @if(\Carbon\Carbon::parse(\Carbon\Carbon::now())->gt(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)))
-                            <h3>
-                                    Przetarg zakończony
+                                <h3>
+                                Przetarg zakończony
                                 </h3>
                                 <br>
                                 <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
@@ -74,7 +74,7 @@
                                 Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
                             @endif
                         @endif
-                            <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
+                            <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions()?->first()?->id]) }}">
                                 Zobacz wyniki przetargu
                             </a>
                         @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
