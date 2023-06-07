@@ -2197,7 +2197,7 @@
                             text += `<p> CBO: ${Math.round(offerFinanceBilans * 100) / 100} </p>`
 
                             settledDeclared.forEach((amount) => {
-                                text += `<p> ZD: ${amount} </p>`;
+                                text += `<p> RD: ${amount} </p>`;
                             });
 
                             return text;
