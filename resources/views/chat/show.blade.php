@@ -74,7 +74,7 @@
                                 Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
                             @endif
                         @endif
-                            <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions()?->first()?->id]) }}">
+                            <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
                                 Zobacz wyniki przetargu
                             </a>
                         @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
