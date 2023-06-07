@@ -74,7 +74,7 @@
                                 Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
                             @endif
                         @endif
-                        @if(empty($chat->auctions->first()))
+                        @if(!empty($chat->auctions->first()))
                             <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
                                 Zobacz wyniki przetargu
                             </a>
