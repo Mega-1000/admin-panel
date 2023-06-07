@@ -249,6 +249,7 @@
                             <i class="voyager-edit"></i>
                             <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
                         </button>
+                    </form>
                 </td>
                 </tr>
 
