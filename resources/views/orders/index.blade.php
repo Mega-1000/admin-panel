@@ -2181,6 +2181,7 @@
 
                                 if (payment.operation_type === 'Wartość pobrania przez firmę zewnętrzną') {
                                     WPFZ += parsedDeclaredAmount;
+                                    return;
                                 }
 
                                 if (parsedAmount < 0 && payment.operation_type !== "Zwrot towaru") {
