@@ -3,11 +3,13 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
+use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
 use App\Entities\Transaction;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
+use App\Services\FindOrCreatePaymentForPackageService;
 use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
 use DateTime;
@@ -30,7 +32,7 @@ use Illuminate\Support\Str;
  *
  * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
  */
-class ImportAllegroPayInJob implements ShouldQueue
+readonly final class ImportAllegroPayInJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -52,19 +54,10 @@ class ImportAllegroPayInJob implements ShouldQueue
      */
     protected TransactionRepository $transactionRepository;
 
-    /**
-     * @var UploadedFile
-     */
-    protected UploadedFile $file;
-
-    /**
-     * ImportAllegroPayInJob constructor.
-     * @param UploadedFile $file
-     */
-    public function __construct(UploadedFile $file)
-    {
-        $this->file = $file;
-    }
+    public function __construct(
+        protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
+        protected UploadedFile $file
+    ) {}
 
     /**
      *
@@ -104,6 +97,10 @@ class ImportAllegroPayInJob implements ShouldQueue
 
             try {
                 if (!empty($order)) {
+                    $this->findOrCreatePaymentForPackageService->execute(
+                        OrderPackage::where('order_id', $order->id)->first(),
+                    );
+
                     $this->settleOrder($order, $payIn);
                 } else {
                     fputcsv($file, $payIn);
@@ -275,11 +272,13 @@ class ImportAllegroPayInJob implements ShouldQueue
         $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
         $shipment_price_client = $order->shipment_price_for_client ?? 0;
         $totalProductPrice = 0;
+
         foreach ($order->items as $item) {
             $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
             $quantity = $item->quantity ?? 0;
             $totalProductPrice += $price * $quantity;
         }
+
         return round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
     }
 
