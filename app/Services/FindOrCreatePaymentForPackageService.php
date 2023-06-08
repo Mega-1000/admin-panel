@@ -19,8 +19,8 @@ class FindOrCreatePaymentForPackageService
     {
         $payment = OrderPayment::where('order_package_id', $orderPackage?->id)->first();
 
-        if ($orderPackage->cash_on_delivery > 0 && empty($payment)) {
-            $orderPackage->orderPayments()->create([
+        if ($orderPackage?->cash_on_delivery > 0 && empty($payment)) {
+            $orderPackage?->orderPayments()->create([
                 'declared_sum' => $orderPackage->cash_on_delivery,
                 'type' => 'cash_on_delivery',
                 'status' => 'new',
