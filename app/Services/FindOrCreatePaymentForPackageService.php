@@ -13,9 +13,9 @@ class FindOrCreatePaymentForPackageService
      * Find or create payment for order package
      *
      * @param OrderPackage $orderPackage
-     * @return OrderPayment
+     * @return null|OrderPayment
      */
-    public function execute(OrderPackage $orderPackage): OrderPayment
+    public function execute(OrderPackage $orderPackage): ?OrderPayment
     {
         $payment = OrderPayment::where('order_package_id', $orderPackage->id)->first();
 
