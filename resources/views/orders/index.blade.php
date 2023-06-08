@@ -2160,6 +2160,7 @@
                             const payments = row['payments'];
                             let returnedValue = 0;
                             let kwonPayments = 0;
+                            let WPFZ = 0;
 
                             payments.forEach(payment => {
                                 const { amount, declared_sum, status } = payment;
@@ -2176,6 +2177,10 @@
 
                                 if (payment.kwonPayments === '{{ \App\Enums\OrderPaymentsEnum::KWON_STATUS }}') {
                                     kwonPayments += parsedAmount;
+                                }
+
+                                if (payment.operation_type === 'Wartość pobrania przez firmę zewnętrzną') {
+                                    WPFZ += parsedAmount;
                                 }
 
                                 if (parsedAmount < 0 && payment.operation_type !== "Zwrot towaru") {
@@ -2198,9 +2203,10 @@
                             text += `<p> ZW: ${Math.round(totalOfReturns * 100) / 100} </p>`;
                             text += `<p> D: ${Math.round(totalOfDeclaredPayments * 100) / 100} </p>`;
                             text += `<p> ZT: ${Math.round(returnedValue * 100) / 100} </p>`;
-                            text += `<p> KWON: ${Math.round(kwonPayments * 100) / 100} </p>`;
+                            text += `<p> WTON: ${Math.round(kwonPayments * 100) / 100} </p>`;
                             text += `<p> BIF: ${Math.round(bilans * 100) / 100} </p>`;
                             text += `<p> CBO: ${Math.round(offerFinanceBilans * 100) / 100} </p>`;
+                            text += `<p> WPFZ: ${Math.round(WPFZ * 100) / 100} </p>`;
 
                             settledDeclared.forEach((amount) => {
                                 text += `<p> RD: ${amount} </p>`;

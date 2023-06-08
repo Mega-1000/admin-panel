@@ -27,6 +27,7 @@ class FindOrCreatePaymentForPackageService
                 'token' => Str::random(32),
                 'order_id' => $orderPackage->order_id,
                 'tracking_number' => $orderPackage->tracking_number,
+                'operation_type' => 'Wartość pobrania przez firmę zewnętrzną',
             ]);
 
             $payment = OrderPayment::where('order_package_id', $orderPackage->id)->first();
