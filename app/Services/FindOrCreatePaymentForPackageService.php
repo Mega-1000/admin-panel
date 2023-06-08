@@ -16,7 +16,7 @@ class FindOrCreatePaymentForPackageService
      */
     public function execute(OrderPackage $orderPackage): Payment
     {
-        $payment = Payment::where('package_id', $orderPackage->id)->first();
+        $payment = Payment::where('order_package_id', $orderPackage->id)->first();
 
         if ($orderPackage->cash_on_delivery > 0 && empty($payment)) {
             $orderPackage->orderPayments()->create([
@@ -28,7 +28,7 @@ class FindOrCreatePaymentForPackageService
                 'tracking_number' => $orderPackage->tracking_number,
             ]);
 
-            $payment = Payment::where('package_id', $orderPackage->id)->first();
+            $payment = Payment::where('order_package_id', $orderPackage->id)->first();
         }
 
         return $payment;
