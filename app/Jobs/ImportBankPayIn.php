@@ -45,9 +45,13 @@ class ImportBankPayIn implements ShouldQueue
      */
     protected LabelService $labelService;
 
+    /**
+     * @var FindOrCreatePaymentForPackageService
+     */
+    protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService;
+
     public function __construct(
         protected UploadedFile                         $file,
-        protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
     ) {}
 
     /**
