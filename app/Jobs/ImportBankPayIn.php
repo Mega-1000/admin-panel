@@ -59,10 +59,16 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param TransactionRepository $transaction
      * @param LabelService $labelService
+     * @param FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService
      * @return string
      */
-    public function handle(TransactionRepository $transaction, LabelService $labelService): string
+    public function handle(
+        TransactionRepository $transaction,
+        LabelService $labelService,
+        FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService): string
     {
+        $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
+
         $header = NULL;
         $fileName = 'bankTransactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');
