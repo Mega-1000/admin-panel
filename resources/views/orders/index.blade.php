@@ -2175,7 +2175,7 @@
                                     return;
                                 }
 
-                                if (payment.kwonPayments === '{{ \App\Enums\OrderPaymentsEnum::KWON_STATUS }}') {
+                                if (payment.operation_type === '{{ \App\Enums\OrderPaymentsEnum::KWON_STATUS }}') {
                                     kwonPayments += parsedAmount;
                                 }
 
