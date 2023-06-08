@@ -12,12 +12,12 @@ class FindOrCreatePaymentForPackageService
     /**
      * Find or create payment for order package
      *
-     * @param OrderPackage $orderPackage
+     * @param OrderPackage|null $orderPackage
      * @return null|OrderPayment
      */
-    public function execute(OrderPackage $orderPackage): ?OrderPayment
+    public function execute(?OrderPackage $orderPackage): ?OrderPayment
     {
-        $payment = OrderPayment::where('order_package_id', $orderPackage->id)->first();
+        $payment = OrderPayment::where('order_package_id', $orderPackage?->id)->first();
 
         if ($orderPackage->cash_on_delivery > 0 && empty($payment)) {
             $orderPackage->orderPayments()->create([
@@ -30,7 +30,7 @@ class FindOrCreatePaymentForPackageService
                 'operation_type' => 'Wartość pobrania przez firmę zewnętrzną',
             ]);
 
-            $payment = OrderPayment::where('order_package_id', $orderPackage->id)->first();
+            $payment = OrderPayment::where('order_package_id', $orderPackage?->id)->first();
         }
 
         return $payment;
