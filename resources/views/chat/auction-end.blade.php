@@ -54,30 +54,87 @@
         #chat-container {
             margin-top: 50px;
         }
+
+        th.asc::after {
+            content: " ↓"; /* Change to arrow SVG or symbol as needed */
+        }
+
+        th.desc::after {
+            content: " ↑"; /* Change to arrow SVG or symbol as needed */
+        }
     </style>
 
     <script>
-        window.onload = function() {
-            window.order = {};
-
-            document.querySelectorAll('.offer-checkbox').forEach(function (checkbox) {
-                checkbox.addEventListener('change', function () {
-                    if (this.checked) {
-                        // if firm have product alredy in order make it array and push new product
-                        if (window.order[this.dataset.firm]) {
-                            window.order[this.dataset.firm].push(this.dataset.product);
-                        } else {
-                            window.order[this.dataset.firm] = [this.dataset.product];
+        (() => {
+            function sortTable(n) {
+                let table = document.querySelector("table");
+                let switching = true;
+                let dir = "asc";
+                let switchcount = 0;
+                while (switching) {
+                    switching = false;
+                    let rows = table.rows;
+                    for (let i = 1; i < (rows.length - 1); i++) {
+                        let shouldSwitch = false;
+                        let x = rows[i].getElementsByTagName("TD")[n];
+                        let y = rows[i + 1].getElementsByTagName("TD")[n];
+                        shouldSwitch = shouldSwitchRows(x, y, dir);
+                        if (shouldSwitch) {
+                            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                            switching = true;
+                            switchcount++;
+                        } else if (switchcount === 0 && dir === "asc") {
+                            dir = "desc";
+                            switching = true;
                         }
-                    } else {
-                        delete window.order[this.dataset.firm];
                     }
+                }
+            }
 
-                    console.log(window.order);
+            function shouldSwitchRows(x, y, dir) {
+                if (dir === "asc") {
+                    return x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase();
+                } else if (dir === "desc") {
+                    return x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase();
+                }
+                return false;
+            }
+
+            const order = {};
+
+            window.onload = () => {
+                const offerCheckboxes = document.querySelectorAll('.offer-checkbox');
+                offerCheckboxes.forEach((checkbox) => {
+                    checkbox.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            if (order[e.target.dataset.firm]) {
+                                order[e.target.dataset.firm].push(e.target.dataset.product);
+                            } else {
+                                order[e.target.dataset.firm] = [e.target.dataset.product];
+                            }
+                        } else {
+                            delete order[e.target.dataset.firm];
+                        }
+                        console.log(order);
+                    });
                 });
-            });
 
-            document.querySelector('#submit-button').addEventListener('click', () => {
+                const submitButton = document.querySelector('#submit-button');
+                submitButton.addEventListener('click', () => {
+                    const form = createForm(order);
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+
+                const headers = document.querySelectorAll("th");
+                headers.forEach((header, i) => {
+                    header.addEventListener('click', () => sortTable(i));
+                });
+
+                headers[1].click();
+            };
+
+            function createForm(order) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '{{ route('auctions.end-create-orders', ['auction' => $auction->id]) }}';
@@ -85,7 +142,7 @@
 
                 const orderInput = document.createElement('input');
                 orderInput.name = 'order';
-                orderInput.value = JSON.stringify(window.order);
+                orderInput.value = JSON.stringify(order);
                 form.appendChild(orderInput);
 
                 const csrfInput = document.createElement('input');
@@ -93,11 +150,12 @@
                 csrfInput.value = '{{ csrf_token() }}';
                 form.appendChild(csrfInput);
 
-                document.body.appendChild(form);
-                form.submit();
-            });
-        };
+                return form;
+            }
+
+        })();
     </script>
+
 </head>
 
 <body>
@@ -113,14 +171,20 @@
                         </h5>
                     </th> <!-- Empty cell for the top-left corner -->
                     @foreach($products as $product)
-                        <th>{{ $product->product->name }}</th>
+                        <th>{{ $product->product->name }}
+                            <button class="btn btn-primary">
+                                Sortuj
+                            </button>
+                        </th>
                     @endforeach
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($firms as $firm)
                     <tr>
-                        <td>{{ $firm->firm->symbol }}</td> <!-- Modify this according to your firm object -->
+                        <td>
+                            {{ $firm->firm->symbol }}
+                        </td> <!-- Modify this according to your firm object -->
                         @foreach($products as $product)
                             <td>
                                 @if($offer = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->first())

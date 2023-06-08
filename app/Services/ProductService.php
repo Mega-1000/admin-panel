@@ -57,10 +57,6 @@ readonly class ProductService
         $orders = array_merge(...$orders);
         $users = new Collection();
 
-        if ($orders === null) {
-            return null;
-        }
-
         foreach ($orders as $order) {
             // if order is array
             if (is_array($order)) {

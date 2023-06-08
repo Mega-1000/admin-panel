@@ -3,10 +3,15 @@
 namespace App\Observers;
 
 use App\Entities\OrderPackage;
+use App\Services\FindOrCreatePaymentForPackageService;
 use Illuminate\Support\Str;
 
-class OrderPackageObserver
+final readonly class OrderPackageObserver
 {
+    public function __construct(
+      protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService
+    ) {}
+
     /**
      * Handle the OrderPackage "created" event.
      *
@@ -15,17 +20,7 @@ class OrderPackageObserver
      */
     public function created(OrderPackage $orderPackage): void
     {
-        // is cash on delivery
-        if ($orderPackage->cash_on_delivery > 0) {
-            $orderPackage->orderPayments()->create([
-                'declared_sum' => $orderPackage->cash_on_delivery,
-                'type' => 'cash_on_delivery',
-                'status' => 'new',
-                'token' => Str::random(32),
-                'order_id' => $orderPackage->order_id,
-                'tracking_number' => $orderPackage->tracking_number,
-            ]);
-        }
+        $this->findOrCreatePaymentForPackageService->execute($orderPackage);
     }
 
     /**

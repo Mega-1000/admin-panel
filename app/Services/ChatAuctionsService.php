@@ -4,17 +4,16 @@ namespace App\Services;
 
 use App\DTO\ChatAuctions\CreateChatAuctionDTO;
 use App\Entities\ChatAuction;
-use App\Entities\ChatAuctionFirm;
 use App\Entities\Firm;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
 use App\Mail\NotifyFirmAboutAuction;
+use App\Repositories\ChatAuctionFirms;
 use App\Repositories\ChatAuctionOffers;
 use App\Repositories\Employees;
 use App\Repositories\Firms;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 readonly class ChatAuctionsService
 {
@@ -25,6 +24,7 @@ readonly class ChatAuctionsService
         protected ChatAuctionOfferService     $chatAuctionOfferService,
         protected Firms                       $firmsRepository,
         protected AuctionOffersCreatorService $auctionOffersCreatorService,
+        protected ChatAuctionFirms            $chatAuctionFirmsRepository,
     ) {}
 
     /**
@@ -98,15 +98,7 @@ readonly class ChatAuctionsService
      */
     public function generateLinkForAuction(ChatAuction $auction, Firm $firm): string
     {
-        $token = Str::random(60);
-
-        ChatAuctionFirm::query()->create([
-            'chat_auction_id' => $auction->id,
-            'firm_id' => $firm->id,
-            'token' => $token,
-        ]);
-
-        return $token;
+        return $this->chatAuctionFirmsRepository->createWithToken($auction, $firm);
     }
 
     /**

@@ -13,6 +13,7 @@ use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\FileInvoiceRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
+use App\Services\FindOrCreatePaymentForPackageService;
 use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
 use DateTime;
@@ -30,9 +31,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-/**
- *
- */
 class ImportBankPayIn implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -47,19 +45,10 @@ class ImportBankPayIn implements ShouldQueue
      */
     protected LabelService $labelService;
 
-    /**
-     * @var UploadedFile
-     */
-    protected UploadedFile $file;
-
-    /**
-     * ImportBankPayIn constructor.
-     * @param UploadedFile $file
-     */
-    public function __construct(UploadedFile $file)
-    {
-        $this->file = $file;
-    }
+    public function __construct(
+        protected UploadedFile                         $file,
+        protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
+    ) {}
 
     /**
      * Execute the job.
@@ -348,6 +337,8 @@ class ImportBankPayIn implements ShouldQueue
         $amount = $payIn['kwota'];
 
         foreach ($orders as $order) {
+            $this->findOrCreatePaymentForPackageService->execute($order);
+
             if ($amount < 0) {
                 $this->saveOrderPayment($order, $amount, $payIn, false);
                 continue;
