@@ -24,7 +24,7 @@ class GetProductsForChimneyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'attr' => 'required|string|max:255',
+            'attr' => 'required',
         ];
     }
 }
