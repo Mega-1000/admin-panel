@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\DTO\PayInDTO;
 use App\Entities\Order;
+use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
 use App\Entities\Transaction;
 use App\Enums\OrderTransactionEnum;
@@ -347,7 +348,9 @@ class ImportBankPayIn implements ShouldQueue
         $amount = $payIn['kwota'];
 
         foreach ($orders as $order) {
-            $this->findOrCreatePaymentForPackageService->execute($order);
+            $this->findOrCreatePaymentForPackageService->execute(
+                OrderPackage::where('order_id', $order->id)->first(),
+            );
 
             if ($amount < 0) {
                 $this->saveOrderPayment($order, $amount, $payIn, false);
