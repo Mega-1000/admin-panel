@@ -212,11 +212,13 @@ class CustomersController extends Controller
     /**
      * @return Factory|View
      */
-    public function create()
+    public function create(): View
     {
         $role = Role::find(Auth::user()->role_id);
         $roleName = $role->name;
+
         $this->roleName = $roleName;
+
         return view('customers.create', compact('roleName'));
     }
 
@@ -225,9 +227,9 @@ class CustomersController extends Controller
      *
      * @param int $id
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function edit(int $id)
+    public function edit(int $id): View
     {
         $customer = $this->repository->find($id);
         $customerAddressStandard = $this->customerAddressRepository->findWhere([
@@ -242,12 +244,18 @@ class CustomersController extends Controller
             'customer_id' => $customer->id,
             'type' => 'DELIVERY_ADDRESS'
         ]);
+
         $role = Role::find(Auth::user()->role_id);
         $roleName = $role->name;
         $this->roleName = $roleName;
-        return view('customers.edit',
-            compact('customer', 'customerAddressStandard', 'customerAddressInvoice', 'customerAddressDelivery',
-                'roleName'));
+
+        return view('customers.edit', compact(
+                'customer',
+                'customerAddressStandard',
+                'customerAddressInvoice',
+                'customerAddressDelivery',
+                'roleName',
+        ));
     }
 
     /**
@@ -257,7 +265,7 @@ class CustomersController extends Controller
      *
      * @return RedirectResponse
      */
-    public function destroy(int $id)
+    public function destroy(int $id): RedirectResponse
     {
         $deleted = $this->repository->delete($id);
 
