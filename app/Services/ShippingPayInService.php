@@ -3,17 +3,20 @@
 namespace App\Services;
 
 use App\Domains\DelivererPackageImport\PriceFormatter;
+use App\DTO\ImportPayIn\ShippingPayInCsvDataDTO;
 use App\Entities\Deliverer;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
 use App\Entities\ProviderTransaction;
 use App\Entities\Transaction;
+use App\Factory\ShippingPayInCsvDataFactory;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\DelivererRepositoryEloquent;
 use App\Repositories\OrderPackageRepositoryEloquent;
 use App\Repositories\ProviderTransactionRepositoryEloquent;
+use App\Repositories\ProviderTransactions;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
 use DateTime;
@@ -71,9 +74,10 @@ final class ShippingPayInService
         }
 
         foreach ($data as $payIn) {
-            dd($payIn);
+            $payIn = ShippingPayInCsvDataFactory::create($payIn);
+
             try {
-                $orderPackage = $this->findOrderByLetterNumber($payIn['numer_listu']);
+                $orderPackage = $this->findOrderByLetterNumber($payIn->numer_listu);
 
                 if (!empty($orderPackage)) {
                     $realCost = $this->addRealCost($orderPackage, $payIn);
@@ -82,26 +86,32 @@ final class ShippingPayInService
                     }
                     $order = $orderPackage->order;
                 } else {
-                    fputcsv($file, $payIn);
+                    fputcsv($file, $payIn->toArray());
                     continue;
                 }
+
                 if (!empty($order)) {
-                    if (empty($payIn['wartosc_pobrania'])) {
+                    if (empty($payIn->wartosc_pobrania)) {
                         continue;
                     }
 
-                    $payIn['rzeczywisty_koszt_transportu_brutto'] = (float)str_replace(',', '.', $payIn['rzeczywisty_koszt_transportu_brutto']);
+                    $payIn->rzeczywisty_koszt_transportu_brutto = (float)str_replace(',', '.', $payIn->rzeczywisty_koszt_transportu_brutto);
                     $transaction = $this->saveTransaction($order, $payIn);
+
                     if ($transaction === null) {
                         continue;
                     }
+
                     $this->settlePromisePayments($order, $payIn);
                     $orders = $this->getRelatedOrders($order);
 
                     $this->settleOrders($orders, $transaction);
                     $this->settleProvider($payIn, $transaction);
                 } else {
-                    fputcsv($file, $payIn);
+                    fputcsv(
+                        $file,
+                        $payIn->toArray()
+                    );
                 }
             } catch (Exception $exception) {
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage() . ' w lini ' . $exception->getLine(), ['line' => __LINE__, 'file' => __FILE__]);
@@ -116,11 +126,11 @@ final class ShippingPayInService
         return OrderPackage::where('letter_number', $letterNumber)->first();
     }
 
-    private function addRealCost(OrderPackage $orderPackage, array $payIn): bool
+    private function addRealCost(OrderPackage $orderPackage, ShippingPayInCsvDataDTO $payIn): bool
     {
-        $delivery = Deliverer::where('name', $payIn['symbol_spedytora'])->firstOrFail();
+        $delivery = Deliverer::where('name', $payIn->symbol_spedytora)->firstOrFail();
 
-        $cost = PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn['rzeczywisty_koszt_transportu_brutto']));
+        $cost = PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn->rzeczywisty_koszt_transportu_brutto));
         $orderPackageRealCost = $orderPackage->realCostsForCompany()
             ->where('deliverer_id', '=', $delivery->id)
             ->where('cost', '=', $cost)
@@ -131,8 +141,9 @@ final class ShippingPayInService
             $orderPackage->realCostsForCompany()->create([
                 'order_package_id' => $orderPackage->id,
                 'deliverer_id' => $delivery->id,
-                'cost' => PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn['rzeczywisty_koszt_transportu_brutto']))
+                'cost' => PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn->rzeczywisty_koszt_transportu_brutto))
             ]);
+
             return true;
         } else {
             return false;
@@ -143,14 +154,13 @@ final class ShippingPayInService
      * Save new transaction
      *
      * @param Order $order Order object
-     * @param array $data Additional data
+     * @param ShippingPayInCsvDataDTO $data Additional data
      * @return ?Transaction
      *
-     * @throws Exception
      */
-    private function saveTransaction(Order $order, array $data): ?Transaction
+    private function saveTransaction(Order $order, ShippingPayInCsvDataDTO $data): ?Transaction
     {
-        $identifier = 's-' . strtotime($data['data_nadania_otrzymania']) . '-' . $order->id;
+        $identifier = 's-' . strtotime($data->data_nadania_otrzymania) . '-' . $order->id;
         $existingTransaction = Transaction::where('payment_id', $identifier)->first();
 
         if (!empty($existingTransaction)) {
@@ -160,16 +170,16 @@ final class ShippingPayInService
         try {
             return Transaction::create([
                 'customer_id' => $order->customer_id,
-                'posted_in_system_date' => new DateTime($data['data_nadania_otrzymania']),
+                'posted_in_system_date' => new DateTime($data->data_nadania_otrzymania),
                 'posted_in_bank_date' => new DateTime(),
                 'payment_id' => $identifier,
                 'kind_of_operation' => 'wpłata pobraniowa',
                 'order_id' => $order->id,
-                'operator' => $data['symbol_spedytora'],
-                'operation_value' => $data['wartosc_pobrania'],
-                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['wartosc_pobrania'],
+                'operator' => $data->symbol_spedytora,
+                'operation_value' => $data->wartosc_pobrania,
+                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data->wartosc_pobrania,
                 'accounting_notes' => '',
-                'transaction_notes' => 'Numer listu: ' . $data['numer_listu'] . ' Nr faktury:' . $data['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
+                'transaction_notes' => 'Numer listu: ' . $data->numer_listu . ' Nr faktury:' . $data->nr_faktury_do_ktorej_dany_lp_zostal_przydzielony,
                 'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
             ]);
         } catch (Exception $exception) {
@@ -195,9 +205,9 @@ final class ShippingPayInService
      * Settle promise.
      *
      * @param Order $order Order object.
-     * @param array $payIn Pay in row.
+     * @param ShippingPayInCsvDataDTO $payIn Pay in row.
      */
-    private function settlePromisePayments(Order $order, array $payIn): void
+    private function settlePromisePayments(Order $order, ShippingPayInCsvDataDTO $payIn): void
     {
         $promisePayments = $order->payments()
             ->where('promise', '=', '1')
@@ -206,7 +216,7 @@ final class ShippingPayInService
             ->get();
 
         foreach ($promisePayments as $payment) {
-            if ($payIn['kwota'] === (float)$payment->amount) {
+            if ($payIn->kwota === (float)$payment->amount) {
                 $payment->delete();
             } else {
                 $preventionArray = [];
@@ -239,15 +249,18 @@ final class ShippingPayInService
         foreach ($orders as $order) {
             $orderBookedPaymentSum = $order->bookedPaymentsSum();
             $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
+
             if ($amount == 0 || $amountOutstanding == 0) {
                 continue;
             }
+
             if ($amountOutstanding > 0) {
                 if (bccomp($amount, $amountOutstanding, 3) >= 0) {
                     $paymentAmount = $amountOutstanding;
                 } else {
                     $paymentAmount = $amount;
                 }
+
                 $transfer = $this->saveTransfer($order, $transaction, $paymentAmount);
                 $payment = $order->payments()->create([
                     'transaction_id' => $transfer->id,
@@ -271,11 +284,13 @@ final class ShippingPayInService
         $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
         $shipment_price_client = $order->shipment_price_for_client ?? 0;
         $totalProductPrice = 0;
+
         foreach ($order->items as $item) {
             $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
             $quantity = $item->quantity ?? 0;
             $totalProductPrice += $price * $quantity;
         }
+
         return round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
     }
 
@@ -312,29 +327,30 @@ final class ShippingPayInService
         ]);
     }
 
-    private function settleProvider($payIn, $transaction): void
+    private function settleProvider(ShippingPayInCsvDataDTO $payIn, $transaction): void
     {
-        $providerBalance = $this->providerTransactionRepositoryEloquent->getBalance($payIn['symbol_spedytora']);
+        $providerBalance = $this->providerTransactionRepositoryEloquent->getBalance($payIn->symbol_spedytora);
         $providerBalanceOnInvoice = $this->providerTransactionRepositoryEloquent->getBalanceOnInvoice(
-            $payIn['symbol_spedytora'],
-            $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony']
+            $payIn->symbol_spedytora,
+            $payIn->nr_faktury_do_ktorej_dany_lp_zostal_przydzielony,
         );
 
-        $existingTransaction = ProviderTransaction::where('provider', $payIn['symbol_spedytora'])
-            ->where('invoice_number', $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'])
-            ->where('cash_on_delivery', $payIn['wartosc_pobrania'])
-            ->first();
+        $existingTransaction = ProviderTransactions::getProviderTransactionByProviderAndInvoiceNumberAndCashOnDelivery(
+            $payIn->symbol_spedytora,
+            $payIn->nr_faktury_do_ktorej_dany_lp_zostal_przydzielony,
+            $payIn->wartosc_pobrania,
+        );
 
         if (!empty($existingTransaction)) {
             return;
         }
 
         ProviderTransaction::create([
-            'provider' => $payIn['symbol_spedytora'],
-            'waybill_number' => $payIn['numer_listu'],
-            'invoice_number' => $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
+            'provider' => $payIn->symbol_spedytora,
+            'waybill_number' => $payIn->numer_listu,
+            'invoice_number' => $payIn->nr_faktury_do_ktorej_dany_lp_zostal_przydzielony,
             'order_id' => $transaction->order_id,
-            'cash_on_delivery' => $payIn['wartosc_pobrania'],
+            'cash_on_delivery' => $payIn->wartosc_pobrania,
             'provider_balance' => $providerBalance + (float)$transaction->operation_value,
             'provider_balance_on_invoice' => $providerBalanceOnInvoice + (float)$transaction->operation_value,
             'transaction_id' => $transaction->id,

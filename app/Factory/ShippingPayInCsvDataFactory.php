@@ -4,14 +4,93 @@ namespace App\Factory;
 
 use App\DTO\ImportPayIn\ShippingPayInCsvDataDTO;
 
-class ShippingPayInCsvDataFactory
+readonly final class ShippingPayInCsvDataFactory
 {
-    // create DTO from array
-    public function createFromArray(array $data): ShippingPayInCsvDataDTO
-    {
+    /**
+     * @param array $data
+     * @return ShippingPayInCsvDataDTO
+     */
+    public static function create(array $data): ShippingPayInCsvDataDTO {
         return new ShippingPayInCsvDataDTO(
-            $data['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
-            $data['wartosc_pobrania'],
+            $data['symbol_spedytora'] ?? '',
+            $data['numer_listu'] ?? '',
+            $data['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'] ?? '',
+            $data['data_nadania_otrzymania'] ?? '',
+            $data['nr_i_d'] ?? '',
+            $data['rzeczywisty_koszt_transportu_brutto'] ?? '',
+            $data['wartosc_pobrania'] ?? '',
+            $data['file'] ?? '',
+            $data['reszta'] ?? '',
+            $data['rodzaj'] ?? '',
+            $data['pfc'] ?? '',
+            $data['parcel_num'] ?? '',
+            $data['parcel_status'] ?? '',
+            $data['rname1'] ?? '',
+            $data['rname2'] ?? '',
+            $data['rname3'] ?? '',
+            $data['rcountry'] ?? '',
+            $data['rpost'] ?? '',
+            $data['rcity'] ?? '',
+            $data['rstreet'] ?? '',
+            $data['content'] ?? '',
+            $data['note1'] ?? '',
+            $data['weight'] ?? '',
+            $data['date'] ?? '',
+            $data['kwota_pobrania'] ?? '0',
+            $data['zamówienie'] ?? '',
+            $data['numer_przesylki'] ?? '',
+            $data['nr_referencyjny_klienta'] ?? '',
+            $data['www'] ?? '',
+            $data['id'] ?? '',
+            $data['walidacja'] ?? '',
+            $data['zatwierdzona'] ?? '',
+            $data['pobranie'] ?? '',
+            $data['zwrot_palet'] ?? '',
+            $data['zwrot_dokumentów'] ?? '',
+            $data['status'] ?? '',
+            $data['iloœc_palet'] ?? '0',
+            $data['cena_szacunkowa'] ?? '',
+            $data['platnik'] ?? '',
+            $data['data_zlecenia'] ?? '',
+            $data['data_podjecia_od'] ?? '',
+            $data['data_podjecia_do'] ?? '',
+            $data['czas_podjecia_od'] ?? '',
+            $data['czas_podjecia_do'] ?? '',
+            $data['data_doreczenia_od'] ?? '',
+            $data['data_doreczenia_do'] ?? '',
+            $data['czas_doreczenia_od'] ?? '',
+            $data['czas_doreczenia_do'] ?? '',
+            $data['nadawca_symbol'] ?? '',
+            $data['nadawca'] ?? '',
+            $data['nadawca_kraj'] ?? '',
+            $data['nadawca_miasto'] ?? '',
+            $data['nadawca_kod_poczt'] ?? '',
+            $data['odbiorca_symbol'] ?? '',
+            $data['odbiorca'] ?? '',
+            $data['odbiorca_kraj'] ?? '',
+            $data['odbiorca_miasto'] ?? '',
+            $data['odbiorca_kod_poczt'] ?? '',
+            $data['miejsce_podjecia_nazwa'] ?? '',
+            $data['miejsce_podjecia_adres'] ?? '',
+            $data['miejsce_podjecia_kod'] ?? '',
+            $data['miejsce_podjecia_miasto'] ?? '',
+            $data['miejsce_podjecia_kraj'] ?? '',
+            $data['miejsce_dostawy_nazwa'] ?? '',
+            $data['miejsce_dostawy_adres'] ?? '',
+            $data['miejsce_dostawy_kod'] ?? '',
+            $data['miejsce_dostawy_miasto'] ?? '',
+            $data['miejsce_dostawy_kraj'] ?? '',
+            $data['iloœc_deklarowana'] ?? '',
+            $data['waga_deklarowana'] ?? '',
+            $data['objetoœc_deklarowana'] ?? '',
+            $data['waga_przesylki'] ?? '',
+            $data['objetoœc_przesylki'] ?? '',
+            $data['punkty_a_d_r'] ?? '',
+            $data['ilosc_l_q_a_d_r'] ?? '',
+            $data['ilosc_e_q_a_d_r'] ?? '',
+            $data['a_d_r'] ?? '',
+            $data['s_e_n_t'] ?? '',
+            $data['data_doreczenia_rzeczywista'] ?? ''
         );
     }
 }
