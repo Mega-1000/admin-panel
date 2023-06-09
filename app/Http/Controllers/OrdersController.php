@@ -799,8 +799,8 @@ class OrdersController extends Controller
         $newGroup = $newGroup->concat([$task]);
 
         $data = [
-            'start' => Carbon::now()->toDateTimeString(),
-            'end' => Carbon::now()->addMinutes(self::DURATION)->toDateTimeString(),
+            'start' => Carbon::now()->startOfMinute()->toDateTimeString(),
+            'end' => Carbon::now()->startOfMinute()->addMinutes(self::DURATION)->toDateTimeString(),
             'id' => $user_id,
             'user_id' => $user_id
         ];

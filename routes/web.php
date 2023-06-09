@@ -509,6 +509,7 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::post('/store/planner', 'TasksController@saveTaskToPlanner')->name('storePlanner');
 
                     Route::get('/{taskId}/checkQuantityInStock', 'TasksController@checkQuantityInStock')->name('checkQuantityInStock');
+                    Route::get('/{orderId}/checkOrderQuantityInStock', 'TasksController@checkOrderQuantityInStock')->name('checkOrderQuantityInStock');
 
                 });
             Route::prefix('reports')->as('reports.')
