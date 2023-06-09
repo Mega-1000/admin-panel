@@ -4003,7 +4003,8 @@
                         status = 1;
                     }
                     $.each(data.data, function (index, value) {
-                        html += `<h3>oferta ${index}</h3>
+                        html += `
+                        <h3>oferta ${index}</h3>
                         <table class="table">
                                 <tr class="appendRow">
                                 <td style="width: 200px;">Nazwa</td>
@@ -4013,7 +4014,8 @@
                                 <td>#</td>
                             </tr>`;
                         $.each(value, function (index, value) {
-                            html += `<tr class="appendRow">
+                            html += `
+                            <tr class="appendRow">
                                 <td>${value.product_name}</td>
                                 <td>${value.product_symbol}</td>
                                 <td>${value.quantity}</td>
