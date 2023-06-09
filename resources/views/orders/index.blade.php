@@ -3995,7 +3995,7 @@
             let status = 0;
             $.ajax({
                 type: "GET",
-                url: '/admin/planning/tasks/' + orderId + '/checkOrderQuantityInStock',
+                url: '/admin/planning/tasks/${orderId}/checkOrderQuantityInStock',
                 async: false
             }).done(function (data) {
                 if (data.status == 200) {
@@ -4004,8 +4004,8 @@
                     }
                     $.each(data.data, function (index, value) {
 
-                        html += '<h3>oferta '+ index +'</h3>';
-                        html += '<table class="table">';
+                        html += '<h3>oferta ${index}</h3>';
+                        html += '<table class="table">';a
                             html += '<tr class="appendRow">';
                             html += '<td style="width: 200px;">Nazwa</td>';
                             html += '<td style="width: 100px;">Symbol</td>';
@@ -4015,11 +4015,11 @@
                             html += '</tr>';
                         $.each(value, function (index, value) {
                             html += '<tr class="appendRow">';
-                            html += '<td>' + value.product_name + '</td>';
-                            html += '<td>' + value.product_symbol + '</td>';
-                            html += '<td>' + value.quantity + '</td>';
-                            html += '<td>' + value.stock_quantity + '/' + value.first_position_quantity + '</td>';
-                            html += '<td><a href="/admin/products/stocks/' + value.product_stock_id + '/edit" target="_blank">Przenieś</a></td>';
+                            html += '<td>${value.product_name}</td>';
+                            html += '<td>${value.product_symbol}</td>';
+                            html += '<td>${value.quantity}</td>';
+                            html += '<td>${value.stock_quantity}/${value.first_position_quantity}</td>';
+                            html += '<td><a href="/admin/products/stocks/${value.product_stock_id}/edit" target="_blank">Przenieś</a></td>';
                             html += '</tr>';
                         });
                         html += '</table>';
