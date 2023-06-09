@@ -4003,23 +4003,23 @@
                         status = 1;
                     }
                     $.each(data.data, function (index, value) {
-                        html += '<h3>oferta ${index}</h3>';
-                        html += '<table class="table">';
-                            html += '<tr class="appendRow">';
-                            html += '<td style="width: 200px;">Nazwa</td>';
-                            html += '<td style="width: 100px;">Symbol</td>';
-                            html += '<td style="width: 50px;">Ilość potrzebna</td>';
-                            html += '<td style="width: 50px;">Na magazynie/Ilość na pozycji</td>';
-                            html += '<td>#</td>';
-                            html += '</tr>';
+                        html += `<h3>oferta ${index}</h3>
+                        <table class="table">
+                                <tr class="appendRow">
+                                <td style="width: 200px;">Nazwa</td>
+                                <td style="width: 100px;">Symbol</td>
+                                <td style="width: 50px;">Ilość potrzebna</td>
+                                <td style="width: 50px;">Na magazynie/Ilość na pozycji</td>
+                                <td>#</td>
+                            </tr>`;
                         $.each(value, function (index, value) {
-                            html += '<tr class="appendRow">';
-                            html += '<td>${value.product_name}</td>';
-                            html += '<td>${value.product_symbol}</td>';
-                            html += '<td>${value.quantity}</td>';
-                            html += '<td>${value.stock_quantity}/${value.first_position_quantity}</td>';
-                            html += '<td><a href="/admin/products/stocks/${value.product_stock_id}/edit" target="_blank">Przenieś</a></td>';
-                            html += '</tr>';
+                            html += `<tr class="appendRow">
+                                <td>${value.product_name}</td>
+                                <td>${value.product_symbol}</td>
+                                <td>${value.quantity}</td>
+                                <td>${value.stock_quantity}/${value.first_position_quantity}</td>
+                                <td><a href="/admin/products/stocks/${value.product_stock_id}/edit" target="_blank">Przenieś</a></td>
+                            </tr>`;
                         });
                         html += '</table>';
                     });
