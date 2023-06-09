@@ -4003,9 +4003,8 @@
                         status = 1;
                     }
                     $.each(data.data, function (index, value) {
-
                         html += '<h3>oferta ${index}</h3>';
-                        html += '<table class="table">';a
+                        html += '<table class="table">';
                             html += '<tr class="appendRow">';
                             html += '<td style="width: 200px;">Nazwa</td>';
                             html += '<td style="width: 100px;">Symbol</td>';
