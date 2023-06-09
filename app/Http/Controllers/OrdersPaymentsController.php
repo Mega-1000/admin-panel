@@ -1572,7 +1572,7 @@ class OrdersPaymentsController extends Controller
 
         DB::table('order_payments_logs')->where('id', '>', 0)->delete();
         DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');
-        DB::statement('DELETE FROM order_payments WHERE id > 0 AND order_package_id IS NULL');
+        DB::statement('DELETE FROM order_payments WHERE id > 0 AND order_package_id IS NULL AND operation_type = "Zwrot towaru"');
 
         return redirect()->route('payments.index')->with(['message' => 'Płatności poprawnie wyczyszczone', 'alert-type' => 'success']);
     }
@@ -1601,9 +1601,9 @@ class OrdersPaymentsController extends Controller
                     'amount' => $amount,
                     'amount_left' => $amount,
                     'customer_id' => $order->customer_id,
-                    'created_at' => $date
-
+                    'created_at' => $date,
                 ]);
+
                 $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                 $this->orderPaymentLogService->create(
