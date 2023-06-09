@@ -2793,7 +2793,7 @@
             if (labelId == '49') {
                 let checkQuantity = checkOrderQuantityInStock(orderId);
 
-                if (checkQuantity==1) {
+                if (checkQuantity == 1) {
                     $('#quantity-in-stock-list').modal('show');
                     return;
                 }
@@ -3991,15 +3991,15 @@
         }
 
         function checkOrderQuantityInStock(orderId) {
-            html = '';
+            let html = '';
             let status = 0;
             $.ajax({
                 type: "GET",
                 url: '/admin/planning/tasks/' + orderId + '/checkOrderQuantityInStock',
                 async: false
             }).done(function (data) {
-                if(data.status == 200){
-                    if(Object.keys(data.data).length>0){
+                if (data.status == 200) {
+                    if (Object.keys(data.data).length > 0) {
                         status = 1;
                     }
                     $.each(data.data, function (index, value) {
@@ -4025,9 +4025,9 @@
                         html += '</table>';
                     });
                     $('#quantity-in-stock-list .error-finish-task-form').html(html);
-                }else{
-                    status = 1;
+                    return status;
                 }
+                status = 1;
             }).fail(function () {
                 status = 1;
             });

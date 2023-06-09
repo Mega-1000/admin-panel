@@ -112,7 +112,7 @@ class TaskTimeService
     /**
      * @return StockListDTO[]
      */
-    public function getQuantityInStockList(Collection $tasks)//: array
+    public function getQuantityInStockList(Collection $tasks): array
     {
         $stockLists = [];
         foreach ($tasks as $task) {
