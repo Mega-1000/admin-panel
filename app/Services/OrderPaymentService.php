@@ -132,4 +132,13 @@ readonly final class OrderPaymentService
             dispatch(new DispatchLabelEventByNameJob($payment->order, "required-payment-before-unloading"));
         }
     }
+
+    /**
+     * @param Order $order
+     * @return bool
+     */
+    public function hasAnyPayment(Order $order): bool
+    {
+        return $order->payments->count() > 0;
+    }
 }
