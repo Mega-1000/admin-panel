@@ -77,13 +77,15 @@ final class ShippingPayInService
             $payIn = ShippingPayInCsvDataFactory::create($payIn);
 
             try {
-                $orderPackage = $this->findOrderByLetterNumber($payIn->numer_listu);
+                $orderPackage = $this->findOrderPackageByLetterNumber($payIn->numer_listu);
 
                 if (!empty($orderPackage)) {
                     $realCost = $this->addRealCost($orderPackage, $payIn);
+
                     if (!$realCost) {
                         continue;
                     }
+
                     $order = $orderPackage->order;
                 } else {
                     fputcsv($file, $payIn->toArray());
@@ -95,7 +97,7 @@ final class ShippingPayInService
                         continue;
                     }
 
-                    $payIn->rzeczywisty_koszt_transportu_brutto = (float)str_replace(',', '.', $payIn->rzeczywisty_koszt_transportu_brutto);
+                    $payIn->rzeczywisty_koszt_transportu_brutto = (float)str_replace(',', '.',$payIn->rzeczywisty_koszt_transportu_brutto);
                     $transaction = $this->saveTransaction($order, $payIn);
 
                     if ($transaction === null) {
@@ -117,17 +119,26 @@ final class ShippingPayInService
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage() . ' w lini ' . $exception->getLine(), ['line' => __LINE__, 'file' => __FILE__]);
             }
         }
+
         fclose($file);
-        Storage::disk('local')->put('public/transaction/shippingTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+        Storage::disk('local')
+            ->put('public/transaction/shippingTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
     }
 
-    private function findOrderByLetterNumber(string $letterNumber): ?OrderPackage
+    private function findOrderPackageByLetterNumber(string $letterNumber): ?OrderPackage
     {
         return OrderPackage::where('letter_number', $letterNumber)->first();
     }
 
     private function addRealCost(OrderPackage $orderPackage, ShippingPayInCsvDataDTO $payIn): bool
     {
+        $notices = explode($orderPackage->notices, '^')[0];
+        $orderPackage->update([
+            'notices' => $notices . '^' . $payIn->reszta,
+            'invoice_number' => $payIn->nr_faktury_do_ktorej_dany_lp_zostal_przydzielony,
+            'service_courier_name' => $payIn->symbol_spedytora,
+        ]);
+
         $delivery = Deliverer::where('name', $payIn->symbol_spedytora)->firstOrFail();
 
         $cost = PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn->rzeczywisty_koszt_transportu_brutto));
@@ -145,9 +156,9 @@ final class ShippingPayInService
             ]);
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
