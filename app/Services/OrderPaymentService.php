@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace App\Services;
 
 use App\Entities\Label;
@@ -14,33 +12,22 @@ use App\Enums\OrderStatus;
 use App\Helpers\PriceHelper;
 use App\Helpers\TokenHelper;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Jobs\DispatchLabelEventByNameJob;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
 use Illuminate\Database\Eloquent\Model;
 
-class OrderPaymentService
+readonly final class OrderPaymentService
 {
-    protected $orderPaymentRepository;
-    protected $orderRepository;
-    protected $paymentRepository;
-    protected $labelService;
-    protected $orderPaymentMailService;
 
     public function __construct(
-        OrderPaymentRepository  $orderPaymentRepository,
-        OrderRepository         $orderRepository,
-        PaymentRepository       $paymentRepository,
-        LabelService            $labelService,
-        OrderPaymentMailService $orderPaymentMailService
-    )
-    {
-        $this->orderPaymentRepository = $orderPaymentRepository;
-        $this->orderRepository = $orderRepository;
-        $this->paymentRepository = $paymentRepository;
-        $this->labelService = $labelService;
-        $this->orderPaymentMailService = $orderPaymentMailService;
-    }
+        protected OrderPaymentRepository  $orderPaymentRepository,
+        protected OrderRepository         $orderRepository,
+        protected PaymentRepository       $paymentRepository,
+        protected LabelService            $labelService,
+        protected OrderPaymentMailService $orderPaymentMailService
+    ) {}
 
     // TODO TYPOWANIA POPRAWIć!!!
     public function payOrder(
@@ -55,7 +42,7 @@ class OrderPaymentService
         bool    $isWarehousePayment = null
     ): OrderPayment
     {
-        $order = $this->orderRepository->find($orderId);
+        $order = Order::find($orderId);
 
         if ($order->payments->count() == 0) {
             $this->labelService->dispatchLabelEventByNameJob($order->id, LabelEventName::PAYMENT_RECEIVED);
@@ -114,11 +101,6 @@ class OrderPaymentService
         return $payment;
     }
 
-    public function hasAnyPayment(Order $order): bool
-    {
-        return $order->payments->count() > 0;
-    }
-
     private function removePromisedPayment(string $masterPaymentId, string $amount, int $orderId): void
     {
         $masterPayment = $this->paymentRepository->find($masterPaymentId);
@@ -140,5 +122,14 @@ class OrderPaymentService
             'operation_type' => 'Zwrot towaru',
             'payer' => $request['payer'],
         ]);
+    }
+
+    public function dispatchLabelsForPaymentAmount($payment): void
+    {
+        if ($payment->order->isPaymentRegulated()) {
+            dispatch(new DispatchLabelEventByNameJob($payment->order, "payment-equal-to-order-value"));
+        } else {
+            dispatch(new DispatchLabelEventByNameJob($payment->order, "required-payment-before-unloading"));
+        }
     }
 }
