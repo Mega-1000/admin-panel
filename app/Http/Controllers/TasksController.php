@@ -1327,4 +1327,20 @@ class TasksController extends Controller
             'data' => $lists
         ]);
     }
+
+    /**
+     * @param int $orderId
+     * @return JsonResponse
+     */
+    public function checkOrderQuantityInStock(int $orderId): JsonResponse
+    {
+        $tasks = Task::with(['parent'])->where('order_id', $orderId)->get();
+
+        $lists = $this->taskTimeService->getQuantityInStockList($tasks);
+
+        return response()->json([
+            'status' => 200,
+            'data' => $lists
+        ]);
+    }
 }
