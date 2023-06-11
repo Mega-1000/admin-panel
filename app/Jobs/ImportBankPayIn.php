@@ -273,8 +273,8 @@ class ImportBankPayIn implements ShouldQueue
             }
         }
 
-        $invoicePattern = '/\b(?:\d{1,6}\s*\/\s*(?:STA|MAG|TRA|KOS)\s*\/\s*\d{2}\s*\/\s*\d{2}\s*\d{2})\b/';
-        if (preg_match($invoicePattern, $payIn['tytul'], $matches)) {
+        $invoicePattern = '/\b(?:\d{1,6}\s*\/\s*(?:sta|mag|tra|kos)\s*\/\s*\d{2}\s*\/\s*\d{2}\s*\d{2})\b/';
+        if (preg_match($invoicePattern, mb_strtolower($payIn['tytul']), $matches)) {
             $matches[0] = str_replace(' ', '', $matches[0]);
             $orderId = FileInvoiceRepository::getInvoiceIdFromNumber(str_replace('/', '_', $matches[0]));
             $order = Order::query()->find($orderId);
