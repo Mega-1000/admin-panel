@@ -243,7 +243,7 @@ class ImportBankPayIn implements ShouldQueue
         if (count($matches)) {
             foreach ($matches[0] as $orderId) {
                 $order = Order::query()->find($orderId);
-
+                Log::notice($order);
                 if (!empty($order) && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
                     return PayInDTOFactory::createPayInDTO([
                         'orderId' => (int)$order->id,
