@@ -4,7 +4,9 @@ namespace App\Jobs;
 
 use App\Entities\Order;
 use App\Entities\OrderPackage;
+use App\Entities\OrderPayment;
 use App\Entities\Transaction;
+use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\FindOrCreatePaymentForPackageService;
@@ -30,11 +32,9 @@ use Illuminate\Support\Str;
  *
  * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
  */
-final class ImportAllegroPayInJob implements ShouldQueue
+readonly final class ImportAllegroPayInJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService;
 
     const CHAR_TO_REMOVE = [
         "\xEF\xBB\xBF" => '',
@@ -55,17 +55,16 @@ final class ImportAllegroPayInJob implements ShouldQueue
     protected TransactionRepository $transactionRepository;
 
     public function __construct(
-        readonly protected UploadedFile $file
+        protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
+        protected UploadedFile $file
     ) {}
 
     /**
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function handle(TransactionRepository $transaction, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService): void
+    public function handle(TransactionRepository $transaction)
     {
-        $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
-
         $header = NULL;
         $fileName = 'transactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');

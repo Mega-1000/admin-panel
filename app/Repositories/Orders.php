@@ -121,7 +121,7 @@ class Orders
     /**
      * @param Order $order
      *
-     * @return int
+     * @return float
      */
     public function getOrderReturnGoods(Order $order): float
     {

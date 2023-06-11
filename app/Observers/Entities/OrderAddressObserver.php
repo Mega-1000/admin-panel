@@ -43,7 +43,7 @@ class OrderAddressObserver
         }
     }
 
-    public function updated(OrderAddress $orderAddress)
+    public function updated(OrderAddress $orderAddress): void
     {
         $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
         $this->addLabelIfManualCheckIsRequired($orderAddress);
@@ -60,12 +60,19 @@ class OrderAddressObserver
     protected function addLabelIfManualCheckIsRequired(OrderAddress $orderAddress): void
     {
         $loopPresentationArray = [];
-        if (app(OrderPaymentService::class)->hasAnyPayment($orderAddress->order) &&
+        if (app(OrderPaymentService::class)->hasAnyPayment($orderAddress->order)&&
             !(new OrderAddressService())->addressIsValid($orderAddress)) {
             AddLabelService::addLabels($orderAddress->order, [LabelsHelper::INVALID_ORDER_ADDRESS], $loopPresentationArray, [], Auth::user()?->id);
             return;
         }
-        RemoveLabelService::removeLabels($orderAddress->order, [LabelsHelper::INVALID_ORDER_ADDRESS], $loopPresentationArray, [], Auth::user()?->id);
+
+        RemoveLabelService::removeLabels(
+            $orderAddress->order,
+            [LabelsHelper::INVALID_ORDER_ADDRESS],
+            $loopPresentationArray,
+            [],
+            Auth::user()?->id
+        );
     }
 
     protected function addHistoryLog(OrderAddress $orderAddress): void

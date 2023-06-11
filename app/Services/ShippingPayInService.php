@@ -281,7 +281,7 @@ final class ShippingPayInService
                 ]);
 
                 if ($payment instanceof OrderPayment) {
-                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
+                    OrderPaymentService::dispatchLabelsForPaymentAmount($payment);
                 }
 
                 $amount -= $paymentAmount;

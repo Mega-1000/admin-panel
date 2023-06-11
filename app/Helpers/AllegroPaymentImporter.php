@@ -9,6 +9,7 @@ use App\Entities\Order;
 use App\Entities\SelTransaction;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Services\Label\RemoveLabelService;
+use App\Services\OrderPaymentService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,18 +18,19 @@ class AllegroPaymentImporter
     const DATE_COLUMN_NUMBER = 0;
     const AMOUNT_COLUMN_NUMBER = 8;
     const ID_COLUMN_NUMBER = 2;
-    private $filename;
+    public function __construct(
+        private $filename
+    ) {}
 
-    public function __construct($filename)
-    {
-        $this->filename = $filename;
-    }
-
-    public function import()
+    /**
+     * @throws Exception
+     */
+    public function import(): array
     {
         if (($handle = fopen($this->filename, "r")) === FALSE) {
             throw new Exception('Nie można otworzyć pliku');
         }
+
         $errors = [];
         $firstline = true;
         while (($line = fgetcsv($handle, 0, ",")) !== FALSE) {
@@ -94,6 +96,7 @@ class AllegroPaymentImporter
         $found->save();
         $prev = [];
         RemoveLabelService::removeLabels($order, [Label::IS_NOT_PAID], $prev, [], Auth::user()->id);
-        OrdersPaymentsController::dispatchLabelsForPaymentAmount($found);
+
+        OrderPaymentService::dispatchLabelsForPaymentAmount($found);
     }
 }

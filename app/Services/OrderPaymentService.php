@@ -87,7 +87,7 @@ readonly final class OrderPaymentService
             $this->labelService->removeLabel($orderId, [Label::IS_NOT_PAID]);
         }
 
-        OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
+        OrderPaymentService::dispatchLabelsForPaymentAmount($payment);
 
         if (!empty($chooseOrder)) {
             $this->removePromisedPayment($masterPaymentId, $amount, $orderId);
@@ -124,7 +124,7 @@ readonly final class OrderPaymentService
         ]);
     }
 
-    public function dispatchLabelsForPaymentAmount($payment): void
+    public static function dispatchLabelsForPaymentAmount($payment): void
     {
         if ($payment->order->isPaymentRegulated()) {
             dispatch(new DispatchLabelEventByNameJob($payment->order, "payment-equal-to-order-value"));

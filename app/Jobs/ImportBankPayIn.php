@@ -17,6 +17,7 @@ use App\Repositories\TransactionRepository;
 use App\Services\FindOrCreatePaymentForPackageService;
 use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
+use App\Services\OrderPaymentService;
 use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -51,6 +52,11 @@ class ImportBankPayIn implements ShouldQueue
      */
     protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService;
 
+    /**
+     * @var OrderPaymentService
+     */
+    protected OrderPaymentService $orderPaymentService;
+
     public function __construct(
         protected UploadedFile                         $file,
     ) {}
@@ -61,14 +67,18 @@ class ImportBankPayIn implements ShouldQueue
      * @param TransactionRepository $transaction
      * @param LabelService $labelService
      * @param FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService
+     * @param OrderPaymentService $orderPaymentService
      * @return string
      */
     public function handle(
-        TransactionRepository $transaction,
-        LabelService $labelService,
-        FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService): string
+        TransactionRepository                $transaction,
+        LabelService                         $labelService,
+        FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
+        OrderPaymentService                  $orderPaymentService,
+    ): string
     {
         $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
+        $this->orderPaymentService = $orderPaymentService;
 
         $header = NULL;
         $fileName = 'bankTransactionWithoutOrder.csv';
@@ -371,7 +381,7 @@ class ImportBankPayIn implements ShouldQueue
             $orderPayment = $this->saveOrderPayment($order, $paymentAmount, $payIn, $declaredSum);
 
             if ($orderPayment instanceof OrderPayment) {
-                OrdersPaymentsController::dispatchLabelsForPaymentAmount($orderPayment);
+                $this->orderPaymentService->dispatchLabelsForPaymentAmount($orderPayment);
             }
         }
     }
