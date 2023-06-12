@@ -72,7 +72,7 @@ class RemoveLabelService
                 continue;
             }
 
-            if ($label->manual_label_selection_to_add_after_removal) {
+            if ($label?->manual_label_selection_to_add_after_removal) {
                 $labelIdsToAttach = $customLabelIdsToAddAfterRemoval;
             } else {
                 $labelIdsToAttach = [];
