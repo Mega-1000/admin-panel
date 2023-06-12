@@ -32,7 +32,7 @@ use Illuminate\Support\Str;
  *
  * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
  */
-readonly final class ImportAllegroPayInJob implements ShouldQueue
+final class ImportAllegroPayInJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -52,11 +52,11 @@ readonly final class ImportAllegroPayInJob implements ShouldQueue
     /**
      * @var TransactionRepository
      */
-    protected TransactionRepository $transactionRepository;
+    protected readonly TransactionRepository $transactionRepository;
 
     public function __construct(
-        protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
-        protected UploadedFile $file
+        protected readonly FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
+        protected readonly UploadedFile $file
     ) {}
 
     /**
