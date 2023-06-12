@@ -54,8 +54,11 @@ final class ImportAllegroPayInJob implements ShouldQueue
      */
     protected readonly TransactionRepository $transactionRepository;
 
+    /**
+     * @var FindOrCreatePaymentForPackageService
+     */
+    protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService;
     public function __construct(
-        protected readonly FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
         protected readonly UploadedFile $file
     ) {}
 
@@ -63,8 +66,9 @@ final class ImportAllegroPayInJob implements ShouldQueue
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function handle(TransactionRepository $transaction)
+    public function handle(TransactionRepository $transaction, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService)
     {
+        $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
         $header = NULL;
         $fileName = 'transactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');

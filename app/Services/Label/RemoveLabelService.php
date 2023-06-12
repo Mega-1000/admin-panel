@@ -48,7 +48,6 @@ class RemoveLabelService
             $label = Label::query()->find($labelId);
 
             if ($time !== null) {
-
                 $preLabelId = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->first()?->label_to_add_id;
 
                 if ($preLabelId === null) continue;
