@@ -301,9 +301,9 @@ class TaskService
 
     /**
      * @param $task
-     * @return bool
+     * @return bool|null
      */
-    public function markTaskAsProduced($task): bool
+    public function markTaskAsProduced($task): bool|null
     {
         $response = null;
         if ($task->childs->count()) {
@@ -329,7 +329,8 @@ class TaskService
                 Auth::user()->id
             );
         }
-        return array_key_exists('success', $response);
+
+        return ( $response !== null ? array_key_exists('success', $response) : $response );
     }
 
     /**
