@@ -181,6 +181,9 @@
                 </thead>
                 <tbody>
                 @foreach($firms as $firm)
+                    @if($auction->offers->where('firm_id', $firm->id)->count() === 0)
+                        @continue
+                    @endif
                     <tr>
                         <td>
                             {{ $firm->firm->symbol }}
