@@ -5,6 +5,7 @@ namespace App\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ChatAuctionFirm extends Model
 {
@@ -32,5 +33,10 @@ class ChatAuctionFirm extends Model
     public function firm(): BelongsTo
     {
         return $this->belongsTo(Firm::class);
+    }
+
+    public function chatAuctionOffers(): HasMany
+    {
+        return $this->hasMany(ChatAuctionOffer::class);
     }
 }
