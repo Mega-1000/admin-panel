@@ -329,11 +329,8 @@ class TaskService
                 Auth::user()->id
             );
         }
-        if ($response!==null) {
-            return array_key_exists('success', $response);
-        }
 
-        return $response;
+        return ( $response !== null ? array_key_exists('success', $response) : $response );
     }
 
     /**
