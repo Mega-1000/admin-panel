@@ -40,8 +40,8 @@ class ChatAuctionFirms
             ->where('chat_auction_id', $chat_auction_id)
             ->with('firm')
             ->get()
-            ->unique(function ($q) {
-                return $q->firm->name;
+            ->where(function ($q) {
+                return $q->firm->offers->count() !== 0;
             });// distinc by firm email;
     }
 
