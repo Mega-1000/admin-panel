@@ -171,7 +171,14 @@
                         </h5>
                     </th> <!-- Empty cell for the top-left corner -->
                     @foreach($products as $product)
-                        <th>{{ $product->product->name }}
+                        <th>
+                            @php
+                                $name = $product->product->name;
+                                $words = explode(' ', $name);
+                                array_shift($words);
+                                $name = implode(' ', $words);
+                            @endphp
+                            {{ $name }}
                             <button class="btn btn-primary">
                                 Sortuj
                             </button>
@@ -191,13 +198,7 @@
                         @foreach($products as $product)
                             <td>
                                 @if($offer = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->first())
-                                    @php
-                                        $name = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_net');
-                                        $words = explode(' ', $name);
-                                        array_shift($words);
-                                        $name = implode(' ', $words);
-                                    @endphp
-                                    {{ $name }} Zł
+                                    {{ $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_net'); }} Zł
 
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-firm="{{ $firm->firm->name }}" data-product="{{ $product->product->name }}">
                                 @else
