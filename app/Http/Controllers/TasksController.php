@@ -706,8 +706,15 @@ class TasksController extends Controller
             $task = Task::findOrFail($request->id);
             $end = Carbon::now();
             $end->second = 0;
+            $start = Carbon::parse($task->taskTime->date_start);
+            $start->second = 0;
             $task->taskTime->date_end = $end;
+            if ($start >= $end)
+            {
+                $task->taskTime->date_start = $end->subMinutes(2);
+            }
             $task->status = Task::FINISHED;
+            $task->color = Task::LIGHT_GREEN_COLOR;
             $task->taskTime->save();
 
             $response = $this->taskService->markTaskAsProduced($task);
@@ -719,12 +726,12 @@ class TasksController extends Controller
                 ]);
             }
             $task->save();
-            if ($request->warehouse_notice) {
+            if (isset($request->warehouse_notice) && $request->warehouse_notice !== '') {
                 $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
                 $task->taskSalaryDetail->save();
             }
 
-            if ($request->description !== '') {
+            if (isset($request->description) && $request->description !== '') {
                 $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->description);
                 $task->taskSalaryDetail->save();
             }
