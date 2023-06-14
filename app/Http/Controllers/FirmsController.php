@@ -123,7 +123,7 @@ class FirmsController extends Controller
             }
         }
 
-        return redirect()->route('firms.edit', ['firma' => $firm->id])->with([
+        return redirect()->route('firms.edit', ['firm' => $firm->id])->with([
             'message' => __('firms.message.store'),
             'alert-type' => 'success'
         ]);
@@ -132,9 +132,10 @@ class FirmsController extends Controller
     /**
      * @return Factory|View
      */
-    public function create()
+    public function create(): Factory|View
     {
         $warehouses = $this->warehouseRepository->all();
+
         return view('firms.create', compact('warehouses'));
     }
 
@@ -142,7 +143,7 @@ class FirmsController extends Controller
      * @param $id
      * @return Factory|View
      */
-    public function edit($id)
+    public function edit($id): Factory|View
     {
         $firm = $this->repository->find($id);
 
