@@ -35,8 +35,8 @@ class FirmCreateRequest extends FormRequest
             'nip' => 'required|regex:/[0-9]{9}/',
             'account_number' => 'required|min:10',
             'city' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
+            'latitude' => 'nullable',
+            'longitude' => 'nullable',
             'postal_code' => 'required|regex:/[0-9]{2}\-[0-9]{3}/',
         ];
     }
