@@ -996,7 +996,13 @@ class TasksController extends Controller
         }
     }
 
-    public function updateTask(Request $request, $id)
+    /**
+     * @param TaskUpdateRequest $request
+     * @param                   $id
+     *
+     * @return RedirectResponse
+     */
+    public function updateTask(TaskUpdateRequest $request, $id): RedirectResponse
     {
         if ($request->update == 1) {
             return $this->onlyUpdateTask($id, $request);
@@ -1014,7 +1020,9 @@ class TasksController extends Controller
      */
     private function onlyUpdateTask($id, Request $request): RedirectResponse
     {
+        $data = $request->validated();
         //TODO DODAĆ WALIDACJĘ !!! Ktokolwiek będzie coś tu zmieniał, ma być dodana walidacja do kodu
+
         $task = $this->repository->find($id);
         if ($task->order_id != null) {
             $customId = 'taskOrder-' . $task->order_id;
