@@ -77,7 +77,7 @@ class FirmsController extends Controller
      * @param FirmCreateRequest $request
      * @return RedirectResponse
      */
-    public function store(FirmCreateRequest $request)
+    public function store(FirmCreateRequest $request): RedirectResponse
     {
         $firm = new Firm;
         $firm->name = $request->name;
@@ -94,14 +94,13 @@ class FirmsController extends Controller
         $firm->notices = $request->notices;
         $firm->secondary_phone = $request->secondary_phone;
         $firm->secondary_notices = $request->secondary_notices;
-        
+
         if (empty($request->short_name)) {
             $firm->short_name = substr($request->name, 0, 50);
         }
         $firm->save();
 
         $firmService = new FirmService($firm);
-        $firmService->addNewEmployeeForComplaint();
 
         $this->firmAddressRepository->create([
             'firm_id' => $firm->id,

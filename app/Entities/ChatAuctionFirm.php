@@ -34,9 +34,4 @@ class ChatAuctionFirm extends Model
     {
         return $this->belongsTo(Firm::class);
     }
-
-    public function chatAuctionOffers(): HasMany
-    {
-        return $this->hasMany(ChatAuctionOffer::class);
-    }
 }

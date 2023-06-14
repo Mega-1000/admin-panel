@@ -11,14 +11,14 @@ class CreateEmployeeroleEmployeeTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('employeerole_employee', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('employee_id');
             $table->unsignedInteger('employee_role_id');
             $table->timestamps();
-            
+
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
             $table->foreign('employee_role_id')->references('id')->on('employee_roles')->onDelete('cascade');
         });
@@ -29,7 +29,7 @@ class CreateEmployeeroleEmployeeTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('employeerole_employee');
     }

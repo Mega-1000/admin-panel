@@ -37,7 +37,14 @@ class ChatAuctionOffer extends Model
 
     public function firm(): HasOneThrough
     {
-        return $this->hasOneThrough(Firm::class, ChatAuctionFirm::class, 'id', 'id', 'auction_firm_id', 'firm_id');
+        return $this->hasOneThrough(
+            Firm::class,
+            ChatAuctionFirm::class,
+            'id',
+            'id',
+            'auction_firm_id',
+            'firm_id'
+        );
     }
 
     public function orderItem(): BelongsTo

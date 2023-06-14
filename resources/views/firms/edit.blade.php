@@ -264,24 +264,24 @@
 @section('datatable-scripts')
     <script>
         $(document).ready(function () {
-            var general = $('#general').show();
-            var address = $('#address').hide();
-            var warehouses = $('#warehouses').hide();
-            var employees = $('#employees').hide();
-            var pageTitle = $('.page-title').children('i');
-            var createButtonWarehouse = $('#create-button-warehouse').hide();
-            var createButtonEmployee = $('#create-button-employee').hide();
-            var uri = $('#uri').val();
-            var value;
-            var referrer = document.referrer;
-            var breadcrumb = $('.breadcrumb');
-            var item = '{{old('tab')}}';
+            const general = $('#general').show();
+            const address = $('#address').hide();
+            const warehouses = $('#warehouses').hide();
+            const employees = $('#employees').hide();
+            const pageTitle = $('.page-title').children('i');
+            const createButtonWarehouse = $('#create-button-warehouse').hide();
+            const createButtonEmployee = $('#create-button-employee').hide();
+            const uri = $('#uri').val();
+            let value;
+            const referrer = document.referrer;
+            const breadcrumb = $('.breadcrumb');
+            const item = '{{old('tab')}}';
 
             breadcrumb.children().remove();
             breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
             breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit'>Firmy</a></li>");
             breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
-            if (referrer.search('warehouses') != -1 || uri.search('warehouses') != -1 || item === 'warehouses') {
+            if (referrer.search('warehouses') !== -1 || uri.search('warehouses') !== -1 || item === 'warehouses') {
                 $('#button-general').removeClass('active');
                 $('#button-address').removeClass('active');
                 $('#button-warehouses').addClass('active');
@@ -297,7 +297,7 @@
                 breadcrumb.children().last().remove();
                 breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit#warehouses'>Magazyny</a></li>");
 
-            } else if (referrer.search('employees') != -1 || uri.search('employees') != -1 || item === 'employees') {
+            } else if (referrer.search('employees') !== -1 || uri.search('employees') !== -1 || item === 'employees') {
                 $('#button-general').removeClass('active');
                 $('#button-address').removeClass('active');
                 $('#button-warehouses').removeClass('active');
@@ -491,7 +491,7 @@
         });
         @foreach($visibilitiesWarehouse as $key =>$row)
 
-        var {{'show'.$row->name}}  = @json($row->show);
+        let {{'show'.$row->name}}  =;
         {{'show'.$row->name}} = {{'show'.$row->name}}.map(function(x){
             // if (typeof table.column(x+':name').index() === "number")
             return tableWarehouses.column(x+':name').index();
@@ -500,7 +500,7 @@
             return el != null;
         });
 
-        var {{'hidden'.$row->name}} = @json($row->hidden);
+        let {{'hidden'.$row->name}} =;
         {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function(x){
             // if (typeof table.column(x+':name').index() === "number")
             return tableWarehouses.column(x+':name').index();
@@ -517,10 +517,10 @@
         @endforeach
 
         $('#dataTableWarehouses thead tr th').each(function (i) {
-            var title = $(this).text();
+            const title = $(this).text();
             if (title !== '' && title !== 'Akcje') {
                 $(this).html('<div><span>'+title+'</span></div><div><input type="text" placeholder="Szukaj '+ title +'" id="columnSearch' + i + '"/></div>');
-            } else if(title == 'Akcje') {
+            } else if(title === 'Akcje') {
                 $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
             }
             $('input', this).on('keyup change', function () {
