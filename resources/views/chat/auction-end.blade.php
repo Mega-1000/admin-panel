@@ -191,7 +191,14 @@
                         @foreach($products as $product)
                             <td>
                                 @if($offer = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->first())
-                                    {{ $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_net') }} Zł
+                                    @php
+                                        $name = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_net');
+                                        $words = explode(' ', $name);
+                                        array_shift($words);
+                                        $name = implode(' ', $words);
+                                    @endphp
+                                    {{ $name }} Zł
+
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-firm="{{ $firm->firm->name }}" data-product="{{ $product->product->name }}">
                                 @else
                                     No offer
