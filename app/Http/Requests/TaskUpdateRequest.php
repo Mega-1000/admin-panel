@@ -29,6 +29,17 @@ class TaskUpdateRequest extends FormRequest
             'order_id' => 'nullable',
             'warehouse_value' => 'nullable|numeric',
             'consultant_value' => 'nullable|numeric',
+            'new_group' => 'nullable',
+            'view_type' => 'nullable',
+            'active_start' => 'nullable',
+            'name' => 'nullable',
+            'start' => 'nullable',
+            'end' => 'nullable',
+            'color' => 'nullable',
+            'consultant_notice' => 'nullable',
+            'warehouse_notice' => 'nullable',
+            'shipment_date' => 'nullable',
+            'update' => 'nullable'
         ];
     }
 }
