@@ -14,6 +14,8 @@ use App\Repositories\FirmAddressRepository;
 use App\Repositories\FirmRepository;
 use App\Repositories\WarehouseRepository;
 use App\Services\FirmService;
+use Exception;
+use FontLib\TrueType\Collection;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -28,41 +30,23 @@ use Yajra\DataTables\Facades\DataTables;
 class FirmsController extends Controller
 {
     /**
-     * @var FirmRepository
-     */
-    protected $repository;
-
-    /**
-     * @var FirmAddressRepository
-     */
-    protected $firmAddressRepository;
-
-    /**
-     * @var WarehouseRepository
-     */
-    protected $warehouseRepository;
-
-    /**
      * FirmsController constructor.
      *
      * @param FirmRepository $repository
+     * @param FirmAddressRepository $firmAddressRepository
+     * @param WarehouseRepository $warehouseRepository
      */
     public function __construct(
-        FirmRepository        $repository,
-        FirmAddressRepository $firmAddressRepository,
-        WarehouseRepository   $warehouseRepository
-    )
-    {
-        $this->repository = $repository;
-        $this->firmAddressRepository = $firmAddressRepository;
-        $this->warehouseRepository = $warehouseRepository;
-    }
+        protected FirmRepository        $repository,
+        protected FirmAddressRepository $firmAddressRepository,
+        protected WarehouseRepository   $warehouseRepository
+    ) {}
 
 
     /**
      * @return Factory|View
      */
-    public function index()
+    public function index(): Factory|View
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('firms'));
         foreach ($visibilities as $key => $row) {
@@ -99,8 +83,6 @@ class FirmsController extends Controller
             $firm->short_name = substr($request->name, 0, 50);
         }
         $firm->save();
-
-        $firmService = new FirmService($firm);
 
         $this->firmAddressRepository->create([
             'firm_id' => $firm->id,
@@ -199,8 +181,9 @@ class FirmsController extends Controller
 
     /**
      * @return JsonResponse
+     * @throws Exception
      */
-    public function datatable()
+    public function datatable(): JsonResponse
     {
         $collection = $this->prepareCollection();
 
@@ -210,24 +193,19 @@ class FirmsController extends Controller
     /**
      * @return mixed
      */
-    public function prepareCollection()
+    public function prepareCollection(): Collection
     {
-        $collection = $this->repository->all();
-
-        return $collection;
+        return $this->repository->all();
     }
 
     /**
      * @param $id
      * @return RedirectResponse
      */
-    public function changeStatus($id)
+    public function changeStatus($id): RedirectResponse
     {
-        $firm = $this->repository->find($id);
+        $firm = Firm::findOrFail($id);
 
-        if (empty($firm)) {
-            abort(404);
-        }
         $dataToStore = [];
         $dataToStore['status'] = $firm['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
         $this->repository->update($dataToStore, $firm->id);
@@ -243,13 +221,10 @@ class FirmsController extends Controller
      * @param $id
      * @return RedirectResponse
      */
-    public function update(FirmUpdateRequest $request, $id)
+    public function update(FirmUpdateRequest $request, $id): RedirectResponse
     {
-        $firm = Firm::find($id);
+        $firm = Firm::findOrFail($id);
 
-        if (empty($firm)) {
-            abort(404);
-        }
         $firm->name = $request->name;
         $firm->short_name = $request->short_name;
         $firm->symbol = $request->symbol;
@@ -264,9 +239,11 @@ class FirmsController extends Controller
         $firm->notices = $request->notices;
         $firm->secondary_phone = $request->secondary_phone;
         $firm->secondary_notices = $request->secondary_notices;
+
         if (empty($request->short_name)) {
             $firm->short_name = substr($request->name, 0, 50);
         }
+
         $firm->save();
 
         $firmService = new FirmService($firm);
@@ -300,13 +277,9 @@ class FirmsController extends Controller
         ]);
     }
 
-    public function sendRequestToUpdateFirmData($id)
+    public function sendRequestToUpdateFirmData($id): RedirectResponse
     {
-        $firm = $this->repository->find($id);
-
-        if (empty($firm)) {
-            abort(404);
-        }
+        $firm = Firm::findOrFail($id);
 
         if ($firm->email !== null) {
             $firm->send_request_to_update_data = true;
