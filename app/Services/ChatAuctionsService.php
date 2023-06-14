@@ -12,6 +12,7 @@ use App\Repositories\ChatAuctionFirms;
 use App\Repositories\ChatAuctionOffers;
 use App\Repositories\Employees;
 use App\Repositories\Firms;
+use App\Services\Label\AddLabelService;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
@@ -87,6 +88,15 @@ readonly class ChatAuctionsService
         $auction->update([
             'confirmed' => true,
         ]);
+
+        $arr = [];
+
+        AddLabelService::addLabels(
+            $order,
+            [224],
+            $arr,
+            [],
+        );
     }
 
     /**
