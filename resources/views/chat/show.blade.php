@@ -50,6 +50,17 @@
                             </a>
                         @else
                             <!-- if auction->end_of_auction is in past show message  -->
+                            <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}">
+                                @csrf
+                                @method('PUT')
+                                <input class="form-control" name="end_of_auction" type="date" value="{{ $chat->auctions()->first()->end_of_auction }}">
+
+                                <button class="btn btn-primary">
+                                    Zmień datę zakończenia przetargu
+                                </button>
+                            </form>
+
+
                             @if(\Carbon\Carbon::parse(\Carbon\Carbon::now())->gt(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)))
                                 <h3>
                                 Przetarg zakończony

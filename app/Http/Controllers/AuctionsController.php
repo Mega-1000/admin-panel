@@ -11,6 +11,7 @@ use App\Exceptions\DeliverAddressNotFoundException;
 use App\Helpers\Exceptions\ChatException;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
+use App\Http\Requests\UpdateChatAuctionRequest;
 use App\Repositories\ChatAuctionFirms;
 use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
@@ -150,5 +151,19 @@ class AuctionsController extends Controller
         $this->chatAuctionsService->endAuction($auction, $request->get('order'), $customer);
 
         return redirect()->route('success');
+    }
+
+    /**
+     * @param UpdateChatAuctionRequest $request
+     * @param ChatAuction $auction
+     * @return RedirectResponse
+     */
+    public function update(UpdateChatAuctionRequest $request, ChatAuction $auction): RedirectResponse
+    {
+        $auction->update(
+            $request->validated()
+        );
+
+        return redirect()->back();
     }
 }
