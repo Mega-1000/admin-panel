@@ -75,7 +75,13 @@
                         {{ $product->chatAuctionOffers->min('price') }} PLN
                     </h4>
                     <p>
-                        {{ $product->product->name }}
+                        @php
+                            $name = $product->product->name;
+                            $words = explode(' ', $name);
+                            array_shift($words);
+                            $name = implode(' ', $words);
+                        @endphp
+                        {{ $name }}
                     </p>
                     <p>
                         symbol: {{ $product->product->symbol }}
