@@ -193,7 +193,7 @@ class FirmsController extends Controller
     /**
      * @return mixed
      */
-    public function prepareCollection(): Collection
+    public function prepareCollection(): mixed
     {
         return $this->repository->all();
     }
