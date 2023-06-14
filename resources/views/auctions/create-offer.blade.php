@@ -90,7 +90,7 @@
                         ilość: {{ $product->quantity }}
                     </p>
                     <p>
-                        cena: {{ $product->price }} PLN
+                        Wartość brutto: {{ $product->price }} PLN
                     </p>
                 </div>
                 <form style="display: flex; flex-direction: column" action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST">
