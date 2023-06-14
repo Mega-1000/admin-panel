@@ -40,6 +40,8 @@
             Miejscowość: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->city }}
             <br>
             Kod pocztowy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}
+            <br>
+            Numer oferty: {{ $chat_auction_firm->chatAuction->chat->order->id }}
         </h3>
     </div>
     @foreach($products as $product)
