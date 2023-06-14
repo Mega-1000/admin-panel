@@ -107,7 +107,7 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $profit = $this->calculateProfit($item, $profit);
+                    $profit = $this->taskService->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -173,18 +173,6 @@ class TasksController extends Controller
         return view('planning.tasks.create', compact('users', 'orders', 'warehouses'));
     }
 
-    /**
-     * @param       $item
-     * @param float $profit
-     *
-     * @return float
-     */
-    private function calculateProfit($item, float $profit): float
-    {
-        $profit += (((float)$item->gross_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->gross_purchase_price_commercial_unit * (int)$item->quantity));
-        return $profit;
-    }
-
     public function update(TaskUpdateRequest $request, $id)
     {
         $data = $request->validated();
@@ -222,7 +210,7 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $profit = $this->calculateProfit($item, $profit);
+                    $profit = $this->taskService->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -328,7 +316,7 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $profit = $this->calculateProfit($item, $profit);
+                    $profit = $this->taskService->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -953,7 +941,7 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $profit = $this->calculateProfit($item, $profit);
+                    $profit = $this->taskService->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -996,143 +984,41 @@ class TasksController extends Controller
         }
     }
 
-    public function updateTask(Request $request, $id)
-    {
-        if ($request->update == 1) {
-            return $this->onlyUpdateTask($id, $request);
-        } else {
-            return $this->deleteTask($id, $request);
-        }
-
-    }
-
     /**
-     * @param         $id
-     * @param Request $request
+     * @param TaskUpdateRequest $request
+     * @param                   $id
      *
      * @return RedirectResponse
      */
-    private function onlyUpdateTask($id, Request $request): RedirectResponse
+    public function updateTask(TaskUpdateRequest $request, int $id): RedirectResponse
     {
-        //TODO DODAĆ WALIDACJĘ !!! Ktokolwiek będzie coś tu zmieniał, ma być dodana walidacja do kodu
-        $task = $this->repository->find($id);
-        if ($task->order_id != null) {
-            $customId = 'taskOrder-' . $task->order_id;
-        } else {
-            $customId = 'task-' . $task->id;
-        }
-        if (empty($task)) {
-            abort(404);
-        }
-        if ($request->new_group) {
-            $newGroup = Task::whereIn('id', $request->new_group)->get();
-            $this->updateOldAndCreateNewGroup($newGroup, $request, $task);
-        }
+        if ($request->update == 1) {
+            $customId = $this->taskService->onlyUpdateTask($id, $request);
 
-        $dataToStore = [
-            'start' => $request->start,
-            'end' => $request->end,
-            'id' => $id,
-            'user_id' => $task->user_id,
-            'color' => substr($request->color, 1),
-            'name' => $request->name,
-        ];
-        if (substr($request->color, 1) == '008000' || substr($request->color, 1) == '32CD32') {
-            $dataToStore['status'] = Task::FINISHED;
-        }
-        $allow = TaskTimeHelper::allowTaskMove($dataToStore);
-        if ($allow === true) {
-            $dataToStore['date_start'] = $dataToStore['start'];
-            $dataToStore['date_end'] = $dataToStore['end'];
-            $task->update($dataToStore);
-            $task->taskTime->update($dataToStore);
-            if ($task->taskSalaryDetail == null) {
-                $task->taskSalaryDetail()->create($request->all());
-            } else {
-                $task->taskSalaryDetail->update($request->all());
-            }
-            if ($task->order_id !== null) {
-                $task->taskSalaryDetail->update($request->all());
-                $orderItemKMD = 0;
-                $totalPrice = $task->order->total_price;
-                $profit = 0;
-                foreach ($task->order->items as $item) {
-                    if ($item->product->symbol == 'KMD') {
-                        $orderItemKMD = $item->quantity;
-                    }
-                    $profit = $this->calculateProfit($item, $profit);
-                }
-                if ($task->order->status_id === 4) {
-                    $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
-                        number_format($profit, 2, '.', ''));
-                    $totalPrice += $consultantVal;
-                } else {
-                    $consultantVal = $request->consultant_value;
-                    $totalPrice += $task->order->total_price + (float)$request->consultant_value;
-                }
-                $shipmentDate = $request->shipment_date;
-                $task->order->update([
-                    'shipment_date' => $shipmentDate,
-                    'consultant_value' => $consultantVal,
-                    'warehouse_value' => $request->warehouse_value,
-                    'total_price' => $totalPrice
-                ]);
-                $prev = [];
-
-                if ($task->color == '32CD32') {
-                    RemoveLabelService::removeLabels($task->order, [49], $prev, [], Auth::user()->id);
-                    AddLabelService::addLabels($task->order, [50], $prev, [], Auth::user()->id);
-                }
-                if ($task->color == '008000') {
-                    RemoveLabelService::removeLabels($task->order, [74], $prev, [], Auth::user()->id);
-                }
-                $dateTime = new Carbon($request->start);
-                $title = $task->order_id . ' - ' . $dateTime->format('d-m') . ' - ' . $task->order->warehouse_value;
-                $task->update([
-                    'name' => $title
+            if ($customId !== null) {
+                return redirect()->route('planning.timetable.index', [
+                    'id' => $customId,
+                    'view_type' => $request->view_type,
+                    'active_start' => $request->active_start,
+                ])->with([
+                    'message' => __('tasks.messages.update'),
+                    'alert-type' => 'success'
                 ]);
             }
+
             return redirect()->route('planning.timetable.index', [
                 'id' => $customId,
                 'view_type' => $request->view_type,
                 'active_start' => $request->active_start,
             ])->with([
-                'message' => __('tasks.messages.update'),
-                'alert-type' => 'success'
+                'message' => __('tasks.messages.update_error'),
+                'alert-type' => 'error'
             ]);
+
+        } else {
+            return $this->deleteTask($id, $request);
         }
-        return redirect()->route('planning.timetable.index', [
-            'id' => $customId,
-            'view_type' => $request->view_type,
-            'active_start' => $request->active_start,
-        ])->with([
-            'message' => __('tasks.messages.update_error'),
-            'alert-type' => 'error'
-        ]);
-    }
 
-    /**
-     * @param $newGroup
-     * @param $request
-     * @param $task
-     */
-    private function updateOldAndCreateNewGroup($newGroup, $request, $task): void
-    {
-        $duration = $newGroup->reduce(function ($prev, $next) {
-            $time = $next->taskTime;
-            $finishTime = new Carbon($time->date_start);
-            $startTime = new Carbon($time->date_end);
-            $totalDuration = $finishTime->diffInMinutes($startTime);
-            return $prev + $totalDuration;
-        }, 0);
-        $taskTime = $task->taskTime;
-        $endTime = new Carbon($taskTime->date_end);
-        $endTime->subMinutes($duration);
-        $taskTime->date_end = $endTime->toDateTimeString();
-        $taskTime->save();
-        $request->end = $taskTime->date_end;
-
-        TaskHelper::createOrUpdateTask($newGroup, $task, $duration, []);
     }
 
     /**
