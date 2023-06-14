@@ -522,6 +522,6 @@ class TaskService
     public function calculateProfit($item, float $profit): float
     {
         $profit += (((float)$item->gross_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->gross_purchase_price_commercial_unit * (int)$item->quantity));
-        return $profit;
+        return $profit + (((float)$item->gross_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->gross_purchase_price_commercial_unit * (int)$item->quantity));
     }
 }
