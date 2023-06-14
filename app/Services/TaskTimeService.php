@@ -10,6 +10,7 @@ use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
 use App\Entities\Task;
 use App\Entities\TaskTime;
+use App\Entities\TaskSalaryDetails;
 use App\Repositories\TaskRepository;
 use App\Repositories\Tasks;
 use App\Repositories\TaskTimeRepository;
@@ -45,6 +46,22 @@ class TaskTimeService
         $start = Carbon::parse($date->format('Y-m-d') . ' ' . $start_date);
         $end = Carbon::parse($date->format('Y-m-d') . ' ' . $start_date)->addMinutes(2);
 
+        $task = Task::where('order_id',$order->id)->first();
+
+        if ($task->count() > 0) {
+            $task->update([
+                'warehouse_id' => $warehouse_id,
+                'user_id' => USER::MAGAZYN_OLAWA_ID,
+                'name' => $order->id !== null ? $order->id : null,
+            ]);
+            $taskTime = TaskTime::where('task_id',$task->id)->first();
+            $taskTime->update([
+                'date_start' => $start,
+                'date_end' => $end,
+            ]);
+            return $task->id;
+        }
+
         $task = Task::create([
             'warehouse_id' => $warehouse_id,
             'user_id' => USER::MAGAZYN_OLAWA_ID,
@@ -59,8 +76,14 @@ class TaskTimeService
             'date_start' => $start,
             'date_end' => $end,
         ]);
+        TaskSalaryDetails::create([
+            'task_id' => $task->id,
+            'consultant_value' => 0,
+            'warehouse_value' => 0
+        ]);
 
         return $task->id;
+
     }
 
     /**
