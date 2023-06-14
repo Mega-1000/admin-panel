@@ -401,22 +401,20 @@ class TaskService
      * @param                   $id
      * @param TaskUpdateRequest $request
      *
-     * @return RedirectResponse
+     * @return string|null
      */
-    public function onlyUpdateTask(int $id, TaskUpdateRequest $request): RedirectResponse
+    public function onlyUpdateTask(int $id, TaskUpdateRequest $request): string|null
     {
         $data = $request->validated();
         //TODO DODAĆ WALIDACJĘ !!! Ktokolwiek będzie coś tu zmieniał, ma być dodana walidacja do kodu
 
-        $task = $this->taskRepository->find($id);
+        $task = $this->taskRepository->findOrFail($id);
         if ($task->order_id != null) {
             $customId = 'taskOrder-' . $task->order_id;
         } else {
             $customId = 'task-' . $task->id;
         }
-        if (empty($task)) {
-            abort(404);
-        }
+        
         if (isset($data['new_group'])) {
             $newGroup = Task::whereIn('id', $data['new_group'])->get();
             $this->updateOldAndCreateNewGroup($newGroup, $request, $task);
@@ -485,23 +483,10 @@ class TaskService
                     'name' => $title
                 ]);
             }
-            return redirect()->route('planning.timetable.index', [
-                'id' => $customId,
-                'view_type' => $data['view_type'],
-                'active_start' => $data['active_start'],
-            ])->with([
-                'message' => __('tasks.messages.update'),
-                'alert-type' => 'success'
-            ]);
+            return $customId;
         }
-        return redirect()->route('planning.timetable.index', [
-            'id' => $customId,
-            'view_type' => $data['view_type'],
-            'active_start' => $data['active_start'],
-        ])->with([
-            'message' => __('tasks.messages.update_error'),
-            'alert-type' => 'error'
-        ]);
+        
+        return null;
     }
 
     /**

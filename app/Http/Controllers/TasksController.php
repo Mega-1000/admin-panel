@@ -993,7 +993,28 @@ class TasksController extends Controller
     public function updateTask(TaskUpdateRequest $request, int $id): RedirectResponse
     {
         if ($request->update == 1) {
-            return $this->taskService->onlyUpdateTask($id, $request);
+            $customId = $this->taskService->onlyUpdateTask($id, $request);
+
+            if ($customId !== null) {
+                return redirect()->route('planning.timetable.index', [
+                    'id' => $customId,
+                    'view_type' => $request->view_type,
+                    'active_start' => $request->active_start,
+                ])->with([
+                    'message' => __('tasks.messages.update'),
+                    'alert-type' => 'success'
+                ]);
+            }
+
+            return redirect()->route('planning.timetable.index', [
+                'id' => $customId,
+                'view_type' => $request->view_type,
+                'active_start' => $request->active_start,
+            ])->with([
+                'message' => __('tasks.messages.update_error'),
+                'alert-type' => 'error'
+            ]);
+
         } else {
             return $this->deleteTask($id, $request);
         }
