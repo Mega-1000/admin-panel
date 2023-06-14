@@ -11,7 +11,7 @@ class FirmCreateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,23 +21,23 @@ class FirmCreateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name' => 'required|min:3',
             'short_name' => 'nullable',
             'email' => 'required|email|unique:firms',
             'firm_type' => 'required|in:PRODUCTION,DELIVERY,OTHER',
-            'secondary_email' => 'nullable|email',
-            'complaint_email' => 'nullable|email',
-            'phone' => 'nullable',
-            'secondary_phone' => 'nullable',
-            'nip' => 'nullable|regex:/[0-9]{9}/',
-            'account_number' => 'nullable|min:10',
-            'city' => 'nullable',
-            'latitude' => 'nullable',
-            'longitude' => 'nullable',
-            'postal_code' => 'nullable|regex:/[0-9]{2}\-[0-9]{3}/',
+            'secondary_email' => 'required|email',
+            'complaint_email' => 'required|email',
+            'phone' => 'required',
+            'secondary_phone' => 'required',
+            'nip' => 'required|regex:/[0-9]{9}/',
+            'account_number' => 'required|min:10',
+            'city' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'postal_code' => 'required|regex:/[0-9]{2}\-[0-9]{3}/',
         ];
     }
 }
