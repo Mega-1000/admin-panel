@@ -48,7 +48,7 @@ class TaskTimeService
 
         $task = Task::where('order_id', $order->id)->first();
 
-        if ($task->count() > 0) {
+        if (isset($task) && $task->count() > 0) {
             $task->update([
                 'warehouse_id' => $warehouse_id,
                 'user_id' => USER::MAGAZYN_OLAWA_ID,
