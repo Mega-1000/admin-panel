@@ -25,8 +25,7 @@
     <style>
         .product {
             width: fit-content;
-            margin: 0 auto;
-            margin-top: 20px;
+            margin: 20px auto 0;
         }
     </style>
 </head>
@@ -44,6 +43,13 @@
             Numer oferty: {{ $chat_auction_firm->chatAuction->chat->order->id }}
         </h3>
     </div>
+
+    @if(session()->has('success'))
+        <div class="alert alert-success">
+            {{ session()->get('success') }}
+        </div>
+    @endif
+
     @foreach($products as $product)
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -52,12 +58,6 @@
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-            </div>
-        @endif
-
-        @if(session()->has('success'))
-            <div class="alert alert-success">
-                {{ session()->get('success') }}
             </div>
         @endif
 
@@ -105,7 +105,17 @@
                            value="{{ $product->product->packing->numbers_of_basic_commercial_units_in_pack }}">
                     <input type="hidden" name="order_item_id" value="{{ $product->id }}">
                     @include('chat/pricing_table')
-                    <input type="submit" value="aktualizuj">
+
+                    @php
+                        $product->current_firm_offers = $product->chatAuctionOffers->where('firm_id', $chat_auction_firm->id)->sortByDesc('id')->first();
+                    @endphp
+
+                    <div class="d-flex">
+                        Powiadamiaj mnie w przypadku przebicia najniższej ceny:
+                        <input type="checkbox" name="send_notification" value="true" {{ $product->current_firm_offers->send_notification ? 'checked' : '' }}>
+                    </div>
+
+                    <button type="submit">aktualizuj</button>
                 </form>
             </div>
         @else

@@ -198,7 +198,7 @@
                         @foreach($products as $product)
                             <td>
                                 @if($offer = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->first())
-                                    {{ $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_net'); }} Zł
+                                    {{ $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_net') }} Zł
 
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-firm="{{ $firm->firm->name }}" data-product="{{ $product->product->name }}">
                                 @else
@@ -215,6 +215,30 @@
                 Wyślij zamówienie
             </button>
         </div>
+
+        <table class="mb-5">
+            <thead>
+            <tr>
+                <th>
+                    <h5 style="text-align: right">
+                        Firmy, które nie złożyły oferty
+                    </h5>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+
+            @foreach($firms as $firm)
+                @if($auction->offers->where('firm_id', $firm->id)->count() === 0)
+                    <tr>
+                        <td>
+                            {{ $firm->firm->symbol }} <!-- Modify this according to your firm object -->
+                        </td>
+                    </tr>
+                @endif
+            @endforeach
+            </tbody>
+        </table>
     </div>
 </div>
 </body>

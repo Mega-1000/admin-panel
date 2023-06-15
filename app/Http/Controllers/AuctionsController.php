@@ -100,7 +100,8 @@ class AuctionsController extends Controller
     {
         return view('auctions.create-offer', [
             'chat_auction_firm' => ChatAuctionFirms::getChatAuctionFirmByToken($token),
-            'products' => ChatAuctionFirms::getItemsByToken($token)
+            'products' => ChatAuctionFirms::getItemsByToken($token),
+            'current_firm_offers' => ChatAuctionFirms::getCurrentFirmOffersByToken($token),
         ]);
     }
 

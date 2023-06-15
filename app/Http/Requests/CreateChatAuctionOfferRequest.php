@@ -11,7 +11,7 @@ class CreateChatAuctionOfferRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,7 +21,7 @@ class CreateChatAuctionOfferRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'commercial_price_net' => 'required|numeric',
@@ -33,6 +33,7 @@ class CreateChatAuctionOfferRequest extends FormRequest
             'calculated_price_gross' => 'required|numeric',
             'aggregate_price_gross' => 'required|numeric',
             'order_item_id' => 'required|integer',
+            'send_notification' => 'nullable',
         ];
     }
 }

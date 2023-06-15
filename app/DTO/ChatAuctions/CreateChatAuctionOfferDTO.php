@@ -16,6 +16,7 @@ readonly class CreateChatAuctionOfferDTO
         public int $order_item_id,
         public int $chat_auction_id,
         public int $firm_id,
+        public bool $send_notification,
     ) {}
 
     public static function fromRequest($data): CreateChatAuctionOfferDTO
@@ -32,6 +33,7 @@ readonly class CreateChatAuctionOfferDTO
             $data['order_item_id'],
             $data['chat_auction_id'],
             $data['firm_id'],
+            $data['send_notification'] ?? false,
         );
     }
 }

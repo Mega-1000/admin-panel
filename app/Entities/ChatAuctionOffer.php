@@ -23,6 +23,7 @@ class ChatAuctionOffer extends Model
         'calculated_price_gross',
         'aggregate_price_gross',
         'order_item_id',
+        'send_notification'
     ];
 
     public function chatAuction(): BelongsTo
@@ -32,7 +33,7 @@ class ChatAuctionOffer extends Model
 
     public function auctionFirm(): BelongsTo
     {
-        return $this->belongsTo(ChatAuctionFirm::class);
+        return $this->belongsTo(ChatAuctionFirm::class, 'firm_id');
     }
 
     public function firm(): HasOneThrough
@@ -42,7 +43,6 @@ class ChatAuctionOffer extends Model
             ChatAuctionFirm::class,
             'id',
             'id',
-            'auction_firm_id',
             'firm_id'
         );
     }

@@ -15,8 +15,13 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-class AuctionOffersCreatorService
+readonly class AuctionOffersCreatorService
 {
+    private OrderBuilder $orderBuilder;
+    public function __construct(
+        private ProductService $productService
+    ) {}
+
     /**
      * @throws Exception
      */
@@ -76,13 +81,14 @@ class AuctionOffersCreatorService
     {
         $orderBuilder = new OrderBuilder();
         $orderBuilder
+            ->setProductService($this->productService)
             ->setPackageGenerator(new BackPackPackageDivider())
             ->setPriceCalculator(new OrderPriceCalculator())
             ->setTotalTransportSumCalculator(new TransportSumCalculator)
-            ->setUserSelector(new GetCustomerForNewOrder())
-            ->setProductService($this->productService);
+            ->setUserSelector(new GetCustomerForNewOrder());
+        $this->orderBuilder = $orderBuilder;
 
-        ['id' => $id] = $orderBuilder->newStore([], $user);
+        ['id' => $id] = $this->orderBuilder->newStore([], $user);
 
         return $id;
     }
@@ -92,8 +98,7 @@ class AuctionOffersCreatorService
      */
     private function assignItemsAndUpdateOrder($order, array $items): void
     {
-        $orderBuilder = new OrderBuilder();
-        $orderBuilder->assignItemsToOrder($order, $items);
+        $this->orderBuilder->assignItemsToOrder($order, $items);
 
         foreach ($order->items as $item) {
             $offer = $this->getChatAuctionOffer($item->product->name);

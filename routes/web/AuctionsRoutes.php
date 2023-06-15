@@ -14,7 +14,7 @@ Route::prefix('auctions/{auction}')->name('auctions.')->group(function () {
     Route::post('confirm', [AuctionsController::class, 'confirm'])->name('confirm')->middleware('auth');
     Route::get('end', [AuctionsController::class, 'end'])->name('end');
     Route::post('end-create-orders', [AuctionsController::class, 'endCreateOrders'])->name('end-create-orders');
-    Route::put('edit', [AuctionsController::class, 'update'])->name('edit');
+    Route::put('edit', [AuctionsController::class, 'update '])->name('edit');
 });
 
 Route::get('auctions/offer/create/{token}', [AuctionsController::class, 'createOffer'])->name('auctions.offer.create');

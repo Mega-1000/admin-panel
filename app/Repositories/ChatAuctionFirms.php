@@ -42,6 +42,15 @@ class ChatAuctionFirms
             ->get();
     }
 
+    public static function getCurrentFirmOffersByToken(string $token)
+    {
+        return ChatAuctionFirm::query()
+            ->where('token', $token)
+            ->first()
+            ->chatAuction
+            ->offers;
+    }
+
     /**
      * Create chat auction firm
      *
