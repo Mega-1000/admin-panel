@@ -52,6 +52,7 @@ return [
         'access_forbidden' => 'Nie posiadasz uprawnień do utworzenia płatności zaksięgowanej'
     ],
     'form' => [
+        'order_id' => 'Numer zlecenia',
         'client' => 'Płatność klienta',
         'warehouse' => 'Płatność magazynu',
         'spedition' => 'Płatność transportu',

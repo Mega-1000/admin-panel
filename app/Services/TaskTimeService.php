@@ -28,9 +28,7 @@ class TaskTimeService
         protected readonly TaskTimeRepository $taskTimeRepository,
         protected readonly Tasks              $tasksRepository,
         protected readonly TaskTimes          $taskTimesRepository
-    )
-    {
-    }
+    ) {}
 
     /**
      * add task to planer

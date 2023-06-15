@@ -37,7 +37,7 @@
             Prosimy o skorygowanie ceny za m3 i zatwierdzenie poprzez użycie przycisku "Aktualizuj" przy każdym produkcie oddzielnie.
             <br>
             <br>
-            Miejscowość: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->city }}
+            Miejscowość dostawy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->city }}
             <br>
             Kod pocztowy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}
             <br>

@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -28,7 +29,8 @@ class TaskSalaryDetails extends Model implements Transformable
         'warehouse_value'
     ];
 
-    public function task(){
+    public function task(): BelongsTo
+    {
         return $this->belongsTo(Task::class);
     }
 

@@ -17,9 +17,13 @@ class OrderPaymentObserver
         protected Orders $orderRepository,
         protected LabelService $labelService,
         protected OrderPaymentLabelsService $orderPaymentLabelsService,
-    ) {
-    }
+    ) {}
 
+    /**
+     * @param OrderPayment $orderPayment
+     *
+     * @return void
+     */
     public function created(OrderPayment $orderPayment): void
     {
         $this->addLabelIfManualCheckIsRequired($orderPayment);
@@ -28,6 +32,10 @@ class OrderPaymentObserver
         AllegroPaymentsReturnService::checkAllegroReturn($orderPayment->order);
     }
 
+    /**
+     * @param OrderPayment $orderPayment
+     * @return void
+     */
     protected function addLabelIfManualCheckIsRequired(OrderPayment $orderPayment): void
     {
         foreach ($orderPayment->order->addresses as $orderAddress) {
@@ -52,6 +60,11 @@ class OrderPaymentObserver
         $this->orderPaymentLabelsService->calculateLabels($orderPayment->order);
     }
 
+    /**
+     * @param OrderPayment $orderPayment
+     *
+     * @return void
+     */
     public function updated(OrderPayment $orderPayment): void
     {
         $this->orderPaymentLabelsService->calculateLabels($orderPayment->order);

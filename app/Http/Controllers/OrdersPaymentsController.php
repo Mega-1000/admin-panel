@@ -114,15 +114,16 @@ class OrdersPaymentsController extends Controller
      *
      * @param int $id
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function edit(int $id)
+    public function edit(int $id): View
     {
-        $orderPayment = $this->repository->find($id);
+        $orderPayment = OrderPayment::findOrFail($id);
         $customerOrders = $orderPayment->order->customer->orders;
         $firms = Firm::all();
+        $orderIds = $customerOrders->pluck('id')->toArray();
 
-        return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders', 'firms'));
+        return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders', 'firms', 'orderIds'));
     }
 
     // TODO CAŁA TE METODA DO POPRAWIENIA, VALIDATED + poprawienie zasad, względem logiki, pozwalamy na nullable ale już ich nie obsługujemy
@@ -132,20 +133,12 @@ class OrdersPaymentsController extends Controller
         $chooseOrder = $request->input('chooseOrder');
         $masterPaymentId = $request->input('masterPaymentId');
 
-        if (!empty($chooseOrder)) {
-            $orderId = $chooseOrder;
-        } else {
-            $orderId = $order_id;
-        }
+        $orderId = empty($chooseOrder) ? $order_id : $chooseOrder;
 
         WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order_id);
         $promise = $request->input('promise');
 
-        if ($promise == 'on') {
-            $promise = '1';
-        } else {
-            $promise = '';
-        }
+        $promise = $promise == 'on' ? '1' : '';
 
         $isWarehousePayment = $request->input('warehousePayment');
 
@@ -158,7 +151,6 @@ class OrdersPaymentsController extends Controller
             $chooseOrder, $promiseDate,
             $type, $isWarehousePayment,
         );
-
 
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
         $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
@@ -186,9 +178,10 @@ class OrdersPaymentsController extends Controller
      * @return Factory|View
      * @var integer $id Order ID
      */
-    public function create($id)
+    public function create(int $id): Factory|View
     {
         WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
+
         return view('orderPayments.create', compact('id'), [
             'order' => Order::query()->findorFail($id),
             'firms' => Firm::all()
@@ -1233,11 +1226,13 @@ class OrdersPaymentsController extends Controller
         $orderPayment = OrderPayment::findOrFail($id);
         $oldOrderId = $orderPayment->order_id;
 
-        $promise = $updateData['promise'] == 'yes' ? '1' : '';
-
-        if ($orderPayment->promise == '1' && $promise == '') {
-            $prev = [];
-            AddLabelService::addLabels($orderPayment, [5], $prev, [], Auth::user()->id);
+        $promise = '';
+        if (array_key_exists('promise', $updateData)) {
+            $promise = $updateData['promise'] == 'yes' ? '1' : '';
+            if ($orderPayment->promise == '1' && $promise == '') {
+                $prev = [];
+                AddLabelService::addLabels($orderPayment, [5], $prev, [], Auth::user()->id);
+            }
         }
         unset($updateData['amount']);
 

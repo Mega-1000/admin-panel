@@ -7,15 +7,6 @@
             <span>@lang('order_payments.list')</span>
         </a>
     </h1>
-    <style>
-        .tags {
-            width: 100%;
-        }
-        .tag {
-            width: 50%;
-            float: right;
-        }
-    </style>
     <!-- Select2 CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css">
 
@@ -78,6 +69,16 @@
                        value="{{ $orderPayment->operation_id }}">
             </div>
             <div class="form-group">
+                <label for="order_id">@lang('order_payments.form.order_id')</label>
+                <!-- Order ids select 2 -->
+                <select class="form-control select2" data-live-search="true" name="order_id">
+                    <option value="{{ $orderPayment->order_id }}">{{ $orderPayment->order_id }}</option>
+                    @foreach($orderIds as $order)
+                        <option value="{{ $order }}">{{ $order }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="declared_sum">@lang('order_payments.form.declared_sum')</label>
                 <input type="text" class="form-control" id="declared_sum" name="declared_sum"
                        value="{{ $orderPayment->declared_sum }}">
@@ -104,7 +105,7 @@
 @section('scripts')
     <script src="{{URL::asset('js/jscolor.js')}}"></script>
     <script>
-        var breadcrumb = $('.breadcrumb:nth-child(2)');
+        const breadcrumb = $('.breadcrumb:nth-child(2)');
 
         breadcrumb.children().remove();
         breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
