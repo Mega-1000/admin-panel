@@ -33,7 +33,7 @@
                         <td>{{ $order->id }}</td>
                         <td>{{ $order->created_at }}</td>
                         <td>{{ $order->status->name }}</td>
-                        <td>{{ $order->total_price }}</td>
+                        <td>{{ $order->getValue() }}</td>
                         <td>
                             <form action="{{ route('orderPayments.rebookStore', ['order' => $order->id, 'payment' => $orderPayment->id]) }}" method="post" class="d-flex align-items-center">
                                 @csrf
