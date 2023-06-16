@@ -43,7 +43,7 @@ class TaskHelper
             'warehouse_id' => $task->warehouse_id,
             'user_id' => $task->user_id,
             'created_by' => $task->created_by,
-            'name' => implode(', ', $name),
+            'name' => 'Grupa: ' . implode(', ', $name),
             'color' => $task->color,
             'status' => $task->status
         ]);
