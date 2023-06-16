@@ -30,19 +30,19 @@
         </thead>
         <tbody>
             @foreach ($allOrdersForUser as $order)
-                <form action="{{ route('orderPayments.rebookStore', ['order' => $order->id, 'payment' => $orderPayment->id]) }}" method="post">
-                    <tr>
-                        <td>{{ $order->id }}</td>
-                        <td>{{ $order->created_at }}</td>
-                        <td>{{ $order->status->name }}</td>
-                        <td>{{ $order->total_price }}</td>
-                        <td><input type="text" name="value" value="{{ $orderPayment->amount }}"></td>
-                        <td>
-                            @csrf
-                            <button type="submit" class="btn btn-primary">Przeksięguj na to zamówienie</button>
-                        </td>
-                    </tr>
-                </form>
-            @endforeach
+                <tr>
+                    <td>{{ $order->id }}</td>
+                    <td>{{ $order->created_at }}</td>
+                    <td>{{ $order->status->name }}</td>
+                    <td>{{ $order->total_price }}</td>
+                    <form action="{{ route('orderPayments.rebookStore', ['order' => $order->id, 'payment' => $orderPayment->id]) }}" method="post">
+                    <td><input type="text" name="value" value="{{ $orderPayment->amount }}"></td>
+                    <td>
+                        @csrf
+                        <button type="submit" class="btn btn-primary">Przeksięguj na to zamówienie</button>
+                    </td>
+                    </form>
+                </tr>
+        @endforeach
     </table>
 @endsection
