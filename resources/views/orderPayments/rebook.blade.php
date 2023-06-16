@@ -38,9 +38,8 @@
                         <td>{{ $order->total_price }}</td>
                         <td><input type="text" name="value" value="{{ $orderPayment->amount }}"></td>
                         <td>
-                                @csrf
-
-                                <button role="submit" class="btn btn-primary">Przeksięguj na to zamówienie</button>
+                            @csrf
+                            <button type="submit" class="btn btn-primary">Przeksięguj na to zamówienie</button>
                         </td>
                     </tr>
                 </form>
