@@ -77,7 +77,7 @@ class Orders
     public function getAllRelatedOrderPaymentsValue(Order $order): float
     {
         $payments = self::getAllRelatedOrderPayments($order);
-
+        dd($payments);
         $paymentsValue = 0;
         foreach ($payments as $order) {
             if ($order->operation_type != "Zwrot towaru") {
