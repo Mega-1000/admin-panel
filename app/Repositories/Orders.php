@@ -96,7 +96,7 @@ class Orders
     public function getAllRelatedOrderPayments(Order $order): array
     {
         $orders = self::getAllRelatedOrders($order);
-
+    dd($orders);
         $orderPayments = [];
         foreach ($orders as $order) {
             foreach ($order->payments as $payment) {
