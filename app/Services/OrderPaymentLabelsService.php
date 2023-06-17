@@ -21,7 +21,7 @@ class OrderPaymentLabelsService
      * @oaram bool|null $calculateRelated
      *
      */
-    public function calculateLabels(Order $order, ?bool $calculateRelated): void
+    public function calculateLabels(Order $order, ?bool $calculateRelated = null): void
     {
         $relatedPaymentsValue = round($this->orderRepository->getAllRelatedOrderPaymentsValue($order), 2);
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
