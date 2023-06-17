@@ -25,6 +25,8 @@ class OrderPaymentLabelsService
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
         $orderReturnGoods = round($this->orderRepository->getOrderReturnGoods($order), 2);
 
+        dd($relatedOrdersValue, $relatedPaymentsValue, $orderReturnGoods);
+
         $relatedPaymentsValue -= $orderReturnGoods;
         $arr = [];
 
