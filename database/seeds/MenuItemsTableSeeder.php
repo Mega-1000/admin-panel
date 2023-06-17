@@ -280,6 +280,13 @@ class MenuItemsTableSeeder extends Seeder
             'route' => 'warehouse.orders.index',
         ]);
 
+        MenuItem::firstOrNew([
+            'menu_id' => $menu->id,
+            'title' => 'Billing allegro',
+            'url' => '',
+            'route' => 'allegro-billing.index',
+        ]);
+
         if (!$menuItem->exists) {
             $menuItem->fill([
                 'target' => '_self',

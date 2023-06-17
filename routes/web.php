@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AllegroBillingController;
 use App\Http\Controllers\EmailSettingsController;
+use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\ProductStocksController;
 use Illuminate\Support\Facades\Route;
@@ -608,6 +610,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/twsu/create', [ProductStocksController::class, 'storeTWSOAdminOrders']);
 
     Route::post('change-chat-visibility', [OrdersMessagesController::class, 'changeChatVisibility'])->name('change-chat-visibility');
+
+    Route::post('/import-allegro-billing', ImportAllegroBillingController::class)->name('import-allegro-billing');
+    Route::get('/allegro-billing', [AllegroBillingController::class, 'index'])->name('import-allegro-billing');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

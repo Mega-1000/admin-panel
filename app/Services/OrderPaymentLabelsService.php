@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class OrderPaymentLabelsService
 {
     public function __construct(
-        protected Orders $orderRepository,
+        protected Orders       $orderRepository,
         protected LabelService $labelService,
     ) {}
 
