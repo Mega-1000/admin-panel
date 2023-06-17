@@ -42,9 +42,9 @@ class ImportCsvFileJob implements ShouldQueue
 
     public $currentCategories;
 
-    private $categories = ['id' => 0, 'children' => []];
-    private $productsRelated = [];
-    private $jpgData = [];
+    private array $categories = ['id' => 0, 'children' => []];
+    private array $productsRelated = [];
+    private array $jpgData = [];
 
     private $currentLine;
 
@@ -163,7 +163,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
-    private function getUrl($url)
+    private function getUrl($url): array|string
     {
         $imgUrlExploded = explode('\\', $url);
         $imgUrlExploded = end($imgUrlExploded);
@@ -172,12 +172,12 @@ class ImportCsvFileJob implements ShouldQueue
         return str_replace("\\", '/', $imgUrlWebsite);
     }
 
-    private function getShowOnPageParameter(array $line, int $columnIterator)
+    private function getShowOnPageParameter(array $line, int $columnIterator): bool
     {
         return array_key_exists($columnIterator + 14, $line) && $line[$columnIterator + 14] == 1;
     }
 
-    private function getProductsOrder(array $line, int $columnIterator)
+    private function getProductsOrder(array $line, int $columnIterator): int
     {
         return ((int)$line[$columnIterator + 7]) ?: 1000000;
     }
@@ -324,7 +324,7 @@ class ImportCsvFileJob implements ShouldQueue
         }
     }
 
-    private function getChimneyReplacements($line)
+    private function getChimneyReplacements($line): array
     {
         $replacements = [];
         $start = 462;
@@ -672,7 +672,7 @@ class ImportCsvFileJob implements ShouldQueue
         return $array;
     }
 
-    private function getCategoryColumn($line)
+    private function getCategoryColumn($line): ?int
     {
         for ($col = 598; $col <= count($line) - 15; $col += 16) {
             if (!empty($line[$col]) || !empty($line[$col + 8])) {
@@ -682,7 +682,7 @@ class ImportCsvFileJob implements ShouldQueue
         return null;
     }
 
-    private function getCategoryTree($line, $categoryColumn)
+    private function getCategoryTree($line, $categoryColumn): array
     {
         $category = [];
         for ($j = 1; $j <= 6; $j++) {
@@ -695,7 +695,7 @@ class ImportCsvFileJob implements ShouldQueue
         return $category;
     }
 
-    private function rewrite($string)
+    private function rewrite($string): string
     {
         return strtolower(
             str_replace(
@@ -710,7 +710,7 @@ class ImportCsvFileJob implements ShouldQueue
         );
     }
 
-    public function getProductsMedia($line)
+    public function getProductsMedia($line): array
     {
         $media = [];
         for ($i = 304; $i <= 308; $i++) {
@@ -721,7 +721,7 @@ class ImportCsvFileJob implements ShouldQueue
         return $media;
     }
 
-    public function prepareMediaData($line)
+    public function prepareMediaData($line): array
     {
         $temp = explode('||', $line);
         return ['url' => $temp[0], 'description' => $temp[1]];
@@ -738,30 +738,29 @@ class ImportCsvFileJob implements ShouldQueue
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function setProductTradeGroups(array $line, Entities\Product $product)
     {
         $this->getTradeGroupParams(379, 'price', $line, $product);
         $this->getTradeGroupParams(385, 'weight', $line, $product);
     }
 
+    /**
+     * @throws Exception
+     */
     private function getTradeGroupParams($firstParam, $type, $line, Entities\Product $product)
     {
         $tradeGroup = new ProductTradeGroup();
         $tradeGroup->type = $type;
         for ($i = 0; $i < 6; $i += 2) {
-            switch ($i / 2) {
-                case 0:
-                    $prefix = 'first';
-                    break;
-                case 1:
-                    $prefix = 'second';
-                    break;
-                case 2:
-                    $prefix = 'third';
-                    break;
-                default:
-                    throw new Exception('Błąd ustawiania grupy');
-            }
+            $prefix = match ($i / 2) {
+                0 => 'first',
+                1 => 'second',
+                2 => 'third',
+                default => throw new Exception('Błąd ustawiania grupy'),
+            };
             $conditionField = $prefix . '_condition';
             $priceField = $prefix . '_price';
             if ($line[$firstParam + $i] === '' || $line[$firstParam + $i + 1] === '') {
@@ -876,12 +875,15 @@ class ImportCsvFileJob implements ShouldQueue
     {
         $old = Storage::path("user-files/baza/$old.csv");
         $new = Storage::path("user-files/baza/$new.csv");
+
         if (!file_exists($old)) {
             return;
         }
+
         if (file_exists($new)) {
             unlink($new);
         }
+
         rename($old, $new);
     }
 

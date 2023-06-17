@@ -58,6 +58,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
      * @var FindOrCreatePaymentForPackageService
      */
     protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService;
+
     public function __construct(
         protected readonly UploadedFile $file
     ) {}
