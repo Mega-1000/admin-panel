@@ -16,15 +16,22 @@ class OrderPaymentLabelsService
 
     /**
      * @param Order $order
-     *
+     * @param bool|null $calculateRelated
      * @return void
+     * @oaram bool|null $calculateRelated
+     *
      */
-    public function calculateLabels(Order $order): void
+    public function calculateLabels(Order $order, ?bool $calculateRelated): void
     {
         $relatedPaymentsValue = round($this->orderRepository->getAllRelatedOrderPaymentsValue($order), 2);
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
         $orderReturnGoods = round($this->orderRepository->getOrderReturnGoods($order), 2);
 
+        if ($calculateRelated) {
+            foreach ($this->orderRepository->getAllRelatedOrders($order) as $relatedOrder) {
+                $this->calculateLabels($relatedOrder, false);
+            }
+        }
 
         $relatedPaymentsValue -= $orderReturnGoods;
         $arr = [];
