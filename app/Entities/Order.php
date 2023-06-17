@@ -240,7 +240,7 @@ class Order extends Model implements Transformable
      */
     public function getValue(): float
     {
-        return $this->getItemsGrossValue() + $this->packing_warehouse_cost + $this->shipment_price_for_client + $this->additional_service_cost;
+        return $this->getItemsGrossValue() + $this->packing_warehouse_cost + $this->shipment_price_for_client + $this->additional_service_cost + $this->shipment_price_for_client;
     }
 
     /**
