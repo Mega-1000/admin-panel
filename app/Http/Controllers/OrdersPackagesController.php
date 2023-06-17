@@ -64,44 +64,21 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class OrdersPackagesController extends Controller
 {
-    protected $repository;
-
-    protected $orderRepository;
-
-    protected $orderPackagesDataHelper;
-
-    protected $firmRepository;
-
-    protected $packageTemplateRepository;
-
-    /**
-     * @var ShipmentGroupRepository
-     */
-    private $shipmentGroupRepository;
-
-
     public function __construct(
-        OrderPackageRepository    $repository,
-        OrderRepository           $orderRepository,
-        OrderPackagesDataHelper   $orderPackagesDataHelper,
-        FirmRepository            $firmRepository,
-        PackageTemplateRepository $packageTemplateRepository,
-        ShipmentGroupRepository   $shipmentGroupRepository
-    )
-    {
-        $this->repository = $repository;
-        $this->orderRepository = $orderRepository;
-        $this->orderPackagesDataHelper = $orderPackagesDataHelper;
-        $this->firmRepository = $firmRepository;
-        $this->packageTemplateRepository = $packageTemplateRepository;
-        $this->shipmentGroupRepository = $shipmentGroupRepository;
-    }
+        private   OrderPackageRepository    $repository,
+        protected OrderRepository           $orderRepository,
+        protected OrderPackagesDataHelper   $orderPackagesDataHelper,
+        protected FirmRepository            $firmRepository,
+        protected PackageTemplateRepository $packageTemplateRepository,
+        protected ShipmentGroupRepository   $shipmentGroupRepository
+    ) {}
 
-    public function changeValue(Request $request)
+    public function changeValue(Request $request): RedirectResponse
     {
         $this->repository->update([
             'cash_on_delivery' => $request->input('modalPackageValue')
         ], $request->input('packageId'));
+
         return redirect()->back()->with('template-id', $request->input('template-id'));
     }
 
@@ -430,15 +407,10 @@ class OrdersPackagesController extends Controller
      *
      * @return Application|Response|ResponseFactory|RedirectResponse
      */
-    public function destroy(Request $request, int $id)
+    public function destroy(Request $request, int $id): Response|RedirectResponse|Application|ResponseFactory
     {
-        $package = OrderPackage::find($id);
-        if (empty($package)) {
-            return redirect()->back()->with([
-                'message' => __('orders.message.not_delete'),
-                'alert-type' => 'error'
-            ])->withInput(['tab' => 'orderPackages']);
-        }
+        $package = OrderPackage::findOrFail($id);
+
         $prods = $package->packedProducts;
 
         $order = $package->order;
@@ -449,6 +421,7 @@ class OrdersPackagesController extends Controller
             $container->order_id = $order->id;
             $container->save();
         }
+
         $prods->map(function ($product) use ($container) {
             $exist = $container->products()->where('product_id', $product->id)->first();
             if ($exist) {
@@ -464,14 +437,17 @@ class OrdersPackagesController extends Controller
             if (isset($request->redirect) && $request->redirect == 'false') {
                 return response('failure', 400);
             }
+
             return redirect()->back()->with([
                 'message' => __('orders.message.not_delete'),
                 'alert-type' => 'error'
             ])->withInput(['tab' => 'orderPackages']);
         }
+
         if (isset($request->redirect) && $request->redirect == 'false') {
             return response('success');
         }
+
         return redirect()->back()->with([
             'message' => __('order_packages.message.delete'),
             'alert-type' => 'success'
@@ -479,10 +455,11 @@ class OrdersPackagesController extends Controller
     }
 
     /**
+     * @param int $id
      * @return JsonResponse
      * @throws Exception
      */
-    public function datatable($id)
+    public function datatable(int $id): JsonResponse
     {
         $collection = $this->prepareCollection($id);
         return DataTables::collection($collection)
@@ -498,9 +475,8 @@ class OrdersPackagesController extends Controller
         return $this->repository->with(['realCostsForCompany'])->findByField('order_id', $id);
     }
 
-    public function sendRequestForCancelled(OrderPackage $orderPackage)
+    public function sendRequestForCancelled(OrderPackage $orderPackage): RedirectResponse
     {
-
         $response = OrderPackageService::setPackageAsCancelled($orderPackage);
 
         if ($response !== OrderPackageService::RESPONSE_OK) {
@@ -516,7 +492,7 @@ class OrdersPackagesController extends Controller
         ]);
     }
 
-    public function getProtocols(GetProtocolRequest $request)
+    public function getProtocols(GetProtocolRequest $request): Response|RedirectResponse
     {
         $request->validated();
         $courierName = strtoupper($request->courier);

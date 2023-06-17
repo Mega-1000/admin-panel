@@ -31,7 +31,7 @@ final readonly class OrderPackageObserver
      */
     public function updated(OrderPackage $orderPackage): void
     {
-        if ($orderPackage->cash_on_delivery) {
+        if ($orderPackage->cash_on_delivery >= 0) {
             $orderPackage->orderPayments()->update([
                 'declared_sum' => $orderPackage->cash_on_delivery,
             ]);
