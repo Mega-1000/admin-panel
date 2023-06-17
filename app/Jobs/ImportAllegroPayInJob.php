@@ -93,7 +93,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
 
         $data = array_reverse($data);
         foreach ($data as $payIn) {
-            if (!in_array($payIn['operacja'], ['wpłata', 'zwrot'])) {
+            if (!in_array($payIn['operacja'], ['wpłata', 'zwrot', 'dopłata'])) {
                 continue;
             }
 
