@@ -612,7 +612,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('change-chat-visibility', [OrdersMessagesController::class, 'changeChatVisibility'])->name('change-chat-visibility');
 
     Route::post('/allegro-billing', ImportAllegroBillingController::class)->name('import-allegro-billing');
-    Route::get('/allegro-billing', [AllegroBillingController::class, 'index'])->name('import-allegro-billing');
+    Route::get('/allegro-billing', [AllegroBillingController::class, 'index']);
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
