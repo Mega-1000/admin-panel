@@ -122,37 +122,33 @@ class OrderExcelService
 
     private function prepareHeadersForSheet(string $sheetName): array
     {
-        switch($sheetName) {
-            case SheetNames::ORDER_DATA:
-                return [
-                    OrderHeaders::getDescription(OrderHeaders::ORDER_ID),
-                    OrderHeaders::getDescription(OrderHeaders::PACKAGE_LETTER_NUMBER),
-                    OrderHeaders::getDescription(OrderHeaders::CASH_ON_DELIVERY_AMOUNT),
-                    OrderHeaders::getDescription(OrderHeaders::ALLEGRO_ORDER_ID),
-                    OrderHeaders::getDescription(OrderHeaders::ORDER_ITEMS_SUM),
-                    OrderHeaders::getDescription(OrderHeaders::SHIPMENT_PRICE_FOR_CLIENT),
-                    OrderHeaders::getDescription(OrderHeaders::ADDITIONAL_SERVICE_COST),
-                    OrderHeaders::getDescription(OrderHeaders::ADDITIONAL_CASH_ON_DELIVERY_COST),
-                    OrderHeaders::getDescription(OrderHeaders::ORDER_PROFIT),
-                    OrderHeaders::getDescription(OrderHeaders::CLIENT_PACKAGE_COST),
-                    OrderHeaders::getDescription(OrderHeaders::FIRM_PACKAGE_COST),
-                    OrderHeaders::getDescription(OrderHeaders::REAL_PACKAGE_COST)
-                ];
-            case SheetNames::ALLEGRO_PAYMENTS:
-                return [
-                    AllegroHeaders::getDescription(AllegroHeaders::ORDER_ID),
-                    AllegroHeaders::getDescription(AllegroHeaders::ALLEGRO_PAYMENT_ID),
-                    AllegroHeaders::getDescription(AllegroHeaders::PROMISE_PAYMENTS_SUM),
-                    AllegroHeaders::getDescription(AllegroHeaders::REFUND_ID),
-                    AllegroHeaders::getDescription(AllegroHeaders::REFUNDED),
-                ];
-            case SheetNames::CLIENT_PAYMENTS:
-                return [
-                    PaymentsHeader::getDescription(PaymentsHeader::ORDER_ID),
-                    PaymentsHeader::getDescription(PaymentsHeader::PAYMENT_SUM)
-                ];
-            default:
-                return [];
-        }
+        return match ($sheetName) {
+            SheetNames::ORDER_DATA => [
+                OrderHeaders::getDescription(OrderHeaders::ORDER_ID),
+                OrderHeaders::getDescription(OrderHeaders::PACKAGE_LETTER_NUMBER),
+                OrderHeaders::getDescription(OrderHeaders::CASH_ON_DELIVERY_AMOUNT),
+                OrderHeaders::getDescription(OrderHeaders::ALLEGRO_ORDER_ID),
+                OrderHeaders::getDescription(OrderHeaders::ORDER_ITEMS_SUM),
+                OrderHeaders::getDescription(OrderHeaders::SHIPMENT_PRICE_FOR_CLIENT),
+                OrderHeaders::getDescription(OrderHeaders::ADDITIONAL_SERVICE_COST),
+                OrderHeaders::getDescription(OrderHeaders::ADDITIONAL_CASH_ON_DELIVERY_COST),
+                OrderHeaders::getDescription(OrderHeaders::ORDER_PROFIT),
+                OrderHeaders::getDescription(OrderHeaders::CLIENT_PACKAGE_COST),
+                OrderHeaders::getDescription(OrderHeaders::FIRM_PACKAGE_COST),
+                OrderHeaders::getDescription(OrderHeaders::REAL_PACKAGE_COST)
+            ],
+            SheetNames::ALLEGRO_PAYMENTS => [
+                AllegroHeaders::getDescription(AllegroHeaders::ORDER_ID),
+                AllegroHeaders::getDescription(AllegroHeaders::ALLEGRO_PAYMENT_ID),
+                AllegroHeaders::getDescription(AllegroHeaders::PROMISE_PAYMENTS_SUM),
+                AllegroHeaders::getDescription(AllegroHeaders::REFUND_ID),
+                AllegroHeaders::getDescription(AllegroHeaders::REFUNDED),
+            ],
+            SheetNames::CLIENT_PAYMENTS => [
+                PaymentsHeader::getDescription(PaymentsHeader::ORDER_ID),
+                PaymentsHeader::getDescription(PaymentsHeader::PAYMENT_SUM)
+            ],
+            default => [],
+        };
     }
 }
