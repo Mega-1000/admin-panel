@@ -64,8 +64,6 @@ class LabelsController extends Controller
         ->get();
 
         return $labels->toArray();
-
-          dd($labels->toArray());
     }
 
     public function getLabelsSchedulerAwait(Request $request, $userId)

@@ -14,6 +14,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property string $service_courier_name
  * @property string $symbol
  * @property string $status
+ * @property integer $real_cost_for_company
  *
  * @property ?ShipmentGroup $shipmentGroup
  * @package namespace App\Entities;
@@ -22,7 +23,7 @@ class OrderPackage extends Model implements Transformable
 {
     use TransformableTrait;
 
-    public $customColumnsVisibilities = [
+    public array $customColumnsVisibilities = [
         'number',
         'size_a',
         'size_b',

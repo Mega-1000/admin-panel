@@ -5,6 +5,16 @@ namespace App\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property string $offer_name
+ * @property string $offer_identification
+ * @property string $operation_type
+ * @property string $credit
+ * @property string $debit
+ * @property string $balance
+ * @property string $operation_details
+ * @property string $attached_value_parameter
+ */
 class AllegroGeneralExpense extends Model
 {
     use HasFactory;
@@ -17,6 +27,7 @@ class AllegroGeneralExpense extends Model
         'debit',
         'balance',
         'operation_details',
+        'attached_value_parameter'
     ];
 
     protected $casts = [

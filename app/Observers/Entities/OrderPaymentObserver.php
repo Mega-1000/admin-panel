@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Auth;
 class OrderPaymentObserver
 {
     public function __construct(
-        protected Orders $orderRepository,
-        protected LabelService $labelService,
+        protected Orders                    $orderRepository,
+        protected LabelService              $labelService,
         protected OrderPaymentLabelsService $orderPaymentLabelsService,
     ) {}
 
