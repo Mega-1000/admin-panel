@@ -1522,7 +1522,6 @@
 
                                     html += `
                                        SOP: ${SOPValue}
-                                       <br />
                                        SOD: ${SODValue}
                                     `;
 
