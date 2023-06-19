@@ -3,8 +3,11 @@
 namespace App\Repositories;
 
 use App\Entities\OrderPackage;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use App\Entities\Order;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Orders
@@ -16,11 +19,9 @@ class Orders
      */
     public static function getChatOrdersNeedSupport(): ?Collection
     {
-        $ordersNeedSupport = Order::where('need_support', true)->whereHas('chat', function($q) {
+        return Order::where('need_support', true)->whereHas('chat', function($q) {
             $q->whereNull('user_id');
         })->get();
-
-        return $ordersNeedSupport;
     }
 
     /**
@@ -100,9 +101,9 @@ class Orders
 
     /**
      * @param int $order_id
-     * @return Order
+     * @return object|null
      */
-    public function getOrderWithCustomer(int $order_id): Order
+    public function getOrderWithCustomer(int $order_id): object|null
     {
         return Order::with(['customer','labels'])->where('id',$order_id)->first();
     }

@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Entities\PackageTemplate;
 use Exception;
+use Illuminate\Support\Collection;
 
 /**
  * @property int $id
@@ -17,15 +18,15 @@ class Package
 {
     const CAN_NOT_ADD_MORE = 'Nie można dodać produktu do koszyka';
     const DPD_COURIER = 'DPD';
-    public $productList;
+    public Collection $productList;
     public $packageName;
-    public $displayed_name;
+    public mixed $displayed_name;
     public $price;
     protected $visible = ['packageName', 'productList'];
     private $maxWeight;
     private $volumeRatio;
     private $volumeMargin;
-    private $isLong = false;
+    private bool $isLong = false;
 
     public function __construct($packageName, $margin)
     {
@@ -41,7 +42,10 @@ class Package
         $this->productList = collect([]);
     }
 
-    public function addItem($product, $quantity)
+    /**
+     * @throws Exception
+     */
+    public function addItem($product, $quantity): void
     {
         if ($this->canPutNewItem($product, $quantity)) {
             $this->productList = $this->icreaseAmount($this->productList, $product, $quantity);
@@ -50,7 +54,7 @@ class Package
         }
     }
 
-    public function canPutNewItem($product, $quantity)
+    public function canPutNewItem($product, $quantity): bool
     {
         $moreItems = $this->productList->map(function ($item) {
             return clone $item;
@@ -76,7 +80,7 @@ class Package
         return $list;
     }
 
-    private function calculateVolumeForItem($item, $list)
+    private function calculateVolumeForItem($item, $list): float|int
     {
         $maxLength = false;
         if ($this->isLong) {
@@ -101,12 +105,12 @@ class Package
         });
     }
 
-    public function getProducts()
+    public function getProducts(): Collection
     {
         return $this->productList;
     }
 
-    public function deepCopy()
+    public function deepCopy(): Package
     {
         $copy = clone $this;
         $copy->productList = $copy->productList->map(function ($item) {
@@ -115,14 +119,14 @@ class Package
         return $copy;
     }
 
-    public function removeEmpty()
+    public function removeEmpty(): void
     {
         $this->productList = $this->productList->reject(function ($item) {
             return $item->quantity === 0;
         });
     }
 
-    public function getIsLong()
+    public function getIsLong(): bool
     {
         return $this->isLong;
     }

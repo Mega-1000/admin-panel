@@ -409,7 +409,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
     /**
      * @return array
      */
-    public function createPackageForApaczka()
+    public function createPackageForApaczka(): array
     {
         try {
             $apaczka = new ApaczkaGuzzleClient($this->config['apaczka']['appId'], $this->config['apaczka']['appSecret']);
