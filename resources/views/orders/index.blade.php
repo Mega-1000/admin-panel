@@ -2208,7 +2208,7 @@
                             });
 
                             bilans = totalOfPayments - totalOfReturns + totalOfDeclaredPayments;
-                            let offerFinanceBilans = row['values_data']['sum_of_gross_values'] - bilans + returnedValue + WPFZ - kwonPayments;
+                            let offerFinanceBilans = row['values_data']['sum_of_gross_values'] - bilans + returnedValue - WPFZ - kwonPayments;
 
                             text += `<p> Z: ${Math.round(totalOfPayments * 100) / 100} </p>`;
                             text += `<p> ZW: ${Math.round(totalOfReturns * 100) / 100} </p>`;
