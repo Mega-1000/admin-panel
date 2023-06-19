@@ -121,17 +121,6 @@ class OrdersController extends Controller
     const DURATION = 2;
     const LOCK_NAME = 'file.lock.small';
 
-    protected array $dtColumns = [
-        'clientFirstname' => 'customer_addresses.firstname',
-        'clientLastname' => 'customer_addresses.lastname',
-        'clientEmail' => 'customer_addresses.email',
-        'clientPhone' => 'customer_addresses.phone',
-        'statusName' => 'statuses.name',
-        'name' => 'users.name',
-        'orderId' => 'orders.id',
-        'orderDate' => 'orders.created_at',
-    ];
-
     private array $replaceSearch = [
         'sello_payment' => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
     ];

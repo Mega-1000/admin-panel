@@ -15,7 +15,21 @@ readonly class OrderDatatableService
 {
     public function __construct(
         private SpeditionExchangeRepository $speditionExchangeRepository
-    ) {}
+    ) {
+        $this->dtColumns = [
+            'clientFirstname' => 'customer_addresses.firstname',
+            'clientLastname' => 'customer_addresses.lastname',
+            'clientEmail' => 'customer_addresses.email',
+            'clientPhone' => 'customer_addresses.phone',
+            'statusName' => 'statuses.name',
+            'name' => 'users.name',
+            'orderId' => 'orders.id',
+            'orderDate' => 'orders.created_at',
+        ];
+    }
+
+
+    protected array $dtColumns;
 
     /**
      * @param null $selectAllDates
