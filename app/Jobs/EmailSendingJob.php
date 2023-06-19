@@ -14,12 +14,9 @@ class EmailSendingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $emailSendingService;
-
-    public function __construct(EmailSendingService $emailSendingService)
-    {
-        $this->emailSendingService = $emailSendingService;
-    }
+    public function __construct(
+        protected readonly EmailSendingService $emailSendingService
+    ) {}
 
     public function handle()
     {
