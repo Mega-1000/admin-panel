@@ -82,6 +82,7 @@ use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
+use App\Services\Orders\OrderDatatableService;
 use App\Services\TaskService;
 use App\Services\WorkingEventsService;
 use App\User;
@@ -89,6 +90,7 @@ use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Exception;
 use iio\libmergepdf\Merger;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\Builder;
@@ -118,127 +120,8 @@ class OrdersController extends Controller
 
     const DURATION = 2;
     const LOCK_NAME = 'file.lock.small';
-    /**
-     * @var FirmRepository
-     */
-    protected $repository;
 
-    /**
-     * @var WarehouseRepository
-     */
-    protected $warehouseRepository;
-
-    /**
-     * @var OrderRepository
-     */
-    protected $orderRepository;
-
-    /**
-     * @var CustomerRepository
-     */
-    protected $customerRepository;
-
-    /**
-     * @var EmployeeRepository
-     */
-    protected $employeeRepository;
-
-    /**
-     * @var OrderPaymentRepository
-     */
-    protected $orderPaymentRepository;
-
-    /**
-     * @var CustomerAddressRepository
-     */
-    protected $customerAddressRepository;
-
-    /**
-     * @var OrderItemRepository
-     */
-    protected $orderItemRepository;
-
-    /**
-     * @var StatusRepository
-     */
-    protected $statusRepository;
-
-    /**
-     * @var OrderMessageRepository
-     */
-    protected $orderMessageRepository;
-
-    /**
-     * @var OrderAddressRepository
-     */
-    protected $orderAddressRepository;
-
-    /**
-     * @var UserRepository
-     */
-    protected $userRepository;
-
-    /**
-     * @var ProductPackingRepository
-     */
-    protected $productPackingRepository;
-
-    /**
-     * @var LabelGroupRepository
-     */
-    protected $labelGroupRepository;
-
-    /**
-     * @var LabelRepository
-     */
-    protected $labelRepository;
-
-    /**
-     * @var ProductStockRepository
-     */
-    protected $productStockRepository;
-
-    /**
-     * @var ProductStockPositionRepository
-     */
-    protected $productStockPositionRepository;
-
-    /**
-     * @var ProductStockLogRepository
-     */
-    protected $productStockLogRepository;
-
-    /**
-     * @var FirmRepository
-     */
-    protected $firmRepository;
-
-    /**
-     * @var ProductRepository
-     */
-    protected $productRepository;
-
-    /** @var SpeditionExchangeRepository */
-    protected $speditionExchangeRepository;
-
-    /** @var OrderPackageRepository */
-    protected $orderPackageRepository;
-
-    /** @var TaskRepository */
-    protected $taskRepository;
-
-    protected $orderInvoiceService;
-
-    protected $orderExcelService;
-
-    protected $emailSendingService;
-
-    /** @var TaskService */
-    protected $taskService;
-
-    protected $productStockPacketRepository;
-
-    protected $dtColumns = [
+    protected array $dtColumns = [
         'clientFirstname' => 'customer_addresses.firstname',
         'clientLastname' => 'customer_addresses.lastname',
         'clientEmail' => 'customer_addresses.email',
@@ -248,80 +131,52 @@ class OrdersController extends Controller
         'orderId' => 'orders.id',
         'orderDate' => 'orders.created_at',
     ];
-    private $replaceSearch = [
+
+    private array $replaceSearch = [
         'sello_payment' => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
     ];
 
     public function __construct(
-        FirmRepository                 $repository,
-        WarehouseRepository            $warehouseRepository,
-        OrderRepository                $orderRepository,
-        CustomerRepository             $customerRepository,
-        EmployeeRepository             $employeeRepository,
-        OrderPaymentRepository         $orderPaymentRepository,
-        CustomerAddressRepository      $customerAddressRepository,
-        OrderItemRepository            $orderItemRepository,
-        StatusRepository               $statusRepository,
-        OrderMessageRepository         $orderMessageRepository,
-        OrderAddressRepository         $orderAddressRepository,
-        UserRepository                 $userRepository,
-        ProductPackingRepository       $productPackingRepository,
-        LabelGroupRepository           $labelGroupRepository,
-        LabelRepository                $labelRepository,
-        ProductStockRepository         $productStockRepository,
-        ProductStockPositionRepository $productStockPositionRepository,
-        ProductStockLogRepository      $productStockLogRepository,
-        FirmRepository                 $firmRepository,
-        ProductRepository              $productRepository,
-        SpeditionExchangeRepository    $speditionExchangeRepository,
-        OrderPackageRepository         $orderPackageRepository,
-        TaskRepository                 $taskRepository,
-        OrderInvoiceService            $orderInvoiceService,
-        OrderExcelService              $orderExcelService,
-        EmailSendingService            $emailSendingService,
-        ProductStockPacketRepository   $productStockPacketRepository,
-        TaskService                    $taskService
-    )
-    {
-        $this->repository = $repository;
-        $this->warehouseRepository = $warehouseRepository;
-        $this->orderRepository = $orderRepository;
-        $this->customerRepository = $customerRepository;
-        $this->employeeRepository = $employeeRepository;
-        $this->orderPaymentRepository = $orderPaymentRepository;
-        $this->customerAddressRepository = $customerAddressRepository;
-        $this->orderItemRepository = $orderItemRepository;
-        $this->statusRepository = $statusRepository;
-        $this->orderMessageRepository = $orderMessageRepository;
-        $this->orderAddressRepository = $orderAddressRepository;
-        $this->userRepository = $userRepository;
-        $this->productPackingRepository = $productPackingRepository;
-        $this->labelGroupRepository = $labelGroupRepository;
-        $this->labelRepository = $labelRepository;
-        $this->productStockRepository = $productStockRepository;
-        $this->productStockPositionRepository = $productStockPositionRepository;
-        $this->productStockLogRepository = $productStockLogRepository;
-        $this->firmRepository = $firmRepository;
-        $this->productRepository = $productRepository;
-        $this->speditionExchangeRepository = $speditionExchangeRepository;
-        $this->orderPackageRepository = $orderPackageRepository;
-        $this->taskRepository = $taskRepository;
-        $this->orderInvoiceService = $orderInvoiceService;
-        $this->orderExcelService = $orderExcelService;
-        $this->emailSendingService = $emailSendingService;
-        $this->productStockPacketRepository = $productStockPacketRepository;
-        $this->taskService = $taskService;
-    }
+        protected readonly FirmRepository               $repository,
+        private readonly WarehouseRepository            $warehouseRepository,
+        private readonly OrderRepository                $orderRepository,
+        private readonly CustomerRepository             $customerRepository,
+        protected readonly EmployeeRepository           $employeeRepository,
+        protected readonly OrderPaymentRepository       $orderPaymentRepository,
+        private readonly CustomerAddressRepository      $customerAddressRepository,
+        private readonly OrderItemRepository            $orderItemRepository,
+        private readonly StatusRepository               $statusRepository,
+        private readonly OrderMessageRepository         $orderMessageRepository,
+        private readonly OrderAddressRepository         $orderAddressRepository,
+        private readonly UserRepository                 $userRepository,
+        private readonly ProductPackingRepository       $productPackingRepository,
+        private readonly LabelGroupRepository           $labelGroupRepository,
+        private readonly LabelRepository                $labelRepository,
+        private readonly ProductStockRepository         $productStockRepository,
+        private readonly ProductStockPositionRepository $productStockPositionRepository,
+        private readonly ProductStockLogRepository      $productStockLogRepository,
+        private readonly FirmRepository                 $firmRepository,
+        private readonly ProductRepository              $productRepository,
+        protected readonly OrderPackageRepository       $orderPackageRepository,
+        private readonly TaskRepository                 $taskRepository,
+        protected readonly OrderInvoiceService          $orderInvoiceService,
+        private readonly OrderExcelService              $orderExcelService,
+        private readonly EmailSendingService            $emailSendingService,
+        private readonly ProductStockPacketRepository   $productStockPacketRepository,
+        private readonly TaskService                    $taskService,
+        private readonly OrderDatatableService          $orderDatatableService
+    ) {}
 
     /**
-     * @return Factory|\Illuminate\View\View
+     * @param Request $request
+     * @return \Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\View\View
     {
         WorkingEventsService::createEvent(WorkingEvents::ORDER_LIST_EVENT);
         $labelGroups = $this->labelGroupRepository->get()->sortBy('order');
         $labels = $this->labelRepository->where('status', 'ACTIVE')->orderBy('order')->get();
-        $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
+        $couriers = DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
         $storekeepers = User::where('role_id', User::ROLE_STOREKEEPER)->get();
         $allWarehouses = Warehouse::all();
@@ -402,7 +257,7 @@ class OrdersController extends Controller
             ->withCouriersTasks($couriersTasks);
     }
 
-    public function editPackages($id)
+    public function editPackages($id): \Illuminate\Contracts\View\View|Factory|Application
     {
         Session::put('uri', 'orderPackages');
         return $this->edit($id);
@@ -413,9 +268,9 @@ class OrdersController extends Controller
      *
      * @param int $id
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return Application|\Illuminate\Contracts\View\View|Factory
      */
-    public function edit(int $id)
+    public function edit(int $id): Application|Factory|\Illuminate\Contracts\View\View
     {
         $order = Order::with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
 
@@ -441,23 +296,18 @@ class OrdersController extends Controller
         ])->first();
 
         $orderAddressService = new OrderAddressService();
-//        if ($orderInvoiceAddress !== null) {
+
         $orderAddressService->addressIsValid($orderInvoiceAddress);
         $orderInvoiceAddressErrors = $orderAddressService->errors();
-//        } else {
-//            $orderInvoiceAddressErrors = [];
-//        }
 
-//        if ($orderDeliveryAddress !== null) {
         $orderAddressService->addressIsValid($orderDeliveryAddress);
         $orderDeliveryAddressErrors = $orderAddressService->errors();
-//        } else {
-//            $orderDeliveryAddressErrors = [];
-//        }
+
         $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
         $orderItems = $order->items;
         $productsArray = [];
+
         foreach ($orderItems as $item) {
             $productsArray[] = $item->product_id;
         }
@@ -555,6 +405,10 @@ class OrdersController extends Controller
         $chatMessages = $chat?->messages;
 
         $userType = MessagesHelper::TYPE_USER;
+
+        foreach ($order->packages as $package) {
+            $package->realCostForCompany = $package->realCostsForCompany();
+        }
 
         if ($order->customer_id == 4128) {
             return view(
@@ -2171,7 +2025,7 @@ class OrdersController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
-    public function returnItemsFromStock(Request $request)
+    public function returnItemsFromStock(Request $request): RedirectResponse
     {
         foreach ($request->input('item_quantity') as $id => $quantity) {
             if ($quantity != null) {
@@ -2220,7 +2074,7 @@ class OrdersController extends Controller
      * @param $orderId
      * @return RedirectResponse
      */
-    public function sendSelfOrderToWarehouse($orderId)
+    public function sendSelfOrderToWarehouse($orderId): RedirectResponse
     {
         $order = $this->orderRepository->find($orderId);
         $prev = [];
@@ -2232,12 +2086,12 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function sendVisibleCouriers(Request $request)
+    public function sendVisibleCouriers(Request $request): JsonResponse
     {
         $data = $request->all();
-        [$collection, $countFiltred] = $this->prepareCollection($data);
+        [$collection, $countFiltred] = $this->orderDatatableService->prepareCollection($data);
         if (!$countFiltred) {
-            return response("Brak zamówień");
+            return response()->json("Brak zamówień");
         }
         $messages = [];
         foreach ($collection as $ord) {
@@ -2246,361 +2100,10 @@ class OrdersController extends Controller
                 $messages = array_merge($messages, $message);
             }
         }
-        return response(['errors' => $messages], 200);
+
+        return response()->json(['errors' => $messages], 200);
     }
 
-    /**
-     * @return mixed
-     */
-    public function prepareCollection($data, $withoutPagination = false, $minId = false)
-    {
-        $sortingColumnId = $data['order'][0]['column'];
-        $sortingColumnDirection = $data['order'][0]['dir'];
-
-        $sortingColumns = [
-            4 => 'users.name',
-            13 => 'orders.created_at',
-            14 => 'orders.id',
-            17 => 'statuses.name',
-            10 => 'symbol',
-            20 => 'customer_notices',
-            22 => 'customer_addresses.phone',
-            23 => 'customer_addresses.email',
-            24 => 'customer_addresses.firstname',
-            25 => 'customer_addresses.lastname',
-            46 => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
-        ];
-
-        if (array_key_exists($sortingColumnId, $sortingColumns)) {
-            $sortingColumn = $sortingColumns[$sortingColumnId];
-        } else {
-            $sortingColumn = 'orders.id';
-        }
-        $query = $this->getQueryForDataTables($data['selectAllDates'])->orderBy($sortingColumn, $sortingColumnDirection);
-
-        foreach ($data['columns'] as $column) {
-            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
-                if ($column['name'] != "shipment_date") {
-                    if (array_key_exists($column['name'], $this->dtColumns)) {
-                        if ($column['name'] == 'statusName' && $column['search']['regex']) {
-                            $query->whereRaw($this->dtColumns[$column['name']] . ' REGEXP ' . "'{$column['search']['value']}'");
-                        } else {
-                            $query->where($this->dtColumns[$column['name']], 'LIKE', "%{$column['search']['value']}%");
-                        }
-                    } else {
-                        if ($column['name'] == 'sello_payment') {
-                            $columnName = $this->replaceSearch[$column['name']] ?? $column['name'];
-                            $searchValue = trim($column['search']['value']);
-                            $query->where(function ($query) use ($column, $columnName, $searchValue) {
-                                $query->orWhere($columnName, 'LIKE', "%{$searchValue}%");
-                                $query->orWhere('orders.return_payment_id', 'LIKE', "%{$searchValue}%");
-                                $query->orWhere('orders.allegro_payment_id', 'LIKE', "%{$searchValue}%");
-                            });
-                        } else {
-                            $columnName = $this->replaceSearch[$column['name']] ?? $column['name'];
-                            $query->where($columnName, 'LIKE', "%{$column['search']['value']}%");
-                        }
-                    }
-                }
-            } else {
-                if ($column['name'] == "shipment_date" && !empty($column['search']['value'])) {
-                    $now = new Carbon();
-
-                    switch ($column['search']['value']) {
-                        case "yesterday":
-                            $query->where("orders.shipment_date", '<', $now->toDateString());
-                            $query->where("orders.shipment_date", '>=', $now->subDay()->toDateString());
-                            break;
-                        case "today":
-                            $query->where("orders.shipment_date", '>=', $now->toDateString());
-                            $query->where("orders.shipment_date", '<', $now->addDay()->toDateString());
-                            break;
-                        case "tomorrow":
-                            $query->where("orders.shipment_date", '>=', $now->addDay()->toDateString());
-                            $query->where("orders.shipment_date", '<', $now->addDay()->toDateString());
-                            break;
-                        case "from_tomorrow":
-                            $query->where("orders.shipment_date", '>=', $now->addDay()->toDateString());
-                            break;
-                        case "all":
-                        default:
-                            break;
-                    }
-                } elseif ($column['name'] == "remainder_date" && isset($column['search']['value'])) {
-                    $val = filter_var($column['search']['value'], FILTER_VALIDATE_BOOLEAN);
-                    if ($val) {
-                        $query->whereRaw('remainder_date < Now()');
-                    }
-                } elseif ($column['name'] == "search_on_lp" && !empty($column['search']['value'])) {
-                    $query->leftJoin('order_packages', 'orders.id', '=', 'order_packages.order_id');
-                    $query->whereRaw('order_packages.letter_number' . ' REGEXP ' . "'{$column['search']['value']}'");
-                } elseif (in_array($column['name'], $this->getLabelGroupsNames()) && !empty($column['search']['value'])) {
-                    $query->whereExists(function ($innerQuery) use ($column) {
-                        $innerQuery->select("*")
-                            ->from('order_labels')
-                            ->whereRaw("order_labels.order_id = orders.id and order_labels.label_id = {$column['search']['value']}");
-                    });
-                } elseif ($column['name'] == "packages_sent" && !empty($column['search']['value'])) {
-                    $searched = explode(' ', $column['search']['value']);
-                    if ($searched[0] === 'plus') {
-                        $query->whereExists(function ($innerQuery) use ($column, $searched) {
-                            $innerQuery->select("*")
-                                ->from('order_packages')
-                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_cost_balance > " . $searched[1] . " AND order_packages.status IN ('SENDING', 'DELIVERED')");
-                        });
-                    } else if ($searched[0] === 'minus') {
-                        $query->whereExists(function ($innerQuery) use ($column, $searched) {
-                            $innerQuery->select("*")
-                                ->from('order_packages')
-                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_cost_balance < -" . $searched[1] . " AND order_packages.status IN ('SENDING', 'DELIVERED')");
-                        });
-                    } else {
-                        $query->whereExists(function ($innerQuery) use ($column) {
-                            $innerQuery->select("*")
-                                ->from('order_packages')
-                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_courier_name LIKE '{$column['search']['value']}' AND order_packages.status IN ('SENDING', 'DELIVERED')");
-                        });
-                    }
-                } elseif ($column['name'] == "packages_not_sent" && !empty($column['search']['value'])) {
-                    $query->whereExists(function ($innerQuery) use ($column) {
-                        $innerQuery->select("*")
-                            ->from('order_packages')
-                            ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_courier_name LIKE '{$column['search']['value']}' AND order_packages.status NOT IN ('SENDING', 'DELIVERED', 'CANCELLED')");
-                    });
-                } elseif ($column['name'] == 'sum_of_payments' && !empty($column['search']['value'])) {
-                    $query->whereRaw('(select sum(amount) from order_payments where order_payments.order_id = orders.id)' . ' LIKE ' . "'%{$column['search']['value']}%'");
-                } elseif ($column['name'] == 'sum_of_gross_values' && !empty($column['search']['value'])) {
-                    $query->whereRaw('CAST((select sum(net_selling_price_commercial_unit * quantity * 1.23) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)' . ' LIKE ' . "'%{$column['search']['value']}%'");
-                } elseif ($column['name'] == 'left_to_pay' && !empty($column['search']['value'])) {
-                    $sumQuery = '
-                    IFNULL((
-                            CAST(
-                                (SELECT sum(gross_selling_price_commercial_unit * quantity) FROM order_items where order_id = orders.id)
-                            AS DECIMAL (12,2))
-                            + IFNULL(orders.additional_service_cost, 0)
-                            + IFNULL(orders.additional_cash_on_delivery_cost, 0)
-                            + IFNULL(orders.shipment_price_for_client, 0)
-                        )
-                        - IFNULL(
-                            (SELECT sum(amount) FROM order_payments WHERE order_payments.order_id = orders.id AND order_payments.promise != "1")
-                        , 0)
-                    , 0)
-                    ';
-                    if ($data['differenceMode']) {
-                        $differenceUp = (float)($column['search']['value'] + 2);
-                        $differenceDown = (float)($column['search']['value'] - 2);
-                        $query->whereRaw($sumQuery . ' < ' . "{$differenceUp}" . ' AND ' . $sumQuery . ' > ' . $differenceDown);
-                    } else {
-                        $query->whereRaw($sumQuery . ' = ' . "'{$column['search']['value']}'");
-                    }
-                }
-            }
-        }
-
-        if ($minId) {
-            $query->where($sortingColumns[14], '>', $minId);
-        }
-
-        if (isset($data['same'])) {
-            $query->whereRaw("date({$data["dateColumn"]}) = '{$data['dateFrom']}'");
-        } else {
-            if (isset($data['dateFrom'])) {
-                $query->whereRaw("date({$data["dateColumn"]}) >= '{$data['dateFrom']}'");
-            }
-            if (isset($data['dateTo'])) {
-                $query->whereRaw("date({$data["dateColumn"]}) <= '{$data['dateTo']}'");
-            }
-        }
-
-        if (!empty($data['customerId'])) {
-            $query->where('orders.customer_id', $data['customerId']);
-        }
-
-        //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');
-
-        $count = $query->count();
-
-        if ($withoutPagination) {
-            $collection = $query
-                ->get();
-        } else {
-            $collection = $query
-                ->limit($data['length'])->offset($data['start'])
-                ->get();
-        }
-
-        foreach ($collection as $row) {
-            $orderId = $row->orderId;
-            $row->allegro_commission = abs(\DB::table('order_allegro_commissions')->where('order_id', $row->orderId)->sum('amount'));
-            $row->items = \DB::table('order_items')->where('order_id', $row->orderId)->get();
-            $row->connected = \DB::table('orders')->where('master_order_id', $row->orderId)->get();
-            $row->payments = OrderPayment::withTrashed()->where('order_id', $row->orderId)->get();
-
-            $row->packages = \DB::table('order_packages')->where('order_id', $row->orderId)->get();
-            if ($row->packages) {
-                $row->packages->map(function ($item) {
-                    $item->sumOfCosts = DB::table('order_packages_real_cost_for_company')
-                        ->select(DB::raw('SUM(cost) as sum'))
-                        ->where('order_package_id', $item->id)
-                        ->groupBy('order_package_id')
-                        ->first();
-
-                    return $item;
-                });
-            }
-
-            $row->otherPackages = \DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
-            $row->addresses = \DB::table('order_addresses')->where('order_id', $row->orderId)->get();
-            $row->history = Order::where('customer_id', $row->customer_id)->with('labels')->get();
-            $row->left_to_pay = 0;
-            $row->history = $row->history->reduce(function ($acu, $current) {
-                $insert = ['id' => $current->id, 'labels' => $current->labels];
-                $acu[] = $insert;
-                return $acu;
-            }, []);
-            $invoices = \DB::table('order_order_invoices')->where('order_id', $row->orderId)->get(['invoice_id']);
-            $arrInvoice = [];
-            foreach ($invoices as $invoice) {
-                $arrInvoice[] = $invoice->invoice_id;
-            }
-            if (count($arrInvoice) > 0) {
-                $row->invoices = \DB::table('order_invoices')->whereIn('id', $arrInvoice)->get();
-            }
-
-            $labels = [];
-            $labelsIds = \DB::table('order_labels')->where('order_id', $row->orderId)->get();
-            if (!empty($labelsIds)) {
-                foreach ($labelsIds as $labelId) {
-                    $labels[] = \DB::table('labels')->where('id', $labelId->label_id)->get();
-                }
-                foreach ($labels as $label) {
-                    if (isset($label[0])) {
-                        if (!empty($label[0]->label_group_id)) {
-                            $label[0]->label_group = \DB::table('label_groups')->where(
-                                'id',
-                                $label[0]->label_group_id
-                            )->get();
-                        }
-
-                        foreach ($labelsIds as $labelId) {
-                            if ($labelId->label_id === $label[0]->id) {
-                                $label[0]->added_type = $labelId->added_type;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            $row->labels = $labels;
-            $row->closest_label_schedule_type_c = \DB::table('order_label_schedulers')
-                ->where('order_id', $row->orderId)
-                ->where('type', 'C')
-                ->where('triggered_at', null)
-                ->orderBy('trigger_time')
-                ->first();
-            $row->generalMessage = $this->generateMessagesForTooltip($row->orderId, "GENERAL");
-            $row->shippingMessage = $this->generateMessagesForTooltip($row->orderId, "SHIPPING", false);
-            $row->warehouseMessage = $this->generateMessagesForTooltip($row->orderId, "WAREHOUSE");
-            $row->complaintMessage = $this->generateMessagesForTooltip($row->orderId, "COMPLAINT");
-            $row->transport_exchange_offers = $this->speditionExchangeRepository
-                ->with(['speditionOffers', 'chosenSpedition'])
-                ->whereHas('items', function ($q) use ($orderId) {
-                    $q->where('order_id', '=', $orderId);
-                })
-                ->all();
-            $row->files = OrderFiles::where('order_id', $row->orderId)->get();
-        }
-
-        return [$collection, $count];
-    }
-
-    /**
-     * @return Builder
-     */
-    private function getQueryForDataTables($selectAllDates = null): Builder
-    {
-        return \DB::table('orders')
-            ->distinct()
-            ->select(
-                '*',
-                'orders.created_at as orderDate',
-                'orders.id as orderId',
-                'customers.login as clientEmail',
-                'statuses.name as statusName',
-                'customer_addresses.firstname as clientFirstname',
-                'customer_addresses.lastname as clientLastname',
-                'customer_addresses.phone as clientPhone',
-                'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment',
-                'sel_tr__transaction.tr_CheckoutFormId as sello_form',
-                'task_times.date_start as production_date',
-                'taskUser.firstname as taskUserFirstName',
-                'taskUser.lastname as taskUserLastName'
-            )
-            //poniższe left joiny mają na celu wyświetlenie czasów oraz wykonwaców zadań z tabeli tasks na "gridzie"
-            ->leftJoin('tasks', 'orders.id', '=', 'tasks.order_id')
-            ->leftJoin('tasks as parentTask', 'parentTask.id', '=', 'tasks.parent_id')
-            ->leftJoin('users as taskUser', \DB::raw('COALESCE(parentTask.user_id, tasks.user_id)'), '=', 'taskUser.id')
-            ->leftJoin('task_times', 'task_times.task_id', '=', \DB::raw('COALESCE(parentTask.id, tasks.id)'))
-            //tasks - koniec
-            ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
-            ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
-            ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
-            ->leftJoin('sel_tr__transaction', 'orders.sello_id', '=', 'sel_tr__transaction.id')
-            ->leftJoin('users', 'orders.employee_id', '=', 'users.id')
-            ->leftJoin('order_dates', 'orders.id', '=', 'order_dates.order_id')
-            ->leftJoin('customer_addresses', function ($join) {
-                $join->on('customers.id', '=', 'customer_addresses.customer_id')
-                    ->where('type', '=', 'STANDARD_ADDRESS');
-            })->where(function ($query) {
-                if (Auth::user()->role_id == 4) {
-                    $query->where('orders.employee_id', '=', Auth::user()->id);
-                }
-            })->where(function ($query) use (&$selectAllDates) {
-                if ($selectAllDates === 'false') {
-                    $query->where('orders.created_at', '>', Carbon::now()->addMonths(-3))
-                        ->orWhere('orders.updated_at', '>', Carbon::now()->addMonths(-3));
-                }
-            });
-    }
-
-    /**
-     * @return array
-     */
-    private function getLabelGroupsNames()
-    {
-        return [
-            'label_platnosci',
-            'label_produkcja',
-            'label_transport',
-            'label_info_dodatkowe',
-            'label_fakury_zakupu',
-        ];
-    }
-
-    /**
-     * @param $orderId
-     * @param $type
-     * @param bool $allSources
-     * @return string
-     */
-    protected function generateMessagesForTooltip($orderId, $type, $allSources = true)
-    {
-        $messagesDb = \DB::table('order_messages')->where('order_id', $orderId)->where('type', $type);
-        if ($allSources) {
-            $messagesDb = $messagesDb->get();
-        } else {
-            $messagesDb = $messagesDb->where('source', 'FORM')->get();
-        }
-
-        $messages = [];
-        if (count($messagesDb)) {
-            foreach ($messagesDb as $message) {
-                $messages[] = $message->message;
-            }
-        }
-
-        return implode(' ----------- ', $messages);
-    }
 
     private function sendPackagesForOrder($ord)
     {
@@ -2626,15 +2129,14 @@ class OrdersController extends Controller
         $finalPdfFileName = 'allPrints.pdf';
         $lockName = 'file.lock';
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
-        if (File::exists(public_path($lockName))) {
-            // return response(['error' => 'file_exist']);
-        }
+
         file_put_contents($lockName, '');
         $data = $request->all();
-        [$collection, $count] = $this->prepareCollection($data, true);
+        [$collection, $count] = $this->orderDatatableService->prepareCollection($data, true);
         $tagHelper = new EmailTagHandlerHelper();
         $merger = new Merger;
         $i = 0;
+
         foreach ($collection as $ord) {
             $dompdf = new Dompdf(['enable_remote' => true]);
 
@@ -2683,7 +2185,7 @@ class OrdersController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function autocomplete(Request $request)
+    public function autocomplete(Request $request): JsonResponse
     {
         $data = Product::where('symbol', 'LIKE', "%{$request->input('term')}%")->limit(10)->pluck('symbol')->toArray();
 
@@ -2711,7 +2213,7 @@ class OrdersController extends Controller
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function print($token)
+    public function print($token): \Illuminate\Contracts\View\View
     {
         $order = $this->orderRepository->where('token', $token)->first();
 
@@ -2737,13 +2239,11 @@ class OrdersController extends Controller
      * @param $orderIdToSend
      * @return JsonResponse
      */
-    public function moveData($orderIdToGet, $orderIdToSend)
+    public function moveData($orderIdToGet, $orderIdToSend): JsonResponse
     {
-        $orderToGetData = $this->orderRepository->find($orderIdToGet);
-        $orderToSendData = $this->orderRepository->find($orderIdToSend);
-        if (empty($orderToGetData) || empty($orderToSendData)) {
-            abort(404);
-        }
+        $orderToGetData = Order::find($orderIdToGet);
+        $orderToSendData = Order::find($orderIdToSend);
+
         foreach ($orderToGetData->addresses as $address) {
             if ($address->type == 'DELIVERY_ADDRESS') {
                 $deliveryAddress = [
@@ -2790,6 +2290,7 @@ class OrdersController extends Controller
     }
 
     /**
+     * @param Request $request
      * @param $orderIdToGet
      * @param $orderIdToSend
      * @return JsonResponse
@@ -2799,9 +2300,6 @@ class OrdersController extends Controller
         $orderToGetData = $this->orderRepository->find($orderIdToGet);
         $orderToSendData = $this->orderRepository->find($orderIdToSend);
         $paymentAmount = $request->input('paymentAmount');
-        if (empty($orderToGetData) || empty($orderToSendData)) {
-            abort(404);
-        }
 
         $masterPaymentId = 0;
         foreach ($orderToGetData->payments()->where('promise', '=', '')->get() as $orderGetPayment) {
@@ -2814,7 +2312,7 @@ class OrdersController extends Controller
             }
         }
 
-        $payment = OrderPayment::create([
+        OrderPayment::create([
             'amount' => str_replace(",", ".", $paymentAmount),
             'master_payment_id' => $masterPaymentId,
             'order_id' => $orderToSendData->id,
@@ -3185,40 +2683,46 @@ class OrdersController extends Controller
         return view('customers.confirmation.confirmationThanks');
     }
 
-    public function getCosts()
+    public function getCosts(): RedirectResponse
     {
         dispatch(new UpdatePackageRealCostJob());
+
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto pobieranie realnych wartości zleceń',
             'alert-type' => 'success',
         ]);
     }
 
-    public function selloImport()
+    public function selloImport(): RedirectResponse
     {
         dispatch_now(new ImportOrdersFromSelloJob());
+
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto import z Sello',
             'alert-type' => 'success',
         ]);
     }
 
-    public function generateFs()
+    public function generateFs(): RedirectResponse
     {
         dispatch_now(new GenerateXmlForNexoJob());
+
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto generowanie faktur sprzedaży',
             'alert-type' => 'success',
         ]);
     }
 
-    public function findPage(Request $request, $id)
+    public function findPage(Request $request, $id): \Illuminate\Http\Response|Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
-        [$collection, $count] = $this->prepareCollection($request->all(), false, $id);
+        [$collection, $count] = $this->orderDatatableService->prepareCollection($request->all(), false, $id);
         return response($count / $request->all()['length']);
     }
 
-    public function findByDates(Request $request)
+    /**
+     * @throws Exception
+     */
+    public function findByDates(Request $request): JsonResponse
     {
         return $this->datatable($request);
     }
@@ -3231,7 +2735,7 @@ class OrdersController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         $data = $request->all();
-        [$collection, $countFiltred] = $this->prepareCollection($data);
+        [$collection, $countFiltred] = $this->orderDatatableService->prepareCollection($data);
         $count = Order::with('payments')->get();
         $count = count($count);
         $collection = $this->prepareAdditionalOrderData($collection);
@@ -3266,7 +2770,7 @@ class OrdersController extends Controller
         return $collection;
     }
 
-    public function sendTrackingNumbers()
+    public function sendTrackingNumbers(): RedirectResponse
     {
         dispatch_now(new AllegroTrackingNumberUpdater());
         return redirect()->route('orders.index')->with([
@@ -3275,14 +2779,16 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function goToBasket(Request $request)
+    public function goToBasket(Request $request): RedirectResponse
     {
 
         try {
             $user = Auth::user();
+
             if (empty($user)) {
                 throw new Exception('Wrong User');
             }
+
             $order = Order::findOrFail($request->id);
 
 
@@ -3307,9 +2813,9 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function invoiceRequest(Request $request)
+    public function invoiceRequest(Request $request): JsonResponse
     {
-        $invoiceRequest = InvoiceRequest::create([
+        InvoiceRequest::create([
             'order_id' => $request->input('id'),
             'status' => 'MISSING'
         ]);

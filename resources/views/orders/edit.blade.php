@@ -2844,7 +2844,7 @@
                 breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#employees'>Zadania</a></li>");
                 addOrder.hide();
 
-            } else if (referrer.search('orderPackages') != -1 || uri.search('orderPackages') != -1 || item === 'orderPackages') {
+            } else if (referrer.search('orderPackages') !== -1 || uri.search('orderPackages') !== -1 || item === 'orderPackages') {
                 $('#button-general').removeClass('active');
                 $('#button-tasks').removeClass('active');
                 $('#button-payments').removeClass('active');

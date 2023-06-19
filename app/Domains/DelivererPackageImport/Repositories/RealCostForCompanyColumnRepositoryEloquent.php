@@ -14,7 +14,7 @@ use Illuminate\Support\Collection;
 
 class RealCostForCompanyColumnRepositoryEloquent implements DelivererImportRuleColumnRepositoryInterface
 {
-    private $orderPackageRepositoryEloquent;
+    private OrderPackageRepositoryEloquent $orderPackageRepositoryEloquent;
 
     public function __construct(OrderPackageRepositoryEloquent $orderPackageRepositoryEloquent)
     {

@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -100,7 +101,7 @@ class OrderPackage extends Model implements Transformable
     /**
      * @return BelongsTo
      */
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
@@ -110,7 +111,7 @@ class OrderPackage extends Model implements Transformable
         return $this->hasMany('App\Entities\OrderPackageRealCostForCompany');
     }
 
-    public function packedProducts()
+    public function packedProducts(): BelongsToMany
     {
         return $this->belongsToMany('App\Entities\Product')->withPivot('quantity');
     }
@@ -122,20 +123,26 @@ class OrderPackage extends Model implements Transformable
 
     public function getPathToSticker(): string
     {
-        if ($this->service_courier_name === 'INPOST' || $this->service_courier_name === 'ALLEGRO-INPOST') {
-            $path = "/storage/inpost/stickers/sticker$this->letter_number.pdf";
-        } else if ($this->delivery_courier_name === 'DPD') {
-            $path = "/storage/dpd/stickers/sticker$this->letter_number.pdf";
-        } else if ($this->delivery_courier_name === 'POCZTEX') {
-            $path = "/storage/pocztex/protocols/protocol$this->sending_number.pdf";
-        } else if ($this->delivery_courier_name === 'JAS') {
-            $path = "/storage/jas/protocols/protocol$this->sending_number.pdf";
-            $path = "/storage/jas/labels/label$this->sending_number.pdf";
-        } else if ($this->delivery_courier_name === 'GIELDA') {
-            $path = "/storage/gielda/stickers/sticker$this->letter_number.pdf";
-        } else if ($this->delivery_courier_name === 'ODBIOR_OSOBISTY') {
-            $path = "/storage/odbior_osobisty/stickers/sticker$this->letter_number.pdf";
+        $paths = [
+            'INPOST' => "/storage/inpost/stickers/sticker$this->letter_number.pdf",
+            'ALLEGRO-INPOST' => "/storage/inpost/stickers/sticker$this->letter_number.pdf",
+            'DPD' => "/storage/dpd/stickers/sticker$this->letter_number.pdf",
+            'POCZTEX' => "/storage/pocztex/protocols/protocol$this->sending_number.pdf",
+            'JAS' => [
+                "/storage/jas/protocols/protocol$this->sending_number.pdf",
+                "/storage/jas/labels/label$this->sending_number.pdf"
+            ],
+            'GIELDA' => "/storage/gielda/stickers/sticker$this->letter_number.pdf",
+            'ODBIOR_OSOBISTY' => "/storage/odbior_osobisty/stickers/sticker$this->letter_number.pdf"
+        ];
+
+        $path = '';
+        if (array_key_exists($this->service_courier_name, $paths)) {
+            $path = $paths[$this->service_courier_name];
+        } else if (array_key_exists($this->delivery_courier_name, $paths)) {
+            $path = $paths[$this->delivery_courier_name];
         }
+
         return $path;
     }
 

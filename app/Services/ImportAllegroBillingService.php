@@ -17,6 +17,12 @@ class ImportAllegroBillingService
         protected AllegroBillingImportHelper $billingHelper,
     ) {}
 
+    /**
+     * Import billing entries
+     *
+     * @param array $data
+     * @return void
+     */
     public function import(array $data): void
     {
         foreach ($data as $dto) {
@@ -24,8 +30,15 @@ class ImportAllegroBillingService
         }
     }
 
+    /**
+     * Import single billing entry
+     *
+     * @param ImportAllegroBillingDTO $data
+     * @return void
+     */
     private function importSingle(ImportAllegroBillingDTO $data): void
     {
+        AllegroGeneralExpenses::deleteAll();
         $billingEntry = AllegroGeneralExpenses::createFromDTO($data);
         $trackingNumber = $this->billingHelper->extractTrackingNumber($data->getOperationDetails());
 
@@ -43,7 +56,7 @@ class ImportAllegroBillingService
             return;
         }
 
-        $this->updateOrderPackage($orderPackage, $data->getCharges());
+        $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOD');
     }
 
     /**
@@ -71,13 +84,22 @@ class ImportAllegroBillingService
             return;
         }
 
-        $this->updateOrderPackage($orderPackage, $data->getCharges());
+        $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOP');
     }
 
-    private function updateOrderPackage(OrderPackage $orderPackage, string $charges): void
+    /**
+     * Update order package with real costs for company
+     *
+     * @param OrderPackage $orderPackage
+     * @param string $charges
+     * @param mixed|null $type
+     * @return void
+     */
+    private function updateOrderPackage(OrderPackage $orderPackage, string $charges, mixed $type = null): void
     {
         $orderPackage->realCostsForCompany()->create([
-            'value' => $charges,
+            'cost' => (float)$charges,
+            'type' => $type,
         ]);
     }
 }

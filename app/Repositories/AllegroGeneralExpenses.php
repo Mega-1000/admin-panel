@@ -7,6 +7,16 @@ use App\Entities\AllegroGeneralExpense;
 
 class AllegroGeneralExpenses
 {
+    /**
+     * Delete all resources
+     *
+     * @return void
+     */
+    public static function deleteAll(): void
+    {
+        AllegroGeneralExpense::truncate();
+    }
+
     public static function createFromDTO(ImportAllegroBillingDTO $dto): AllegroGeneralExpense
     {
         return AllegroGeneralExpense::create([
