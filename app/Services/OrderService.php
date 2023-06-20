@@ -176,14 +176,14 @@ class OrderService
                 $order,
                 $paymentDTO,
                 OrderPaymentsEnum::REBOOKED_TYPE_IN . " " . (string)$payment->order()->first()->id,
-                $payment
+                $payment,
             );
 
             OrderPayments::createRebookedOrderPayment(
                 $payment->order()->first(),
                 $paymentDTO->setAmount($paymentDTO->getAmount() * -1),
                 OrderPaymentsEnum::REBOOKED_TYPE_OUT . " " . $order->id,
-                $payment
+                $payment,
             );
         });
     }

@@ -1364,7 +1364,12 @@ class OrdersPaymentsController extends Controller
      */
     public function destroy(int $id): RedirectResponse
     {
-        $orderPayment = $this->repository->find($id);
+        $orderPayment = OrderPayment::find($id);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $deleted = OrderPayment::find($id)->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
 
         if ($orderPayment->master_payment_id != NULL) {
             $payment = OrderPayment::query()->where('id', $orderPayment->master_payment_id)->first();
@@ -1398,10 +1403,6 @@ class OrdersPaymentsController extends Controller
             OrderPaymentLogTypeEnum::REMOVE_PAYMENT,
             false
         );
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        $deleted = DB::table('order_payments')->where('id', $id)->delete();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         if (empty($deleted)) {
             return redirect()->back()->with([
@@ -1556,7 +1557,11 @@ class OrdersPaymentsController extends Controller
     {
         $payment = OrderPayment::findOrFail($payment);
 
-        $this->orderService->rebookStore($order, $payment, OrderPaymentDTO::fromPayment($payment, $request->get('value')));
+        $this->orderService->rebookStore(
+            $order,
+            $payment,
+            OrderPaymentDTO::fromPayment($payment, $request->get('value'))
+        );
 
         return redirect()->route('orders.edit', $order->id);
     }

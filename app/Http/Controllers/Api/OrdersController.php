@@ -1050,6 +1050,7 @@ class OrdersController extends Controller
                 'error_message' => $exception->getMessage()
             ], 500);
         }
+
         return response()->json($order, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
