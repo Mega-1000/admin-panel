@@ -17,6 +17,7 @@ use App\Repositories\TransactionRepository;
 use App\Services\FindOrCreatePaymentForPackageService;
 use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
+use App\Services\OrderPaymentLabelsService;
 use App\Services\OrderPaymentService;
 use DateTime;
 use Exception;
@@ -37,25 +38,13 @@ class ImportBankPayIn implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var TransactionRepository
-     */
-    protected TransactionRepository $transactionRepository;
+    protected TransactionRepository                $transactionRepository;
 
-    /**
-     * @var LabelService
-     */
-    protected LabelService $labelService;
-
-    /**
-     * @var FindOrCreatePaymentForPackageService
-     */
+    protected LabelService                         $labelService;
     protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService;
 
-    /**
-     * @var OrderPaymentService
-     */
-    protected OrderPaymentService $orderPaymentService;
+    protected OrderPaymentService                  $orderPaymentService;
+    protected OrderPaymentLabelsService            $orderPaymentLabelsService;
 
     public function __construct(
         protected UploadedFile                         $file,
@@ -307,9 +296,9 @@ class ImportBankPayIn implements ShouldQueue
             ['customer_id', '=', $customerId]
         ])->last())) {
             return $lastCustomerTransaction->balance;
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     /**
@@ -396,7 +385,7 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function saveOrderPayment(Order $order, $paymentAmount, $payIn, $declaredSum = false): Model
     {
-        return $order->payments()->create([
+        $payment = $order->payments()->create([
             'amount' => $paymentAmount,
             'type' => 'CLIENT',
             'promise' => '',
@@ -407,6 +396,10 @@ class ImportBankPayIn implements ShouldQueue
             'operation_type' => 'Wpłata/wypłata bankowa',
             'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
         ]);
+
+        $this->orderPaymentLabelsService->calculateLabels($payment->order);
+
+        return $payment;
     }
 
 
