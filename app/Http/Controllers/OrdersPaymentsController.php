@@ -1572,7 +1572,7 @@ class OrdersPaymentsController extends Controller
         $this->orderService->rebookStore(
             $order,
             $payment,
-            OrderPaymentDTO::fromPayment($payment, (float)$request->get('value'))
+            OrderPaymentDTO::fromPayment($payment, (float)$request->get('value_of_rebook'))
         );
 
         return redirect()->route('orders.edit', $order->id);
