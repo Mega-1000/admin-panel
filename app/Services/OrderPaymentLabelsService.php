@@ -33,7 +33,7 @@ class OrderPaymentLabelsService
             }
         }
 
-        $relatedPaymentsValue -= $orderReturnGoods;
+        $relatedPaymentsValue += $orderReturnGoods;
         $arr = [];
 
         if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
