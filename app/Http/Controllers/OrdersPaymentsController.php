@@ -1565,6 +1565,19 @@ class OrdersPaymentsController extends Controller
         return redirect()->route('orders.edit', $order->id);
     }
 
+    public function rebookStoreSingle($payment, Request $request): RedirectResponse
+    {
+        $payment = OrderPayment::findOrFail($payment);
+        $order = Order::findOrFail($request->input('rebook_order_id'));
+        $this->orderService->rebookStore(
+            $order,
+            $payment,
+            OrderPaymentDTO::fromPayment($payment, (float)$request->get('value'))
+        );
+
+        return redirect()->route('orders.edit', $order->id);
+    }
+
     public function cleanTable(): RedirectResponse
     {
         Log::notice('Użytkownik o ID: ' . Auth::user()->id . ' dokonał usunięcia płatności');

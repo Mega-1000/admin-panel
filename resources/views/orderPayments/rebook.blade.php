@@ -17,6 +17,15 @@
 @endsection
 @section('table')
     <!--- display allOrdersForUser in table -->
+
+    <form id="separate_form" action="{{ route('orderPayments.rebookStoreSingle', ['payment' => $orderPayment->id]) }}" method="post">
+        @csrf
+        <input class="form-control" id="value_of_rebook" name="value_of_rebook" type="text" placeholder="wartość przeksięgowania">
+        <input class="form-control" id="rebook_order_id" name="rebook_order_id" type="text" placeholder="id oferty">
+
+        <input class="btn btn-primary" value="Zapisz" type="submit">
+    </form>
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -27,6 +36,7 @@
                 <th>Akcje</th>
             </tr>
         </thead>
+
         <tbody>
             @foreach ($allOrdersForUser as $order)
                     <tr>
@@ -45,3 +55,15 @@
         @endforeach
     </table>
 @endsection
+
+<script>
+    const onSubmit = (e) => {
+        e.preventDefault();
+        const value = document.getElementById('value_of_rebook').value;
+        const orderId = document.getElementById('rebook_order_id').value;
+
+        alert(value);
+        const form = document.getElementById('separate_form');
+        form.action = `/orderPayments/rebook/${orderId}/${value}`;
+    };
+</script>
