@@ -68,6 +68,7 @@ class ImportBankPayIn implements ShouldQueue
     {
         $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
         $this->orderPaymentService = $orderPaymentService;
+        $this->orderPaymentLabelsService = $orderPaymentService;
 
         $header = NULL;
         $fileName = 'bankTransactionWithoutOrder.csv';
