@@ -44,7 +44,7 @@ class ImportBankPayIn implements ShouldQueue
     protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService;
 
     protected OrderPaymentService                  $orderPaymentService;
-    protected OrderPaymentLabelsService            $orderPaymentLabelsService;
+    protected                                      $orderPaymentLabelsService;
 
     public function __construct(
         protected UploadedFile                         $file,
