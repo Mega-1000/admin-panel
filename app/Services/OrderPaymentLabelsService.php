@@ -26,7 +26,7 @@ class OrderPaymentLabelsService
         $relatedPaymentsValue = round($this->orderRepository->getAllRelatedOrderPaymentsValue($order), 2);
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
         $orderReturnGoods = round($this->orderRepository->getOrderReturnGoods($order), 2);
-        dd($relatedPaymentsValue, $relatedOrdersValue, $orderReturnGoods);
+
         if ($calculateRelated) {
             foreach ($this->orderRepository->getAllRelatedOrders($order) as $relatedOrder) {
                 $this->calculateLabels($relatedOrder, false);
