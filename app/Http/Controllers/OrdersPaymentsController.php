@@ -1746,7 +1746,7 @@ class OrdersPaymentsController extends Controller
      */
     public function recalculateAllOrders(): RedirectResponse
     {
-        dispatch(new RecalculateAllOrdersBilansJob());
+        dispatch_now(new RecalculateAllOrdersBilansJob());
 
         return redirect()->back();
     }
