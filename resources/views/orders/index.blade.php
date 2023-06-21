@@ -1667,9 +1667,8 @@
                                             html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                         } else if (value.delivery_courier_name === 'GLS') {
                                             let url = "{{ route('orders.package.getSticker', ['package_id' => '%%'])}}"
-                                            html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
+                                            html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p style="margin-bottom: 0px;">';
                                             html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
-                                            html += '</p></a>';
                                             html += '<div>';
                                             if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
                                                 html += '<span>' + value.cash_on_delivery + ' zł</span>';
