@@ -23,6 +23,7 @@ use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Http\Requests\ReturnSurplusPaymentRequest;
 use App\Http\Requests\UpdateOrderPaymentRequest;
 use App\Jobs\DispatchLabelEventByNameJob;
+use App\Jobs\RecalculateAllOrdersBilansJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
@@ -1738,5 +1739,15 @@ class OrdersPaymentsController extends Controller
         $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
         return $globalPayment;
+    }
+
+    /**
+     * @return RedirectResponse
+     */
+    public function recalculateAllOrders(): RedirectResponse
+    {
+        dispatch(new RecalculateAllOrdersBilansJob());
+
+        return redirect()->back();
     }
 }

@@ -604,6 +604,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/transactions/rebook/{orderPayment}', 'OrdersPaymentsController@rebook')->name('orderPayments.rebook');
     Route::post('/transactions/rebook/{order}/{payment}', 'OrdersPaymentsController@rebookStore')->name('orderPayments.rebookStore');
     Route::post('/transactions/rebook/{payment}', 'OrdersPaymentsController@rebookStoreSingle')->name('orderPayments.rebookStoreSingle');
+    Route::get('/transactions/recalculate-all-orders', 'OrdersPaymentsController@recalculateAllOrders')->name('orderPayments.recalculateAllOrders');
 
     Route::post('/upload-invoice', 'InvoicesController@uploadInvoice')->name('uploadInvoice');
 
