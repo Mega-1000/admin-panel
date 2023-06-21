@@ -128,11 +128,10 @@ class Orders
     }
 
     /**
-     * @param Order $order
      * @param int $labelId
      * @return Collection
      */
-    public function getAllOrdersAttachedToLabel(int $labelId): Collection
+    public static function getAllOrdersAttachedToLabel(int $labelId): Collection
     {
         return Order::query()->whereHas('labels', function ($query) use ($labelId) {
             $query->where('label_id', $labelId);

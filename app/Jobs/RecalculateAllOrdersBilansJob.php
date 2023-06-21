@@ -19,15 +19,13 @@ class RecalculateAllOrdersBilansJob implements ShouldQueue
      * Execute the job.
      *
      * @param OrderPaymentLabelsService $orderPaymentLabelsService
-     * @param Orders $ordersRepository
      * @return void
      */
     public function handle(
         OrderPaymentLabelsService $orderPaymentLabelsService,
-        Orders                    $ordersRepository
     ): void
     {
-        $ordersRepository->getAllOrdersAttachedToLabel(134)->each(function (Order $order) use ($orderPaymentLabelsService) {
+        Orders::getAllOrdersAttachedToLabel(134)->each(function (Order $order) use ($orderPaymentLabelsService) {
             $orderPaymentLabelsService->calculateLabels($order);
         });
     }
