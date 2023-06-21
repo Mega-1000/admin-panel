@@ -41,8 +41,7 @@ class OrderPaymentLabelsService
             return;
         }
 
-        if ($relatedPaymentsValue === $relatedOrdersValue) {
-            dd('NO TAK CHUJ MI W DUPE');
+        if ($relatedPaymentsValue == $relatedOrdersValue) {
             $this->labelService->removeLabel($order->id, [134]);
             AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
 
