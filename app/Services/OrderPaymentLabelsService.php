@@ -41,8 +41,6 @@ class OrderPaymentLabelsService
             return;
         }
 
-        dd($relatedPaymentsValue === $relatedOrdersValue, (int)$relatedPaymentsValue, (int)$relatedOrdersValue);
-
         if ((int)$relatedPaymentsValue == (int)$relatedOrdersValue) {
             $this->labelService->removeLabel($order->id, [134]);
             AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
