@@ -23,7 +23,7 @@ class OrderPaymentLabelsService
      */
     public function calculateLabels(Order $order, ?bool $calculateRelated = null): void
     {
-        $relatedPaymentsValue = round($this->orderRepository->getAllRelatedOrderPaymentsValue($order),);
+        $relatedPaymentsValue = round($this->orderRepository->getAllRelatedOrderPaymentsValue($order));
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order));
         $orderReturnGoods = round($this->orderRepository->getOrderReturnGoods($order));
 
