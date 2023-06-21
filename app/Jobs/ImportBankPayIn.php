@@ -57,6 +57,7 @@ class ImportBankPayIn implements ShouldQueue
      * @param LabelService $labelService
      * @param FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService
      * @param OrderPaymentService $orderPaymentService
+     * @param OrderPaymentLabelsService $orderPaymentLabelsService
      * @return string
      */
     public function handle(
@@ -64,11 +65,12 @@ class ImportBankPayIn implements ShouldQueue
         LabelService                         $labelService,
         FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
         OrderPaymentService                  $orderPaymentService,
+        OrderPaymentLabelsService            $orderPaymentLabelsService,
     ): string
     {
         $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
         $this->orderPaymentService = $orderPaymentService;
-        $this->orderPaymentLabelsService = $orderPaymentService;
+        $this->orderPaymentLabelsService = $orderPaymentLabelsService;
 
         $header = NULL;
         $fileName = 'bankTransactionWithoutOrder.csv';

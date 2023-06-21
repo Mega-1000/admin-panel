@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
 
 readonly final class OrderPaymentService
 {
-
     public function __construct(
         protected OrderPaymentRepository  $orderPaymentRepository,
         protected OrderRepository         $orderRepository,
