@@ -65,12 +65,12 @@ use Yajra\DataTables\Facades\DataTables;
 class OrdersPackagesController extends Controller
 {
     public function __construct(
-        private   OrderPackageRepository    $repository,
-        protected OrderRepository           $orderRepository,
-        protected OrderPackagesDataHelper   $orderPackagesDataHelper,
-        protected FirmRepository            $firmRepository,
-        protected PackageTemplateRepository $packageTemplateRepository,
-        protected ShipmentGroupRepository   $shipmentGroupRepository
+        private readonly OrderPackageRepository $repository,
+        protected OrderRepository               $orderRepository,
+        protected OrderPackagesDataHelper       $orderPackagesDataHelper,
+        protected FirmRepository                $firmRepository,
+        protected PackageTemplateRepository     $packageTemplateRepository,
+        protected ShipmentGroupRepository       $shipmentGroupRepository
     ) {}
 
     public function changeValue(Request $request): RedirectResponse

@@ -1,4 +1,4 @@
-<?php
+'<?php
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -14,8 +14,8 @@ class CreateOrdersTable extends Migration
 	 *
 	 * @return void
 	 */
-	public function up()
-	{
+	public function up(): void
+    {
 		Schema::create('orders', function(Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('customer_id');

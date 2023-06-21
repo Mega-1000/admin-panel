@@ -1556,11 +1556,10 @@ class OrdersPaymentsController extends Controller
     public function rebookStore(Order $order, $payment, Request $request): RedirectResponse
     {
         $payment = OrderPayment::findOrFail($payment);
-
         $this->orderService->rebookStore(
             $order,
             $payment,
-            OrderPaymentDTO::fromPayment($payment, $request->get('value'))
+            OrderPaymentDTO::fromPayment($payment, (float)$request->get('value'))
         );
 
         return redirect()->route('orders.edit', $order->id);

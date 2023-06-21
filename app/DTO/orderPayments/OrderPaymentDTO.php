@@ -7,16 +7,13 @@ use App\Entities\OrderPayment;
 class OrderPaymentDTO
 {
     public function __construct(
-        public string $amount,
+        public float $amount,
         public readonly ?string $payment_date,
         public readonly ?string $payment_type,
         public readonly ?string $status,
         public readonly ?string $token,
         public readonly ?string $operation_type,
-    )
-    {
-
-    }
+    ) {}
 
     /**
      * @param array $array
@@ -37,10 +34,10 @@ class OrderPaymentDTO
 
     /**
      * @param OrderPayment $payment
-     *
+     * @param int $amount
      * @return static
      */
-    public static function fromPayment(OrderPayment $payment, int $amount): self
+    public static function fromPayment(OrderPayment $payment, float $amount): self
     {
         return new self(
             $amount,
