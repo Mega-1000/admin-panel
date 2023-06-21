@@ -7,6 +7,7 @@ use App\Entities\Status;
 use App\Facades\Mailer;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
+use App\Repositories\Orders;
 use App\Repositories\StatusRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\OrderPaymentLabelsService;
@@ -97,5 +98,16 @@ readonly class OrderObserver
         }
 
         $this->orderPaymentLabelsService->calculateLabels($order);
+    }
+
+    /**
+     * @param Order $order
+     * @return void
+     */
+    public function deleted(Order $order): void
+    {
+        Orders::getAllRelatedOrders($order)->each(function (Order $order) {
+            $order->delete();
+        });
     }
 }
