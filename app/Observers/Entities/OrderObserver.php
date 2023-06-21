@@ -99,15 +99,4 @@ readonly class OrderObserver
 
         $this->orderPaymentLabelsService->calculateLabels($order);
     }
-
-    /**
-     * @param Order $order
-     * @return void
-     */
-    public function deleted(Order $order): void
-    {
-        Orders::getAllRelatedOrders($order)->each(function (Order $order) {
-            $order->delete();
-        });
-    }
 }
