@@ -350,10 +350,8 @@ class ImportBankPayIn implements ShouldQueue
         $amount = $payIn['kwota'];
         $order = $orders[0];
 
-        dd($amount, $order);
-
         $this->findOrCreatePaymentForPackageService->execute(
-            OrderPackage::where('order_id', $orders->id)->first(),
+            OrderPackage::where('order_id', $order->id)->first(),
         );
 
         if ($amount < 0) {
