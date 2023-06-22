@@ -38,10 +38,10 @@ use App\Entities\ChatUser;
 
 class MessagesHelper
 {
-    public int $chatId = 0;
+    public $chatId = 0;
     public array $users = [];
-    public int $productId = 0;
-    public int $orderId = 0;
+    public $productId = 0;
+    public $orderId = 0;
     public $currentUserType;
 
     /**
