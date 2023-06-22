@@ -348,33 +348,23 @@ class ImportBankPayIn implements ShouldQueue
     private function settleOrders(Collection $orders, array $payIn): void
     {
         $amount = $payIn['kwota'];
+        $order = $orders[0];
 
-        foreach ($orders as $order) {
-            $this->findOrCreatePaymentForPackageService->execute(
-                OrderPackage::where('order_id', $order->id)->first(),
-            );
+        $this->findOrCreatePaymentForPackageService->execute(
+            OrderPackage::where('order_id', $orders->id)->first(),
+        );
 
-            if ($amount < 0) {
-                $this->saveOrderPayment($order, $amount, $payIn, false);
-                continue;
-            }
+        if ($amount < 0) {
+            $this->saveOrderPayment($order, $amount, $payIn, false);
+        }
 
-            $amountOutstanding = $order->getOfferFinanceBilans($order);
+        $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
+        OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
 
-            if ($amount == 0 || $amountOutstanding == 0) {
-                continue;
-            }
+        $orderPayment = $this->saveOrderPayment($order, $amount, $payIn, $declaredSum);
 
-            $paymentAmount = min($amount, $amountOutstanding);
-
-            $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
-            OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
-
-            $orderPayment = $this->saveOrderPayment($order, $paymentAmount, $payIn, $declaredSum);
-
-            if ($orderPayment instanceof OrderPayment) {
-                $this->orderPaymentService->dispatchLabelsForPaymentAmount($orderPayment);
-            }
+        if ($orderPayment instanceof OrderPayment) {
+            $this->orderPaymentService->dispatchLabelsForPaymentAmount($orderPayment);
         }
     }
 

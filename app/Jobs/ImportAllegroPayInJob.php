@@ -220,7 +220,6 @@ final class ImportAllegroPayInJob implements ShouldQueue
      */
     private function settleOrder(Order $order, $payIn): void
     {
-        dd($payIn);
         $payIn['kwota'] = explode(" ", $payIn['kwota'])[0];
         Log::notice($payIn['kwota']);
 
