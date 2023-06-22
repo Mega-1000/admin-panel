@@ -73,7 +73,7 @@ class OrdersPaymentsController extends Controller
      * @return View
      * @var integer $id Order ID
      */
-    public function createMaster($id): View
+    public function createMaster(int $id): View
     {
         $order = $this->orderRepository->find($id);
         return view('orderPayments.master.create', compact('order'));
@@ -105,6 +105,7 @@ class OrdersPaymentsController extends Controller
         $allegro = new AllegroPaymentImporter(Storage::path('user-files/allegro-payments/') . $fileName);
         $errors = $allegro->import();
         Storage::delete('user-files/allegro-payments/' . $fileName);
+
         return redirect()->route('orders.index')->with(
             'allegro_payments_errors', $errors
         );
@@ -117,7 +118,7 @@ class OrdersPaymentsController extends Controller
      *
      * @return View
      */
-    public function edit(int $id): View
+    public function edit (int $id): View
     {
         $orderPayment = OrderPayment::findOrFail($id);
         $customerOrders = $orderPayment->order->customer->orders;
@@ -1585,7 +1586,7 @@ class OrdersPaymentsController extends Controller
 
         DB::table('order_payments_logs')->where('id', '>', 0)->delete();
         DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');
-        DB::statement('DELETE FROM order_payments WHERE id > 0 AND order_package_id IS NULL AND operation_type != "Zwrot towaru"');
+        DB::statement('DELETE FROM order_payments WHERE id > 0 AND order_package_id IS NULL AND operation_type != "Zwrot towaru" AND rebooked_order_payment_id IS NULL');
 
         return redirect()->route('payments.index')->with(['message' => 'Płatności poprawnie wyczyszczone', 'alert-type' => 'success']);
     }

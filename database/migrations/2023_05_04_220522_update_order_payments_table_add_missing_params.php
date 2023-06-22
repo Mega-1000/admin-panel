@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('order_payments', function (Blueprint $table) {
             $table->string('external_payment_id')->nullable()->comment('ID zewnetrznych płatności ( np allegro , bank itp  - nieobligatoryjne');
@@ -33,7 +33,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         //
     }
