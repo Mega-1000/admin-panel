@@ -31,37 +31,37 @@ class OrderBuilder
     /**
      * @var iDividable
      */
-    private iDividable $packageGenerator;
+    private $packageGenerator;
 
     /**
      * @var iOrderTotalPriceCalculator
      */
-    private iOrderTotalPriceCalculator $priceCalculator;
+    private $priceCalculator;
 
     /**
      * @var iOrderPriceOverrider
      */
-    private iOrderPriceOverrider $priceOverrider;
+    private $priceOverrider;
 
     /**
      * @var iSumable
      */
-    private iSumable $totalTransportSumCalculator;
+    private $totalTransportSumCalculator;
 
     /**
      * @var iGetUser
      */
-    private iGetUser $userSelector;
+    private $userSelector;
 
     /**
      * @var iPostOrderAction
      */
-    private iPostOrderAction $postOrderActions;
+    private $postOrderActions;
 
     /**
      * @var ProductService
      */
-    private ProductService $productService;
+    private $productService;
 
 
     public function setPackageGenerator(iDividable $generator): static
