@@ -19,7 +19,7 @@ class Courier extends Model
 
     protected $table = 'courier';
 
-    protected array $casts = [
+    protected $casts = [
         'id' => 'integer',
         'item_number' => 'integer',
         'active' => 'boolean'
@@ -31,7 +31,7 @@ class Courier extends Model
      * @var array
      */
 
-    protected array $fillable = [
+    protected $fillable = [
         'courier_name',
         'courier_key',
         'item_number',
