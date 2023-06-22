@@ -9,14 +9,11 @@ use App\Helpers\interfaces\iOrderPriceOverrider;
 
 class OrderPriceOverrider implements iOrderPriceOverrider
 {
-    private $overrides;
+    public function __construct(
+        private $overrides
+    ) {}
 
-    public function __construct($overrides)
-    {
-        $this->overrides = $overrides;
-    }
-
-    public function override(OrderItem $orderItem)
+    public function override(OrderItem $orderItem): OrderItem
     {
         $key = $orderItem->product_id;
         if ($orderItem->type == 'multiple') {
@@ -31,6 +28,7 @@ class OrderPriceOverrider implements iOrderPriceOverrider
                 $orderItem->$column = $prices[$column];
             }
         }
+
         return $orderItem;
     }
 }

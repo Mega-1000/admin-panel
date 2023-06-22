@@ -7,7 +7,6 @@ use App\Entities\Order;
 
 interface iOrderTotalPriceCalculator
 {
-    public function addItem($price, $quantity);
 
     public function getTotal();
 }

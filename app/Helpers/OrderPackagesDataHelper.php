@@ -10,11 +10,12 @@ namespace App\Helpers;
 use App\Entities\OrderPackage;
 use App\Entities\PackageTemplate;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 
 class OrderPackagesDataHelper extends DateHelper
 {
-    public function getData()
+    public function getData(): Collection
     {
         $deliveryTemplates = PackageTemplate::all();
         return $deliveryTemplates->sortBy('list_order');
@@ -36,7 +37,7 @@ class OrderPackagesDataHelper extends DateHelper
         return $this->nearestWorkingDay($now);
     }
 
-    public function calculateDeliveryDate($shipmentDate)
+    public function calculateDeliveryDate($shipmentDate): string
     {
         $date = Carbon::make($shipmentDate);
 

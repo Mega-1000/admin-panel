@@ -9,12 +9,17 @@ use Illuminate\Support\Facades\Hash;
 
 class GetCustomerForNewOrder implements iGetUser
 {
-    public function getCustomer($order, $data)
+    /**
+     * @throws Exception
+     */
+    public function getCustomer($order, $data): Customer
     {
-        $customer = $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
-        return $customer;
+        return $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
     }
 
+    /**
+     * @throws Exception
+     */
     private function getCustomerByLogin(string $login, string $pass): Customer
     {
         if (empty($login)) {

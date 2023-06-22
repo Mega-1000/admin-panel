@@ -24,7 +24,7 @@ class Helper
         '5' => 'storekeeper'
     ];
 
-    public static function checkRole($module, $field)
+    public static function checkRole($module, $field): true|string
     {
         $currentUser = Auth::user()->role_id;
         $roleName = self::USER_ROLE[$currentUser];
@@ -82,9 +82,9 @@ class Helper
         $number = str_replace('+48', '', $number);
 
         // Sprawdź, czy numer telefonu składa się tylko z cyfr 
-        if (!preg_match('/^\d+$/', $number)) 
+        if (!preg_match('/^\d+$/', $number))
         {
-            return false; 
+            return false;
         }
 
         $len = strlen($number);

@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 use App\Entities\PackageTemplate;
+use Exception;
 
 class Palette
 {
@@ -30,23 +31,29 @@ class Palette
         $this->setType(self::PALETTE_100);
     }
 
-    public function addItem($package)
+    /**
+     * @param $package
+     * @return void
+     * @throws Exception
+     */
+    public function addItem($package): void
     {
         if ($this->canPutNewItem($package)) {
             $this->packagesList->push($package);
-        } else {
-            throw new \Exception(self::CAN_NOT_ADD_MORE);
+            return;
         }
+
+        throw new Exception(self::CAN_NOT_ADD_MORE);
     }
 
-    public function canPutNewItem(Package $package)
+    public function canPutNewItem(Package $package): bool
     {
         $currentCarry = $this->getCarry();
         return ($currentCarry['volume'] + $package->getTotalVolume()) < self::PALETTE_100_VOLUME
             && ($currentCarry['weight'] + $package->getTotalWeight()) < self::PALETTE_100_WEIGHT;
     }
 
-    public function tryFitInSmallerPalette()
+    public function tryFitInSmallerPalette(): void
     {
         $carry = $this->getCarry();
         $canFitInSmaller = $carry['volume'] < self::PALETTE_80_VOLUME && $carry['weight'] < self::PALETTE_80_WEIGHT;
@@ -55,7 +62,8 @@ class Palette
         }
     }
 
-    private function setType($type) {
+    private function setType($type): void
+    {
         switch ($type) {
             case self::PALETTE_80:
                 $this->type = self::PALETTE_80;
@@ -69,7 +77,6 @@ class Palette
         }
         $packageTemplate = PackageTemplate::where('symbol', strtolower($this->type))->firstOrFail();
         $this->displayed_name = $packageTemplate->displayed_name ?: $this->type;
-
     }
     private function getCarry()
     {
@@ -80,7 +87,7 @@ class Palette
         }, ['weight' => 0, 'volume' => 0]);
     }
 
-    public function setPackageCost()
+    public function setPackageCost(): void
     {
         $this->packagesCost =  $this->packagesList->reduce(function ($carry, Package $next) {
            return $carry + $next->price;

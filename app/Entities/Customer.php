@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
@@ -42,14 +43,14 @@ class Customer extends Authenticatable implements Transformable
     protected $hidden = ['password', 'remember_token'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function addresses()
+    public function addresses(): HasMany
     {
         return $this->hasMany(CustomerAddress::class);
     }
 
-    public function standardAddress(): CustomerAddress
+    public function standardAddress(): Model
     {
         /** @var ?CustomerAddress $standardAddress */
         $standardAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_STANDARD)->first();
@@ -61,7 +62,7 @@ class Customer extends Authenticatable implements Transformable
         return $standardAddress;
     }
 
-    public function deliveryAddress(): CustomerAddress
+    public function deliveryAddress(): Model
     {
         /** @var CustomerAddress $deliveryAddress */
         $deliveryAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_DELIVERY)->first();
@@ -73,7 +74,7 @@ class Customer extends Authenticatable implements Transformable
         return $deliveryAddress;
     }
 
-    public function invoiceAddress(): ?CustomerAddress
+    public function invoiceAddress(): Model
     {
         /** @var CustomerAddress $invoiceAddress */
         $invoiceAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_INVOICE)->first();
@@ -125,12 +126,13 @@ class Customer extends Authenticatable implements Transformable
     /**
      * @throws Exception
      */
-    public function generatePassword($pass)
+    public function generatePassword($pass): string
     {
         $pass = preg_replace('/[^0-9]/', '', $pass);
         if (strlen($pass) < 9) {
             throw new Exception('wrong_phone');
         }
+
         return Hash::make($pass);
     }
 

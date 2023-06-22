@@ -17,7 +17,7 @@ class Firm extends Model implements Transformable
 {
     use TransformableTrait;
 
-    public $customColumnsVisibilities = [
+    public array $customColumnsVisibilities = [
         'name',
         'short_name',
         'symbol',
@@ -99,7 +99,7 @@ class Firm extends Model implements Transformable
     /**
      * @return HasOne
      */
-    public function deliveryWarehouse()
+    public function deliveryWarehouse(): HasOne
     {
         return $this->hasOne(Warehouse::class, 'delivery_warehouse_id');
     }
@@ -107,7 +107,7 @@ class Firm extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function firmSources()
+    public function firmSources(): HasMany
     {
         return $this->hasMany(FirmSource::class);
     }

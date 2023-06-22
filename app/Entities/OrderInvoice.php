@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -28,9 +29,9 @@ class OrderInvoice extends Model implements Transformable
 
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function order()
+    public function order(): BelongsToMany
     {
         return $this->belongsToMany(Order::class, 'order_order_invoices', 'invoice_id', 'order_id');
     }

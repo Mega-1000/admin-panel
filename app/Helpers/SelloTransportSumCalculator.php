@@ -8,14 +8,9 @@ use App\Helpers\interfaces\iSumable;
 
 class SelloTransportSumCalculator implements iSumable
 {
+    private float $transportPrice;
 
-    private $transportPrice;
-
-    public function __construct()
-    {
-    }
-
-    public function getSum($order)
+    public function getSum($order): float
     {
         return $this->transportPrice;
     }

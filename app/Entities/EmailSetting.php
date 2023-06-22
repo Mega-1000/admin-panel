@@ -35,7 +35,8 @@ class EmailSetting extends Model
         'content'
     ];
 
-    public function getStatusUserFriendlyName(): string {
+    public function getStatusUserFriendlyName(): string
+    {
         return EmailSettingsEnum::fromKey( $this->status );
     }
 }

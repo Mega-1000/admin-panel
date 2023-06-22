@@ -6,6 +6,7 @@ namespace App\Entities;
 
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
+use BenSampo\Enum\Exceptions\InvalidEnumMemberException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -89,11 +90,17 @@ class DelivererImportRule extends Model
         'condition_value',
     ];
 
+    /**
+     * @throws InvalidEnumMemberException
+     */
     public function getAction(): DelivererRulesActionEnum
     {
         return new DelivererRulesActionEnum($this->action);
     }
 
+    /**
+     * @throws InvalidEnumMemberException
+     */
     public function getColumnName(): DelivererRulesColumnNameEnum
     {
         return new DelivererRulesColumnNameEnum($this->db_column_name);

@@ -19,14 +19,14 @@ class PackageDivider implements iPackageDivider
         $this->itemList = $itemList;
     }
 
-    public function divide()
+    public function divide(): array
     {
         $sorted = $this->groupByPackageType();
         $parcels = $this->divideToParcels($sorted);
         return $this->divideToPalette($parcels);
     }
 
-    private function groupByPackageType()
+    private function groupByPackageType(): array
     {
         $warehouses = [];
         foreach ($this->itemList as $product) {
@@ -55,10 +55,10 @@ class PackageDivider implements iPackageDivider
         return $warehouses;
     }
 
-    private function divideToParcels($sorted)
+    private function divideToParcels($sorted): array
     {
         $divided = [];
-        $notCalculated = isset($sorted[self::NOT_CALCULABLE]) ? $sorted[self::NOT_CALCULABLE] : [];
+        $notCalculated = $sorted[self::NOT_CALCULABLE] ?? [];
         unset($sorted[self::NOT_CALCULABLE]);
         $transportCalculations = [];
         foreach ($sorted as $key => $items) {
@@ -90,11 +90,11 @@ class PackageDivider implements iPackageDivider
             $totalPacks = array_merge($divided, $totalPacks);
         }
         return ['packages' => array_values($totalPacks),
-            'transport_groups' => isset($transportCalculations['calculated']) ? $transportCalculations['calculated'] : [],
+            'transport_groups' => $transportCalculations['calculated'] ?? [],
             'not_calculated' => array_merge($notCalculated, $failed)];
     }
 
-    private function calculateTransportGroups($sorted)
+    private function calculateTransportGroups($sorted): array
     {
         $sums = [];
         foreach ($sorted as $key => $group) {

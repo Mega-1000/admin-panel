@@ -2,7 +2,6 @@
 
 namespace App\Entities;
 
-use Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -23,7 +22,7 @@ class ColumnVisibility extends Model
      * @param $module_id
      * @return mixed
      */
-    public static function getVisibilities($module_id)
+    public static function getVisibilities($module_id): mixed
     {
         return self::where([['module_id', $module_id], ['role_id', Auth::user()->role_id]])->get();
     }

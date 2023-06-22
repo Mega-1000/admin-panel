@@ -23,7 +23,7 @@ class Payment extends Model implements Transformable
     ];
 
 
-    public function getOrdersUsingPayment()
+    public function getOrdersUsingPayment(): array
     {
         $orderPayments = DB::table('order_payments')->where('master_payment_id', '=', $this->id)->get();
 
@@ -31,12 +31,13 @@ class Payment extends Model implements Transformable
 
         foreach($orderPayments as $orderPayment)
         {
-            if(array_key_exists($orderPayment->order_id, $orders)) {
+            if (array_key_exists($orderPayment->order_id, $orders)) {
                 $orders[$orderPayment->order_id] = (float)$orders[$orderPayment->order_id] + (float)$orderPayment->amount;
-            } else {
-                $orders[$orderPayment->order_id] = (float)$orderPayment->amount;
+
+                continue;
             }
 
+            $orders[$orderPayment->order_id] = (float)$orderPayment->amount;
         }
 
         return $orders;

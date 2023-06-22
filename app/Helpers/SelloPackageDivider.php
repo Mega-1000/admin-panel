@@ -6,6 +6,7 @@ use App\Entities\Order;
 use App\Entities\PackageTemplate;
 use App\Entities\ProductPacking;
 use App\Helpers\interfaces\iDividable;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class SelloPackageDivider implements iDividable
@@ -17,7 +18,10 @@ class SelloPackageDivider implements iDividable
     const TEMPLATE_IDS_FOR_PACZKOMAT = [self::TEMPLATE_PACZKOMAT_A, self::TEMPLATE_PACZKOMAT_B, self::TEMPLATE_PACZKOMAT_C];
     private $transactionList;
 
-    public function divide($data, Order $order)
+    /**
+     * @throws Exception
+     */
+    public function divide($data, Order $order): false
     {
         $this->divideForTransaction($data, $order, $this->transactionList[0]);
 
@@ -28,6 +32,7 @@ class SelloPackageDivider implements iDividable
      * @param $items
      * @param Order $order
      * @param $transaction
+     * @throws Exception
      */
     private function divideForTransaction($items, Order $order, $transaction)
     {
@@ -46,8 +51,9 @@ class SelloPackageDivider implements iDividable
     /**
      * @param $items
      * @param $transaction
+     * @return false
      */
-    private function findProductInData($items, $transaction)
+    private function findProductInData($items, $transaction): false
     {
         $data = false;
         foreach ($items as $product) {
@@ -58,27 +64,30 @@ class SelloPackageDivider implements iDividable
                 $data = $product;
             }
         }
+
         return $data;
     }
 
     /**
      * @param $transaction
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    private function prepareTemplate($transaction)
+    private function prepareTemplate($transaction): mixed
     {
         if (empty($transaction->tr_DelivererId) || empty($transaction->tr_DeliveryId)) {
-            throw new \Exception('Brak powiązanego szablonu z sello id: ' . $transaction->id);
+            throw new Exception('Brak powiązanego szablonu z sello id: ' . $transaction->id);
         }
+
         try {
             $template = PackageTemplate::where('sello_delivery_id', $transaction->tr_DeliveryId)
                 ->where('sello_deliverer_id', $transaction->tr_DelivererId)
                 ->firstOrFail();
-        } catch (\Exception $e) {
-            throw new \Exception('Import Sello: Nie znaleziono szablonu sello id:'
+        } catch (Exception $e) {
+            throw new Exception('Import Sello: Nie znaleziono szablonu sello id:'
                 . $transaction->id . ' deliverer id:' . $transaction->tr_DelivererId . ' delivery id:' . $transaction->tr_DeliveryId);
         }
+
         return $template;
     }
 
@@ -107,6 +116,7 @@ class SelloPackageDivider implements iDividable
         if (!$template) {
             Log::error("Brak szablonu paczki lub błędny numer id: $templateName : o ID $selectedTemplateId");
         }
+
         return array($quantity, $template);
     }
 
@@ -114,5 +124,4 @@ class SelloPackageDivider implements iDividable
     {
         $this->transactionList = $group;
     }
-
 }

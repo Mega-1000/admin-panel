@@ -8,13 +8,13 @@ class ChimneyProduct extends Model
 {
     public $fillable = ['product_code', 'formula', 'column_number', 'optional'];
 
-    public function category()
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo('App\Entities\Category');
+        return $this->belongsTo(Category::class);
     }
 
     public function replacements()
     {
-        return $this->hasMany('App\Entities\ChimneyReplacement');
+        return $this->hasMany(ChimneyReplacement::class);
     }
 }

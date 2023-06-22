@@ -6,7 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateChatsTables extends DatabaseRelations
 {
-    protected $relations = [
+    protected array $relations = [
         'chats' => ['product' => ['nullable' => true], 'order' => ['nullable' => true], 'employee' => ['nullable' => true]],
         'messages' => ['chat_user' => ['table' => 'chat_user'], 'chat'],
         'chat_user' => ['chat', 'user' => ['nullable' => true], 'employee' => ['nullable' => true], 'customer' => ['nullable' => true]]

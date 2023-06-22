@@ -66,6 +66,7 @@ class BackPackPackageDivider implements iDividable
         } else {
             $date = $helper->calculateShipmentDate(9, 9);
         }
+
         $pack->shipment_date = $date;
         $pack->cost_for_client = $packTemplate->approx_cost_client;
         $pack->quantity = 1;
@@ -74,6 +75,7 @@ class BackPackPackageDivider implements iDividable
         $pack->packing_type = $packTemplate->packing_type;
         $pack->shape = $packTemplate->shape;
         $pack->save();
+
         return $pack;
     }
 

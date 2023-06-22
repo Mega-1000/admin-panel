@@ -112,7 +112,7 @@
 
                     <div class="d-flex">
                         Powiadamiaj mnie w przypadku przebicia najniższej ceny:
-                        <input type="checkbox" name="send_notification" value="true" {{ $product->current_firm_offers->send_notification ? 'checked' : '' }}>
+                        <input type="checkbox" name="send_notification" value="true" {{ $product->current_firm_offers?->send_notification ? 'checked' : '' }}>
                     </div>
 
                     <button type="submit">aktualizuj</button>

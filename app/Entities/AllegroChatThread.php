@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
 * Class Order.
@@ -34,7 +35,8 @@ class AllegroChatThread extends Model
         'updated_at',
     ];
 
-    public function user() {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 }

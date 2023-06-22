@@ -10,7 +10,7 @@ class OrdersHelper {
      * @param $order
      * @return mixed
      */
-    public static function findSimilarOrders($order)
+    public static function findSimilarOrders($order): mixed
     {
         $notSentYetLabel = Label::NOT_SENT_YET_LABELS_IDS;
         $batteryId = Label::ORDER_ITEMS_REDEEMED_LABEL;
@@ -38,6 +38,7 @@ class OrdersHelper {
                 return $acu;
             }, []);
         }
+
         return $similar ?? [];
     }
 }

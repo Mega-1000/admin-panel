@@ -8,7 +8,6 @@ use Carbon\Carbon;
 
 class TaskTimeHelper
 {
-
     public static function getFirstAvailableTime(int $duration, array $data = [])
     {
         if (count($data) === 0) {

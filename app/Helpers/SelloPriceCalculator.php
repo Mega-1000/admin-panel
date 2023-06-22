@@ -6,13 +6,8 @@ use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 
 class SelloPriceCalculator implements iOrderTotalPriceCalculator
 {
-    private $total = 0;
+    private int $total = 0;
     private $products;
-
-    public function addItem($price, $quantity)
-    {
-        //stub
-    }
 
     public function getTotal()
     {

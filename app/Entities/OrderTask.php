@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -25,28 +26,28 @@ class OrderTask extends Model implements Transformable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function employee()
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }
 
-    public $customColumnsVisibilities = [
-            'description',
-            'title' ,
-            'show_label_at' ,
-            'status' ,
-            'created_at',
-            'closed',
-            'open',
-            ];
+    public array $customColumnsVisibilities = [
+        'description',
+        'title' ,
+        'show_label_at' ,
+        'status' ,
+        'created_at',
+        'closed',
+        'open',
+    ];
 }

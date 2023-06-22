@@ -28,7 +28,7 @@ class Employee extends Model implements Transformable
         'firm_id', 'warehouse_id', 'email', 'firstname', 'lastname', 'phone', 'job_position', 'comments', 'additional_comments', 'postal_code', 'status'
     ];
 
-    public $customColumnsVisibilities = [
+    public array $customColumnsVisibilities = [
         'firstname',
         'lastname' ,
         'email' ,
@@ -86,7 +86,7 @@ class Employee extends Model implements Transformable
     }
 
 
-    public function chats()
+    public function chats(): BelongsToMany
     {
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }

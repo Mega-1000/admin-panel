@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CustomPageCategory extends Model
 {
@@ -18,13 +19,13 @@ class CustomPageCategory extends Model
         return $query->whereNull('parent_id');
     }
 
-    public function childrens()
+    public function childrens(): HasMany
     {
-        return $this->hasMany('App\Entities\CustomPageCategory', 'parent_id', 'id');
+        return $this->hasMany(CustomPageCategory::class, 'parent_id', 'id');
     }
 
-    public function pages()
+    public function pages(): HasMany
     {
-        return $this->hasMany('App\Entities\CustomPage', 'category_id', 'id');
+        return $this->hasMany(CustomPage::class, 'category_id', 'id');
     }
 }

@@ -13,13 +13,13 @@ use App\Services\OrderPaymentService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
-class AllegroPaymentImporter
+readonly class AllegroPaymentImporter
 {
     const DATE_COLUMN_NUMBER = 0;
     const AMOUNT_COLUMN_NUMBER = 8;
     const ID_COLUMN_NUMBER = 2;
     public function __construct(
-        private $filename
+        private string $filename,
     ) {}
 
     /**
@@ -55,6 +55,7 @@ class AllegroPaymentImporter
             }
         }
         fclose($handle);
+
         return $errors;
     }
 
@@ -64,7 +65,6 @@ class AllegroPaymentImporter
      */
     private function payForOrder(?array $line): void
     {
-        $date = $line[self::DATE_COLUMN_NUMBER];
         $amount = explode(" ", $line[self::AMOUNT_COLUMN_NUMBER])[0];
         $id = $line[self::ID_COLUMN_NUMBER];
 
@@ -77,9 +77,9 @@ class AllegroPaymentImporter
             throw new Exception(json_encode(['id' => $id, 'amount' => $amount]), 1);
         }
         $order = $transaction->order;
-        if (empty($order)) {
-            throw new Exception(json_encode(['id' => $id, 'amount' => $amount]), 2);
-        }
+
+        Order::findOrfail($id);
+
         $payment = $order->promisePayments();
         $found = $payment->filter(function ($item) use ($amount) {
             return abs($item->amount - $amount) < 2;

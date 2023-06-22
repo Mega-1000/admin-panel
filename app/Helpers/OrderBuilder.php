@@ -41,12 +41,12 @@ class OrderBuilder
     /**
      * @var iOrderPriceOverrider
      */
-    private $priceOverrider;
+    private iOrderPriceOverrider $priceOverrider;
 
     /**
      * @var iSumable
      */
-    private $totalTransportSumCalculator;
+    private iSumable $totalTransportSumCalculator;
 
     /**
      * @var iGetUser
@@ -56,12 +56,12 @@ class OrderBuilder
     /**
      * @var iPostOrderAction
      */
-    private $postOrderActions;
+    private iPostOrderAction $postOrderActions;
 
     /**
      * @var ProductService
      */
-    private $productService;
+    private ProductService $productService;
 
 
     public function setPackageGenerator(iDividable $generator): static
@@ -339,7 +339,6 @@ class OrderBuilder
             }
 
             unset($orderItem->type);
-            $this->priceCalculator->addItem($product->price->gross_price_of_packing, $orderItem->quantity);
 
             $order->items()->save($orderItem);
 

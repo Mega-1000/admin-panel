@@ -61,6 +61,8 @@ class ChatHelper
      */
     public static function formatChatUser(Employee|Customer|User $chatUser, string $userType): string
     {
+        $userData = '';
+
         if ($userType == MessagesHelper::TYPE_EMPLOYEE) {
             $firstname = $chatUser->firstname_visibility ? $chatUser->firstname : '';
             $lastname  = $chatUser->lastname_visibility ? $chatUser->lastname : '';
@@ -81,7 +83,7 @@ class ChatHelper
         return $userData;
     }
 
-    public static function getMessageHeader($message)
+    public static function getMessageHeader($message): string
     {
         $header = '';
         if ($message->chatUser->customer) {
@@ -100,6 +102,7 @@ class ChatHelper
             $header .= self::formatEmailAndPhone($message->chatUser->user->email, $message->chatUser->user->phone);
             $header .= ':';
         }
+
         return $header;
     }
 
@@ -113,11 +116,10 @@ class ChatHelper
         $token = $helper->encrypt();
         return $employee->employeeRoles->where('is_contact_displayed_in_fronted', 1)
             ->map(function ($role) use ($token) {
-                $button = [
+                return [
                     'description' => $role->name,
                     'url' => route('chat.show', ['token' => $token])
                 ];
-                return $button;
             })->toArray();
     }
 
@@ -143,6 +145,7 @@ class ChatHelper
             $key = $product->getProducent();
             $orderButtons[$key] = $buttons;
         }
+
         return $orderButtons;
     }
 }

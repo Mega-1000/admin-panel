@@ -8,7 +8,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class DatabaseRelations extends Migration
 {
-    protected $relations = [];
+    protected array $relations = [];
 
     public function upRelations()
     {
@@ -35,7 +35,7 @@ class DatabaseRelations extends Migration
      *
      * @return void
      */
-    public function downRelations()
+    public function downRelations(): void
     {
         foreach ($this->getRelations() as $tableName => $columns) {
             Schema::table($tableName, function (Blueprint $table) use ($columns) {
