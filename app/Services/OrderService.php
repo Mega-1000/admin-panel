@@ -215,7 +215,6 @@ class OrderService
             ]);
 
             $item = $order->items()->first();
-            $item->gross_purchase_price_commercial_unit = $fromRequest->getPurchaseValue();
             $item->save();
         });
 
