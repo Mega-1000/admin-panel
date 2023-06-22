@@ -15,16 +15,13 @@ class DelivererImportLogger
     public const FILE_LOG_EXTENSION = 'xlsx';
 
     /* @var $logger Logger */
-    private $logger;
-
-    private $delivererImportLogService;
+    private Logger $logger;
 
     private $logFileName;
 
-    public function __construct(DelivererImportLogService $delivererImportLogService)
-    {
-        $this->delivererImportLogService = $delivererImportLogService;
-    }
+    public function __construct(
+        protected DelivererImportLogService $delivererImportLogService
+    ) {}
 
     public function setLogFileName(string $fileName): void
     {

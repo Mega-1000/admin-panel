@@ -10,7 +10,7 @@ class DelivererImportRulesColumnNumberVO
 
     private const MAX_COLUMN_NUMBER = 20;
 
-    private $columnNumber;
+    private int $columnNumber;
 
     public function __construct(int $columnNumber)
     {

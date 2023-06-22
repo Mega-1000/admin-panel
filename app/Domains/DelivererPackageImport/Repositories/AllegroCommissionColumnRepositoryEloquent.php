@@ -12,12 +12,9 @@ use Illuminate\Support\Collection;
 
 class AllegroCommissionColumnRepositoryEloquent implements DelivererImportRuleColumnRepositoryInterface
 {
-    private $orderAllegroCommissionRepositoryEloquent;
-
-    public function __construct(OrderAllegroCommissionRepositoryEloquent $orderAllegroCommissionRepositoryEloquent)
-    {
-        $this->orderAllegroCommissionRepositoryEloquent = $orderAllegroCommissionRepositoryEloquent;
-    }
+    public function __construct(
+        protected OrderAllegroCommissionRepositoryEloquent $orderAllegroCommissionRepositoryEloquent
+    ) {}
 
     public function findOrder($valueToSearch): ?Collection
     {

@@ -10,14 +10,11 @@ use App\Entities\Order;
 use App\Repositories\OrderRepositoryEloquent;
 use Illuminate\Support\Collection;
 
-class AllegroAdditionalServiceColumnRepositoryEloquent implements DelivererImportRuleColumnRepositoryInterface
+readonly class AllegroAdditionalServiceColumnRepositoryEloquent implements DelivererImportRuleColumnRepositoryInterface
 {
-    private $orderRepositoryEloquent;
-
-    public function __construct(OrderRepositoryEloquent $orderRepositoryEloquent)
-    {
-        $this->orderRepositoryEloquent = $orderRepositoryEloquent;
-    }
+    public function __construct(
+        private OrderRepositoryEloquent $orderRepositoryEloquent
+    ) {}
 
     public function findOrder($valueToSearch): ?Collection
     {

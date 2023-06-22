@@ -159,33 +159,6 @@ final class ImportAllegroPayInJob implements ShouldQueue
     }
 
     /**
-     * Tworzy transakcje przeksięgowania
-     *
-     * @param Order $order
-     * @param Transaction $transaction
-     * @param float $amount
-     * @return Transaction
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function saveRefund(Order $order, Transaction $transaction, float $amount): Transaction
-    {
-        return $this->transactionRepository->create([
-            'customer_id' => $order->customer_id,
-            'posted_in_system_date' => new DateTime(),
-            'payment_id' => str_replace('w-', 'z-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date,
-            'kind_of_operation' => 'przeksięgowanie zwrotne',
-            'order_id' => $order->id,
-            'operator' => 'SYSTEM',
-            'operation_value' => abs($amount),
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) + abs($amount),
-            'accounting_notes' => '',
-            'transaction_notes' => '',
-            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
-        ]);
-    }
-
-    /**
      * Calculate balance
      *
      * @param integer $customerId Customer id
@@ -199,9 +172,9 @@ final class ImportAllegroPayInJob implements ShouldQueue
             ['customer_id', '=', $customerId]
         ])->last())) {
             return $lastCustomerTransaction->balance;
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     /**
@@ -217,10 +190,11 @@ final class ImportAllegroPayInJob implements ShouldQueue
         foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
             if ($payIn['kwota'] === (float)$payment->amount) {
                 $payment->delete();
-            } else {
-                $preventionArray = [];
-                AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()?->id);
+                continue;
             }
+
+            $preventionArray = [];
+            AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()?->id);
         }
     }
 
@@ -246,6 +220,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
      */
     private function settleOrder(Order $order, $payIn): void
     {
+        dd($payIn);
         $payIn['kwota'] = explode(" ", $payIn['kwota'])[0];
         Log::notice($payIn['kwota']);
 
