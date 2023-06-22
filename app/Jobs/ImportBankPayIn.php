@@ -356,6 +356,7 @@ class ImportBankPayIn implements ShouldQueue
 
         if ($amount < 0) {
             $this->saveOrderPayment($order, $amount, $payIn, false);
+            return;
         }
 
         $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
