@@ -45,9 +45,7 @@ class ProductStocksController extends Controller
         protected readonly ProductStockLogRepository      $productStockLogRepository,
         protected readonly ProductService                 $productService,
         protected readonly OrderService                   $orderService
-    )
-    {
-    }
+    ) {}
 
     /**
      * @return \Illuminate\Contracts\View\View|Application|Factory
