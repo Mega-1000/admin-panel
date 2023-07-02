@@ -212,7 +212,8 @@ class ImportBankPayIn implements ShouldQueue
 
         $patterns = [
             '/[qQ][qQ](\d{3,5})[qQ][qQ]/',
-            '/[zZ][zZ](\d{3,5})[zZ][zZ]/'
+            '/[zZ][zZ](\d{3,5})[zZ][zZ]/',
+            '/[yY][yY](\d{3,5})[yY][yY]/',
         ];
 
         foreach ($patterns as $pattern) {
