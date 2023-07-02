@@ -424,7 +424,10 @@ class ProductStocksController extends Controller
      */
     public function storeTWSOAdminOrders(StoreTWSOAdminOrdersRequest $request, ProductService $productService): RedirectResponse
     {
-        $order = $this->orderService->createTWSOUrders(CreateTWSOUrdersDTO::fromRequest($request->validated()), $productService);
+        $order = $this->orderService->createTWSOOrders(
+            CreateTWSOOrdersDTO::fromRequest($request->validated()),
+            $productService
+        );
 
         return redirect()->route('orders.edit', $order)->with([
             'message' => 'Zamówienie zostało utworzone',
