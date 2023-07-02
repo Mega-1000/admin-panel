@@ -53,13 +53,13 @@ class OrderReturnController extends Controller
         foreach($request->return as $v => $return){
             if ($return['sum_of_return']) {
                 $order = Order::find($request->get('order_id'));
-                dd($order);
-                OrderPayment::create([
+
+                dd(OrderPayment::create([
                     'amount' => $return['sum_of_return'] * -1,
                     'order_id' => $order->id,
                     'operation_type' => 'Zwrot towaru',
                     'payer' => $order->customer->login,
-                ]);
+                ]));
             }
 
             if($return['check'] > 0){
