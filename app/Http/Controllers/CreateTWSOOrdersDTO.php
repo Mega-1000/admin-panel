@@ -1,17 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
-readonly class CreateTWSOUrdersDTO
+readonly class CreateTWSOOrdersDTO
 {
     public function __construct(
         protected string $warehousesSymbols,
         protected string $clientEmail,
         protected float $purchaseValue,
-        protected string $consultantDescription,
-    )
-    {
-    }
+        protected ?string $consultantDescription,
+    ) {}
 
     public static function fromRequest(array $request): self
     {
