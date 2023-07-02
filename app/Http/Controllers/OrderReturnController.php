@@ -8,6 +8,7 @@ use App\Entities\OrderReturn;
 use App\Entities\ProductStock;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\OrdersHelper;
+use App\Services\Label\AddLabelService;
 use App\Services\OrderReturnService;
 use App\User;
 use Illuminate\Http\Request;
@@ -54,12 +55,15 @@ class OrderReturnController extends Controller
             if ($return['sum_of_return']) {
                 $order = Order::find($request->get('order_id'));
 
-                dd(OrderPayment::create([
+                OrderPayment::create([
                     'amount' => $return['sum_of_return'] * -1,
                     'order_id' => $order->id,
                     'operation_type' => 'Zwrot towaru',
                     'payer' => $order->customer->login,
-                ]));
+                ]);
+                $arr = [];
+
+                AddLabelService::addLabels($order, [229], $arr, [], Auth::user()?->id);
             }
 
             if($return['check'] > 0){
