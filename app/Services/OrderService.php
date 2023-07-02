@@ -16,7 +16,7 @@ use App\Enums\OrderPaymentsEnum;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
-use App\Http\Controllers\CreateTWSOUrdersDTO;
+use App\Http\Controllers\CreateTWSOOrdersDTO;
 use App\Repositories\Customers;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderPayments;
@@ -188,7 +188,7 @@ class OrderService
         });
     }
 
-    public function createTWSOUrders(CreateTWSOUrdersDTO $fromRequest, ProductService $productService): string
+    public function createTWSOOrders(CreateTWSOOrdersDTO $fromRequest, ProductService $productService): string
     {
         $customer = Customers::getFirstCustomerWithLogin($fromRequest->getClientEmail());
 
