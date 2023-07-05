@@ -5,13 +5,12 @@
     function showHide() {
         setTimeout(() => {
             let elements = document.getElementsByClassName('hidden');
-            // convert HTMLCollection to array
-            console.log(elements)
+
             elements = Array.from(elements);
-            console.log(elements)
+
             for (let i = 0; i < elements.length; i++) {
                 elements[i].classList.remove('hidden');
-                console.log(elements[i])
+                console.log(elements[i] )
             }
         }, 1000)
     }
