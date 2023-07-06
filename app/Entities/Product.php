@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -176,9 +177,9 @@ class Product extends Model implements Transformable
     ];
 
     /**
-     * @return BelongsToMany
+     * @return BelongsTo
      */
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
@@ -186,7 +187,7 @@ class Product extends Model implements Transformable
     /**
      * @return HasOne
      */
-    public function packing()
+    public function packing(): HasOne
     {
         return $this->hasOne(ProductPacking::class);
     }
@@ -194,7 +195,7 @@ class Product extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function photos()
+    public function photos(): HasMany
     {
         return $this->hasMany(ProductPhoto::class);
     }
@@ -202,7 +203,7 @@ class Product extends Model implements Transformable
     /**
      * @return HasOne
      */
-    public function price()
+    public function price(): HasOne
     {
         return $this->hasOne(ProductPrice::class);
     }
@@ -218,32 +219,32 @@ class Product extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function orderItems()
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function parentProduct()
+    public function parentProduct(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id', 'id');
     }
 
-    public function media()
+    public function media(): HasMany
     {
         return $this->hasMany(ProductMedia::class);
     }
 
-    public function tradeGroups()
+    public function tradeGroups(): HasMany
     {
         return $this->hasMany(ProductTradeGroup::class);
     }
 
-    public function children()
+    public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
-    public function firm()
+    public function firm(): BelongsTo
     {
         return $this->belongsTo(Firm::class, 'product_name_supplier', 'symbol');
     }
@@ -251,17 +252,17 @@ class Product extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function productAnalyzer()
+    public function productAnalyzer(): HasMany
     {
         return $this->hasMany(ProductAnalyzer::class);
     }
 
-    public function isInTransportGroup()
+    public function isInTransportGroup(): bool
     {
         return $this->tradeGroups()->count() > 0;
     }
 
-    public function hasAllTransportParameters()
+    public function hasAllTransportParameters(): bool
     {
         return $this->packing->warehouse && $this->packing->recommended_courier && $this->packing->packing_name;
     }
@@ -281,14 +282,22 @@ class Product extends Model implements Transformable
         return $this->producent_override ?? $this->product_name_supplier;
     }
 
-    public function getPositions()
+    public function getPositions(): \Illuminate\Database\Eloquent\Collection
     {
         return $this->stock->position;
     }
 
-    public function getSimpleSymbol()
+    public function getSimpleSymbol(): string
     {
         $rawSymbol = explode('-', $this->symbol);
         return $rawSymbol[0];
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function discounts(): HasMany
+    {
+        return $this->hasMany(Discount::class);
     }
 }

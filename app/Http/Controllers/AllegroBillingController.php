@@ -15,7 +15,7 @@ class AllegroBillingController
     public function index(): View
     {
         return view('allegro-billing.index', [
-                'expenses' => AllegroGeneralExpense::paginate(30),
-            ]);
+            'expenses' => AllegroGeneralExpense::paginate(30),
+        ]);
     }
 }

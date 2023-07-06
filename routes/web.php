@@ -615,6 +615,8 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::post('/allegro-billing', ImportAllegroBillingController::class)->name('import-allegro-billing');
     Route::get('/allegro-billing', [AllegroBillingController::class, 'index']);
+
+    Route::group([], __DIR__ . '/web/DiscountRoutes.php');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

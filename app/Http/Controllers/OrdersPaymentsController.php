@@ -1368,7 +1368,7 @@ class OrdersPaymentsController extends Controller
     {
         $orderPayment = OrderPayment::find($id);
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        §
         $deleted = OrderPayment::find($id)->delete();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 

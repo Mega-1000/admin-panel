@@ -3,7 +3,9 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * Class Category.
@@ -44,29 +46,36 @@ class Category extends Model
     /**
      * @return HasMany
      */
-    public function products()
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
 
-    public function chimneyAttributes()
+    public function chimneyAttributes(): HasMany
     {
-        return $this->hasMany('App\Entities\ChimneyAttribute');
+        return $this->hasMany(ChimneyAttribute::class);
     }
 
-    public function chimneyProducts()
+    public function chimneyProducts(): HasMany
     {
-        return $this->hasMany('App\Entities\ChimneyProduct');
+        return $this->hasMany(ChimneyProduct::class);
     }
 
-    public function parentCategory()
+    public function parentCategory(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id', 'id');
     }
 
-    public function children()
+    public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
+    public function discounts(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Discount::class,
+            Product::class
+        );
+    }
 }
