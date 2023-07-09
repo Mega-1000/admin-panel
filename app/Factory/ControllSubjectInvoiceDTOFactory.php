@@ -57,6 +57,8 @@ class ControllSubjectInvoiceDTOFactory
 
         $dtos = [];
 
+        $csvData['value'] = str_replace(' ', '', $csvData['value']);
+
         foreach ($csvData as $row) {
             $mappedData = self::mapDataToDTOColumns(array_combine($headers, $row));
             $dtos[] = new ControllSubjectInvoiceDTO($mappedData);
