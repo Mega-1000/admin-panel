@@ -11,6 +11,7 @@ use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
+use App\Helpers\MessagesHelper;
 use App\Http\Requests\CalculateAdminOrderRequest;
 use App\Http\Requests\CalculateMultipleAdminOrder;
 use App\Http\Requests\CreateAdminOrderRequest;
@@ -420,13 +421,19 @@ class ProductStocksController extends Controller
      *
      * @param StoreTWSOAdminOrdersRequest $request
      * @param ProductService $productService
+     * @param MessagesHelper $messagesHelper
      * @return RedirectResponse
      */
-    public function storeTWSOAdminOrders(StoreTWSOAdminOrdersRequest $request, ProductService $productService): RedirectResponse
+    public function storeTWSOAdminOrders(
+        StoreTWSOAdminOrdersRequest $request,
+        ProductService $productService,
+        MessagesHelper $messagesHelper
+    ): RedirectResponse
     {
         $this->orderService->createTWSOOrders(
             CreateTWSOOrdersDTO::fromRequest($request->validated()),
-            $productService
+            $productService,
+            $messagesHelper,
         );
 
         return redirect()->route('orders.index')->with([
