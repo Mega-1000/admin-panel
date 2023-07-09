@@ -42,7 +42,7 @@ readonly final class ControllSubjectInvoiceDTO
         $this->issueDate = $data['issueDate'];
         $this->commentsCount = $data['commentsCount'];
         $this->number = $data['number'];
-        $this->value = $data['value'];
+        $this->value = str_replace(' ', '', $data['value']);
         $this->flag = $data['flag'];
         $this->buyerSymbol = $data['buyerSymbol'];
         $this->notes = $data['notes'];
