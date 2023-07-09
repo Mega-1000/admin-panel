@@ -14,7 +14,7 @@ class ControllSubjectInvoiceController extends Controller
         Request $request,
     ): array
     {
-        DB::statemnt('TRUNCATE TABLE controll_subject_invoices');
+        DB::statement('TRUNCATE TABLE controll_subject_invoices');
 
         return $controllSubjectInvoiceService->handle(
             ControllSubjectInvoiceDTOFactory::createFromCsvFile($request->file('file'))
