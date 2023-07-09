@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\Messages\CreateMessageDTO;
 use App\Entities\Chat;
 use App\Entities\ChatUser;
 use App\Entities\Customer;
@@ -19,6 +20,7 @@ use App\Http\Requests\Messages\PostMessageRequest;
 use App\Jobs\ChatNotificationJob;
 use App\Repositories\Chats;
 use App\Services\Label\AddLabelService;
+use App\Services\MessageService;
 use App\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -29,21 +31,16 @@ use Illuminate\Support\Facades\Hash;
 
 class MessagesController extends Controller
 {
-    public function postNewMessage(PostMessageRequest $request, string $token)
+    public function __construct(
+        readonly protected MessageService $messageService,
+    ) {}
+
+    public function postNewMessage(PostMessageRequest $request, string $token): Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         try {
-            $helper = new MessagesHelper($token);
-            $chat = $helper->getChat();
-            if (!$chat) {
-                $helper->createNewChat();
-            }
-            if (!$helper->canUserSendMessage()) {
-                throw new ChatException('User not allowed to send message');
-            }
-            $data = $request->validated();
-            $file = $data['file'] ?? null;
-            $message = $helper->addMessage($data['message'], $data['area'], $file);
-            $helper->setLastRead();
+            $message = $this->messageService->addMessage(
+                CreateMessageDTO::fromRequest($request->validated(), $token),
+            );
 
             $msgTemplate = view('chat/single_message')->with([
                 'message' => $message,

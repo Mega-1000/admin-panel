@@ -6,6 +6,7 @@ use App\DTO\orderPayments\OrderPaymentDTO;
 use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
+use App\Entities\Chat;
 use App\Entities\ChatUser;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
@@ -189,8 +190,8 @@ class OrderService
 
     public function createTWSOOrders(
         CreateTWSOOrdersDTO $fromRequest,
-        ProductService $productService,
-        MessagesHelper $messagesHelper
+        ProductService      $productService,
+        MessageService      $messageService
     ): string
     {
         $customer = Customers::getFirstCustomerWithLogin($fromRequest->getClientEmail());
@@ -223,16 +224,6 @@ class OrderService
             $order->employee_id = 12;
             $order->save();
         });
-
-        $chatUser = new  ChatUser();
-        $chatUser->chat_id = $order->chat->id;
-        $chatUser->user_id = 12;
-        $chatUser->save();
-
-        $messagesHelper->addMessage(
-            message: $fromRequest->getConsultantDescription(),
-            chat: $order->chat
-        );
 
         return $order->id;
     }

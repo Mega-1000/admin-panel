@@ -181,6 +181,7 @@ class ImportBankPayIn implements ShouldQueue
             'PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
             'PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
             'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
+            'PP/PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
         ];
 
         $notPossibleOperationDescriptions = [

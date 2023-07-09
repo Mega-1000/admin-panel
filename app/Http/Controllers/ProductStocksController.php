@@ -25,6 +25,7 @@ use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
 use App\Repositories\Warehouses;
+use App\Services\MessageService;
 use App\Services\OrderService;
 use App\Services\ProductService;
 use Exception;
@@ -421,19 +422,19 @@ class ProductStocksController extends Controller
      *
      * @param StoreTWSOAdminOrdersRequest $request
      * @param ProductService $productService
-     * @param MessagesHelper $messagesHelper
+     * @param MessageService $messageService
      * @return RedirectResponse
      */
     public function storeTWSOAdminOrders(
         StoreTWSOAdminOrdersRequest $request,
-        ProductService $productService,
-        MessagesHelper $messagesHelper
+        ProductService              $productService,
+        MessageService              $messageService,
     ): RedirectResponse
     {
         $this->orderService->createTWSOOrders(
             CreateTWSOOrdersDTO::fromRequest($request->validated()),
             $productService,
-            $messagesHelper,
+            $messageService,
         );
 
         return redirect()->route('orders.index')->with([
