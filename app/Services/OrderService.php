@@ -6,6 +6,7 @@ use App\DTO\orderPayments\OrderPaymentDTO;
 use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
+use App\Entities\ChatUser;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Product;
@@ -222,6 +223,11 @@ class OrderService
             $order->employee_id = 12;
             $order->save();
         });
+
+        $chatUser = new  ChatUser();
+        $chatUser->chat_id = $order->chat->id;
+        $chatUser->user_id = 12;
+        $chatUser->save();
 
         $messagesHelper->addMessage(
             message: $fromRequest->getConsultantDescription(),
