@@ -125,6 +125,25 @@
             <div class="panel panel-bordered">
                 <div class="panel-heading">
                     <div class="panel-title">
+                        KONTROLER WARTOSCI FAKTUR ZAKUPOWYCH SUBIEKT -VOYAGER
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form method="post" action="{{ route('controll-subject-invoices') }}" enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" name="file">
+
+                        <button class="btn btn-primary">Kontroluj</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-bordered">
+                <div class="panel-heading">
+                    <div class="panel-title">
                         {{ \App\ChatStatus::first()->is_active === 0 ? 'Konsultanci dla czatu/duskusja są dostępni' : 'Konsultanci dla czatu/duskusja są nie dostępni' }}
                     </div>
                 </div>
