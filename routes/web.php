@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AllegroBillingController;
+use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\OrdersMessagesController;
@@ -431,6 +432,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('import/store', 'ImportController@store')->name('import.store');
         Route::post('import/store-nexo-controller', 'ImportController@storeNexoController')->name('import.storeNexoController');
         Route::get('store/import/{id}/{amount}', 'OrdersPaymentsController@storeFromImport');
+        Route::post('/controll-subject-invoice', ControllSubjectInvoiceController::class)->name('controll-subject-invoices');
 
         Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
