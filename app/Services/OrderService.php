@@ -12,6 +12,7 @@ use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
 use App\Enums\OrderPaymentsEnum;
+use App\Enums\UserRole;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
@@ -224,7 +225,6 @@ class OrderService
 
         $messagesHelper->addMessage(
             message: $fromRequest->getConsultantDescription(),
-            area: 'Konsultant',
             chat: $order->chat
         );
 
