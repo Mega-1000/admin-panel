@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTO\CreateTWSOOrdersDTO;
 use App\DTO\Messages\CreateMessageDTO;
+use App\Entities\Message;
 use App\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 
@@ -16,7 +17,7 @@ readonly class MessageService
     /**
      * @throws \App\Helpers\Exceptions\ChatException
      */
-    public function addMessage(CreateMessageDTO $data): string
+    public function addMessage(CreateMessageDTO $data): Message
     {
         $helper = new MessagesHelper($data->token);
         $chat = $helper->getChat();
@@ -32,7 +33,7 @@ readonly class MessageService
         $file = $data->file ?? null;
         $message = $helper->addMessage($data->message, $data->area, $file);
         $helper->setLastRead();
-        dd($message);
+
         return $message;
     }
 }
