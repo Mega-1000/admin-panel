@@ -2244,7 +2244,7 @@
                             row.invoiceValues.forEach((invoice) => {
                                 SBWF += parseFloat(invoice.value);
 
-                                html += invoice.value + "<br>";
+                                html += Math.round(invoice.value * 100) / 100 + "<br>";
                             });
 
                             return `
