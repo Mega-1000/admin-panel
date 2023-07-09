@@ -6,28 +6,23 @@ use App\DTO\orderPayments\OrderPaymentDTO;
 use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
-use App\Entities\Customer;
 use App\Entities\Order;
-use App\Entities\OrderMessage;
 use App\Entities\OrderPayment;
 use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
 use App\Enums\OrderPaymentsEnum;
 use App\Helpers\BackPackPackageDivider;
+use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Http\Controllers\CreateTWSOOrdersDTO;
 use App\Repositories\Customers;
-use App\Repositories\Employees;
-use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\ProductStockLogs;
 use App\Repositories\Warehouses;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -190,7 +185,11 @@ class OrderService
         });
     }
 
-    public function createTWSOOrders(CreateTWSOOrdersDTO $fromRequest, ProductService $productService): string
+    public function createTWSOOrders(
+        CreateTWSOOrdersDTO $fromRequest,
+        ProductService $productService,
+        MessagesHelper $messagesHelper
+    ): string
     {
         $customer = Customers::getFirstCustomerWithLogin($fromRequest->getClientEmail());
 
@@ -222,6 +221,12 @@ class OrderService
             $order->employee_id = 12;
             $order->save();
         });
+
+        $messagesHelper->addMessage(
+            message: $fromRequest->getConsultantDescription(),
+            area: 'Konsultant',
+            chat: $order->chat
+        );
 
         return $order->id;
     }
