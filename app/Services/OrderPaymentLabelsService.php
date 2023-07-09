@@ -27,8 +27,6 @@ class OrderPaymentLabelsService
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
         $orderReturnGoods = round($this->orderRepository->getOrderReturnGoods($order), 2);
 
-        dd($relatedPaymentsValue, $relatedOrdersValue, $orderReturnGoods);
-
         if ($calculateRelated) {
             foreach ($this->orderRepository->getAllRelatedOrders($order) as $relatedOrder) {
                 $this->calculateLabels($relatedOrder, false);
@@ -42,6 +40,8 @@ class OrderPaymentLabelsService
             $this->labelService->removeLabel($order->id, [134]);
             return;
         }
+
+        dd($relatedPaymentsValue, $relatedOrdersValue);
 
         if ((float)$relatedPaymentsValue == (float)$relatedOrdersValue) {
             $this->labelService->removeLabel($order->id, [134]);
