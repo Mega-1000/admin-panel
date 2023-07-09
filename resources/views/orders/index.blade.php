@@ -2237,35 +2237,20 @@
                         data: 'id',
                         name: 'left_to_pay',
                         searchable: false,
-                        render(date, type, row) {
-                            let totalOfProductsPrices = 0;
-                            let additionalServiceCost = row.additional_service_cost ?? 0;
-                            let additionalPackageCost = row.additional_cash_on_delivery_cost ?? 0;
-                            let shipmentPriceForClient = row.shipment_price_for_client ?? 0;
+                        render(data, type, row) {
+                            let html = "";
+                            let SBWF = 0;
 
-                            const items = row.items;
-                            for (const item of items) {
-                                const price = item.gross_selling_price_commercial_unit ?? 0;
-                                const quantity = item.quantity ?? 0;
-                                totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
-                            }
+                            row.invoiceValues.forEach((invoice) => {
+                                SBWF += parseFloat(invoice.value);
 
-                            const orderSum = (
-                                totalOfProductsPrices +
-                                parseFloat(shipmentPriceForClient) +
-                                parseFloat(additionalServiceCost) +
-                                parseFloat(additionalPackageCost)
-                            ).toFixed(2);
+                                html += invoice.value + "<br>";
+                            });
 
-                            let totalOfPayments = 0;
-                            const payments = row.payments;
-                            for (const payment of payments) {
-                                if (payment.promise !== "1") {
-                                    totalOfPayments += parseFloat(payment.amount);
-                                }
-                            }
-
-                            return (orderSum - totalOfPayments).toFixed(2);
+                            return `
+                                ${html} <br>
+                                SBWF: ${SBWF} <br>
+                            `;
                         }
                     },
                     {

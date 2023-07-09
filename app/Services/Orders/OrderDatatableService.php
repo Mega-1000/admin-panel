@@ -293,6 +293,7 @@ readonly class OrderDatatableService
                 return $acu;
             }, []);
             $invoices = DB::table('order_order_invoices')->where('order_id', $row->orderId)->get(['invoice_id']);
+            $invoiceValues = DB::table('order_invoice_values')->where('order_id', $row->orderId)->get();
             $arrInvoice = [];
             foreach ($invoices as $invoice) {
                 $arrInvoice[] = $invoice->invoice_id;
@@ -326,6 +327,7 @@ readonly class OrderDatatableService
                 }
             }
             $row->labels = $labels;
+            $row->invoiceValues = $invoiceValues;
             $row->closest_label_schedule_type_c = DB::table('order_label_schedulers')
                 ->where('order_id', $row->orderId)
                 ->where('type', 'C')
