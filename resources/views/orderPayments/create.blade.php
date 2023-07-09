@@ -74,6 +74,11 @@
                 <textarea class="form-control" id="comments" name="comments"
                           value="{{old('comments')}}" rows="5"></textarea>
             </div>
+
+            <div class="form-group">
+                <label for="deletable">@lang('order_payments.form.deletable')</label>
+                <input type="checkbox" name="deletable" checked>
+            </div>
             <input type="hidden" value="{{ $id }}" name="order_id">
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
@@ -81,7 +86,7 @@
 @endsection
 @section('scripts')
     <script>
-        var breadcrumb = $('.breadcrumb:nth-child(2)');
+        const breadcrumb = $('.breadcrumb:nth-child(2)');
 
         breadcrumb.children().remove();
         breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");

@@ -7,14 +7,11 @@ use App\DTO\Messages\CreateMessageDTO;
 use App\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 
-class MessageService
+readonly class MessageService
 {
-    protected $messagesHelper;
-
-    public function __construct(MessagesHelper $messagesHelper)
-    {
-        $this->messagesHelper = $messagesHelper;
-    }
+    public function __construct(
+        public MessagesHelper $messagesHelper
+    ) {}
 
     /**
      * @throws \App\Helpers\Exceptions\ChatException
@@ -23,9 +20,11 @@ class MessageService
     {
         $helper = new MessagesHelper($data->token);
         $chat = $helper->getChat();
+
         if (!$chat) {
             $helper->createNewChat();
         }
+
         if (!$helper->canUserSendMessage()) {
             throw new \App\Helpers\Exceptions\ChatException('User not allowed to send message');
         }
@@ -35,5 +34,5 @@ class MessageService
         $helper->setLastRead();
 
         return $message;
-}
+    }
 }
