@@ -837,7 +837,7 @@ class Order extends Model implements Transformable
         return $return->first();
     }
 
-    public function orderInvoiceValues(): HasMany
+    public function invoiceValues(): HasMany
     {
         return $this->hasMany(OrderInvoiceValue::class);
     }
