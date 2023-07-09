@@ -41,7 +41,7 @@ class OrderPaymentLabelsService
             return;
         }
 
-        dd($relatedPaymentsValue, $relatedOrdersValue, $relatedOrdersValue === $relatedPaymentsValue);
+        dd($relatedPaymentsValue, $relatedOrdersValue, $relatedOrdersValue == $relatedPaymentsValue);
 
         if ((float)$relatedPaymentsValue == (float)$relatedOrdersValue) {
             $this->labelService->removeLabel($order->id, [134]);
