@@ -29,7 +29,7 @@ readonly class MessageService
             throw new \App\Helpers\Exceptions\ChatException('User not allowed to send message');
         }
 
-        $file = $data['file'] ?? null;
+        $file = $data->file ?? null;
         $message = $helper->addMessage($data->message, $data->area, $file);
         $helper->setLastRead();
 
