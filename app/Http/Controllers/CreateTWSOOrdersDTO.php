@@ -34,4 +34,9 @@ readonly class CreateTWSOOrdersDTO
     {
         return $this->purchaseValue;
     }
+
+    public function getConsultantDescription(): ?string
+    {
+        return $this->consultantDescription;
+    }
 }

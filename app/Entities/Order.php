@@ -1,10 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Entities;
 
-use App\Enums\OrderPaymentsEnum;
 use App\Enums\PackageStatus;
 use App\Helpers\TaskTimeHelper;
 use App\Traits\SaveQuietlyTrait;

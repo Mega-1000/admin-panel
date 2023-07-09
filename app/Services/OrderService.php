@@ -8,6 +8,7 @@ use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
 use App\Entities\Customer;
 use App\Entities\Order;
+use App\Entities\OrderMessage;
 use App\Entities\OrderPayment;
 use App\Entities\Product;
 use App\Entities\ProductStock;
@@ -18,6 +19,7 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Http\Controllers\CreateTWSOOrdersDTO;
 use App\Repositories\Customers;
+use App\Repositories\Employees;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\ProductStockLogs;
@@ -216,6 +218,15 @@ class OrderService
 
             $item = $order->items()->first();
             $item->save();
+
+            $order->employee_id = 12;
+            $order->save();
+
+            $message = new OrderMessage();
+            $message->order_id = $order->id;
+            $message->message = $fromRequest->getConsultantDescription();
+            $message->employee_id = 12;
+            $message->save();
         });
 
         return $order->id;
