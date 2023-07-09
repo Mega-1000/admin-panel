@@ -221,12 +221,6 @@ class OrderService
 
             $order->employee_id = 12;
             $order->save();
-
-            $message = new OrderMessage();
-            $message->order_id = $order->id;
-            $message->message = $fromRequest->getConsultantDescription();
-            $message->employee_id = 12;
-            $message->save();
         });
 
         return $order->id;
