@@ -72,7 +72,7 @@ class ControllSubjectInvoiceService
 
         $arr = [];
 
-        if ($orderInvoiceValuesSum != $order->getValue()) {
+        if (round($orderInvoiceValuesSum, 2) != round((float)$order->getValue())) {
 //            AddLabelService::addLabels($order, [231],$arr, []);
 //
 //            $order->labels()->detach(232);
