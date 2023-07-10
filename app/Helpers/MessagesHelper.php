@@ -517,16 +517,16 @@ class MessagesHelper
         $this->orderId = $orderId;
         $this->currentUserId = $userId;
         $this->currentUserType = $userType;
-        $chatUserToken = $this->encrypt();
 
-        return $chatUserToken;
+        return $this->encrypt();
     }
 
-    public static function hasNewMessageStatic($chat, $chatUser, $notification = false)
+    public static function hasNewMessageStatic($chat, $chatUser, $notification = false): bool
     {
         if (!$chatUser) {
             return false;
         }
+
         for ($i = count($chat->messages) - 1; $i >= 0; $i--) {
             $message = $chat->messages[$i];
             if ($message->created_at > $chatUser->last_read_time && $message->chat_user_id != $chatUser->id) {
@@ -538,6 +538,7 @@ class MessagesHelper
                 }
             }
         }
+
         return false;
     }
 
@@ -591,6 +592,7 @@ class MessagesHelper
 
             $customer->save();
         }
+
         return $customer;
     }
 
@@ -604,13 +606,13 @@ class MessagesHelper
 
     private function setChatLabel(Chat $chat, bool $clearDanger = false, int $area = 0): void
     {
-
         if ($clearDanger) {
             $total = Chat::where('order_id', $chat->order->id)->where('need_intervention', true)->count();
             if ($total <= 1 && $chat->need_intervention) {
                 $chat->order->labels()->detach(MessagesHelper::MESSAGE_RED_LABEL_ID);
             }
         }
+
         if($area == 0) {
             OrderLabelHelper::setBlueLabel($chat);
         }
@@ -625,10 +627,12 @@ class MessagesHelper
         if ($product) {
             return 'Czat dotyczy produktu: ' . $product->name . ' (<b>' . $product->symbol . '</b>)';
         }
+
         $order = $this->getOrder();
         if ($order) {
             return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
         }
+
         return 'Chat ogólny z administracją EPH POLSKA';
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTO\Messages\CreateMessageDTO;
 use App\DTO\orderPayments\OrderPaymentDTO;
 use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
@@ -16,6 +17,7 @@ use App\Entities\ProductStockPosition;
 use App\Enums\OrderPaymentsEnum;
 use App\Enums\UserRole;
 use App\Helpers\BackPackPackageDivider;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
@@ -25,6 +27,7 @@ use App\Repositories\OrderPayments;
 use App\Repositories\ProductStockLogs;
 use App\Repositories\Warehouses;
 use Carbon\Carbon;
+use http\Message;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -188,6 +191,9 @@ class OrderService
         });
     }
 
+    /**
+     * @throws ChatException
+     */
     public function createTWSOOrders(
         CreateTWSOOrdersDTO $fromRequest,
         ProductService      $productService,
@@ -224,6 +230,14 @@ class OrderService
             $order->employee_id = 12;
             $order->save();
         });
+
+        $messageService->addMessage(
+            new CreateMessageDTO(
+                message: $fromRequest->getConsultantDescription(),
+                area: UserRole::Main,
+                token: (new MessagesHelper)->getChatToken($order->id, auth()->user()->id),
+            ),
+        );
 
         return $order->id;
     }
