@@ -2249,7 +2249,7 @@
 
                             return `
                                 ${html} <br>
-                                SBWF: ${SBWF} <br>
+                                SBWF: ${Math.round(SBWF * 100) / 100} <br>
                             `;
                         }
                     },
