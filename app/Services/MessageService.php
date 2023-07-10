@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use App\DTO\CreateTWSOOrdersDTO;
 use App\DTO\Messages\CreateMessageDTO;
 use App\Entities\Message;
-use App\Exceptions\ChatException;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 
 readonly class MessageService
@@ -15,7 +14,7 @@ readonly class MessageService
     ) {}
 
     /**
-     * @throws \App\Helpers\Exceptions\ChatException
+     * @throws ChatException
      */
     public function addMessage(CreateMessageDTO $data): Message
     {
@@ -27,7 +26,7 @@ readonly class MessageService
         }
 
         if (!$helper->canUserSendMessage()) {
-            throw new \App\Helpers\Exceptions\ChatException('User not allowed to send message');
+            throw new ChatException('User not allowed to send message');
         }
 
         $file = $data->file ?? null;

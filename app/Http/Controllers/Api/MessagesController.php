@@ -53,7 +53,7 @@ class MessagesController extends Controller
         }
     }
 
-    public function addUser(Request $request, $token)
+    public function addUser(Request $request, $token): string|JsonResponse
     {
         try {
             $helper = new MessagesHelper($token);
@@ -64,17 +64,18 @@ class MessagesController extends Controller
             list($user, $chatUser) = $this->findCustomerOrEmployeeInTrash($request, $chat);
             if ($chatUser) {
                 $chatUser->restore();
-                return response('ok');
+                return 'ok';
             }
             $this->createNewCustomerOrEmployee($chat, $request, $user);
             if (is_a($user, Customer::class)) {
                 $email = $user->login;
                 ChatNotificationJob::sendNewMessageEmail($email, $helper);
             }
-            return response('ok');
+
+            return 'ok';
         } catch (ChatException $e) {
             $e->log();
-            return response($e->getMessage(), 400);
+            return response()->json($e->getMessage(), 400);
         }
     }
 
@@ -119,21 +120,23 @@ class MessagesController extends Controller
         $chatUser->save();
     }
 
-    public function removeUser(Request $request, string $token)
+    public function removeUser(Request $request, string $token): string|JsonResponse
     {
         try {
             $helper = new MessagesHelper($token);
             $chatId = $helper->getChat()->id;
+
             if ($request->type == ChatUser::class) {
                 $chatUser = ChatUser::findOrFail($request->user_id);
             } else {
                 $chatUser = $this->findCustomerOrEmployee($request, $chatId);
             }
+
             $chatUser->delete();
-            return response('ok');
+            return 'ok';
         } catch (ChatException $e) {
             $e->log();
-            return response($e->getMessage(), 400);
+            return response()->json($e->getMessage(), 400);
         }
     }
 
@@ -145,12 +148,14 @@ class MessagesController extends Controller
                 'chat_id' => $chatId,
             ])->first();
         }
+
         if ($request->type == Employee::class) {
             $chatUser = ChatUser::where([
                 'employee_id' => $request->user_id,
                 'chat_id' => $chatId,
             ])->first();
         }
+
         return $chatUser;
     }
 

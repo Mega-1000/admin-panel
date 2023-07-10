@@ -2756,12 +2756,14 @@ class OrdersController extends Controller
             $order->sello_payment = $order->allegro_payment_id ?? $order->sello_payment;
             $order->sello_form = $order->sello_form ?? $order->allegro_form_id;
         }
+
         return $collection;
     }
 
     public function sendTrackingNumbers(): RedirectResponse
     {
         dispatch_now(new AllegroTrackingNumberUpdater());
+
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto wysyłanie numerów naklejek do allegro',
             'alert-type' => 'success',
@@ -2770,7 +2772,6 @@ class OrdersController extends Controller
 
     public function goToBasket(Request $request): RedirectResponse
     {
-
         try {
             $user = Auth::user();
 
@@ -2796,6 +2797,7 @@ class OrdersController extends Controller
         } catch (Exception $exception) {
             Log::notice('Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);
         }
+
         return redirect()->back()->with([
             'message' => __('firms.message.send_request_to_update_data_error'),
             'alert-type' => 'error'
@@ -2853,6 +2855,7 @@ class OrdersController extends Controller
             $order->labels()->sync([Label::SHIPPING_MARK]);
             $order->save();
         }
+
         return back()->with([
             'message' => __('voyager.generic.successfully_added_new'),
             'alert-type' => 'success',
@@ -2861,7 +2864,10 @@ class OrdersController extends Controller
 
     public function downloadAllegroPaymentsExcel(Request $request): BinaryFileResponse
     {
-        return $this->orderExcelService->generateAllegroPaymentsExcel($request->input('allegro_from'), $request->input('allegro_to'));
+        return $this->orderExcelService->generateAllegroPaymentsExcel(
+            $request->input('allegro_from'),
+            $request->input('allegro_to')
+        );
     }
 
     public function usePacket($orderId, $packetId)
@@ -2941,11 +2947,9 @@ class OrdersController extends Controller
         $userId = Auth::user()->id;
         $chatUserToken = $helper->getChatToken($order->id, $userId);
 
-        $response = [
+        return response()->json([
             'chatUserToken' => $chatUserToken,
-        ];
-
-        return response()->json($response);
+        ]);
     }
 
     /**
@@ -2957,17 +2961,14 @@ class OrdersController extends Controller
      */
     public function resolveChatIntervention(int $chatId): JsonResponse
     {
-
         $helper = new MessagesHelper();
         $helper->chatId = $chatId;
         $userId = Auth::user()->id;
         $chatUserToken = $helper->getChatToken(null, $userId);
 
-        $response = [
+        return response()->json([
             'chatUserToken' => $chatUserToken,
-        ];
-
-        return response()->json($response);
+        ]);
     }
 
     /**
@@ -2979,11 +2980,9 @@ class OrdersController extends Controller
     {
         $chatsNeedIntervention = Chats::getChatsNeedIntervention();
 
-        $response = [
+        return response()->json([
             'unreadedThreads' => $chatsNeedIntervention,
-        ];
-
-        return response()->json($response);
+        ]);
     }
 
     /**
@@ -2995,11 +2994,9 @@ class OrdersController extends Controller
     {
         $ordersNeedSupport = Orders::getChatOrdersNeedSupport();
 
-        $response = [
+        return response()->json([
             'unreadedThreads' => $ordersNeedSupport,
-        ];
-
-        return response()->json($response);
+        ]);
     }
 
     /**
@@ -3029,7 +3026,9 @@ class OrdersController extends Controller
         if ($this->isLockFileExisting() === true) {
             return false;
         }
+
         file_put_contents(self::LOCK_NAME, '');
+
         return true;
     }
 }
