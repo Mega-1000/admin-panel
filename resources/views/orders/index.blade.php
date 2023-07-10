@@ -1222,6 +1222,7 @@
             select.find('optgroup').remove();
             // sort by first word is number so filter by this id
 
+            console.log(opt)
             opt = opt.sort(function(a, b) {
                 let aId = a.name.split(' - ').shift();
                 let bId = b.name.split(' - ').shift();
