@@ -11,6 +11,7 @@ use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
+use App\Helpers\MessagesHelper;
 use App\Http\Requests\CalculateAdminOrderRequest;
 use App\Http\Requests\CalculateMultipleAdminOrder;
 use App\Http\Requests\CreateAdminOrderRequest;
@@ -24,6 +25,7 @@ use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
 use App\Repositories\Warehouses;
+use App\Services\MessageService;
 use App\Services\OrderService;
 use App\Services\ProductService;
 use Exception;
@@ -420,17 +422,23 @@ class ProductStocksController extends Controller
      *
      * @param StoreTWSOAdminOrdersRequest $request
      * @param ProductService $productService
+     * @param MessageService $messageService
      * @return RedirectResponse
      */
-    public function storeTWSOAdminOrders(StoreTWSOAdminOrdersRequest $request, ProductService $productService): RedirectResponse
+    public function storeTWSOAdminOrders(
+        StoreTWSOAdminOrdersRequest $request,
+        ProductService              $productService,
+        MessageService              $messageService,
+    ): RedirectResponse
     {
-        $order = $this->orderService->createTWSOOrders(
+        $this->orderService->createTWSOOrders(
             CreateTWSOOrdersDTO::fromRequest($request->validated()),
-            $productService
+            $productService,
+            $messageService,
         );
 
-        return redirect()->route('orders.edit', $order)->with([
-            'message' => 'Zamówienie zostało utworzone',
+        return redirect()->route('orders.index')->with([
+            'message' => 'stworzono zamówienie TWSU',
             'alert-type' => 'success'
         ]);
     }

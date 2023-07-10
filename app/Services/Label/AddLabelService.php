@@ -19,7 +19,6 @@ use App\Entities\EmailSetting;
 
 class AddLabelService
 {
-
     public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId = null, ?Carbon $time = null): void
     {
         $now = Carbon::now();
@@ -48,7 +47,6 @@ class AddLabelService
             $label = Label::query()->find($labelId);
             // init timed labels
             if ($time !== null) {
-
                 $preLabelId = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->first()?->label_to_add_id;
                 if($preLabelId === null) continue;
 
@@ -72,7 +70,6 @@ class AddLabelService
             $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
             if ($time === null) {
-
                 if($alreadyHasLabel) {
                     $order->labels()->detach($labelId);
                 }
@@ -193,9 +190,8 @@ class AddLabelService
         }
     }
 
-    private static function savePackageGroup(Order $order)
+    private static function savePackageGroup(Order $order): void
     {
-
         foreach ($order->packages as $package) {
             if (!empty($package->shipmentGroup)) {
                 continue;

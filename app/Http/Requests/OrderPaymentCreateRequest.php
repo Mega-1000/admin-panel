@@ -11,7 +11,7 @@ class OrderPaymentCreateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,7 +21,7 @@ class OrderPaymentCreateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'amount' => 'nullable|regex:/^\d*([\.,]{1}\d{1,2})?$/',
@@ -33,7 +33,8 @@ class OrderPaymentCreateRequest extends FormRequest
             'declared_sum' => 'nullable|regex:/^\d*([\.,]{1}\d{1,2})?$/',
             'posting_date' => 'nullable|date',
             'operation_type' => 'nullable|string',
-            'comments' => 'nullable|string'
+            'comments' => 'nullable|string',
+            'deletable' => 'nullable',
         ];
     }
 }

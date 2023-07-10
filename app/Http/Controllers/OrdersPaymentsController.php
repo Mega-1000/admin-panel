@@ -154,6 +154,9 @@ class OrdersPaymentsController extends Controller
             $type, $isWarehousePayment,
         );
 
+        $orderPayment->deletable = $request->input('deletable') == 'on' ? 1 : 0;
+        $orderPayment->save();
+
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
         $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
 
@@ -1368,8 +1371,8 @@ class OrdersPaymentsController extends Controller
     {
         $orderPayment = OrderPayment::find($id);
 
-        §
-        $deleted = OrderPayment::find($id)->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $deleted = DB::table('order_payments')->where('id', $id)->delete();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
 
@@ -1500,7 +1503,6 @@ class OrdersPaymentsController extends Controller
             'surplus_amount' => $userSurplusPayment->surplus_amount - $request->input('surplus_amount')
         ]);
 
-
         UserSurplusPaymentHistory::create([
             'user_id' => $request->input('surplus_customer_id'),
             'surplus_amount' => $request->input('surplus_amount'),
@@ -1586,7 +1588,8 @@ class OrdersPaymentsController extends Controller
 
         DB::table('order_payments_logs')->where('id', '>', 0)->delete();
         DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');
-        DB::statement('DELETE FROM order_payments WHERE id > 0 AND order_package_id IS NULL AND operation_type != "Zwrot towaru" AND rebooked_order_payment_id IS NULL');
+
+        DB::statement('DELETE FROM order_payments WHERE id > 0 AND order_package_id IS NULL AND operation_type != "Zwrot towaru" AND rebooked_order_payment_id IS NULL AND deletable = 1');
 
         return redirect()->route('payments.index')->with(['message' => 'Płatności poprawnie wyczyszczone', 'alert-type' => 'success']);
     }

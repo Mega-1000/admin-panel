@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTO\Messages\CreateMessageDTO;
 use App\Entities\Chat;
 use App\Entities\ChatUser;
 use App\Entities\Customer;
@@ -19,6 +20,7 @@ use App\Http\Requests\Messages\PostMessageRequest;
 use App\Jobs\ChatNotificationJob;
 use App\Repositories\Chats;
 use App\Services\Label\AddLabelService;
+use App\Services\MessageService;
 use App\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -29,21 +31,16 @@ use Illuminate\Support\Facades\Hash;
 
 class MessagesController extends Controller
 {
-    public function postNewMessage(PostMessageRequest $request, string $token)
+    public function __construct(
+        readonly protected MessageService $messageService,
+    ) {}
+
+    public function postNewMessage(PostMessageRequest $request, string $token): Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         try {
-            $helper = new MessagesHelper($token);
-            $chat = $helper->getChat();
-            if (!$chat) {
-                $helper->createNewChat();
-            }
-            if (!$helper->canUserSendMessage()) {
-                throw new ChatException('User not allowed to send message');
-            }
-            $data = $request->validated();
-            $file = $data['file'] ?? null;
-            $message = $helper->addMessage($data['message'], $data['area'], $file);
-            $helper->setLastRead();
+            $message = $this->messageService->addMessage(
+                CreateMessageDTO::fromRequest($request->validated(), $token),
+            );
 
             $msgTemplate = view('chat/single_message')->with([
                 'message' => $message,
@@ -56,7 +53,7 @@ class MessagesController extends Controller
         }
     }
 
-    public function addUser(Request $request, $token)
+    public function addUser(Request $request, $token): string|JsonResponse
     {
         try {
             $helper = new MessagesHelper($token);
@@ -67,17 +64,18 @@ class MessagesController extends Controller
             list($user, $chatUser) = $this->findCustomerOrEmployeeInTrash($request, $chat);
             if ($chatUser) {
                 $chatUser->restore();
-                return response('ok');
+                return 'ok';
             }
             $this->createNewCustomerOrEmployee($chat, $request, $user);
             if (is_a($user, Customer::class)) {
                 $email = $user->login;
                 ChatNotificationJob::sendNewMessageEmail($email, $helper);
             }
-            return response('ok');
+
+            return 'ok';
         } catch (ChatException $e) {
             $e->log();
-            return response($e->getMessage(), 400);
+            return response()->json($e->getMessage(), 400);
         }
     }
 
@@ -122,21 +120,23 @@ class MessagesController extends Controller
         $chatUser->save();
     }
 
-    public function removeUser(Request $request, string $token)
+    public function removeUser(Request $request, string $token): string|JsonResponse
     {
         try {
             $helper = new MessagesHelper($token);
             $chatId = $helper->getChat()->id;
+
             if ($request->type == ChatUser::class) {
                 $chatUser = ChatUser::findOrFail($request->user_id);
             } else {
                 $chatUser = $this->findCustomerOrEmployee($request, $chatId);
             }
+
             $chatUser->delete();
-            return response('ok');
+            return 'ok';
         } catch (ChatException $e) {
             $e->log();
-            return response($e->getMessage(), 400);
+            return response()->json($e->getMessage(), 400);
         }
     }
 
@@ -148,12 +148,14 @@ class MessagesController extends Controller
                 'chat_id' => $chatId,
             ])->first();
         }
+
         if ($request->type == Employee::class) {
             $chatUser = ChatUser::where([
                 'employee_id' => $request->user_id,
                 'chat_id' => $chatId,
             ])->first();
         }
+
         return $chatUser;
     }
 

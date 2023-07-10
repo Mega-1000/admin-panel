@@ -13,7 +13,7 @@ class CreateOrderLabelsTable extends Migration
 	 *
 	 * @return void
 	 */
-	public function up()
+	public function up(): void
 	{
 		Schema::create('order_labels', function(Blueprint $table) {
             $table->increments('id');

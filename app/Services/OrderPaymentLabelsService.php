@@ -41,7 +41,7 @@ class OrderPaymentLabelsService
             return;
         }
 
-        if ((float)$relatedPaymentsValue == (float)$relatedOrdersValue) {
+        if (round($relatedOrdersValue, 2) == round($relatedPaymentsValue, 2)) {
             $this->labelService->removeLabel($order->id, [134]);
             AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
 

@@ -252,6 +252,10 @@ readonly class OrderDatatableService
             $query->where('orders.customer_id', $data['customerId']);
         }
 
+        if (array_key_exists('selectOnlyWrongInvoiceBilansOrders', $data) && $data['selectOnlyWrongInvoiceBilansOrders'] === 'true') {
+            $query->whereRaw('orders.invoice_bilans = 0');
+        }
+
         //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');
 
         $count = $query->count();
@@ -293,6 +297,7 @@ readonly class OrderDatatableService
                 return $acu;
             }, []);
             $invoices = DB::table('order_order_invoices')->where('order_id', $row->orderId)->get(['invoice_id']);
+            $invoiceValues = DB::table('order_invoice_values')->where('order_id', $row->orderId)->get();
             $arrInvoice = [];
             foreach ($invoices as $invoice) {
                 $arrInvoice[] = $invoice->invoice_id;
@@ -326,6 +331,7 @@ readonly class OrderDatatableService
                 }
             }
             $row->labels = $labels;
+            $row->invoiceValues = $invoiceValues;
             $row->closest_label_schedule_type_c = DB::table('order_label_schedulers')
                 ->where('order_id', $row->orderId)
                 ->where('type', 'C')

@@ -2,30 +2,33 @@
 
 namespace App\Services;
 
+use App\DTO\Messages\CreateMessageDTO;
 use App\DTO\orderPayments\OrderPaymentDTO;
 use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
-use App\Entities\Customer;
+use App\Entities\Chat;
+use App\Entities\ChatUser;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
 use App\Enums\OrderPaymentsEnum;
+use App\Enums\UserRole;
 use App\Helpers\BackPackPackageDivider;
+use App\Helpers\Exceptions\ChatException;
+use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Http\Controllers\CreateTWSOOrdersDTO;
 use App\Repositories\Customers;
-use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\ProductStockLogs;
 use App\Repositories\Warehouses;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
+use http\Message;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -188,7 +191,14 @@ class OrderService
         });
     }
 
-    public function createTWSOOrders(CreateTWSOOrdersDTO $fromRequest, ProductService $productService): string
+    /**
+     * @throws ChatException
+     */
+    public function createTWSOOrders(
+        CreateTWSOOrdersDTO $fromRequest,
+        ProductService      $productService,
+        MessageService      $messageService
+    ): string
     {
         $customer = Customers::getFirstCustomerWithLogin($fromRequest->getClientEmail());
 
@@ -216,7 +226,18 @@ class OrderService
 
             $item = $order->items()->first();
             $item->save();
+
+            $order->employee_id = 12;
+            $order->save();
         });
+
+        $messageService->addMessage(
+            new CreateMessageDTO(
+                message: $fromRequest->getConsultantDescription(),
+                area: UserRole::Main,
+                token: (new MessagesHelper)->getChatToken($order->id, auth()->user()->id),
+            ),
+        );
 
         return $order->id;
     }
