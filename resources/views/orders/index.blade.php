@@ -819,6 +819,7 @@
 
     @include('orders.buttons')
     <button name="selectAllDates" id="selectAllDates">Wybierz wszystkie daty</button>
+    <button name="selectOnlyWrongInvoiceBilansOrders" id="selectOnlyWrongInvoiceBilansOrders" class="btn btn-primary"></button>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
         <tr>
@@ -1040,7 +1041,7 @@
         </thead>
     </table>
     <div class="vue-components">
-        <tracker :enabled="true" :user="{{ Auth::user()->id }}"/>
+        <tracker :enabled="true" :user="{{ Auth::user()->id }}" />
     </div>
     @include('bonus.modal')
 @endsection
@@ -1423,6 +1424,7 @@
                         }
                         d.customerId = customerId;
                         d.selectAllDates = localStorage.getItem('selectAllDates');
+                        d.selectOnlyWrongInvoiceBilansOrders = localStorage.getItem('selectOnlyWrongInvoiceBilansOrders');
                         let differenceMode = localStorage.getItem('differenceMode');
                         if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
                     },
@@ -1482,10 +1484,10 @@
                                 if (isProblem) {
                                     html += '<div style="border: solid red 4px" >'
                                 }
-                                if (value.status == 'SENDING' || value.status == 'DELIVERED') {
+                                if (value.status === 'SENDING' || value.status === 'DELIVERED') {
                                     html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
                                         '<div style="display: flex; align-items: center;">' +
-                                        '<p style="margin: 8px 0px 0px 0px;">' + row.orderId + '/' + value.number + '</p>'
+                                        '<p style="margin: 8px 0 0 0;">' + row.orderId + '/' + value.number + '</p>'
                                     let name = value.container_type
                                     if (value.symbol) {
                                         name = value.symbol;
@@ -4235,23 +4237,33 @@
             table.ajax.reload();
         })
 
+        const selectOnlyWrongInvoiceBilansOrders = () => {
+            $('#selectOnlyWrongInvoiceBilansOrders').text(localStorage.getItem('selectOnlyWrongInvoiceBilansOrders') === 'true' ? 'Wybierz wszystkie' : 'Wybierz tylko z błędami');
+        }
+
+        document.querySelector('#selectOnlyWrongInvoiceBilansOrders').addEventListener('click', () => {
+            localStorage.setItem('selectOnlyWrongInvoiceBilansOrders', localStorage.getItem('selectOnlyWrongInvoiceBilansOrders') === 'true' ? 'false' : 'true');
+            selectOnlyWrongInvoiceBilansOrders();
+            table.ajax.reload();
+        });
     </script>
 
     <script>
         $(document).ready(function () {
-            var now = new Date();
+            const now = new Date();
             const dateFrom = document.querySelector('#protocol_datepicker_from');
             const dateTo = document.querySelector('#protocol_datepicker_to');
 
-            var day = ("0" + now.getDate()).slice(-2);
-            var month = ("0" + (now.getMonth() + 1)).slice(-2);
+            const day = ("0" + now.getDate()).slice(-2);
+            const month = ("0" + (now.getMonth() + 1)).slice(-2);
 
-            var today = (day) + "/" + (month) + "/" + now.getFullYear();
+            const today = (day) + "/" + (month) + "/" + now.getFullYear();
 
             dateFrom.value = today;
             dateTo.value = today;
 
             setSelectAllDatesText();
+            selectOnlyWrongInvoiceBilansOrders();
         });
     </script>
 

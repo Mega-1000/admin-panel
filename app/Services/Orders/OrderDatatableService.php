@@ -252,6 +252,10 @@ readonly class OrderDatatableService
             $query->where('orders.customer_id', $data['customerId']);
         }
 
+        if (array_key_exists('selectOnlyWrongInvoiceBilansOrders', $data) && $data['selectOnlyWrongInvoiceBilansOrders'] === 'true') {
+            $query->whereRaw('orders.invoice_bilans = 0');
+        }
+
         //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');
 
         $count = $query->count();

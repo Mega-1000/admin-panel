@@ -73,13 +73,19 @@ class ControllSubjectInvoiceService
         $arr = [];
 
         if ($orderInvoiceValuesSum != $order->getValue()) {
-            AddLabelService::addLabels($order, [231],$arr, []);
+//            AddLabelService::addLabels($order, [231],$arr, []);
+//
+//            $order->labels()->detach(232);
+//            return;
 
-            $order->labels()->detach(232);
+            $order->invoice_bilans = 1;
+            $order->save();
             return;
         }
 
-        AddLabelService::addLabels($order, [232],$arr, []);
-        $order->labels()->detach(231);
+//        AddLabelService::addLabels($order, [232],$arr, []);
+//        $order->labels()->detach(231);
+        $order->invoice_bilans = 0;
+        $order->save();
     }
 }
