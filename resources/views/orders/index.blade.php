@@ -1222,14 +1222,13 @@
             select.find('optgroup').remove();
             // sort by first word is number so filter by this id
 
-            console.log(opt)
-            opt = opt.sort(function(a, b) {
-                let aId = a.name.split(' - ').shift();
-                let bId = b.name.split(' - ').shift();
-                return aId - bId;
-            });
-
             $.each(opt, function (key, value) {
+                value = value.sort(function(a, b) {
+                    let aId = a.name.split(' - ').shift();
+                    let bId = b.name.split(' - ').shift();
+                    return aId - bId;
+                });
+
                 if (value.length > 0) {
                     let group = $('<optgroup label="' + key + '" />');
                     $.each(value, function () {
