@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Entities\OrderPackage;
+use App\Enums\OrderPaymentsEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -84,7 +85,7 @@ class Orders
      *
      * @return array
      */
-    public function getAllRelatedOrderPayments(Order $order): array
+    public static function getAllRelatedOrderPayments(Order $order): array
     {
         $orders = self::getAllRelatedOrders($order);
         $orderPayments = [];
@@ -113,7 +114,7 @@ class Orders
      *
      * @return float
      */
-    public function getOrderReturnGoods(Order $order): float
+    public static function getOrderReturnGoods(Order $order): float
     {
         $payments = self::getAllRelatedOrderPayments($order);
 
@@ -136,5 +137,22 @@ class Orders
         return Order::query()->whereHas('labels', function ($query) use ($labelId) {
             $query->where('label_id', $labelId);
         })->get();
+    }
+
+    /**
+     * @param Order $order
+     * @return float
+     */
+    public static function getSumOfWTONPayments(Order $order): float
+    {
+        $payments = self::getAllRelatedOrderPayments($order);
+        $paymentsValue = 0;
+        foreach ($payments as $order) {
+            if ($order->operation_type == OrderPaymentsEnum::KWON_STATUS) {
+                $paymentsValue += $order->amount ?? $order->declared_sum ?? 0;
+            }
+        }
+
+        return $paymentsValue;
     }
 }
