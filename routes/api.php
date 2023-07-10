@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\DiscountController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -160,3 +161,10 @@ Route::group(['prefix' => 'working-events', 'as' => 'workingEvents_api.'], __DIR
 Route::group(['prefix' => 'countries', 'as' => 'countries.'], __DIR__ . '/api/CountriesRoutes.php');
 
 Route::get('/orders/{id}/sendOfferToCustomer', 'Api\OrdersController@sendOfferToCustomer')->name('api.orders.sendOfferToCustomer');
+
+Route::prefix('discounts')->group(function () {
+    Route::get('/get-by-category/{category:name}', [DiscountController::class, 'getByCategory'])
+        ->name('discounts.get-by-category');
+    Route::get('/get-categories', [DiscountController::class, 'getCategories'])
+        ->name('discounts.get-categories');
+});

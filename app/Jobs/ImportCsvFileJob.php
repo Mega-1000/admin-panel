@@ -189,7 +189,6 @@ class ImportCsvFileJob implements ShouldQueue
     {
         $parent = &$this->getCategoryParent($categoryTree);
 
-
         /** @var Category $existingCategory */
         $existingCategory = $this->currentCategories->filter(function ($category) use ($categoryTree) {
             return $category->name === end($categoryTree);
@@ -312,6 +311,9 @@ class ImportCsvFileJob implements ShouldQueue
                 $product->replacement_img = $replacements[$product->column_number]['img'];
             }
             $category->chimneyProducts()->save($product);
+
+
+
             if (isset($replacements[$product->column_number])) {
                 $array = $replacements[$product->column_number]['products'];
                 foreach ($array as $key => $value) {
@@ -400,6 +402,14 @@ class ImportCsvFileJob implements ShouldQueue
         $product->fill($array);
         $product->save();
         $product->restore();
+
+        if (!empty($array['newsletter'])) {
+            $product->discounts()->create([
+                'old_price' => $product->getValue(),
+                'new_price' => $product->getValue(),
+                'description' => 'Newsletter',
+            ]);
+        }
 
         if ($updatePrices) {
             $price = $product->price ?? new Entities\ProductPrice();
@@ -556,6 +566,7 @@ class ImportCsvFileJob implements ShouldQueue
             'show_on_page' => $this->getShowOnPageParameter($line, $categoryColumn),
             'priority' => $this->getProductsOrder($line, $categoryColumn),
             'average_amount_of_product_in_package' => $line[244],
+            'newsletter' => $line[13],
         ];
 
         foreach ($array as $key => $value) {
@@ -566,7 +577,7 @@ class ImportCsvFileJob implements ShouldQueue
             if ($value === '#ARG!' || $value === '#DZIEL/0!' || $value === '$ADR!') {
                 unset($array[$key]);
             }
-            if (is_string($value) && strpos($value, ',') !== false) {
+            if (is_string($value) && str_contains($value, ',')) {
                 if ($key !== 'symbol') {
                     $value = str_replace(',', '.', $value);
                     $array[$key] = $value;

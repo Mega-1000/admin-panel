@@ -1220,6 +1220,7 @@
             let opt = $(this).data('couriertasks');
             let select = $('#print-package-group').find('[name="task_id"]');
             select.find('optgroup').remove();
+            opt = Object.keys(opt).sort().reduce((r, k) => (r[k] = opt[k], r), {});
             $.each(opt, function (key, value) {
                 if (value.length > 0) {
                     let group = $('<optgroup label="' + key + '" />');
