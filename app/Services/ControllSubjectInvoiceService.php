@@ -71,21 +71,15 @@ class ControllSubjectInvoiceService
 
         $orderInvoiceValuesSum = OrderInvoiceValues::getSumOfInvoiceValuesByOrder($order);
         $orderValue = $order->getValue() - Orders::getOrderReturnGoods($order) - Orders::getSumOfWTONPayments($order);
-//        $arr = [];
+        $arr = [];
         if (round($orderInvoiceValuesSum, 2) != round($orderValue, 2)) {
-//            AddLabelService::addLabels($order, [231],$arr, []);
-//
-//            $order->labels()->detach(232);
-//            return;
+            AddLabelService::addLabels($order, [231],$arr, []);
 
-            $order->invoice_bilans = 0;
-            $order->save();
+            $order->labels()->detach(232);
             return;
         }
 
-//        AddLabelService::addLabels($order, [232],$arr, []);
-//        $order->labels()->detach(231);
-        $order->invoice_bilans = 1;
-        $order->save();
+        AddLabelService::addLabels($order, [232],$arr, []);
+        $order->labels()->detach(231);
     }
 }

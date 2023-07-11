@@ -2705,6 +2705,7 @@ class OrdersController extends Controller
     public function findPage(Request $request, $id): \Illuminate\Http\Response|Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         [$collection, $count] = $this->orderDatatableService->prepareCollection($request->all(), false, $id);
+
         return response($count / $request->all()['length']);
     }
 
