@@ -50,6 +50,8 @@ class ControllSubjectInvoiceService
             return;
         }
 
+        OrderInvoiceValue::where('order_id', $order->id)->where('value', $grossInvoiceValue)->first()->delete();
+
         OrderInvoiceValue::create([
             'order_id' => $order->id,
             'value' => $grossInvoiceValue
