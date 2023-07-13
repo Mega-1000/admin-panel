@@ -55,16 +55,14 @@ class AllegroChatService extends AllegroApiService {
     }
     public function newAttachmentDeclaration(array $data) {
         $url = $this->getRestUrl("/messaging/message-attachments");
-        $response = $this->request('POST', $url, $data);
 
-        return $response;
+        return $this->request('POST', $url, $data);
     }
 
     public function changeReadFlagOnThread(string $threadId, array $data) {
-        $url = $this->getRestUrl("/messaging/threads/{$threadId}/read");
-        $response = $this->request('PUT', $url, $data);
+        $url = $this->getRestUrl("/messaging/threads/{$threadId}/read");]
 
-        return $response;
+        return $this->request('PUT', $url, $data);
     }
     public function uploadAttachment(string $attachmentId, string $contents, string $mimeType) {
 
@@ -74,9 +72,8 @@ class AllegroChatService extends AllegroApiService {
         ];
 
         $url = $this->getRestUrl("/messaging/message-attachments/{$attachmentId}");
-        $response = $this->request('PUT', $url, [], $attachment, true);
 
-        return $response;
+        return $this->request('PUT', $url, [], $attachment, true);
     }
     public function areNewMessages(string $chatLastCheck): bool {
 

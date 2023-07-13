@@ -27,14 +27,14 @@ class AllegroChatController extends Controller
     public function checkUnreadedThreads(Request $request): JsonResponse {
 
         $chatLastCheck = $request->input('chatLastCheck');
-        
+
         $areNewMessages = false;
         if($chatLastCheck) {
             $areNewMessages = $this->allegroChatService->areNewMessages($chatLastCheck);
         }
 
         $unreadedThreads = setting('allegro.unreaded_chat_threads') ?: '[]';
-        
+
         $response = [
             'unreadedThreads' => json_decode($unreadedThreads),
             'areNewMessages' => $areNewMessages,
@@ -50,8 +50,8 @@ class AllegroChatController extends Controller
         if(empty($unreadedThreads)) return response()->json(null);
 
         $currentThread = $this->allegroChatService->getCurrentThread($unreadedThreads);
-        
-        if(empty($currentThread)) return response()->json(null);
+
+        if (empty($currentThread)) return response()->json(null);
 
         return response()->json($currentThread);
     }
@@ -77,7 +77,7 @@ class AllegroChatController extends Controller
             $res = $this->allegroChatService->listMessages($threadId, $allegroPrevMessages->last()->original_allegro_date);
         }
         if($allegroPrevMessages->isEmpty() && !$res['messages']) return response()->json(null);
-        
+
         $newMessages = $this->allegroChatService->insertMsgsToDB($res['messages']);
 
         $messagesCollection = collect($newMessages);
@@ -92,7 +92,7 @@ class AllegroChatController extends Controller
         $threadId = $data->input('threadId');
         $lastDate = $data->input('lastDate');
         $isPreview = $data->input('isPreview');
-        
+
         if(!$isPreview) {
             // mark thread as read
             $this->allegroChatService->changeReadFlagOnThread($threadId, [
@@ -101,9 +101,9 @@ class AllegroChatController extends Controller
         }
 
         $res = $this->allegroChatService->listMessages($threadId, $lastDate);
-        
+
         if(!$res['messages']) return response('null', 200);
-        
+
         $newMessages = collect( $this->allegroChatService->insertMsgsToDB($res['messages']) );
 
         return response($newMessages);
@@ -132,7 +132,7 @@ class AllegroChatController extends Controller
         // update current time for prevent unmark msg for consultant
         $currentDate = Carbon::now();
         $currentDateTime = $currentDate->toDateTimeString();
-        
+
         AllegroChatThread::where([
             'allegro_thread_id' => $threadId,
             'type' => 'PENDING',
@@ -141,7 +141,7 @@ class AllegroChatController extends Controller
         ]);
 
         if(!$res['id']) return response()->json(null);
-        
+
         return response()->json('OK');
     }
 
@@ -174,7 +174,7 @@ class AllegroChatController extends Controller
 
         return response($res['id']);
     }
-    
+
     public function downloadAttachment(string $attachmentId) {
         $res = $this->allegroChatService->downloadAttachment($attachmentId);
 

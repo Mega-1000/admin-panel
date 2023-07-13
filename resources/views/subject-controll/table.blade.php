@@ -6,11 +6,10 @@
 <table class="table table-striped table-hover">
     <thead class="thead-dark">
     <tr>
-        <th scope="col">K</th>
-        <th scope="col">Delivery End Date</th>
-        <th scope="col">Warehouse Date</th>
-        <th scope="col">Issue Date</th>
-        <th scope="col">Comments Count</th>
+        <th scope="col">Data wystawienia</th>
+        <th scope="col">Uwagi</th>
+        <th scope="col">Numer</th>
+        <th scope="col">Wartość</th>
     </tr>
     </thead>
     <tbody>
@@ -20,19 +19,16 @@
                 $invoice = $invoice[0];
             @endphp
             <td>
-                {{ $invoice['k'] }}
-            </td>
-            <td>
-                {{ $invoice['deliveryEndDate'] }}
-            </td>
-            <td>
-                {{ $invoice['warehouseDate'] }}
-            </td>
-            <td>
                 {{ $invoice['issueDate'] }}
             </td>
             <td>
-                {{ $invoice['commentsCount'] }}
+                {{ $invoice['notes'] }}
+            </td>
+            <td>
+                {{ $invoice['number'] }}
+            </td>
+            <td>
+                {{ $invoice['value'] }}
             </td>
         </tr>
     @endforeach

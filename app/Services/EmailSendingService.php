@@ -32,13 +32,13 @@ class EmailSendingService
         $allegroChatService = new AllegroChatService();
 
         $emailSetting = EmailSetting::where('status', EmailSetting::NEW_ALLEGRO_MSG)->get();
-        
+
         foreach($emailSetting as $setting) {
-            
+
             $order = Order::whereHas('customer', function($q) use ($email) {
                 $q->where('login', $email);
             })->first();
-            
+
             $content = $emailTagHandlerHelper->parseTags($order, $setting->content, $email);
             $data = [
                 'text' => $content,
@@ -89,7 +89,7 @@ class EmailSendingService
     public function saveScheduledEmail(Order $order, EmailSetting $setting): int
     {
         $file = $this->generateAttachment($setting->content);
-        
+
         $sending = new EmailSending();
         $sending->order_id = $order->id;
         $sending->email_setting_id = $setting->id;
@@ -118,7 +118,7 @@ class EmailSendingService
             $allegroOrder = AllegroOrder::where('order_id', $order->allegro_form_id)->first();
             return $allegroOrder->buyer_email;
         }
-        
+
         return $order->customer->login;
     }
 
@@ -138,35 +138,37 @@ class EmailSendingService
         if($text) {
             $content = $this->getText($content,$text);
         }
+
         if($link) {
             $content = $this->getLink($content,$link);
         }
+
         if($file) {
             $content = str_replace("[file]".$file."[/file]", "", $content);
         }
+
         return $content;
     }
 
 
     public function generateAttachment(string $content): string
     {
-        $file = $this->getStringBetween($content, '[file]', '[/file]');
-        return $file;
+        return $this->getStringBetween($content, '[file]', '[/file]');
     }
 
     public function getText(string $content, string $text): string
     {
         $txt = file_get_contents($text);
-        $msg = str_replace("[text]".$text."[/text]", $txt, $content);
-        return $msg;
+
+        return str_replace("[text]".$text."[/text]", $txt, $content);
     }
 
     public function getLink(string $content, string $link): string
     {
         $l = explode("|",$link);
         $txt = '<a href="'.$l[0].'">'.$l[1].'</a>';
-        $msg = str_replace("[link]".$link."[/link]", $txt, $content);
-        return $msg;
+
+        return str_replace("[link]".$link."[/link]", $txt, $content);
     }
 
     public function getStringBetween(string $string, string $start, string $end): string {
@@ -182,15 +184,15 @@ class EmailSendingService
     }
 
 
-    public function sendScheduledEmail(): bool
+    public function sendScheduledEmail(): void
     {
         $now = new Carbon();
-        $sending = EmailSending::where( 'scheduled_date', '<=', $now->toDateTimeString() )->where('message_send', 0)->get();
+        $sending = EmailSending::where('scheduled_date', '<=', $now->toDateTimeString())
+            ->where('message_send', 0)
+            ->get();
         foreach($sending as $send) {
             $this->sendEmail($send, $now);
         }
-
-        return true;
     }
 
     public function sendEmail(EmailSending $send, Carbon $now): bool
@@ -203,7 +205,7 @@ class EmailSendingService
             Mailer::create()
                 ->to($send->email)
                 ->send(new MailSending($send->title, $msg, $send->attachment));
-            
+
             $send->message_send = 1;
             $send->send_date = $now->toDateTimeString();
             $send->save();
@@ -211,7 +213,7 @@ class EmailSendingService
             return true;
         } catch (Exception $exception) {
             Log::error('Email was not sent due to. Error: ' . $exception->getMessage());
-            
+
             return false;
         }
     }
