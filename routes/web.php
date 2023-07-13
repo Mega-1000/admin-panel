@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AllegroBillingController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
+use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\OrdersMessagesController;
@@ -289,6 +290,7 @@ Route::group(['prefix' => 'admin'], function () {
             'uses' => 'OrdersController@updateSelf',
         ])->name('orders.updateSelf');
         Route::get('orders/{token}/print', 'OrdersController@print')->name('orders.print');
+        Route::get('orders/invoice-value-delete/{id}', DeleteOrderInvoiceValueController::class)->name('orders.invoice-value');
 
         Route::get('orderReturn/{order_id}', 'OrderReturnController@index')->name('order_return.index');
         Route::put('orderReturn/{id}/store', ['uses' => 'OrderReturnController@store'])->name('order_return.store');

@@ -2254,7 +2254,11 @@
                             row.invoiceValues.forEach((invoice) => {
                                 SBWF += parseFloat(invoice.value);
 
-                                html += Math.round(invoice.value * 100) / 100 + "<br>";
+                                html += `
+                                    ${Math.round(invoice.value * 100) / 100}
+                                    <a class="btn btn-danger" href="orders/invoice-value-delete/${invoice.id}">Usuń</a>
+                                    <br>
+                                `;
                             });
 
                             return `
@@ -2425,9 +2429,8 @@
                             }
 
                             let price = (parseFloat(priceForClient) - parseFloat(priceForUs)).toFixed(2);
-                            let html = '<span style="margin-top: 5px;">' + price + '</span>';
 
-                            return html;
+                            return '<span style="margin-top: 5px;">' + price + '</span>';
                         }
                     },
                     {
