@@ -177,7 +177,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
         }
 
         if (count($fileNames) > 0) {
-
             $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
             $zip = new ZipArchive();
             $zip->open(storage_path('app/public' . config('nexo.xml_path') . $zipName), ZipArchive::CREATE);

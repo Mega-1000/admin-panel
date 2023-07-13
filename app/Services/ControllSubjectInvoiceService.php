@@ -72,7 +72,7 @@ class ControllSubjectInvoiceService
         $order = Order::find($orderId);
 
         $orderInvoiceValuesSum = OrderInvoiceValues::getSumOfInvoiceValuesByOrder($order);
-        $orderValue = $order->getValue() - Orders::getOrderReturnGoods($order) - Orders::getSumOfWTONPayments($order);
+        $orderValue = $order->getValue() + Orders::getOrderReturnGoods($order) - Orders::getSumOfWTONPayments($order);
         $arr = [];
         if (round($orderInvoiceValuesSum, 2) != round($orderValue, 2)) {
             AddLabelService::addLabels($order, [231],$arr, []);
