@@ -4006,7 +4006,7 @@
             let status = 0;
             $.ajax({
                 type: 'GET',
-                url: '/admin/planning/tasks/${orderId}/checkOrderQuantityInStock',
+                url: `/admin/planning/tasks/${orderId}/checkOrderQuantityInStock`,
                 async: false
             }).done(function (data) {
                 if (data.status !== 200) {
