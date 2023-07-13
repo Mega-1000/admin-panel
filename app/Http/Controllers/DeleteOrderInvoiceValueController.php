@@ -23,7 +23,7 @@ class DeleteOrderInvoiceValueController extends Controller
             AddLabelService::addLabels($order, [231],$arr, []);
 
             $order->labels()->detach(232);
-            return;
+            return redirect()->back();
         }
 
         AddLabelService::addLabels($order, [232],$arr, []);
