@@ -106,6 +106,30 @@
             <div class="panel panel-bordered">
                 <div class="panel-heading">
                     <div class="panel-title">
+                        Wczytywanie etykiet
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form action="{{ route('add-labels-from-csv-file') }}" method="post" enctype="multipart/form-data">
+                        @csrf
+
+                        <label for="labels_to_add">Etykiety do dodania</label>
+                        <input type="text" name="labels_to_add" id="labels_to_add" class="form-control" placeholder="np. 123, 456, 789">
+
+                        <label for="labels_to_delete">Etykiety do usunięcia</label>
+                        <input type="text" name="labels_to_delete" id="labels_to_delete" class="form-control" placeholder="np. 123, 456, 789">
+
+                        <input type="file" name="file">
+                        <button type="submit" class="btn btn-success">Wczytaj</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-bordered">
+                <div class="panel-heading">
+                    <div class="panel-title">
                         Import danych z allegro
                     </div>
                 </div>

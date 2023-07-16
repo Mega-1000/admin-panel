@@ -621,6 +621,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/allegro-billing', [AllegroBillingController::class, 'index']);
 
     Route::group([], __DIR__ . '/web/DiscountRoutes.php');
+
+    Route::post('/add-labels-from-csv-file', \App\Http\Controllers\AddLabelsCSVController::class)->name('add-labels-from-csv-file');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
