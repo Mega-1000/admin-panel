@@ -2255,7 +2255,9 @@
                                 SBWF += parseFloat(invoice.value);
 
                                 html += `
-                                    ${Math.round(invoice.value * 100) / 100}
+                                    ${Math.round(invoice.value * 100) / 100} -
+                                    ${invoice.invoice_number} -
+                                    ${invoice.issue_date} -
                                     <a class="btn btn-danger" href="orders/invoice-value-delete/${invoice.id}">Usuń</a>
                                     <br>
                                 `;
