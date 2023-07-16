@@ -25,8 +25,9 @@ class RecordEmailSent
      */
     public function handle(MessageSent $event): void
     {
+        dd($event->data);
         MailReport::create([
-            'email' => key($event->message->getTo()),
+            'email' => key($event->data->getTo()),
             'subject' => $event->message->getSubject(),
             'body' => $event->message->getBody(),
         ]);
