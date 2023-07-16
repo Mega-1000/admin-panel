@@ -13,6 +13,13 @@ class ControllSubjectInvoiceService
 {
     public array $report = [];
     public array $orders = [];
+    public const NOTES_FOR_CONTINUE = [
+        'OK',
+        'ok',
+        'Ok',
+        'magazyn',
+        'Magazyn',
+    ];
 
     /**
      * @param array<ControllSubjectInvoiceDTO> $data
@@ -36,10 +43,20 @@ class ControllSubjectInvoiceService
         $grossInvoiceValue = $dto->value;
         $notes = $dto->notes;
 
+        if (in_array(explode($notes, ' ')[0], self::NOTES_FOR_CONTINUE)) {
+            return;
+        }
+
         $regex = '/^\d{5}/';
 
         if (preg_match($regex, $notes, $matches)) {
              $order = Order::find($matches[0]);
+
+             if ($value = $order->invoiceValues()->where('invoice_number', $dto->number)->first()) {
+                 $value->update([
+                     'value' => $grossInvoiceValue,
+                 ]);
+             }
 
              if (!$order) {
                     $this->addToReport($dto);
@@ -50,12 +67,7 @@ class ControllSubjectInvoiceService
             return;
         }
 
-        OrderInvoiceValue::where('order_id', $order->id)->where('value', $grossInvoiceValue)->first()?->delete();
-
-        OrderInvoiceValue::create([
-            'order_id' => $order->id,
-            'value' => $grossInvoiceValue
-        ]);
+        OrderInvoiceValueService::createFromDTO($dto, $order);
 
         $this->orders[] = $order->id;
     }
