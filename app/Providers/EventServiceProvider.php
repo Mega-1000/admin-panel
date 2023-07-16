@@ -2,9 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Mail\Events\MessageSent;
 use App\Listeners\RecordEmailSent;
-use App\Mail\MessageSent;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
