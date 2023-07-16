@@ -42,8 +42,6 @@ class ControllSubjectInvoiceService
     {
         $notes = $dto->notes;
 
-
-        // if first word is in notes to continue
         if (in_array(explode(' ', $notes)[0], self::NOTES_FOR_CONTINUE)) {
             return;
         }

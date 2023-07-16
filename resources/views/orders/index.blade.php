@@ -1452,6 +1452,8 @@
                         $('[data-toggle="tooltip"]').tooltip();
                         $('[data-toggle="transport-exchange-tooltip"]').tooltip();
                         $('[data-toggle="label-tooltip"]').tooltip();
+
+                        setDeleteEventListeners();
                     }, 1000);
 
                     $(".spedition-exchange-selector-no-invoice").on('click', function () {
@@ -2258,7 +2260,7 @@
                                     ${Math.round(invoice.value * 100) / 100} -
                                     ${invoice.invoice_number} -
                                     ${invoice.issue_date} -
-                                    <a class="btn btn-danger" href="orders/invoice-value-delete/${invoice.id}">Usuń</a>
+                                    <a class="btn btn-danger" id="delete" href="orders/invoice-value-delete/${invoice.id}">Usuń</a>
                                     <br>
                                 `;
                             });
@@ -4048,7 +4050,30 @@
             return status;
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/render-calendar.js') }}"></script>
+    <script>
+        const setDeleteEventListeners = () => {
+            const deleteLinks = document.querySelectorAll('#delete');
+            deleteLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+
+                    swal.fire({
+                        title: 'Jesteś pewien usuwania?',
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'OK',
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            window.location.href = href;
+                        }
+                    });
+                });
+            });
+        }
+    </script>
     <script>
         $(document).ready(function () {
             localStorage.removeItem('differenceMode');
@@ -4259,6 +4284,8 @@
             selectOnlyWrongInvoiceBilansOrders();
             table.ajax.reload();
         });
+
+        setDeleteEventListeners();
     </script>
 
     <script>
