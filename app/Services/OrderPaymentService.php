@@ -16,6 +16,7 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
+use App\Services\Label\AddLabelService;
 use Illuminate\Database\Eloquent\Model;
 
 readonly final class OrderPaymentService
@@ -41,11 +42,13 @@ readonly final class OrderPaymentService
         bool    $isWarehousePayment = null
     ): OrderPayment
     {
+        $arr = [];
         $order = Order::find($orderId);
 
         if ($order->payments->count() == 0) {
             $this->labelService->dispatchLabelEventByNameJob($order->id, LabelEventName::PAYMENT_RECEIVED);
-            $this->labelService->removeLabel($orderId, [45]);
+
+            AddLabelService::addLabels($order, [45], $arr, []);
         }
 
         if ($type == null) {
