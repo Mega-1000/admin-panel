@@ -56,11 +56,9 @@ class EmailSendingService
      */
     public function addNewScheduledEmail(Order $order, string $status = EmailSetting::NEW): bool
     {
-        if (empty($order)) {
-            abort(404);
-        }
+        $isUserFromAllegro = $order->customer->isAllegroUser();
 
-        $emailSetting = EmailSetting::where('status', $status)->get();
+        $emailSetting = EmailSetting::where('status', $status)->where('is_allegro', $isUserFromAllegro)->get();
         foreach($emailSetting as $setting) {
             $this->saveScheduledEmail($order, $setting);
         }
@@ -69,15 +67,13 @@ class EmailSendingService
     }
     public function addScheduledEmail(Order $order, int $labelID): bool
     {
-        if (empty($order)) {
-            abort(404);
-        }
-
         $status = EmailSettingsEnum::coerce($labelID);
         if( $status === null ) return false;
         $statusName = str_replace('LABEL_', '', $status->key);
 
-        $emailSetting = EmailSetting::where('status', $statusName)->get();
+        $isUserFromAllegro = $order->customer->isAllegroUser();
+
+        $emailSetting = EmailSetting::where('status', $statusName)->where('is_allegro', $isUserFromAllegro)->get();
 
         foreach($emailSetting as $setting) {
             $this->saveScheduledEmail($order, $setting);
@@ -98,7 +94,7 @@ class EmailSendingService
         $sending->content = $this->generateContent($setting->content, $file);
         $sending->attachment = $file;
 
-        if($setting->status === EmailSetting::PICKED_UP_2) {
+        if ($setting->status === EmailSetting::PICKED_UP_2) {
             $nextBusinessDay = Carbon::now()->nextBusinessDay()->startOfDay()->addHours(7)->toDateTimeString();
             $sending->scheduled_date = $nextBusinessDay;
         } else {
@@ -187,6 +183,8 @@ class EmailSendingService
     public function sendScheduledEmail(): void
     {
         $now = new Carbon();
+        $isUserFromAllegro =
+
         $sending = EmailSending::where('scheduled_date', '<=', $now->toDateTimeString())
             ->where('message_send', 0)
             ->get();

@@ -4,10 +4,21 @@
 @endsection
 
 @section('table')
+    <!-- errors -->
+    @if (count($errors) > 0)
+        <div class="alert alert-danger">
+            <strong>Ups!</strong> Wystąpiły problemy z twoim wpisem.<br><br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}<br></li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <form action="{{ action('EmailSettingsController@store') }}" method="POST" class="form-horizontal">
         {{ csrf_field() }}
-        
+
         <div class="form-group">
             <div class="col-sm-6">
                 <label>Zdarzenie:</label>
@@ -35,6 +46,15 @@
                 @include('email_module/_tags_selector')
                 <label>Wiadomość:</label>
                 <textarea rows="20" class="form-control" id="content" name="content" required></textarea>
+            </div>
+        </div>
+        <div>
+            <!-- is allegro -->
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <label>Wysyłaj do allegro:</label>
+                    <input type="checkbox" id="is_allegro" name="is_allegro" />
+                </div>
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Zapisz</button>

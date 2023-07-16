@@ -6,14 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\EmailSettingsEnum;
+use phpDocumentor\Reflection\Types\Boolean;
 
 /**
- * @property int    $id
- * @property string $status - NEW | PRODUCED | PICKED_UP | PROVIDED | ADDRESS_CHANGED | PICKED_UP_2 | NEW_ALLEGRO_MSG
- * @property int    $time
- * @property string $title
- * @property string $content
- * @property string $statusTitle
+ * @property int     $id
+ * @property string  $status - NEW | PRODUCED | PICKED_UP | PROVIDED | ADDRESS_CHANGED | PICKED_UP_2 | NEW_ALLEGRO_MSG
+ * @property int     $time
+ * @property Boolean $isAllegro
+ * @property string  $title
+ * @property string  $content
+ * @property string  $statusTitle
 */
 
 class EmailSetting extends Model
@@ -32,7 +34,8 @@ class EmailSetting extends Model
         'status',
         'time',
         'title',
-        'content'
+        'content',
+        'is_allegro',
     ];
 
     public function getStatusUserFriendlyName(): string

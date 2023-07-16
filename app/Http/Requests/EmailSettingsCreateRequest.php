@@ -20,7 +20,15 @@ class EmailSettingsCreateRequest extends FormRequest
             'status' => 'required|in:'.implode(',', $validStatuses),
             'time' => 'required|numeric',
             'title' => 'required',
-            'content' => 'required'
+            'content' => 'required',
+            'is_allegro' => 'required|in:on,of'
         ];
+    }
+
+    public function validated($key = null, $default = null): array
+    {
+        $validated = parent::validated();
+        $validated['is_allegro'] = $validated['is_allegro'] === 'on';
+        return $validated;
     }
 }

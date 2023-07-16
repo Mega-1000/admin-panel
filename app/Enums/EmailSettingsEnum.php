@@ -19,10 +19,8 @@ final class EmailSettingsEnum extends Enum
 
     public static function getAllStatuses(): array {
 
-        $allStatuses = array_filter(self::getConstants(), function($key) {
-            return strpos($key, 'LABEL_') === false;
+        return array_filter(self::getConstants(), function($key) {
+            return !str_contains($key, 'LABEL_');
         }, ARRAY_FILTER_USE_KEY);
-        
-        return $allStatuses;
     }
 }

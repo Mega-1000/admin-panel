@@ -19,6 +19,7 @@ class EmailSettingsController extends Controller
     public function index(): View
     {
         $emailSettings = EmailSetting::get();
+
         return view('email_module.index', compact('emailSettings'));
     }
 
@@ -28,7 +29,6 @@ class EmailSettingsController extends Controller
     public function create(): View
     {
         $statuses = EmailSettingsEnum::getAllStatuses();
-
         $tags = Tag::all();
 
         return view('email_module.create', compact('statuses', 'tags'));
@@ -39,11 +39,9 @@ class EmailSettingsController extends Controller
      *
      * @return RedirectResponse
      */
-    public function store(EmailSettingsCreateRequest $request): RedirectResponse {
-
-        $email_setting = new EmailSetting;
-        $email_setting->fill($request->all());
-        $email_setting->save();
+    public function store(EmailSettingsCreateRequest $request): RedirectResponse
+    {
+        EmailSetting::create($request->validated());
 
         return redirect()->route('emailSettings')->with([
             'message' => 'Ustawienia E-mail dodane poprawnie!',
@@ -56,8 +54,8 @@ class EmailSettingsController extends Controller
      *
      * @return View
      */
-    public function edit(EmailSetting $emailSetting): View {
-
+    public function edit(EmailSetting $emailSetting): View
+    {
         $statuses = EmailSettingsEnum::getAllStatuses();
 
         $tags = Tag::all();
@@ -70,8 +68,8 @@ class EmailSettingsController extends Controller
      * @param  EmailSetting               $emailSetting
      * @return RedirectResponse
      */
-    public function update(EmailSettingsCreateRequest $request, EmailSetting $emailSetting): RedirectResponse {
-
+    public function update(EmailSettingsCreateRequest $request, EmailSetting $emailSetting): RedirectResponse
+    {
         $emailSetting->fill($request->all());
         $emailSetting->save();
 
@@ -91,10 +89,6 @@ class EmailSettingsController extends Controller
      */
     public function destroy(EmailSetting $emailSetting): RedirectResponse
     {
-        if (empty($emailSetting)) {
-            abort(404);
-        }
-        
         $emailSetting->delete();
 
         return redirect()->route('emailSettings')->with([

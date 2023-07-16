@@ -158,4 +158,9 @@ class Customer extends Authenticatable implements Transformable
     {
         return $this->transactions->sortBy('id', true, true)->values();
     }
+
+    public function isAllegroUser(): bool
+    {
+        return str_contains($this->login, 'allegromail.pl');
+    }
 }
