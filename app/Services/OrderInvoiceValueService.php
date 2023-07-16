@@ -8,6 +8,11 @@ use App\Entities\OrderInvoiceValue;
 
 final class OrderInvoiceValueService
 {
+    /**
+     * @param ControllSubjectInvoiceDTO $dto
+     * @param Order $order
+     * @return OrderInvoiceValue
+     */
     public static function createFromDTO(ControllSubjectInvoiceDTO $dto, Order $order): OrderInvoiceValue
     {
         return OrderInvoiceValue::create([
@@ -17,6 +22,11 @@ final class OrderInvoiceValueService
         ]);
     }
 
+    /**
+     * @param ControllSubjectInvoiceDTO $dto
+     * @param OrderInvoiceValue $orderInvoiceValue
+     * @return void
+     */
     public static function updateFromDTO(ControllSubjectInvoiceDTO $dto, OrderInvoiceValue $orderInvoiceValue): void
     {
         $orderInvoiceValue->update([

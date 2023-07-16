@@ -40,7 +40,6 @@ class ControllSubjectInvoiceService
 
     private function handleSingle(ControllSubjectInvoiceDTO $dto): void
     {
-        $grossInvoiceValue = $dto->value;
         $notes = $dto->notes;
 
         if (in_array(explode($notes, ' ')[0], self::NOTES_FOR_CONTINUE)) {
@@ -52,15 +51,14 @@ class ControllSubjectInvoiceService
         if (preg_match($regex, $notes, $matches)) {
              $order = Order::find($matches[0]);
 
-             if ($value = $order->invoiceValues()->where('invoice_number', $dto->number)->first()) {
-                 $value->update([
-                     'value' => $grossInvoiceValue,
-                 ]);
-             }
+            if (!$order) {
+                $this->addToReport($dto);
+                return;
+            }
 
-             if (!$order) {
-                    $this->addToReport($dto);
-                    return;
+             if ($value = $order->invoiceValues()->where('invoice_number', $dto->number)->first()) {
+                 OrderInvoiceValueService::updateFromDTO($dto, $value);
+                 return;
              }
         } else {
             $this->addToReport($dto);
