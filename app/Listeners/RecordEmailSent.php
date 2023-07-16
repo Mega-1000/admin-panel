@@ -29,7 +29,7 @@ class RecordEmailSent
         MailReport::create([
             'email' => $event->data['email'],
             'subject' => $event->data['title'],
-            'body' => $event->data['message']->parameters,
+            'body' => $event->message->getBody()->getBody(),
         ]);
     }
 }
