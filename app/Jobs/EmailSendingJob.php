@@ -10,12 +10,12 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 use App\Services\EmailSendingService;
 
-class EmailSendingJob implements ShouldQueue
+readonly class EmailSendingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        protected readonly EmailSendingService $emailSendingService
+        protected EmailSendingService $emailSendingService
     ) {}
 
     public function handle()

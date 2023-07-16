@@ -5,8 +5,10 @@ use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\ImportAllegroBillingController;
+use App\Http\Controllers\MailReportController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\ProductStocksController;
+use App\MailReport;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -623,6 +625,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group([], __DIR__ . '/web/DiscountRoutes.php');
 
     Route::post('/add-labels-from-csv-file', \App\Http\Controllers\AddLabelsCSVController::class)->name('add-labels-from-csv-file');
+
+    Route::get('/email-reports', [MailReportController::class, 'index'])->name('email-reports.index');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
