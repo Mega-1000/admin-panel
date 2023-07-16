@@ -12,7 +12,9 @@ class OrderInvoiceValue extends Model
 
     protected $fillable = [
         'order_id',
-        'value'
+        'value',
+        'invoice_number',
+        'issue_date',
     ];
 
     public function order(): BelongsTo

@@ -19,6 +19,7 @@ final class OrderInvoiceValueService
             'order_id' => $order->id,
             'value' => $dto->value,
             'invoice_number' => $dto->number,
+            'issue_date' => $dto->issueDate,
         ]);
     }
 
