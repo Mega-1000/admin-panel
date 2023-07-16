@@ -4,6 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use TCG\Voyager\Models\MenuItem;
 use TCG\Voyager\Models\Permission;
+use TCG\Voyager\Models\Menu;
+
 
 class PriceAnalyzer extends Migration
 {
@@ -14,6 +16,10 @@ class PriceAnalyzer extends Migration
 	 */
 	public function up()
 	{
+		Menu::firstOrCreate([
+            'name' => 'admin',
+        ]);
+
 		$item = new MenuItem();
 		$item->menu_id = 1;
 		$item->title = 'Analizator cen';

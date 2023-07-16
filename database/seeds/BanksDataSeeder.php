@@ -1,4 +1,5 @@
 <?php
+namespace Database\Seeders;
 
 use App\Bank;
 use Illuminate\Database\Seeder;
