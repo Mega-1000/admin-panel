@@ -1,4 +1,5 @@
 <?php
+namespace Database\Seeders\Voyager;
 
 use Illuminate\Database\Seeder;
 use TCG\Voyager\Traits\Seedable;
@@ -19,7 +20,7 @@ class VoyagerDatabaseSeeder extends Seeder
         $this->seed('DataTypesTableSeeder');
         $this->seed('DataRowsTableSeeder');
         $this->seed('MenusTableSeeder');
-        $this->seed('MenuItemsTableSeeder');
+        $this->seed(\Database\Seeders\MenuItemsTableSeeder::class);
         $this->seed('RolesTableSeeder');
         $this->seed('PermissionsTableSeeder');
         $this->seed('PermissionRoleTableSeeder');

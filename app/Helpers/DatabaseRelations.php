@@ -5,6 +5,7 @@ namespace App\Helpers;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Str;
 
 class DatabaseRelations extends Migration
 {
@@ -56,7 +57,7 @@ class DatabaseRelations extends Migration
             $a = [];
             foreach ($row as $key => $value) {
                 $a[(is_string($key) ? $key : $value).'_id'] = [
-                    'table' => is_string($key) && isset($value['table']) ? $value['table'] : str_plural(is_string($key) ? $key : $value),
+                    'table' => is_string($key) && isset($value['table']) ? $value['table'] : Str::plural(is_string($key) ? $key : $value),
                     'nullable' => is_string($key) && isset($value['nullable']) && $value['nullable'],
                     'foreign' => is_string($key) && isset($value['foreign']) ? $value['foreign'] : true
                 ];

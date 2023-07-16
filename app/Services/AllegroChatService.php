@@ -60,7 +60,7 @@ class AllegroChatService extends AllegroApiService {
     }
 
     public function changeReadFlagOnThread(string $threadId, array $data) {
-        $url = $this->getRestUrl("/messaging/threads/{$threadId}/read");]
+        $url = $this->getRestUrl("/messaging/threads/{$threadId}/read");
 
         return $this->request('PUT', $url, $data);
     }

@@ -1,6 +1,8 @@
 <?php
+namespace Database\Seeders\Internal;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use TCG\Voyager\Models\Role;
 use TCG\Voyager\Models\User;
 
@@ -16,7 +18,7 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker\Factory::create();
+        $faker = \Faker\Factory::create();
 
         $role = Role::where('name', 'super_admin')->firstOrFail();
 
@@ -29,7 +31,7 @@ class UserTableSeeder extends Seeder
                 'lastname' => 'suadmin',
                 'phone' => '722325222',
                 'password' => bcrypt('password'),
-                'remember_token' => str_random(60),
+                'remember_token' => Str::random(60),
                 'role_id' => $role->id,
                 'status' => 'ACTIVE'
             ]);
@@ -46,7 +48,7 @@ class UserTableSeeder extends Seeder
                 'lastname' => 'admin',
                 'phone' => '722322222',
                 'password' => bcrypt('password'),
-                'remember_token' => str_random(60),
+                'remember_token' => Str::random(60),
                 'role_id' => $role->id,
                 'status' => 'ACTIVE'
             ]);
@@ -63,7 +65,7 @@ class UserTableSeeder extends Seeder
                 'lastname' => 'accountant',
                 'phone' => '722322312',
                 'password' => bcrypt('password'),
-                'remember_token' => str_random(60),
+                'remember_token' => Str::random(60),
                 'role_id' => $role->id,
                 'status' => 'ACTIVE'
             ]);
@@ -80,7 +82,7 @@ class UserTableSeeder extends Seeder
                 'lastname' => 'consultant',
                 'phone' => '722122222',
                 'password' => bcrypt('password'),
-                'remember_token' => str_random(60),
+                'remember_token' => Str::random(60),
                 'role_id' => $role->id,
                 'status' => 'ACTIVE'
             ]);
@@ -97,7 +99,7 @@ class UserTableSeeder extends Seeder
                 'lastname' => 'storekeeper',
                 'phone' => '722322827',
                 'password' => bcrypt('password'),
-                'remember_token' => str_random(60),
+                'remember_token' => Str::random(60),
                 'role_id' => $role->id,
                 'status' => 'ACTIVE'
             ]);
