@@ -194,6 +194,7 @@ class OrdersController extends Controller
     public function newOrder(StoreOrderRequest $request, ProductService $productService): JsonResponse
     {
         $data = $request->all();
+
         $customer = Customer::where('login', $data['customer_login'])->first();
         $customer = $customer ?? auth()->guard('api')->user();
 
@@ -248,7 +249,9 @@ class OrdersController extends Controller
             }
 
             $builderData['token'] = $order->getToken();
-            return response()->json($builderData);
+            return response()->json($builderData + [
+                'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
+            ]);
         } catch (Exception $e) {
             DB::rollBack();
 
