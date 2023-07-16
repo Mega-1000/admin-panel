@@ -48,7 +48,7 @@ readonly final class OrderPaymentService
         if ($order->payments->count() == 0) {
             $this->labelService->dispatchLabelEventByNameJob($order->id, LabelEventName::PAYMENT_RECEIVED);
 
-            AddLabelService::addLabels($order, [45], $arr, []);
+            AddLabelService::addLabels($order, [45, 68], $arr, []);
         }
 
         if ($type == null) {
