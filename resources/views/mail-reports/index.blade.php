@@ -32,6 +32,9 @@
             <th>
                 opis
             </th>
+            <th>
+                Stworzono
+            </th>
         </tr>
         @foreach($mailReports as $operation)
             <tr>
@@ -46,6 +49,9 @@
                 </td>
                 <td>
                     {{ $operation->body }}
+                </td>
+                <td>
+                    {{ $operation->created_at }}
                 </td>
             </tr>
         @endforeach
