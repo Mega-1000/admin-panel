@@ -276,7 +276,7 @@ class TransactionsController extends Controller
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function import(string $kind, Request $request)
+    public function import(string $kind, Request $request): JsonResponse
     {
         $job = null;
         switch ($kind) {
@@ -305,6 +305,7 @@ class TransactionsController extends Controller
                 ];
             }
         }
+
         return response()->json($response);
     }
 

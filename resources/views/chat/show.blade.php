@@ -513,6 +513,11 @@
                     <div>Data: ${complaintForm.date}</div>
                     <div>Numer kontaktowy do kierowcy: ${complaintForm?.driverPhone}</div>
                     <div>Numer śledzenia: ${complaintForm?.trackingNumber}</div>
+                    <div>Imię osoby obsługującej reklamacje ${complaintForm?.nameOfPersonHandlingTheComplaint}</div>
+                    <div>Nazwisko osoby obsługującej reklamacje ${complaintForm?.surnameOfPersonHandlingTheComplaint}</div>
+                    <div>Telefon osoby obsługującej reklamacje ${complaintForm?.phoneOfPersonHandlingTheComplaint}</div>
+                    <div>Email osoby obsługującej reklamacje ${complaintForm?.emailOfPersonHandlingTheComplaint}</div>
+                    <div>Propozycja rozwiązania ${complaintForm?.proposalOfTheClientsClaimOrSolutionToTheTopic}</div>
                     <div>Załącznik:
                         <a class="attachment-path" style="display: block; margin-top: 10px; color: #000;"
                             href="${storagePath}/${complaintForm.image}" target="_blank" download="${complaintForm.image_name}">

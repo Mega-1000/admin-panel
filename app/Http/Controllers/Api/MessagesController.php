@@ -26,6 +26,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 
@@ -99,6 +100,7 @@ class MessagesController extends Controller
                 ->withTrashed()
                 ->first();
         }
+
         return array($user, $chatUser);
     }
 
@@ -159,7 +161,7 @@ class MessagesController extends Controller
         return $chatUser;
     }
 
-    public function askForIntervention($token)
+    public function askForIntervention($token): Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         try {
             $helper = new MessagesHelper($token);
@@ -295,10 +297,10 @@ class MessagesController extends Controller
      *
      * @param CustomerComplaintRequest $request
      * @param Order $order
-     *
+     * @param MessagesHelper $helper
      * @return JsonResponse
      */
-    public function createCustomerComplaintChat(CustomerComplaintRequest $request, Order $order): JsonResponse
+    public function createCustomerComplaintChat(CustomerComplaintRequest $request, Order $order, MessagesHelper $helper): JsonResponse
     {
         $complaintForm = $request->validated();
         $customer = $request->user();
@@ -306,13 +308,12 @@ class MessagesController extends Controller
         $arr = [];
         AddLabelService::addLabels($order,[59], $arr, []);
 
-        try {
-            $helper = new MessagesHelper();
-
+        DB::transaction(function () use ($order, $customer, $helper, $complaintForm, &$chatUserToken) {
             if ($order->customer_id !== $customer->id) {
                 throw new ChatException('Customer ID is different than in the order');
             }
-            $chat = Chat::where('order_id', $order->id)->first();
+
+            $chat = $order->chat;
 
             if ($chat !== null) {
                 $helper->chatId = $chat->id;
@@ -320,11 +321,9 @@ class MessagesController extends Controller
 
             $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
 
-            if ($chat === null) {
-                $chat = $helper->createNewChat();
-            }
+            $chat = $chat === null ? $helper->createNewChat() : $chat;
 
-            if ( array_key_exists('image', $complaintForm) && !empty($complaintForm['image']) ) {
+            if (array_key_exists('image', $complaintForm) && !empty($complaintForm['image'])) {
                 $originalFileName = $complaintForm['image']->getClientOriginalName();
                 $hashedFileName = Hash::make($originalFileName);
                 $path = $complaintForm['image']->storeAs('chat_files/' . $chat->id, $hashedFileName, 'public');
@@ -336,16 +335,16 @@ class MessagesController extends Controller
 
             $chat->complaint_form = json_encode($complaintForm);
             $chat->save();
+        });
 
+        if (!isset($chatUserToken)) {
             return response()->json([
-                'chatUserToken' => $chatUserToken,
-            ]);
-        } catch (ChatException $e) {
-            $e->log();
+                'error' => 'Problem z utworzeniem nowego czatu dla klienta',
+            ], 500);
         }
 
         return response()->json([
-            'error' => 'Problem z utworzeniem nowego czatu dla klienta',
+            'chatUserToken' => $chatUserToken,
         ]);
     }
 
@@ -355,6 +354,7 @@ class MessagesController extends Controller
      * @param string $token
      *
      * @return void
+     * @throws ChatException
      */
     public function closeChat(string $token): void
     {
@@ -392,6 +392,7 @@ class MessagesController extends Controller
      * @param string $token
      *
      * @return void
+     * @throws ChatException
      */
     public function callComplaint(Request $request, string $token): void
     {
@@ -401,7 +402,7 @@ class MessagesController extends Controller
         $helper->sendComplaintEmail($email);
     }
 
-    public function getHistory(Request $request)
+    public function getHistory(Request $request): Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         $user = $request->user();
         $out = [];
@@ -416,10 +417,11 @@ class MessagesController extends Controller
                 'new_message' => $helper->hasNewMessage()
             ];
         }
+
         return response($out);
     }
 
-    public function editPrices(Request $request, $token)
+    public function editPrices(Request $request, $token): Response|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         try {
             $helper = new MessagesHelper($token);
@@ -458,10 +460,11 @@ class MessagesController extends Controller
             return response('Edytowany przedmiot nie istnieje', 400);
         }
         $url = route('chat.show', ['token' => $token]);
+
         return redirect($url);
     }
 
-    public function getUrl(Request $request)
+    public function getUrl(Request $request): JsonResponse
     {
         try {
             $url = \App\Http\Controllers\MessagesController::getChatUrl($request->mediaId,
@@ -471,11 +474,12 @@ class MessagesController extends Controller
         } catch (ChatException $exception) {
             $exception->log();
             if ($exception->getMessage() == 'wrong_password') {
-                return response(['errorMessage' => 'Podany email istnieje w naszej bazie. Proszę podać prawidłowe hasło/numer telefonu'], 400);
+                return response()->json(['errorMessage' => 'Podany email istnieje w naszej bazie. Proszę podać prawidłowe hasło/numer telefonu'], 400);
             } else {
-                return response(['errorMessage' => 'Wystąpil błąd. Spróbuj ponownie później'], 400);
+                return response()->json(['errorMessage' => 'Wystąpil błąd. Spróbuj ponownie później'], 400);
             }
         }
-        return response(['url' => $url], 200);
+
+        return response()->json(['url' => $url], 200);
     }
 }

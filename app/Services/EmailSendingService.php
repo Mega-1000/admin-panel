@@ -68,7 +68,7 @@ class EmailSendingService
     public function addScheduledEmail(Order $order, int $labelID): bool
     {
         $status = EmailSettingsEnum::coerce($labelID);
-        if( $status === null ) return false;
+        if ( $status === null ) return false;
         $statusName = str_replace('LABEL_', '', $status->key);
 
         $isUserFromAllegro = $order->customer->isAllegroUser();

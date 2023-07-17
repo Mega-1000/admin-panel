@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\DiscountController;
+use App\Http\Controllers\Api\OrderPackageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -168,3 +169,6 @@ Route::prefix('discounts')->group(function () {
     Route::get('/get-categories', [DiscountController::class, 'getCategories'])
         ->name('discounts.get-categories');
 });
+
+Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'getByOrder'])
+    ->name('api.get-packages-for-order');
