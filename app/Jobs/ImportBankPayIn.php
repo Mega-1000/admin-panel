@@ -193,7 +193,7 @@ class ImportBankPayIn implements ShouldQueue
         ];
 
         foreach ($notPossibleOperationDescriptions as $notPossibleOperationDescription) {
-            if (str_contains($payIn['tytul'], $notPossibleOperationDescription)) {
+            if (str_contains((string)$payIn, $notPossibleOperationDescription)) {
                 return PayInDTOFactory::createPayInDTO([
                     'data' => $payIn,
                     'message' => 'Brak dopasowania',
