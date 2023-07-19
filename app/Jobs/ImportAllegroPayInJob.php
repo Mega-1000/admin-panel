@@ -148,7 +148,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
 
         $payment = Payment::where('order_id', $order->id)->where('amount', $payIn['kwota'])->first();
 
-        if (empty($payment)) {
+        if (!empty($payment)) {
             $order->payments()->create([
                 'amount' => $payIn['kwota'],
                 'type' => 'CLIENT',
