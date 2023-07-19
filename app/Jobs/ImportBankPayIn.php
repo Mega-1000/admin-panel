@@ -6,6 +6,7 @@ use App\DTO\PayInDTO;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
+use App\Entities\Payment;
 use App\Entities\Transaction;
 use App\Enums\OrderTransactionEnum;
 use App\Factory\PayInDTOFactory;
@@ -381,17 +382,20 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function saveOrderPayment(Order $order, $paymentAmount, $payIn, $declaredSum = false): Model
     {
-        $payment = $order->payments()->create([
-            'amount' => $paymentAmount,
-            'type' => 'CLIENT',
-            'promise' => '',
-            'payer' => $order->customer()->first()->login,
-            'operation_date' => $payIn['data_ksiegowania'],
-            'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
-            'comments' => implode(" ", $payIn),
-            'operation_type' => 'Wpłata/wypłata bankowa',
-            'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
-        ]);
+        $payment = Payment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
+
+        $payment = !empty($payment)
+            ? $order->payments()->create([
+                'amount' => $paymentAmount,
+                'type' => 'CLIENT',
+                'promise' => '',
+                'payer' => $order->customer()->first()->login,
+                'operation_date' => $payIn['data_ksiegowania'],
+                'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
+                'comments' => implode(" ", $payIn),
+                'operation_type' => 'Wpłata/wypłata bankowa',
+                'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
+            ]) : $payment;
 
         $this->orderPaymentLabelsService->calculateLabels($payment->order);
 
