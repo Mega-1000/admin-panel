@@ -10,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 
 use App\Services\EmailSendingService;
 
-readonly class EmailSendingJob implements ShouldQueue
+final class EmailSendingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

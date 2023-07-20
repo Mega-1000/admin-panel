@@ -2,28 +2,16 @@
 
 namespace App\Jobs;
 
-use App\Entities\Order;
-use App\Entities\OrderPackage;
-use App\Entities\OrderPayment;
-use App\Entities\Payment;
-use App\Entities\Transaction;
-use App\Http\Controllers\OrdersPaymentsController;
-use App\Repositories\OrderPayments;
+use App\Enums\AllegroImportPayInDataEnum;
 use App\Repositories\TransactionRepository;
+use App\Services\AllegroImportPayInService;
 use App\Services\FindOrCreatePaymentForPackageService;
-use App\Services\Label\AddLabelService;
-use Carbon\Carbon;
-use DateTime;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -64,7 +52,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
         protected readonly UploadedFile $file
     ) {}
 
-    public function handle(TransactionRepository $transaction, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService)
+    public function handle(TransactionRepository $transaction, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService, AllegroImportPayInService $allegroImportPayInService)
     {
         $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
         $header = NULL;
@@ -90,27 +78,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
         }
 
         $data = array_reverse($data);
-        foreach ($data as $payIn) {
-            if (!in_array($payIn['operacja'], ['wpłata', 'zwrot', 'dopłata'])) {
-                continue;
-            }
-
-            $order = Order::where('allegro_payment_id', '=', $payIn['identyfikator'])->first();
-
-            try {
-                if (!empty($order)) {
-                    $this->findOrCreatePaymentForPackageService->execute(
-                        OrderPackage::where('order_id', $order->id)->first(),
-                    );
-
-                    $this->settleOrder($order, $payIn);
-                } else {
-                    fputcsv($file, $payIn);
-                }
-            } catch (Exception $exception) {
-                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
-            }
-        }
+        $allegroImportPayInService->writeToFile($data, AllegroImportPayInDataEnum::CSV, $file, $this->findOrCreatePaymentForPackageService);
 
         fclose($file);
         Storage::disk('local')->put('public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv', file_get_contents($fileName));
@@ -131,35 +99,5 @@ final class ImportAllegroPayInJob implements ShouldQueue
         }
 
         return 0;
-    }
-
-    /**
-     * Settle orders.
-     *
-     * @param Order $order
-     * @param $payIn
-     */
-    private function settleOrder(Order $order, $payIn): void
-    {
-        $payIn['kwota'] = explode(" ", $payIn['kwota'])[0];
-
-        $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
-        OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
-
-        $payment = Payment::where('order_id', $order->id)->where('amount', $payIn['kwota'])->first();
-
-        if (empty($payment)) {
-            $order->payments()->create([
-                'amount' => $payIn['kwota'],
-                'type' => 'CLIENT',
-                'promise' => '',
-                'external_payment_id' => $payIn['identyfikator'],
-                'payer' => $order->customer->login,
-                'operation_date' => Carbon::parse($payIn['data']),
-                'comments' => implode(' ', $payIn),
-                'operation_type' => 'wplata/wyplata allegro',
-                'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
-            ]);
-        }
     }
 }
