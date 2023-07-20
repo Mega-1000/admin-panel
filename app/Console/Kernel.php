@@ -84,7 +84,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('schenker:pull_package_dictionary')->daily();
 
-        $schedule->job('set-logs-permissions')->daily();
+        $schedule->job('set-logs-permissions')->dailyAt('01:00');
     }
 
     /**

@@ -148,7 +148,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
 
         $payment = Payment::where('order_id', $order->id)->where('amount', $payIn['kwota'])->first();
 
-            dd($order->payments()->create([
+            $order->payments()->create([
                 'amount' => $payIn['kwota'],
                 'type' => 'CLIENT',
                 'promise' => '',
@@ -158,6 +158,6 @@ final class ImportAllegroPayInJob implements ShouldQueue
                 'comments' => implode(' ', $payIn),
                 'operation_type' => 'wplata/wyplata allegro',
                 'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
-            ]));
+            ]);
     }
 }
