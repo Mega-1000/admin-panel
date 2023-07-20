@@ -3,15 +3,12 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
-use App\Entities\OrderPackage;
-use App\Entities\OrderPayment;
 use App\Entities\Transaction;
-use App\Http\Controllers\OrdersPaymentsController;
-use App\Repositories\OrderPayments;
+use App\Enums\AllegroImportPayInDataEnum;
 use App\Repositories\TransactionRepository;
+use App\Services\AllegroImportPayInService;
 use App\Services\FindOrCreatePaymentForPackageService;
 use App\Services\Label\AddLabelService;
-use Carbon\Carbon;
 use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -22,7 +19,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -67,7 +63,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function handle(TransactionRepository $transaction, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService)
+    public function handle(TransactionRepository $transaction, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService, AllegroImportPayInService $allegroImportPayInService)
     {
         $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
         $header = NULL;
@@ -93,29 +89,11 @@ final class ImportAllegroPayInJob implements ShouldQueue
         }
 
         $data = array_reverse($data);
-        foreach ($data as $payIn) {
-            if (!in_array($payIn['operacja'], ['wpłata', 'zwrot', 'dopłata'])) {
-                continue;
-            }
-
-            $order = Order::where('allegro_payment_id', '=', $payIn['identyfikator'])->first();
-
-            try {
-                if (!empty($order)) {
-                    $this->findOrCreatePaymentForPackageService->execute(
-                        OrderPackage::where('order_id', $order->id)->first(),
-                    );
-
-                    $this->settleOrder($order, $payIn);
-                } else {
-                    fputcsv($file, $payIn);
-                }
-            } catch (Exception $exception) {
-                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
-            }
-        }
+        
+        $allegroImportPayInService->writeToFile($data, AllegroImportPayInDataEnum::CSV, $file, $this->findOrCreatePaymentForPackageService);
 
         fclose($file);
+
         Storage::disk('local')->put('public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv', file_get_contents($fileName));
     }
 
@@ -209,34 +187,6 @@ final class ImportAllegroPayInJob implements ShouldQueue
     private function getRelatedOrders(Order $order): Collection
     {
         return Order::where('master_order_id', '=', $order->id)->orWhere('id', '=', $order->id)->get();
-    }
-
-    /**
-     * Settle orders.
-     *
-     * @param Order $order
-     * @param $payIn
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function settleOrder(Order $order, $payIn): void
-    {
-        $payIn['kwota'] = explode(" ", $payIn['kwota'])[0];
-        Log::notice($payIn['kwota']);
-
-        $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
-        OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
-
-         $order->payments()->create([
-            'amount' => $payIn['kwota'],
-            'type' => 'CLIENT',
-            'promise' => '',
-            'external_payment_id' => $payIn['identyfikator'],
-            'payer' => $order->customer->login,
-            'operation_date' => Carbon::parse($payIn['data']),
-            'comments' => implode(' ', $payIn),
-            'operation_type' => 'wplata/wyplata allegro',
-            'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
-        ]);
     }
 
     /**

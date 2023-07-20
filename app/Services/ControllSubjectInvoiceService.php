@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\DTO\ControllSubjectInvoice\ControllSubjectInvoiceDTO;
 use App\Entities\Order;
-use App\Entities\OrderInvoiceValue;
 use App\Repositories\OrderInvoiceValues;
 use App\Repositories\Orders;
 use App\Services\Label\AddLabelService;
