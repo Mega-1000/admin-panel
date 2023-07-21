@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Exception;
 
 class AllegroImportPayInService {
-    public function writeToFile(array $data, int $type = AllegroImportPayInDataEnum::API, $file, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService) {
+    public function writeToFile(array $data, int $type = AllegroImportPayInDataEnum::API, $file, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService): void {
         foreach ($data as $payInData) {
             $payIn = null;
             if ($type === AllegroImportPayInDataEnum::CSV) {

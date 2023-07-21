@@ -1,1 +1,0 @@
-Transakcje Allegro

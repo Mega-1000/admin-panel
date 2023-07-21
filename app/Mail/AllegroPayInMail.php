@@ -19,7 +19,7 @@ class AllegroPayInMail extends Mailable
      *
      * @return void
      */
-    public function __construct(public string $filePath) {}
+    public function __construct(public readonly string $filePath) {}
 
     /**
      * Get the message envelope.
@@ -40,9 +40,7 @@ class AllegroPayInMail extends Mailable
      */
     public function content()
     {
-        return new Content(
-            view: 'emails.allegro-pay-in',
-        );
+        return new Content(htmlString: 'Transakcje bez zamówień z Allegro');
     }
 
     /**

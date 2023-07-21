@@ -6,10 +6,6 @@ class AllegroPaymentService extends AllegroApiService {
 
     private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 
-    public function __construct() {
-        parent::__construct();
-    }
-
     public function getPaymentsFromPastDay(): array {
         $date = Carbon::now()->subDay();
 
