@@ -1,4 +1,6 @@
-<?php namespace App\Services;
+<?php 
+
+namespace App\Services;
 
 use App\DTO\ImportPayIn\AllegroPayInDTO;
 use App\Entities\Order;
@@ -57,16 +59,20 @@ class AllegroImportPayInService {
         $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn->toArray()) >= 1;
         OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn->toArray());
 
-         $order->payments()->create([
-            'amount' => $payIn->amount,
-            'type' => 'CLIENT',
-            'promise' => '',
-            'external_payment_id' => $payIn->allegroIdentifier,
-            'payer' => $order->customer->login,
-            'operation_date' => Carbon::parse($payIn->date),
-            'comments' => implode(' ', $payIn->toArray()),
-            'operation_type' => 'wplata/wyplata allegro',
-            'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
-        ]);
+        $existingPayment = $order->payments()->where('amount', $payIn->amount)->first();
+
+        if (empty($existingPayment)) {
+            $order->payments()->create([
+                'amount' => $payIn->amount,
+                'type' => 'CLIENT',
+                'promise' => '',
+                'external_payment_id' => $payIn->allegroIdentifier,
+                'payer' => $order->customer->login,
+                'operation_date' => Carbon::parse($payIn->date),
+                'comments' => implode(' ', $payIn->toArray()),
+                'operation_type' => 'wplata/wyplata allegro',
+                'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
+            ]);
+        }
     }
 }

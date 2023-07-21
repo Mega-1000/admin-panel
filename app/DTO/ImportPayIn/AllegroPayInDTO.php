@@ -1,4 +1,6 @@
-<?php namespace App\DTO\ImportPayIn;
+<?php 
+
+namespace App\DTO\ImportPayIn;
 
 final class AllegroPayInDTO {
     public function __construct(
