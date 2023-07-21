@@ -258,15 +258,15 @@ class ImportBankPayIn implements ShouldQueue
 
         $allegoIdPattern = '/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/';
         if (preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
-            $order = Order::query()->where('allegro_form_id', $matches[0])->first();
+        $order = Order::query()->where('allegro_form_id', $matches[0])->first();
 
-            if (!empty($order)) {
-                return PayInDTOFactory::createPayInDTO([
-                    'orderId' => (int)$order->id,
-                    'data' => $payIn,
-                ]);
-            }
+        if (!empty($order)) {
+            return PayInDTOFactory::createPayInDTO([
+                'orderId' => (int)$order->id,
+                'data' => $payIn,
+            ]);
         }
+    }
 
         $invoicePattern = '/\b(?:\d{1,6}\s*\/\s*(?:sta|mag|tra|kos)\s*\/\s*\d{2}\s*\/\s*\d{2}\s*\d{2})\b/';
         if (preg_match($invoicePattern, mb_strtolower($payIn['tytul']), $matches)) {
@@ -384,7 +384,7 @@ class ImportBankPayIn implements ShouldQueue
     {
         $payment = Payment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
 
-        $payment = !empty($payment)
+        $payment = empty($payment)
             ? $order->payments()->create([
                 'amount' => $paymentAmount,
                 'type' => 'CLIENT',
