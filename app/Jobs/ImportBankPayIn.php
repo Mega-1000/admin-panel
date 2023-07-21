@@ -380,7 +380,7 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @return Model
      */
-    private function saveOrderPayment(Order $order, float $paymentAmount, array $payIn, false $declaredSum = false): Model
+    private function saveOrderPayment(Order $order, float $paymentAmount, array $payIn, bool $declaredSum = false): Model
     {
         $payment = Payment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
 
