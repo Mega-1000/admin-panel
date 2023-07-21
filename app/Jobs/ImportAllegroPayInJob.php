@@ -226,7 +226,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
         $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
         OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
 
-        $existingPayment = $order->payments()->where('amount', $payIn['kwota'])->first();
+        $existingPayment = OrderPayment::where('amount', $payIn['kwota'])->first();
 
         if (empty($existingPayment)) {
             $order->payments()->create([
