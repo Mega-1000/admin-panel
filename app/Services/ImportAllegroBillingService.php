@@ -110,6 +110,6 @@ class ImportAllegroBillingService
      */
     private function handleNoTrackingNumber(AllegroGeneralExpense $billingEntry, ImportAllegroBillingDTO $data): void
     {
-        return null;
+        return;
     }
 }
