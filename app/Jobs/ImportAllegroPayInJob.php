@@ -228,17 +228,19 @@ final class ImportAllegroPayInJob implements ShouldQueue
 
         $existingPayment = $order->payments()->where('amount', $payIn['kwota'])->first();
 
-        $order->payments()->create([
-            'amount' => $payIn['kwota'],
-            'type' => 'CLIENT',
-            'promise' => '',
-            'external_payment_id' => $payIn['identyfikator'],
-            'payer' => $order->customer->login,
-            'operation_date' => Carbon::parse($payIn['data']),
-            'comments' => implode(' ', $payIn),
-            'operation_type' => 'wplata/wyplata allegro',
-            'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
-        ]);
+        if (empty($existingPayment)) {
+            $order->payments()->create([
+                'amount' => $payIn['kwota'],
+                'type' => 'CLIENT',
+                'promise' => '',
+                'external_payment_id' => $payIn['identyfikator'],
+                'payer' => $order->customer->login,
+                'operation_date' => Carbon::parse($payIn['data']),
+                'comments' => implode(' ', $payIn),
+                'operation_type' => 'wplata/wyplata allegro',
+                'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
+            ]);
+        }
     }
 
     /**
