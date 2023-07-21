@@ -384,7 +384,7 @@ class ImportBankPayIn implements ShouldQueue
     {
         $payment = Payment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
 
-        $payment = isset($payment)
+        $payment = !isset($payment)
             ? $order->payments()->create([
                 'amount' => $paymentAmount,
                 'type' => 'CLIENT',
