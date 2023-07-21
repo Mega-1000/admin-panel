@@ -382,6 +382,7 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function saveOrderPayment(Order $order, float $paymentAmount, array $payIn, false $declaredSum = false): Model
     {
+        $payment = Payment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
 
         $payment = empty($payment)
             ? $order->payments()->create([

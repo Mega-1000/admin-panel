@@ -299,6 +299,7 @@ class TransactionsController extends Controller
             try {
                 $response = dispatch_now($job);
             } catch (\Exception $exception) {
+                dd($exception);
                 $response = [
                     'errorCode' => 500,
                     'errorMessage' => $exception->getMessage()
