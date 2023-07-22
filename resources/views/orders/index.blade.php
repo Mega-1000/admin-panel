@@ -2195,14 +2195,19 @@
                                 return 0;
                             }
 
+                            const Z = (sumDetails.sumOfSelling - sumDetails.sumOfPurchase - RKTBO).toFixed(2);
+
+                            const BZO = (Z - RKTBO - PSIK - PSW + WAC + ZP).toFixed(2);
+
+
                             return `
-                                <p><span title="Zysk">Z: ${(sumDetails.sumOfSelling - sumDetails.sumOfPurchase - RKTBO).toFixed(2)}</p>
+                                <p><span title="Zysk">Z: ${Z}</p>
                                 <p>RKTBO: ${RKTBO}</p>
                                 <p>PSIK: ${PSIK}</p>
                                 <p>PSW: ${PSW}</p>
                                 <p>WAC: ${WAC}</p>
                                 <p>ZP: ${ZP}</p>
-
+                                <p>BZO: ${BZO}</p>
                             `;
                         }
                     },
