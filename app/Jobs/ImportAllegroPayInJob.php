@@ -2,28 +2,16 @@
 
 namespace App\Jobs;
 
-use App\Entities\Order;
-use App\Entities\OrderPackage;
-use App\Entities\OrderPayment;
-use App\Entities\Payment;
-use App\Entities\Transaction;
-use App\Http\Controllers\OrdersPaymentsController;
-use App\Repositories\OrderPayments;
+use App\Enums\AllegroImportPayInDataEnum;
 use App\Repositories\TransactionRepository;
+use App\Services\AllegroImportPayInService;
 use App\Services\FindOrCreatePaymentForPackageService;
-use App\Services\Label\AddLabelService;
-use Carbon\Carbon;
-use DateTime;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -64,11 +52,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
         protected readonly UploadedFile $file
     ) {}
 
-    /**
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    public function handle(TransactionRepository $transaction, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService)
+    public function handle(TransactionRepository $transaction, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService, AllegroImportPayInService $allegroImportPayInService)
     {
         $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
         $header = NULL;
@@ -94,27 +78,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
         }
 
         $data = array_reverse($data);
-        foreach ($data as $payIn) {
-            if (!in_array($payIn['operacja'], ['wpłata', 'zwrot', 'dopłata'])) {
-                continue;
-            }
-
-            $order = Order::where('allegro_payment_id', '=', $payIn['identyfikator'])->first();
-
-            try {
-                if (!empty($order)) {
-                    $this->findOrCreatePaymentForPackageService->execute(
-                        OrderPackage::where('order_id', $order->id)->first(),
-                    );
-
-                    $this->settleOrder($order, $payIn);
-                } else {
-                    fputcsv($file, $payIn);
-                }
-            } catch (Exception $exception) {
-                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
-            }
-        }
+        $allegroImportPayInService->writeToFile($data, AllegroImportPayInDataEnum::CSV, $file, $this->findOrCreatePaymentForPackageService);
 
         fclose($file);
         Storage::disk('local')->put('public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv', file_get_contents($fileName));
@@ -176,119 +140,5 @@ final class ImportAllegroPayInJob implements ShouldQueue
         }
 
         return 0;
-    }
-
-    /**
-     * Settle promise.
-     *
-     * @param Order $order Order object.
-     * @param array $payIn Pay in row.
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function settlePromisePayments(Order $order, array $payIn): void
-    {
-        foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
-            if ($payIn['kwota'] === (float)$payment->amount) {
-                $payment->delete();
-                continue;
-            }
-
-            $preventionArray = [];
-            AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()?->id);
-        }
-    }
-
-    /**
-     * Return related Orders
-     *
-     * @param Order $order Order object.
-     * @return Collection
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function getRelatedOrders(Order $order): Collection
-    {
-        return Order::where('master_order_id', '=', $order->id)->orWhere('id', '=', $order->id)->get();
-    }
-
-    /**
-     * Settle orders.
-     *
-     * @param Order $order
-     * @param $payIn
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function settleOrder(Order $order, $payIn): void
-    {
-        $payIn['kwota'] = explode(" ", $payIn['kwota'])[0];
-
-        $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
-        OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
-
-        $existingPayment = OrderPayment::where('amount', $payIn['kwota'])->first();
-
-        if (empty($existingPayment)) {
-            $order->payments()->create([
-                'amount' => $payIn['kwota'],
-                'type' => 'CLIENT',
-                'promise' => '',
-                'external_payment_id' => $payIn['identyfikator'],
-                'payer' => $order->customer->login,
-                'operation_date' => Carbon::parse($payIn['data']),
-                'comments' => implode(' ', $payIn),
-                'operation_type' => 'wplata/wyplata allegro',
-                'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
-            ]);
-        }
-    }
-
-    /**
-     * @param Order $order
-     * @return float
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function getTotalOrderValue(Order $order): float
-    {
-        $additional_service = $order->additional_service_cost ?? 0;
-        $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
-        $shipment_price_client = $order->shipment_price_for_client ?? 0;
-        $totalProductPrice = 0;
-
-        foreach ($order->items as $item) {
-            $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
-            $quantity = $item->quantity ?? 0;
-            $totalProductPrice += $price * $quantity;
-        }
-
-        return round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
-    }
-
-    /**
-     * Tworzy transakcje przeksięgowania
-     *
-     * @param Order $order
-     * @param Transaction $transaction
-     * @param float $amount
-     * @return Transaction
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function saveTransfer(Order $order, Transaction $transaction, float $amount): Transaction
-    {
-        return $this->transactionRepository->create([
-            'customer_id' => $order->customer_id,
-            'posted_in_system_date' => new DateTime(),
-            'payment_id' => str_replace('w-', 'p-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
-            'kind_of_operation' => 'przeksięgowanie',
-            'order_id' => $order->id,
-            'operator' => 'SYSTEM',
-            'operation_value' => -$amount,
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) - $amount,
-            'accounting_notes' => '',
-            'transaction_notes' => '',
-            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
-        ]);
     }
 }

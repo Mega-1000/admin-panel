@@ -85,6 +85,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('schenker:pull_package_dictionary')->daily();
 
         $schedule->job('set-logs-permissions')->dailyAt('01:00');
+
+        $schedule->job(Jobs\ImportPayInFromAllegroJob::class)->dailyAt("23:55");
     }
 
     /**
