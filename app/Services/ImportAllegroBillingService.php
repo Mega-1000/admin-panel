@@ -25,6 +25,8 @@ class ImportAllegroBillingService
      */
     public function import(array $data): void
     {
+        AllegroGeneralExpenses::deleteAll();
+
         foreach ($data as $dto) {
             $this->importSingle($dto);
         }
@@ -38,7 +40,6 @@ class ImportAllegroBillingService
      */
     private function importSingle(ImportAllegroBillingDTO $data): void
     {
-        AllegroGeneralExpenses::deleteAll();
         $billingEntry = AllegroGeneralExpenses::createFromDTO($data);
         $trackingNumber = $this->billingHelper->extractTrackingNumber($data->getOperationDetails());
 
@@ -110,6 +111,6 @@ class ImportAllegroBillingService
      */
     private function handleNoTrackingNumber(AllegroGeneralExpense $billingEntry, ImportAllegroBillingDTO $data): void
     {
-        return null;
+        return;
     }
 }

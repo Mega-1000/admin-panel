@@ -14,6 +14,7 @@ use App\Repositories\TransactionRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionsController extends Controller
@@ -299,6 +300,7 @@ class TransactionsController extends Controller
             try {
                 $response = dispatch_now($job);
             } catch (\Exception $exception) {
+                Log::notice($exception);
                 $response = [
                     'errorCode' => 500,
                     'errorMessage' => $exception->getMessage()

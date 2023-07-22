@@ -85,10 +85,51 @@ final class ImportAllegroPayInJob implements ShouldQueue
     }
 
     /**
+     * Save new transaction
+     *
+     * @param Order $order Order object
+     * @param array $data Additional data
+     * @return Transaction|null
+     *
+     * @throws Exception
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function saveTransaction(Order $order, array $data): ?Transaction
+    {
+        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', 'w-' . $data['identyfikator'])->first();
+        if ($existingTransaction !== null) {
+            if ($data['operacja'] == 'zwrot') {
+                $paymentsToReturn = $order->payments()->where('amount', '=', $data['kwota'])->whereNull('deleted_at')->first();
+                if (!empty($paymentsToReturn)) {
+                    $paymentsToReturn->delete();
+                }
+            } else {
+                return null;
+            }
+        }
+        return $this->transactionRepository->create([
+            'customer_id' => $order->customer_id,
+            'posted_in_system_date' => new DateTime(),
+            'posted_in_bank_date' => new DateTime($data['data']),
+            'payment_id' => (($data['operacja'] === 'zwrot') ? 'z' : 'w-') . $data['identyfikator'],
+            'kind_of_operation' => $data['operacja'],
+            'order_id' => $order->id,
+            'operator' => $data['operator'],
+            'operation_value' => preg_replace('/[^.\d]/', '', $data['kwota']),
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
+            'accounting_notes' => '',
+            'transaction_notes' => '',
+            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL
+        ]);
+    }
+
+    /**
      * Calculate balance
      *
      * @param integer $customerId Customer id
      * @return float
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function getCustomerBalance(int $customerId): float
     {
