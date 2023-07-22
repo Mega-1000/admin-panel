@@ -92,7 +92,13 @@ return [
             'driver' => 'local',
             'root' => storage_path('wsdl'),
             'visibility' => 'private',
-        ]
+        ],
+
+        'allegroPayInDisk' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public' . env('ALLEGRO_PAY_IN_PATH', '/allegro-pay-in/')),
+            'visibility' => 'public',
+        ],
 
     ],
 
