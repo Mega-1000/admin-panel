@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTO\AllegroBilling\ImportAllegroBillingDTO;
 use App\Entities\AllegroGeneralExpense;
+use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Enums\AllegroImport\AllegroBillingAttachedValueParameterEnum;
 use App\Repositories\AllegroGeneralExpenses;
@@ -41,9 +42,20 @@ class ImportAllegroBillingService
     private function importSingle(ImportAllegroBillingDTO $data): void
     {
         $billingEntry = AllegroGeneralExpenses::createFromDTO($data);
-        $trackingNumber = $this->billingHelper->extractTrackingNumber($data->getOperationDetails());
 
-        if (!$trackingNumber) return;
+        $trackingNumber = $this->billingHelper->extractTrackingNumber(
+            $data->getOperationDetails()
+        );
+
+        if (!$trackingNumber) {
+            $allegroId = $this->billingHelper->extractAllegroId($data->getOperationDetails());
+
+            $order = Order::where('allegro_transaction_id', $allegroId)->first();
+
+            if (empty($order)) {
+                return;
+            }
+        };
 
         $orderPackage = $this->orderPackagesRepository->getByLetterNumber($trackingNumber);
 
@@ -59,8 +71,9 @@ class ImportAllegroBillingService
 
         $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOD');
 
-        $order = $orderPackage->order;
-        $order->allegroGeneralExpenses()->attach($billingEntry->id);
+        $order = empty($order) ? $orderPackage->order : $order;
+
+        $billingEntry->order()->associate($order);
     }
 
     /**

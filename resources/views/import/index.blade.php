@@ -130,7 +130,7 @@
             <div class="panel panel-bordered">
                 <div class="panel-heading">
                     <div class="panel-title">
-                        Import danych z allegro
+                        Import danych - billing allegro
                     </div>
                 </div>
                 <div class="panel-body">
@@ -138,7 +138,7 @@
                         @csrf
                         <input type="file" name="file">
 
-                        <button class="btn btn-primary">Importuj dane z allegro</button>
+                        <button class="btn btn-primary">Importuj billing allegro</button>
                     </form>
                 </div>
             </div>
