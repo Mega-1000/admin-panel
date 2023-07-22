@@ -28,7 +28,8 @@ class AllegroGeneralExpense extends Model
         'debit',
         'balance',
         'operation_details',
-        'attached_value_parameter'
+        'attached_value_parameter',
+        'order_id',
     ];
 
     protected $casts = [

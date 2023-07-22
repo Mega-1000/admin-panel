@@ -15,6 +15,7 @@ class AllegroBillingImportHelper
         '/UPS operator - opłaty podstawowe/',
     ];
 
+    private string $allegroIdPattern = '/Identyfikator zamówienia: ([a-z0-9-]+)/';
     private string $numberPattern = '/Numer nadania: (\d+)/';
 
     /**
@@ -25,6 +26,17 @@ class AllegroBillingImportHelper
     {
         return preg_match($this->numberPattern, $details)
             ? explode(',', preg_replace($this->numberPattern, '$1', $details))[0]
+            : null;
+    }
+
+    /**
+     * @param string $details
+     * @return string|null
+     */
+    public function extractAllegroId(string $details): ?string
+    {
+        return preg_match($this->allegroIdPattern, $details)
+            ? explode(',', preg_replace($this->allegroIdPattern, '$1', $details))[0]
             : null;
     }
 
