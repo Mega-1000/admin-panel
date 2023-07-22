@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Listeners;
-
 use App\MailReport;
 use Illuminate\Mail\Events\MessageSent;
-
+use \Symfony\Component\Mime\Address;
 class RecordEmailSent
 {
     /**
@@ -16,7 +14,6 @@ class RecordEmailSent
     {
         //
     }
-
     /**
      * Handle the event.
      *
@@ -25,10 +22,14 @@ class RecordEmailSent
      */
     public function handle(MessageSent $event): void
     {
+        $receivers = array_map(function (Address $receiver) {
+            return $receiver->getAddress();
+        }, $event->message->getTo());
+
         MailReport::create([
-            'email' => $event->data['email'],
-            'subject' => $event->data['title'],
-            'body' => $event->message->getBody()->getBody(),
+            'email' => implode(",", $receivers),
+            'subject' => $event->message->getSubject(),
+            'body' => $event->message->getBody()->bodyToString(),
         ]);
     }
 }
