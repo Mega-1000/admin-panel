@@ -192,7 +192,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
             }
 
             Mailer::create()
-                ->to('pawbud6969@gmail.com')
+                ->to('ksiegowosc@ephpolska.pl')
                 ->send(new XmlForNexoMail($zipName));
         }
     }
