@@ -20,7 +20,7 @@ class ImportAllegroBillingService
     /**
      * Import billing entries
      *
-     * @param array $data
+     * @param array<ImportAllegroBillingDTO> $data
      * @return void
      */
     public function import(array $data): void
@@ -58,6 +58,9 @@ class ImportAllegroBillingService
         }
 
         $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOD');
+
+        $order = $orderPackage->order;
+        $order->allegroGeneralExpenses()->attach($billingEntry->id);
     }
 
     /**

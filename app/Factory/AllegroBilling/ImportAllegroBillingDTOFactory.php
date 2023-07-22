@@ -22,7 +22,7 @@ final class ImportAllegroBillingDTOFactory
         while (($data = fgetcsv($handle, 0, ';')) !== false) {
             $dtos[] = new ImportAllegroBillingDTO(
                 $data[0] ?? null,
-                $data[1] ?? null,
+                $dwata[1] ?? null,
                 $data[2] ?? null,
                 $data[3] ?? null,
                 $data[4] ?? null,

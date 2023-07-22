@@ -21,12 +21,12 @@ class AllegroGeneralExpenses
     {
         return AllegroGeneralExpense::create([
             'date_of_commitment_creation' => $dto->getDate(),
-            'offer_name' => $dto->getOfferName(),
-            'offer_identification' => $dto->getOfferIdentifier(),
-            'operation_type' => $dto->getOperationType(),
-            'credit' => $dto->getCredits(),
-            'balance' => $dto->getBalance(),
-            'operation_details' => $dto->getOperationDetails(),
+            'offer_name'                  => $dto->getOfferName(),
+            'offer_identification'        => $dto->getOfferIdentifier(),
+            'operation_type'              => $dto->getOperationType(),
+            'credit'                      => $dto->getCredits(),
+            'balance'                     => $dto->getBalance(),
+            'operation_details'           => $dto->getOperationDetails(),
         ]);
     }
 }

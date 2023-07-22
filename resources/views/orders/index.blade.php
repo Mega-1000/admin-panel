@@ -2131,7 +2131,8 @@
                         render: function (date, type, row) {
                             let sumOfSelling = 0;
                             let sumOfPurchase = 0;
-                            var items = row['items'];
+                            const items = row['items'];
+                            let html = '';
 
                             for (let index = 0; index < items.length; index++) {
                                 let priceSelling = items[index].gross_selling_price_commercial_unit;
@@ -2149,9 +2150,11 @@
                                 }
                                 sumOfSelling += parseFloat(priceSelling) * parseInt(quantity);
                                 sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
+
+                                html += JSON.stringify(row.allegroGeneralExpenses ?? row.debit ?? '??');
                             }
 
-                            return (sumOfSelling - (sumOfPurchase * 1.23)).toFixed(2);
+                            return html;
 
                         }
                     },

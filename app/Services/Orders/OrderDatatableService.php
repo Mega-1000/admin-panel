@@ -305,6 +305,7 @@ readonly class OrderDatatableService
             if (count($arrInvoice) > 0) {
                 $row->invoices = DB::table('order_invoices')->whereIn('id', $arrInvoice)->get();
             }
+            $row->allegroGeneralExpenses = DB::table('allegro_general_expenses')->where('order_id', $row->orderId)->get();
 
             $labels = [];
             $labelsIds = DB::table('order_labels')->where('order_id', $row->orderId)->get();
