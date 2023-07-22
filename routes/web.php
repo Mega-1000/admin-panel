@@ -586,6 +586,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/messagesPreview/{threadId}', 'AllegroChatController@messagesPreview')->name('messagesPreview');
             Route::post('/newAttachmentDeclaration', 'AllegroChatController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
             Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
+
+            Route::get('return-payment/{orderId}', 'AllegroReturnPaymentController@index')->name('returnPayment');
         });
     });
 

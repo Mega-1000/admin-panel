@@ -15,6 +15,7 @@ return [
         'add_folder'             => 'Dodaj folder',
         'add_new'                => 'Dodaj nowy',
         'all_done'               => 'Wszystko gotowe',
+        'allegro_return'         => 'Zwrot Allegro',
         'are_you_sure'           => 'Na pewno',
         'are_you_sure_delete'    => 'Na pewno usunąć',
         'auto_increment'         => 'Automatyczny przyrost',
