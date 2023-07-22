@@ -85,10 +85,12 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     ->setKod($address->postal_code)
                     ->setPanstwo('Polska');
 
+                $postalCodeWithOnlyNumbers = preg_replace("/[^0-9]/", "", $address->postal_code);
+
                 $preKlient = new PreKlient();
                 $preKlient
                     ->setTyp((empty($address->nip)) ? EPreKlientTyp::OSOBA : EPreKlientTyp::FIRMA)
-                    ->setSymbol((empty($address->nip)) ? strtoupper(PdfCharactersHelper::changePolishCharactersToNonAccented($address->lastname . $address->firstname . $address->flat_number)) : $address->nip)
+                    ->setSymbol((empty($address->nip)) ? strtoupper(PdfCharactersHelper::changePolishCharactersToNonAccented($address->lastname . $address->firstname . $postalCodeWithOnlyNumbers)) : $address->nip)
                     ->setNazwa((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
                     ->setNazwaPelna((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
                     ->setOsobaImie($address->firstname)
