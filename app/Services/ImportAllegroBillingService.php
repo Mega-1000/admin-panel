@@ -20,7 +20,7 @@ class ImportAllegroBillingService
     /**
      * Import billing entries
      *
-     * @param array $data
+     * @param array<ImportAllegroBillingDTO> $data
      * @return void
      */
     public function import(array $data): void
