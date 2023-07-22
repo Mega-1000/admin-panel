@@ -55,6 +55,8 @@ class ImportAllegroBillingService
             if (empty($order)) {
                 return;
             }
+
+            $billingEntry->order()->associate($order);
         };
 
         $orderPackage = $this->orderPackagesRepository->getByLetterNumber($trackingNumber);
