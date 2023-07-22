@@ -72,7 +72,7 @@ final class ImportAllegroBillingDTO
      */
     public function getCharges(): ?float
     {
-        return (float)$this->obciazenia;
+        return (float)str_replace(',', '.', $this->obciazenia);
     }
 
     /**
