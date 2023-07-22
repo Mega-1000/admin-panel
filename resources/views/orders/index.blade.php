@@ -2189,8 +2189,9 @@
 
                             function checkDetail(expense, details) {
                                 if (details.includes(expense.operation_details)) {
-                                    return parseFloat(expense.amount);
+                                    return parseFloat(expense.debit ?? expense.credit);
                                 }
+
                                 return 0;
                             }
 
