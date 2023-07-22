@@ -2189,7 +2189,7 @@
 
                             function checkDetail(expense, details) {
                                 if (details.includes(expense.operation_type)) {
-                                    return parseFloat(expense.debit ?? expense.credit);
+                                    return parseFloat(expense.debit === '0' ? expense.credit : expense.debit);
                                 }
 
                                 return 0;
@@ -2202,6 +2202,7 @@
                                 <p>PSW: ${PSW}</p>
                                 <p>WAC: ${WAC}</p>
                                 <p>ZP: ${ZP}</p>
+
                             `;
                         }
                     },
