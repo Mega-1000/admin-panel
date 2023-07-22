@@ -68,11 +68,11 @@ final class ImportAllegroBillingDTO
     /**
      * Get the value of charges
      *
-     * @return ?string
+     * @return ?float
      */
-    public function getCharges(): ?string
+    public function getCharges(): ?float
     {
-        return $this->obciazenia;
+        return (float)$this->obciazenia;
     }
 
     /**

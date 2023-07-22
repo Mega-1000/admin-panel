@@ -19,8 +19,6 @@ class AllegroGeneralExpenses
 
     public static function createFromDTO(ImportAllegroBillingDTO $dto): AllegroGeneralExpense
     {
-
-        dd($dto);
         return AllegroGeneralExpense::create([
             'date_of_commitment_creation' => $dto->getDate(),
             'offer_name'                  => $dto->getOfferName(),
