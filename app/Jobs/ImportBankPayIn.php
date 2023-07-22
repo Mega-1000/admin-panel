@@ -165,8 +165,6 @@ class ImportBankPayIn implements ShouldQueue
      * @param string $fileLine Line in csv file.
      * @param $payIn
      * @return PayInDTO
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function checkOrderNumberFromTitle(string $fileLine, $payIn): PayInDTO
     {
@@ -293,8 +291,6 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param integer $customerId Customer id
      * @return float
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function getCustomerBalance(int $customerId): float
     {
@@ -312,8 +308,6 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param Order $order Order object.
      * @param array $payIn Pay in row.
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function settlePromisePayments(Order $order, array $payIn): void
     {
@@ -332,8 +326,6 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param Order $order Order object.
      * @return Collection
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function getRelatedOrders(Order $order): Collection
     {
@@ -345,8 +337,6 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param Collection $orders Orders collection
      * @param array $payIn
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function settleOrders(Collection $orders, array $payIn): void
     {
@@ -382,7 +372,7 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function saveOrderPayment(Order $order, float $paymentAmount, array $payIn, bool $declaredSum = false): Model
     {
-        $payment = Payment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
+        $payment = OrderPayment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
 
         $payment = !isset($payment)
             ? $order->payments()->create([
@@ -400,60 +390,6 @@ class ImportBankPayIn implements ShouldQueue
         $this->orderPaymentLabelsService->calculateLabels($payment->order);
 
         return $payment;
-    }
-
-
-    /**
-     * @param Order $order
-     * @return float
-     */
-    private function getTotalOrderValue(Order $order): float
-    {
-        $additional_service = $order->additional_service_cost ?? 0;
-        $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
-        $shipment_price_client = $order->shipment_price_for_client ?? 0;
-        $totalProductPrice = 0;
-        foreach ($order->items as $item) {
-            $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
-            $quantity = $item->quantity ?? 0;
-            $totalProductPrice += $price * $quantity;
-        }
-        return round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
-    }
-
-    /**
-     * Tworzy transakcje przeksięgowania
-     *
-     * @param Order $order
-     * @param Transaction $transaction
-     * @param float $amount
-     * @param boolean $back
-     * @return Transaction|null
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function saveTransfer(Order $order, Transaction $transaction, float $amount, bool $back = false): ?Transaction
-    {
-        $identifier = 'p-' . strtotime($transaction->posted_in_bank_date->format('Y-m-d H:i:s')) . '-' . $order->id;
-        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
-
-        if ($existingTransaction !== null) {
-            return null;
-        }
-
-        return $this->transactionRepository->create([
-            'customer_id' => $order->customer_id,
-            'posted_in_system_date' => new DateTime(),
-            'payment_id' => $identifier,
-            'kind_of_operation' => 'przeksięgowanie',
-            'order_id' => $order->id,
-            'operator' => 'SYSTEM',
-            'operation_value' => -$amount,
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) - (float)$amount,
-            'accounting_notes' => '',
-            'transaction_notes' => '',
-            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
-        ]);
     }
 }
 
