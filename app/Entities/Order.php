@@ -253,6 +253,11 @@ class Order extends Model implements Transformable
         return $this->hasOne(AllegroDispute::class);
     }
 
+    public function allegroGeneralExpenses(): HasMany
+    {
+        return $this->hasMany(AllegroGeneralExpense::class);
+    }
+
     /**
      * @return HasMany
      */

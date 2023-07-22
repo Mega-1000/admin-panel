@@ -58,6 +58,9 @@ class ImportAllegroBillingService
         }
 
         $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOD');
+
+        $order = $orderPackage->order;
+        $order->allegroGeneralExpenses()->attach($billingEntry->id);
     }
 
     /**
