@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $offer_name
@@ -27,10 +28,16 @@ class AllegroGeneralExpense extends Model
         'debit',
         'balance',
         'operation_details',
-        'attached_value_parameter'
+        'attached_value_parameter',
+        'order_id',
     ];
 
     protected $casts = [
         'date_of_commitment_creation' => 'datetime',
     ];
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
 }
