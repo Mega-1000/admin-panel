@@ -50,7 +50,7 @@ class ImportAllegroBillingService
         if (!$trackingNumber) {
             $allegroId = $this->billingHelper->extractAllegroId($data->getOperationDetails());
 
-            $order = Order::where('allegro_transaction_id', $allegroId)->first();
+            $order = Order::where('allegro_form_id', $allegroId)->first();
 
             if (empty($order)) {
                 return;
