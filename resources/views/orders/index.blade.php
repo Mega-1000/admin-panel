@@ -2129,33 +2129,78 @@
                         searchable: false,
                         orderable: false,
                         render: function (date, type, row) {
-                            let sumOfSelling = 0;
-                            let sumOfPurchase = 0;
-                            const items = row['items'];
-                            let html = '';
+                            let RKTBO = 0, PSIK = 0, PSW = 0, WAC = 0, ZP = 0;
 
-                            for (let index = 0; index < items.length; index++) {
-                                let priceSelling = items[index].gross_selling_price_commercial_unit;
-                                let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
-                                let quantity = items[index].quantity;
+                            const RKTBOOperationDetails = [
+                                'Allegro Paczkomaty Inpost',
+                                'DPD - Kurier opłaty dodatkowe',
+                                'Inpost - dopłaty dodatkowe',
+                                'Przesyłka DPD',
+                                'UPS Operator - opłaty podstawowe',
+                            ];
+                            const PSIKOperationDetails = [
+                                'Prowizja od sprzedaży',
+                                'Jednostkowa opłata transakcyjna',
+                                'Opłata za udpstępnienie metody płatnośći Allegro Pay',
+                            ];
+                            const PSWOperationDetails = [
+                                'Prowizja od sprzedaży oferty wyróżnionej',
+                            ];
+                            const WACOperationDetails = [
+                                'Wyrównanie w programie Allegro Ceny',
+                            ];
+                            const ZPOperationDetails = [
+                                'Zwrot kosztów',
+                            ];
 
-                                if (priceSelling == null) {
-                                    priceSelling = 0;
-                                }
-                                if (pricePurchase == null) {
-                                    pricePurchase = 0;
-                                }
-                                if (quantity == null) {
-                                    quantity = 0;
-                                }
-                                sumOfSelling += parseFloat(priceSelling) * parseInt(quantity);
-                                sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
+                            const sumDetails = computeSumDetails(row['items']);
+                            computeExpenses(row.allegroGeneralExpenses);
 
-                                html += JSON.stringify(row.allegroGeneralExpenses ?? row.debit ?? '??');
+                            function computeSumDetails(items) {
+                                let sumOfSelling = 0;
+                                let sumOfPurchase = 0;
+
+                                for (let item of items) {
+                                    sumOfSelling += getItemTotal(item.gross_selling_price_commercial_unit, item.quantity);
+                                    sumOfPurchase += getItemTotal(item.net_purchase_price_commercial_unit_after_discounts, item.quantity);
+                                }
+
+                                return {
+                                    sumOfSelling: sumOfSelling,
+                                    sumOfPurchase: sumOfPurchase
+                                };
                             }
 
-                            return html;
+                            function computeExpenses(expenses) {
+                                for (let expense of expenses) {
+                                    RKTBO += checkDetail(expense, RKTBOOperationDetails);
+                                    PSIK += checkDetail(expense, PSIKOperationDetails);
+                                    PSW += checkDetail(expense, PSWOperationDetails);
+                                    WAC += checkDetail(expense, WACOperationDetails);
+                                    ZP += checkDetail(expense, ZPOperationDetails);
+                                }
+                            }
 
+                            function getItemTotal(price, quantity) {
+                                price = price || 0;
+                                quantity = quantity || 0;
+                                return parseFloat(price) * parseInt(quantity);
+                            }
+
+                            function checkDetail(expense, details) {
+                                if (details.includes(expense.operation_details)) {
+                                    return parseFloat(expense.debit ?? expense.credit);
+                                }
+
+                                return 0;
+                            }
+
+                            return `
+                                <p><span title="Zysk">Z: ${(sumDetails.sumOfSelling - sumDetails.sumOfPurchase - RKTBO).toFixed(2)}</p>
+                                <p>RKTBO: ${RKTBO}</p>
+                                <p>PSIK: ${PSIK}</p>
+                                <p>PSW: ${PSW}</p>
+                            `;
                         }
                     },
                     {

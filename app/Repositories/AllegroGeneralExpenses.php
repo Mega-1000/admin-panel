@@ -25,6 +25,7 @@ class AllegroGeneralExpenses
             'offer_identification'        => $dto->getOfferIdentifier(),
             'operation_type'              => $dto->getOperationType(),
             'credit'                      => $dto->getCredits(),
+            'debit'                       => $dto->getCharges(),
             'balance'                     => $dto->getBalance(),
             'operation_details'           => $dto->getOperationDetails(),
         ]);
