@@ -8,22 +8,33 @@ class AllegroPaymentService extends AllegroApiService {
 
     private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 
-    public function getPaymentsFromPastDay(): array {
-        $date = Carbon::now()->subDay();
+    public function getPaymentsFromLastDay(): array {
+        $startDate = Carbon::yesterday()->startOfDay();
+        $endDate = Carbon::yesterday()->endOfDay();
 
-        return $this->getPaymentsAfterDate($date);
+        return $this->getPaymentsBetweenDates($startDate, $endDate);
     }
 
-    public function getPaymentsAfterDate(Carbon $date): array {
-        $dateString = urlencode($date->toIso8601String());
+    public function getPaymentsBetweenDates(Carbon $startDate, Carbon $endDate): array {
+        $startDateString = $startDate->format('Y-m-d\TH:i:s\Z');
+        $endDateString = $endDate->format('Y-m-d\TH:i:s\Z');
         $limit = 50;
         $offset = 0;
         $totalCount = 0;
 
         $payments = [];
 
+        var_dump($startDateString, $endDateString);
+
         do {
-            $url = $this->getRestUrl("/payments/payment-operations?occurredAt.gte={$dateString}&limit={$limit}&offset={$offset}");
+            $query_params = [
+                'occurredAt.gte' => $startDateString,
+                'occurredAt.lte' => $endDateString,
+                'limit' => $limit,
+                'offset' => $offset,
+            ];
+
+            $url = $this->getRestUrl("/payments/payment-operations?" . http_build_query($query_params));
             if (!($response = $this->request('GET', $url, []))) {
                 break;
             }

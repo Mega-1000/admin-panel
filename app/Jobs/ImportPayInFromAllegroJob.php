@@ -9,6 +9,7 @@ use App\Mail\AllegroPayInMail;
 use App\Services\AllegroImportPayInService;
 use App\Services\AllegroPaymentService;
 use App\Services\FindOrCreatePaymentForPackageService;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -32,7 +33,7 @@ class ImportPayInFromAllegroJob implements ShouldQueue
             Storage::disk('allegroPayInDisk')->delete($file);
         }
 
-        $payments = $allegroPaymentService->getPaymentsFromPastDay();
+        $payments = $allegroPaymentService->getPaymentsFromLastDay();
 
         $filename = "transactionWithoutOrder.csv";
         $file = fopen($filename, 'w');
@@ -43,7 +44,9 @@ class ImportPayInFromAllegroJob implements ShouldQueue
 
         fclose($file);
 
-        $newFilePath = 'public/transaction/TransactionWithoutOrdersFromAllegro' . date('Y-m-d') . '.csv';
+        $yesterdayDate = Carbon::yesterday()->format('Y-m-d');
+
+        $newFilePath = 'public/transaction/TransactionWithoutOrdersFromAllegro' . $yesterdayDate . '.csv';
 
         Storage::disk('allegroPayInDisk')->put($newFilePath, file_get_contents($filename));
 
