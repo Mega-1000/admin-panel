@@ -2200,6 +2200,8 @@
                                 <p>RKTBO: ${RKTBO}</p>
                                 <p>PSIK: ${PSIK}</p>
                                 <p>PSW: ${PSW}</p>
+                                <p>WAC: ${WAC}</p>
+                                <p>ZP: ${ZP}</p>
                             `;
                         }
                     },
