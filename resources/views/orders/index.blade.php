@@ -2229,7 +2229,7 @@
                                 <p>WAC: ${WAC}</p>
                                 <p>ZP: ${ZP}</p>
                                 <p>BZO: ${BZO}</p>
-                                <p><a href="/admin/allegro-billing?order-id=${row.orderId}" class="btn btn-primary">Zobacz na liście</a></p>
+                                <p><a href="/admin/allegro-billing?order-id=${row.orderId}" class="btn btn-primary" target="_blank" z na liście</a></p>
                             `;
                         }
                     },
