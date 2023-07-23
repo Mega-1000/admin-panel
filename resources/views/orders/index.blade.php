@@ -2197,7 +2197,7 @@
 
                             const Z = (sumDetails.sumOfSelling - sumDetails.sumOfPurchase - RKTBO).toFixed(2);
 
-                            const BZO = (Z + RKTBO + PSIK - PSW + WAC + ZP).toFixed(2);
+                            const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseInt(ZP)).toFixed(2);
 
                             return `
                                 <p><span title="Zysk">Z: ${Z}</p>
@@ -2958,7 +2958,7 @@
                         delivery_warehouse: delivery_warehouse
                     },
                 }).done(function (data) {
-                    if(data.status=='ERROR'){
+                    if (data.status === 'ERROR'){
                         let modal = $('#add-withdraw-task');
                         let input_delivery_warehouse = modal.find("#add-withdraw-task-delivery_warehouse");
                         let input_order_id = modal.find("#add-withdraw-task-order_id");
