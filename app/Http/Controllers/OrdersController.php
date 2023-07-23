@@ -1562,7 +1562,7 @@ class OrdersController extends Controller
      *
      * @return RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $roleId = Auth::user()->role_id;
         if ($roleId != 1 && $roleId != 2) {
