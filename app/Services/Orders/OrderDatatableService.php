@@ -365,9 +365,11 @@ readonly class OrderDatatableService
         }
 
         foreach ($collection as $item) {
-            $package->realCosts = DB::table('order_packages_real_cost_for_company')
-                ->where('order_package_id', $package->id)
-                ->get();
+            $item->packages?->map(function ($package) {
+                $package->realCosts = DB::table('order_packages_real_cost_for_company')
+                    ->where('order_package_id', $package->id)
+                    ->get();
+            });
 
             $item->rc = 0;
             foreach ($package->realCosts as $i) {
