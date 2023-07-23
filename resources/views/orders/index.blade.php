@@ -2229,7 +2229,7 @@
                                 <p>WAC: ${WAC}</p>
                                 <p>ZP: ${ZP}</p>
                                 <p>BZO: ${BZO}</p>
-                                <p><a href="/admin/allegro-billing?order-id=${row.orderId}" class="btn btn-primary" target="_blank" z na liście</a></p>
+                                <p><a href="/admin/allegro-billing?order-id=${row.orderId}" class="btn btn-primary" target="_blank">pokaz na liście</a></p>
                             `;
                         }
                     },
@@ -3227,7 +3227,7 @@
             ajaxParams['dateTo'] = dateTo;
             ajaxParams['dateColumn'] = dateColumn;
 
-            if (dateFrom === dateTo) ajaxParams['same'] = true;
+            if (dateFrom == dateTo) ajaxParams['same'] = true;
 
             window.table.destroy();
             window.table = table = datatable(ajaxParams);
