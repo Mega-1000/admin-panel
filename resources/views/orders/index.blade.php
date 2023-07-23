@@ -2195,7 +2195,7 @@
 
                             function computeExpenses(expenses) {
                                 for (let expense of expenses) {
-                                    RKTBO += row.realCosts;
+                                    RKTBO += row.rc;
                                     PSIK += checkDetail(expense, PSIKOperationDetails);
                                     PSW += checkDetail(expense, PSWOperationDetails);
                                     WAC += checkDetail(expense, WACOperationDetails);
