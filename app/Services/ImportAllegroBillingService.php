@@ -67,7 +67,6 @@ class ImportAllegroBillingService
         $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOD');
 
         $order = empty($order) ? $orderPackage->order : $order;
-
         $this->associateOrderToBillingEntry($billingEntry, $order);
     }
 
@@ -79,21 +78,20 @@ class ImportAllegroBillingService
     private function getOrderFromAllegroId($operationDetails): ?Order
     {
         $allegroId = $this->billingHelper->extractAllegroId($operationDetails);
+
         return Order::where('allegro_form_id', $allegroId)->first();
     }
 
     private function associateOrderToBillingEntry($billingEntry, $order): void
     {
-        if (empty($order)) {
-            return;
+        if (!empty($order)) {
+            $billingEntry->order()->associate($order);
         }
-
-        $billingEntry->order()->associate($order);
     }
 
     private function getOrderPackageByLetterNumber($trackingNumber): ?OrderPackage
     {
-        return dd($this->orderPackagesRepository->getByLetterNumber($trackingNumber));
+        return $this->orderPackagesRepository->getByLetterNumber($trackingNumber);
     }
 
     /**
