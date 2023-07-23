@@ -30,7 +30,7 @@ class OrderPaymentCreateRequest extends FormRequest
             'operation_date' => 'nullable|date',
             'tracking_number' => 'nullable|string',
             'operation_id' => 'nullable|string',
-            'declared_sum' => 'nullable|regex:/^\d*([\.,]{1}\d{1,2})?$/',
+            'declared_sum' => 'nullable|numeric',
             'posting_date' => 'nullable|date',
             'operation_type' => 'nullable|string',
             'comments' => 'nullable|string',
