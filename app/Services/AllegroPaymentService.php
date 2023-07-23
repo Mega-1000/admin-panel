@@ -2,6 +2,7 @@
 
 namespace App\Services;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AllegroPaymentService extends AllegroApiService {
     protected $auth_record_id = 3;
@@ -23,8 +24,6 @@ class AllegroPaymentService extends AllegroApiService {
         $totalCount = 0;
 
         $payments = [];
-
-        var_dump($startDateString, $endDateString);
 
         do {
             $query_params = [
@@ -85,5 +84,19 @@ class AllegroPaymentService extends AllegroApiService {
 
 
         return $payments;
+    }
+
+    public function getNotCancelledReturnsByPaymentId(string $paymentId): array {
+        $url = $this->getRestUrl("/payments/refunds?payment.id=" . $paymentId);
+
+        Log::info($url);
+
+        if (!($response = $this->request('GET', $url, []))) {
+            return [];
+        }
+
+        return array_filter($response['refunds'], function ($refund) {
+            return $refund['status'] !== "CANCELED";
+        });
     }
 }
