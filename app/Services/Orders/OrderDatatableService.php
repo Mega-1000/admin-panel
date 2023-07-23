@@ -279,16 +279,14 @@ readonly class OrderDatatableService
             $row->payments = OrderPayment::withTrashed()->where('order_id', $row->orderId)->get();
             $row->packages = DB::table('order_packages')->where('order_id', $row->orderId)->get();
 
-            //OrderPackageRealCostForCompany
-            $row->packages?->map(function ($item) {
-                $item->sumOfCosts = DB::table('order_packages_real_cost_for_company')
-                    ->select(DB::raw('SUM(cost) as sum'))
-                    ->where('order_package_id', $item->id)
-                    ->groupBy('order_package_id')
-                    ->first();
-
-                return $item;
-            });
+            foreach ($row->packages as $package) {
+                $package->realSpecialCosts = OrderPackageRealCostForCompany::query()
+                        ->select('cost')
+                        ->where('order_package_id', $package->id)
+                        ->groupBy('order_package_id')
+                        ->first();
+                $row->speditionCost += $package->realSpecialCosts?->cost;
+            }
 
             $row->packages?->map(function ($item) {
                 $item->sumOfCosts = DB::table('order_packages_real_cost_for_company')

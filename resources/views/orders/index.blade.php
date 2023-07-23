@@ -2193,13 +2193,13 @@
                                 };
                             }
 
-                            function computeExpenses(expenses) {
-                                for (let expense of expenses) {
-                                    RKTBO += row.speditionCost;
-                                    PSIK += checkDetail(expense, PSIKOperationDetails);
-                                    PSW += checkDetail(expense, PSWOperationDetails);
-                                    WAC += checkDetail(expense, WACOperationDetails);
-                                    ZP += checkDetail(expense, ZPOperationDetails);
+                                    function computeExpenses(expenses) {
+                                        for (let expense of expenses) {
+                                            RKTBO += row.sumOfCosts;
+                                            PSIK += checkDetail(expense, PSIKOperationDetails);
+                                            PSW += checkDetail(expense, PSWOperationDetails);
+                                            WAC += checkDetail(expense, WACOperationDetails);
+                                            ZP += checkDetail(expense, ZPOperationDetails);
                                 }
                             }
 
