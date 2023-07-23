@@ -3212,6 +3212,11 @@
             }
         }
 
+        function findSite() {
+            let id = $('#searchBySite').val();
+            window.table.page(parseInt(id - 1)).draw('page');
+        }
+
         function findByDates() {
             let dateColumn = $('#columnSearch-choose_date').val();
             let dateFrom = $('#dates_from').val();

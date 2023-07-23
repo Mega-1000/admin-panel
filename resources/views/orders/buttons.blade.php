@@ -444,6 +444,13 @@
                 <input type="search" name="searchById" id="searchById">
                 <button onclick="findPage()" class="btn btn-success">Znajdź zlecenie</button>
             </div>
+
+            <div class="col-md-4 mb-4">
+                <label for="searchById">skocz do strony</label>
+                <input type="search" name="searchBySite" id="searchBySite">
+                <button onclick="findSite()" class="btn btn-success">Znajdź zlecenie</button>
+            </div>
+
             <div class="col-md-4 mb-4">
                 <label for="selectAllOrders">Zaznacz wszystkie zlecenia</label>
                 <input id="selectAllOrders" type="checkbox"/>
@@ -482,7 +489,7 @@
     </div>
     <div class="col-md-3">
         <h4>Drukuj paczki z grupy:</h4>
-        @foreach($couriersTasks as $courierCode => $tasksInDay) 
+        @foreach($couriersTasks as $courierCode => $tasksInDay)
             @if(isset(\App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode]))
             <div class="row">
                 <div class="col-lg-12 print-group">
