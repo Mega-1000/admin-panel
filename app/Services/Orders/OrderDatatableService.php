@@ -4,6 +4,7 @@ namespace App\Services\Orders;
 
 use App\Entities\Order;
 use App\Entities\OrderFiles;
+use App\Entities\OrderPackageRealCostForCompany;
 use App\Entities\OrderPayment;
 use App\Repositories\SpeditionExchangeRepository;
 use Carbon\Carbon;
@@ -279,12 +280,12 @@ readonly class OrderDatatableService
             $row->packages = DB::table('order_packages')->where('order_id', $row->orderId)->get();
 
             foreach ($row->packages as $package) {
-                $package->realSpecialCosts = DB::table('order_packages_real_cost_for_company')
+                $package->realSpecialCosts = OrderPackageRealCostForCompany::query()
                         ->select('cost')
                         ->where('order_package_id', $package->id)
                         ->groupBy('order_package_id')
                         ->first();
-                $row->speditionCost += $package->realSpecialCosts?->cost / 2;
+                $row->speditionCost += $package->realSpecialCosts?->cost;
             }
 
             $row->packages?->map(function ($item) {
