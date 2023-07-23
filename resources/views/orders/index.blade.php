@@ -2195,7 +2195,7 @@
                                 return 0;
                             }
 
-                            const Z = (sumDetails.sumOfSelling - sumDetails.sumOfPurchase - RKTBO).toFixed(2);
+                            const Z = item.profit;
 
                             const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseInt(ZP)).toFixed(2);
 
