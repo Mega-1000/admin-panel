@@ -298,6 +298,7 @@ readonly class OrderDatatableService
                 return $item;
             });
 
+
             $row->otherPackages = DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
             $row->addresses = DB::table('order_addresses')->where('order_id', $row->orderId)->get();
             $row->history = Order::where('customer_id', $row->customer_id)->with('labels')->get();
