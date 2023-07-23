@@ -33,10 +33,10 @@
                 Typ operacji
             </th>
             <th>
-                Kredyt
+                Obciążenia
             </th>
             <th>
-                Saldo
+                Uznania
             </th>
             <th>
                 Szczegóły operacji
@@ -57,10 +57,10 @@
                     {{ $operation->operation_type }}
                 </td>
                 <td>
-                    {{ $operation->credit }}
+                    {{ $operation->debit }}
                 </td>
                 <td>
-                    {{ $operation->balance }}
+                    {{ $operation->credit }}
                 </td>
                 <td>
                     {{ $operation->operation_details }}
