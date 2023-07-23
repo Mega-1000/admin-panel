@@ -21,6 +21,7 @@ class OrderPackageRealCostForCompany extends Model
         'deliverer_id',
         'cost',
         'type',
+        'invoice_num',
     ];
 
     public function orderPackage(): BelongsTo
