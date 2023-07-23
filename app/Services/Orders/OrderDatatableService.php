@@ -280,7 +280,7 @@ readonly class OrderDatatableService
 
             foreach ($row->packages as $package) {
                 $package->realSpecialCosts = DB::table('order_packages_real_cost_for_company')
-                        ->select('sum')
+                        ->select('const')
                         ->where('order_package_id', $package->id)
                         ->groupBy('order_package_id')
                         ->first();
