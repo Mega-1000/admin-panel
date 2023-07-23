@@ -167,7 +167,6 @@ final class ShippingPayInService
      * @param Order $order Order object
      * @param ShippingPayInCsvDataDTO $data Additional data
      * @return ?Transaction
-     *
      */
     private function saveTransaction(Order $order, ShippingPayInCsvDataDTO $data): ?Transaction
     {

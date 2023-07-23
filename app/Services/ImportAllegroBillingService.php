@@ -59,11 +59,6 @@ class ImportAllegroBillingService
             return;
         }
 
-        if (!$this->billingHelper->hasCourierMatch($operationDetails)) {
-            $this->handleNoCourierMatch($billingEntry, $data, $orderPackage);
-            return;
-        }
-
         $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOD');
 
         $order = empty($order) ? $orderPackage->order : $order;
@@ -107,22 +102,6 @@ class ImportAllegroBillingService
     }
 
     /**
-     * @param AllegroGeneralExpense $billingEntry
-     * @param ImportAllegroBillingDTO $data
-     * @param OrderPackage $orderPackage
-     * @return void
-     */
-    private function handleNoCourierMatch(AllegroGeneralExpense $billingEntry, ImportAllegroBillingDTO $data, OrderPackage $orderPackage): void
-    {
-        if (!$this->billingHelper->hasCourierChargeMatch($data->getOperationDetails())) {
-            $this->updateBillingEntryNotAttached($billingEntry);
-            return;
-        }
-
-        $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOP');
-    }
-
-    /**
      * Update order package with real costs for company
      *
      * @param OrderPackage $orderPackage
@@ -132,6 +111,12 @@ class ImportAllegroBillingService
      */
     private function updateOrderPackage(OrderPackage $orderPackage, string $charges, mixed $type = null): void
     {
+        $existingRealCosts = $orderPackage->realCostsForCompany()->where('cost', (float)$charges)->first();
+
+        if(!empty($existingRealCosts)) {
+            return;
+        }
+
         $orderPackage->realCostsForCompany()->create([
             'cost' => (float)$charges,
             'type' => $type,
