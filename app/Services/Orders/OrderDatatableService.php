@@ -284,7 +284,7 @@ readonly class OrderDatatableService
                         ->where('order_package_id', $package->id)
                         ->groupBy('order_package_id')
                         ->first();
-                $row->speditionCost += $package->realSpecialCosts?->sum;
+                $row->speditionCost += $package->realSpecialCosts?->cost;
             }
 
             $row->packages?->map(function ($item) {
