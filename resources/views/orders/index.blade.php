@@ -2197,8 +2197,7 @@
 
                             const Z = (sumDetails.sumOfSelling - sumDetails.sumOfPurchase - RKTBO).toFixed(2);
 
-                            const BZO = (Z - RKTBO - PSIK - PSW + WAC + ZP).toFixed(2);
-
+                            const BZO = (Z - RKTBO + PSIK - PSW + WAC + ZP).toFixed(2);
 
                             return `
                                 <p><span title="Zysk">Z: ${Z}</p>

@@ -42,31 +42,24 @@ class ImportAllegroBillingService
     private function importSingle(ImportAllegroBillingDTO $data): void
     {
         $billingEntry = AllegroGeneralExpenses::createFromDTO($data);
+        $operationDetails = $data->getOperationDetails();
 
-        $trackingNumber = $this->billingHelper->extractTrackingNumber(
-            $data->getOperationDetails()
-        );
+        $trackingNumber = $this->getTrackingNumber($operationDetails);
+        $order = null;
 
         if (!$trackingNumber) {
-            $allegroId = $this->billingHelper->extractAllegroId($data->getOperationDetails());
+            $order = $this->getOrderFromAllegroId($operationDetails);
+            $this->associateOrderToBillingEntry($billingEntry, $order);
+        }
 
-            $order = Order::where('allegro_form_id', $allegroId)->first();
-
-            if (empty($order)) {
-                return;
-            }
-
-            $billingEntry->order()->associate($order);
-        };
-
-        $orderPackage = $this->orderPackagesRepository->getByLetterNumber($trackingNumber);
+        $orderPackage = $this->getOrderPackageByLetterNumber($trackingNumber);
 
         if (empty($orderPackage)) {
             $this->updateBillingEntryNotAttached($billingEntry);
             return;
         }
 
-        if (!$this->billingHelper->hasCourierMatch($data->getOperationDetails())) {
+        if (!$this->billingHelper->hasCourierMatch($operationDetails)) {
             $this->handleNoCourierMatch($billingEntry, $data, $orderPackage);
             return;
         }
@@ -75,7 +68,32 @@ class ImportAllegroBillingService
 
         $order = empty($order) ? $orderPackage->order : $order;
 
+        $this->associateOrderToBillingEntry($billingEntry, $order);
+    }
+
+    private function getTrackingNumber($operationDetails): ?string
+    {
+        return $this->billingHelper->extractTrackingNumber($operationDetails);
+    }
+
+    private function getOrderFromAllegroId($operationDetails): ?Order
+    {
+        $allegroId = $this->billingHelper->extractAllegroId($operationDetails);
+        return Order::where('allegro_form_id', $allegroId)->first();
+    }
+
+    private function associateOrderToBillingEntry($billingEntry, $order): void
+    {
+        if (empty($order)) {
+            return;
+        }
+
         $billingEntry->order()->associate($order);
+    }
+
+    private function getOrderPackageByLetterNumber($trackingNumber): ?OrderPackage
+    {
+        return dd($this->orderPackagesRepository->getByLetterNumber($trackingNumber));
     }
 
     /**

@@ -762,7 +762,7 @@ class MessagesHelper
             $subject,
             [
                 'url' => route('chat.show', ['token' => $newChatToken]),
-                'title' => $this->getTitle(false),
+                'title' => $this->getTitle(),
                 'complaintForm' => $complaintForm,
             ]
         );
