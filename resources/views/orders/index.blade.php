@@ -3214,7 +3214,7 @@
 
         function findSite() {
             let id = $('#searchBySite').val();
-            window.table.page(parseInt(id - 1)).draw('page');
+            window.table.page(parseInt(id) - 1).draw('page');
         }
 
         function findByDates() {
@@ -3227,7 +3227,7 @@
             ajaxParams['dateTo'] = dateTo;
             ajaxParams['dateColumn'] = dateColumn;
 
-            if (dateFrom == dateTo) ajaxParams['same'] = true;
+            if (dateFrom === dateTo) ajaxParams['same'] = true;
 
             window.table.destroy();
             window.table = table = datatable(ajaxParams);
@@ -3240,7 +3240,7 @@
             chosenLabel = $("#choosen-label");
             let timed = chosenLabel[0].selectedOptions[0].dataset.timed;
 
-            if (chosenLabel.val() == "") {
+            if (chosenLabel.val() === "") {
                 alert("Nie wybrano etykiety");
                 return;
             }
