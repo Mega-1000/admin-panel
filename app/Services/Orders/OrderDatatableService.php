@@ -283,8 +283,8 @@ readonly class OrderDatatableService
                         ->select(DB::raw('SUM(cost) as sum'))
                         ->where('order_package_id', $package->id)
                         ->groupBy('order_package_id')
-                    ->first();
-                $row->speditionCost += $package->realSpecialCosts->sum;
+                        ->first();
+                $row->speditionCost += $package->realSpecialCosts?->sum;
             }
 
             $row->packages?->map(function ($item) {
