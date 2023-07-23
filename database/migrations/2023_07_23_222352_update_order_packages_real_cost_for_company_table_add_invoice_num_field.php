@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('order_packages_real_cost_for_company', function (Blueprint $table) {
-            $table->string('invoice_num')->nullable()->after('invoice_file');
+            $table->string('invoice_num')->nullable();
         });
     }
 
