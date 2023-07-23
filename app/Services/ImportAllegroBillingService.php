@@ -111,12 +111,6 @@ class ImportAllegroBillingService
      */
     private function updateOrderPackage(OrderPackage $orderPackage, string $charges, mixed $type = null): void
     {
-        $existingRealCosts = $orderPackage->realCostsForCompany()->where('cost', (float)$charges)->first();
-
-        if(!empty($existingRealCosts)) {
-            return;
-        }
-
         $orderPackage->realCostsForCompany()->create([
             'cost' => (float)$charges,
             'type' => $type,
