@@ -3631,7 +3631,7 @@
                             let value = [];
 
                             real_costs_for_company.map(function (item) {
-                                value.push('<span>' + item.cost + '</span>');
+                                value.push('<span>' + item.cost + item.invoice_num + '</span>');
                             })
 
                             return value.join('<br />');

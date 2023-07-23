@@ -143,16 +143,17 @@ final class ShippingPayInService
 
         $cost = PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn->rzeczywisty_koszt_transportu_brutto));
         $orderPackageRealCost = $orderPackage->realCostsForCompany()
-            ->where('deliverer_id', '=', $delivery->id)
-            ->where('cost', '=', $cost)
-            ->where('order_package_id', '=', $orderPackage->id)
+            ->where('deliverer_id', $delivery->id)
+            ->where('cost', $cost)
+            ->where('order_package_id', $orderPackage->id)
             ->first();
 
         if (empty($orderPackageRealCost)) {
             $orderPackage->realCostsForCompany()->create([
                 'order_package_id' => $orderPackage->id,
                 'deliverer_id' => $delivery->id,
-                'cost' => PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn->rzeczywisty_koszt_transportu_brutto))
+                'cost' => PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn->rzeczywisty_koszt_transportu_brutto)),
+                'invoice_num' => $payIn->nr_faktury_do_ktorej_dany_lp_zostal_przydzielony,
             ]);
 
             return true;
