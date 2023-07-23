@@ -77,10 +77,10 @@ class ImportAllegroBillingService
         return Order::where('allegro_form_id', $allegroId)->first();
     }
 
-    private function associateOrderToBillingEntry($billingEntry, $order): void
+    private function associateOrderToBillingEntry(AllegroGeneralExpense $billingEntry, ?Order $order): void
     {
-        if (!empty($order)) {
-            $billingEntry->order()->associate($order);
+        if (!empty($order) && empty($billingEntry->order)) {
+            $billingEntry->update(['order_id' => $order->id]);
         }
     }
 
@@ -111,6 +111,12 @@ class ImportAllegroBillingService
      */
     private function updateOrderPackage(OrderPackage $orderPackage, string $charges, mixed $type = null): void
     {
+        $existingRealCosts = $orderPackage->realCostsForCompany()->where('cost', (float)$charges)->first();
+
+        if(!empty($existingRealCosts)) {
+            return;
+        }
+
         $orderPackage->realCostsForCompany()->create([
             'cost' => (float)$charges,
             'type' => $type,
