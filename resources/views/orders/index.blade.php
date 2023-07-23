@@ -2219,7 +2219,7 @@
 
                             const Z = (sumOfSelling - (sumOfPurchase * 1.23)).toFixed(2);
 
-                            const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseInt(ZP)).toFixed(2);
+                            const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseFloat(ZP)).toFixed(2);
 
                             return `
                                 <p><span title="Zysk">Z: ${Z}</p>
