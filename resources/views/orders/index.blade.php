@@ -2131,6 +2131,28 @@
                         render: function (date, type, row) {
                             let RKTBO = 0, PSIK = 0, PSW = 0, WAC = 0, ZP = 0;
 
+                            let sumOfSelling = 0;
+                            let sumOfPurchase = 0;
+                            const items = row['items'];
+
+                            for (let index = 0; index < items.length; index++) {
+                                let priceSelling = items[index].gross_selling_price_commercial_unit;
+                                let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
+                                let quantity = items[index].quantity;
+
+                                if (priceSelling == null) {
+                                    priceSelling = 0;
+                                }
+                                if (pricePurchase == null) {
+                                    pricePurchase = 0;
+                                }
+                                if (quantity == null) {
+                                    quantity = 0;
+                                }
+                                sumOfSelling += parseFloat(priceSelling) * parseInt(quantity);
+                                sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
+                            }
+
                             const RKTBOOperationDetails = [
                                 'Allegro Paczkomaty Inpost',
                                 'DPD - Kurier opłaty dodatkowe',
@@ -2195,7 +2217,7 @@
                                 return 0;
                             }
 
-                            const Z = row.profit;
+                            const Z = (sumOfSelling - (sumOfPurchase * 1.23)).toFixed(2);
 
                             const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseInt(ZP)).toFixed(2);
 
