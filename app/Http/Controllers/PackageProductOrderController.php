@@ -35,10 +35,10 @@ class PackageProductOrderController extends Controller
             ->assignItemsToOrder(
                 $order,
                 [
-                    ...$order->items->toArray(),
                     Product::find($request->validated('product_id'))->toArray() +
                     ['amount' => $request->validated('quantity')]
                 ],
+                false,
             );
 
         return redirect()->route('orders.edit', $order->id);
