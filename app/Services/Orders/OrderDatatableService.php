@@ -6,6 +6,7 @@ use App\Entities\Order;
 use App\Entities\OrderFiles;
 use App\Entities\OrderPackageRealCostForCompany;
 use App\Entities\OrderPayment;
+use App\Repositories\OrderPackageRealCostsForCompany;
 use App\Repositories\SpeditionExchangeRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
@@ -365,21 +366,10 @@ readonly class OrderDatatableService
         }
 
         foreach ($collection as $item) {
-            $item->rc = 0;
-
-            $item->packages?->map(function ($package) use (&$item) {
-                $package->realCosts = DB::table('order_packages_real_cost_for_company')
-                    ->where('order_package_id', $package->id)
-                    ->get();
-
-                foreach ($package->realCosts as $i) {
-                    $item->rc += $i->cost;
-                }
-
-                return $package;
-            });
+            $item->rc = OrderPackageRealCostsForCompany::getAllByOrderId(
+                $item->orderId
+            );
         }
-
 
         return [$collection, $count];
     }

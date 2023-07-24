@@ -113,7 +113,7 @@ class ImportAllegroBillingService
     {
         $existingRealCosts = $orderPackage->realCostsForCompany()->where('cost', (float)$charges)->first();
 
-        if(!empty($existingRealCosts)) {
+        if (!empty($existingRealCosts)) {
             return;
         }
 
