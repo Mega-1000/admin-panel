@@ -50,9 +50,9 @@ class ProductStocksController extends Controller
     ) {}
 
     /**
-     * @return View|Application|Factory
+     * @return Factory|\Illuminate\Contracts\View\View|Application
      */
-    public function index(): Application|Factory|View
+    public function index(): Factory|\Illuminate\Contracts\View\View|Application
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stocks'));
 
