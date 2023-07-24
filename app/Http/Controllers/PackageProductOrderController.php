@@ -31,15 +31,21 @@ class PackageProductOrderController extends Controller
      */
     public function store(Order $order, StorePackageProductOrderRequest $request): RedirectResponse
     {
-        OrderBuilderFactory::create()
-            ->assignItemsToOrder(
-                $order,
-                [
-                    Product::find($request->validated('product_id'))->toArray() +
-                    ['amount' => $request->validated('quantity')]
-                ],
-                false,
-            );
+        foreach ($request->validated('quantity') as $key => $quantity) {
+            if ($quantity === 0) {
+                continue;
+            }
+
+            OrderBuilderFactory::create()
+                ->assignItemsToOrder(
+                    $order,
+                    [
+                        Product::find($key)->toArray() +
+                        ['amount' => $quantity]
+                    ],
+                    false,
+                );
+        }
 
         return redirect()->route('orders.edit', $order->id);
     }

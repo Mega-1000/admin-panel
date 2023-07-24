@@ -24,8 +24,7 @@ class StorePackageProductOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quantity' => 'required|integer|min:1',
-            'product_id' => 'required|integer',
+            'quantity' => 'required',
         ];
     }
 }
