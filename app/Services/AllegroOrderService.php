@@ -392,7 +392,7 @@ class AllegroOrderService extends AllegroApiService
         return $response;
     }
 
-    public function getOrderDetailsByPaymentId(string $paymentId): array
+    public function getOrderByPaymentId(string $paymentId): array
     {
         $url = $this->getRestUrl("/order/checkout-forms?payment.id=" . $paymentId);
 
@@ -400,10 +400,6 @@ class AllegroOrderService extends AllegroApiService
             return [];
         }
 
-        foreach ($response['checkoutForms'] as $checkoutForm) {
-            var_dump($checkoutForm['lineItems']);
-        }
-
-        return $response['checkoutForms'];
+        return $response['checkoutForms'][0];
     }
 }

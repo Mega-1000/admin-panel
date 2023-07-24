@@ -86,7 +86,7 @@ class AllegroPaymentService extends AllegroApiService {
         return $payments;
     }
 
-    public function getNotCancelledReturnsByPaymentId(string $paymentId): array {
+    public function getRefundsByPaymentId(string $paymentId): array {
         $url = $this->getRestUrl("/payments/refunds?payment.id=" . $paymentId);
 
         Log::info($url);
