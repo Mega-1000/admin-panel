@@ -13,7 +13,7 @@
             <label for="product">Produkt</label>
             <div style="display: flex;">
                 @foreach($packageProducts as $product)
-                    <div>
+                    <div style="display: flex">
                         <label for="product">{{ $product->name }}</label>
                         <img src="{{  $product->getImageUrl() }}"  alt="product image" width="100px" height="100px">
 
