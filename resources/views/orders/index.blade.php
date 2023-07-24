@@ -2194,7 +2194,7 @@
                             }
 
                             function computeExpenses(expenses) {
-                                for (let expense of expenses)
+                                for (let expense of expenses) {
                                     PSIK += checkDetail(expense, PSIKOperationDetails);
                                     PSW += checkDetail(expense, PSWOperationDetails);
                                     WAC += checkDetail(expense, WACOperationDetails);
