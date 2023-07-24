@@ -50,23 +50,25 @@ class ProductStocksController extends Controller
     ) {}
 
     /**
-     * @return \Illuminate\Contracts\View\View|Application|Factory
+     * @return View|Application|Factory
      */
-    public function index(): Application|Factory|\Illuminate\Contracts\View\View
+    public function index(): Application|Factory|View
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stocks'));
+
         foreach ($visibilities as $key => $row) {
             $row->show = json_decode($row->show, true);
             $row->hidden = json_decode($row->hidden, true);
         }
+
         return view('product_stocks.index', compact('visibilities'));
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return \Illuminate\Contracts\View\View|Application|Factory
      */
-    public function edit($id): Application|Factory|\Illuminate\Contracts\View\View
+    public function edit(int $id): Application|Factory|\Illuminate\Contracts\View\View
     {
         $productStocks = ProductStock::where('product_id', $id)->first();
         $similarProducts = $this->productService->checkForSimilarProducts($id);
@@ -159,9 +161,9 @@ class ProductStocksController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\View|Application|Factory
      */
-    public function print()
+    public function print(): Factory|\Illuminate\Contracts\View\View|Application
     {
         $query = DB::table('product_stocks')
             ->distinct()
@@ -178,7 +180,7 @@ class ProductStocksController extends Controller
             $row->positions = DB::table('product_stock_positions')->where('product_stock_id', $row->stockId)->get();
         }
 
-        return View::make('product_stocks.print', [
+        return view('product_stocks.print', [
             'products' => $collection,
         ]);
     }
@@ -186,7 +188,7 @@ class ProductStocksController extends Controller
     /**
      * Raport pozycji stanów magazynowych
      */
-    public function printReport()
+    public function printReport(): \Illuminate\Contracts\View\View
     {
         $result = ProductStockPosition::whereHas('stock', function ($stockQuery) {
             $stockQuery->where('quantity', '<>', '0');
@@ -234,11 +236,8 @@ class ProductStocksController extends Controller
     public function update(ProductStockUpdateRequest $request): RedirectResponse
     {
         if ($request->select_position !== null) {
+            $itemPosition = ProductStockPosition::findOrFail($request->select_position);
 
-            $itemPosition = $this->productStockPositionRepository->find($request->select_position);
-            if (empty($itemPosition)) {
-                abort(404);
-            }
             if (str_contains($request->different, '+') === true) {
                 $val = explode('+', $request->different);
                 $calc = $itemPosition->position_quantity + (int)$val[1];
@@ -251,12 +250,12 @@ class ProductStocksController extends Controller
                     ]);
                 }
                 $calc = $itemPosition->position_quantity - (int)$val[1];
-
             }
 
             $this->productStockPositionRepository->update(['position_quantity' => $calc], $request->select_position);
             $this->createLog($request->different, $request->id, $itemPosition->id);
         }
+
         $productStock = $this->repository->find($request->id);
 
         if (empty($productStock)) {
@@ -268,6 +267,8 @@ class ProductStocksController extends Controller
 
         $this->repository->update($request->all(), $productStock->id);
         $this->productRepository->update($request->all(), $productStock->product_id);
+
+        Product::find($productStock->product_id)->update(['is_package' => $request->is_package === 'on']);
 
         return redirect()->back()->with([
             'message' => __('product_stocks.message.update'),
