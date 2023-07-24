@@ -11,21 +11,23 @@
         <form action="{{ route('storePackageProductOrder', ['order' => $order->id]) }}" method="post">
             @csrf
             <label for="product">Produkt</label>
-            @foreach($packageProducts as $product)
-                <div>
-                    <label for="product">{{ $product->name }}</label>
-                    <img src="{{  $product->getImageUrl() }}"  alt="product image" width="100px" height="100px">
+            <div style="display: flex;">
+                @foreach($packageProducts as $product)
+                    <div>
+                        <label for="product">{{ $product->name }}</label>
+                        <img src="{{  $product->getImageUrl() }}"  alt="product image" width="100px" height="100px">
 
-                    <label class="mt-4" for="quantity">Ilość</label>
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="quantity"
-                        placeholder="Ilość"
-                        name="quantity[{{ $product->id }}]"
-                    >
-                </div>
-            @endforeach
+                        <label class="mt-4" for="quantity">Ilość</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="quantity"
+                            placeholder="Ilość"
+                            name="quantity[{{ $product->id }}]"
+                        >
+                    </div>
+                @endforeach
+            </div>
 
             <button class="btn mt-3 btn-primary">
                 Zapisz
