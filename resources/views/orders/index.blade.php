@@ -2129,7 +2129,7 @@
                         searchable: false,
                         orderable: false,
                         render: function (date, type, row) {
-                            let RKTBO = 0, PSIK = 0, PSW = 0, WAC = 0, ZP = 0;
+                            let RKTBO = row.rc, PSIK = 0, PSW = 0, WAC = 0, ZP = 0;
 
                             let sumOfSelling = 0;
                             let sumOfPurchase = 0;
@@ -2194,8 +2194,7 @@
                             }
 
                             function computeExpenses(expenses) {
-                                for (let expense of expenses) {
-                                    RKTBO += row.rc;
+                                for (let expense of expenses)
                                     PSIK += checkDetail(expense, PSIKOperationDetails);
                                     PSW += checkDetail(expense, PSWOperationDetails);
                                     WAC += checkDetail(expense, WACOperationDetails);
