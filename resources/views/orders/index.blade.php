@@ -1946,8 +1946,9 @@
                             html += ' class="btn penalty btn-danger btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
                             html += '<a href="{{ route('transactions.index') }}?email=' + data.email + '" class="btn edit btn-sm btn-success">Transakcje</a>';
                             @endif
+                            html += `<a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>`;
 
-                                return html;
+                            return html;
                         }
                     },
                     {

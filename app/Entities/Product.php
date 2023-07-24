@@ -18,7 +18,6 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property string $symbol
  * @property ProductStock $stock
  * @property string $manufacturer
- * @package namespace App\Entities;
  */
 class Product extends Model implements Transformable
 {
@@ -96,9 +95,10 @@ class Product extends Model implements Transformable
         'stock_product',
         'average_amount_of_product_in_package',
         'employees_ids',
+        'is_package'
     ];
 
-    public $customColumnsVisibilities = [
+    public array $customColumnsVisibilities = [
         'symbol',
         'name',
         'manufacturer',
@@ -164,7 +164,8 @@ class Product extends Model implements Transformable
         'gross_selling_price_aggregate_unit',
         'gross_purchase_price_aggregate_unit_after_discounts',
         'gross_selling_price_the_largest_unit',
-        'gross_purchase_price_the_largest_unit_after_discounts'
+        'gross_purchase_price_the_largest_unit_after_discounts',
+        'is_package',
     ];
 
     protected $attributes = [
