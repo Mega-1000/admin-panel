@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entities\Order;
-use App\Entities\OrderItem;
+use App\Entities\Product;
 use App\Entities\ProductPrice;
 use App\Factory\OrderBuilderFactory;
 use Closure;
@@ -54,6 +54,8 @@ final class PackageProductOrderService
      */
     private function prepareProductArrayAndOrderItems(Order $order, int|string $key, float $quantity): array
     {
+        $productArray = Product::findOrFail($key)->toArray();
+
         $productArray['gross_selling_price_commercial_unit'] = ProductPrice::query()
             ->where('product_id', $key)
             ->firstOrFail()
@@ -114,7 +116,7 @@ final class PackageProductOrderService
      * @param array $orderItems
      * @return void
      */
-    public function handle001PricesReassignment(Order $order, array $productArray, float $quantity, array &$orderItems): void
+    public function handle001PricesReassignment(Order $order, array &$productArray, float $quantity, array &$orderItems): void
     {
         $productArray['gross_selling_price_commercial_unit'] = 0.01;
 
