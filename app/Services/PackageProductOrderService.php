@@ -34,7 +34,7 @@ class PackageProductOrderService
 
             OrderBuilderFactory::create()
                 ->assignItemsToOrder(
-                    $order,-
+                    $order,
                     [
                         $productArray +
                         ['amount' => $quantity]
