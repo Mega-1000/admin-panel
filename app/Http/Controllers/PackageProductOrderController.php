@@ -6,12 +6,17 @@ use App\Entities\Order;
 use App\Entities\Product;
 use App\Factory\OrderBuilderFactory;
 use App\Http\Requests\StorePackageProductOrderRequest;
+use App\Services\PackageProductOrderService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PackageProductOrderController extends Controller
 {
+    public function __construct(
+        protected PackageProductOrderService $packageProductOrderService,
+    ) {}
+
     /**
      * @param Order $order
      * @return View
@@ -31,21 +36,10 @@ class PackageProductOrderController extends Controller
      */
     public function store(Order $order, StorePackageProductOrderRequest $request): RedirectResponse
     {
-        foreach ($request->validated('quantity') as $key => $quantity) {
-            if ($quantity === 0) {
-                continue;
-            }
-
-            OrderBuilderFactory::create()
-                ->assignItemsToOrder(
-                    $order,
-                    [
-                        Product::find($key)->toArray() +
-                        ['amount' => $quantity]
-                    ],
-                    false,
-                );
-        }
+        $this->packageProductOrderService->store(
+            $order,
+            $request->validated()
+        );
 
         return redirect()->route('orders.edit', $order->id);
     }
