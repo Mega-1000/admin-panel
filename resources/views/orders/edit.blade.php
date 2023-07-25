@@ -3814,14 +3814,17 @@
                     const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     net_selling_price_sum += $(this).val() * quantity;
                 });
-                if ($('#additional_service_cost').val() == '') {
+                if ($('#additional_service_cost').val() === '') {
                     additionalServiceCost = 0;
                 } else {
                     additionalServiceCost = parseFloat($('#additional_service_cost').val());
                 }
-                const profit = ((gross_selling_price_sum - gross_purchase_price_sum) + parseFloat($('#additional_cash_on_delivery_cost').val())).toFixed(2);
+
+                console.log(parseFloat($('#additional_cash_on_delivery_cost').val() !== '' $('#additional_cash_on_delivery_cost').val() : 0));
+                const profit = ((gross_selling_price_sum - gross_purchase_price_sum) + parseFloat($('#additional_cash_on_delivery_cost').val() ?? 0)).toFixed(2);
                 const total_price = gross_selling_price_sum.toFixed(2);
                 console.log('Total ' + total_price);
+
                 $('input#profit').val(profit);
                 $('input#total_price').val(total_price);
                 $("#profitInfo").val($('#profit').val());
@@ -3835,6 +3838,9 @@
                     ).toFixed(2))
                 $("#weightInfo").val($("#weight").val());
             }
+            $('#additional_cash_on_delivery_cost').on('change', function () {
+                updateProfit();
+            });
 
             $('.quantityChange').on('change', function () {
                 updateOrderSum();
@@ -4412,12 +4418,12 @@
         });
 
         function updateOrderSum(profit = null) {
-            if ($('#totalPriceInfo').val() == '') {
+            if ($('#totalPriceInfo').val() === '') {
                 valueOfItemsGross = 0;
             } else {
                 valueOfItemsGross = parseFloat($('#orderItemsSum').val().replace(',', ''));
             }
-            if ($('#additional_cash_on_delivery_cost').val() == '') {
+            if ($('#additional_cash_on_delivery_cost').val() === '') {
                 packingWarehouseCost = 0;
             } else {
                 packingWarehouseCost = parseFloat($('#additional_cash_on_delivery_cost').val());
