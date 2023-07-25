@@ -168,7 +168,7 @@ final class PackageProductOrderService
      */
     private function reassignOrderItems(Order $order, float $quantity, array $newProduct, array $orderItems): void
     {
-        OrderBuilderFactory::create()
+        $order = OrderBuilderFactory::create()
             ->assignItemsToOrder(
                 $order,
                 [
@@ -176,5 +176,11 @@ final class PackageProductOrderService
                     ...$orderItems
                 ],
             );
+
+        $order->items->each(
+            fn (OrderItem $item) => $item->update(
+                ['gross_selling_price_commercial_unit',$newProduct['gross_selling_price_commercial_unit']]
+            )
+        );
     }
 }
