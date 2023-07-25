@@ -3820,7 +3820,8 @@
                     additionalServiceCost = parseFloat($('#additional_service_cost').val());
                 }
 
-                const profit = ((gross_selling_price_sum - gross_purchase_price_sum) + parseFloat($('#additional_cash_on_delivery_cost').val() !== '' $('#additional_cash_on_delivery_cost').val() : 0).toFixed(2);
+                const profit = ((gross_selling_price_sum - gross_purchase_price_sum) +
+                    parseFloat($('#additional_cash_on_delivery_cost').val() == '' ? 0 : $('#additional_cash_on_delivery_cost').val())).toFixed(2);
                 const total_price = gross_selling_price_sum.toFixed(2);
                 console.log('Total ' + total_price);
 
