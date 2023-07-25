@@ -25,8 +25,8 @@ class StorePackageProductOrderRequest extends FormRequest
     {
         return [
             'quantity' => 'required',
-            'subtract-from-shipping-cost' => 'required',
-            'do-not-count-price' => 'required',
+            'subtract-from-shipping-cost' => 'nullable',
+            'do-not-count-price' => 'nullable',
         ];
     }
 }

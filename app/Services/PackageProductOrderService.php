@@ -24,11 +24,11 @@ class PackageProductOrderService
                 ->gross_selling_price_commercial_unit;
 
 
-            if ($data['subtract-from-shipping-cost'] === 'on') {
+            if (array_key_exists('subtract-from-shipping-cost', $data) && $data['subtract-from-shipping-cost'] === 'on') {
                 $order->shipment_price_for_client -= $productArray['gross_selling_price_commercial_unit'] * $quantity;
             }
 
-            if ($data['do-not-count-price']) {
+            if (array_key_exists('do-not-count-price', $data) && $data['do-not-count-price']) {
                 $productArray['gross_selling_price_commercial_unit'] = 0;
             }
 
