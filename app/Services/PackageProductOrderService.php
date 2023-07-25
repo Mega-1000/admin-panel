@@ -60,7 +60,9 @@ final class PackageProductOrderService
             ->gross_selling_price_commercial_unit;
         $orderItems = $order->items()->get()->toArray();
 
-        array_map(fn ($item) => $item->product()->first(), $orderItems);
+        foreach ($orderItems as &$item) {
+            $item = $item->product;
+        }
 
         return [$productArray, $orderItems];
     }
