@@ -364,6 +364,7 @@ readonly class OrderDatatableService
                 ->all();
             $row->files = OrderFiles::where('order_id', $row->orderId)->get();
         }
+        $row->additional_cash_on_delivery_cost = Order::find($row->orderId)->additional_cash_on_delivery_cost;
 
         foreach ($collection as $item) {
             $item->rc = OrderPackageRealCostsForCompany::getAllByOrderId(

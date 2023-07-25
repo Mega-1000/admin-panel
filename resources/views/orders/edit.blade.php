@@ -3769,30 +3769,30 @@
 
             function updateProfit() {
                 commaReplace('.priceChange');
-                var gross_purchase_price_sum = 0;
-                var net_purchase_price_sum = 0;
-                var gross_selling_price_sum = 0;
-                var net_selling_price_sum = 0;
+                let gross_purchase_price_sum = 0;
+                let net_purchase_price_sum = 0;
+                let gross_selling_price_sum = 0;
+                let net_selling_price_sum = 0;
                 $('.productsTableEdit .gross_purchase_price_commercial_unit').each(function () {
-                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
-                    var gross_selling_price = $('.gross_selling_price_commercial_unit[data-item-id="' + $(this).data('item-id') + '"]').val();
+                    const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    const gross_selling_price = $('.gross_selling_price_commercial_unit[data-item-id="' + $(this).data('item-id') + '"]').val();
                     gross_purchase_price_sum += $(this).val() * quantity;
-                    var gross_purchase_price = $(this).val() * quantity;
-                    var sellingSum = gross_selling_price * quantity;
-                    var weightSum = parseFloat($('[name="weight_trade_unit[' + $(this).data('item-id') + ']').val()) * quantity;
-                    var profitItem = ((gross_selling_price * quantity) - gross_purchase_price).toFixed(2);
+                    const gross_purchase_price = $(this).val() * quantity;
+                    const sellingSum = gross_selling_price * quantity;
+                    const weightSum = parseFloat($('[name="weight_trade_unit[' + $(this).data('item-id') + ']').val()) * quantity;
+                    const profitItem = ((gross_selling_price * quantity) - gross_purchase_price).toFixed(2);
 
-                    var unitCommercialName = $('[name="unit_commercial_name[' + $(this).data('item-id') + ']"]').val();
+                    const unitCommercialName = $('[name="unit_commercial_name[' + $(this).data('item-id') + ']"]').val();
 
-                    var unitBasicUnits = $('[name="unit_basic_units[' + $(this).data('item-id') + ']"]').val();
-                    var unitBasicName = $('[name="unit_basic_name[' + $(this).data('item-id') + ']"]').val();
+                    const unitBasicUnits = $('[name="unit_basic_units[' + $(this).data('item-id') + ']"]').val();
+                    const unitBasicName = $('[name="unit_basic_name[' + $(this).data('item-id') + ']"]').val();
 
-                    var unitCalculationUnits = $('[name="calculation_unit_units[' + $(this).data('item-id') + ']"]').val();
-                    var unitCalculationConsumption = $('[name="calculation_unit_consumption[' + $(this).data('item-id') + ']"]').val();
-                    var unitCalculationName = $('[name="calculation_unit_name[' + $(this).data('item-id') + ']"]').val();
+                    const unitCalculationUnits = $('[name="calculation_unit_units[' + $(this).data('item-id') + ']"]').val();
+                    const unitCalculationConsumption = $('[name="calculation_unit_consumption[' + $(this).data('item-id') + ']"]').val();
+                    const unitCalculationName = $('[name="calculation_unit_name[' + $(this).data('item-id') + ']"]').val();
 
-                    var unitCollectiveUnits = $('[name="unit_of_collective_units[' + $(this).data('item-id') + ']"]').val();
-                    var unitCollectiveName = $('[name="unit_of_collective_name[' + $(this).data('item-id') + ']"]').val();
+                    const unitCollectiveUnits = $('[name="unit_of_collective_units[' + $(this).data('item-id') + ']"]').val();
+                    const unitCollectiveName = $('[name="unit_of_collective_name[' + $(this).data('item-id') + ']"]').val();
 
                     $('[name="unit_commercial[' + $(this).data('item-id') + ']"]').val(quantity + ' ' + unitCommercialName);
                     $('[name="unit_basic[' + $(this).data('item-id') + ']"]').val(quantity * unitBasicUnits + ' ' + unitBasicName);
@@ -3803,15 +3803,15 @@
                     $('input.item-value[data-item-id="' + $(this).data('item-id') + '"]').val(parseFloat(sellingSum).toFixed(2) + ' zł');
                 });
                 $('.productsTableEdit .net_purchase_price_commercial_unit').each(function () {
-                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     net_purchase_price_sum += $(this).val() * quantity;
                 });
                 $('.productsTableEdit .gross_selling_price_commercial_unit').each(function () {
-                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     gross_selling_price_sum += $(this).val() * quantity;
                 });
                 $('.productsTableEdit .net_selling_price_commercial_unit').each(function () {
-                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     net_selling_price_sum += $(this).val() * quantity;
                 });
                 if ($('#additional_service_cost').val() == '') {
@@ -3819,8 +3819,8 @@
                 } else {
                     additionalServiceCost = parseFloat($('#additional_service_cost').val());
                 }
-                var profit = ((gross_selling_price_sum - gross_purchase_price_sum) + parseFloat($('#additional_cash_on_delivery_cost').val())).toFixed(2);
-                var total_price = gross_selling_price_sum.toFixed(2);
+                const profit = ((gross_selling_price_sum - gross_purchase_price_sum) + parseFloat($('#additional_cash_on_delivery_cost').val())).toFixed(2);
+                const total_price = gross_selling_price_sum.toFixed(2);
                 console.log('Total ' + total_price);
                 $('input#profit').val(profit);
                 $('input#total_price').val(total_price);
@@ -3847,45 +3847,47 @@
             $(document).on('change', 'input.price', function () {
                     commaReplace('.priceChange');
 
-                    var itemId = $(this).data('item-id');
+                const itemId = $(this).data('item-id');
 
-                    var net_purchase_price_commercial_unit = $('.net_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
-                    var net_purchase_price_basic_unit = $('.net_purchase_price_basic_unit[data-item-id="' + itemId + '"');
-                    var net_purchase_price_calculated_unit = $('.net_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
-                    var net_purchase_price_aggregate_unit = $('.net_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
-                    var net_selling_price_commercial_unit = $('.net_selling_price_commercial_unit[data-item-id="' + itemId + '"');
-                    var net_selling_price_basic_unit = $('.net_selling_price_basic_unit[data-item-id="' + itemId + '"');
-                    var net_selling_price_calculated_unit = $('.net_selling_price_calculated_unit[data-item-id="' + itemId + '"');
-                    var net_selling_price_aggregate_unit = $('.net_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+                const net_purchase_price_commercial_unit = $('.net_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
+                const net_purchase_price_basic_unit = $('.net_purchase_price_basic_unit[data-item-id="' + itemId + '"');
+                const net_purchase_price_calculated_unit = $('.net_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
+                const net_purchase_price_aggregate_unit = $('.net_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
+                const net_selling_price_commercial_unit = $('.net_selling_price_commercial_unit[data-item-id="' + itemId + '"');
+                const net_selling_price_basic_unit = $('.net_selling_price_basic_unit[data-item-id="' + itemId + '"');
+                const net_selling_price_calculated_unit = $('.net_selling_price_calculated_unit[data-item-id="' + itemId + '"');
+                const net_selling_price_aggregate_unit = $('.net_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
 
-                    var gross_purchase_price_commercial_unit = $('.gross_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
-                    var gross_purchase_price_basic_unit = $('.gross_purchase_price_basic_unit[data-item-id="' + itemId + '"');
-                    var gross_purchase_price_calculated_unit = $('.gross_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
-                    var gross_purchase_price_aggregate_unit = $('.gross_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
-                    var gross_selling_price_commercial_unit = $('.gross_selling_price_commercial_unit[data-item-id="' + itemId + '"');
-                    var gross_selling_price_basic_unit = $('.gross_selling_price_basic_unit[data-item-id="' + itemId + '"');
-                    var gross_selling_price_calculated_unit = $('.gross_selling_price_calculated_unit[data-item-id="' + itemId + '"');
-                    var gross_selling_price_aggregate_unit = $('.gross_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+                const gross_purchase_price_commercial_unit = $('.gross_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
+                const gross_purchase_price_basic_unit = $('.gross_purchase_price_basic_unit[data-item-id="' + itemId + '"');
+                const gross_purchase_price_calculated_unit = $('.gross_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
+                const gross_purchase_price_aggregate_unit = $('.gross_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
+                const gross_selling_price_commercial_unit = $('.gross_selling_price_commercial_unit[data-item-id="' + itemId + '"');
+                const gross_selling_price_basic_unit = $('.gross_selling_price_basic_unit[data-item-id="' + itemId + '"');
+                const gross_selling_price_calculated_unit = $('.gross_selling_price_calculated_unit[data-item-id="' + itemId + '"');
+                const gross_selling_price_aggregate_unit = $('.gross_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
 
-                    var numbers_of_basic_commercial_units_in_pack = $('.numbers_of_basic_commercial_units_in_pack[data-item-id="' + itemId + '"');
-                    var number_of_sale_units_in_the_pack = $('.number_of_sale_units_in_the_pack[data-item-id="' + itemId + '"');
-                    var number_of_trade_items_in_the_largest_unit = $('.number_of_trade_items_in_the_largest_unit[data-item-id="' + itemId + '"');
-                    var unit_consumption = $('.unit_consumption[data-item-id="' + itemId + '"');
+                const numbers_of_basic_commercial_units_in_pack = $('.numbers_of_basic_commercial_units_in_pack[data-item-id="' + itemId + '"');
+                const number_of_sale_units_in_the_pack = $('.number_of_sale_units_in_the_pack[data-item-id="' + itemId + '"');
+                const number_of_trade_items_in_the_largest_unit = $('.number_of_trade_items_in_the_largest_unit[data-item-id="' + itemId + '"');
+                const unit_consumption = $('.unit_consumption[data-item-id="' + itemId + '"');
 
-                    var net_purchase_price_commercial_unit_value = 0;
-                    if (!$(this).hasClass('gross_purchase_price_commercial_unit')) {
-                        net_purchase_price_commercial_unit_value = parseFloat(net_purchase_price_commercial_unit.val());
-                    } else {
-                        net_purchase_price_commercial_unit_value = parseFloat(gross_purchase_price_commercial_unit.val() / 1.23);
-                    }
-                    var net_purchase_price_basic_unit_value = 0;
-                    if (!$(this).hasClass('gross_purchase_price_basic_unit')) {
-                        net_purchase_price_basic_unit_value = parseFloat(net_purchase_price_basic_unit.val());
-                    } else {
-                        net_purchase_price_basic_unit_value = parseFloat(gross_purchase_price_basic_unit.val() / 1.23);
-                    }
-                    var net_purchase_price_aggregate_unit_value = 0;
-                    if (!$(this).hasClass('gross_purchase_price_aggregate_unit')) {
+                let net_purchase_price_commercial_unit_value = 0;
+                if (!$(this).hasClass('gross_purchase_price_commercial_unit')) {
+                    net_purchase_price_commercial_unit_value = parseFloat(net_purchase_price_commercial_unit.val());
+                } else {
+                    net_purchase_price_commercial_unit_value = parseFloat(gross_purchase_price_commercial_unit.val() / 1.23);
+                }
+
+                let net_purchase_price_basic_unit_value = 0;
+                if (!$(this).hasClass('gross_purchase_price_basic_unit')) {
+                    net_purchase_price_basic_unit_value = parseFloat(net_purchase_price_basic_unit.val());
+                } else {
+                    net_purchase_price_basic_unit_value = parseFloat(gross_purchase_price_basic_unit.val() / 1.23);
+                }
+
+                let net_purchase_price_aggregate_unit_value = 0;
+                if (!$(this).hasClass('gross_purchase_price_aggregate_unit')) {
                         net_purchase_price_aggregate_unit_value = parseFloat(net_purchase_price_aggregate_unit.val());
                     } else {
                         net_purchase_price_aggregate_unit_value = parseFloat(gross_purchase_price_aggregate_unit.val() / 1.23);
