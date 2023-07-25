@@ -3819,7 +3819,7 @@
                 } else {
                     additionalServiceCost = parseFloat($('#additional_service_cost').val());
                 }
-                var profit = ((gross_selling_price_sum - gross_purchase_price_sum)).toFixed(2);
+                var profit = ((gross_selling_price_sum - gross_purchase_price_sum) + parseFloat($('#additional_cash_on_delivery_cost').val())).toFixed(2);
                 var total_price = gross_selling_price_sum.toFixed(2);
                 console.log('Total ' + total_price);
                 $('input#profit').val(profit);
