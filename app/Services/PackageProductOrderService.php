@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entities\Order;
 use App\Entities\Product;
+use App\Entities\ProductPrice;
 use App\Factory\OrderBuilderFactory;
 
 class PackageProductOrderService
@@ -15,7 +16,13 @@ class PackageProductOrderService
                 continue;
             }
 
-            $productArray = Product::find($key)->toArray();
+            $productArray = Product::findOrFail($key)->toArray();
+
+            $productArray['gross_selling_price_commercial_unit'] = ProductPrice::query()
+                ->where('product_id', $key)
+                ->firstOrFail()
+                ->gross_selling_price_commercial_unit;
+
 
             if ($data['subtract-from-shipping-cost'] === 'on') {
                 $order->shipment_price_for_client -= $productArray['gross_selling_price_commercial_unit'] * $quantity;
