@@ -143,6 +143,7 @@ final class PackageProductOrderService
         }
 
         $orderItems[$biggestQuantityIndex]['gross_selling_price_commercial_unit'] -= count($this->data) * 0.01;
+        dd($orderItems);
     }
 
     /**
