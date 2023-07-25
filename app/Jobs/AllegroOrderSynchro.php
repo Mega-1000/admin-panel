@@ -617,10 +617,20 @@ class AllegroOrderSynchro implements ShouldQueue
 
         list($code, $phone) = Helper::prepareCodeAndPhone($address['phoneNumber']);
 
+        $firstName = $address['firstName'];
+        if (array_key_exists('naturalPerson', $address)) {
+            $firstName = $address['naturalPerson']['firstName'];
+        }
+
+        $lastName = $address['lastName'];  
+        if (array_key_exists('naturalPerson', $address)) {
+            $lastName = $address['naturalPerson']['lastName'];
+        }
+
         $addressData = [
             'type' => $type,
-            'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'] ?? null,
-            'lastname' => $address['lastName'] ?? $address['naturalPerson']['lastName'] ?? null,
+            'firstname' => $firstName ?? null,
+            'lastname' => $lastName ?? null,
             'address' => $street,
             'flat_number' => $flatNo,
             'city' => $address['city'],
