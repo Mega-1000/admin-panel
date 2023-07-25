@@ -24,7 +24,6 @@ class PackageProductOrderService
                 ->gross_selling_price_commercial_unit;
 
 
-
             if ($data['subtract-from-shipping-cost'] === 'on') {
                 $order->shipment_price_for_client -= $productArray['gross_selling_price_commercial_unit'] * $quantity;
             }
