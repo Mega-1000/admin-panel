@@ -27,6 +27,7 @@ class StorePackageProductOrderRequest extends FormRequest
             'quantity' => 'required',
             'subtract-from-shipping-cost' => 'nullable',
             'do-not-count-price' => 'nullable',
+            '0.001-prices' => 'nullable',
         ];
     }
 }
