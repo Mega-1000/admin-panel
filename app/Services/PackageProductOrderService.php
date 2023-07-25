@@ -172,8 +172,7 @@ final class PackageProductOrderService
             ->assignItemsToOrder(
                 $order,
                 [
-                    $newProduct +
-                    ['amount' => $quantity],
+                    $newProduct + ['amount' => $quantity, 'recalculate' => true],
                     ...$orderItems
                 ],
             );
