@@ -4,9 +4,11 @@ use App\Http\Controllers\AllegroBillingController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\EmailSettingsController;
+use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\MailReportController;
 use App\Http\Controllers\OrdersMessagesController;
+use App\Http\Controllers\PackageProductOrderController;
 use App\Http\Controllers\ProductStocksController;
 use App\MailReport;
 use Illuminate\Support\Facades\Route;
@@ -588,6 +590,13 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
         });
     });
+
+    Route::get('/generate-real-cost-for-company-invoice-report', GenerateRealCostsForCompanyReportController::class)
+        ->name('generateRealCostForCompanyInvoiceReport');
+    Route::get('/create-package-product-order/{order}', [PackageProductOrderController::class, 'create'])
+        ->name('createPackageProductOrder');
+    Route::post('/create-package-product-order/{order}', [PackageProductOrderController::class, 'store'])
+        ->name('storePackageProductOrder');
 
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');

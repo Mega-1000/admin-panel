@@ -85,6 +85,7 @@
                     <input type="checkbox" id="stock_product" name="stock_product" checked>
                 </div>
             @endif
+            Czy to jest produkt pakowy <input type="checkbox" id="is_package" name="is_package" {{ $similarProduct->is_package === 1 ? 'checked' : '' }}>
         </div>
         <div class="product_stocks-stocks" id="stocks">
             <div class="form-group">

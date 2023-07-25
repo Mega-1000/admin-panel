@@ -11,6 +11,8 @@ use Prettus\Repository\Traits\TransformableTrait;
  * Class ProductPrice.
  *
  * @package namespace App\Entities;
+ *
+ * @property string $gross_selling_price_commercial_unit
  */
 class ProductPrice extends Model implements Transformable
 {

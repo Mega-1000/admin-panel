@@ -2313,7 +2313,7 @@
                                                class="form-control item-profit priceChange"
                                                data-item-id="{{$item->id}}" disabled
                                                name="item-profit"
-                                               value="{{ number_format(($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }}">
+                                               value="{{ number_format(($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23) + $item->additional_cash_on_delivery_cost, 2) }}">
                                     </td>
                                     <td colspan="3"></td>
                                 </tr>
@@ -3631,7 +3631,7 @@
                             let value = [];
 
                             real_costs_for_company.map(function (item) {
-                                value.push('<span>' + item.cost + '</span>');
+                                value.push('<span>' + item.cost + ' ' + item.invoice_num + '</span>');
                             })
 
                             return value.join('<br />');
@@ -3819,7 +3819,7 @@
                 } else {
                     additionalServiceCost = parseFloat($('#additional_service_cost').val());
                 }
-                var profit = ((gross_selling_price_sum - gross_purchase_price_sum)).toFixed(2);
+                var profit = ((gross_selling_price_sum - gross_purchase_price_sum) + parseFloat($('#additional_cash_on_delivery_cost').val())).toFixed(2);
                 var total_price = gross_selling_price_sum.toFixed(2);
                 console.log('Total ' + total_price);
                 $('input#profit').val(profit);

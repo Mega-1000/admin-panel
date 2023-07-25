@@ -1,38 +1,26 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Services;
 
+use App\Entities\Firm;
 use App\Entities\Order;
+use App\Entities\OrderAddress;
 use App\Entities\Product;
+use App\Entities\Warehouse;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Helpers\ProductSymbolCoreExtractor;
-use App\Repositories\FirmRepository;
-use App\Repositories\OrderAddressRepository;
-use App\Repositories\ProductRepository;
-use App\Repositories\WarehouseRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 readonly class ProductService
 {
-    public function __construct(
-        protected ProductRepository    $productRepository,
-        private OrderAddressRepository $orderAddressRepository,
-        private FirmRepository         $firmRepository,
-        private WarehouseRepository    $warehouseRepository
-    ) {}
-
     public function checkForSimilarProducts(int $productId): ?Collection
     {
-        $product = $this->productRepository->find($productId);
+        $product = Product::find($productId);
         $productSymbolCore = ProductSymbolCoreExtractor::getProductSymbolCore($product->symbol);
 
-        return $this->productRepository->findWhere([
-            ['symbol', 'LIKE', '%' . $productSymbolCore . '%']
-        ]);
+        return Product::where('symbol', 'LIKE', '%' . $productSymbolCore . '%')->get();
     }
 
     public function getStockProduct(int $productId): ?Product
@@ -58,7 +46,6 @@ readonly class ProductService
         $users = new Collection();
 
         foreach ($orders as $order) {
-            // if order is array
             if (is_array($order)) {
                 $orderObj = Product::find($order['id']);
                 $orderObj->firm->employees->each(function ($employee) use ($order, &$users) {
@@ -88,10 +75,9 @@ readonly class ProductService
     {
         $productsVariation = [];
 
-        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
-            "order_id" => $order->id,
-            'type' => 'DELIVERY_ADDRESS',
-        ])->first();
+        $orderDeliveryAddress = OrderAddress::where('order_id', $order->id)
+            ->where('type', 'DELIVERY_ADDRESS')
+            ->first();
 
         $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
         if ($deliveryAddressLatLon === null) {
@@ -102,9 +88,9 @@ readonly class ProductService
             if ($product->product->product_group == null) {
                 continue;
             }
-            $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
+            $productVar = Product::where('product_group', $product->product->product_group)->first();
             foreach ($productVar as $prod) {
-                $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
+                $firm = Firm::where('symbol', $prod->product_name_supplier)->first();
                 $radius = 0;
 
                 if ($firm->isEmpty() || $firm->first->id->warehouses->isEmpty()) {
@@ -154,7 +140,7 @@ readonly class ProductService
                             ['product_id' => $prod->id, 'class' => get_class($this), 'line' => __LINE__]
                         );
                 }
-                $warehouse = $this->warehouseRepository->find($raw->id);
+                $warehouse = Warehouse::find($raw->id);
                 if (
                     $radius > $warehouse->radius ||
                     $prod->price->gross_selling_price_commercial_unit === null ||

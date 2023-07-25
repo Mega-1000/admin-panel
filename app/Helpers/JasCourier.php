@@ -2,10 +2,10 @@
 
 namespace App\Helpers;
 
-use App\Helpers\interfaces\ICourier;
+use App\Helpers\interfaces\iCourier;
 use App\Integrations\Jas\Jas;
 
-class JasCourier implements ICourier
+class JasCourier implements iCourier
 {
     /**
      * @param $package

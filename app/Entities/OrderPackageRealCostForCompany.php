@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +21,7 @@ class OrderPackageRealCostForCompany extends Model
         'deliverer_id',
         'cost',
         'type',
+        'invoice_num',
     ];
 
     public function orderPackage(): BelongsTo

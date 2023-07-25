@@ -108,12 +108,12 @@ class OrderPackage extends Model implements Transformable
 
     public function realCostsForCompany(): HasMany
     {
-        return $this->hasMany('App\Entities\OrderPackageRealCostForCompany');
+        return $this->hasMany(OrderPackageRealCostForCompany::class);
     }
 
     public function packedProducts(): BelongsToMany
     {
-        return $this->belongsToMany('App\Entities\Product')->withPivot('quantity');
+        return $this->belongsToMany(Product::class)->withPivot('quantity');
     }
 
     public function shipmentGroup(): BelongsTo

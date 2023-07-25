@@ -42,40 +42,51 @@ class ImportAllegroBillingService
     private function importSingle(ImportAllegroBillingDTO $data): void
     {
         $billingEntry = AllegroGeneralExpenses::createFromDTO($data);
+        $operationDetails = $data->getOperationDetails();
 
-        $trackingNumber = $this->billingHelper->extractTrackingNumber(
-            $data->getOperationDetails()
-        );
+        $trackingNumber = $this->getTrackingNumber($operationDetails);
+        $order = null;
 
         if (!$trackingNumber) {
-            $allegroId = $this->billingHelper->extractAllegroId($data->getOperationDetails());
+            $order = $this->getOrderFromAllegroId($operationDetails);
+            $this->associateOrderToBillingEntry($billingEntry, $order);
+        }
 
-            $order = Order::where('allegro_form_id', $allegroId)->first();
-
-            if (empty($order)) {
-                return;
-            }
-
-            $billingEntry->order()->associate($order);
-        };
-
-        $orderPackage = $this->orderPackagesRepository->getByLetterNumber($trackingNumber);
+        $orderPackage = $this->getOrderPackageByLetterNumber($trackingNumber);
 
         if (empty($orderPackage)) {
             $this->updateBillingEntryNotAttached($billingEntry);
             return;
         }
 
-        if (!$this->billingHelper->hasCourierMatch($data->getOperationDetails())) {
-            $this->handleNoCourierMatch($billingEntry, $data, $orderPackage);
-            return;
-        }
-
         $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOD');
 
         $order = empty($order) ? $orderPackage->order : $order;
+        $this->associateOrderToBillingEntry($billingEntry, $order);
+    }
 
-        $billingEntry->order()->associate($order);
+    private function getTrackingNumber($operationDetails): ?string
+    {
+        return $this->billingHelper->extractTrackingNumber($operationDetails);
+    }
+
+    private function getOrderFromAllegroId($operationDetails): ?Order
+    {
+        $allegroId = $this->billingHelper->extractAllegroId($operationDetails);
+
+        return Order::where('allegro_form_id', $allegroId)->first();
+    }
+
+    private function associateOrderToBillingEntry(AllegroGeneralExpense $billingEntry, ?Order $order): void
+    {
+        if (!empty($order) && empty($billingEntry->order)) {
+            $billingEntry->update(['order_id' => $order->id]);
+        }
+    }
+
+    private function getOrderPackageByLetterNumber($trackingNumber): ?OrderPackage
+    {
+        return $this->orderPackagesRepository->getByLetterNumber($trackingNumber);
     }
 
     /**
@@ -91,22 +102,6 @@ class ImportAllegroBillingService
     }
 
     /**
-     * @param AllegroGeneralExpense $billingEntry
-     * @param ImportAllegroBillingDTO $data
-     * @param OrderPackage $orderPackage
-     * @return void
-     */
-    private function handleNoCourierMatch(AllegroGeneralExpense $billingEntry, ImportAllegroBillingDTO $data, OrderPackage $orderPackage): void
-    {
-        if (!$this->billingHelper->hasCourierChargeMatch($data->getOperationDetails())) {
-            $this->updateBillingEntryNotAttached($billingEntry);
-            return;
-        }
-
-        $this->updateOrderPackage($orderPackage, $data->getCharges(), 'SOP');
-    }
-
-    /**
      * Update order package with real costs for company
      *
      * @param OrderPackage $orderPackage
@@ -116,6 +111,12 @@ class ImportAllegroBillingService
      */
     private function updateOrderPackage(OrderPackage $orderPackage, string $charges, mixed $type = null): void
     {
+        $existingRealCosts = $orderPackage->realCostsForCompany()->where('cost', (float)$charges)->first();
+
+        if (!empty($existingRealCosts)) {
+            return;
+        }
+
         $orderPackage->realCostsForCompany()->create([
             'cost' => (float)$charges,
             'type' => $type,

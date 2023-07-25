@@ -5,13 +5,13 @@ namespace App\Helpers;
 use App\Entities\OrderPackage;
 use App\Enums\CourierStatus\GlsPackageStatus;
 use App\Enums\PackageStatus;
-use App\Helpers\interfaces\ICourier;
+use App\Helpers\interfaces\iCourier;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Request;
 
-class GlsCourier implements ICourier
+class GlsCourier implements iCourier
 {
     use CourierTrait;
 

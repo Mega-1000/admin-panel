@@ -1946,8 +1946,9 @@
                             html += ' class="btn penalty btn-danger btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
                             html += '<a href="{{ route('transactions.index') }}?email=' + data.email + '" class="btn edit btn-sm btn-success">Transakcje</a>';
                             @endif
+                            html += `<a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>`;
 
-                                return html;
+                            return html;
                         }
                     },
                     {
@@ -1955,8 +1956,7 @@
                         name: 'section',
                         orderable: false,
                         render: function () {
-                            let html = 'tymczasowy brak';
-                            return html;
+                            return 'tymczasowy brak';
                         }
                     },
                     {
@@ -2129,7 +2129,29 @@
                         searchable: false,
                         orderable: false,
                         render: function (date, type, row) {
-                            let RKTBO = 0, PSIK = 0, PSW = 0, WAC = 0, ZP = 0;
+                            let RKTBO = row.rc, PSIK = 0, PSW = 0, WAC = 0, ZP = 0;
+
+                            let sumOfSelling = 0;
+                            let sumOfPurchase = 0;
+                            const items = row['items'];
+
+                            for (let index = 0; index < items.length; index++) {
+                                let priceSelling = items[index].gross_selling_price_commercial_unit;
+                                let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
+                                let quantity = items[index].quantity;
+
+                                if (priceSelling == null) {
+                                    priceSelling = 0;
+                                }
+                                if (pricePurchase == null) {
+                                    pricePurchase = 0;
+                                }
+                                if (quantity == null) {
+                                    quantity = 0;
+                                }
+                                sumOfSelling += parseFloat(priceSelling) * parseInt(quantity);
+                                sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
+                            }
 
                             const RKTBOOperationDetails = [
                                 'Allegro Paczkomaty Inpost',
@@ -2153,7 +2175,7 @@
                                 'Zwrot kosztów',
                             ];
 
-                            const sumDetails = computeSumDetails(row['items']);
+                            computeSumDetails(row['items']);
                             computeExpenses(row.allegroGeneralExpenses);
 
                             function computeSumDetails(items) {
@@ -2173,7 +2195,6 @@
 
                             function computeExpenses(expenses) {
                                 for (let expense of expenses) {
-                                    RKTBO += checkDetail(expense, RKTBOOperationDetails);
                                     PSIK += checkDetail(expense, PSIKOperationDetails);
                                     PSW += checkDetail(expense, PSWOperationDetails);
                                     WAC += checkDetail(expense, WACOperationDetails);
@@ -2188,18 +2209,26 @@
                             }
 
                             function checkDetail(expense, details) {
-                                if (details.includes(expense.operation_details)) {
-                                    return parseFloat(expense.debit ?? expense.credit);
+                                if (details.includes(expense.operation_type)) {
+                                    return parseFloat(expense.debit === '0' ? expense.credit : expense.debit);
                                 }
 
                                 return 0;
                             }
 
+                            const Z = (sumOfSelling + parseFloat(row.additional_cash_on_delivery_cost) - (sumOfPurchase * 1.23)).toFixed(2);
+
+                            const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseFloat(ZP)).toFixed(2);
+
                             return `
-                                <p><span title="Zysk">Z: ${(sumDetails.sumOfSelling - sumDetails.sumOfPurchase - RKTBO).toFixed(2)}</p>
+                                <p><span title="Zysk">Z: ${Z}</p>
                                 <p>RKTBO: ${RKTBO}</p>
                                 <p>PSIK: ${PSIK}</p>
                                 <p>PSW: ${PSW}</p>
+                                <p>WAC: ${WAC}</p>
+                                <p>ZP: ${ZP}</p>
+                                <p>BZO: ${BZO}</p>
+                                <p><a href="/admin/allegro-billing?order-id=${row.orderId}" class="btn btn-primary" target="_blank">pokaz na liście</a></p>
                             `;
                         }
                     },
@@ -2462,8 +2491,11 @@
                         data: 'packages',
                         name: 'real_cost_for_company',
                         render: function (packages) {
-                            return '<span style="margin-top: 5px;">' +
-                                packages.reduce((prev, next) => (prev + parseFloat(next.real_cost_for_company ?? 0)), 0) + '</span>';
+                            return `
+                                <span style="margin-top: 5px;">
+                                    ${packages.reduce((prev, next) => (prev + parseFloat(next.real_cost_for_company ?? 0)), 0)}
+                                </span>
+                            `;
                         }
                     },
                     {
@@ -2950,7 +2982,7 @@
                         delivery_warehouse: delivery_warehouse
                     },
                 }).done(function (data) {
-                    if(data.status=='ERROR'){
+                    if (data.status === 'ERROR'){
                         let modal = $('#add-withdraw-task');
                         let input_delivery_warehouse = modal.find("#add-withdraw-task-delivery_warehouse");
                         let input_order_id = modal.find("#add-withdraw-task-order_id");
@@ -3182,6 +3214,11 @@
             }
         }
 
+        function findSite() {
+            let id = $('#searchBySite').val();
+            window.table.page(parseInt(id) - 1).draw('page');
+        }
+
         function findByDates() {
             let dateColumn = $('#columnSearch-choose_date').val();
             let dateFrom = $('#dates_from').val();
@@ -3205,7 +3242,7 @@
             chosenLabel = $("#choosen-label");
             let timed = chosenLabel[0].selectedOptions[0].dataset.timed;
 
-            if (chosenLabel.val() == "") {
+            if (chosenLabel.val() === "") {
                 alert("Nie wybrano etykiety");
                 return;
             }

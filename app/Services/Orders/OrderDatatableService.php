@@ -4,7 +4,9 @@ namespace App\Services\Orders;
 
 use App\Entities\Order;
 use App\Entities\OrderFiles;
+use App\Entities\OrderPackageRealCostForCompany;
 use App\Entities\OrderPayment;
+use App\Repositories\OrderPackageRealCostsForCompany;
 use App\Repositories\SpeditionExchangeRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
@@ -271,12 +273,22 @@ readonly class OrderDatatableService
 
         foreach ($collection as $row) {
             $orderId = $row->orderId;
+            $row->speditionCost = 0;
             $row->allegro_commission = abs(DB::table('order_allegro_commissions')->where('order_id', $row->orderId)->sum('amount'));
             $row->items = DB::table('order_items')->where('order_id', $row->orderId)->get();
             $row->connected = DB::table('orders')->where('master_order_id', $row->orderId)->get();
             $row->payments = OrderPayment::withTrashed()->where('order_id', $row->orderId)->get();
-
             $row->packages = DB::table('order_packages')->where('order_id', $row->orderId)->get();
+
+            foreach ($row->packages as $package) {
+                $package->realSpecialCosts = OrderPackageRealCostForCompany::query()
+                        ->select('cost')
+                        ->where('order_package_id', $package->id)
+                        ->groupBy('order_package_id')
+                        ->first();
+                $row->speditionCost += $package->realSpecialCosts?->cost;
+            }
+
             $row->packages?->map(function ($item) {
                 $item->sumOfCosts = DB::table('order_packages_real_cost_for_company')
                     ->select(DB::raw('SUM(cost) as sum'))
@@ -286,6 +298,7 @@ readonly class OrderDatatableService
 
                 return $item;
             });
+
 
             $row->otherPackages = DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
             $row->addresses = DB::table('order_addresses')->where('order_id', $row->orderId)->get();
@@ -353,12 +366,9 @@ readonly class OrderDatatableService
         }
 
         foreach ($collection as $item) {
-            $item->packages->map(function ($package) {
-                $package->realCosts = DB::table('order_packages_real_cost_for_company')
-                    ->where('order_package_id', $package->id)
-                    ->get();
-                return $package;
-            });
+            $item->rc = OrderPackageRealCostsForCompany::getAllByOrderId(
+                $item->orderId
+            );
         }
 
         return [$collection, $count];

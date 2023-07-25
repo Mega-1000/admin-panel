@@ -39,7 +39,7 @@ class Package
 
         $this->volumeMargin = $margin;
         $this->packageName = $packageName;
-        $this->productList = collect([]);
+        $this->productList = collect();
     }
 
     /**
@@ -48,7 +48,7 @@ class Package
     public function addItem($product, $quantity): void
     {
         if ($this->canPutNewItem($product, $quantity)) {
-            $this->productList = $this->icreaseAmount($this->productList, $product, $quantity);
+            $this->productList = $this->increaseAmount($this->productList, $product, $quantity);
         } else {
             throw new Exception(self::CAN_NOT_ADD_MORE);
         }
@@ -60,7 +60,7 @@ class Package
             return clone $item;
         });
 
-        $moreItems = $this->icreaseAmount($moreItems, $product, $quantity);
+        $moreItems = $this->increaseAmount($moreItems, $product, $quantity);
         $total = $moreItems->reduce(function ($carry, $item) use ($moreItems) {
             $carry['weight'] += $item->weight_trade_unit * $item->quantity;
             $carry['volume'] += $this->calculateVolumeForItem($item, $moreItems);
@@ -69,7 +69,7 @@ class Package
         return $total['weight'] < $this->maxWeight && $total['volume'] < $this->volumeRatio;
     }
 
-    private function icreaseAmount($list, $product, $quantity)
+    private function increaseAmount($list, $product, $quantity)
     {
         if (empty($list->firstWhere('id', $product->id))) {
             $productClone = clone $product;
@@ -77,6 +77,7 @@ class Package
             $list->prepend($productClone);
         }
         $list->firstWhere('id', $product->id)->quantity += $quantity;
+
         return $list;
     }
 
@@ -88,6 +89,7 @@ class Package
                 return max($item->packing->dimension_x, $carry);
             });
         }
+
         return $item->packing->getVolume($maxLength) * $item->quantity * $this->volumeMargin;
     }
 

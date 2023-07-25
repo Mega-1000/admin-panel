@@ -27,6 +27,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property int $reminder_date
  * @property int $status_id
  * @property \Illuminate\Database\Eloquent\Collection<OrderItem>
+ * @property string $shipment_price_for_client
  *
  * @property Carbon $created_at
  * @property ?Warehouse $warehouse
