@@ -11,7 +11,7 @@ class PackageProductOrderService
     public function store(Order $order, array $data): void
     {
         foreach ($data['quantity'] as $key => $quantity) {
-            if ($quantity === 0) {
+            if (empty($quantity)) {
                 continue;
             }
 
