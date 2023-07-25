@@ -58,9 +58,9 @@ final class PackageProductOrderService
             ->where('product_id', $key)
             ->firstOrFail()
             ->gross_selling_price_commercial_unit;
-        $orderItems = $order->items()->get()->map(function (OrderItem $item) {
-            return $item->product;
-        })->toArray();
+        $orderItems = $order->items()->get()->toArray();
+
+        array_map(fn ($item) => $item->product()->first(), $orderItems);
 
         return [$productArray, $orderItems];
     }
