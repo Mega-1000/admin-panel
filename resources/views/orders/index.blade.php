@@ -1956,8 +1956,7 @@
                         name: 'section',
                         orderable: false,
                         render: function () {
-                            let html = 'tymczasowy brak';
-                            return html;
+                            return 'tymczasowy brak';
                         }
                     },
                     {
@@ -2217,7 +2216,7 @@
                                 return 0;
                             }
 
-                            const Z = (sumOfSelling - (sumOfPurchase * 1.23)).toFixed(2);
+                            const Z = (sumOfSelling + row.additional_cash_on_delivery_cost - (sumOfPurchase * 1.23)).toFixed(2);
 
                             const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseFloat(ZP)).toFixed(2);
 
