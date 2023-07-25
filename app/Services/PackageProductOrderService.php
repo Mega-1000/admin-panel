@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entities\Order;
+use App\Entities\OrderItem;
 use App\Entities\Product;
 use App\Entities\ProductPrice;
 use App\Factory\OrderBuilderFactory;
@@ -60,13 +61,12 @@ final class PackageProductOrderService
             ->where('product_id', $key)
             ->firstOrFail()
             ->gross_selling_price_commercial_unit;
-        $orderItems = $order->items()->get();
-
-        foreach ($orderItems as &$item) {
-            $item = $item->product->toArray();
-        }
-
-        $orderItems = $orderItems->toArray();
+        $orderItems = $order->items()
+            ->with('product')
+            ->get()
+            ->each(fn (OrderItem $item) => $item->product->amount = $item->quantity)
+            ->pluck('product')
+            ->toArray();
 
         return [$productArray, $orderItems];
     }
@@ -143,7 +143,6 @@ final class PackageProductOrderService
         }
 
         $orderItems[$biggestQuantityIndex]['gross_selling_price_commercial_unit'] -= count($this->data) * 0.01;
-        dd($orderItems);
     }
 
     /**
