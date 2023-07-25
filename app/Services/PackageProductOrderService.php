@@ -171,8 +171,8 @@ final class PackageProductOrderService
                 $order,
                 [
                     $newProduct +
-                    ['amount' => $quantity] +
-                    $orderItems,
+                    ['amount' => $quantity],
+                    ...$orderItems
                 ],
             );
     }

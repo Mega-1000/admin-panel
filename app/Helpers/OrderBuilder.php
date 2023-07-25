@@ -289,6 +289,7 @@ class OrderBuilder
      */
     public function assignItemsToOrder($order, $items, bool $deleteItems = true): Order
     {
+        dd($items);
         $weight = 0;
         $orderItems = $order->items;
         if ($deleteItems) {
