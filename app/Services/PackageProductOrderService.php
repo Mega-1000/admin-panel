@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entities\Order;
-use App\Entities\Product;
+use App\Entities\OrderItem;
 use App\Entities\ProductPrice;
 use App\Factory\OrderBuilderFactory;
 use Closure;
@@ -46,13 +46,21 @@ final class PackageProductOrderService
         $order->save();
     }
 
+    /**
+     * @param Order $order
+     * @param int|string $key
+     * @param float $quantity
+     * @return array
+     */
     private function prepareProductArrayAndOrderItems(Order $order, int|string $key, float $quantity): array
     {
         $productArray['gross_selling_price_commercial_unit'] = ProductPrice::query()
             ->where('product_id', $key)
             ->firstOrFail()
             ->gross_selling_price_commercial_unit;
-        $orderItems = $order->items()->get()->toArray();
+        $orderItems = $order->items()->get()->map(function (OrderItem $item) {
+            return $item->product;
+        })->toArray();
 
         return [$productArray, $orderItems];
     }
