@@ -4437,6 +4437,10 @@
             $('#orderValueSum').val(sum.toFixed(2));
             $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
         }
+        setTimeout(() => {
+            updateTransportBilans();
+        }, 1000);
+
         function updateTransportBilans() {
             $('#transport_bilans').val($('#shipment_price_for_client').val() - parseFloat({{ $order->rc }})).val()
         }
