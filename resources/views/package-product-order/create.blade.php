@@ -16,7 +16,7 @@
                 <label for="name">Nie licz cen</label>
                 <input type="checkbox" name="do-not-count-price">
 
-                <label for="name">ceny towarów pakowych 0,01 </label>
+                <label for="name">ceny towarów pakowych 0,01</label
                 <input type="checkbox" name="package-products-price-0-01">
             </div>
 
