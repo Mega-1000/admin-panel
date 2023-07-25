@@ -2223,6 +2223,7 @@
                             return `
                                 <p><span title="Zysk">Z: ${Z}</p>
                                 <p>RKTBO: ${RKTBO}</p>
+                                <p>BT: ${row.shipment_price_for_client - RKTBO}</p>
                                 <p>PSIK: ${PSIK}</p>
                                 <p>PSW: ${PSW}</p>
                                 <p>WAC: ${WAC}</p>

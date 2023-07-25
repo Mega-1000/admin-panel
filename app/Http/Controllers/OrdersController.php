@@ -61,6 +61,7 @@ use App\Repositories\LabelRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\OrderMessageRepository;
+use App\Repositories\OrderPackageRealCostsForCompany;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
@@ -399,6 +400,10 @@ class OrdersController extends Controller
         foreach ($order->packages as $package) {
             $package->realCostForCompany = $package->realCostsForCompany();
         }
+
+        $order->rc = OrderPackageRealCostsForCompany::getAllByOrderId(
+            $order->id,
+        );
 
         if ($order->customer_id == 4128) {
             return view(

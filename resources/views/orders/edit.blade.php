@@ -221,6 +221,11 @@
                            value="{{ $order->additional_cash_on_delivery_cost }}">
                 </div>
                 <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="packing_warehouse_cost">Bilans transportu</label>
+                    <input class="form-control priceChange sumChange" id="transport_bilans"
+                           name="transport_bilans" disabled>
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                     <label for="shipment_price_for_client">@lang('orders.form.shipment_price_for_client')</label>
                     <input type="text" class="form-control sumChange" id="shipment_price_for_client"
                            name="shipment_price_for_client"
@@ -4258,8 +4263,8 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (data) {
-                        var currentId = $('.id').length;
-                        var id = parseInt(currentId) + 1;
+                        const currentId = $('.id').length;
+                        const id = parseInt(currentId) + 1;
 
                         $('#products-tbody:last-child').append(
                             '<tr class="id" id="id[' + id + ']">\n' +
@@ -4367,9 +4372,8 @@
                     }
                 });
             });
-            var sh = 0;
+            let sh = 0;
             $('input.change-order').on('change', function () {
-                //   $('#new-order').show();
                 sh = 1;
             });
 
@@ -4380,8 +4384,6 @@
                     $('#new-order').show();
                 }
             });
-
-            //  $('#new-order').hide();
         });
 
         function commaReplace(cssClass) {
@@ -4392,17 +4394,6 @@
 
         $(document).ready(function () {
             commaReplace('.priceChange');
-            let valueOfItemsGross;
-            let packingWarehouseCost;
-            let shipmentPriceForClient;
-            let additionalServiceCost;
-
-            if ($('#additional_service_cost').val() == '') {
-                additionalServiceCost = 0;
-            } else {
-                additionalServiceCost = parseFloat($('#additional_service_cost').val());
-            }
-
 
             let profit = parseFloat($('#profit').val().replace(',', ''));
             $("#profitInfo").val(profit);
@@ -4413,8 +4404,6 @@
             $('.sumChange').on('change', function () {
                 updateOrderSum();
             });
-
-
         });
 
         function updateOrderSum(profit = null) {
@@ -4441,13 +4430,20 @@
                 additionalServieCost = parseFloat($('#additional_service_cost').val());
             }
 
-            if (profit == 1) {
+            if (profit === 1) {
                 $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
             }
             let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
             $('#orderValueSum').val(sum.toFixed(2));
             $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
         }
+        function updateTransportBilans() {
+            $('#transport_bilans').val($('#shipment_price_for_client').val() - parseFloat({{ $order->rc }})).val()
+        }
+
+        $('#shipment_price_for_client').on('change', function () {
+            updateTransportBilans();
+        });
 
         $('#status').on('change', function () {
             $('#shouldBeSent').attr('checked', true);
@@ -4493,7 +4489,6 @@
                 let name = '[name="modal_quantity_commercial[' + itemId + ']"]';
                 let base = $(this).next().find('[name="base[' + itemId + ']"]');
                 let productQuantity = $(name);
-                let productQuantityValue = productQuantity.val();
                 productQuantity.val(productQuantity.val() - $(this).val());
                 let leftClass = '[name="left[' + $(this).data('item-id') + ']"]';
                 let quantityLeft = base.text() - sumSplitOrdersQuantity(itemId);
@@ -4955,7 +4950,7 @@
             $('.message-row').each(function() {
                 const area = String($(this).data('area'));
 
-                selectedArea == area ? $(this).show() : $(this).hide();
+                selectedArea === area ? $(this).show() : $(this).hide();
             });
             scrollBottom();
             $('html, body').scrollTop(
