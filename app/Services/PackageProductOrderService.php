@@ -58,11 +58,13 @@ final class PackageProductOrderService
             ->where('product_id', $key)
             ->firstOrFail()
             ->gross_selling_price_commercial_unit;
-        $orderItems = $order->items()->get()->toArray();
+        $orderItems = $order->items()->get();
 
         foreach ($orderItems as &$item) {
-            $item = $item->product;
+            $item = $item->product->toArray();
         }
+
+        $orderItems = $orderItems->toArray();
 
         return [$productArray, $orderItems];
     }
