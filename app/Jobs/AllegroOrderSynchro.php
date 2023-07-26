@@ -581,17 +581,18 @@ class AllegroOrderSynchro implements ShouldQueue
 
         $addressReverseArray = array_reverse(str_split($address));
         foreach ($addressReverseArray as $i => $character) {
-            if (is_numeric($character) || $character == '/') {
-                if (is_numeric($character) && $lettersInARow > 0) {
+            $characterIsNumeric = is_numeric($character);
+            if ($characterIsNumeric || $character == '/') {
+                if ($characterIsNumeric && $lettersInARow > 0) {
                     $flatNo = StringHelper::addFirstCharactersInReverseOrder($flatNo, $addressReverseArray, $lettersInARow, $i);
 
                     $lettersInARow = 0;
                 }
                 $flatNo = $character . $flatNo;
-            } else {
-                $lettersInARow++;
-            }
-
+                continue;
+            } 
+            
+            $lettersInARow++;
             if ($lettersInARow >= 3) {
                 break;
             }
@@ -604,32 +605,28 @@ class AllegroOrderSynchro implements ShouldQueue
     }
 
     private function getAddressMultipleWords(string $address): array {
-        $flatNo = "";
-        
-        $addressArray = explode(' ', $address);
-        $lastKey = array_key_last($addressArray);
-        $flatNo = $addressArray[$lastKey];
-        unset($addressArray[$lastKey]);
+        list($address, $flatNo) = $this->getAddressOneWord($address);
 
         $rememberString = "";
-        $addressReverseArray = array_reverse($addressArray);
+        $addressReverseArray = str_split(strrev($address));
         foreach ($addressReverseArray as $part) {
             if ($rememberString != "") {
                 $part = $part . " " . $rememberString;
                 $rememberString = "";
             }
 
-            if (StringHelper::hasThreeLettersInARow($part)) {
+            if (StringHelper::hasThreeLettersInARow($part) || (ctype_alpha($part) && $rememberString != "")) {
                 break;
-            } else if (ctype_alpha($part) && $rememberString != "") {
-                break;
-            } else if (ctype_alpha($part)) {
+            } 
+            
+            if (ctype_alpha($part)) {
                 $rememberString = $part;
-            } else {
-                $part = $rememberString . " " . $part;
-                $flatNo = $part . " " . $flatNo;
-                $rememberString = "";
+                continue;
             }
+
+            $part = $rememberString . " " . $part;
+            $flatNo = $part . " " . $flatNo;
+            $rememberString = "";
         }
 
         $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));

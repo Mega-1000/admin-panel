@@ -27,4 +27,11 @@ class StringHelper {
         }
         return strrev($result);
     }
+
+    public static function separateLastWord(string $string): array {
+        $words = explode(' ', $string);
+        $lastWord = array_pop($words);
+        $firstWords = implode(' ', $words);
+        return [$firstWords, $lastWord];
+    }
 }
