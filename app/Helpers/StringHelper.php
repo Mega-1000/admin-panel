@@ -19,6 +19,7 @@ class StringHelper
                 return true;
             }
         }
+        
         return false;
     }
 
