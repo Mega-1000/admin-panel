@@ -28,7 +28,7 @@ class ImportPayInFromAllegro extends Command
      */
     public function handle()
     {
-        ImportPayInFromAllegroJob::dispatch();
+        ImportPayInFromAllegroJob::dispatchNow();
 
         return Command::SUCCESS;
     }
