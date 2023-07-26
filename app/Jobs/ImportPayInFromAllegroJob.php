@@ -16,7 +16,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ImportPayInFromAllegroJob implements ShouldQueue
@@ -35,13 +34,8 @@ class ImportPayInFromAllegroJob implements ShouldQueue
             Storage::disk('allegroPayInDisk')->delete($file);
         }
 
-        try {
-            $payments = $allegroPaymentService->getPaymentsFromLastDay();
-        } catch (\Exception $e) {
-            Mailer::create()->to('pawbud6969@gmail.com')->send(new TestMail());
-            return;
-        }
-
+        $payments = $allegroPaymentService->getPaymentsFromLastDay();
+        
         $filename = "transactionWithoutOrder.csv";
         $file = fopen($filename, 'w');
 
@@ -58,6 +52,6 @@ class ImportPayInFromAllegroJob implements ShouldQueue
         Storage::disk('allegroPayInDisk')->put($newFilePath, file_get_contents($filename));
 
         Mailer::create()
-            ->to('pawbud6969@gmail.com')->send(new AllegroPayInMail($newFilePath));
+            ->to('ksiegowosc@ephpolska.pl')->send(new AllegroPayInMail($newFilePath));
     }
 }
