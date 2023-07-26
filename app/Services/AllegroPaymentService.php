@@ -4,7 +4,7 @@ namespace App\Services;
 use Carbon\Carbon;
 
 class AllegroPaymentService extends AllegroApiService {
-    protected $auth_record_id = 2;
+    protected $auth_record_id = 3;
 
     private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 

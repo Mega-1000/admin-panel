@@ -86,7 +86,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->job('set-logs-permissions')->dailyAt('01:00');
 
-        $schedule->command('import:transactions')->dailyAt("15:00");
+        $schedule->command('import:transactions')->dailyAt("15:45");
     }
 
     /**

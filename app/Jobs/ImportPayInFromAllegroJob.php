@@ -6,6 +6,7 @@ use App\DTO\ImportPayIn\AllegroPayInDTO;
 use App\Enums\AllegroImportPayInDataEnum;
 use App\Facades\Mailer;
 use App\Mail\AllegroPayInMail;
+use App\Mail\TestMail;
 use App\Services\AllegroImportPayInService;
 use App\Services\AllegroPaymentService;
 use App\Services\FindOrCreatePaymentForPackageService;
@@ -15,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ImportPayInFromAllegroJob implements ShouldQueue
@@ -33,7 +35,12 @@ class ImportPayInFromAllegroJob implements ShouldQueue
             Storage::disk('allegroPayInDisk')->delete($file);
         }
 
-        $payments = $allegroPaymentService->getPaymentsFromLastDay();
+        try {
+            $payments = $allegroPaymentService->getPaymentsFromLastDay();
+        } catch (\Exception $e) {
+            Mailer::create()->to('pawbud6969@gmail.com')->send(new TestMail());
+            return;
+        }
 
         $filename = "transactionWithoutOrder.csv";
         $file = fopen($filename, 'w');
@@ -51,6 +58,6 @@ class ImportPayInFromAllegroJob implements ShouldQueue
         Storage::disk('allegroPayInDisk')->put($newFilePath, file_get_contents($filename));
 
         Mailer::create()
-            ->to('ksiegowosc@ephpolska.pl')->send(new AllegroPayInMail($newFilePath));
+            ->to('pawbud6969@gmail.com')->send(new AllegroPayInMail($newFilePath));
     }
 }
