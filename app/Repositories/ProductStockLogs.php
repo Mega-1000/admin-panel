@@ -33,7 +33,7 @@ class ProductStockLogs
         foreach ($orders as $order) {
             foreach ($order->items as $item) {
                 if ($item->product_id == $product->id) {
-                    $res += $item->amount;
+                    $res += $item->quantity;
                 }
             }
         }
