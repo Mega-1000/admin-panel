@@ -2,7 +2,8 @@
 
 namespace App\Helpers;
 
-class StringHelper {
+class StringHelper 
+{
     public static function hasThreeLettersInARow(string $string): bool 
     {
         $letters = str_split($string);
