@@ -10,6 +10,10 @@ use App\Services\Label\AddLabelService;
 class CalculateSubjectInvoiceBilansLabels {
     public static function handle(Order $order): void
     {
+        if ($order->payments()->count() === 0) {
+            return;
+        }
+
         $orderInvoiceValuesSum = OrderInvoiceValues::getSumOfInvoiceValuesByOrder($order);
         $orderValue = $order->getValue() + Orders::getOrderReturnGoods($order) - Orders::getSumOfWTONPayments($order);
         $arr = [];
