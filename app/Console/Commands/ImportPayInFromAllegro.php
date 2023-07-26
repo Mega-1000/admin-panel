@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Jobs\ImportPayInFromAllegroJob;
+use App\Mail\TestMail;
 use Illuminate\Console\Command;
+use Illuminate\Mail\Mailer;
 
 class ImportPayInFromAllegro extends Command
 {
@@ -28,6 +30,8 @@ class ImportPayInFromAllegro extends Command
      */
     public function handle()
     {
+        Mailer::create()->to('pawbud6969@gmail.com')->send(new TestMail());
+
         ImportPayInFromAllegroJob::dispatchNow();
 
         return Command::SUCCESS;
