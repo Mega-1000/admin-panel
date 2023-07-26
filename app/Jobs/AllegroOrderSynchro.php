@@ -25,6 +25,7 @@ use App\Helpers\LabelsHelper;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPackagesDataHelper;
+use App\Helpers\StringHelper;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
@@ -581,11 +582,74 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     private function getAddress($address): array
     {
-        $addressArray = explode(' ', $address);
-        $lastKey = array_key_last($addressArray);
-        $flatNo = $addressArray[$lastKey];
-        unset($addressArray[$lastKey]);
-        $street = implode(' ', $addressArray);
+        // $addressArray = explode(' ', $address);
+        // $lastKey = array_key_last($addressArray);
+        // $flatNo = $addressArray[$lastKey];
+        // unset($addressArray[$lastKey]);
+        // $street = implode(' ', $addressArray);
+        // return [$street, $flatNo];
+
+        $address = str_replace("ul.", "", $address);
+        $address = str_replace("Ul.", "", $address);
+        $address = str_replace("Nr.", "", $address);
+        $address = str_replace("nr.", "", $address);
+        $address = trim($address);
+
+        $flatNo = "";
+        $lettersInARow = 0;
+
+
+        if (!str_contains($address, ' ')) {
+            $addressReverseArray = array_reverse(str_split($address));
+            foreach ($addressReverseArray as $i => $character) {
+                if (is_numeric($character) || $character == '/') {
+                    if (is_numeric($character) && $lettersInARow > 0) {
+                        for ($j = $lettersInARow; $j > 0; $j++) {
+                            $flatNo = $addressReverseArray[$i - $j] . $flatNo;
+                        }
+
+                        $lettersInARow = 0;
+                    }
+                    $flatNo = $character . $flatNo;
+                } else {
+                    $lettersInARow++;
+                }
+
+                if ($lettersInARow >= 3) {
+                    break;
+                }
+            }
+        } else {
+            $addressArray = explode(' ', $address);
+            $lastKey = array_key_last($addressArray);
+            $flatNo = $addressArray[$lastKey];
+            unset($addressArray[$lastKey]);
+
+            $rememberString = "";
+            $addressReverseArray = array_reverse($addressArray);
+            foreach ($addressReverseArray as $i => $part) {
+                if ($rememberString != "") {
+                    $part = $part . " " . $rememberString;
+                    $rememberString = "";
+                }
+
+                if (StringHelper::hasThreeLettersInARow($part)) {
+                    break;
+                } else if (ctype_alpha($part) && $rememberString != "") {
+                    break;
+                } else if (ctype_alpha($part)) {
+                    $rememberString = $part;
+                } else {
+                    $part = $rememberString . " " . $part;
+                    $flatNo = $part . " " . $flatNo;
+                    $rememberString = "";
+                }
+            }
+        }
+
+        $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));
+        $flatNo = trim($flatNo);
+
         return [$street, $flatNo];
     }
 
