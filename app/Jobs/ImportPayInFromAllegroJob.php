@@ -25,9 +25,16 @@ class ImportPayInFromAllegroJob implements ShouldQueue
     /**
      * Execute the job.
      *
+     * @param AllegroPaymentService $allegroPaymentService
+     * @param AllegroImportPayInService $allegroImportPayInService
+     * @param FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService
      * @return void
      */
-    public function handle(AllegroPaymentService $allegroPaymentService, AllegroImportPayInService $allegroImportPayInService, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService)
+    public function handle(
+        AllegroPaymentService $allegroPaymentService,
+        AllegroImportPayInService $allegroImportPayInService,
+        FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService
+    ): void
     {
         $files = Storage::disk('allegroPayInDisk')->files();
         foreach ($files as $file) {
@@ -35,7 +42,7 @@ class ImportPayInFromAllegroJob implements ShouldQueue
         }
 
         $payments = $allegroPaymentService->getPaymentsFromLastDay();
-        
+
         $filename = "transactionWithoutOrder.csv";
         $file = fopen($filename, 'w');
 

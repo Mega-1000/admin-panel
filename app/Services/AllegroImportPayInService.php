@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Services;
 
@@ -35,9 +35,9 @@ class AllegroImportPayInService {
                     );
 
                     $this->settleOrder($order, $payIn);
-                } else {
-                    fputcsv($file, $payIn->toArray());
+                    return;
                 }
+                fputcsv($file, $payIn->toArray());
             } catch (Exception $exception) {
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
             }
@@ -48,7 +48,7 @@ class AllegroImportPayInService {
      * Settle orders.
      *
      * @param Order $order
-     * @param $payIn
+     * @param AllegroPayInDTO $payIn
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function settleOrder(Order $order, AllegroPayInDTO $payIn): void
