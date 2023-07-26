@@ -575,7 +575,8 @@ class AllegroOrderSynchro implements ShouldQueue
         $customerAddress->save();
     }
 
-    private function getAddressOneWord(string $address): array {
+    private function getAddressOneWord(string $address): array 
+    {
         $flatNo = "";
         $lettersInARow = 0;
 
@@ -604,7 +605,8 @@ class AllegroOrderSynchro implements ShouldQueue
         return [$street, $flatNo];
     }
 
-    private function getAddressMultipleWords(string $address): array {
+    private function getAddressMultipleWords(string $address): array 
+    {
         list($address, $flatNo) = $this->getAddressOneWord($address);
 
         $rememberString = "";
@@ -644,12 +646,8 @@ class AllegroOrderSynchro implements ShouldQueue
     {
         $toReplace = ["ul.", "Ul.", "Nr.", "nr."];
         $address = trim(str_replace($toReplace, "", $address));
-
-        if (!str_contains($address, ' ')) {
-            return $this->getAddressOneWord($address);
-        } else {
-            return $this->getAddressMultipleWords($address);
-        }
+        
+        return str_contains($address, ' ') ? $this->getAddressMultipleWords($address) : $this->getAddressOneWord($address);
     }
 
     /**

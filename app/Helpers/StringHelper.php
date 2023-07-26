@@ -3,7 +3,8 @@
 namespace App\Helpers;
 
 class StringHelper {
-    public static function hasThreeLettersInARow(string $string): bool {
+    public static function hasThreeLettersInARow(string $string): bool 
+    {
         $letters = str_split($string);
         $count = 0;
         foreach ($letters as $letter) {
@@ -20,15 +21,18 @@ class StringHelper {
         return false;
     }
 
-    public static function addFirstCharactersInReverseOrder(string $initialString, array $chars, int $count, int $idx): string {
+    public static function addFirstCharactersInReverseOrder(string $initialString, array $chars, int $count, int $idx): string
+    {
         $result = $initialString;
         for ($i = $count; $i > 0; $i++) {
             $result = $chars[$idx - $i] . $result;
         }
+
         return strrev($result);
     }
 
-    public static function separateLastWord(string $string): array {
+    public static function separateLastWord(string $string): array
+    {
         $words = explode(' ', $string);
         $lastWord = array_pop($words);
         $firstWords = implode(' ', $words);
