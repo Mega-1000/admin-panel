@@ -86,7 +86,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->job('set-logs-permissions')->dailyAt('01:00');
 
-        $schedule->job(Jobs\ImportPayInFromAllegroJob::class)->dailyAt("14:10");
+        $schedule->command('import:transactions')->dailyAt("14:45");
     }
 
     /**
