@@ -11,6 +11,7 @@ use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Http\Requests\CalculateAdminOrderRequest;
 use App\Http\Requests\CalculateMultipleAdminOrder;
@@ -425,6 +426,7 @@ class ProductStocksController extends Controller
      * @param ProductService $productService
      * @param MessageService $messageService
      * @return RedirectResponse
+     * @throws ChatException
      */
     public function storeTWSOAdminOrders(
         StoreTWSOAdminOrdersRequest $request,
