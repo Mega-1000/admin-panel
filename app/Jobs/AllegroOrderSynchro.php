@@ -681,7 +681,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $firstName = "";
         $lastName = "";
 
-        if (array_key_exists('naturalPerson', $address)) {
+        if (array_key_exists('naturalPerson', $address) && $address['naturalPerson'] !== null) {
             $firstName = $address['naturalPerson']['firstName'];
             $lastName = $address['naturalPerson']['lastName'];
         } else {
