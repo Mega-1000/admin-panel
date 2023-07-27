@@ -49,7 +49,7 @@ readonly class OrderObserver
             /** @var Status $status */
             $status = Status::query()->find($statusId);
             $loopPresentationArray = [];
-            AddLabelService::addLabels($order, $status->labelsToAddOnChange()->pluck('labels.id')->toArray(), $loopPresentationArray, [], Auth::user()->id);
+            AddLabelService::addLabels($order, $status->labelsToAddOnChange()->pluck('labels.id')->toArray(), $loopPresentationArray, [], Auth::user()?->id);
         }
 
         if (!empty($order->getDirty()['employee_id'])) {
