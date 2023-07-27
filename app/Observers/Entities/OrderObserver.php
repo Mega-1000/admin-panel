@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 readonly class OrderObserver
 {
@@ -26,15 +27,16 @@ readonly class OrderObserver
     public function __construct(
         protected StatusRepository $statusRepository,
         protected OrderPaymentLabelsService $orderPaymentLabelsService,
-    )
-    {
-    }
+    ) {}
 
     public function created(Order $order): void
     {
         dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
 
         $this->orderPaymentLabelsService->calculateLabels($order);
+
+        $order->token = Str::random(32);
+        $order->save();
     }
 
     public function updating(Order $order): void
