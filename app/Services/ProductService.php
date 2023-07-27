@@ -88,7 +88,7 @@ readonly class ProductService
             if ($product->product->product_group == null) {
                 continue;
             }
-            $productVar = Product::where('product_group', $product->product->product_group)->first();
+            $productVar = Product::where('product_group', $product->product->product_group)->get();
             foreach ($productVar as $prod) {
                 $firm = Firm::where('symbol', $prod->product_name_supplier)->first();
                 $radius = 0;
