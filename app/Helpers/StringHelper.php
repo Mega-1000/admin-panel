@@ -19,14 +19,14 @@ class StringHelper
                 return true;
             }
         }
-        
+
         return false;
     }
 
     public static function addFirstCharactersInReverseOrder(string $initialString, array $chars, int $count, int $idx): string
     {
         $result = $initialString;
-        for ($i = $count; $i > 0; $i++) {
+        for ($i = $count; $i <= $idx; $i++) {
             $result = $chars[$idx - $i] . $result;
         }
 
