@@ -58,7 +58,7 @@ class ImportPayInFromAllegroJob implements ShouldQueue
 
         Storage::disk('allegroPayInDisk')->put($newFilePath, file_get_contents($filename));
 
-        Mailer::create()
-            ->to('ksiegowosc@ephpolska.pl')->send(new AllegroPayInMail($newFilePath));
+//        Mailer::create()
+//            ->to('ksiegowosc@ephpolska.pl')->send(new AllegroPayInMail($newFilePath));
     }
 }
