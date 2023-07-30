@@ -59,12 +59,6 @@ class AllegroImportPayInService {
         $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn->toArray()) >= 1;
         OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn->toArray());
 
-    $existingPayment = $order->payments()
-        ->where('amount', $payIn->amount)
-        ->where('operation_type', 'wplata/wyplata allegro')
-        ->first();
-
-        if (empty($existingPayment)) {
             $order->payments()->create([
                 'amount' => $payIn->amount,
                 'type' => 'CLIENT',
@@ -76,6 +70,5 @@ class AllegroImportPayInService {
                 'operation_type' => 'wplata/wyplata allegro',
                 'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]);
-        }
     }
 }
