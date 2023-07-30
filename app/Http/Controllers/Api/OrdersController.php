@@ -266,7 +266,6 @@ class OrdersController extends Controller
 
             $message = $this->errors[$this->error_code] ?? $this->defaultError;
 
-            dd($e);
             return response()->json([
                 'error_code' => $this->error_code,
                 'error_message' => $message
