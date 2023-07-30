@@ -653,7 +653,7 @@ class AllegroOrderSynchro implements ShouldQueue
      *
      * @return array
      */
-    private function getAddress($address): array
+    private function getAddress(string $address): array
     {
         $toRemove = ['ul.', 'Ul.', 'nr.', 'Nr.'];
         $address = str_replace($toRemove, '', $address);
