@@ -15,7 +15,9 @@ class OrderPackageRealCostsForCompany {
 
         $sum = 0;
         foreach($realCosts as $cost) {
-            $sum += (float)$cost->first()?->cost;
+            $cost->each(function ($cost) use (&$sum) {
+                $sum += $cost->value;
+            });
         }
 
         return $sum;
