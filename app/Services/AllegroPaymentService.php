@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Services;
+use App\DTO\AllegroPayment\AllegroReturnDTO;
+use App\DTO\AllegroPayment\AllegroReturnItemDTO;
+use App\Enums\AllegroReturnItemTypeEnum;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class AllegroPaymentService extends AllegroApiService {
     protected $auth_record_id = 3;
@@ -89,14 +91,47 @@ class AllegroPaymentService extends AllegroApiService {
     public function getRefundsByPaymentId(string $paymentId): array {
         $url = $this->getRestUrl("/payments/refunds?payment.id=" . $paymentId);
 
-        Log::info($url);
-
         if (!($response = $this->request('GET', $url, []))) {
             return [];
         }
 
-        return array_filter($response['refunds'], function ($refund) {
+        $uncancelledRefunds = array_filter($response['refunds'], function ($refund) {
             return $refund['status'] !== "CANCELED";
         });
+
+        return $uncancelledRefunds;
+    }
+
+    public function initiateRefund(AllegroReturnDTO $allegroReturnDTO): void {
+        $url = $this->getRestUrl("/payments/refunds");
+
+        $data = [
+            'paymentId' => $allegroReturnDTO->paymentId,
+            'reason' => $allegroReturnDTO->reason,
+            'lineItems' => array_map(function (AllegroReturnItemDTO $lineItem) {
+                if ($lineItem->type->is(AllegroReturnItemTypeEnum::AMOUNT)) {
+                    return [
+                        'id' => $lineItem->id,
+                        'type' => $lineItem->type->value,
+                        'amount' => [
+                            'amount' => $lineItem->amount,
+                            'currency' => $lineItem->currency,
+                        ],
+                    ];
+                }
+
+                return [
+                    'id' => $lineItem->id,
+                    'type' => $lineItem->type->value,
+                    'quantity' => $lineItem->quantity,
+                ];
+            }, $allegroReturnDTO->lineItems),
+        ];
+        
+        dd($data);
+
+        // if (!($response = $this->request('POST', $url, $data))) {
+        //     return false;
+        // }
     }
 }

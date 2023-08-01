@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\DTO\AllegroPayment\AllegroReturnDTO;
+use App\DTO\AllegroPayment\AllegroReturnItemDTO;
 use App\Entities\Order;
+use App\Enums\AllegroReturnItemTypeEnum;
 use App\Helpers\AllegroOrderHelper;
 use App\Services\AllegroOrderService;
 use App\Services\AllegroPaymentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class AllegroReturnPaymentController extends Controller
 {
@@ -35,7 +37,7 @@ class AllegroReturnPaymentController extends Controller
         $order = Order::with(['items', 'orderReturn'])->find($orderId);
 
         if (empty($order)) {
-            abort(404);
+            return response(status: 404);
         }
 
         $allegroPaymentId = $order['allegro_payment_id'];
@@ -56,26 +58,31 @@ class AllegroReturnPaymentController extends Controller
                 continue;
             }
 
+            $quantity = (int)$itemReturn['quantity'];
+
             if (array_key_exists('deductionCheck', $itemReturn) && strtolower($itemReturn['deductionCheck']) === "on") {
-                $amount = (int)$itemReturn['quantity'] * (float)$itemReturn['price'] - (float)$itemReturn['deduction'];
-                $lineItems[] = [
-                    'id' => $allegroId,
-                    'type' => 'AMOUNT',
-                    'value' => [
-                        'amount' => $amount ,
-                        'currency' => 'PLN',
-                    ],
-                ];
+                $amount = $quantity * (float)$itemReturn['price'] - (float)$itemReturn['deduction'];
+                $lineItems[] = new AllegroReturnItemDTO(
+                    id: $allegroId,
+                    type: AllegroReturnItemTypeEnum::fromValue(AllegroReturnItemTypeEnum::AMOUNT),
+                    amount: $amount,
+                );
             } else {
-                $lineItems[] = [
-                    'id' => $allegroId,
-                    'type' => 'QUANTITY',
-                    'quantity' => $itemReturn['quantity'],
-                ];
+                $lineItems[] = new AllegroReturnItemDTO(
+                    id: $allegroId,
+                    type: AllegroReturnItemTypeEnum::fromValue(AllegroReturnItemTypeEnum::QUANTITY),
+                    quantity: $quantity,
+                );
             }
         }
 
-        dd($lineItems);
+        $data = new AllegroReturnDTO(
+            paymentId: $allegroPaymentId,
+            reason: $request->reason,
+            lineItems: $lineItems,
+        );
+
+        $this->allegroPaymentService->initiateRefund($data);
 
         return redirect()->route('allegro-return.index', ['orderId' => $orderId]);
     }
