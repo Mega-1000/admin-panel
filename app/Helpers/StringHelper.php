@@ -23,14 +23,11 @@ class StringHelper
         return false;
     }
 
-    public static function addFirstCharactersInReverseOrder(string $initialString, array $chars, int $count, int $idx): string
+    public static function addCharactersInReverseOrder(string $string, array $characters): string
     {
-        $result = $initialString;
-        for ($i = $count; $i <= $idx; $i++) {
-            $result = $chars[$idx - $i] . $result;
-        }
+        $charactersString = strrev(implode('', $characters));        
 
-        return strrev($result);
+        return $charactersString . $string;
     }
 
     public static function separateLastWord(string $string): array
@@ -39,5 +36,14 @@ class StringHelper
         $lastWord = array_pop($words);
         $firstWords = implode(' ', $words);
         return [$firstWords, $lastWord];
+    }
+
+    public static function removeMultipleSpaces(string $string): string
+    {
+        $words = explode(' ', $string);
+        $words = array_filter($words, function($word) {
+            return $word !== '';
+        });
+        return implode(' ', $words);
     }
 }

@@ -555,6 +555,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $country = Country::firstOrCreate(['iso2' => $data['address']['countryCode'] ?? $data['countryCode']], ['name' => $data['address']['countryCode'] ?? $data['countryCode']]);
 
         $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber'] ?? $data['address']['phoneNumber']);
+        
         $customerAddressData = [
             'type' => $type,
             'firstname' => $data['firstName'] ?? $data['address']['naturalPerson']['firstName'] ?? null,
@@ -575,81 +576,94 @@ class AllegroOrderSynchro implements ShouldQueue
         $customerAddress->save();
     }
 
-    // private function getAddressOneWord(string $address): array 
-    // {
-    //     $flatNo = "";
-    //     $lettersInARow = 0;
+    private function getAddressOneWord(string $address): array 
+    {
+        $flatNo = "";
+        $lettersInARow = 0;
 
-    //     $addressReverseArray = array_reverse(str_split($address));
-    //     foreach ($addressReverseArray as $i => $character) {
-    //         $characterIsNumeric = is_numeric($character);
-    //         if ($characterIsNumeric || $character == '/') {
-    //             if ($characterIsNumeric && $lettersInARow > 0) {
-    //                 $flatNo = StringHelper::addFirstCharactersInReverseOrder($flatNo, $addressReverseArray, $lettersInARow, $i);
-
-    //                 $lettersInARow = 0;
-    //             }
-    //             $flatNo = $character . $flatNo;
-    //             continue;
-    //         } 
+        $addressReverseArray = array_reverse(str_split($address));
+        foreach ($addressReverseArray as $i => $character) {
+            $characterIsNumeric = is_numeric($character);
+            if ($characterIsNumeric || $character == '/') {
+                if ($characterIsNumeric && $lettersInARow > 0) {
+                    $charactersToAdd = array_slice($addressReverseArray, $i - $lettersInARow, $lettersInARow);
+                    $flatNo = StringHelper::addCharactersInReverseOrder($flatNo, $charactersToAdd);
+                }
+                
+                $lettersInARow = 0;
+                $flatNo = $character . $flatNo;
+                continue;
+            } 
             
-    //         $lettersInARow++;
-    //         if ($lettersInARow >= 3) {
-    //             break;
-    //         }
-    //     }
+            $lettersInARow++;
+            if ($lettersInARow >= 3) {
+                break;
+            }
+        }
 
-    //     $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));
-    //     $flatNo = trim($flatNo);
+        $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));
+        $flatNo = trim($flatNo);
 
-    //     return [$street, $flatNo];
-    // }
+        return [$street, $flatNo];
+    }
 
-    // private function getAddressMultipleWords(string $address): array 
-    // {
-    //     list($address, $flatNo) = StringHelper::separateLastWord($address);
+    private function getAddressMultipleWords(string $address): array 
+    {
+        $address = StringHelper::removeMultipleSpaces($address);
 
-    //     $rememberString = "";
-    //     $addressReverseArray = str_split(strrev($address));
-    //     foreach ($addressReverseArray as $part) {
-    //         if ($rememberString != "") {
-    //             $part = $part . " " . $rememberString;
-    //             $rememberString = "";
-    //         }
+        list($street, $flatNo) = StringHelper::separateLastWord($address);
 
-    //         if (StringHelper::hasThreeLettersInARow($part) || (ctype_alpha($part) && $rememberString != "")) {
-    //             break;
-    //         } 
-            
-    //         if (ctype_alpha($part)) {
-    //             $rememberString = $part;
-    //             continue;
-    //         }
+        $rememberString = "";
+        $streetReverseArray = array_reverse(explode(" ", $street));
+        foreach ($streetReverseArray as $part) {
+            if (ctype_alpha($part)) {
+                if ($rememberString != "") {
+                    break;
+                }
 
-    //         $part = $rememberString . " " . $part;
-    //         $flatNo = $part . " " . $flatNo;
-    //         $rememberString = "";
-    //     }
+                $rememberString = $part;
+                continue;
+            }
 
-    //     $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));
-    //     $flatNo = trim($flatNo);
+            if (StringHelper::hasThreeLettersInARow($part)) {
+                list($_, $toAddFlatNo) = $this->getAddressOneWord($part);
+                if ($rememberString != "") {
+                    $toAddFlatNo .= " " . $rememberString;
+                    $rememberString = "";
+                }
+                $flatNo = $toAddFlatNo . " " . $flatNo;
+                break;
+            }
 
-    //     return [$street, $flatNo];
-    // }
+            if ($rememberString != "") {
+                $part .= " " . $rememberString;
+                $rememberString = "";
+            }
+            $flatNo = $part . " " . $flatNo;
+        }
+        
+        $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));
+        $flatNo = trim($flatNo);
+        
+        return [$street, $flatNo];
+    }
 
     /**
      * @param $address
      *
      * @return array
      */
-    private function getAddress($address): array
+    private function getAddress(string $address): array
     {
-        $addressArray = explode(' ', $address);
-        $lastKey = array_key_last($addressArray);
-        $flatNo = $addressArray[$lastKey];
-        unset($addressArray[$lastKey]);
-        $street = implode(' ', $addressArray);
-        return [$street, $flatNo];
+        $toRemove = ['ul.', 'Ul.', 'nr.', 'Nr.'];
+        $address = str_replace($toRemove, '', $address);
+        $address = trim($address);
+
+        if (str_contains($address, ' ')) {
+            return $this->getAddressMultipleWords($address);
+        }
+
+        return $this->getAddressOneWord($address);
     }
     
 
@@ -681,26 +695,15 @@ class AllegroOrderSynchro implements ShouldQueue
 
         list($code, $phone) = Helper::prepareCodeAndPhone($address['phoneNumber']);
 
-        // $firstName = "";
-        // $lastName = "";
-
-        // if (array_key_exists('naturalPerson', $address) && $address['naturalPerson'] !== null) {
-        //     $firstName = $address['naturalPerson']['firstName'];
-        //     $lastName = $address['naturalPerson']['lastName'];
-        // } else {
-        //     if (array_key_exists('firstName', $address)) {
-        //         $firstName = $address['firstName'];
-        //     }
-
-        //     if (array_key_exists('lastName', $address)) {
-        //         $lastName = $address['lastName'];
-        //     }
-        // }
+        if (isset($address['naturalPerson'])) {
+            $address['firstName'] = $address['naturalPerson']['firstName'];
+            $address['lastName'] = $address['naturalPerson']['lastName'];
+        }
 
         $addressData = [
             'type' => $type,
-            'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'] ?? null,
-            'lastname' => $address['lastName'] ?? $address['naturalPerson']['lastName'] ?? null,
+            'firstname' => $address['firstName'] ?? null,
+            'lastname' => $address['lastName'] ?? null,
             'address' => $street,
             'flat_number' => $flatNo,
             'city' => $address['city'],
