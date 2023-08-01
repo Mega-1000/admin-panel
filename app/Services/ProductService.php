@@ -93,7 +93,7 @@ readonly class ProductService
                 $firm = Firm::where('symbol', $prod->product_name_supplier)->first();
                 $radius = 0;
 
-                if (empty($firm) || empty($firm?->first?->id?->warehouses)) {
+                if (empty($firm) || empty($firm?->first?->idw->warehouses)) {
                     continue;
                 }
 
