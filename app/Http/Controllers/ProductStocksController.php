@@ -75,14 +75,14 @@ class ProductStocksController extends Controller
         $similarProducts = $this->productService->checkForSimilarProducts($id);
         $visibilitiesLogs = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stock_logs'));
 
-        foreach ($visibilitiesLogs as $key => $row) {
+        foreach ($visibilitiesLogs as $row) {
             $row->show = json_decode($row->show, true);
             $row->hidden = json_decode($row->hidden, true);
         }
 
         $visibilitiesPosition = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stock_positions'));
 
-        foreach ($visibilitiesPosition as $key => $row) {
+        foreach ($visibilitiesPosition as $row) {
             $row->show = json_decode($row->show, true);
             $row->hidden = json_decode($row->hidden, true);
         }
@@ -100,7 +100,7 @@ class ProductStocksController extends Controller
         $data = $request->all();
         $collection = $this->prepareCollection($data);
 
-        return DataTables::of($collection[0])->with(['recordsFiltered' => $collection[1]])->skipPaging()->setTotalRecords($collection[1])->make(true);
+        return DataTables::of($collection[0])->with(['recordsFiltered' => $collection[1]])->skipPaging()->setTotalRecords($collection[1])->make();
 
     }
 
@@ -257,11 +257,8 @@ class ProductStocksController extends Controller
             $this->createLog($request->different, $request->id, $itemPosition->id);
         }
 
-        $productStock = $this->repository->find($request->id);
+        $productStock = ProductStock::findOrFail($request->id);
 
-        if (empty($productStock)) {
-            abort(404);
-        }
         $request->merge([
             'stock_product' => (bool)$request->get('stock_product'),
         ]);

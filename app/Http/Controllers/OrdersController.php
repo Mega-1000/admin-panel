@@ -402,7 +402,7 @@ class OrdersController extends Controller
         }
 
         $order->rc = OrderPackageRealCostsForCompany::getAllByOrderId(
-            $order->id,
+            $order->id
         );
 
         if ($order->customer_id == 4128) {
