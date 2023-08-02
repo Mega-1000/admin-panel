@@ -26,7 +26,6 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class ProductStockPositionsController extends Controller
 {
-
     /**
      * @param ProductStockPositionCreate $request
      * @return RedirectResponse
@@ -52,11 +51,7 @@ class ProductStockPositionsController extends Controller
         $productStockPosition = ProductStockPosition::create(
             array_merge(['product_stock_id' => $request->id], $request->all())
         );
-        $positionQuantity = $request->position_quantity;
         $productStock = ProductStock::findOrFail($productStockPosition->product_stock_id);
-
-        $quantity = $productStock->quantity + $positionQuantity;
-        $productStock->update(['quantity' => $quantity]);
         $this->createLog('+' . $request->position_quantity, $productStock->id, $productStockPosition->id);
 
         return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
@@ -160,8 +155,6 @@ class ProductStockPositionsController extends Controller
         $positionQuantity = $productStockPosition->position_quantity;
         $productStock = ProductStock::findOrFail($productStockPosition->product_stock_id);
 
-        $quantity = $productStock->quantity - $positionQuantity;
-        $productStock->update(['quantity' => $quantity]);
         $productStockPosition->delete();
         $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id);
 
