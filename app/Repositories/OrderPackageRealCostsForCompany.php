@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Entities\Order;
+use Ramsey\Collection\Collection;
 
 class OrderPackageRealCostsForCompany {
     public static function getAllByOrderId(int $orderId): float
@@ -23,4 +24,14 @@ class OrderPackageRealCostsForCompany {
         return $sum;
     }
 
+    /**
+     * @param Order $order
+     * @return Collection
+     */
+    public static function getAllCostsByOrder(Order $order): Collection
+    {
+        return $order->packages->map(function ($orderPackage) {
+            return $orderPackage->realCostsForCompany;
+        });
+    }
 }
