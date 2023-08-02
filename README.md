@@ -31,8 +31,8 @@ Aktualizacja CSV:
 ##### plik: `ImportCsvFileJob.php`
 
 1. wyeksportować z excela plik o nazwie `Baza.csv` a następnie skopiować go do `public/storage`
-2. `php artisan import:products`
 
+2. `php artisan import:products`
 Testowanie kody:
 -----------------
 

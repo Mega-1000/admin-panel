@@ -26,7 +26,6 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class ProductStockPositionsController extends Controller
 {
-
     /**
      * @param ProductStockPositionCreate $request
      * @return RedirectResponse
