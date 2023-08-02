@@ -52,7 +52,6 @@ class ProductStockPositionsController extends Controller
             array_merge(['product_stock_id' => $request->id], $request->all())
         );
         $productStock = ProductStock::findOrFail($productStockPosition->product_stock_id);
-
         $this->createLog('+' . $request->position_quantity, $productStock->id, $productStockPosition->id);
 
         return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
