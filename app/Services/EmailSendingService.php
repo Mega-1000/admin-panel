@@ -183,7 +183,6 @@ class EmailSendingService
     public function sendScheduledEmail(): void
     {
         $now = new Carbon();
-        $isUserFromAllegro =
 
         $sending = EmailSending::where('scheduled_date', '<=', $now->toDateTimeString())
             ->where('message_send', 0)

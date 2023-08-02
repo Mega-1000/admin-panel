@@ -179,6 +179,7 @@ readonly class ProductService
                 ];
                 $productsVariation[$product->product->id][] = $array;
             }
+             
             foreach ($productsVariation as $variation) {
                 if (isset($productsVariation[$product->product->id])) {
                     $productsVariation[$product->product->id] = collect($variation)->sortBy('different', 1, true);
