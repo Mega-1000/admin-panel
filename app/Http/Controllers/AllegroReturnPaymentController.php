@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\DTO\AllegroPayment\AllegroReturnDTO;
 use App\DTO\AllegroPayment\AllegroReturnItemDTO;
 use App\Entities\Order;
+use App\Entities\OrderReturn;
 use App\Enums\AllegroReturnItemTypeEnum;
 use App\Helpers\AllegroOrderHelper;
 use App\Services\AllegroOrderService;
@@ -19,10 +20,12 @@ class AllegroReturnPaymentController extends Controller
      ) {}
     
     public function index(int $orderId) {
-        $order = Order::with(['items', 'orderReturn'])->find($orderId);
+        $order = Order::with(['items'])->findOrFail($orderId);
 
-        if (empty($order)) {
-            abort(404);
+        foreach ($order['items'] as $item) {
+            $productId = $item->product_id;
+            $orderReturn = OrderReturn::with(['product'])->where('product_id', $productId)->where('order_id', $orderId)->first();
+            $item['orderReturn'] = $orderReturn;
         }
 
         $existingAllegroReturns = $this->allegroPaymentService->getRefundsByPaymentId($order['allegro_payment_id']);
@@ -34,11 +37,7 @@ class AllegroReturnPaymentController extends Controller
     }
 
     public function store(Request $request, int $orderId) {
-        $order = Order::with(['items', 'orderReturn'])->find($orderId);
-
-        if (empty($order)) {
-            return response(status: 404);
-        }
+        $order = Order::with(['items', 'orderReturn'])->findOrFail($orderId);
 
         $allegroPaymentId = $order['allegro_payment_id'];
         $allegroOrder = $this->allegroOrderService->getOrderByPaymentId($allegroPaymentId);
@@ -54,26 +53,26 @@ class AllegroReturnPaymentController extends Controller
         $lineItems = [];
 
         foreach ($returnsByAllegroId as $allegroId => $itemReturn) {
-            if (!array_key_exists('check', $itemReturn) || strtolower($itemReturn['check']) !== "on" || !array_key_exists('quantity', $itemReturn) || $itemReturn['quantity'] <= 0) {
-                continue;
-            }
-
-            $quantity = (int)$itemReturn['quantity'];
+            $quantityUndamaged = $itemReturn['quantityUndamaged'];
+            $quantityDamaged = $itemReturn['quantityDamaged'];
+            $quantityTotal = $quantityUndamaged + $quantityDamaged;
 
             if (array_key_exists('deductionCheck', $itemReturn) && strtolower($itemReturn['deductionCheck']) === "on") {
-                $amount = $quantity * (float)$itemReturn['price'] - (float)$itemReturn['deduction'];
+                $amount = $quantityUndamaged * (float)$itemReturn['price'] - (float)$itemReturn['deduction'];
                 $lineItems[] = new AllegroReturnItemDTO(
                     id: $allegroId,
-                    type: AllegroReturnItemTypeEnum::fromValue(AllegroReturnItemTypeEnum::AMOUNT),
+                    type: AllegroReturnItemTypeEnum::AMOUNT(),
                     amount: $amount,
                 );
-            } else {
-                $lineItems[] = new AllegroReturnItemDTO(
-                    id: $allegroId,
-                    type: AllegroReturnItemTypeEnum::fromValue(AllegroReturnItemTypeEnum::QUANTITY),
-                    quantity: $quantity,
-                );
+
+                continue;
             }
+            
+            $lineItems[] = new AllegroReturnItemDTO(
+                id: $allegroId,
+                type: AllegroReturnItemTypeEnum::QUANTITY(),
+                quantity: $quantityUndamaged,
+            );
         }
 
         $data = new AllegroReturnDTO(

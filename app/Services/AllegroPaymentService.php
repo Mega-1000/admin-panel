@@ -105,33 +105,56 @@ class AllegroPaymentService extends AllegroApiService {
     public function initiateRefund(AllegroReturnDTO $allegroReturnDTO): void {
         $url = $this->getRestUrl("/payments/refunds");
 
-        $data = [
-            'paymentId' => $allegroReturnDTO->paymentId,
-            'reason' => $allegroReturnDTO->reason,
-            'lineItems' => array_map(function (AllegroReturnItemDTO $lineItem) {
-                if ($lineItem->type->is(AllegroReturnItemTypeEnum::AMOUNT)) {
-                    return [
-                        'id' => $lineItem->id,
-                        'type' => $lineItem->type->value,
-                        'amount' => [
-                            'amount' => $lineItem->amount,
-                            'currency' => $lineItem->currency,
-                        ],
-                    ];
-                }
-
+        $lineItems = array_map(function (AllegroReturnItemDTO $lineItem) {
+            if ($lineItem->type->is(AllegroReturnItemTypeEnum::AMOUNT)) {
                 return [
                     'id' => $lineItem->id,
                     'type' => $lineItem->type->value,
-                    'quantity' => $lineItem->quantity,
+                    'amount' => [
+                        'amount' => $lineItem->amount,
+                        'currency' => $lineItem->currency,
+                    ],
                 ];
-            }, $allegroReturnDTO->lineItems),
+            }
+
+            return [
+                'id' => $lineItem->id,
+                'type' => $lineItem->type->value,
+                'quantity' => $lineItem->quantity,
+            ];
+        },  $allegroReturnDTO->lineItems);
+
+        $data = [
+            'paymentId' => $allegroReturnDTO->paymentId,
+            'reason' => $allegroReturnDTO->reason,
+            'lineItems' => $lineItems,
         ];
         
         dd($data);
 
         // if (!($response = $this->request('POST', $url, $data))) {
         //     return false;
+        // }
+    }
+
+    /**
+     * Tworzy zwrot prowizji dla podanego lineItemId
+     * @param string $lineItemId
+     * @param int $quantity
+     * @return void
+     */
+    public function createCommissionRefund(string $lineItemId, int $quantity): void {
+        $data = [
+            "lineItem" => [
+                "id" => $lineItemId
+            ],
+            "quantity" => $quantity
+        ];
+
+        $url = $this->getRestUrl("/order/refund-claims");
+
+        // if (!($response = $this->request('POST', $url, $data))) {
+        //     return;
         // }
     }
 }

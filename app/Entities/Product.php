@@ -224,6 +224,11 @@ class Product extends Model implements Transformable
         return $this->hasMany(OrderItem::class);
     }
 
+    public function orderReturns(): HasMany
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
+
     public function parentProduct(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id', 'id');
