@@ -20,7 +20,7 @@ class AllegroImportPayInService {
         private readonly FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
     ) {}
 
-    public function importLastDayPayInsFromAllegroApi() {
+    public function importLastDayPayInsFromAllegroApi(): void {
         $files = Storage::disk('allegroPayInDisk')->files();
         foreach ($files as $file) {
             Storage::disk('allegroPayInDisk')->delete($file);
