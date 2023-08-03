@@ -27,9 +27,8 @@ class ImportPayInFromAllegro extends Command
      *
      * @return int
      */
-    public function handle(): int
+    public function handle(AllegroImportPayInService $payInService): int
     {
-        $payInService = app(AllegroImportPayInService::class);
         $payInService->importLastDayPayInsFromAllegroApi();
 
         return CommandAlias::SUCCESS;
