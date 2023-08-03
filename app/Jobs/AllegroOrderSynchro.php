@@ -25,6 +25,7 @@ use App\Helpers\LabelsHelper;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPackagesDataHelper;
+use App\Helpers\PdfCharactersHelper;
 use App\Helpers\StringHelper;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderRepository;
@@ -616,6 +617,17 @@ class AllegroOrderSynchro implements ShouldQueue
         $rememberString = "";
         $streetReverseArray = array_reverse(explode(" ", $street));
         foreach ($streetReverseArray as $part) {
+            $part = PdfCharactersHelper::changePolishCharactersToNonAccented($part);
+            
+            if (StringHelper::hasThreeLettersInARow($part)) {
+                list($_, $toAddFlatNo) = $this->getAddressOneWord($part);
+                if ($rememberString != "") {
+                    $toAddFlatNo .= " " . $rememberString;
+                }
+                $flatNo = $toAddFlatNo . " " . $flatNo;
+                break;
+            }
+
             if (ctype_alpha($part)) {
                 if ($rememberString != "") {
                     break;
@@ -625,20 +637,11 @@ class AllegroOrderSynchro implements ShouldQueue
                 continue;
             }
 
-            if (StringHelper::hasThreeLettersInARow($part)) {
-                list($_, $toAddFlatNo) = $this->getAddressOneWord($part);
-                if ($rememberString != "") {
-                    $toAddFlatNo .= " " . $rememberString;
-                    $rememberString = "";
-                }
-                $flatNo = $toAddFlatNo . " " . $flatNo;
-                break;
-            }
-
             if ($rememberString != "") {
                 $part .= " " . $rememberString;
                 $rememberString = "";
             }
+
             $flatNo = $part . " " . $flatNo;
         }
         
