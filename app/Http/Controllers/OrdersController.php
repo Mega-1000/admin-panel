@@ -486,7 +486,7 @@ class OrdersController extends Controller
         );
     }
 
-    private function getVariations($order)
+    public function getVariations($order): array
     {
         $productsVariation = [];
 

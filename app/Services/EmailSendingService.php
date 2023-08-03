@@ -100,6 +100,7 @@ class EmailSendingService
         } else {
             $sending->scheduled_date = $this->getDate($setting);
         }
+
         $sending->send_date = null;
         $sending->message_send = false;
         $sending->save();
@@ -110,7 +111,7 @@ class EmailSendingService
 
     public function getEmail(Order $order): string
     {
-        if($order->allegro_form_id !== null && $order->allegro_form_id !== '') {
+        if ($order->allegro_form_id !== null && $order->allegro_form_id !== '') {
             $allegroOrder = AllegroOrder::where('order_id', $order->allegro_form_id)->first();
             return $allegroOrder->buyer_email;
         }
@@ -123,6 +124,7 @@ class EmailSendingService
     {
         $date = new DateTime();
         $date->modify('+'.$setting->time.' minute');
+
         return $date->format('Y-m-d H:i:s');
     }
 
@@ -131,15 +133,15 @@ class EmailSendingService
         $text = $this->getStringBetween($content, '[text]', '[/text]');
         $link = $this->getStringBetween($content, '[link]', '[/link]');
 
-        if($text) {
+        if ($text) {
             $content = $this->getText($content,$text);
         }
 
-        if($link) {
+        if ($link) {
             $content = $this->getLink($content,$link);
         }
 
-        if($file) {
+        if ($file) {
             $content = str_replace("[file]".$file."[/file]", "", $content);
         }
 
@@ -195,7 +197,6 @@ class EmailSendingService
     public function sendEmail(EmailSending $send, Carbon $now): bool
     {
         try {
-
             $order = Order::find( $send->order_id );
             $emailTagHandlerHelper = new EmailTagHandlerHelper();
             $msg = $emailTagHandlerHelper->parseTags($order, $send->content);
