@@ -33,22 +33,31 @@
                                 (symbol: {{ $item->orderReturn->product->symbol }})</div>
                             </h4>
                         </div>
-                        <div style="width: 60%">
-                            <p>Ilość nieuszkodzona: {{ $item->orderReturn->quantity_undamaged }}</p>
-                            <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][quantityUndamaged]" value="{{ $item->orderReturn->quantity_undamaged }}">
-                            <p>Ilość uszkodzona: {{ $item->orderReturn->quantity_damaged }}</p>
-                            <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][quantityDamaged]" value="{{ $item->orderReturn->quantity_damaged }}">
-                            <input type="checkbox" id="deductionCheck-{{$item->orderReturn->product->symbol}}"
-                                    name="return[{{$item->orderReturn->product->symbol}}][deductionCheck]">
-                            Potrącić kwotę?
-                            <input class="return-deduction" type="number" min="0" step="0.01" max="{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}"
-                                    name="return[{{$item->orderReturn->product->symbol}}][deduction]" disabled="true" value="29.90" id="deduction-{{$item->orderReturn->product->symbol}}">
-                            Wartość potrącenia
-                            <p>Cena: {{ $item->gross_selling_price_commercial_unit }}</p>
-                            <p>Wartość zwrotu: 
-                                <div id="value-{{$item->orderReturn->product->symbol}}">{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}</div>
-                            </p>
-                            <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][price]" value={{$item->gross_selling_price_commercial_unit}}>
+                        <div style="width: 60%; display: flex; justify-content: space-around">
+                            <div>
+                                <p>Ilość nieuszkodzona: {{ $item->orderReturn->quantity_undamaged }}</p>
+                                <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][quantityUndamaged]" value="{{ $item->orderReturn->quantity_undamaged }}">
+                                <p>Ilość uszkodzona: {{ $item->orderReturn->quantity_damaged }}</p>
+                                <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][quantityDamaged]" value="{{ $item->orderReturn->quantity_damaged }}">
+                                <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][price]" value={{$item->gross_selling_price_commercial_unit}}>
+                                <p>Cena: {{ $item->gross_selling_price_commercial_unit }}</p>
+                            </div>
+                            <div>
+                                <div>
+                                    <input type="checkbox" id="deductionCheck-{{$item->orderReturn->product->symbol}}"
+                                            name="return[{{$item->orderReturn->product->symbol}}][deductionCheck]">
+                                    <label for="deductionCheck-{{$item->orderReturn->product->symbol}}">Potrącić kwotę?</label>
+                                </div>
+                                <div>
+                                    <input class="return-deduction" type="number" min="0" step="0.01" max="{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}"
+                                            name="return[{{$item->orderReturn->product->symbol}}][deduction]" disabled="true" value="29.90" id="deduction-{{$item->orderReturn->product->symbol}}">
+                                    <label for="deduction-{{$item->orderReturn->product->symbol}}">Wartość potrącenia</label>
+                                </div>
+                                <p>Wartość zwrotu: 
+                                    <span id="value-{{$item->orderReturn->product->symbol}}">{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}</span>
+                                </p>
+                            </div>
+                            
                         </div>
                     </div>
                 @endforeach

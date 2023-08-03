@@ -102,7 +102,7 @@ class AllegroPaymentService extends AllegroApiService {
         return $uncancelledRefunds;
     }
 
-    public function initiateRefund(AllegroReturnDTO $allegroReturnDTO): void {
+    public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): void {
         $url = $this->getRestUrl("/payments/refunds");
 
         $lineItems = array_map(function (AllegroReturnItemDTO $lineItem) {
@@ -130,7 +130,7 @@ class AllegroPaymentService extends AllegroApiService {
             'lineItems' => $lineItems,
         ];
         
-        dd($data);
+        dd($url, $data);
 
         // if (!($response = $this->request('POST', $url, $data))) {
         //     return false;
@@ -152,6 +152,8 @@ class AllegroPaymentService extends AllegroApiService {
         ];
 
         $url = $this->getRestUrl("/order/refund-claims");
+
+        dd($url, $data);
 
         // if (!($response = $this->request('POST', $url, $data))) {
         //     return;
