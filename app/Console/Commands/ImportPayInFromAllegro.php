@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ImportPayInFromAllegroJob;
+use App\Services\AllegroImportPayInService;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
@@ -29,7 +29,8 @@ class ImportPayInFromAllegro extends Command
      */
     public function handle(): int
     {
-        ImportPayInFromAllegroJob::dispatchNow();
+        $payInService = app(AllegroImportPayInService::class);
+        $payInService->importLastDayPayInsFromAllegroApi();
 
         return CommandAlias::SUCCESS;
     }
