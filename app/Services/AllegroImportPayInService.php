@@ -5,32 +5,73 @@ namespace App\Services;
 use App\DTO\ImportPayIn\AllegroPayInDTO;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
-use App\Enums\AllegroImportPayInDataEnum;
 use App\Factory\AllegroPayInDTOFactory;
+use App\Mail\AllegroPayInMail;
 use App\Repositories\OrderPayments;
 use Carbon\Carbon;
+use App\Facades\Mailer;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
-class AllegroImportPayInService {
-    public function writeToFile(array $data, int $type = AllegroImportPayInDataEnum::API, $file, FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService): void {
-        foreach ($data as $payInData) {
-            $payIn = null;
-            if ($type === AllegroImportPayInDataEnum::CSV) {
-                $payIn = AllegroPayInDTOFactory::fromAllegroCsvData($payInData);
-            } else if ($type === AllegroImportPayInDataEnum::API) {
-                $payIn = AllegroPayInDTOFactory::fromAllegroApiData($payInData);
-            }
+readonly class AllegroImportPayInService 
+{
+    public function __construct(
+        private AllegroPaymentService $allegroPaymentService,
+        private FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
+    ) {}
 
+    public function importLastDayPayInsFromAllegroApi(): void 
+    {
+        $files = Storage::disk('allegroPayInDisk')->files();
+        foreach ($files as $file) {
+            Storage::disk('allegroPayInDisk')->delete($file);
+        }
+
+        $payments = $this->allegroPaymentService->getPaymentsFromLastDay();
+
+        $filename = "transactionWithoutOrder.csv";
+        $file = fopen($filename, 'w');
+
+        fputcsv($file, AllegroPayInDTO::$headers);
+
+        $payments = array_map(function ($payment) {
+            return AllegroPayInDTOFactory::fromAllegroApiData($payment);
+        }, $payments);
+
+        $this->import($payments, $file);
+
+        fclose($file);
+
+        $yesterdayDate = Carbon::yesterday()->format('Y-m-d');
+
+        $newFilePath = 'public/transaction/TransactionWithoutOrdersFromAllegro' . $yesterdayDate . '.csv';
+
+        Storage::disk('allegroPayInDisk')->put($newFilePath, file_get_contents($filename));
+
+        Mailer::create()
+            ->to(config('allegro.payInMailReceiver'))->send(new AllegroPayInMail($newFilePath));
+    }
+
+    /**
+     * @param AllegroPayInDTO[] $data
+     * @param resource $file
+     * @return void
+     */
+    public function import(array $data, $file): void 
+    {
+        foreach ($data as $payIn) {
             if (!in_array($payIn->operation, ['wpłata', 'zwrot', 'dopłata'])) {
                 continue;
             }
 
             $order = Order::where('allegro_payment_id', '=', $payIn->allegroIdentifier)->first();
 
+            var_dump($order);
+
             try {
                 if (!empty($order)) {
-                    $findOrCreatePaymentForPackageService->execute(
+                    $this->findOrCreatePaymentForPackageService->execute(
                         OrderPackage::where('order_id', $order->id)->first(),
                     );
 
