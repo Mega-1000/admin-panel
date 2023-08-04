@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 
-class AllegroImportPayInService {
+readonly class AllegroImportPayInService {
     public function __construct(
-        private readonly AllegroPaymentService $allegroPaymentService,
-        private readonly FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
+        private AllegroPaymentService $allegroPaymentService,
+        private FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
     ) {}
 
     public function importLastDayPayInsFromAllegroApi(): void {
@@ -48,7 +48,7 @@ class AllegroImportPayInService {
         Storage::disk('allegroPayInDisk')->put($newFilePath, file_get_contents($filename));
 
         Mailer::create()
-            ->to('pawbud6969@gmail.com')->send(new AllegroPayInMail($newFilePath));
+            ->to(config('allegro.payInMailReceiver'))->send(new AllegroPayInMail($newFilePath));
     }
 
     /**
