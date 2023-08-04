@@ -74,66 +74,64 @@ class AddLabelService
                     $order->labels()->detach($labelId);
                 }
 
-                if (!empty($label)) {
-                    foreach($label->labelsToRemoveAfterAddition as $labelToRemove) {
-                        $order->labels()->detach($labelToRemove->id);
-                    }
-                    foreach($label->labelsToAddAfterAddition as $labelToAdd) {
-                        $order->labels()->attach($order->id, [
-                            'label_id'   => $labelToAdd->id,
-                            'added_type' => $options['added_type'],
-                            'created_at' => Carbon::now()
-                        ]);
-                    }
-
+                foreach($label->labelsToRemoveAfterAddition as $labelToRemove) {
+                    $order->labels()->detach($labelToRemove->id);
+                }
+                foreach($label->labelsToAddAfterAddition as $labelToAdd) {
                     $order->labels()->attach($order->id, [
-                        'label_id'   => $label->id,
+                        'label_id'   => $labelToAdd->id,
                         'added_type' => $options['added_type'],
                         'created_at' => Carbon::now()
                     ]);
+                }
 
-                    self::setScheduledLabelsAfterAddition($order, $label, $userId);
-                    $loopPreventionArray['already-added'][] = $labelId;
+                $order->labels()->attach($order->id, [
+                    'label_id'   => $label->id,
+                    'added_type' => $options['added_type'],
+                    'created_at' => Carbon::now()
+                ]);
 
-                    if ($label->message !== null && $labelId !== 89) {
-                        LabelNotificationService::addLabelSentNotification($order, $label);
-                    }
+                self::setScheduledLabelsAfterAddition($order, $label, $userId);
+                $loopPreventionArray['already-added'][] = $labelId;
 
-                    if ($label->id == 52) {  //wyslana do awizacji
-                        LabelNotificationService::orderStatusChangeToDispatchNotification($order, $order->customer->id == 4128);
-                    }
+                if ($label->message !== null && $labelId !== 89) {
+                    LabelNotificationService::addLabelSentNotification($order, $label);
+                }
 
-                    if ($label->id == Label::ORDER_ITEMS_CONSTRUCTED) {
-                        self::savePackageGroup($order);
+                if ($label->id == 52) {  //wyslana do awizacji
+                    LabelNotificationService::orderStatusChangeToDispatchNotification($order, $order->customer->id == 4128);
+                }
 
-                        $tasks = Task::query()->where('order_id', '=', $order->id)->get();
-                        if (count($tasks) != 0) {
-                            foreach ($tasks as $task) {
-                                $task->update([
-                                    'color' => '32CD32',
-                                    'status' => 'FINISHED'
-                                ]);
-                            }
+                if ($label->id == Label::ORDER_ITEMS_CONSTRUCTED) {
+                    self::savePackageGroup($order);
+
+                    $tasks = Task::query()->where('order_id', '=', $order->id)->get();
+                    if (count($tasks) != 0) {
+                        foreach ($tasks as $task) {
+                            $task->update([
+                                'color' => '32CD32',
+                                'status' => 'FINISHED'
+                            ]);
                         }
                     }
+                }
 
-                    if ($label->id == Label::ORDER_ITEMS_REDEEMED_LABEL) {
+                if ($label->id == Label::ORDER_ITEMS_REDEEMED_LABEL) {
 
-                        $emailSendingService = new EmailSendingService();
-                        $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP);
-                        $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP_2);
+                    $emailSendingService = new EmailSendingService();
+                    $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP);
+                    $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP_2);
 
 
-                        $order->preferred_invoice_date = $now;
-                        $tasks = Task::query()->where('order_id', '=', $order->id)->get();
+                    $order->preferred_invoice_date = $now;
+                    $tasks = Task::query()->where('order_id', '=', $order->id)->get();
 
-                        if (count($tasks) != 0) {
-                            foreach ($tasks as $task) {
-                                $task->update([
-                                    'color' => '008000',
-                                    'status' => 'FINISHED'
-                                ]);
-                            }
+                    if (count($tasks) != 0) {
+                        foreach ($tasks as $task) {
+                            $task->update([
+                                'color' => '008000',
+                                'status' => 'FINISHED'
+                            ]);
                         }
                     }
                 }
