@@ -1,6 +1,7 @@
 <?php
 
 namespace App\DTO\AllegroPayment;
+
 use App\Enums\AllegroReturnItemTypeEnum;
 
 class AllegroReturnItemDTO
