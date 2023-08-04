@@ -23,7 +23,8 @@ class AllegroReturnPaymentController extends Controller
         private readonly AllegroOrderService $allegroOrderService,
     ) {}
     
-    public function index(int $orderId) {
+    public function index(int $orderId) 
+    {
         $order = Order::with(['items'])->findOrFail($orderId);
 
         foreach ($order['items'] as $item) {
@@ -40,7 +41,8 @@ class AllegroReturnPaymentController extends Controller
         ]);
     }
 
-    public function store(Request $request, int $orderId) {
+    public function store(Request $request, int $orderId) 
+    {
         $order = Order::with(['items', 'orderReturn'])->findOrFail($orderId);
 
         $allegroPaymentId = $order['allegro_payment_id'];
