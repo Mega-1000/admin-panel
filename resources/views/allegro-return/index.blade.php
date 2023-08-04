@@ -71,7 +71,6 @@
     <script>
         $(document).ready(function() {
             @foreach($order->items as $item)
-                
                 $('#deduction-{{$item->orderReturn->product->symbol}}').ready(function() {
                     $(this).val(Math.min(29.90, {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}}));
                 })
