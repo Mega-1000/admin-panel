@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AllegroReturnPaymentHelper;
 use App\DTO\AllegroPayment\AllegroReturnDTO;
-use App\DTO\AllegroPayment\AllegroReturnItemDTO;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderReturn;
-use App\Enums\AllegroReturnItemTypeEnum;
 use App\Helpers\AllegroOrderHelper;
 use App\Services\AllegroOrderService;
 use App\Services\AllegroPaymentService;
@@ -17,7 +16,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AllegroReturnPaymentController extends Controller
 {
-    
     public function __construct(
         private readonly AllegroPaymentService $allegroPaymentService,
         private readonly AllegroOrderService $allegroOrderService,
@@ -56,40 +54,7 @@ class AllegroReturnPaymentController extends Controller
             $returnsByAllegroId[$symbolToAllegroIdPairings[$symbol]] = $itemReturn;
         }
 
-        $lineItemsForPaymentRefund = [];
-        $lineItemsForCommissionRefund = [];
-
-        foreach ($returnsByAllegroId as $allegroId => $itemReturn) {
-            $quantityUndamaged = (int)$itemReturn['quantityUndamaged'];
-            $quantityDamaged = (int)$itemReturn['quantityDamaged'];
-            $quantityTotal = $quantityUndamaged + $quantityDamaged;
-
-            if ($quantityTotal === 0) {
-                continue;
-            }
-            
-            if ($quantityUndamaged > 0) {
-                if (array_key_exists('deductionCheck', $itemReturn) && strtolower($itemReturn['deductionCheck']) === "on") {
-                    $amount = $quantityUndamaged * (float)$itemReturn['price'] - (float)$itemReturn['deduction'];
-                    $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
-                        id: $allegroId,
-                        type: AllegroReturnItemTypeEnum::AMOUNT(),
-                        amount: $amount,
-                    );
-                }
-                
-                $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
-                    id: $allegroId,
-                    type: AllegroReturnItemTypeEnum::QUANTITY(),
-                    quantity: $quantityUndamaged,
-                );
-            }
-
-            $lineItemsForCommissionRefund[] = [
-                'id' => $allegroId,
-                'quantity' => $quantityTotal
-            ];
-        }
+        list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
 
         $data = new AllegroReturnDTO(
             paymentId: $allegroPaymentId,
