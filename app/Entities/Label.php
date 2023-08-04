@@ -91,6 +91,8 @@ class Label extends Model implements Transformable
     public const INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS = 210;
     public const GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO = 218;
 
+    public const NEED_TO_RETURN_PAYMENT = 178;
+
     public $customColumnsVisibilities = [
         'name',
         'group',

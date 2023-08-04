@@ -40,6 +40,7 @@
                                 <p>Ilość uszkodzona: {{ $item->orderReturn->quantity_damaged }}</p>
                                 <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][quantityDamaged]" value="{{ $item->orderReturn->quantity_damaged }}">
                                 <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][price]" value={{$item->gross_selling_price_commercial_unit}}>
+                                <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][name]" value="{{ $item->product->name }}">
                                 <p>Cena: {{ $item->gross_selling_price_commercial_unit }}</p>
                             </div>
                             <div>
@@ -57,7 +58,6 @@
                                     <span id="value-{{$item->orderReturn->product->symbol}}">{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}</span>
                                 </p>
                             </div>
-                            
                         </div>
                     </div>
                 @endforeach

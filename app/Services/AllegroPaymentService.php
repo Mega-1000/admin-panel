@@ -7,7 +7,7 @@ use App\Enums\AllegroReturnItemTypeEnum;
 use Carbon\Carbon;
 
 class AllegroPaymentService extends AllegroApiService {
-    protected $auth_record_id = 3;
+    protected $auth_record_id = 2;
 
     private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 
@@ -102,7 +102,12 @@ class AllegroPaymentService extends AllegroApiService {
         return $uncancelledRefunds;
     }
 
-    public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): void {
+    /**
+     * tworzy zwrot płatności
+     * @param AllegroReturnDTO $allegroReturnDTO
+     * @return bool - czy udało się stworzyć zwrot płatności
+     */
+    public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): bool {
         $url = $this->getRestUrl("/payments/refunds");
 
         $lineItems = array_map(function (AllegroReturnItemDTO $lineItem) {
@@ -110,7 +115,7 @@ class AllegroPaymentService extends AllegroApiService {
                 return [
                     'id' => $lineItem->id,
                     'type' => $lineItem->type->value,
-                    'amount' => [
+                    'value' => [
                         'amount' => $lineItem->amount,
                         'currency' => $lineItem->currency,
                     ],
@@ -125,25 +130,27 @@ class AllegroPaymentService extends AllegroApiService {
         },  $allegroReturnDTO->lineItems);
 
         $data = [
-            'paymentId' => $allegroReturnDTO->paymentId,
+            'payment' => [
+                'id' => $allegroReturnDTO->paymentId
+            ],
             'reason' => $allegroReturnDTO->reason,
             'lineItems' => $lineItems,
         ];
-        
-        dd($url, $data);
 
-        // if (!($response = $this->request('POST', $url, $data))) {
-        //     return false;
-        // }
+        if (!($response = $this->request('POST', $url, $data))) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Tworzy zwrot prowizji dla podanego lineItemId
      * @param string $lineItemId
      * @param int $quantity
-     * @return void
+     * @return bool - czy udało się stworzyć zwrot prowizji
      */
-    public function createCommissionRefund(string $lineItemId, int $quantity): void {
+    public function createCommissionRefund(string $lineItemId, int $quantity): bool {
         $data = [
             "lineItem" => [
                 "id" => $lineItemId
@@ -153,10 +160,10 @@ class AllegroPaymentService extends AllegroApiService {
 
         $url = $this->getRestUrl("/order/refund-claims");
 
-        dd($url, $data);
+        if (!($response = $this->request('POST', $url, $data))) {
+            return false;
+        }
 
-        // if (!($response = $this->request('POST', $url, $data))) {
-        //     return;
-        // }
+        return true;
     }
 }
