@@ -12,4 +12,23 @@ class AllegroReturnItemDTO
         public readonly ?float $amount = null,
         public readonly ?string $currency = "PLN",
     ) {}
+
+    public function toAllegroRefundArray(): array {
+        if ($this->type->is(AllegroReturnItemTypeEnum::AMOUNT)) {
+            return [
+                'id' => $this->id,
+                'type' => $this->type->value,
+                'value' => [
+                    'amount' => $this->amount,
+                    'currency' => $this->currency,
+                ],
+            ];
+        }
+
+        return [
+            'id' => $this->id,
+            'type' => $this->type->value,
+            'quantity' => $this->quantity,
+        ];
+    }
 }

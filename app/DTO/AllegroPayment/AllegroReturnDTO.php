@@ -14,4 +14,16 @@ class AllegroReturnDTO
         public readonly string $reason,
         public readonly array $lineItems,
     ) {}
+
+    public function toAllegroRefundArray(): array {
+        return [
+            'payment' => [
+                'id' => $this->paymentId
+            ],
+            'reason' => $this->reason,
+            'lineItems' => array_map(function (AllegroReturnItemDTO $item) {
+                return $item->toAllegroRefundArray();
+            }, $this->lineItems)
+        ];
+    }
 }

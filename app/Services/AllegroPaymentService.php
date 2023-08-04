@@ -110,32 +110,7 @@ class AllegroPaymentService extends AllegroApiService {
     public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): bool {
         $url = $this->getRestUrl("/payments/refunds");
 
-        $lineItems = array_map(function (AllegroReturnItemDTO $lineItem) {
-            if ($lineItem->type->is(AllegroReturnItemTypeEnum::AMOUNT)) {
-                return [
-                    'id' => $lineItem->id,
-                    'type' => $lineItem->type->value,
-                    'value' => [
-                        'amount' => $lineItem->amount,
-                        'currency' => $lineItem->currency,
-                    ],
-                ];
-            }
-
-            return [
-                'id' => $lineItem->id,
-                'type' => $lineItem->type->value,
-                'quantity' => $lineItem->quantity,
-            ];
-        },  $allegroReturnDTO->lineItems);
-
-        $data = [
-            'payment' => [
-                'id' => $allegroReturnDTO->paymentId
-            ],
-            'reason' => $allegroReturnDTO->reason,
-            'lineItems' => $lineItems,
-        ];
+        $data = $allegroReturnDTO->toAllegroRefundArray();
 
         if (!($response = $this->request('POST', $url, $data))) {
             return false;
