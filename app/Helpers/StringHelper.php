@@ -2,14 +2,29 @@
 
 namespace App\Helpers;
 
-class StringHelper 
+class StringHelper
 {
+    /**
+     * cares about polish characters
+     * @param string $string
+     * @return bool
+     */
+    public static function isAlpha(string $string): bool
+    {
+        return ctype_alpha(PdfCharactersHelper::changePolishCharactersToNonAccented($string));
+    }
+
+    /**
+     * cares about polish characters
+     * @param string $string
+     * @return bool
+     */
     public static function hasThreeLettersInARow(string $string): bool 
     {
         $letters = str_split($string);
         $count = 0;
         foreach ($letters as $letter) {
-            if (ctype_alpha($letter)) {
+            if (self::isAlpha($letter)) {
                 $count++;
             } else {
                 $count = 0;
@@ -23,6 +38,11 @@ class StringHelper
         return false;
     }
 
+    /**
+     * @param string $string
+     * @param string[] $characters
+     * @return string
+     */
     public static function addCharactersInReverseOrder(string $string, array $characters): string
     {
         $charactersString = strrev(implode('', $characters));        
@@ -30,6 +50,10 @@ class StringHelper
         return $charactersString . $string;
     }
 
+    /**
+     * @param string $string
+     * @return array
+     */
     public static function separateLastWord(string $string): array
     {
         $words = explode(' ', $string);
@@ -38,6 +62,10 @@ class StringHelper
         return [$firstWords, $lastWord];
     }
 
+    /**
+     * @param string $string
+     * @return string
+     */
     public static function removeMultipleSpaces(string $string): string
     {
         $words = explode(' ', $string);

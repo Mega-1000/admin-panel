@@ -617,8 +617,6 @@ class AllegroOrderSynchro implements ShouldQueue
         $rememberString = "";
         $streetReverseArray = array_reverse(explode(" ", $street));
         foreach ($streetReverseArray as $part) {
-            $part = PdfCharactersHelper::changePolishCharactersToNonAccented($part);
-            
             if (StringHelper::hasThreeLettersInARow($part)) {
                 list($_, $toAddFlatNo) = $this->getAddressOneWord($part);
                 if ($rememberString != "") {
@@ -628,7 +626,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 break;
             }
 
-            if (ctype_alpha($part)) {
+            if (StringHelper::isAlpha($part)) {
                 if ($rememberString != "") {
                     break;
                 }
