@@ -5,19 +5,22 @@ namespace App\Services;
 use App\DTO\AllegroPayment\AllegroReturnDTO;
 use Carbon\Carbon;
 
-class AllegroPaymentService extends AllegroApiService {
+class AllegroPaymentService extends AllegroApiService 
+{
     protected $auth_record_id = 2;
 
     private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 
-    public function getPaymentsFromLastDay(): array {
+    public function getPaymentsFromLastDay(): array 
+    {
         $startDate = Carbon::yesterday()->startOfDay();
         $endDate = Carbon::yesterday()->endOfDay();
 
         return $this->getPaymentsBetweenDates($startDate, $endDate);
     }
 
-    public function getPaymentsBetweenDates(Carbon $startDate, Carbon $endDate): array {
+    public function getPaymentsBetweenDates(Carbon $startDate, Carbon $endDate): array 
+    {
         $startDateString = $startDate->format('Y-m-d\TH:i:s\Z');
         $endDateString = $endDate->format('Y-m-d\TH:i:s\Z');
         $limit = 50;
@@ -87,7 +90,8 @@ class AllegroPaymentService extends AllegroApiService {
         return $payments;
     }
 
-    public function getRefundsByPaymentId(string $paymentId): array {
+    public function getRefundsByPaymentId(string $paymentId): array 
+    {
         $url = $this->getRestUrl("/payments/refunds?payment.id=" . $paymentId);
 
         if (!($response = $this->request('GET', $url, []))) {
@@ -106,7 +110,8 @@ class AllegroPaymentService extends AllegroApiService {
      * @param AllegroReturnDTO $allegroReturnDTO
      * @return bool - czy udało się stworzyć zwrot płatności
      */
-    public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): bool {
+    public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): bool
+    {
         $url = $this->getRestUrl("/payments/refunds");
 
         $data = $allegroReturnDTO->toAllegroRefundArray();
@@ -124,7 +129,8 @@ class AllegroPaymentService extends AllegroApiService {
      * @param int $quantity
      * @return bool - czy udało się stworzyć zwrot prowizji
      */
-    public function createCommissionRefund(string $lineItemId, int $quantity): bool {
+    public function createCommissionRefund(string $lineItemId, int $quantity): bool 
+    {
         $data = [
             "lineItem" => [
                 "id" => $lineItemId
