@@ -14,13 +14,15 @@ use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 
-readonly class AllegroImportPayInService {
+readonly class AllegroImportPayInService 
+{
     public function __construct(
         private AllegroPaymentService $allegroPaymentService,
         private FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
     ) {}
 
-    public function importLastDayPayInsFromAllegroApi(): void {
+    public function importLastDayPayInsFromAllegroApi(): void 
+    {
         $files = Storage::disk('allegroPayInDisk')->files();
         foreach ($files as $file) {
             Storage::disk('allegroPayInDisk')->delete($file);
@@ -56,7 +58,8 @@ readonly class AllegroImportPayInService {
      * @param resource $file
      * @return void
      */
-    public function import(array $data, $file): void {
+    public function import(array $data, $file): void 
+    {
         foreach ($data as $payIn) {
             if (!in_array($payIn->operation, ['wpłata', 'zwrot', 'dopłata'])) {
                 continue;
