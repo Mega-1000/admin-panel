@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Services;
+
 use App\DTO\AllegroPayment\AllegroReturnDTO;
-use App\DTO\AllegroPayment\AllegroReturnItemDTO;
-use App\Enums\AllegroReturnItemTypeEnum;
 use Carbon\Carbon;
 
 class AllegroPaymentService extends AllegroApiService {

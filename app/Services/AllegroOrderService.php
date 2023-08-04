@@ -1,4 +1,6 @@
-<?php namespace App\Services;
+<?php 
+
+namespace App\Services;
 
 use App\Entities\AllegroOrder;
 use App\Entities\Order;
@@ -37,7 +39,7 @@ class AllegroOrderService extends AllegroApiService
     const STATUS_SUSPENDED = "SUSPENDED";
     const TYPE_BUYER_CANCELLED = "BUYER_CANCELLED ";
     const READY_FOR_PROCESSING = 'READY_FOR_PROCESSING';
-    protected $auth_record_id = 2;
+    protected $auth_record_id = 3;
 
     public function __construct()
     {
