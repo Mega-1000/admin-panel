@@ -25,6 +25,7 @@
                 </select>
                 <hr />
                 @foreach($order->items as $item)
+                @if($item->orderReturn != null)
                     <div style="display: flex; margin-top: 5px;">
                         <div style="width: 40%">
                             <h4 style="display: flex; margin-right: 10px">
@@ -60,6 +61,7 @@
                             </div>
                         </div>
                     </div>
+                @endif
                 @endforeach
                 <button type="submit" class="btn btn-primary pull-right">Zwróć</button>
             </div>
@@ -71,6 +73,7 @@
     <script>
         $(document).ready(function() {
             @foreach($order->items as $item)
+            @if($item->orderReturn != null)
                 $('#deduction-{{$item->orderReturn->product->symbol}}').ready(function() {
                     $(this).val(Math.min(29.90, {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}}));
                 })
@@ -99,6 +102,7 @@
                     newValue = ({{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}} - value).toFixed(2);
                     $('#value-{{$item->orderReturn->product->symbol}}').text(newValue);
                 });
+            @endif
             @endforeach
         });
     </script>

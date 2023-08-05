@@ -25,10 +25,24 @@ class AllegroReturnPaymentController extends Controller
     {
         $order = Order::with(['items'])->findOrFail($orderId);
 
+        $hasOrderReturn = false;
+
         foreach ($order['items'] as $item) {
             $productId = $item->product_id;
-            $orderReturn = OrderReturn::with(['product'])->where('product_id', $productId)->where('order_id', $orderId)->first();
+            $orderReturn = OrderReturn::with(['product'])->where('product_id', $productId)->where('order_id', $orderId)->orderByDesc('created_at')->first();
+            if (empty($orderReturn)) {
+                $item['orderReturn'] = null;
+                continue;
+            }
             $item['orderReturn'] = $orderReturn;
+            $hasOrderReturn = true;
+        }
+
+        if (!$hasOrderReturn) {
+            return redirect()->route('orders.index')->with([
+                'message' => 'Nie można zwrócić płatności, ponieważ nie ma zwrotów dla tego zamówienia',
+                'alert-type' => 'error',
+            ]);
         }
 
         $existingAllegroReturns = $this->allegroPaymentService->getRefundsByPaymentId($order['allegro_payment_id']);
@@ -56,20 +70,22 @@ class AllegroReturnPaymentController extends Controller
 
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
 
-        $data = new AllegroReturnDTO(
-            paymentId: $allegroPaymentId,
-            reason: $request->reason,
-            lineItems: $lineItemsForPaymentRefund,
-        );
+        if (count($lineItemsForPaymentRefund) > 0) {
+            $data = new AllegroReturnDTO(
+                paymentId: $allegroPaymentId,
+                reason: $request->reason,
+                lineItems: $lineItemsForPaymentRefund,
+            );
 
-        $refundCreatedSuccessfully = $this->allegroPaymentService->initiatePaymentRefund($data);
-        if (!$refundCreatedSuccessfully) {
-            return redirect()->route('allegro-return.index', ['orderId' => $orderId])->with([
-                'message' => 'Nie udało się zwrócić płatności',
-                'alert-type' => 'error',
-            ]);
+            $refundCreatedSuccessfully = $this->allegroPaymentService->initiatePaymentRefund($data);
+            if (!$refundCreatedSuccessfully) {
+                return redirect()->route('allegro-return.index', ['orderId' => $orderId])->with([
+                    'message' => 'Nie udało się zwrócić płatności',
+                    'alert-type' => 'error',
+                ]);
+            }
         }
-
+            
         $loopPreventionArray = [];
         RemoveLabelService::removeLabels($order, [Label::NEED_TO_RETURN_PAYMENT], $loopPreventionArray, [], Auth::user()?->id);
 
@@ -80,7 +96,6 @@ class AllegroReturnPaymentController extends Controller
             if (!$commissionRefundCreatedSuccessfully) {
                 $itemName = $returnsByAllegroId[$lineItem['id']]['name'];
                 $unsuccessfulCommissionRefundsItemNames[] = $itemName;
-                continue;
             }
         }
 
