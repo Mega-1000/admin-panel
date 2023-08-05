@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
+use App\Services\ProductStockQuantityCalculationService;
 
 class ProductStockPositionObserver
 {
@@ -15,11 +16,21 @@ class ProductStockPositionObserver
      */
     public function updated(ProductStockPosition $productStockPosition): void
     {
-        $stockQuantity = ProductStockPosition::where('product_stock_id', $productStockPosition->product_stock_id)
-            ->sum('product_stock_id');
+        ProductStockQuantityCalculationService::calculateQuantity(
+            $productStockPosition
+        );
+    }
 
-        $productStock = ProductStock::find($productStockPosition->product_stock_id);
-        $productStock->quantity = $stockQuantity;
-        $productStock->save();
+    /**
+     * Handle the ProductStockPosition "created" event.
+     *
+     * @param ProductStockPosition $productStockPosition
+     * @return void
+     */
+    public function created(ProductStockPosition $productStockPosition): void
+    {
+        ProductStockQuantityCalculationService::calculateQuantity(
+            $productStockPosition
+        );
     }
 }
