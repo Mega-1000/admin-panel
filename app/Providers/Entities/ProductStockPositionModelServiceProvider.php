@@ -3,10 +3,12 @@
 namespace App\Providers\Entities;
 
 use App\Entities\Order;
+use App\Entities\ProductStockPosition;
 use App\Observers\Entities\OrderObserver;
+use App\Observers\ProductStockPositionObserver;
 use Illuminate\Support\ServiceProvider;
 
-class OrderModelServiceProvider extends ServiceProvider
+class ProductStockPositionModelServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap services.
@@ -15,6 +17,6 @@ class OrderModelServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Order::observe(OrderObserver::class);
+        ProductStockPosition::observe(ProductStockPositionObserver::class);
     }
 }
