@@ -67,18 +67,16 @@ readonly class AllegroImportPayInService
 
             $order = Order::where('allegro_payment_id', '=', $payIn->allegroIdentifier)->first();
 
-            var_dump($order);
-
             try {
-                if (!empty($order)) {
-                    $this->findOrCreatePaymentForPackageService->execute(
-                        OrderPackage::where('order_id', $order->id)->first(),
-                    );
-
-                    $this->settleOrder($order, $payIn);
-                    return;
+                if (empty($order)) {
+                    fputcsv($file, $payIn->toArray());
+                    continue;
                 }
-                fputcsv($file, $payIn->toArray());
+
+                $this->findOrCreatePaymentForPackageService->execute(
+                    OrderPackage::where('order_id', $order->id)->first(),
+                );
+                $this->settleOrder($order, $payIn);
             } catch (Exception $exception) {
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
             }
