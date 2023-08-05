@@ -1938,10 +1938,10 @@
                                 html += '</a>';
 
                                 // allegro return button
-                                html += `<a href="/admin/allegro/return-payment/${id}" class="btn btn-sm btn-danger edit">`;
-                                html += '<i class="glyphicon glyphicon-share-alt"></i>';
-                                html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.allegro_return')</span>';
-                                html += '</a>';
+                                html += `<a href="/admin/allegro/return-payment/${id}" class="btn btn-sm btn-danger edit">
+                                    <i class="glyphicon glyphicon-share-alt"></i>
+                                    <span class="hidden-xs hidden-sm"> @lang('voyager.generic.allegro_return')</span>
+                                </a>`;
                             }
                             @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === User::ORDER_DELETE_USER)
                                 html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + id + ')">';
