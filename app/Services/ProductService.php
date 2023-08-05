@@ -39,7 +39,7 @@ readonly class ProductService
      *
      * @param Order $order
      * @return Collection|null
-     * @throws DeliverAddressNotFoundException
+     * @throws DeliverAddressNotFoundException|BindingResolutionException
      */
     public function getUsersFromVariations(Order $order): ?Collection
     {
