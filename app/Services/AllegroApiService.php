@@ -247,4 +247,9 @@ class AllegroApiService
         Log::error('AllegroApiService: request error.');
         return false;
     }
+
+    protected function getRestUrlWithQuery(string $resource, array $query): string
+    {
+        return $this->getRestUrl($resource) . '?' . http_build_query($query);
+    }
 }

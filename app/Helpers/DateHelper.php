@@ -80,4 +80,12 @@ class DateHelper
 
         return $date->hour >= $a && $date->hour < $b;
     }
+
+    public static function getYesterdayStartAndEnd(): array
+    {
+        $startDate = Carbon::yesterday()->startOfDay();
+        $endDate = Carbon::yesterday()->endOfDay();
+
+        return [$startDate, $endDate];
+    }
 }
