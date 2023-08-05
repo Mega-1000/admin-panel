@@ -91,13 +91,13 @@
                     valueEl.text(newValue);
                 });
                 $('#deduction-{{$item->orderReturn->product->symbol}}').change(function() {
-                    const value = $(this).val();
+                    let value = $(this).val();
                     const max = parseFloat($(this).prop('max'));
                     if (parseFloat($(this).val()) > max) {
                         $(this).val(max);
                         value = max;
                     }
-                    newValue = ({{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}} - value).toFixed(2);
+                    const newValue = ({{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}} - value).toFixed(2);
                     $('#value-{{$item->orderReturn->product->symbol}}').text(newValue);
                 });
             @endif
