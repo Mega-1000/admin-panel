@@ -79,22 +79,20 @@
                 })
 
                 $('#deductionCheck-{{$item->orderReturn->product->symbol}}').change(function() {
-                    var valueEl = $('#value-{{$item->orderReturn->product->symbol}}');
-                    var deductionInput = $('#deduction-{{$item->orderReturn->product->symbol}}');
-                    var newValue;
-                    if ($(this).is(':checked')) {
-                        deductionInput.prop('disabled', false);
-                        newValue = {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}} - parseFloat(deductionInput.val());
-                    } else {
-                        deductionInput.prop('disabled', true);
-                        newValue = {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}};
-                    }
+                    const isChecked = $(this).is(':checked');
+                    const valueEl = $('#value-{{$item->orderReturn->product->symbol}}');
+
+                    const deductionInput = $('#deduction-{{$item->orderReturn->product->symbol}}');
+                    deductionInput.prop('disabled', !$(this).is(':checked'));
+                    
+                    let newValue = {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}};
+                    newValue = isChecked ? newValue - parseFloat(deductionInput.val()) : newValue;
                     newValue = newValue.toFixed(2)
                     valueEl.text(newValue);
                 });
                 $('#deduction-{{$item->orderReturn->product->symbol}}').change(function() {
-                    var value = $(this).val();
-                    var max = parseFloat($(this).prop('max'));
+                    const value = $(this).val();
+                    const max = parseFloat($(this).prop('max'));
                     if (parseFloat($(this).val()) > max) {
                         $(this).val(max);
                         value = max;

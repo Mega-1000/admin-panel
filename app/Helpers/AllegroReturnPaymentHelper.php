@@ -46,4 +46,18 @@ final class AllegroReturnPaymentHelper
 
         return [$lineItemsForPaymentRefund, $lineItemsForCommissionRefund];
     }
+
+    public static function createReturnsByAllegroId(array $allegroOrder, array $returns)
+    {
+        $symbolToAllegroIdPairings = AllegroOrderHelper::createSymbolToAllegroIdPairingsFromLineItems($allegroOrder['lineItems']);
+
+        $returnsByAllegroId = [];
+
+        foreach ($returns as $symbol => $itemReturn) {
+            $symbol = explode("-", $symbol)[0];
+            $returnsByAllegroId[$symbolToAllegroIdPairings[$symbol]] = $itemReturn;
+        }
+
+        return $returnsByAllegroId;
+    }
 }

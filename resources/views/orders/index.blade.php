@@ -1938,7 +1938,7 @@
                                 html += '</a>';
 
                                 // allegro return button
-                                html += '<a href="/admin/allegro/return-payment/' + id + '" class="btn btn-sm btn-danger edit">';
+                                html += `<a href="/admin/allegro/return-payment/${id}" class="btn btn-sm btn-danger edit">`;
                                 html += '<i class="glyphicon glyphicon-share-alt"></i>';
                                 html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.allegro_return')</span>';
                                 html += '</a>';

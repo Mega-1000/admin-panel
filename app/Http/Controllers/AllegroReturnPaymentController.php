@@ -10,35 +10,26 @@ use App\Entities\OrderReturn;
 use App\Helpers\AllegroOrderHelper;
 use App\Services\AllegroOrderService;
 use App\Services\AllegroPaymentService;
+use App\Services\AllegroPaymentsReturnService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Illuminate\Contracts\View\View;
 
 class AllegroReturnPaymentController extends Controller
 {
     public function __construct(
         private readonly AllegroPaymentService $allegroPaymentService,
         private readonly AllegroOrderService $allegroOrderService,
+        private readonly AllegroPaymentsReturnService $allegroPaymentsReturnService,
     ) {}
     
-    public function index(int $orderId) 
+    public function index(int $orderId): RedirectResponse|View 
     {
-        $order = Order::with(['items'])->findOrFail($orderId);
+        $order = $this->allegroPaymentsReturnService->getOrderWithItems($orderId);
 
-        $hasOrderReturn = false;
-
-        foreach ($order['items'] as $item) {
-            $productId = $item->product_id;
-            $orderReturn = OrderReturn::with(['product'])->where('product_id', $productId)->where('order_id', $orderId)->orderByDesc('created_at')->first();
-            if (empty($orderReturn)) {
-                $item['orderReturn'] = null;
-                continue;
-            }
-            $item['orderReturn'] = $orderReturn;
-            $hasOrderReturn = true;
-        }
-
-        if (!$hasOrderReturn) {
+        if (empty($order)) {
             return redirect()->route('orders.index')->with([
                 'message' => 'Nie można zwrócić płatności, ponieważ nie ma zwrotów dla tego zamówienia',
                 'alert-type' => 'error',
@@ -53,20 +44,14 @@ class AllegroReturnPaymentController extends Controller
         ]);
     }
 
-    public function store(Request $request, int $orderId) 
+    public function store(Request $request, int $orderId): RedirectResponse
     {
         $order = Order::with(['items', 'orderReturn'])->findOrFail($orderId);
 
         $allegroPaymentId = $order['allegro_payment_id'];
         $allegroOrder = $this->allegroOrderService->getOrderByPaymentId($allegroPaymentId);
-        $symbolToAllegroIdPairings = AllegroOrderHelper::createSymbolToAllegroIdPairingsFromLineItems($allegroOrder['lineItems']);
-
-        $returnsByAllegroId = [];
-
-        foreach ($request->return as $symbol => $itemReturn) {
-            $symbol = explode("-", $symbol)[0];
-            $returnsByAllegroId[$symbolToAllegroIdPairings[$symbol]] = $itemReturn;
-        }
+        
+        $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, $request->return);
 
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
 
@@ -89,15 +74,7 @@ class AllegroReturnPaymentController extends Controller
         $loopPreventionArray = [];
         RemoveLabelService::removeLabels($order, [Label::NEED_TO_RETURN_PAYMENT], $loopPreventionArray, [], Auth::user()?->id);
 
-        $unsuccessfulCommissionRefundsItemNames = [];
-
-        foreach ($lineItemsForCommissionRefund as $lineItem) {
-            $commissionRefundCreatedSuccessfully = $this->allegroPaymentService->createCommissionRefund($lineItem['id'], $lineItem['quantity']);
-            if (!$commissionRefundCreatedSuccessfully) {
-                $itemName = $returnsByAllegroId[$lineItem['id']]['name'];
-                $unsuccessfulCommissionRefundsItemNames[] = $itemName;
-            }
-        }
+        $unsuccessfulCommissionRefundsItemNames = $this->allegroPaymentsReturnService->returnCommissionsAndReturnFailed($lineItemsForCommissionRefund, $returnsByAllegroId);
 
         if (count($unsuccessfulCommissionRefundsItemNames) > 0) {
             $message = "Zwrot płatności pomyślny! Nie udało się zwrócić prowizji dla następujących przedmiotów: " . implode(", ", $unsuccessfulCommissionRefundsItemNames);

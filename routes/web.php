@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AllegroBillingController;
+use App\Http\Controllers\AllegroReturnPaymentController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\EmailSettingsController;
@@ -587,8 +588,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/newAttachmentDeclaration', 'AllegroChatController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
             Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
 
-            Route::get('return-payment/{orderId}', 'AllegroReturnPaymentController@index')->name('returnPayment');
-            Route::post('return-payment/{orderId}', 'AllegroReturnPaymentController@store')->name('returnPayment');
+            Route::get('return-payment/{orderId}', [AllegroReturnPaymentController::class, 'index'])->name('returnPayment');
+            Route::post('return-payment/{orderId}', [AllegroReturnPaymentController::class, 'store'])->name('returnPayment');
         });
     });
 
