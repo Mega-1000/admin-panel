@@ -1947,6 +1947,9 @@
                             html += '<a href="{{ route('transactions.index') }}?email=' + data.email + '" class="btn edit btn-sm btn-success">Transakcje</a>';
                             @endif
                             html += `<a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>`;
+                            if (data.is_buying_admin_side) {
+                                html += `<a class="btn btn-primary" href="/admin/accept-products/${id}" target="__blank">Zapisz produkty w magazynie</a>`
+                            }
 
                             return html;
                         }

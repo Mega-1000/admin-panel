@@ -164,6 +164,7 @@ class Order extends Model implements Transformable
         'allegro_payment_id',
         'labels_log',
         'preferred_invoice_date',
+        'is_buying_admin_side',
     ];
 
     /**
