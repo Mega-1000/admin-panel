@@ -10,7 +10,7 @@ class ProductStockQuantityCalculationService
     public static function calculateQuantity(ProductStockPosition $productStockPosition): void
     {
         $stockQuantity = ProductStockPosition::where('product_stock_id', $productStockPosition->product_stock_id)
-            ->sum('product_stock_id');
+            ->sum('position_quantity');
 
         $productStock = ProductStock::find($productStockPosition->product_stock_id);
         $productStock->quantity = $stockQuantity;
