@@ -28,18 +28,19 @@ class AllegroBillingService extends AllegroApiService
         $billingEntries = [];
 
         do {
+            $queryParams['offset'] = $offset;
+            
             $url = $this->getRestUrlWithQuery('/billing/billing-entries', $queryParams);
 
             if (!($response = $this->request('GET', $url, []))) {
                 if (count($billingEntries) === 0) {
                     return false;
                 }
-                
+
                 break;
             }
 
             $offset += $limit;
-            $queryParams['offset'] = $offset;
 
             if (count($response['billingEntries']) !== $limit) {
                 break;
