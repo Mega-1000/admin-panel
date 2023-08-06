@@ -12,7 +12,7 @@ use InvalidArgumentException;
 
 class CourierFactory
 {
-    public static function create(string $courierName): DpdCourier|InpostCourier
+    public static function create(string $courierName): mixed
     {
         return match ($courierName) {
             CourierName::INPOST, CourierName::ALLEGRO_INPOST => new InpostCourier(),
