@@ -21,19 +21,32 @@
 
             <div class="mt-5">
                 <hr>
-                ___ |Aleja | Regał | Półka | Pozycja
-                <br>
-                @foreach($item->product->stock->position as $productStockPosition)
-                    <input type="checkbox" id="position[{{ $item->id }}][{{ $productStockPosition->id }}]" name="position[{{ $item->id }}][{{ $productStockPosition->id }}]">
-                    _{{ $productStockPosition->lane }} |
-                    ____{{ $productStockPosition->bookstand }} |
-                    ____{{ $productStockPosition->shelf }} |
-                    ______{{ $productStockPosition->position }} |
-                     <br>
-                @endforeach
-
-                Ilość produktów
-                <input class="form-control" type="text" name="quantity[{{ $item->id }}]quantity" value="{{ $item->quantity }}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Aleja</th>
+                        <th>Regał</th>
+                        <th>Półka</th>
+                        <th>Pozycja</th>
+                        <th>Ilość produktów</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($item->product->stock->position as $productStockPosition)
+                        <tr>
+                            <td>
+                                <input type="checkbox" id="position[{{ $item->id }}][{{ $productStockPosition->id }}]" name="position[{{ $item->id }}][{{ $productStockPosition->id }}]">
+                            </td>
+                            <td>{{ $productStockPosition->lane }}</td>
+                            <td>{{ $productStockPosition->bookstand }}</td>
+                            <td>{{ $productStockPosition->shelf }}</td>
+                            <td>{{ $productStockPosition->position }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+                <label for="quantity[{{ $item->id }}]">Ilość produktów</label>
+                <input class="form-control" type="text" name="quantity[{{ $item->id }}]" value="{{ $item->quantity }}">
             </div>
         @endforeach
 
