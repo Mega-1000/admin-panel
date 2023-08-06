@@ -767,4 +767,13 @@ class MessagesHelper
             ]
         );
     }
+
+    public static function sendAsCurrentUser(Order $order, string $message, int $chatArea = UserRole::Consultant) {
+        $messagesHelper = new self();
+            
+        $chat = $order->chat()->firstOrCreate();
+        $chatUser = $chat->chatUsers()->firstOrCreate(['user_id' => Auth::user()?->id]);
+        $messagesHelper->currentUserType = MessagesHelper::TYPE_USER;
+        $messagesHelper->addMessage($message, $chatArea, null, $chatUser, $chat);
+    }
 }

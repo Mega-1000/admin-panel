@@ -22,6 +22,10 @@ class ChatUser extends Model
         'assigned_messages_ids' => '{}',
     ];
 
+    public $fillable = [
+        'user_id',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

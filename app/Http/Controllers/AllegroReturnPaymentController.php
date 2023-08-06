@@ -6,6 +6,7 @@ use App\Helpers\AllegroReturnPaymentHelper;
 use App\DTO\AllegroPayment\AllegroReturnDTO;
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Helpers\MessagesHelper;
 use App\Services\AllegroOrderService;
 use App\Services\AllegroPaymentService;
 use App\Services\AllegroPaymentsReturnService;
@@ -58,13 +59,16 @@ class AllegroReturnPaymentController extends Controller
                 lineItems: $lineItemsForPaymentRefund,
             );
 
-            $refundCreatedSuccessfully = $this->allegroPaymentService->initiatePaymentRefund($data);
-            if (!$refundCreatedSuccessfully) {
+            $response = $this->allegroPaymentService->initiatePaymentRefund($data);
+            if (!$response) {
                 return redirect()->route('allegro-return.index', ['order' => $order])->with([
                     'message' => 'Nie udało się zwrócić płatności',
                     'alert-type' => 'error',
                 ]);
             }
+
+            $consultantNotice = $response['createdAt'] . "Zwrot płatności: " . $response['id'] . "o wartości" . $response['totalValue']['amount'];
+            MessagesHelper::sendAsCurrentUser($order, $consultantNotice);
         }
             
         $loopPreventionArray = [];
