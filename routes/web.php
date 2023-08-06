@@ -592,7 +592,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/newAttachmentDeclaration', 'AllegroChatController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
             Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
 
-            Route::get('return-payment/{order}', [AllegroReturnPaymentController::class, 'index'])->name('returnPayment');
+            Route::get('return-payment/{order}', [AllegroReturnPaymentController::class, 'index'])->name('returnPaymentPreview');
             Route::post('return-payment/{order}', [AllegroReturnPaymentController::class, 'store'])->name('returnPayment');
         });
     });
