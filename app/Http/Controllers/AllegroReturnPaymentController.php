@@ -6,8 +6,6 @@ use App\Helpers\AllegroReturnPaymentHelper;
 use App\DTO\AllegroPayment\AllegroReturnDTO;
 use App\Entities\Label;
 use App\Entities\Order;
-use App\Entities\OrderReturn;
-use App\Helpers\AllegroOrderHelper;
 use App\Services\AllegroOrderService;
 use App\Services\AllegroPaymentService;
 use App\Services\AllegroPaymentsReturnService;
@@ -25,9 +23,9 @@ class AllegroReturnPaymentController extends Controller
         private readonly AllegroPaymentsReturnService $allegroPaymentsReturnService,
     ) {}
     
-    public function index(int $orderId): RedirectResponse|View 
+    public function index(Order $order): RedirectResponse|View 
     {
-        $order = $this->allegroPaymentsReturnService->getOrderWithItems($orderId);
+        $order = $this->allegroPaymentsReturnService->getOrderItemsWithReturns($order);
 
         if (empty($order)) {
             return redirect()->route('orders.index')->with([
@@ -44,10 +42,8 @@ class AllegroReturnPaymentController extends Controller
         ]);
     }
 
-    public function store(Request $request, int $orderId): RedirectResponse
+    public function store(Request $request, Order $order): RedirectResponse
     {
-        $order = Order::with(['items', 'orderReturn'])->findOrFail($orderId);
-
         $allegroPaymentId = $order['allegro_payment_id'];
         $allegroOrder = $this->allegroOrderService->getOrderByPaymentId($allegroPaymentId);
         
@@ -64,7 +60,7 @@ class AllegroReturnPaymentController extends Controller
 
             $refundCreatedSuccessfully = $this->allegroPaymentService->initiatePaymentRefund($data);
             if (!$refundCreatedSuccessfully) {
-                return redirect()->route('allegro-return.index', ['orderId' => $orderId])->with([
+                return redirect()->route('allegro-return.index', ['order' => $order])->with([
                     'message' => 'Nie udało się zwrócić płatności',
                     'alert-type' => 'error',
                 ]);
@@ -78,7 +74,7 @@ class AllegroReturnPaymentController extends Controller
 
         if (count($unsuccessfulCommissionRefundsItemNames) > 0) {
             $message = "Zwrot płatności pomyślny! Nie udało się zwrócić prowizji dla następujących przedmiotów: " . implode(", ", $unsuccessfulCommissionRefundsItemNames);
-            return redirect()->route('allegro-return.index', ['orderId' => $orderId])->with([
+            return redirect()->route('allegro-return.index', ['order' => $order])->with([
                 'message' => $message
             ]);
         }

@@ -8,7 +8,7 @@
 
 @section('table')
     @if($order->items)
-        <form enctype="multipart/form-data" action="{{ action('AllegroReturnPaymentController@store', ['orderId' => $order->id])}}" method="POST" class="form-horizontal">
+        <form enctype="multipart/form-data" action="{{ action('AllegroReturnPaymentController@store', ['order' => $order])}}" method="POST" class="form-horizontal">
             @csrf
             <div class="grid">
                 @if(count($existingAllegroReturns) > 0)

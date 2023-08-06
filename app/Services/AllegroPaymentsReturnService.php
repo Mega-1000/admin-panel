@@ -44,15 +44,13 @@ class AllegroPaymentsReturnService
         return $order->payments()->where('operation_type', OrderPaymentsEnum::KWON_STATUS)->exists();
     }
 
-    public function getOrderWithItems(int $orderId): ?Order
+    public function getOrderItemsWithReturns(Order $order): ?Order
     {
-        $order = Order::with(['items'])->findOrFail($orderId);
-
         $hasOrderReturn = false;
 
-        foreach ($order['items'] as $item) {
+        foreach ($order->items as $item) {
             $productId = $item->product_id;
-            $orderReturn = OrderReturn::with(['product'])->where('product_id', $productId)->where('order_id', $orderId)->orderByDesc('created_at')->first();
+            $orderReturn = OrderReturn::with(['product'])->where('product_id', $productId)->where('order_id', $order->id)->orderByDesc('created_at')->first();
             if (empty($orderReturn)) {
                 $item['orderReturn'] = null;
                 continue;
