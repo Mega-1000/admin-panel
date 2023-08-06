@@ -31,7 +31,7 @@ class CheckPackagesStatusJob
     public function handle(): void
     {
         if (Auth::user() === null && $this->userId !== null) {
-            Auth::loginUsingId($this->userId)w;
+            Auth::loginUsingId($this->userId);
         }
 
         $orders = Order::whereHas('packages', function ($query) {
