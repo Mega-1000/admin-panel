@@ -43,19 +43,20 @@
                     <thead>
                     <tr>
                         <th>Checkbox</th>
+                        <th>Ilość produktów</th>
                         <th>Aleja</th>
                         <th>Regał</th>
                         <th>Półka</th>
                         <th>Pozycja</th>
-                        <th>Ilość produktów</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($item->product->stock->position as $productStockPosition)
                         <tr>
                             <td>
-                                <input type="checkbox" id="position[{{ $item->id }}][{{ $productStockPosition->id }}]" name="position[{{ $item->id }}][{{ $productStockPosition->id }}]">
+                                <input type="number" id="position[{{ $item->id }}][{{ $productStockPosition->id }}]" name="position[{{ $item->id }}][{{ $productStockPosition->id }}]">
                             </td>
+                            <td>{{ $productStockPosition->position_quantity }}</td>
                             <td>{{ $productStockPosition->lane }}</td>
                             <td>{{ $productStockPosition->bookstand }}</td>
                             <td>{{ $productStockPosition->shelf }}</td>
@@ -64,7 +65,6 @@
                     @endforeach
                     </tbody>
                 </table>
-                <label for="quantity[{{ $item->id }}]">Ilość produktów, przyjętych na stan (domyślnie ilość na zamówieniu)</label>
                 <input class="form-control" type="text" name="quantity[{{ $item->id }}]" value="{{ $item->quantity }}">
             </div>
         @endforeach
@@ -73,28 +73,4 @@
             Zapisz
         </button>
     </form>
-@endsection
-
-@section('javascript')
-    <script>
-        function handleCheckbox() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-
-            checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                    if (checkbox.checked) {
-                        const itemId = checkbox.id.split('[')[1].split(']')[0];
-                        const checkboxesInGroup = document.querySelectorAll(`input[id^="position[${itemId}]"]`);
-                        checkboxesInGroup.forEach(otherCheckbox => {
-                            if (otherCheckbox !== checkbox) {
-                                otherCheckbox.checked = false;
-                            }
-                        });
-                    }
-                });
-            });
-        }
-
-        handleCheckbox();
-    </script>
 @endsection

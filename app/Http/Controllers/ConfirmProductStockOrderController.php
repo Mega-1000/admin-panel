@@ -33,17 +33,23 @@ class ConfirmProductStockOrderController extends Controller
      */
     public function store(Order $order, ConfirmProductStockOrderRequest $request): RedirectResponse
     {
+        $sum = 0;
         foreach ($request->input('position') as $k => $v) {
             foreach ($v as $key => $value) {
                 $position = ProductStockPosition::find($key);
-                $position->position_quantity += $request->get('quantity')[$k];
+                $position->position_quantity += $value;
                 $position->save();
 
-                if (OrderItem::find($k)->quantity != $position->position_quantity) {
-                    $arr = [];
-                    AddLabelService::addLabels($order, [206], $arr, []);
-                }
+                $sum += $value;
             }
+
+
+            if (OrderItem::find()->quantity != $sum) {
+                $arr = [];
+                AddLabelService::addLabels($order, [206], $arr, []);
+            }
+
+            $sum = 0;
         }
 
         return redirect()->route('orders.index');
