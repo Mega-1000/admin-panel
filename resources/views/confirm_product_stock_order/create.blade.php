@@ -64,7 +64,7 @@
                     @endforeach
                     </tbody>
                 </table>
-                <label for="quantity[{{ $item->id }}]">Ilość produktów</label>
+                <label for="quantity[{{ $item->id }}]">Ilość produktów, przyjętych na stan (domyślnie ilość na zamówieniu)</label>
                 <input class="form-control" type="text" name="quantity[{{ $item->id }}]" value="{{ $item->quantity }}">
             </div>
         @endforeach
