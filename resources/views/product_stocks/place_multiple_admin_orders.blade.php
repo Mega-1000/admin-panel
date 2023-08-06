@@ -69,7 +69,7 @@
                         products: this.orders.map((item) => {
                             return {
                                 id: item.product.id,
-                                quantity: item.orderQuantity.calculatedQuantity
+                                quantity: parseInt(item.orderQuantity.calculatedQuantity)
                             }
                         }).filter((item) => item.quantity > 0 && document.getElementById(`checkbox-order-${item.id}`).checked),
                         clientEmail: document.getElementById('client-email').value

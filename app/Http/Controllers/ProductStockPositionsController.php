@@ -9,6 +9,8 @@ use App\Entities\ProductStockPosition;
 use App\Http\Requests\ProductStockPositionCreate;
 use App\Http\Requests\ProductStockPositionUpdate;
 use App\Services\Label\RemoveLabelService;
+use App\Services\ProductStockPositionService;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -24,12 +26,11 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class ProductStockPositionsController extends Controller
 {
-
     /**
      * @param ProductStockPositionCreate $request
      * @return RedirectResponse
      */
-    public function store(ProductStockPositionCreate $request)
+    public function store(ProductStockPositionCreate $request): RedirectResponse
     {
         $existingRecord = ProductStockPosition::where('lane', '=', $request->lane)
             ->where('bookstand', '=', $request->bookstand)
@@ -50,13 +51,8 @@ class ProductStockPositionsController extends Controller
         $productStockPosition = ProductStockPosition::create(
             array_merge(['product_stock_id' => $request->id], $request->all())
         );
-        $positionQuantity = $request->position_quantity;
-        $productStock = ProductStock::find($productStockPosition->product_stock_id);
-        if (empty($productStock)) {
-            abort(404);
-        }
-        $quantity = $productStock->quantity + $positionQuantity;
-        $productStock->update(['quantity' => $quantity]);
+        $productStock = ProductStock::findOrFail($productStockPosition->product_stock_id);
+
         $this->createLog('+' . $request->position_quantity, $productStock->id, $productStockPosition->id);
 
         return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
@@ -68,9 +64,10 @@ class ProductStockPositionsController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return Application|Factory|View
+     * @param $id
+     * @return View
      */
-    public function create($id)
+    public function create($id): View
     {
         return view('product_stocks.positions.create', compact('id'));
     }
@@ -81,13 +78,9 @@ class ProductStockPositionsController extends Controller
      * @param $position_id
      * @return RedirectResponse
      */
-    public function update(ProductStockPositionUpdate $request, $id, $position_id)
+    public function update(ProductStockPositionUpdate $request, $id, $position_id): RedirectResponse
     {
-        $productStockPosition = ProductStockPosition::find($position_id);
-
-        if (empty($productStockPosition)) {
-            abort(404);
-        }
+        $productStockPosition = ProductStockPosition::findOrFail($position_id);
 
         $productStockPosition->fill([
             'lane' => $request->lane,
@@ -95,6 +88,7 @@ class ProductStockPositionsController extends Controller
             'shelf' => $request->shelf,
             'position' => $request->position
         ]);
+
         if (array_intersect(['lane', 'bookstand', 'shelf', 'position'], array_keys($productStockPosition->getDirty()))) {
             $existingRecord = ProductStockPosition::query()
                 ->where('lane', '=', $request->lane)
@@ -116,27 +110,12 @@ class ProductStockPositionsController extends Controller
 
         $productStock = ProductStock::where(['product_id' => $id])->first();
 
-
         if ($request->different !== null) {
-            if (str_contains($request->different, '+') === true) {
-                $val = explode('+', $request->different);
-                $calc = $productStock->quantity + (int)$val[1];
-            } else if (str_contains($request->different, '-') === true) {
-                $val = explode('-', $request->different);
-                if ($val[1] > $productStockPosition->position_quantity) {
-                    return redirect()->back()->with([
-                        'message' => __('product_stocks.message.error_quantity'),
-                        'alert-type' => 'error'
-                    ]);
-                }
-                $calc = $productStock->quantity - (int)$val[1];
-            }
-
-            $productStock->update(['quantity' => $calc]);
             $this->createLog($request->different, $productStock->id, $productStockPosition->id);
         }
         $productStockPosition->update($request->all());
 
+        ProductStockPositionService::calculateQuantityForProductStock($productStock);
 
         return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
             'message' => __('product_stock_positions.message.update'),
@@ -151,7 +130,7 @@ class ProductStockPositionsController extends Controller
      * @param $position_id
      * @return Application|Factory|View
      */
-    public function edit(int $id, $position_id)
+    public function edit(int $id, $position_id): View|Factory|Application
     {
         $productStockPosition = ProductStockPosition::find($position_id);
 
@@ -163,9 +142,9 @@ class ProductStockPositionsController extends Controller
      * @param $position_id
      * @return RedirectResponse
      */
-    public function destroy($id, $position_id)
+    public function destroy($id, $position_id): RedirectResponse
     {
-        $productStockPosition = ProductStockPosition::find($position_id);
+        $productStockPosition = ProductStockPosition::findOrFail($position_id);
 
         if ($productStockPosition->position_quantity != 0) {
             return redirect()->route('product_stocks.edit', ['id' => $id, 'tab' => 'positions'])->with([
@@ -174,18 +153,12 @@ class ProductStockPositionsController extends Controller
             ]);
         }
 
-        if (empty($productStockPosition)) {
-            abort(404);
-        }
         $positionQuantity = $productStockPosition->position_quantity;
-        $productStock = ProductStock::find($productStockPosition->product_stock_id);
-        if (empty($productStock)) {
-            abort(404);
-        }
-        $quantity = $productStock->quantity - $positionQuantity;
-        $productStock->update(['quantity' => $quantity]);
+        $productStock = ProductStock::findOrFail($productStockPosition->product_stock_id);
+
         $productStockPosition->delete();
         $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id);
+
         return redirect()->route('product_stocks.edit', ['id' => $id, 'tab' => 'positions'])->with([
             'message' => __('product_stock_positions.message.delete'),
             'alert-type' => 'info'
@@ -193,9 +166,11 @@ class ProductStockPositionsController extends Controller
     }
 
     /**
+     * @param $id
      * @return JsonResponse
+     * @throws Exception
      */
-    public function datatable($id)
+    public function datatable($id): JsonResponse
     {
         $collection = $this->prepareCollection($id);
 
@@ -203,9 +178,10 @@ class ProductStockPositionsController extends Controller
     }
 
     /**
+     * @param $id
      * @return mixed
      */
-    public function prepareCollection($id)
+    public function prepareCollection($id): mixed
     {
         $collection = ProductStockPosition::where(['product_stock_id' => $id])->get();
 

@@ -61,6 +61,7 @@ use App\Repositories\LabelRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\OrderMessageRepository;
+use App\Repositories\OrderPackageRealCostsForCompany;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
@@ -76,6 +77,7 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\CalculateSubjectInvoiceBilansLabels;
 use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
@@ -399,6 +401,10 @@ class OrdersController extends Controller
             $package->realCostForCompany = $package->realCostsForCompany();
         }
 
+        $order->rc = OrderPackageRealCostsForCompany::getAllByOrderId(
+            $order->id
+        );
+
         if ($order->customer_id == 4128) {
             return view(
                 'orders.edit_self',
@@ -480,7 +486,7 @@ class OrdersController extends Controller
         );
     }
 
-    private function getVariations($order)
+    public function getVariations($order): array
     {
         $productsVariation = [];
 
@@ -1088,7 +1094,7 @@ class OrdersController extends Controller
      * @param $id
      * @return RedirectResponse
      */
-    public function update(OrderUpdateRequest $request, $id)
+    public function update(OrderUpdateRequest $request, $id): RedirectResponse
     {
         switch ($request->submit) {
             case 'update':
@@ -1097,12 +1103,12 @@ class OrdersController extends Controller
                 $this->store($request->all());
                 break;
         }
+
         WorkingEventsService::createEvent(WorkingEvents::ORDER_UPDATE_EVENT, $id);
 
-        $order = $this->orderRepository->find($id);
-        if (empty($order)) {
-            abort(404);
-        }
+        $order = Order::findOrFail($id);
+
+        CalculateSubjectInvoiceBilansLabels::handle($order);
 
         if ($request->input('status') != $order->status_id && empty(Auth::user()->userEmailData) && $request->input('shouldBeSent') == 'on') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
@@ -1562,7 +1568,7 @@ class OrdersController extends Controller
      *
      * @return RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $roleId = Auth::user()->role_id;
         if ($roleId != 1 && $roleId != 2) {
@@ -2725,6 +2731,7 @@ class OrdersController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         $data = $request->all();
+        [$collection, $countFiltred] = $this->orderDatatableService->prepareCollection($data);
         [$collection, $countFiltred] = $this->orderDatatableService->prepareCollection($data);
         $count = Order::with('payments')->get();
         $count = count($count);

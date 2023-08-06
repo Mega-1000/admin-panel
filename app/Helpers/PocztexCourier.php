@@ -3,7 +3,7 @@
 namespace App\Helpers;
 
 use App\Enums\PackageStatus;
-use App\Helpers\interfaces\ICourier;
+use App\Helpers\interfaces\iCourier;
 use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\envelopeStatusType;
 use App\Integrations\Pocztex\getEnvelopeContentShort;
@@ -11,7 +11,7 @@ use App\Integrations\Pocztex\getEnvelopeStatus;
 use App\Integrations\Pocztex\statusType;
 use Illuminate\Support\Facades\Log;
 
-class PocztexCourier implements ICourier
+class PocztexCourier implements iCourier
 {
     /**
      * @param $package

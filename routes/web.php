@@ -1,13 +1,17 @@
 <?php
 
+use App\Http\Controllers\AddLabelsCSVController;
 use App\Http\Controllers\AllegroBillingController;
 use App\Http\Controllers\AllegroReturnPaymentController;
+use App\Http\Controllers\ConfirmProductStockOrderController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\EmailSettingsController;
+use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\MailReportController;
 use App\Http\Controllers\OrdersMessagesController;
+use App\Http\Controllers\PackageProductOrderController;
 use App\Http\Controllers\ProductStocksController;
 use App\MailReport;
 use Illuminate\Support\Facades\Route;
@@ -593,6 +597,13 @@ Route::group(['prefix' => 'admin'], function () {
         });
     });
 
+    Route::get('/generate-real-cost-for-company-invoice-report', GenerateRealCostsForCompanyReportController::class)
+        ->name('generateRealCostForCompanyInvoiceReport');
+    Route::get('/create-package-product-order/{order}', [PackageProductOrderController::class, 'create'])
+        ->name('createPackageProductOrder');
+    Route::post('/create-package-product-order/{order}', [PackageProductOrderController::class, 'store'])
+        ->name('storePackageProductOrder');
+
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
@@ -628,9 +639,14 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::group([], __DIR__ . '/web/DiscountRoutes.php');
 
-    Route::post('/add-labels-from-csv-file', \App\Http\Controllers\AddLabelsCSVController::class)->name('add-labels-from-csv-file');
+    Route::post('/add-labels-from-csv-file', AddLabelsCSVController::class)->name('add-labels-from-csv-file');
 
     Route::get('/email-reports', [MailReportController::class, 'index'])->name('email-reports.index');
+
+    Route::get('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'create']);
+    Route::post('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'store']);
+
+    Route::get('/set-logs-permissions', fn () => \Illuminate\Support\Facades\Artisan::call('set-logs-permissions'));
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

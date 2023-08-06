@@ -9,7 +9,7 @@
 <div class="alert alert-info">
     <strong>Instrukcja obsługi:</strong>
     <p>
-        Ustawione maile, będą wysyłane o określinym czasie, np: 
+        Ustawione maile, będą wysyłane o określinym czasie, np:
         <code>0 - natychmiast po wybranym statusie</code>, <code>60 - 60 minut po wybranym statusie</code><br/><br/>
         W ustawieniach e-maili możesz używać nastepujących tagów:<br/>
         <code>[text]url_pliku[/text]</code> - plik w formacie txt<br/>
@@ -17,4 +17,7 @@
         <code>[link]url|title[/link]</code><br/>
         <em>*pliki umieszczamy w katalogu public</em>
     </p>
+    <a href="/admin/email-reports" class="btn btn-primary">
+        Zobacz raporty wysyłanych wiadomości
+    </a>
 </div>

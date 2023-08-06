@@ -6,6 +6,7 @@ use App\Providers\Entities\OrderAddressModelProvider;
 use App\Providers\Entities\OrderMessageModelServiceProvider;
 use App\Providers\Entities\OrderModelServiceProvider;
 use App\Providers\Entities\OrderPaymentModelServiceProvider;
+use App\Providers\Entities\ProductStockPositionModelServiceProvider;
 use App\Providers\Schenker\SchenkerServiceProvider;
 
 return [
@@ -204,6 +205,7 @@ return [
         OrderPaymentModelServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
 
+        ProductStockPositionModelServiceProvider::class,
         SchenkerServiceProvider::class,
         AppServiceProvider::class,
     ],

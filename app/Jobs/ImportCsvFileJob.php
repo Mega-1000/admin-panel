@@ -48,10 +48,6 @@ class ImportCsvFileJob implements ShouldQueue
 
     private $currentLine;
 
-    public function __construct()
-    {
-    }
-
     /**
      * @throws FileNotFoundException
      */
@@ -149,9 +145,11 @@ class ImportCsvFileJob implements ShouldQueue
             'deleted_at' => Carbon::now()
         ]);
 
-        $this->currentCategories = Categories::getElementsForCsvReloadJob();
-
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        $this->currentCategories = Categories::getElementsForCsvReloadJob();
+        Categories::deleteElementsForCsvReloadJob();
+
         DB::statement("TRUNCATE product_media");
         DB::statement("TRUNCATE product_trade_groups");
         DB::statement("TRUNCATE chimney_replacements");
@@ -405,8 +403,8 @@ class ImportCsvFileJob implements ShouldQueue
 
         if (!empty($array['newsletter'])) {
             $product->discounts()->create([
-                'old_price' => $product->getValue(),
-                'new_price' => $product->getValue(),
+                'old_price' => $product->value,
+                'new_price' => $product->value,
                 'description' => 'Newsletter',
             ]);
         }

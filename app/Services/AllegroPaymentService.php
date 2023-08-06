@@ -24,7 +24,6 @@ class AllegroPaymentService extends AllegroApiService {
         $endDateString = $endDate->format('Y-m-d\TH:i:s\Z');
         $limit = 50;
         $offset = 0;
-        $totalCount = 0;
 
         $payments = [];
 

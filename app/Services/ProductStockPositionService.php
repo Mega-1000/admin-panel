@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Repositories\ProductStockPositionRepository;
+use App\Entities\ProductStock;
+use App\Entities\ProductStockPosition;
 
 class ProductStockPositionService
 {
-    protected $productStockPositionRepository;
-
-    public function __construct(ProductStockPositionRepository $productStockPositionRepository)
-    {
-        $this->productStockPositionRepository = $productStockPositionRepository;
-    }
-
     /**
+     * @param int $positionQuantity
+     * @param int $packetQuantity
+     * @param int $productStockPositionId
+     * @param int $sign
      * @return mixed
      */
     public function updateProductPositionQuantity(
@@ -23,12 +21,27 @@ class ProductStockPositionService
         int $packetQuantity,
         int $productStockPositionId,
         int $sign
-    ) {
-        $positionQuantity = $sign ? $positionQuantity + $packetQuantity : $positionQuantity - abs($packetQuantity);
+    ): mixed
+    {
+        $positionQuantity = $sign
+            ? $positionQuantity + $packetQuantity :
+            $positionQuantity - abs($packetQuantity);
 
-        return $this->productStockPositionRepository->update([
+        return ProductStockPosition::find($productStockPositionId)->update([
             'position_quantity' => $positionQuantity,
-        ], $productStockPositionId);
+        ]);
+    }
+
+    /**
+     * @param ProductStock $productStock
+     * @return void
+     */
+    public static function calculateQuantityForProductStock(ProductStock $productStock): void
+    {
+        $productStock->update([
+            'quantity',
+            $productStock->position->sum('position_quantity'),
+        ]);
     }
 
 }

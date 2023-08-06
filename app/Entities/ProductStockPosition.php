@@ -3,6 +3,8 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -10,6 +12,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * Class ProductStockPosition.
  * @property int $id
  * @property int $position_quantity
+ * @property int $product_stock_id
  * @package namespace App\Entities;
  */
 class ProductStockPosition extends Model implements Transformable
@@ -31,9 +34,9 @@ class ProductStockPosition extends Model implements Transformable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function stock()
+    public function stock(): BelongsTo
     {
         return $this->belongsTo(ProductStock::class, 'product_stock_id', 'id');
     }
@@ -41,7 +44,7 @@ class ProductStockPosition extends Model implements Transformable
 
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function return(): HasMany
     {

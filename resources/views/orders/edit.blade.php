@@ -221,6 +221,11 @@
                            value="{{ $order->additional_cash_on_delivery_cost }}">
                 </div>
                 <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="packing_warehouse_cost">Bilans transportu</label>
+                    <input class="form-control priceChange sumChange" id="transport_bilans"
+                           name="transport_bilans" disabled>
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                     <label for="shipment_price_for_client">@lang('orders.form.shipment_price_for_client')</label>
                     <input type="text" class="form-control sumChange" id="shipment_price_for_client"
                            name="shipment_price_for_client"
@@ -2313,7 +2318,7 @@
                                                class="form-control item-profit priceChange"
                                                data-item-id="{{$item->id}}" disabled
                                                name="item-profit"
-                                               value="{{ number_format(($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }}">
+                                               value="{{ number_format(($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23) + $item->additional_cash_on_delivery_cost, 2) }}">
                                     </td>
                                     <td colspan="3"></td>
                                 </tr>
@@ -3631,7 +3636,7 @@
                             let value = [];
 
                             real_costs_for_company.map(function (item) {
-                                value.push('<span>' + item.cost + '</span>');
+                                value.push('<span>' + item.cost + ' ' + item.invoice_num + '</span>');
                             })
 
                             return value.join('<br />');
@@ -3769,30 +3774,30 @@
 
             function updateProfit() {
                 commaReplace('.priceChange');
-                var gross_purchase_price_sum = 0;
-                var net_purchase_price_sum = 0;
-                var gross_selling_price_sum = 0;
-                var net_selling_price_sum = 0;
+                let gross_purchase_price_sum = 0;
+                let net_purchase_price_sum = 0;
+                let gross_selling_price_sum = 0;
+                let net_selling_price_sum = 0;
                 $('.productsTableEdit .gross_purchase_price_commercial_unit').each(function () {
-                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
-                    var gross_selling_price = $('.gross_selling_price_commercial_unit[data-item-id="' + $(this).data('item-id') + '"]').val();
+                    const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    const gross_selling_price = $('.gross_selling_price_commercial_unit[data-item-id="' + $(this).data('item-id') + '"]').val();
                     gross_purchase_price_sum += $(this).val() * quantity;
-                    var gross_purchase_price = $(this).val() * quantity;
-                    var sellingSum = gross_selling_price * quantity;
-                    var weightSum = parseFloat($('[name="weight_trade_unit[' + $(this).data('item-id') + ']').val()) * quantity;
-                    var profitItem = ((gross_selling_price * quantity) - gross_purchase_price).toFixed(2);
+                    const gross_purchase_price = $(this).val() * quantity;
+                    const sellingSum = gross_selling_price * quantity;
+                    const weightSum = parseFloat($('[name="weight_trade_unit[' + $(this).data('item-id') + ']').val()) * quantity;
+                    const profitItem = ((gross_selling_price * quantity) - gross_purchase_price).toFixed(2);
 
-                    var unitCommercialName = $('[name="unit_commercial_name[' + $(this).data('item-id') + ']"]').val();
+                    const unitCommercialName = $('[name="unit_commercial_name[' + $(this).data('item-id') + ']"]').val();
 
-                    var unitBasicUnits = $('[name="unit_basic_units[' + $(this).data('item-id') + ']"]').val();
-                    var unitBasicName = $('[name="unit_basic_name[' + $(this).data('item-id') + ']"]').val();
+                    const unitBasicUnits = $('[name="unit_basic_units[' + $(this).data('item-id') + ']"]').val();
+                    const unitBasicName = $('[name="unit_basic_name[' + $(this).data('item-id') + ']"]').val();
 
-                    var unitCalculationUnits = $('[name="calculation_unit_units[' + $(this).data('item-id') + ']"]').val();
-                    var unitCalculationConsumption = $('[name="calculation_unit_consumption[' + $(this).data('item-id') + ']"]').val();
-                    var unitCalculationName = $('[name="calculation_unit_name[' + $(this).data('item-id') + ']"]').val();
+                    const unitCalculationUnits = $('[name="calculation_unit_units[' + $(this).data('item-id') + ']"]').val();
+                    const unitCalculationConsumption = $('[name="calculation_unit_consumption[' + $(this).data('item-id') + ']"]').val();
+                    const unitCalculationName = $('[name="calculation_unit_name[' + $(this).data('item-id') + ']"]').val();
 
-                    var unitCollectiveUnits = $('[name="unit_of_collective_units[' + $(this).data('item-id') + ']"]').val();
-                    var unitCollectiveName = $('[name="unit_of_collective_name[' + $(this).data('item-id') + ']"]').val();
+                    const unitCollectiveUnits = $('[name="unit_of_collective_units[' + $(this).data('item-id') + ']"]').val();
+                    const unitCollectiveName = $('[name="unit_of_collective_name[' + $(this).data('item-id') + ']"]').val();
 
                     $('[name="unit_commercial[' + $(this).data('item-id') + ']"]').val(quantity + ' ' + unitCommercialName);
                     $('[name="unit_basic[' + $(this).data('item-id') + ']"]').val(quantity * unitBasicUnits + ' ' + unitBasicName);
@@ -3803,25 +3808,28 @@
                     $('input.item-value[data-item-id="' + $(this).data('item-id') + '"]').val(parseFloat(sellingSum).toFixed(2) + ' zł');
                 });
                 $('.productsTableEdit .net_purchase_price_commercial_unit').each(function () {
-                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     net_purchase_price_sum += $(this).val() * quantity;
                 });
                 $('.productsTableEdit .gross_selling_price_commercial_unit').each(function () {
-                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     gross_selling_price_sum += $(this).val() * quantity;
                 });
                 $('.productsTableEdit .net_selling_price_commercial_unit').each(function () {
-                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     net_selling_price_sum += $(this).val() * quantity;
                 });
-                if ($('#additional_service_cost').val() == '') {
+                if ($('#additional_service_cost').val() === '') {
                     additionalServiceCost = 0;
                 } else {
                     additionalServiceCost = parseFloat($('#additional_service_cost').val());
                 }
-                var profit = ((gross_selling_price_sum - gross_purchase_price_sum)).toFixed(2);
-                var total_price = gross_selling_price_sum.toFixed(2);
+
+                const profit = ((gross_selling_price_sum - gross_purchase_price_sum) +
+                    parseFloat($('#additional_cash_on_delivery_cost').val() == '' ? 0 : $('#additional_cash_on_delivery_cost').val())).toFixed(2);
+                const total_price = gross_selling_price_sum.toFixed(2);
                 console.log('Total ' + total_price);
+
                 $('input#profit').val(profit);
                 $('input#total_price').val(total_price);
                 $("#profitInfo").val($('#profit').val());
@@ -3835,6 +3843,9 @@
                     ).toFixed(2))
                 $("#weightInfo").val($("#weight").val());
             }
+            $('#additional_cash_on_delivery_cost').on('change', function () {
+                updateProfit();
+            });
 
             $('.quantityChange').on('change', function () {
                 updateOrderSum();
@@ -3847,45 +3858,47 @@
             $(document).on('change', 'input.price', function () {
                     commaReplace('.priceChange');
 
-                    var itemId = $(this).data('item-id');
+                const itemId = $(this).data('item-id');
 
-                    var net_purchase_price_commercial_unit = $('.net_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
-                    var net_purchase_price_basic_unit = $('.net_purchase_price_basic_unit[data-item-id="' + itemId + '"');
-                    var net_purchase_price_calculated_unit = $('.net_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
-                    var net_purchase_price_aggregate_unit = $('.net_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
-                    var net_selling_price_commercial_unit = $('.net_selling_price_commercial_unit[data-item-id="' + itemId + '"');
-                    var net_selling_price_basic_unit = $('.net_selling_price_basic_unit[data-item-id="' + itemId + '"');
-                    var net_selling_price_calculated_unit = $('.net_selling_price_calculated_unit[data-item-id="' + itemId + '"');
-                    var net_selling_price_aggregate_unit = $('.net_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+                const net_purchase_price_commercial_unit = $('.net_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
+                const net_purchase_price_basic_unit = $('.net_purchase_price_basic_unit[data-item-id="' + itemId + '"');
+                const net_purchase_price_calculated_unit = $('.net_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
+                const net_purchase_price_aggregate_unit = $('.net_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
+                const net_selling_price_commercial_unit = $('.net_selling_price_commercial_unit[data-item-id="' + itemId + '"');
+                const net_selling_price_basic_unit = $('.net_selling_price_basic_unit[data-item-id="' + itemId + '"');
+                const net_selling_price_calculated_unit = $('.net_selling_price_calculated_unit[data-item-id="' + itemId + '"');
+                const net_selling_price_aggregate_unit = $('.net_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
 
-                    var gross_purchase_price_commercial_unit = $('.gross_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
-                    var gross_purchase_price_basic_unit = $('.gross_purchase_price_basic_unit[data-item-id="' + itemId + '"');
-                    var gross_purchase_price_calculated_unit = $('.gross_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
-                    var gross_purchase_price_aggregate_unit = $('.gross_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
-                    var gross_selling_price_commercial_unit = $('.gross_selling_price_commercial_unit[data-item-id="' + itemId + '"');
-                    var gross_selling_price_basic_unit = $('.gross_selling_price_basic_unit[data-item-id="' + itemId + '"');
-                    var gross_selling_price_calculated_unit = $('.gross_selling_price_calculated_unit[data-item-id="' + itemId + '"');
-                    var gross_selling_price_aggregate_unit = $('.gross_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+                const gross_purchase_price_commercial_unit = $('.gross_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
+                const gross_purchase_price_basic_unit = $('.gross_purchase_price_basic_unit[data-item-id="' + itemId + '"');
+                const gross_purchase_price_calculated_unit = $('.gross_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
+                const gross_purchase_price_aggregate_unit = $('.gross_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
+                const gross_selling_price_commercial_unit = $('.gross_selling_price_commercial_unit[data-item-id="' + itemId + '"');
+                const gross_selling_price_basic_unit = $('.gross_selling_price_basic_unit[data-item-id="' + itemId + '"');
+                const gross_selling_price_calculated_unit = $('.gross_selling_price_calculated_unit[data-item-id="' + itemId + '"');
+                const gross_selling_price_aggregate_unit = $('.gross_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
 
-                    var numbers_of_basic_commercial_units_in_pack = $('.numbers_of_basic_commercial_units_in_pack[data-item-id="' + itemId + '"');
-                    var number_of_sale_units_in_the_pack = $('.number_of_sale_units_in_the_pack[data-item-id="' + itemId + '"');
-                    var number_of_trade_items_in_the_largest_unit = $('.number_of_trade_items_in_the_largest_unit[data-item-id="' + itemId + '"');
-                    var unit_consumption = $('.unit_consumption[data-item-id="' + itemId + '"');
+                const numbers_of_basic_commercial_units_in_pack = $('.numbers_of_basic_commercial_units_in_pack[data-item-id="' + itemId + '"');
+                const number_of_sale_units_in_the_pack = $('.number_of_sale_units_in_the_pack[data-item-id="' + itemId + '"');
+                const number_of_trade_items_in_the_largest_unit = $('.number_of_trade_items_in_the_largest_unit[data-item-id="' + itemId + '"');
+                const unit_consumption = $('.unit_consumption[data-item-id="' + itemId + '"');
 
-                    var net_purchase_price_commercial_unit_value = 0;
-                    if (!$(this).hasClass('gross_purchase_price_commercial_unit')) {
-                        net_purchase_price_commercial_unit_value = parseFloat(net_purchase_price_commercial_unit.val());
-                    } else {
-                        net_purchase_price_commercial_unit_value = parseFloat(gross_purchase_price_commercial_unit.val() / 1.23);
-                    }
-                    var net_purchase_price_basic_unit_value = 0;
-                    if (!$(this).hasClass('gross_purchase_price_basic_unit')) {
-                        net_purchase_price_basic_unit_value = parseFloat(net_purchase_price_basic_unit.val());
-                    } else {
-                        net_purchase_price_basic_unit_value = parseFloat(gross_purchase_price_basic_unit.val() / 1.23);
-                    }
-                    var net_purchase_price_aggregate_unit_value = 0;
-                    if (!$(this).hasClass('gross_purchase_price_aggregate_unit')) {
+                let net_purchase_price_commercial_unit_value = 0;
+                if (!$(this).hasClass('gross_purchase_price_commercial_unit')) {
+                    net_purchase_price_commercial_unit_value = parseFloat(net_purchase_price_commercial_unit.val());
+                } else {
+                    net_purchase_price_commercial_unit_value = parseFloat(gross_purchase_price_commercial_unit.val() / 1.23);
+                }
+
+                let net_purchase_price_basic_unit_value = 0;
+                if (!$(this).hasClass('gross_purchase_price_basic_unit')) {
+                    net_purchase_price_basic_unit_value = parseFloat(net_purchase_price_basic_unit.val());
+                } else {
+                    net_purchase_price_basic_unit_value = parseFloat(gross_purchase_price_basic_unit.val() / 1.23);
+                }
+
+                let net_purchase_price_aggregate_unit_value = 0;
+                if (!$(this).hasClass('gross_purchase_price_aggregate_unit')) {
                         net_purchase_price_aggregate_unit_value = parseFloat(net_purchase_price_aggregate_unit.val());
                     } else {
                         net_purchase_price_aggregate_unit_value = parseFloat(gross_purchase_price_aggregate_unit.val() / 1.23);
@@ -4250,8 +4263,8 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (data) {
-                        var currentId = $('.id').length;
-                        var id = parseInt(currentId) + 1;
+                        const currentId = $('.id').length;
+                        const id = parseInt(currentId) + 1;
 
                         $('#products-tbody:last-child').append(
                             '<tr class="id" id="id[' + id + ']">\n' +
@@ -4359,9 +4372,8 @@
                     }
                 });
             });
-            var sh = 0;
+            let sh = 0;
             $('input.change-order').on('change', function () {
-                //   $('#new-order').show();
                 sh = 1;
             });
 
@@ -4372,8 +4384,6 @@
                     $('#new-order').show();
                 }
             });
-
-            //  $('#new-order').hide();
         });
 
         function commaReplace(cssClass) {
@@ -4384,17 +4394,6 @@
 
         $(document).ready(function () {
             commaReplace('.priceChange');
-            let valueOfItemsGross;
-            let packingWarehouseCost;
-            let shipmentPriceForClient;
-            let additionalServiceCost;
-
-            if ($('#additional_service_cost').val() == '') {
-                additionalServiceCost = 0;
-            } else {
-                additionalServiceCost = parseFloat($('#additional_service_cost').val());
-            }
-
 
             let profit = parseFloat($('#profit').val().replace(',', ''));
             $("#profitInfo").val(profit);
@@ -4405,17 +4404,15 @@
             $('.sumChange').on('change', function () {
                 updateOrderSum();
             });
-
-
         });
 
         function updateOrderSum(profit = null) {
-            if ($('#totalPriceInfo').val() == '') {
+            if ($('#totalPriceInfo').val() === '') {
                 valueOfItemsGross = 0;
             } else {
                 valueOfItemsGross = parseFloat($('#orderItemsSum').val().replace(',', ''));
             }
-            if ($('#additional_cash_on_delivery_cost').val() == '') {
+            if ($('#additional_cash_on_delivery_cost').val() === '') {
                 packingWarehouseCost = 0;
             } else {
                 packingWarehouseCost = parseFloat($('#additional_cash_on_delivery_cost').val());
@@ -4433,13 +4430,24 @@
                 additionalServieCost = parseFloat($('#additional_service_cost').val());
             }
 
-            if (profit == 1) {
+            if (profit === 1) {
                 $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
             }
             let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
             $('#orderValueSum').val(sum.toFixed(2));
             $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
         }
+        setTimeout(() => {
+            updateTransportBilans();
+        }, 1000);
+
+        function updateTransportBilans() {
+            $('#transport_bilans').val($('#shipment_price_for_client').val() - parseFloat({{ $order->rc }})).val()
+        }
+
+        $('#shipment_price_for_client').on('change', function () {
+            updateTransportBilans();
+        });
 
         $('#status').on('change', function () {
             $('#shouldBeSent').attr('checked', true);
@@ -4485,7 +4493,6 @@
                 let name = '[name="modal_quantity_commercial[' + itemId + ']"]';
                 let base = $(this).next().find('[name="base[' + itemId + ']"]');
                 let productQuantity = $(name);
-                let productQuantityValue = productQuantity.val();
                 productQuantity.val(productQuantity.val() - $(this).val());
                 let leftClass = '[name="left[' + $(this).data('item-id') + ']"]';
                 let quantityLeft = base.text() - sumSplitOrdersQuantity(itemId);
@@ -4947,7 +4954,7 @@
             $('.message-row').each(function() {
                 const area = String($(this).data('area'));
 
-                selectedArea == area ? $(this).show() : $(this).hide();
+                selectedArea === area ? $(this).show() : $(this).hide();
             });
             scrollBottom();
             $('html, body').scrollTop(

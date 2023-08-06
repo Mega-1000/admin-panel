@@ -5,11 +5,11 @@ namespace App\Helpers;
 use App\Entities\OrderPackage;
 use App\Enums\CourierStatus\DpdPackageStatus;
 use App\Enums\PackageStatus;
-use App\Helpers\interfaces\ICourier;
+use App\Helpers\interfaces\iCourier;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Request;
 
-class DpdCourier implements ICourier
+class DpdCourier implements iCourier
 {
     use CourierTrait;
 

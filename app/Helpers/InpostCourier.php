@@ -5,13 +5,13 @@ namespace App\Helpers;
 use App\Entities\OrderPackage;
 use App\Enums\CourierStatus\InpostPackageStatus;
 use App\Enums\PackageStatus;
-use App\Helpers\interfaces\ICourier;
+use App\Helpers\interfaces\iCourier;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use OutOfRangeException;
 use Symfony\Component\HttpFoundation\Request;
 
-class InpostCourier implements ICourier
+class InpostCourier implements iCourier
 {
     use CourierTrait;
 

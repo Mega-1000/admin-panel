@@ -17,6 +17,7 @@ class ImportAllegroBillingController extends Controller
     ): RedirectResponse
     {
         $data = $DTOFactory->createFromFile($request->file('file'));
+
         $importAllegroBillingService->import($data);
 
         return redirect()->back()->with('success', 'Imported successfully');

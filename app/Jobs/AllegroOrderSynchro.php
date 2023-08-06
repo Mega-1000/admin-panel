@@ -25,6 +25,8 @@ use App\Helpers\LabelsHelper;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPackagesDataHelper;
+use App\Helpers\PdfCharactersHelper;
+use App\Helpers\StringHelper;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
@@ -554,6 +556,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $country = Country::firstOrCreate(['iso2' => $data['address']['countryCode'] ?? $data['countryCode']], ['name' => $data['address']['countryCode'] ?? $data['countryCode']]);
 
         $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber'] ?? $data['address']['phoneNumber']);
+        
         $customerAddressData = [
             'type' => $type,
             'firstname' => $data['firstName'] ?? $data['address']['naturalPerson']['firstName'] ?? null,
@@ -574,20 +577,96 @@ class AllegroOrderSynchro implements ShouldQueue
         $customerAddress->save();
     }
 
+    private function getAddressOneWord(string $address): array 
+    {
+        $flatNo = "";
+        $lettersInARow = 0;
+
+        $addressReverseArray = array_reverse(str_split($address));
+        foreach ($addressReverseArray as $i => $character) {
+            $characterIsNumeric = is_numeric($character);
+            if ($characterIsNumeric || $character == '/') {
+                if ($characterIsNumeric && $lettersInARow > 0) {
+                    $charactersToAdd = array_slice($addressReverseArray, $i - $lettersInARow, $lettersInARow);
+                    $flatNo = StringHelper::addCharactersInReverseOrder($flatNo, $charactersToAdd);
+                }
+                
+                $lettersInARow = 0;
+                $flatNo = $character . $flatNo;
+                continue;
+            } 
+            
+            $lettersInARow++;
+            if ($lettersInARow >= 3) {
+                break;
+            }
+        }
+
+        $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));
+        $flatNo = trim($flatNo);
+
+        return [$street, $flatNo];
+    }
+
+    private function getAddressMultipleWords(string $address): array 
+    {
+        $address = StringHelper::removeMultipleSpaces($address);
+
+        list($street, $flatNo) = StringHelper::separateLastWord($address);
+
+        $rememberString = "";
+        $streetReverseArray = array_reverse(explode(" ", $street));
+        foreach ($streetReverseArray as $part) {
+            if (StringHelper::hasThreeLettersInARow($part)) {
+                list($_, $toAddFlatNo) = $this->getAddressOneWord($part);
+                if ($rememberString != "") {
+                    $toAddFlatNo .= " " . $rememberString;
+                }
+                $flatNo = $toAddFlatNo . " " . $flatNo;
+                break;
+            }
+
+            if (StringHelper::isAlpha($part)) {
+                if ($rememberString != "") {
+                    break;
+                }
+
+                $rememberString = $part;
+                continue;
+            }
+
+            if ($rememberString != "") {
+                $part .= " " . $rememberString;
+                $rememberString = "";
+            }
+
+            $flatNo = $part . " " . $flatNo;
+        }
+        
+        $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));
+        $flatNo = trim($flatNo);
+        
+        return [$street, $flatNo];
+    }
+
     /**
      * @param $address
      *
      * @return array
      */
-    private function getAddress($address): array
+    private function getAddress(string $address): array
     {
-        $addressArray = explode(' ', $address);
-        $lastKey = array_key_last($addressArray);
-        $flatNo = $addressArray[$lastKey];
-        unset($addressArray[$lastKey]);
-        $street = implode(' ', $addressArray);
-        return [$street, $flatNo];
+        $toRemove = ['ul.', 'Ul.', 'nr.', 'Nr.'];
+        $address = str_replace($toRemove, '', $address);
+        $address = trim($address);
+
+        if (str_contains($address, ' ')) {
+            return $this->getAddressMultipleWords($address);
+        }
+
+        return $this->getAddressOneWord($address);
     }
+    
 
     /**
      * Create or update order address.
@@ -617,10 +696,15 @@ class AllegroOrderSynchro implements ShouldQueue
 
         list($code, $phone) = Helper::prepareCodeAndPhone($address['phoneNumber']);
 
+        if (isset($address['naturalPerson'])) {
+            $address['firstName'] = $address['naturalPerson']['firstName'];
+            $address['lastName'] = $address['naturalPerson']['lastName'];
+        }
+
         $addressData = [
             'type' => $type,
-            'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'] ?? null,
-            'lastname' => $address['lastName'] ?? $address['naturalPerson']['lastName'] ?? null,
+            'firstname' => $address['firstName'] ?? null,
+            'lastname' => $address['lastName'] ?? null,
             'address' => $street,
             'flat_number' => $flatNo,
             'city' => $address['city'],

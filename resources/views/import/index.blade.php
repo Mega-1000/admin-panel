@@ -185,5 +185,19 @@
             </div>
         </div>
     </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-bordered">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                           Generuj raport rzeczywistych kosztów - listy przewozowe
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <a href="{{ route('generateRealCostForCompanyInvoiceReport') }}" class="btn btn-primary" id="generate-report">Generuj raport</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 </div>
 @endsection

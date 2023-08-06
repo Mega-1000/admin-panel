@@ -19,6 +19,18 @@ class Categories
             ->get();
     }
 
+    public static function deleteElementsForCsvReloadJob(): void
+    {
+        Category::query()
+            ->Where('save_name', '=', true)
+            ->orWhere('save_description','=', true)
+            ->orWhere('save_image','=', true)
+            ->orWhere('artificially_created','=', false)
+            ->each(function (Category $category) {
+                $category->delete();
+            });
+    }
+
     public static function getElementsForCsvReloadJobByParentId($id): Collection
     {
         return Category::query()

@@ -8,6 +8,7 @@ use App\Helpers\GlsCourier;
 use App\Helpers\InpostCourier;
 use App\Helpers\JasCourier;
 use App\Helpers\PocztexCourier;
+use InvalidArgumentException;
 
 class CourierFactory
 {
@@ -19,7 +20,7 @@ class CourierFactory
             CourierName::GLS                                 => new GlsCourier(),
             CourierName::JAS                                 => new JasCourier(),
             CourierName::POCZTEX                             => new PocztexCourier(),
-            default => throw new \InvalidArgumentException("Invalid courier name: $courierName"),
+            default                                          => throw new InvalidArgumentException("Invalid courier name: $courierName"),
         };
     }
 }

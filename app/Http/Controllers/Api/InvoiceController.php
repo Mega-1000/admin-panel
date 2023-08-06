@@ -14,8 +14,7 @@ readonly class InvoiceController
      */
     public function __construct(
         private InvoiceService $invoiceService,
-    ) {
-    }
+    ) {}
 
     /**
      * @param Order $order
