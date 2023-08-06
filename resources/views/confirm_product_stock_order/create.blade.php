@@ -21,8 +21,13 @@
 
             <div class="mt-5">
                 <hr>
+                Aleja | Regał | Półka | Posycja
                 @foreach($item->product->stock->position as $productStockPosition)
-                    <input type="checkbox" id="position[{{ $item->id }}][{{ $productStockPosition->id }}]" name="position[{{ $item->id }}][{{ $productStockPosition->id }}]">{{ $productStockPosition->lane }} | {{ $productStockPosition->bookstand }} {{ $productStockPosition->shelf }} {{ $productStockPosition->position }}
+                    <input type="checkbox" id="position[{{ $item->id }}][{{ $productStockPosition->id }}]" name="position[{{ $item->id }}][{{ $productStockPosition->id }}]">
+                    {{ $productStockPosition->lane }} |
+                    {{ $productStockPosition->bookstand }} |
+                    {{ $productStockPosition->shelf }} |
+                    {{ $productStockPosition->position }} |
                      <br>
                 @endforeach
 
