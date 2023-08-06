@@ -1,4 +1,6 @@
-<?php namespace App\Services;
+<?php 
+
+namespace App\Services;
 
 use App\Entities\AllegroOrder;
 use App\Entities\Order;
@@ -390,5 +392,16 @@ class AllegroOrderService extends AllegroApiService
         $response = $this->request('PUT', $url, $params);
 
         return $response;
+    }
+
+    public function getOrderByPaymentId(string $paymentId): array
+    {
+        $url = $this->getRestUrl("/order/checkout-forms?payment.id=" . $paymentId);
+
+        if (!($response = $this->request('GET', $url, []))) {
+            return [];
+        }
+
+        return $response['checkoutForms'][0];
     }
 }

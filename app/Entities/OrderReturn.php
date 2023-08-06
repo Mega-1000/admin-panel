@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderReturn extends Model
 {
@@ -23,5 +24,10 @@ class OrderReturn extends Model
     public function getImageUrl(): ?string
     {
         return $this->photo ? asset('storage/'.str_replace('public/','/',$this->photo)) : null;
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class)->withTrashed();
     }
 }

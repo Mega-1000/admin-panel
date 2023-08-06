@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AddLabelsCSVController;
 use App\Http\Controllers\AllegroBillingController;
+use App\Http\Controllers\AllegroReturnPaymentController;
 use App\Http\Controllers\ConfirmProductStockOrderController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
@@ -590,6 +591,9 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/messagesPreview/{threadId}', 'AllegroChatController@messagesPreview')->name('messagesPreview');
             Route::post('/newAttachmentDeclaration', 'AllegroChatController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
             Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
+
+            Route::get('return-payment/{order}', [AllegroReturnPaymentController::class, 'index'])->name('returnPayment');
+            Route::post('return-payment/{order}', [AllegroReturnPaymentController::class, 'store'])->name('returnPayment');
         });
     });
 

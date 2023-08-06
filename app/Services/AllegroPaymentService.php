@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Services;
+
+use App\DTO\AllegroPayment\AllegroReturnDTO;
 use Carbon\Carbon;
 
 class AllegroPaymentService extends AllegroApiService {
@@ -8,22 +10,22 @@ class AllegroPaymentService extends AllegroApiService {
 
     private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 
-    public function getPaymentsFromLastDay(): array {
+    public function getPaymentsFromLastDay(): array 
+    {
         $startDate = Carbon::yesterday()->startOfDay();
         $endDate = Carbon::yesterday()->endOfDay();
 
         return $this->getPaymentsBetweenDates($startDate, $endDate);
     }
 
-    public function getPaymentsBetweenDates(Carbon $startDate, Carbon $endDate): array {
+    public function getPaymentsBetweenDates(Carbon $startDate, Carbon $endDate): array 
+    {
         $startDateString = $startDate->format('Y-m-d\TH:i:s\Z');
         $endDateString = $endDate->format('Y-m-d\TH:i:s\Z');
         $limit = 50;
         $offset = 0;
 
         $payments = [];
-
-        var_dump($startDateString, $endDateString);
 
         do {
             $query_params = [
@@ -84,5 +86,62 @@ class AllegroPaymentService extends AllegroApiService {
 
 
         return $payments;
+    }
+
+    public function getRefundsByPaymentId(string $paymentId): array 
+    {
+        $url = $this->getRestUrl("/payments/refunds?payment.id=" . $paymentId);
+
+        if (!($response = $this->request('GET', $url, []))) {
+            return [];
+        }
+
+        $uncancelledRefunds = array_filter($response['refunds'], function ($refund) {
+            return $refund['status'] !== "CANCELED";
+        });
+
+        return $uncancelledRefunds;
+    }
+
+    /**
+     * tworzy zwrot płatności
+     * @param AllegroReturnDTO $allegroReturnDTO
+     * @return bool - czy udało się stworzyć zwrot płatności
+     */
+    public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): bool
+    {
+        $url = $this->getRestUrl("/payments/refunds");
+
+        $data = $allegroReturnDTO->toAllegroRefundArray();
+
+        if (!($response = $this->request('POST', $url, $data))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Tworzy zwrot prowizji dla podanego lineItemId
+     * @param string $lineItemId
+     * @param int $quantity
+     * @return bool - czy udało się stworzyć zwrot prowizji
+     */
+    public function createCommissionRefund(string $lineItemId, int $quantity): bool 
+    {
+        $data = [
+            "lineItem" => [
+                "id" => $lineItemId
+            ],
+            "quantity" => $quantity
+        ];
+
+        $url = $this->getRestUrl("/order/refund-claims");
+
+        if (!($response = $this->request('POST', $url, $data))) {
+            return false;
+        }
+
+        return true;
     }
 }
