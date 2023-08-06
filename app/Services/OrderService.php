@@ -109,7 +109,8 @@ class OrderService
                 'customer_id' => $customer->id,
                 'status_id' => 1,
                 'last_status_update_date' => Carbon::now(),
-                'customer_notices' => 'Zamówienie stworzone przez administratora'
+                'customer_notices' => 'Zamówienie stworzone przez administratora',
+                'is_buying_admin_side' => true,
             ]);
 
             $products = $dto->products;

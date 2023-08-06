@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AddLabelsCSVController;
 use App\Http\Controllers\AllegroBillingController;
+use App\Http\Controllers\ConfirmProductStockOrderController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\EmailSettingsController;
@@ -633,9 +635,12 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::group([], __DIR__ . '/web/DiscountRoutes.php');
 
-    Route::post('/add-labels-from-csv-file', \App\Http\Controllers\AddLabelsCSVController::class)->name('add-labels-from-csv-file');
+    Route::post('/add-labels-from-csv-file', AddLabelsCSVController::class)->name('add-labels-from-csv-file');
 
     Route::get('/email-reports', [MailReportController::class, 'index'])->name('email-reports.index');
+
+    Route::get('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'create']);
+    Route::post('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'store']);
 
     Route::get('/set-logs-permissions', fn () => \Illuminate\Support\Facades\Artisan::call('set-logs-permissions'));
 });
