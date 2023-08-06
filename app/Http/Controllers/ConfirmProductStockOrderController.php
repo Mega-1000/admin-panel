@@ -44,10 +44,6 @@ class ConfirmProductStockOrderController extends Controller
             }
 
 
-            if (OrderItem::find($k)->quantity != $sum) {
-                $arr = [];
-                AddLabelService::addLabels($order, [206], $arr, []);
-            }
 
             $sum = 0;
         }
