@@ -14,8 +14,8 @@
                 {{ $item->product->product_name_manufacturer }} |
                 {{ $item->product->supplier_product_symbol }} |
                 {{ $item->product->packing->unit_commercial }} |
-                {{ $item->product->packing->unit_of_collective }} |
                 {{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }} |
+                {{ $item->product->packing->unit_of_collective }} |
                 {{ $item->product->packing->number_of_sale_units_in_the_pack }}
             </h3>
 
