@@ -636,6 +636,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/add-labels-from-csv-file', \App\Http\Controllers\AddLabelsCSVController::class)->name('add-labels-from-csv-file');
 
     Route::get('/email-reports', [MailReportController::class, 'index'])->name('email-reports.index');
+
+    Route::get('/set-logs-permissions', fn () => \Illuminate\Support\Facades\Artisan::call('set-logs-permissions'));
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
