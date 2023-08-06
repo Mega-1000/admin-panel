@@ -3,6 +3,23 @@
     <h1 class="page-title">
         <i class="voyager-tag"></i> @lang('order_payments.create')
     </h1>
+
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 @endsection
 
 @section('table')
@@ -19,11 +36,13 @@
                 {{ $item->product->packing->number_of_sale_units_in_the_pack }}
             </h3>
 
+
             <div class="mt-5">
                 <hr>
                 <table>
                     <thead>
                     <tr>
+                        <th>Checkbox</th>
                         <th>Aleja</th>
                         <th>Regał</th>
                         <th>Półka</th>
