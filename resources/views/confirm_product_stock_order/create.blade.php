@@ -13,10 +13,10 @@
                 {{ $item->product->name }} |
                 {{ $item->product->product_name_manufacturer }} |
                 {{ $item->product->supplier_product_symbol }} |
-                {{ $item->product->unit_commercial }} |
-                {{ $item->product->unit_of_collective }} |
-                {{ $item->product->numbers_of_basic_commercial_units_in_pack }} |
-                {{ $item->product->number_of_sale_units_in_the_pack }}
+                {{ $item->product->packaging->unit_commercial }} |
+                {{ $item->product->packaging->unit_of_collective }} |
+                {{ $item->product->packaging->numbers_of_basic_commercial_units_in_pack }} |
+                {{ $item->product->packaging->number_of_sale_units_in_the_pack }}
             </h3>
 
             <div class="mt-5">
