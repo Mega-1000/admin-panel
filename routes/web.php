@@ -641,6 +641,8 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::get('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'create']);
     Route::post('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'store']);
+
+    Route::get('/set-logs-permissions', fn () => \Illuminate\Support\Facades\Artisan::call('set-logs-permissions'));
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
