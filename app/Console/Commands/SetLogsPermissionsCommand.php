@@ -29,7 +29,7 @@ class SetLogsPermissionsCommand extends Command
     public function handle(): int
     {
         $this->info( 'Setting permissions for storage/logs' );
-        $this->info( shell_exec( 'chmod -R 777 storage/logs' ) );
+        $this->info( shell_exec( 'chmod -R 777 /var/www/admin-mega/storage/logs' ) );
         $this->info( 'Done' );
 
         return CommandAlias::SUCCESS;
