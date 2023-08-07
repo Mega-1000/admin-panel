@@ -23,6 +23,14 @@
     <button style="height: 36px; margin-bottom: 8px;" type="submit" form="orders" id="submitOrderAndStay" name="submit"
             value="updateAndStay"
             class="btn btn-primary">@lang('voyager.generic.saveAndStay')</button>
+    <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
+    <a target="_blank" class="btn btn-primary" style="height: 36px; margin-bottom: 8px;" href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
+        for="add-item">
+        Edytuj zamówienie w koszyku
+    </a>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="height: 36px; margin-bottom: 8px;">
+        Podziel zamówienie
+    </button>
 @endsection
 
 @section('table')
@@ -35,7 +43,7 @@
             </ul>
         </div>
     @endif
-    <div style="margin-bottom: 15px;" class="tab">
+    <div style="margin-bottom: 10px;" class="tab">
         <button class="btn btn-primary active"
                 name="change-button-form" id="button-general"
                 value="general">@lang('orders.form.buttons.details')</button>
@@ -308,8 +316,8 @@
                                name="left_to_pay_on_delivery" disabled>
                     </div>
                 </div>
-                <div style="width: 25%; margin-left: 3px;">
-                    <h4>Dane zamówienia</h4>
+                <div style="width: 25%;">
+                    <h4 style="padding-left: 23px">Dane zamówienia</h4>
                     <table style="border-collapse: separate; border-spacing: 25px 5px;">
                         <thead>
                           <tr>
@@ -496,7 +504,7 @@
                           </tr>
                         </tbody>
                     </table>
-                    <div>
+                    <div style="padding-left: 23px">
                     @if($orderDeliveryAddressErrors->any())
                         <div style="float: left; color: red">
                             Błędy danych do wysyłki: {!! implode(' ', $orderDeliveryAddressErrors->all(':message')) !!}
@@ -508,12 +516,12 @@
                         </div>
                     @endif
                     </div>
-                    <div style="margin-top: 3px">
+                    <div style="margin-top: 3px; padding-left: 23px">
                         <a href="/admin/orders/{{$order->id}}/getDataFromLastOrder" class="btn btn-success">Pobierz dane z
                             ostatniego zamówienia</a>
                         <a href="/admin/orders/{{$order->id}}/getDataFromCustomer" class="btn btn-success">Pobierz dane
                             klienta</a>
-                        <div>
+                        <div style="width: 50%">
                             <label for="firms_data">Symbol firmy</label>
                             <input type="text" class="form-control" id="firms_data" name="firms_data"
                                 value="MEGA-OLAWA">
@@ -526,13 +534,6 @@
                 <div style="width: 10%">
                     <h4>Dane z allegro</h4>
                     <div style="float: left; padding: 1px">
-                        <label for="allegro_form_id">Identyfikator zamówienia w
-                            allegro</label>
-                        <input type="text" class="form-control" id="allegro_form_id"
-                                name="allegro_form_id"
-                                value="{{ $order->allegro_form_id ?? '' }}">
-                    </div>
-                    <div style="float: left; padding: 1px">
                         <label 
                                for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
                         <input type="text" class="form-control" id="customer.nick_allegro"
@@ -540,24 +541,28 @@
                                 value="{{ $order->customer->nick_allegro ?? ''}}" disabled readonly>
                     </div>
                     <div style="float: left; padding: 1px">
+                        <label for="allegro_form_id">ID zamówienia</label>
+                        <input type="text" class="form-control" id="allegro_form_id"
+                                name="allegro_form_id"
+                                value="{{ $order->allegro_form_id ?? '' }}">
+                    </div>
+                    <div style="float: left; padding: 1px">
+                        <label for="allegro_payment_id">ID płatności</label>
+                        <input type="text" class="form-control" id="allegro_payment_id"
+                                name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
+                    </div>
+                    <div style="float: left; padding: 1px">
                         <label 
-                               for="allegro_transaction_id">@lang('orders.form.allegro_transaction_id')</label>
+                               for="allegro_transaction_id">Numer transakcji</label>
                         <input type="text" class="form-control" id="allegro_transaction_id"
                                 name="allegro_transaction_id"
                                 value="{{ $order->allegro_transaction_id ?? '' }}">
                     </div>
                     <div style="float: left; padding: 1px">
-                        <label for="allegro_operation_date">Data operacji w
-                            allegro</label>
+                        <label for="allegro_operation_date">Data operacji</label>
                         <input type="date" class="form-control" id="allegro_operation_date"
                                 name="allegro_operation_date"
                                 value="{{ (isset($order->allegro_operation_date)) ? Carbon::parse($order->allegro_operation_date)->format('Y-m-d') : null }}">
-                    </div>
-                    <div style="float: left; padding: 1px">
-                        <label for="allegro_payment_id">Identyfikator płatności
-                            allegro</label>
-                        <input type="text" class="form-control" id="allegro_payment_id"
-                                name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
                     </div>
                     <div style="float: left; padding: 1px">
                         <label for="refund_id">Numer zwrotu</label>
@@ -575,8 +580,7 @@
                                 name="refunded" value="{{ $order->refunded }}">
                     </div>
                     <div style="float: left; padding: 1px">
-                        <label for="return_payment_id">Identyfikator zwrotu
-                            płatności</label>
+                        <label for="return_payment_id">ID zwrotu płatności</label>
                         <input type="text" class="form-control" id="return_payment_id"
                                 name="return_payment_id" value="{{ $order->return_payment_id }}">
                     </div>
@@ -687,17 +691,6 @@
                     </div>
                 </div>
             </div>
-                <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
-                <div class="form-group" style="widht: 100%; float: left;">
-                    <a target="_blank" class="btn btn-primary" href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
-                       for="add-item">
-                        Edytuj zamówienie w koszyku
-                    </a>
-                    <br>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                        Podziel zamówienie
-                    </button>
-                </div>
                 <h3 style="clear: both;">Produkty</h3>
                 <button type="button" class="btn btn-success" onclick="loadAllegroPrices()">
                     Przelicz po cenach allegro
@@ -1213,7 +1206,6 @@
                     <textarea cols="40" rows="50" style="height: 300px;" class="form-control editor" id="mail_message"
                               name="mail_message"></textarea>
                 </div>
-                <h3>Dane klienta</h3>
                 <h3>Etykiety (kasowanie etykiet nie wywołuje dodatkowych konsekwencji)</h3>
                 @foreach($order->labels as $label)
                     <div class="border" id="label_{{ $label->id }}">
