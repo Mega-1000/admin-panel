@@ -69,6 +69,10 @@ class AllegroReturnPaymentController extends Controller
 
             $consultantNotice = $response['createdAt'] . "Zwrot płatności: " . $response['id'] . "o wartości" . $response['totalValue']['amount'];
             MessagesHelper::sendAsCurrentUser($order, $consultantNotice);
+
+            $order->update([
+                'return_payment_id' => $response['id'],
+            ]);
         }
             
         $loopPreventionArray = [];
