@@ -133,7 +133,8 @@ class OrderPackage extends Model implements Transformable
                 "/storage/jas/labels/label$this->sending_number.pdf"
             ],
             'GIELDA' => "/storage/gielda/stickers/sticker$this->letter_number.pdf",
-            'ODBIOR_OSOBISTY' => "/storage/odbior_osobisty/stickers/sticker$this->letter_number.pdf"
+            'ODBIOR_OSOBISTY' => "/storage/odbior_osobisty/stickers/sticker$this->letter_number.pdf",
+            'DB' => "/storage/db_schenker/stickers/sticker$this->sending_number.pdf"
         ];
 
         $path = '';

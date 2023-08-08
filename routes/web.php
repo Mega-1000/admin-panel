@@ -11,9 +11,9 @@ use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\MailReportController;
 use App\Http\Controllers\OrdersMessagesController;
+use App\Http\Controllers\OrdersPackagesController;
 use App\Http\Controllers\PackageProductOrderController;
 use App\Http\Controllers\ProductStocksController;
-use App\MailReport;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -435,6 +435,8 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@preparePackageToSend')->name('orders.package.prepareToSend');
         Route::get('orders/package/{package_id}/sticker',
             'OrdersPackagesController@getSticker')->name('orders.package.getSticker');
+
+        Route::get('orders/packages/{package}/sticker', [OrdersPackagesController::class, 'getStickerFile'])->name('orders.packages.getStickerFile');
 
         Route::get('import', 'ImportController@index')->name('import.index');
         Route::post('products/stocks/changes', 'ProductStocksController@productsStocksChanges')->name('productsStocks.changes');

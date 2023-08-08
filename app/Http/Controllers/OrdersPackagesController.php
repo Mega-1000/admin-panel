@@ -45,6 +45,7 @@ use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -610,7 +611,7 @@ class OrdersPackagesController extends Controller
     /**
      * @throws FileNotFoundException
      */
-    public function getSticker(Request $request, $id)
+    public function getSticker(int $id)
     {
         $package = OrderPackage::find($id);
         if (empty($package)) {
@@ -1104,5 +1105,21 @@ class OrdersPackagesController extends Controller
             ]);
         }
         return $pdf->download($pdfFilename);
+    }
+
+    public function getStickerFile(OrderPackage $package): View|RedirectResponse
+    {
+        $path = $package->getPathToSticker();
+        if ($package->delivery_courier_name === 'GLS') {
+            $path = route('orders.package.getSticker', ['package_id' => $package->id]);
+        }
+
+        if ($package->sticker_has_been_printed) {
+            return view('orderPackages.print-sticker-confirmation', ['path' => $path]);
+        }
+
+        $package->sticker_has_been_printed = true;
+        $package->save();
+        return redirect($path);
     }
 }
