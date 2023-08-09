@@ -45,25 +45,25 @@
         @foreach($expenses as $operation)
             <tr>
                 <td>
-                    {{ $operation->id }}
+                    {{ $operation['id'] ?? '' }}
                 </td>
                 <td>
-                    {{ $operation->offer_name }}
+                    {{ $operation['offer_name'] ?? '' }}
                 </td>
                 <td>
-                    {{ $operation->offer_identification }}
+                    {{ $operation['offer_identification'] ?? '' }}
                 </td>
                 <td>
-                    {{ $operation->operation_type }}
+                    {{ $operation['operation_type'] ?? '' }}
                 </td>
                 <td>
-                    {{ $operation->debit }}
+                    {{ $operation['debit'] ?? ''}}
                 </td>
                 <td>
-                    {{ $operation->credit }}
+                    {{ $operation['credit'] ?? '' }}
                 </td>
                 <td>
-                    {{ $operation->operation_details }}
+                    {{ $operation['operation_details'] ?? '' }}
                 </td>
             </tr>
         @endforeach
