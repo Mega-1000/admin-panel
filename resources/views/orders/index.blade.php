@@ -1453,6 +1453,10 @@
                         $('[data-toggle="transport-exchange-tooltip"]').tooltip();
                         $('[data-toggle="label-tooltip"]').tooltip();
 
+                        // make all tooltips font bigger
+                        $('.tooltip-inner').css('font-size', '11.2em');
+                        $('.tooltip-inner').css('font-weight', 'bold');
+
                         setDeleteEventListeners();
                     }, 1000);
 
