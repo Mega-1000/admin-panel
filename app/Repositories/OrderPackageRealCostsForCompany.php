@@ -28,7 +28,7 @@ class OrderPackageRealCostsForCompany {
      * @param int $order
      * @return Collection
      */
-    public static function getAllCostsByOrder(int $order): Collection
+    public static function getAllCostsByOrder(int $order): mixed
     {
         return Order::find($order)->packages->map(function ($orderPackage) {
             return $orderPackage->realCostsForCompany;
