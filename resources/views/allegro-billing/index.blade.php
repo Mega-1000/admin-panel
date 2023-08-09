@@ -69,8 +69,4 @@
         @endforeach
     </table>
 
-    <div style="display: block !important;" class="d-flex justify-content-center">
-        {{ $expenses->links() }}
-    </div>
-
 @endsection
