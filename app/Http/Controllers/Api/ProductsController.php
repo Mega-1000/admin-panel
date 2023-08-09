@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Entities\Category;
 use App\Entities\ChimneyAttribute;
 use App\Entities\Product;
+use App\Entities\Warehouse;
 use App\Helpers\MessagesHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetHiddenProductsRequest;
 use App\Http\Requests\GetProductsForChimneyRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Repositories\Categories;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
@@ -35,10 +37,10 @@ class ProductsController extends Controller
     use Paginatable;
 
     public function __construct(
-        protected readonly ProductRepository       $repository,
-        protected readonly WarehouseRepository     $warehouseRepository,
-        protected readonly ProductPriceRepository  $productPriceRepository,
-        protected readonly ProductsService         $productsService,
+        protected readonly ProductRepository      $repository,
+        protected readonly WarehouseRepository    $warehouseRepository,
+        protected readonly ProductPriceRepository $productPriceRepository,
+        protected readonly ProductsService        $productsService,
     ) {}
 
     /**
@@ -47,10 +49,7 @@ class ProductsController extends Controller
      */
     public function getProductsForPriceUpdates($id): array
     {
-        $warehouse = $this->warehouseRepository->find($id);
-        if (empty($warehouse)) {
-            abort(404);
-        }
+        $warehouse = Warehouse::findOrFail($id);
 
         $products = $this->repository->findWhere([
             ['product_name_supplier', '=', $warehouse->symbol]
@@ -241,7 +240,7 @@ class ProductsController extends Controller
         return response(json_encode($tree));
     }
 
-    private function parseTree($tree,  $root = 0): array
+    private function parseTree($tree, $root = 0): array
     {
         $return = [];
 
@@ -289,5 +288,14 @@ class ProductsController extends Controller
             'replacements' => $replacements['replacements'],
             'products_replace' => $replaceProducts
         ]));
+    }
+
+    public function update(Product $product, UpdateProductRequest $request): JsonResponse
+    {
+        $product->update($request->validated());
+
+        return response()->json([
+            'message' => 'success'
+        ]);
     }
 }

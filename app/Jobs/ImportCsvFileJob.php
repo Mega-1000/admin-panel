@@ -15,6 +15,7 @@ use App\Entities\Warehouse;
 use App\Repositories\Categories;
 use DateTime;
 use Exception;
+use FontLib\TrueType\Collection;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -47,6 +48,7 @@ class ImportCsvFileJob implements ShouldQueue
     private array $jpgData = [];
 
     private $currentLine;
+    private $existingProducts;
 
     /**
      * @throws FileNotFoundException
@@ -110,6 +112,9 @@ class ImportCsvFileJob implements ShouldQueue
                         $productAnalyze->parse_url = $line[500];
                     }
 
+                    /** @var Product $existingProducts */
+                    $existingProduct = $this->existingProducts->where('symbol', $array['symbol'])->where('save_name', false)->first();
+
                     $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
                         $this->productsRelated[$categoryColumn . '-' . $multiCalcBase] = $product->id;
@@ -118,6 +123,11 @@ class ImportCsvFileJob implements ShouldQueue
                         $product->category_id = Entities\Product::find($product->parent_id)->category_id;
                         $product->save();
                     }
+
+                    $product->update([
+                        'save_name' => $existingProduct?->save_name ?? true,
+                        'name' => $existingProduct?->name ?? $product->name,
+                    ]);
                 }
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
             } catch (Exception $e) {
@@ -134,6 +144,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function clearTables()
     {
+        $this->existingProducts = Product::where('save_name', false)->get();
         Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
         Product::withTrashed()->update([
             'category_id' => null,

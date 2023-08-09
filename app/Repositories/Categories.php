@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Entities\Category;
 use App\Entities\Product;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Categories
@@ -63,5 +64,15 @@ class Categories
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
             ->orderBy('priority')
             ->orderBy('name');
+    }
+
+    public static function getCategoryWithAllChimneyAttributesOptions(int $id): Model
+    {
+        return Category::with([
+            'chimneyAttributes' => function ($q) {
+                $q->with('options');
+            }
+        ])
+        ->find($id);
     }
 }
