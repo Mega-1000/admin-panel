@@ -29,34 +29,34 @@
                     <div style="display: flex; margin-top: 5px;">
                         <div style="width: 40%">
                             <h4 style="display: flex; margin-right: 10px">
-                                <img src="{!! $item->orderReturn->product->getImageUrl() !!}" style="width: 50%; height: 130px;">
+                                <img src="{!! $item->product->getImageUrl() !!}" style="width: 50%; height: 130px;">
                                 <div style="width: 50%"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }}
-                                (symbol: {{ $item->orderReturn->product->symbol }})</div>
+                                (symbol: {{ $item->product->symbol }})</div>
                             </h4>
                         </div>
                         <div style="width: 60%; display: flex; justify-content: space-around">
                             <div>
                                 <p>Ilość nieuszkodzona: {{ $item->orderReturn->quantity_undamaged }}</p>
-                                <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][quantityUndamaged]" value="{{ $item->orderReturn->quantity_undamaged }}">
+                                <input type="hidden" name="return[{{$item->product->symbol}}][quantityUndamaged]" value="{{ $item->orderReturn->quantity_undamaged }}">
                                 <p>Ilość uszkodzona: {{ $item->orderReturn->quantity_damaged }}</p>
-                                <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][quantityDamaged]" value="{{ $item->orderReturn->quantity_damaged }}">
-                                <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][price]" value={{$item->gross_selling_price_commercial_unit}}>
-                                <input type="hidden" name="return[{{$item->orderReturn->product->symbol}}][name]" value="{{ $item->product->name }}">
+                                <input type="hidden" name="return[{{$item->product->symbol}}][quantityDamaged]" value="{{ $item->orderReturn->quantity_damaged }}">
+                                <input type="hidden" name="return[{{$item->product->symbol}}][price]" value={{$item->gross_selling_price_commercial_unit}}>
+                                <input type="hidden" name="return[{{$item->product->symbol}}][name]" value="{{ $item->product->name }}">
                                 <p>Cena: {{ $item->gross_selling_price_commercial_unit }}</p>
                             </div>
                             <div>
                                 <div>
-                                    <input type="checkbox" id="deductionCheck-{{$item->orderReturn->product->symbol}}"
-                                            name="return[{{$item->orderReturn->product->symbol}}][deductionCheck]">
-                                    <label for="deductionCheck-{{$item->orderReturn->product->symbol}}">Potrącić kwotę?</label>
+                                    <input type="checkbox" id="deductionCheck-{{$item->product->symbol}}"
+                                            name="return[{{$item->product->symbol}}][deductionCheck]">
+                                    <label for="deductionCheck-{{$item->product->symbol}}">Potrącić kwotę?</label>
                                 </div>
                                 <div>
                                     <input class="return-deduction" type="number" min="0" step="0.01" max="{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}"
-                                            name="return[{{$item->orderReturn->product->symbol}}][deduction]" disabled="true" value="29.90" id="deduction-{{$item->orderReturn->product->symbol}}">
-                                    <label for="deduction-{{$item->orderReturn->product->symbol}}">Wartość potrącenia</label>
+                                            name="return[{{$item->product->symbol}}][deduction]" disabled="true" value="29.90" id="deduction-{{$item->product->symbol}}">
+                                    <label for="deduction-{{$item->product->symbol}}">Wartość potrącenia</label>
                                 </div>
                                 <p>Wartość zwrotu: 
-                                    <span id="value-{{$item->orderReturn->product->symbol}}">{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}</span>
+                                    <span id="value-{{$item->product->symbol}}">{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}</span>
                                 </p>
                             </div>
                         </div>
@@ -74,15 +74,15 @@
         $(document).ready(function() {
             @foreach($order->items as $item)
             @if($item->orderReturn != null)
-                $(`#deduction-${$.escapeSelector('{{$item->orderReturn->product->symbol}}')}`).ready(function() {
+                $(`#deduction-${$.escapeSelector('{{$item->product->symbol}}')}`).ready(function() {
                     $(this).val(Math.min(29.90, {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}}));
                 })
 
-                $(`#deductionCheck-${$.escapeSelector('{{$item->orderReturn->product->symbol}}')}`).change(function() {
+                $(`#deductionCheck-${$.escapeSelector('{{$item->product->symbol}}')}`).change(function() {
                     const isChecked = $(this).is(':checked');
-                    const valueEl = $(`#value-${$.escapeSelector('{{$item->orderReturn->product->symbol}}')}`);
+                    const valueEl = $(`#value-${$.escapeSelector('{{$item->product->symbol}}')}`);
 
-                    const deductionInput = $(`#deduction-${$.escapeSelector('{{$item->orderReturn->product->symbol}}')}`);
+                    const deductionInput = $(`#deduction-${$.escapeSelector('{{$item->product->symbol}}')}`);
                     deductionInput.prop('disabled', !$(this).is(':checked'));
                     
                     let newValue = {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}};
@@ -90,7 +90,7 @@
                     newValue = newValue.toFixed(2)
                     valueEl.text(newValue);
                 });
-                $(`#deduction-${$.escapeSelector('{{$item->orderReturn->product->symbol}}')}`).change(function() {
+                $(`#deduction-${$.escapeSelector('{{$item->product->symbol}}')}`).change(function() {
                     let value = $(this).val();
                     const max = parseFloat($(this).prop('max'));
                     if (parseFloat($(this).val()) > max) {
@@ -98,7 +98,7 @@
                         value = max;
                     }
                     const newValue = ({{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}} - value).toFixed(2);
-                    $(`#value-${$.escapeSelector('{{$item->orderReturn->product->symbol}}')}`).text(newValue);
+                    $(`#value-${$.escapeSelector('{{$item->product->symbol}}')}`).text(newValue);
                 });
             @endif
             @endforeach
