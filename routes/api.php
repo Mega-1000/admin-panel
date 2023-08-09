@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\OrderPackageController;
+use App\Http\Controllers\Api\ProductsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,6 +53,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('update-category', 'Api\CategoriesController@updateCategory')->name('api.categories.update-category');
         Route::post('categories/create', 'Api\CategoriesController@create')->name('api.categories.create');
         Route::delete('categories/delete/{category}', 'Api\CategoriesController@delete')->name('api.categories.delete');
+
+        Route::post('products/{product}', [ProductsController::class, 'update'])->name('api.products.update');
     });
 });
 
