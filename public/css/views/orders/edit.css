@@ -3,7 +3,7 @@
 }
 
 .is-empty-info select,
-.is-empty-info input{
+.is-empty-info input {
     border-color: #c40804;
     border-width: 3px;
 }
@@ -26,4 +26,58 @@
 
 .scrollable-notice {
     overflow: scroll;
+}
+
+.header-button {
+    height: 36px;
+    margin-bottom: 8px;
+}
+
+.switch-button {
+    float: right;
+    margin-right: 15px;
+}
+
+.flex-around {
+    display: flex;
+    justify-content: space-around;
+}
+
+.order-data-column {
+    width: 15%;
+    padding: 5px 15px;
+    border-right: 1px solid gray;
+}
+
+.order-data-bigger-column {
+    width: 25%;
+    padding: 5px 15px;
+    border-right: 1px solid gray;
+}
+
+.order-data-column:last-of-type {
+    border-right: none;
+}
+
+.order-data-input {
+    float: left;
+    padding: 1px;
+}
+
+.pl-23px {
+    padding-left: 23px;
+}
+
+.order-data-input-error {
+    float: left;
+    color: red;
+}
+
+.flex2 {
+    display: flex;
+}
+
+.table-spacing {
+    border-collapse: separate;
+    border-spacing: 25px 5px;
 }
