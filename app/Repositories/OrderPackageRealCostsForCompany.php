@@ -25,12 +25,12 @@ class OrderPackageRealCostsForCompany {
     }
 
     /**
-     * @param Order $order
+     * @param int $order
      * @return Collection
      */
-    public static function getAllCostsByOrder(Order $order): Collection
+    public static function getAllCostsByOrder(int $order): Collection
     {
-        return $order->packages->map(function ($orderPackage) {
+        return Order::find($order)->packages->map(function ($orderPackage) {
             return $orderPackage->realCostsForCompany;
         });
     }
