@@ -74,7 +74,7 @@ class AllegroReturnPaymentController extends Controller
                 ]);
             }
 
-            $consultantNotice = $response['createdAt'] . "Zwrot płatności: " . $response['id'] . "o wartości" . $response['totalValue']['amount'];
+            $consultantNotice = $response['createdAt'] . " Zwrot płatności: " . $response['id'] . " o wartości " . $response['totalValue']['amount'];
             MessagesHelper::sendAsCurrentUser($order, $consultantNotice);
 
             $order->update([

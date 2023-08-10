@@ -36,9 +36,10 @@
                         </div>
                         <div style="width: 60%; display: flex; justify-content: space-around">
                             <div>
-                                <p>Ilość nieuszkodzona: {{ $item->orderReturn->quantity_undamaged }}</p>
+                                <p>Ilość zakupiona: {{ $item->quantity }}</p>
+                                <p>Ilość zwrócona nieuszkodzona: {{ $item->orderReturn->quantity_undamaged }}</p>
                                 <input type="hidden" name="return[{{$item->product->symbol}}][quantityUndamaged]" value="{{ $item->orderReturn->quantity_undamaged }}">
-                                <p>Ilość uszkodzona: {{ $item->orderReturn->quantity_damaged }}</p>
+                                <p>Ilość zwrócona uszkodzona: {{ $item->orderReturn->quantity_damaged }}</p>
                                 <input type="hidden" name="return[{{$item->product->symbol}}][quantityDamaged]" value="{{ $item->orderReturn->quantity_damaged }}">
                                 <input type="hidden" name="return[{{$item->product->symbol}}][price]" value={{$item->gross_selling_price_commercial_unit}}>
                                 <input type="hidden" name="return[{{$item->product->symbol}}][name]" value="{{ $item->product->name }}">
