@@ -26,6 +26,13 @@ class AllegroReturnPaymentController extends Controller
     
     public function index(Order $order): RedirectResponse|View 
     {
+        if (empty($order->allegro_payment_id)) {
+            return redirect()->route('orders.index')->with([
+                'message' => 'Ta oferta nie jest ofertą Allegro',
+                'alert-type' => 'error',
+            ]);
+        }
+
         $order = $this->allegroPaymentsReturnService->getOrderItemsWithReturns($order);
 
         if (empty($order)) {
