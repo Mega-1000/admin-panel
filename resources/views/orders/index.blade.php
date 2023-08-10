@@ -5,8 +5,7 @@
     use App\Enums\ProductStockError;
     use App\User; @endphp
 
-@extends
-    ('layouts.datatable')
+@extends('layouts.datatable')
 
 @section('app-header')
     <h1 class="page-title">
