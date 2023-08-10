@@ -217,7 +217,7 @@ class MessagesController extends Controller
         }
 
         $allEmployeesFromRelatedOrders = [];
-        if (get_class($order) === Order::class && $isStyrofoarm) {
+        if (isset($order) && get_class($order) === Order::class && $isStyrofoarm) {
             StyrofoarmAuctionService::updateAuction($chat, $products);
 
             $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
