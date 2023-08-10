@@ -9,6 +9,7 @@ use App\Entities\OrderPayment;
 use App\Repositories\OrderPackageRealCostsForCompany;
 use App\Repositories\SpeditionExchangeRepository;
 use Carbon\Carbon;
+use Cookie;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,8 @@ readonly class OrderDatatableService
 {
     public function __construct(
         private SpeditionExchangeRepository $speditionExchangeRepository
-    ) {
+    )
+    {
         $this->dtColumns = [
             'clientFirstname' => 'customer_addresses.firstname',
             'clientLastname' => 'customer_addresses.lastname',
@@ -75,11 +77,6 @@ readonly class OrderDatatableService
                 if (Auth::user()->role_id == 4) {
                     $query->where('orders.employee_id', '=', Auth::user()->id);
                 }
-            })->where(function ($query) use (&$selectAllDates) {
-                if ($selectAllDates === 'false') {
-                    $query->where('orders.created_at', '>', Carbon::now()->addMonths(-3))
-                        ->orWhere('orders.updated_at', '>', Carbon::now()->addMonths(-3));
-                }
             });
     }
 
@@ -89,7 +86,7 @@ readonly class OrderDatatableService
      * @param bool $minId
      * @return array
      */
-    public function prepareCollection($data, bool $withoutPagination = false,  bool $minId = false): array
+    public function prepareCollection($data, bool $withoutPagination = false, bool $minId = false): array
     {
         $sortingColumnId = $data['order'][0]['column'];
         $sortingColumnDirection = $data['order'][0]['dir'];
@@ -113,7 +110,7 @@ readonly class OrderDatatableService
         } else {
             $sortingColumn = 'orders.id';
         }
-        $query = $this->getQueryForDataTables($data['selectAllDates'])->orderBy($sortingColumn, $sortingColumnDirection);
+        $query = $this->getQueryForDataTables()->orderBy($sortingColumn, $sortingColumnDirection);
 
         foreach ($data['columns'] as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
@@ -258,7 +255,11 @@ readonly class OrderDatatableService
             $query->whereRaw('orders.invoice_bilans = 0');
         }
 
-        //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');
+        if ((bool)Cookie::get('activeOrderLimit', true) === true) {
+            $query->whereRaw('orders.created_at > DATE_ADD(NOW(), INTERVAL -? DAY)', [
+                Cookie::get('orderLimitInDays', 30),
+            ]);
+        }
 
         $count = $query->count();
 
@@ -282,10 +283,10 @@ readonly class OrderDatatableService
 
             foreach ($row->packages as $package) {
                 $package->realSpecialCosts = OrderPackageRealCostForCompany::query()
-                        ->select('cost')
-                        ->where('order_package_id', $package->id)
-                        ->groupBy('order_package_id')
-                        ->first();
+                    ->select('cost')
+                    ->where('order_package_id', $package->id)
+                    ->groupBy('order_package_id')
+                    ->first();
                 $row->speditionCost += $package->realSpecialCosts?->cost;
             }
 
@@ -363,8 +364,8 @@ readonly class OrderDatatableService
                 })
                 ->all();
             $row->files = OrderFiles::where('order_id', $row->orderId)->get();
+            $row->additional_cash_on_delivery_cost = Order::find($row->orderId)->additional_cash_on_delivery_cost;
         }
-        $row->additional_cash_on_delivery_cost = Order::find($row->orderId)->additional_cash_on_delivery_cost;
 
         foreach ($collection as $item) {
             $item->rc = OrderPackageRealCostsForCompany::getAllByOrderId(
