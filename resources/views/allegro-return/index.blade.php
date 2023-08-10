@@ -29,7 +29,7 @@
                     <div style="display: flex; margin-top: 5px;">
                         <div style="width: 40%">
                             <h4 style="display: flex; margin-right: 10px">
-                                <img src="{!! $item->product->getImageUrl() !!}" style="width: 50%; height: 130px;">
+                                <img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px;"
                                 <div style="width: 50%"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }}
                                 (symbol: {{ $item->product->symbol }})</div>
                             </h4>
