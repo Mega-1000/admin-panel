@@ -106,9 +106,9 @@ class AllegroPaymentService extends AllegroApiService {
     /**
      * tworzy zwrot płatności
      * @param AllegroReturnDTO $allegroReturnDTO
-     * @return bool - czy udało się stworzyć zwrot płatności
+     * @return array|false - false jeśli nie udało się stworzyć zwrotu płatności
      */
-    public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): array|bool
+    public function initiatePaymentRefund(AllegroReturnDTO $allegroReturnDTO): array|false
     {
         $url = $this->getRestUrl("/payments/refunds");
 
