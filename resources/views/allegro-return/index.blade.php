@@ -28,11 +28,11 @@
                 @if($item->orderReturn != null)
                     <div style="display: flex; margin-top: 5px;">
                         <div style="width: 40%">
-                            <h4 style="display: flex; margin-right: 10px">
+                            <div style="display: flex; margin-right: 10px">
                                 <img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px;" />
-                                <div><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }}
-                                (symbol: {{ $item->product->symbol }})</div>
-                            </h4>
+                                <h4 style="margin-left: 10px"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }}
+                                (symbol: {{ $item->product->symbol }})</h4>
+                            </div>
                         </div>
                         <div style="width: 60%; display: flex; justify-content: space-around">
                             <div>
@@ -49,7 +49,7 @@
                                 <div>
                                     <input type="checkbox" id="deductionCheck-{{$item->product->symbol}}"
                                             name="return[{{$item->product->symbol}}][deductionCheck]">
-                                    <label for="deductionCheck-{{$item->product->symbol}}">Potrącić kwotę?</label>
+                                    <label for="deductionCheck-{{$item->product->symbol}}">Zaznacz ten checkbox jeśli chcesz potrącić kwotę podaną poniżej od towaru nieuszkodzonego</label>
                                 </div>
                                 <div>
                                     <input class="return-deduction" type="number" min="0" step="0.01" max="{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}"
@@ -62,6 +62,7 @@
                             </div>
                         </div>
                     </div>
+                    <hr />
                 @endif
                 @endforeach
                 <button type="submit" class="btn btn-primary pull-right">Zwróć</button>
