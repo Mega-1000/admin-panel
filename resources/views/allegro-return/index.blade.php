@@ -29,14 +29,14 @@
                     <div style="display: flex; margin-top: 5px;">
                         <div style="width: 40%">
                             <h4 style="display: flex; margin-right: 10px">
-                                <img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px;"
-                                <div style="width: 50%"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }}
+                                <img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px;" />
+                                <div><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }}
                                 (symbol: {{ $item->product->symbol }})</div>
                             </h4>
                         </div>
                         <div style="width: 60%; display: flex; justify-content: space-around">
                             <div>
-                                <p>Ilość zakupiona: {{ $item->quantity }}</p>
+                                <p>Ilość zamówiona: {{ $item->quantity }}</p>
                                 <p>Ilość zwrócona nieuszkodzona: {{ $item->orderReturn->quantity_undamaged }}</p>
                                 <input type="hidden" name="return[{{$item->product->symbol}}][quantityUndamaged]" value="{{ $item->orderReturn->quantity_undamaged }}">
                                 <p>Ilość zwrócona uszkodzona: {{ $item->orderReturn->quantity_damaged }}</p>
