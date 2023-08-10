@@ -49,11 +49,11 @@
                                 <div>
                                     <input type="checkbox" id="deductionCheck-{{$item->product->symbol}}"
                                             name="return[{{$item->product->symbol}}][deductionCheck]">
-                                    <label for="deductionCheck-{{$item->product->symbol}}">Zaznacz ten checkbox jeśli chcesz potrącić kwotę podaną poniżej od towaru nieuszkodzonego</label>
+                                    <label for="deductionCheck-{{$item->product->symbol}}">Zaznacz aby potrącić kwotę od towaru nieuszkodzonego</label>
                                 </div>
                                 <div>
                                     <input class="return-deduction" type="number" min="0" step="0.01" max="{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}"
-                                            name="return[{{$item->product->symbol}}][deduction]" disabled="true" value="29.90" id="deduction-{{$item->product->symbol}}">
+                                            name="return[{{$item->product->symbol}}][deduction]" disabled value="29.90" id="deduction-{{$item->product->symbol}}">
                                     <label for="deduction-{{$item->product->symbol}}">Wartość potrącenia</label>
                                 </div>
                                 <p>Wartość zwrotu: 
