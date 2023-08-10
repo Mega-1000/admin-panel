@@ -1,5 +1,10 @@
-@php use App\Entities\Label;use App\Entities\Warehouse; @endphp
-@php use App\Enums\ProductStockError;use App\User; @endphp
+@php
+    use App\Entities\Label;
+    use App\Entities\Warehouse;
+    use App\Enums\OrderPaymentsEnum;
+    use App\Enums\ProductStockError;
+    use App\User; @endphp
+
 @extends('layouts.datatable')
 
 @section('app-header')
@@ -177,7 +182,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
-                    <button type="submit" form="finish-task-form" id="check-finish-task" class="btn btn-success pull-right">Zakończ</button>
+                    <button type="submit" form="finish-task-form" id="check-finish-task"
+                            class="btn btn-success pull-right">Zakończ
+                    </button>
                     <button id="check-finish-task-refresh" class="btn btn-primary pull-right">Odświez</button>
                 </div>
             </div>
@@ -802,12 +809,15 @@
                     <form method="POST" id="addToPlanner"
                           action="{{ url('admin/planning/tasks/store/planner') }}">
                         @csrf()
-                        <input type="hidden" id="add-withdraw-task-delivery_warehouse" name="delivery_warehouse" value="">
+                        <input type="hidden" id="add-withdraw-task-delivery_warehouse" name="delivery_warehouse"
+                               value="">
                         <input type="hidden" id="add-withdraw-task-order_id" name="order_id" value="">
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" form="withdrawTask" id="withdrawTaskButton" class="btn btn-danger">Wycofaj, chcę sprawdzic</button>
+                    <button type="submit" form="withdrawTask" id="withdrawTaskButton" class="btn btn-danger">Wycofaj,
+                        chcę sprawdzic
+                    </button>
                     <button type="submit" form="addToPlanner" class="btn btn-success pull-right">Dodaj
                     </button>
                 </div>
@@ -818,8 +828,25 @@
 
 
     @include('orders.buttons')
-    <button name="selectAllDates" id="selectAllDates">Wybierz wszystkie daty</button>
-    <button name="selectOnlyWrongInvoiceBilansOrders" id="selectOnlyWrongInvoiceBilansOrders" class="btn btn-primary"></button>
+    <form action="{{route('change.order.limit')}}" method="post" class="card warning">
+        @csrf
+        <div class="card-body">
+            <h4 class="card-title">Ustawienia limitów wyświetlanych danych</h4>
+            <div class="form-inline">
+
+                <input type="checkbox" name="isActive" class="form-check" value="1"
+                       @if( \Illuminate\Support\Facades\Cookie::get('activeOrderLimit', '1') === '1')checked="checked"@endif />
+                <label class="form-label">pokaż</label>
+                <input type="number" size="2" class="form-control ml-1 mr-1" style="width:70px"
+                       value="{{ \Illuminate\Support\Facades\Cookie::get('orderLimitInDays', 30)  }}"
+                       name="daysLimit"/>
+                <label class="form-label">ostatnich dni</label>
+                <input type="submit" value="Zapisz ustawienia limitów" class="btn btn-warning">
+            </div>
+        </div>
+    </form>
+    <button name="selectOnlyWrongInvoiceBilansOrders" id="selectOnlyWrongInvoiceBilansOrders"
+            class="btn btn-primary"></button>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
         <tr>
@@ -1041,7 +1068,7 @@
         </thead>
     </table>
     <div class="vue-components">
-        <tracker :enabled="true" :user="{{ Auth::user()->id }}" />
+        <tracker :enabled="true" :user="{{ Auth::user()->id }}"/>
     </div>
     @include('bonus.modal')
 @endsection
@@ -1161,9 +1188,10 @@
                     response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
                 })
         }
+
         fetchTasksWithChildren('#select-task-with-child-for-finish');
 
-        function fetchChildren(task,div) {
+        function fetchChildren(task, div) {
             $(div).empty();
             let id = task.value
             let url = "{{route('planning.tasks.getChildren', ['taskId' => '%%'])}}"
@@ -1215,7 +1243,7 @@
             }, 5000);
         });
 
-        $('.print-group .print-list').click(function(){
+        $('.print-group .print-list').click(function () {
             $('#print-package-type').val($(this).attr('name'));
             let opt = $(this).data('couriertasks');
             let select = $('#print-package-group').find('[name="task_id"]');
@@ -1223,7 +1251,7 @@
             // sort by first word is number so filter by this id
 
             $.each(opt, function (key, value) {
-                value = value.sort(function(a, b) {
+                value = value.sort(function (a, b) {
                     let aId = a.name.split(' - ').shift();
                     let bId = b.name.split(' - ').shift();
                     return aId - bId;
@@ -1431,7 +1459,6 @@
                             d.same = ajaxParams.same;
                         }
                         d.customerId = customerId;
-                        d.selectAllDates = localStorage.getItem('selectAllDates');
                         d.selectOnlyWrongInvoiceBilansOrders = localStorage.getItem('selectOnlyWrongInvoiceBilansOrders');
                         let differenceMode = localStorage.getItem('differenceMode');
                         if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
@@ -1855,7 +1882,7 @@
                             } else {
                                 html += '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
                             }
-                            if(data.items.length){
+                            if (data.items.length) {
                                 if (data.orderId != null) {
                                     html += '<a href="/admin/orderReturn/' + data.orderId + '/print" target="_blank" class="btn btn-danger">WP</a>';
                                 } else {
@@ -1933,7 +1960,7 @@
                             html += '<i class="voyager-edit"></i>';
                             html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                             html += '</a>';
-                            if(data.items.length){
+                            if (data.items.length) {
                                 html += '<a href="/admin/orderReturn/' + id + '" class="btn btn-sm btn-danger edit">';
                                 html += '<i class="glyphicon glyphicon-share-alt"></i>';
                                 html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.return')</span>';
@@ -1954,7 +1981,7 @@
                             html += ' class="btn penalty btn-danger btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
                             html += '<a href="{{ route('transactions.index') }}?email=' + data.email + '" class="btn edit btn-sm btn-success">Transakcje</a>';
                             @endif
-                            html += `<a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>`;
+                                html += `<a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>`;
                             if (data.is_buying_admin_side) {
                                 html += `<a class="btn btn-primary" href="/admin/accept-products/${id}" target="__blank">Zapisz produkty w magazynie</a>`
                             }
@@ -2281,7 +2308,7 @@
                             let WPFZ = 0;
 
                             payments.forEach(payment => {
-                                const { amount, declared_sum, status } = payment;
+                                const {amount, declared_sum, status} = payment;
                                 const parsedAmount = parseFloat(amount);
                                 const parsedDeclaredAmount = parseFloat(declared_sum);
 
@@ -2293,7 +2320,7 @@
                                     return;
                                 }
 
-                                if (payment.operation_type === '{{ \App\Enums\OrderPaymentsEnum::KWON_STATUS }}') {
+                                if (payment.operation_type === '{{ OrderPaymentsEnum::KWON_STATUS }}') {
                                     kwonPayments += parsedAmount;
                                 }
 
@@ -2304,7 +2331,7 @@
 
                                 if (parsedAmount < 0 && payment.operation_type !== "Zwrot towaru") {
                                     totalOfReturns -= parsedAmount ?? parsedDeclaredAmount;
-                                } else if (parsedAmount && parsedAmount > 0 && payment.operation_type !== '{{ \App\Enums\OrderPaymentsEnum::KWON_STATUS }}') {
+                                } else if (parsedAmount && parsedAmount > 0 && payment.operation_type !== '{{ OrderPaymentsEnum::KWON_STATUS }}') {
                                     totalOfPayments += parsedAmount;
                                 } else if (!parsedAmount && parsedDeclaredAmount > 0) {
                                     totalOfDeclaredPayments += status === 'Rozliczona deklarowana' ? 0 : parsedDeclaredAmount;
@@ -2929,7 +2956,7 @@
                 });
             };
 
-            function removeMultiLabel(orderId, labelId, ids, delivery_warehouse=null) {
+            function removeMultiLabel(orderId, labelId, ids, delivery_warehouse = null) {
                 $.ajax({
                     url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
                     method: "POST",
@@ -2943,7 +2970,7 @@
                         $('#selectWarehouse').val(16);
                         $('#warehouseSelect').attr('selected', true);
                         $('#selectWarehouse').click();
-                        addingTaskToPlanner(orderId,delivery_warehouse);
+                        addingTaskToPlanner(orderId, delivery_warehouse);
                         refreshDtOrReload();
                     }
                     refreshDtOrReload();
@@ -2984,7 +3011,7 @@
                 });
             };
 
-            function addingTaskToPlanner(orderId,delivery_warehouse) {
+            function addingTaskToPlanner(orderId, delivery_warehouse) {
                 $.ajax({
                     method: 'post',
                     url: '{{route('planning.tasks.addingTaskToPlanner')}}',
@@ -2994,7 +3021,7 @@
                         delivery_warehouse: delivery_warehouse
                     },
                 }).done(function (data) {
-                    if (data.status === 'ERROR'){
+                    if (data.status === 'ERROR') {
                         let modal = $('#add-withdraw-task');
                         let input_delivery_warehouse = modal.find("#add-withdraw-task-delivery_warehouse");
                         let input_order_id = modal.find("#add-withdraw-task-order_id");
@@ -3004,9 +3031,9 @@
                         let clickCount = 0;
                         modal.modal();
                         $('#withdrawTaskButton').on('click', () => {
-                            if(clickCount > 0) {
+                            if (clickCount > 0) {
                                 return false;
-                            }else{
+                            } else {
                                 $.ajax({
                                     url: "/admin/orders/label-addition/45",
                                     method: "POST",
@@ -3022,7 +3049,7 @@
                                 clickCount++;
                             }
                         })
-                    }else{
+                    } else {
                         window.open('/admin/planning/timetable', '_blank');
                     }
                 });
@@ -3098,12 +3125,12 @@
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {
                         let ids = [];
                         ids.push(input.val());
-                        if(modal.find("#delivery_warehouse2").val() == ''){
+                        if (modal.find("#delivery_warehouse2").val() == '') {
                             modal.find(".error").show();
                             modal.find(".error .alert").text('Wybierz magazyn');
                             return false;
                         }
-                        if(!ids){
+                        if (!ids) {
                             modal.find(".error").show();
                             modal.find(".error .alert").text('Wybierz przynajmniej jeden etykietę');
                             return false;
@@ -4029,27 +4056,27 @@
         }
 
         $("#check-finish-task-refresh").hide();
-        $("#check-finish-task").click(function(){
+        $("#check-finish-task").click(function () {
             task = $('#select-task-for-finish').val();
-            if(task){
+            if (task) {
                 var checkQuantity = checkQuantityInStock(task);
-                if(checkQuantity==1){
+                if (checkQuantity == 1) {
                     $('#finish-task-form').hide();
                     $("#check-finish-task").hide();
                     $("#check-finish-task-refresh").show();
                     return false;
-                }else{
+                } else {
                     $("#error-finish-task-form").html('');
                     return true;
                 }
             }
         });
-        $("#check-finish-task-refresh").click(function(){
+        $("#check-finish-task-refresh").click(function () {
             task = $('#select-task-for-finish').val();
             var checkQuantity = checkQuantityInStock(task);
-            if(checkQuantity==1){
+            if (checkQuantity == 1) {
                 $('#finish-task-form').hide();
-            }else{
+            } else {
                 $("#error-finish-task-form").html('');
                 $("#check-finish-task").show();
                 $("#check-finish-task-refresh").hide();
@@ -4065,21 +4092,21 @@
                 url: '/admin/planning/tasks/' + task + '/checkQuantityInStock',
                 async: false
             }).done(function (data) {
-                if(data.status == 200){
-                    if(Object.keys(data.data).length>0){
+                if (data.status == 200) {
+                    if (Object.keys(data.data).length > 0) {
                         status = 1;
                     }
                     $.each(data.data, function (index, value) {
 
-                        html += '<h3>oferta '+ index +'</h3>';
+                        html += '<h3>oferta ' + index + '</h3>';
                         html += '<table class="table">';
-                            html += '<tr class="appendRow">';
-                            html += '<td style="width: 200px;">Nazwa</td>';
-                            html += '<td style="width: 100px;">Symbol</td>';
-                            html += '<td style="width: 50px;">Ilość potrzebna</td>';
-                            html += '<td style="width: 50px;">Na magazynie/Ilość na pozycji</td>';
-                            html += '<td>#</td>';
-                            html += '</tr>';
+                        html += '<tr class="appendRow">';
+                        html += '<td style="width: 200px;">Nazwa</td>';
+                        html += '<td style="width: 100px;">Symbol</td>';
+                        html += '<td style="width: 50px;">Ilość potrzebna</td>';
+                        html += '<td style="width: 50px;">Na magazynie/Ilość na pozycji</td>';
+                        html += '<td>#</td>';
+                        html += '</tr>';
                         $.each(value, function (index, value) {
                             html += '<tr class="appendRow">';
                             html += '<td>' + value.product_name + '</td>';
@@ -4092,7 +4119,7 @@
                         html += '</table>';
                     });
                     $('#error-finish-task-form').html(html);
-                }else{
+                } else {
                     status = 1;
                 }
             }).fail(function () {
@@ -4362,16 +4389,6 @@
             }
         })
 
-        const setSelectAllDatesText = () => {
-            $('#selectAllDates').text(localStorage.getItem('selectAllDates') === 'true' ? 'Przeszukuj bazę ostatnie 3 miesiące' : 'Przeszukaj całą bazę');
-        }
-
-        $('#selectAllDates').on('click', () => {
-            localStorage.setItem('selectAllDates', localStorage.getItem('selectAllDates') === 'true' ? 'false' : 'true');
-            setSelectAllDatesText();
-            table.ajax.reload();
-        })
-
         const selectOnlyWrongInvoiceBilansOrders = () => {
             $('#selectOnlyWrongInvoiceBilansOrders').text(localStorage.getItem('selectOnlyWrongInvoiceBilansOrders') === 'true' ? 'Wybierz wszystkie' : 'Wybierz tylko z błędami');
         }
@@ -4399,7 +4416,6 @@
             dateFrom.value = today;
             dateTo.value = today;
 
-            setSelectAllDatesText();
             selectOnlyWrongInvoiceBilansOrders();
         });
     </script>

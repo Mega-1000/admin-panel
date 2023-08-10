@@ -72,7 +72,6 @@ use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockPacketRepository;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
-use App\Repositories\SpeditionExchangeRepository;
 use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
@@ -93,13 +92,15 @@ use Dompdf\Dompdf;
 use Exception;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -156,7 +157,9 @@ class OrdersController extends Controller
         private readonly ProductStockPacketRepository   $productStockPacketRepository,
         private readonly TaskService                    $taskService,
         private readonly OrderDatatableService          $orderDatatableService
-    ) {}
+    )
+    {
+    }
 
     /**
      * @param Request $request
@@ -744,11 +747,9 @@ class OrdersController extends Controller
 
         Log::info("start automat");
 
-        if ($open->count() > 0)
-        {
+        if ($open->count() > 0) {
             $response = $this->taskService->markTaskAsProduced($open->first());
-            if ($response === false)
-            {
+            if ($response === false) {
                 $this->unlinkLockFile();
                 return redirect()->back()->with([
                     'message' => 'Brak pozycji lub stanu magazynowego dla produktu w zamówieniu: ' . $open->first()->order_id,
@@ -2708,7 +2709,7 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function findPage(Request $request, $id): \Illuminate\Http\Response|Application|\Illuminate\Contracts\Routing\ResponseFactory
+    public function findPage(Request $request, $id): Response|Application|ResponseFactory
     {
         [$collection, $count] = $this->orderDatatableService->prepareCollection($request->all(), false, $id);
 
@@ -2723,6 +2724,15 @@ class OrdersController extends Controller
         return $this->datatable($request);
     }
 
+    public function changeOrderLimits(Request $request)
+    {
+        $data = $request->all();
+        return back()->withCookies([
+            Cookie::make('activeOrderLimit', (bool)($data['isActive'] ?? false)),
+            Cookie::make('orderLimitInDays', (int)($data['daysLimit'] ?? 30)),
+        ]);
+    }
+
     /**
      * @param Request $request
      * @return JsonResponse
@@ -2731,13 +2741,10 @@ class OrdersController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         $data = $request->all();
-        [$collection, $countFiltred] = $this->orderDatatableService->prepareCollection($data);
-        [$collection, $countFiltred] = $this->orderDatatableService->prepareCollection($data);
-        $count = Order::with('payments')->get();
-        $count = count($count);
+        [$collection, $countFiltered] = $this->orderDatatableService->prepareCollection($data);
         $collection = $this->prepareAdditionalOrderData($collection);
 
-        return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
+        return DataTables::of($collection)->with(['recordsFiltered' => $countFiltered])->skipPaging()->setTotalRecords($collection->count())->make(true);
     }
 
     public function prepareAdditionalOrderData($collection)
