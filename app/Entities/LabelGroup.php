@@ -18,6 +18,7 @@ class LabelGroup extends Model implements Transformable
     use TransformableTrait;
 
     const PRODUCTION_LABEL_GROUP_ID = 2;
+    const TRANSPORT_LABEL_GROUP_ID = 3;
     public $customColumnsVisibilities = [
         'name',
         'created_at',

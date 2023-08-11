@@ -848,4 +848,9 @@ class Order extends Model implements Transformable
     {
         return $this->hasMany(OrderInvoiceValue::class);
     }
+
+    public function isConstructed(): bool
+    {
+        return $this->labels()->where('label_id', Label::ORDER_ITEMS_CONSTRUCTED)->exists();
+    }
 }

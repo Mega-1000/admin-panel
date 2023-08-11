@@ -50,7 +50,7 @@ class AllegroPaymentsReturnService
             return null;
         }
 
-        $orderIsConstructed = $order->labels()->where('label_id', Label::ORDER_ITEMS_CONSTRUCTED)->exists();
+        $orderIsConstructed = $order->isConstructed();
 
         $hasOrderReturn = false;
 
