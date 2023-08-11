@@ -853,4 +853,9 @@ class Order extends Model implements Transformable
     {
         return $this->labels()->where('label_id', Label::ORDER_ITEMS_CONSTRUCTED)->exists();
     }
+
+    public function cancelAllPackages(): void
+    {
+        $this->packages()->update(['status' => PackageStatus::CANCELLED]);
+    }
 }
