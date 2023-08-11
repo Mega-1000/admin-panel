@@ -32,41 +32,28 @@ final class AllegroReturnPaymentHelper
                 'quantity' => $quantityTotal
             ];
 
-            if ($returnDamaged) {
-                if ($totalDeduction > 0) {
-                    $amount = $quantityTotal * $price - $totalDeduction;
-                    $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
-                        id: $allegroId,
-                        type: AllegroReturnItemTypeEnum::AMOUNT(),
-                        amount: $amount,
-                    );
-                } else {
-                    $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
-                        id: $allegroId,
-                        type: AllegroReturnItemTypeEnum::QUANTITY(),
-                        quantity: $quantityTotal,
-                    );
-                }
-            } else {
-                if ($quantityUndamaged === 0) {
-                    continue;
-                }
-
-                if ($undamagedDeduction > 0) {
-                    $amount = $quantityUndamaged * $price - $undamagedDeduction;
-                    $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
-                        id: $allegroId,
-                        type: AllegroReturnItemTypeEnum::AMOUNT(),
-                        amount: $amount,
-                    );
-                } else {
-                    $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
-                        id: $allegroId,
-                        type: AllegroReturnItemTypeEnum::QUANTITY(),
-                        quantity: $quantityUndamaged,
-                    );
-                }
+            if (!$returnDamaged && $quantityUndamaged === 0) {
+                continue;
             }
+
+            $quantityToReturn = $returnDamaged ? $quantityTotal : $quantityUndamaged;
+            $deductionOfReturn = $returnDamaged ? $totalDeduction : $undamagedDeduction;
+
+            if ($deductionOfReturn > 0) {
+                $amount = $quantityToReturn * $price - $deductionOfReturn;
+                $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
+                    id: $allegroId,
+                    type: AllegroReturnItemTypeEnum::AMOUNT(),
+                    amount: $amount,
+                );
+                continue;
+            } 
+            
+            $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
+                id: $allegroId,
+                type: AllegroReturnItemTypeEnum::QUANTITY(),
+                quantity: $quantityToReturn,
+            );
         }
 
         return [$lineItemsForPaymentRefund, $lineItemsForCommissionRefund];
