@@ -91,17 +91,9 @@ class AllegroReturnPaymentController extends Controller
             ]);
         }
         
-        $loopPreventionArray = [];
-        RemoveLabelService::removeLabels($order, [Label::NEED_TO_RETURN_PAYMENT], $loopPreventionArray, [], Auth::user()?->id);
-        $order->labels()->attach(Label::NEED_TO_ISSUE_INVOICE_CORRECTION);
+        $this->allegroPaymentsReturnService->removeAndAddNeccessaryLabelsAfterAllegroReturn($order);
 
         if (!$order->isConstructed()) {
-            $loopPreventionArray = [];
-            $transportLabels = LabelGroup::query()->find(LabelGroup::TRANSPORT_LABEL_GROUP_ID)->labels()->pluck('labels.id')->toArray();
-            $toRemove = [Label::BLUE_HAMMER_ID, Label::RED_HAMMER_ID, Label::ORDER_ITEMS_UNDER_CONSTRUCTION];
-            $toRemove = array_merge($toRemove, $transportLabels);
-            $order->labels()->detach($toRemove);
-
             $order->taskSchedule()->whereNotIn('status', [Task::FINISHED, Task::REJECTED])->delete();
 
             $order->deleteNewPackagesAndCancelOthers();

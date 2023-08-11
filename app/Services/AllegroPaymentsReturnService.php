@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Entities\Label;
+use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\OrderReturn;
 use App\Enums\OrderPaymentsEnum;
+use App\Services\Label\RemoveLabelService;
+use Illuminate\Support\Facades\Auth;
 
 class AllegroPaymentsReturnService
 {
@@ -88,5 +91,19 @@ class AllegroPaymentsReturnService
         }
 
         return $unsuccessfulCommissionRefundsItemNames;
+    }
+
+    public function removeAndAddNeccessaryLabelsAfterAllegroReturn(Order $order): void
+    {
+        $loopPreventionArray = [];
+        RemoveLabelService::removeLabels($order, [Label::NEED_TO_RETURN_PAYMENT], $loopPreventionArray, [], Auth::user()?->id);
+        $order->labels()->attach(Label::NEED_TO_ISSUE_INVOICE_CORRECTION);
+
+        if (!$order->isConstructed()) {
+            $transportLabels = LabelGroup::query()->find(LabelGroup::TRANSPORT_LABEL_GROUP_ID)->labels()->pluck('labels.id')->toArray();
+            $toRemove = [Label::BLUE_HAMMER_ID, Label::RED_HAMMER_ID, Label::ORDER_ITEMS_UNDER_CONSTRUCTION];
+            $toRemove = array_merge($toRemove, $transportLabels);
+            $order->labels()->detach($toRemove);
+        }
     }
 }
