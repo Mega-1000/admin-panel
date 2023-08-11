@@ -6,7 +6,7 @@ use App\DTO\AllegroPayment\AllegroReturnDTO;
 use Carbon\Carbon;
 
 class AllegroPaymentService extends AllegroApiService {
-    protected $auth_record_id = 3;
+    protected $auth_record_id = 2;
 
     private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 
