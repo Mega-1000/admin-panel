@@ -130,44 +130,10 @@
                         
                         let newValue = {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}};
                         newValue = isChecked ? newValue - parseFloat(deductionInput.val()) : newValue;
-                        newValue = newValue.toFixed(2)
-                        valueEl.text(newValue);
+                        valueEl.text(newValue.toFixed(2));
                         valueEl.trigger('change');
 
-                        const deductionSumEl = $(`#deductionSum-${$.escapeSelector('{{$item->product->symbol}}')}`);
-
-                        @if($item->orderReturn->quantity_damaged > 0)
-                            const damagedDeductionInput = $(`#damagedDeduction-${$.escapeSelector('{{$item->product->symbol}}')}`);
-                            const returnDamagedCheck = $(`#returnDamagedCheck-${$.escapeSelector('{{$item->product->symbol}}')}`);
-
-                            if (!isChecked) {
-                                if (!returnDamagedCheck.is(':checked')) {
-                                    deductionSumEl.text("0.00");
-                                    return;
-                                }
-
-                                const damagedDeduction = parseFloat(damagedDeductionInput.val());
-                                deductionSumEl.text(damagedDeduction.toFixed(2));
-                                return;
-                            }
-
-                            const undamagedDeduction = parseFloat(deductionInput.val());
-                            if (!returnDamagedCheck.is(':checked')) {
-                                deductionSumEl.text(undamagedDeduction.toFixed(2));
-                                return;
-                            }
-
-                            const damagedDeduction = parseFloat(damagedDeductionInput.val());
-                            deductionSumEl.text((undamagedDeduction + damagedDeduction).toFixed(2));
-                        @else
-                            if (!isChecked) {
-                                deductionSumEl.text("0.00");
-                                return;
-                            }
-
-                            const undamagedDeduction = parseFloat(deductionInput.val());
-                            deductionSumEl.text(undamagedDeduction.toFixed(2));
-                        @endif
+                        updateDeductionSum('{{$item->product->symbol}}', {{$item->orderReturn->quantity_damaged}}, {{$item->orderReturn->quantity_undamaged}});
                     });
                     $(`#undamagedDeduction-${$.escapeSelector('{{$item->product->symbol}}')}`).change(function() {
                         const valueEl = $(`#undamagedValue-${$.escapeSelector('{{$item->product->symbol}}')}`);
@@ -182,35 +148,11 @@
                         valueEl.text(newValue);
                         valueEl.trigger('change');
 
-                        const deductionSumEl = $(`#deductionSum-${$.escapeSelector('{{$item->product->symbol}}')}`);
-
-                        @if($item->orderReturn->quantity_damaged > 0)
-                            const damagedDeductionInput = $(`#damagedDeduction-${$.escapeSelector('{{$item->product->symbol}}')}`);
-                            const returnDamagedCheck = $(`#returnDamagedCheck-${$.escapeSelector('{{$item->product->symbol}}')}`);
-
-                            if (!returnDamagedCheck.is(':checked')) {
-                                deductionSumEl.text(value);
-                                return;
-                            }
-
-                            const damagedDeduction = parseFloat(damagedDeductionInput.val());
-                            deductionSumEl.text((damagedDeduction + value).toFixed(2));
-                        @else
-                            deductionSumEl.text(value);
-                        @endif
+                        updateDeductionSum('{{$item->product->symbol}}', {{$item->orderReturn->quantity_damaged}}, {{$item->orderReturn->quantity_undamaged}});
                     });
 
                     $(`#undamagedValue-${$.escapeSelector('{{$item->product->symbol}}')}`).change(function() {
-                        const undamagedValue = parseFloat($(this).text());
-                        let damagedValue = 0;
-                        @if($item->orderReturn->quantity_damaged > 0)
-                            damagedValue = parseFloat($(`#damagedValue-${$.escapeSelector('{{$item->product->symbol}}')}`).text());
-                        @endif
-                        const value = undamagedValue + damagedValue;
-                        const valueEl = $(`#value-${$.escapeSelector('{{$item->product->symbol}}')}`);
-                        valueEl.text(value.toFixed(2));
-                        valueEl.trigger('change');
-
+                        changeSingularItemReturnValue('{{$item->product->symbol}}', {{$item->orderReturn->quantity_damaged}}, {{$item->orderReturn->quantity_undamaged}});
                     });
                 @endif
                 @if($item->orderReturn->quantity_damaged > 0)
@@ -219,48 +161,13 @@
                         const deductionInput = $(`#damagedDeduction-${$.escapeSelector('{{$item->product->symbol}}')}`);
                         deductionInput.prop('disabled', !isChecked);
                         const valueEl = $(`#damagedValue-${$.escapeSelector('{{$item->product->symbol}}')}`);
-                        if (!isChecked) {
-                            valueEl.text("0.00");
-                            valueEl.trigger('change');
-                        } else {
-                            const newValue = {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_damaged}} - parseFloat(deductionInput.val());
-                            valueEl.text(newValue.toFixed(2));
-                            valueEl.trigger('change');
-                        }
 
-                        @if($item->orderReturn->quantity_undamaged > 0)
-                            const undamagedDeductionInput = $(`#undamagedDeduction-${$.escapeSelector('{{$item->product->symbol}}')}`);
-                            const undamagedDeductionCheck = $(`#undamagedDeductionCheck-${$.escapeSelector('{{$item->product->symbol}}')}`);
-                            const deductionSumEl = $(`#deductionSum-${$.escapeSelector('{{$item->product->symbol}}')}`);
+                        const newValue = isChecked ? {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_damaged}} - parseFloat(deductionInput.val()) : 0;
 
-                            if (!isChecked) {
-                                if (!undamagedDeductionCheck.is(':checked')) {
-                                    deductionSumEl.text("0.00");
-                                    return;
-                                }
+                        valueEl.text(newValue.toFixed(2));
+                        valueEl.trigger('change');
 
-                                const undamagedDeduction = parseFloat(undamagedDeductionInput.val());
-                                deductionSumEl.text(undamagedDeduction.toFixed(2));
-                                return;
-                            }
-
-                            const damagedDeduction = parseFloat(deductionInput.val());
-                            if (!undamagedDeductionCheck.is(':checked')) {
-                                deductionSumEl.text(damagedDeduction.toFixed(2));
-                                return;
-                            }
-
-                            const undamagedDeduction = parseFloat(undamagedDeductionInput.val());
-                            deductionSumEl.text((undamagedDeduction + damagedDeduction).toFixed(2));
-                        @else
-                            if (!isChecked) {
-                                deductionSumEl.text("0.00");
-                                return;
-                            }
-
-                            const damagedDeduction = parseFloat(deductionInput.val());
-                            deductionSumEl.text(damagedDeduction.toFixed(2));
-                        @endif
+                        updateDeductionSum('{{$item->product->symbol}}', {{$item->orderReturn->quantity_damaged}}, {{$item->orderReturn->quantity_undamaged}});
                     });
 
                     $(`#damagedDeduction-${$.escapeSelector('{{$item->product->symbol}}')}`).change(function() {
@@ -278,32 +185,11 @@
 
                         const deductionSumEl = $(`#deductionSum-${$.escapeSelector('{{$item->product->symbol}}')}`);
 
-                        @if($item->orderReturn->quantity_undamaged > 0)
-                            const undamagedDeductionInput = $(`#undamagedDeduction-${$.escapeSelector('{{$item->product->symbol}}')}`);
-                            const undamagedDeductionCheck = $(`#undamagedDeductionCheck-${$.escapeSelector('{{$item->product->symbol}}')}`);
-
-                            if (!undamagedDeductionCheck.is(':checked')) {
-                                deductionSumEl.text(value);
-                                return;
-                            }
-
-                            const undamagedDeduction = parseFloat(undamagedDeductionInput.val());
-                            deductionSumEl.text((undamagedDeduction + value).toFixed(2));
-                        @else
-                            deductionSumEl.text(value);
-                        @endif
+                        updateDeductionSum('{{$item->product->symbol}}', {{$item->orderReturn->quantity_damaged}}, {{$item->orderReturn->quantity_undamaged}});
                     });
 
                     $(`#damagedValue-${$.escapeSelector('{{$item->product->symbol}}')}`).change(function() {
-                        let undamagedValue = 0;
-                        @if($item->orderReturn->quantity_undamaged > 0) 
-                            undamagedValue = parseFloat($(`#undamagedValue-${$.escapeSelector('{{$item->product->symbol}}')}`).text());
-                        @endif
-                        const damagedValue = parseFloat($(this).text());
-                        const value = undamagedValue + damagedValue;
-                        const valueEl = $(`#value-${$.escapeSelector('{{$item->product->symbol}}')}`)
-                        valueEl.text(value.toFixed(2));
-                        valueEl.trigger('change');
+                        changeSingularItemReturnValue('{{$item->product->symbol}}', {{$item->orderReturn->quantity_damaged}}, {{$item->orderReturn->quantity_undamaged}});
                     });
                 @endif
             @endif
@@ -318,6 +204,51 @@
                 $('#totalValue').text(totalValue.toFixed(2));
             });
             @endforeach
+
+            function updateDeductionSum(symbol, quantity_damaged, quantity_undamaged) {
+                const deductionSumEl = $(`#deductionSum-${$.escapeSelector(symbol)}`);
+
+                let finalValue = 0;
+
+                if (quantity_undamaged > 0) {
+                    const undamagedDeductionInput = $(`#undamagedDeduction-${$.escapeSelector(symbol)}`);
+                    const undamagedDeductionCheck = $(`#undamagedDeductionCheck-${$.escapeSelector(symbol)}`);
+
+                    finalValue += undamagedDeductionCheck.is(':checked') ? parseFloat(undamagedDeductionInput.val()) : 0;
+                }
+
+                if (quantity_damaged > 0) {
+                    const damagedDeductionInput = $(`#damagedDeduction-${$.escapeSelector(symbol)}`);
+                    const returnDamagedCheck = $(`#returnDamagedCheck-${$.escapeSelector(symbol)}`);
+
+                    finalValue += returnDamagedCheck.is(':checked') ? parseFloat(damagedDeductionInput.val()) : 0;
+                }
+
+                deductionSumEl.text(finalValue.toFixed(2));
+            }
+
+            function calculateSingularItemReturnTotalValue(symbol, quantity_damaged, quantity_undamaged) {
+                let totalValue = 0;
+
+                if (quantity_undamaged > 0) {
+                    const undamagedValue = parseFloat($(`#undamagedValue-${$.escapeSelector(symbol)}`).text());
+                    totalValue += undamagedValue;
+                }
+
+                if (quantity_damaged > 0) {
+                    const damagedValue = parseFloat($(`#damagedValue-${$.escapeSelector(symbol)}`).text());
+                    totalValue += damagedValue;
+                }
+
+                return totalValue;
+            }
+
+            function changeSingularItemReturnValue(symbol, quantity_damaged, quantity_undamaged) {
+                const value = calculateSingularItemReturnTotalValue(symbol, quantity_damaged, quantity_undamaged);
+                const valueEl = $(`#value-${$.escapeSelector(symbol)}`);
+                valueEl.text(value.toFixed(2));
+                valueEl.trigger('change');
+            }
         });
     </script>
 @endsection
