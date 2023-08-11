@@ -27,9 +27,9 @@
                 @foreach($order->items as $item)
                 @if($item->orderReturn != null)
                     <div style="display: flex; margin-top: 5px;">
-                        <div style="width: 25%">
+                        <div style="width: 40%">
                             <div style="display: flex; margin-right: 10px">
-                                <img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px;" />
+                                <img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px" />
                                 <h4 style="margin-left: 10px"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }}
                                 (symbol: {{ $item->product->symbol }})</h4>
                             </div>
@@ -85,7 +85,7 @@
                                     <p>Brak towaru uszkodzonego do zwrotu</p>
                                 @endif
                             </div>
-                            <div style="width: 25%">
+                            <div style="width: 10%">
                                 <p>
                                     Suma potrąceń dla asortymentu:
                                     <span id="deductionSum-{{$item->product->symbol}}">0.00</span>
