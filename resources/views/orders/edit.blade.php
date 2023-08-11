@@ -877,7 +877,7 @@
                                             value="{{$item->gross_purchase_price_commercial_unit_after_discounts}}"
                                             type="text"
                                             data-item-id="{{$item->id}}"
-                                            class="form-control price gross_purchase_price_commercial_unit priceChange"
+                                            class="form-control price gross_purchase_price_commercial_unit priceChange inTable"
                                             id="gross_purchase_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
@@ -1084,14 +1084,14 @@
                                     value="{{ number_format(($item->gross_selling_price_commercial_unit_after_discounts * $item->quantity), 2) }} zł">
                             </div>
                             <div>
-                                <label for="item-value">Waga asortymentu</label>
+                                <label for="item-weight">Waga asortymentu</label>
                                 <input type="text" class="form-control item-weight priceChange"
                                     data-item-id="{{$item->id}}"
                                     disabled name="item-weight"
                                     value="{{ number_format(($item->product->weight_trade_unit * $item->quantity), 2) }} kg">
                             </div>
                             <div>
-                                <label for="item-value">Zysk asortymentu</label>
+                                <label for="item-profit">Zysk asortymentu</label>
                                 <input type="text" class="form-control item-profit priceChange"
                                     data-item-id="{{$item->id}}"
                                     disabled name="item-profit"
@@ -3687,7 +3687,11 @@
                 let net_purchase_price_sum = 0;
                 let gross_selling_price_sum = 0;
                 let net_selling_price_sum = 0;
-                $('.productsTableEdit .gross_purchase_price_commercial_unit').each(function () {
+                $('.gross_purchase_price_commercial_unit').each(function () {
+                    if ($(this).hasClass('inTable')) {
+                        return;
+                    }
+
                     const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     const gross_selling_price = $('.gross_selling_price_commercial_unit[data-item-id="' + $(this).data('item-id') + '"]').val();
                     gross_purchase_price_sum += $(this).val() * quantity;
@@ -3716,15 +3720,15 @@
                     $('input.item-profit[data-item-id="' + $(this).data('item-id') + '"]').val(profitItem + ' zł');
                     $('input.item-value[data-item-id="' + $(this).data('item-id') + '"]').val(parseFloat(sellingSum).toFixed(2) + ' zł');
                 });
-                $('.productsTableEdit .net_purchase_price_commercial_unit').each(function () {
+                $('.net_purchase_price_commercial_unit').each(function () {
                     const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     net_purchase_price_sum += $(this).val() * quantity;
                 });
-                $('.productsTableEdit .gross_selling_price_commercial_unit').each(function () {
+                $('.gross_selling_price_commercial_unit').each(function () {
                     const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     gross_selling_price_sum += $(this).val() * quantity;
                 });
-                $('.productsTableEdit .net_selling_price_commercial_unit').each(function () {
+                $('.net_selling_price_commercial_unit').each(function () {
                     const quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     net_selling_price_sum += $(this).val() * quantity;
                 });
