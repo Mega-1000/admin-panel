@@ -2,20 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\LabelGroup;
 use App\Entities\Task;
 use App\Helpers\AllegroReturnPaymentHelper;
 use App\DTO\AllegroPayment\AllegroReturnDTO;
-use App\Entities\Label;
 use App\Entities\Order;
 use App\Helpers\MessagesHelper;
 use App\Services\AllegroOrderService;
 use App\Services\AllegroPaymentService;
 use App\Services\AllegroPaymentsReturnService;
-use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Illuminate\Contracts\View\View;
 
@@ -61,8 +57,6 @@ class AllegroReturnPaymentController extends Controller
         $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, $request->returns);
 
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
-
-        dd($lineItemsForPaymentRefund, $lineItemsForCommissionRefund);
 
         $totalValue = null;
 
