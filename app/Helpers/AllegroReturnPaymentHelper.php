@@ -32,12 +32,12 @@ final class AllegroReturnPaymentHelper
                 'quantity' => $quantityTotal
             ];
 
-            if (!$returnDamaged && $quantityUndamaged === 0) {
-                continue;
-            }
-
             $quantityToReturn = $returnDamaged ? $quantityTotal : $quantityUndamaged;
             $deductionOfReturn = $returnDamaged ? $totalDeduction : $undamagedDeduction;
+
+            if ($quantityToReturn === 0) {
+                continue;
+            }
 
             if ($deductionOfReturn > 0) {
                 $amount = $quantityToReturn * $price - $deductionOfReturn;
@@ -48,7 +48,7 @@ final class AllegroReturnPaymentHelper
                 );
                 continue;
             } 
-            
+
             $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
                 id: $allegroId,
                 type: AllegroReturnItemTypeEnum::QUANTITY(),
