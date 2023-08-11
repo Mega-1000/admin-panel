@@ -52,14 +52,14 @@ class AllegroReturnPaymentController extends Controller
 
     public function store(Request $request, Order $order): RedirectResponse
     {
-        dd($request);
-
         $allegroPaymentId = $order->allegro_payment_id;
         $allegroOrder = $this->allegroOrderService->getOrderByPaymentId($allegroPaymentId);
         
         $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, $request->returns);
 
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
+
+        dd($lineItemsForPaymentRefund, $lineItemsForCommissionRefund);
 
         // if (count($lineItemsForPaymentRefund) > 0) {
         //     $data = new AllegroReturnDTO(
