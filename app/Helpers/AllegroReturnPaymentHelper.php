@@ -27,6 +27,11 @@ final class AllegroReturnPaymentHelper
                 continue;
             }
 
+            $lineItemsForCommissionRefund[] = [
+                'id' => $allegroId,
+                'quantity' => $quantityTotal
+            ];
+
             if ($returnDamaged) {
                 if ($totalDeduction > 0) {
                     $amount = $quantityTotal * $price - $totalDeduction;
@@ -43,6 +48,10 @@ final class AllegroReturnPaymentHelper
                     );
                 }
             } else {
+                if ($quantityUndamaged === 0) {
+                    continue;
+                }
+
                 if ($undamagedDeduction > 0) {
                     $amount = $quantityUndamaged * $price - $undamagedDeduction;
                     $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
@@ -58,11 +67,6 @@ final class AllegroReturnPaymentHelper
                     );
                 }
             }
-
-            $lineItemsForCommissionRefund[] = [
-                'id' => $allegroId,
-                'quantity' => $quantityTotal
-            ];
         }
 
         return [$lineItemsForPaymentRefund, $lineItemsForCommissionRefund];
