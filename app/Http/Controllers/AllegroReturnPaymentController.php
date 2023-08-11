@@ -104,7 +104,7 @@ class AllegroReturnPaymentController extends Controller
 
             $order->taskSchedule()->whereNotIn('status', [Task::FINISHED, Task::REJECTED])->delete();
 
-            $order->cancelAllPackages();
+            $order->deleteNewPackagesAndCancelOthers();
 
             if (isset($totalValue)) {
                 $order->payments()->create([
