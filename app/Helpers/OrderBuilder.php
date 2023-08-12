@@ -287,13 +287,15 @@ class OrderBuilder
      * @throws Exception
      *
      */
-    public function assignItemsToOrder($order, $items, bool $deleteItems = true): Order
+    public function assignItemsToOrder($order, array $items, bool $deleteItems = true): Order
     {
         $weight = 0;
+
         $orderItems = $order->items;
         if ($deleteItems) {
             $order->items()->delete();
         }
+
         $oldPrices = [];
 
         foreach ($orderItems as $item) {

@@ -64,8 +64,6 @@ final class PackageProductOrderService
         $orderItems = $order->items()
             ->with('product')
             ->get()
-            ->each(fn (OrderItem $item) => $item->product->amount = $item->quantity)
-            ->pluck('product')
             ->toArray();
 
         return [$productArray, $orderItems];
