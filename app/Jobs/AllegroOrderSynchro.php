@@ -25,7 +25,6 @@ use App\Helpers\LabelsHelper;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPackagesDataHelper;
-use App\Helpers\PdfCharactersHelper;
 use App\Helpers\StringHelper;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderRepository;
@@ -689,7 +688,7 @@ class AllegroOrderSynchro implements ShouldQueue
         list($street, $flatNo) = $this->getAddress($address['street']);
         $country = Country::firstOrCreate(['iso2' => $address['countryCode']], ['name' => $address['countryCode']]);
 
-        $orderAddress = OrderAddress::firstOrNew([
+        $orderAddress = OrderAddress::query()->firstOrNew([
             'type' => $type,
             'order_id' => $order->id,
         ]);
@@ -701,6 +700,14 @@ class AllegroOrderSynchro implements ShouldQueue
             $address['lastName'] = $address['naturalPerson']['lastName'];
         }
 
+        if (empty($address['city']) && !empty($street)) {
+            $address['city'] = $street;
+        }
+
+        if (empty($street) && !empty($address['city'])) {
+            $street = $address['city'];
+        }
+
         $addressData = [
             'type' => $type,
             'firstname' => $address['firstName'] ?? null,
@@ -708,7 +715,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'address' => $street,
             'flat_number' => $flatNo,
             'city' => $address['city'],
-            'firmname' => $address['companyName'] ?? $address['company']['name'] ?? null,
+            'firmname' => (!empty($address['company']['taxId'])) ? ($address['company']['name'] ?? $address['comapnyName'] ?? null) : null,
             'nip' => $address['company']['taxId'] ?? null,
             'postal_code' => $address['zipCode'] ?? $address['postCode'],
             'phone_code' => $code,
@@ -719,6 +726,27 @@ class AllegroOrderSynchro implements ShouldQueue
             'isAbroad' => $country->id != 1
         ];
         $orderAddress->fill($addressData);
+
+        if (
+            ($type === OrderAddress::TYPE_INVOICE && empty($address['company']['taxId'])) &&
+            (empty($orderAddress->firstName) || empty($orderAddress->lastName) || empty($orderAddress->address))
+        ) {         
+            $deliveryAddress = OrderAddress::query()->where('order_id', $order->id)->where('type', OrderAddress::TYPE_DELIVERY)->first();
+            
+            if (!empty($deliveryAddress)) {
+                $orderAddress->fill([
+                    'firstname' => $deliveryAddress->firstname,
+                    'lastname' => $deliveryAddress->lastname,
+                    'address' => $deliveryAddress->address,
+                    'flat_number' => $deliveryAddress->flat_number,
+                    'city' => $deliveryAddress->city,
+                    'postal_code' => $deliveryAddress->postal_code,
+                    'phone' => $deliveryAddress->phone,
+                    'phone_code' => $deliveryAddress->phone_code,
+                ]);
+            }
+        }
+
         $orderAddress->save();
     }
 
