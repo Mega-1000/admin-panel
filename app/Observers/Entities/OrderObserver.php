@@ -24,10 +24,12 @@ readonly class OrderObserver
      * OrderObserver constructor.
      * @param StatusRepository $statusRepository
      * @param OrderPaymentLabelsService $orderPaymentLabelsService
+     * @param OrderService $orderService
      */
     public function __construct(
-        protected StatusRepository $statusRepository,
+        protected StatusRepository          $statusRepository,
         protected OrderPaymentLabelsService $orderPaymentLabelsService,
+        protected OrderService              $orderService,
     ) {}
 
     public function created(Order $order): void
@@ -82,9 +84,9 @@ readonly class OrderObserver
         }
     }
 
-    public function updated(Order $order, OrderService $orderService): void
+    public function updated(Order $order): void
     {
-        $orderService->calculateInvoiceReturnsLabels($order);
+        $this->orderService->calculateInvoiceReturnsLabels($order);
 
         if (count($order->payments)) {
             if ($order->isPaymentRegulated()) {
