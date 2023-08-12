@@ -2,14 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Entities\OrderPackage;
+use App\Entities\Label;
 use App\Enums\OrderPaymentsEnum;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use App\Enums\PackageStatus;
 use Illuminate\Support\Collection;
 use App\Entities\Order;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class Orders
 {
@@ -154,5 +151,16 @@ class Orders
         }
 
         return $paymentsValue;
+    }
+
+    public function orderIsConstructed(Order $order): bool
+    {
+        return $order->labels()->where('label_id', Label::ORDER_ITEMS_CONSTRUCTED)->exists();
+    }
+
+    public function deleteNewOrderPackagesAndCancelOthers(Order $order): void
+    {
+        $order->packages()->where('status', PackageStatus::NEW)->delete();
+        $order->packages()->whereNot('status', PackageStatus::NEW)->update(['status' => 'CANCELLED']);
     }
 }

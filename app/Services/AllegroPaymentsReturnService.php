@@ -7,7 +7,7 @@ use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\OrderReturn;
 use App\Enums\OrderPaymentsEnum;
-use App\Repositories\OrderRepository;
+use App\Repositories\Orders;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +16,7 @@ readonly class AllegroPaymentsReturnService
 {
     public function __construct(
         private AllegroPaymentService $allegroPaymentService,
-        private OrderRepository $orderRepository,
+        private Orders $orderRepository,
     ) {}
 
     /**
