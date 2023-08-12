@@ -18,6 +18,7 @@ class OrderPaymentObserver
         protected Orders                    $orderRepository,
         protected LabelService              $labelService,
         protected OrderPaymentLabelsService $orderPaymentLabelsService,
+        protected OrderService              $orderService,
     ) {}
 
     /**
@@ -66,10 +67,10 @@ class OrderPaymentObserver
      * @param OrderService $orderService
      * @return void
      */
-    public function updated(OrderPayment $orderPayment, OrderService $orderService): void
+    public function updated(OrderPayment $orderPayment): void
     {
         $this->orderPaymentLabelsService->calculateLabels($orderPayment->order);
 
-        $orderService->calculateInvoiceReturnsLabels($orderPayment->order);
+        $this->orderService->calculateInvoiceReturnsLabels($orderPayment->order);
     }
 }
