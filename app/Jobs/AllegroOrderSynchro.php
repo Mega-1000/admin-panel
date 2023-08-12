@@ -731,7 +731,7 @@ class AllegroOrderSynchro implements ShouldQueue
             ($type === OrderAddress::TYPE_INVOICE && empty($address['company']['taxId'])) &&
             (empty($orderAddress->firstName) || empty($orderAddress->lastName) || empty($orderAddress->address))
         ) {         
-            $deliveryAddress = OrderAddress::query()->where('order_id', $order->id)->where('type', OrderAddress::TYPE_DELIVERY)->first();
+            $deliveryAddress = $order->getDeliveryAddress();
             
             if (!empty($deliveryAddress)) {
                 $orderAddress->fill([
