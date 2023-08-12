@@ -7,6 +7,7 @@ use App\Helpers\AllegroReturnPaymentHelper;
 use App\DTO\AllegroPayment\AllegroReturnDTO;
 use App\Entities\Order;
 use App\Helpers\MessagesHelper;
+use App\Repositories\OrderRepository;
 use App\Services\AllegroOrderService;
 use App\Services\AllegroPaymentService;
 use App\Services\AllegroPaymentsReturnService;
@@ -21,6 +22,7 @@ class AllegroReturnPaymentController extends Controller
         private readonly AllegroPaymentService $allegroPaymentService,
         private readonly AllegroOrderService $allegroOrderService,
         private readonly AllegroPaymentsReturnService $allegroPaymentsReturnService,
+        private readonly OrderRepository $orderRepository,
     ) {}
     
     public function index(Order $order): RedirectResponse|View 
@@ -85,10 +87,10 @@ class AllegroReturnPaymentController extends Controller
         
         $this->allegroPaymentsReturnService->removeAndAddNeccessaryLabelsAfterAllegroReturn($order);
 
-        if (!$order->isConstructed()) {
+        if (!$this->orderRepository->orderIsConstructed($order)) {
             $order->taskSchedule()->whereNotIn('status', [Task::FINISHED, Task::REJECTED])->delete();
 
-            $order->deleteNewPackagesAndCancelOthers();
+            $this->orderRepository->deleteNewOrderPackagesAndCancelOthers($order);
 
             if (isset($totalValue)) {
                 $declaredSum = -(float)$totalValue;

@@ -7,14 +7,16 @@ use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\OrderReturn;
 use App\Enums\OrderPaymentsEnum;
+use App\Repositories\OrderRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Support\Facades\Auth;
 
-class AllegroPaymentsReturnService
+readonly class AllegroPaymentsReturnService
 {
     public function __construct(
-        private readonly AllegroPaymentService $allegroPaymentService,
+        private AllegroPaymentService $allegroPaymentService,
+        private OrderRepository $orderRepository,
     ) {}
 
     /**
@@ -54,7 +56,8 @@ class AllegroPaymentsReturnService
             return null;
         }
 
-        $orderIsConstructed = $order->isConstructed();
+        $orderIsConstructed = $this->orderRepository->orderIsConstructed($order);
+        dd($orderIsConstructed);
 
         $hasOrderReturn = false;
 
@@ -101,7 +104,7 @@ class AllegroPaymentsReturnService
         $loopPreventionArray = [];
         AddLabelService::addLabels($order, [Label::NEED_TO_ISSUE_INVOICE_CORRECTION], $loopPreventionArray, [], Auth::user()?->id);
 
-        if (!$order->isConstructed()) {
+        if (!$this->orderRepository->orderIsConstructed($order)) {
             $transportLabels = LabelGroup::query()->find(LabelGroup::TRANSPORT_LABEL_GROUP_ID)->labels()->pluck('labels.id')->toArray();
             $toRemove = [Label::BLUE_HAMMER_ID, Label::RED_HAMMER_ID, Label::ORDER_ITEMS_UNDER_CONSTRUCTION];
             $toRemove = array_merge($toRemove, $transportLabels);
