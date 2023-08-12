@@ -155,4 +155,9 @@ class Orders
 
         return $paymentsValue;
     }
+
+    public static function getSumOfBuyingInvoicesReturns(Order $order): float
+    {
+        return $order->payments()->where('operation_type', 'Wpłata/wypłata bankowa - zwrot za faktuę zakupową')->sum('amount');
+    }
 }

@@ -24,10 +24,13 @@ use App\Helpers\OrderPriceCalculator;
 use App\Http\Controllers\CreateTWSOOrdersDTO;
 use App\Repositories\Customers;
 use App\Repositories\OrderPayments;
+use App\Repositories\Orders;
 use App\Repositories\ProductStockLogs;
 use App\Repositories\Warehouses;
+use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
 use http\Message;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -44,7 +47,7 @@ class OrderService
 
         $currentStock = $this->getAllProductsQuantity($dto->productStock->id);
 
-        $orderQuantity =  $traffic - $currentStock;
+        $orderQuantity = $traffic - $currentStock;
 
         return [
             'calculatedQuantity' => max($orderQuantity, 0),
@@ -77,11 +80,11 @@ class OrderService
 
             $products = [];
             $products[0] = [
-                'amount' => $this->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($dto->productStock, [
-                    'daysBack' => $dto->daysBack,
-                    'daysToFuture' => $dto->daysToFuture
-                ])),
-            ] + $product->toArray();
+                    'amount' => $this->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($dto->productStock, [
+                        'daysBack' => $dto->daysBack,
+                        'daysToFuture' => $dto->daysToFuture
+                    ])),
+                ] + $product->toArray();
 
             $orderBuilder = (new OrderBuilder())
                 ->setPackageGenerator(new BackPackPackageDivider())
@@ -117,8 +120,8 @@ class OrderService
             foreach ($products as &$product) {
                 $quantity = $product['quantity'];
                 $product = [
-                    'amount' => $quantity
-                ] + Product::query()->findOrFail($product['id'])->toArray();
+                        'amount' => $quantity
+                    ] + Product::query()->findOrFail($product['id'])->toArray();
             }
 
             $orderBuilder = (new OrderBuilder())
@@ -174,8 +177,9 @@ class OrderService
      *
      * @return void
      */
-    public function rebookStore(Order $order, OrderPayment $payment, OrderPaymentDTO $paymentDTO): void {
-        DB::transaction(function() use ($payment, $order, $paymentDTO) {
+    public function rebookStore(Order $order, OrderPayment $payment, OrderPaymentDTO $paymentDTO): void
+    {
+        DB::transaction(function () use ($payment, $order, $paymentDTO) {
             OrderPayments::createRebookedOrderPayment(
                 $order,
                 $paymentDTO,
@@ -241,5 +245,42 @@ class OrderService
         );
 
         return $order->id;
+    }
+
+    /**
+     * @param Order $order
+     * @return float
+     */
+    public static function calculateTotalCost(Order $order): float
+    {
+        $sumOfPurchase = 0;
+        $items = $order->items;
+
+        foreach ($items as $item) {
+            $pricePurchase = $item->net_purchase_price_commercial_unit_after_discounts ?? 0;
+            $quantity = $item->quantity ?? 0;
+
+            $sumOfPurchase += floatval($pricePurchase) * $quantity;
+        }
+
+        $totalItemsCost = $sumOfPurchase * 1.23;
+        $transportCost = 0;
+
+        if ($order->shipment_price_for_us) {
+            $transportCost = floatval($order->shipment_price_for_us);
+        }
+
+        return $totalItemsCost + $transportCost;
+    }
+
+    public function calculateInvoiceReturnsLabels(Order $order): void
+    {
+        $arr = [];
+        if (self::calculateTotalCost($order) !== Orders::getSumOfBuyingInvoicesReturns($order)) {
+            AddLabelService::addLabels($order, [235], $arr, [], Auth::user()?->id);
+
+            return;
+        }
+        AddLabelService::addLabels($order, [236], $arr, [], Auth::user()?->id);
     }
 }

@@ -11,6 +11,7 @@ use App\Repositories\Orders;
 use App\Repositories\StatusRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\OrderPaymentLabelsService;
+use App\Services\OrderService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -81,8 +82,10 @@ readonly class OrderObserver
         }
     }
 
-    public function updated(Order $order): void
+    public function updated(Order $order, OrderService $orderService): void
     {
+        $orderService->calculateInvoiceReturnsLabels($order);
+
         if (count($order->payments)) {
             if ($order->isPaymentRegulated()) {
                 dispatch(new DispatchLabelEventByNameJob($order, "payment-equal-to-order-value"));
