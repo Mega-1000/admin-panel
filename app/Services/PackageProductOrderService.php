@@ -67,7 +67,7 @@ final class PackageProductOrderService
             ->toArray();
 
         foreach ($orderItems as &$orderItem) {
-            $orderItem['quantity'] = $orderItem['amount'];
+            $orderItem['amount'] = $orderItem['quantity'];
             $orderItem['product_id'] = $orderItem['product']['id'];
         }
 
