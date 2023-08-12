@@ -58,8 +58,6 @@ class AllegroReturnPaymentController extends Controller
 
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
 
-        $totalValue = null;
-
         if (count($lineItemsForPaymentRefund) > 0) {
             $data = new AllegroReturnDTO(
                 paymentId: $allegroPaymentId,
@@ -93,10 +91,12 @@ class AllegroReturnPaymentController extends Controller
             $order->deleteNewPackagesAndCancelOthers();
 
             if (isset($totalValue)) {
+                $declaredSum = -(float)$totalValue;
+
                 $order->payments()->create([
                     'promise' => '1',
                     'promise_date' => Carbon::now()->addWeekdays(2)->toDateTimeString(),
-                    'declared_sum' => "-$totalValue",
+                    'declared_sum' => $declaredSum,
                     'type' => 'CLIENT'
                 ]);
             }

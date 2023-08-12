@@ -7,6 +7,7 @@ use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\OrderReturn;
 use App\Enums\OrderPaymentsEnum;
+use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Support\Facades\Auth;
 
@@ -97,7 +98,8 @@ class AllegroPaymentsReturnService
     {
         $loopPreventionArray = [];
         RemoveLabelService::removeLabels($order, [Label::NEED_TO_RETURN_PAYMENT], $loopPreventionArray, [], Auth::user()?->id);
-        $order->labels()->attach(Label::NEED_TO_ISSUE_INVOICE_CORRECTION);
+        $loopPreventionArray = [];
+        AddLabelService::addLabels($order, [Label::NEED_TO_ISSUE_INVOICE_CORRECTION], $loopPreventionArray, [], Auth::user()?->id);
 
         if (!$order->isConstructed()) {
             $transportLabels = LabelGroup::query()->find(LabelGroup::TRANSPORT_LABEL_GROUP_ID)->labels()->pluck('labels.id')->toArray();
