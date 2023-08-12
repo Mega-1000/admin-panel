@@ -92,6 +92,7 @@ class Label extends Model implements Transformable
     public const GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO = 218;
 
     public const NEED_TO_RETURN_PAYMENT = 178;
+    public const NEED_TO_ISSUE_INVOICE_CORRECTION = 98;
 
     public $customColumnsVisibilities = [
         'name',

@@ -3,14 +3,20 @@
 namespace App\Services;
 
 use App\Entities\Label;
+use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\OrderReturn;
 use App\Enums\OrderPaymentsEnum;
+use App\Repositories\Orders;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
+use Illuminate\Support\Facades\Auth;
 
-class AllegroPaymentsReturnService
+readonly class AllegroPaymentsReturnService
 {
     public function __construct(
-        private readonly AllegroPaymentService $allegroPaymentService,
+        private AllegroPaymentService $allegroPaymentService,
+        private Orders $orderRepository,
     ) {}
 
     /**
@@ -50,7 +56,7 @@ class AllegroPaymentsReturnService
             return null;
         }
 
-        $orderIsConstructed = $order->labels()->where('label_id', Label::ORDER_ITEMS_CONSTRUCTED)->exists();
+        $orderIsConstructed = $this->orderRepository->orderIsConstructed($order);
 
         $hasOrderReturn = false;
 
@@ -88,5 +94,20 @@ class AllegroPaymentsReturnService
         }
 
         return $unsuccessfulCommissionRefundsItemNames;
+    }
+
+    public function removeAndAddNeccessaryLabelsAfterAllegroReturn(Order $order): void
+    {
+        $loopPreventionArray = [];
+        RemoveLabelService::removeLabels($order, [Label::NEED_TO_RETURN_PAYMENT], $loopPreventionArray, [], Auth::user()?->id);
+        $loopPreventionArray = [];
+        AddLabelService::addLabels($order, [Label::NEED_TO_ISSUE_INVOICE_CORRECTION], $loopPreventionArray, [], Auth::user()?->id);
+
+        if (!$this->orderRepository->orderIsConstructed($order)) {
+            $transportLabels = LabelGroup::query()->find(LabelGroup::TRANSPORT_LABEL_GROUP_ID)->labels()->pluck('labels.id')->toArray();
+            $toRemove = [Label::BLUE_HAMMER_ID, Label::RED_HAMMER_ID, Label::ORDER_ITEMS_UNDER_CONSTRUCTION];
+            $toRemove = array_merge($toRemove, $transportLabels);
+            $order->labels()->detach($toRemove);
+        }
     }
 }
