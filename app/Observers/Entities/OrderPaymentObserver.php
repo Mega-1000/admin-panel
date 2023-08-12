@@ -9,6 +9,7 @@ use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
 use App\Services\OrderAddressService;
 use App\Services\OrderPaymentLabelsService;
+use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
 
 class OrderPaymentObserver
@@ -62,11 +63,13 @@ class OrderPaymentObserver
 
     /**
      * @param OrderPayment $orderPayment
-     *
+     * @param OrderService $orderService
      * @return void
      */
-    public function updated(OrderPayment $orderPayment): void
+    public function updated(OrderPayment $orderPayment, OrderService $orderService): void
     {
         $this->orderPaymentLabelsService->calculateLabels($orderPayment->order);
+
+        $orderService->calculateInvoiceReturnsLabels($orderPayment->order);
     }
 }

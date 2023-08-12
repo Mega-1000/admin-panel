@@ -2509,6 +2509,7 @@
                                     data.shipment_price_for_us + '<br />'
                                 transportCost = parseFloat(data.shipment_price_for_us)
                             }
+                            return totalItemsCost + transportCost;
                             html += 'Suma: <br /><b>' + (totalItemsCost + transportCost).toFixed(2) + '<b/>'
                             return html;
                         }
