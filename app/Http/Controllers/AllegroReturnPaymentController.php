@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Task;
 use App\Helpers\AllegroReturnPaymentHelper;
 use App\DTO\AllegroPayment\AllegroReturnDTO;
-use App\Entities\Label;
 use App\Entities\Order;
 use App\Helpers\MessagesHelper;
+use App\Repositories\Orders;
 use App\Services\AllegroOrderService;
 use App\Services\AllegroPaymentService;
 use App\Services\AllegroPaymentsReturnService;
-use App\Services\Label\RemoveLabelService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Illuminate\Contracts\View\View;
 
@@ -22,10 +22,18 @@ class AllegroReturnPaymentController extends Controller
         private readonly AllegroPaymentService $allegroPaymentService,
         private readonly AllegroOrderService $allegroOrderService,
         private readonly AllegroPaymentsReturnService $allegroPaymentsReturnService,
+        private readonly Orders $orderRepository,
     ) {}
     
     public function index(Order $order): RedirectResponse|View 
     {
+        if (empty($order->allegro_payment_id)) {
+            return redirect()->route('orders.index')->with([
+                'message' => 'Ta oferta nie jest ofertą Allegro',
+                'alert-type' => 'error',
+            ]);
+        }
+
         $order = $this->allegroPaymentsReturnService->getOrderItemsWithReturns($order);
 
         if (empty($order)) {
@@ -45,10 +53,10 @@ class AllegroReturnPaymentController extends Controller
 
     public function store(Request $request, Order $order): RedirectResponse
     {
-        $allegroPaymentId = $order['allegro_payment_id'];
+        $allegroPaymentId = $order->allegro_payment_id;
         $allegroOrder = $this->allegroOrderService->getOrderByPaymentId($allegroPaymentId);
         
-        $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, $request->return);
+        $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, $request->returns);
 
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
 
@@ -67,16 +75,34 @@ class AllegroReturnPaymentController extends Controller
                 ]);
             }
 
-            $consultantNotice = $response['createdAt'] . "Zwrot płatności: " . $response['id'] . "o wartości" . $response['totalValue']['amount'];
+            $totalValue = $response['totalValue']['amount'];
+
+            $consultantNotice = $response['createdAt'] . " Zwrot płatności: " . $response['id'] . " o wartości " . $totalValue;
             MessagesHelper::sendAsCurrentUser($order, $consultantNotice);
 
             $order->update([
                 'return_payment_id' => $response['id'],
             ]);
         }
-            
-        $loopPreventionArray = [];
-        RemoveLabelService::removeLabels($order, [Label::NEED_TO_RETURN_PAYMENT], $loopPreventionArray, [], Auth::user()?->id);
+        
+        $this->allegroPaymentsReturnService->removeAndAddNeccessaryLabelsAfterAllegroReturn($order);
+
+        if (!$this->orderRepository->orderIsConstructed($order)) {
+            $order->taskSchedule()->whereNotIn('status', [Task::FINISHED, Task::REJECTED])->delete();
+
+            $this->orderRepository->deleteNewOrderPackagesAndCancelOthers($order);
+
+            if (isset($totalValue)) {
+                $declaredSum = -(float)$totalValue;
+
+                $order->payments()->create([
+                    'promise' => '1',
+                    'promise_date' => Carbon::now()->addWeekdays(2)->toDateTimeString(),
+                    'declared_sum' => $declaredSum,
+                    'type' => 'CLIENT'
+                ]);
+            }
+        }
 
         $unsuccessfulCommissionRefundsItemNames = $this->allegroPaymentsReturnService->returnCommissionsAndReturnFailed($lineItemsForCommissionRefund, $returnsByAllegroId);
 
