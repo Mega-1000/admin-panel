@@ -66,6 +66,11 @@ final class PackageProductOrderService
             ->get()
             ->toArray();
 
+        foreach ($orderItems as &$orderItem) {
+            $orderItem['quantity'] = $orderItem['amount'];
+            $orderItem['product_id'] = $orderItem['product']['id'];
+        }
+
         return [$productArray, $orderItems];
     }
 
