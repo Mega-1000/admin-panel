@@ -715,7 +715,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'address' => $street,
             'flat_number' => $flatNo,
             'city' => $address['city'],
-            'firmname' => (!empty($address['company']['taxId'])) ? ($address['company']['name'] ?? $address['comapnyName'] ?? null) : null,
+            'firmname' => (!empty($address['company']['taxId'])) ? ($address['company']['name'] ?? $address['companyName'] ?? null) : null,
             'nip' => $address['company']['taxId'] ?? null,
             'postal_code' => $address['zipCode'] ?? $address['postCode'],
             'phone_code' => $code,
