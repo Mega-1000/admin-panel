@@ -4,6 +4,7 @@
     .products-grid {
         display: flex;
         flex: 0 0 16.666667%;
+        flex-wrap: wrap;
     }
 </style>
 
