@@ -10,7 +10,5 @@ class PayInDTO
         public ?int $orderId,
         public array $data,
         public ?string $message
-    )
-    {
-    }
+    ) {}
 }

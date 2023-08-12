@@ -114,6 +114,8 @@ class ImportBankPayIn implements ShouldQueue
             $payInDto = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
             $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
 
+            $payIn['operation_type'] = 'Wpłata/wypłata bankowa';
+
             if ($payInDto->message === "Brak dopasowania") {
                 continue;
             } else if ($payInDto->message === "Brak numeru zamówienia") {
@@ -121,6 +123,10 @@ class ImportBankPayIn implements ShouldQueue
                 continue;
             } else if ($payInDto->message === "/[zZ][zZ](\d{3,5})[zZ][zZ]/") {
                 $payIn['kwota'] *= -1;
+            } else if ($payInDto->message === "/[yY][yY](\d{3,5})[yY][yY]/") {
+                $payIn['kwota'] *= -1;
+
+                $payIn['operation_type'] = 'Wpłata/wypłata bankowa - zwrot za faktuę zakupową';
             }
 
             if ($payInDto->orderId === null) {
@@ -348,14 +354,14 @@ class ImportBankPayIn implements ShouldQueue
         );
 
         if ($amount < 0) {
-            $this->saveOrderPayment($order, $amount, $payIn, false);
+            $this->saveOrderPayment($order, $amount, $payIn, false, $payIn['operation_type']);
             return;
         }
 
         $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
         OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
 
-        $orderPayment = $this->saveOrderPayment($order, $amount, $payIn, $declaredSum);
+        $orderPayment = $this->saveOrderPayment($order, $amount, $payIn, $declaredSum, $payIn['operation_type']);
 
         if ($orderPayment instanceof OrderPayment) {
             $this->orderPaymentService->dispatchLabelsForPaymentAmount($orderPayment);
@@ -367,10 +373,10 @@ class ImportBankPayIn implements ShouldQueue
      * @param float $paymentAmount
      * @param array $payIn
      * @param false $declaredSum
-     *
+     * @param string $operationType
      * @return Model
      */
-    private function saveOrderPayment(Order $order, float $paymentAmount, array $payIn, bool $declaredSum = false): Model
+    private function saveOrderPayment(Order $order, float $paymentAmount, array $payIn, $declaredSum = false, string $operationType): Model
     {
         $payment = OrderPayment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
 
@@ -383,7 +389,7 @@ class ImportBankPayIn implements ShouldQueue
                 'operation_date' => $payIn['data_ksiegowania'],
                 'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
                 'comments' => implode(" ", $payIn),
-                'operation_type' => 'Wpłata/wypłata bankowa',
+                'operation_type' => 'Wpłata/wypłata bankowa' ?? $operationType,
                 'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]) : $payment;
 
