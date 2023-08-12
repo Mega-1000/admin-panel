@@ -3,7 +3,7 @@
 <style>
     .products-grid {
         display: flex;
-        flex: 0 0 16.666667%;
+        flex: 0 0 20%;
         flex-wrap: wrap;
     }
 </style>
@@ -30,7 +30,7 @@
 
             @csrf
             <label for="product">Produkt</label>
-            <div style="display: flex;">
+            <div class="products-grid">
                 @foreach($packageProducts as $product)
                     <div class="products-grid">
                         <label for="product">{{ $product->name }}</label>
