@@ -1,5 +1,12 @@
 @extends('layouts.datatable')
 
+<style>
+    .products-grid {
+        display: flex;
+        width: 16.66666666666667%;
+    }
+</style>
+
 @section('app-header')
     <h1 class="page-title">
         Stwórz produkt pakowy
@@ -24,7 +31,7 @@
             <label for="product">Produkt</label>
             <div style="display: flex;">
                 @foreach($packageProducts as $product)
-                    <div style="display: flex">
+                    <div class="products-grid">
                         <label for="product">{{ $product->name }}</label>
                         <img src="{{  $product->getImageUrl() }}"  alt="product image" width="100px" height="100px">
 
