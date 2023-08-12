@@ -3,7 +3,7 @@
 <style>
     .products-grid {
         display: flex;
-        width: 16.66666666666667%;
+        flex: 0 0 16.666667%;
     }
 </style>
 
