@@ -57,7 +57,6 @@ readonly class AllegroPaymentsReturnService
         }
 
         $orderIsConstructed = $this->orderRepository->orderIsConstructed($order);
-        dd($orderIsConstructed);
 
         $hasOrderReturn = false;
 
