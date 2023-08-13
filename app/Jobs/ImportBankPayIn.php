@@ -6,12 +6,9 @@ use App\DTO\PayInDTO;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
-use App\Entities\Payment;
-use App\Entities\Transaction;
 use App\Enums\OrderTransactionEnum;
 use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
-use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\FileInvoiceRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
@@ -20,7 +17,6 @@ use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
 use App\Services\OrderPaymentLabelsService;
 use App\Services\OrderPaymentService;
-use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -389,7 +385,7 @@ class ImportBankPayIn implements ShouldQueue
                 'operation_date' => $payIn['data_ksiegowania'],
                 'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
                 'comments' => implode(" ", $payIn),
-                'operation_type' => 'Wpłata/wypłata bankowa' ?? $operationType,
+                'operation_type' => $operationType ?? 'Wpłata/wypłata bankowa',
                 'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]) : $payment;
 
