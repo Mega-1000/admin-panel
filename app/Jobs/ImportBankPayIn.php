@@ -6,6 +6,7 @@ use App\DTO\PayInDTO;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
+use App\Enums\OrderPaymentsEnum;
 use App\Enums\OrderTransactionEnum;
 use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
@@ -122,7 +123,7 @@ class ImportBankPayIn implements ShouldQueue
             } else if ($payInDto->message === "/[yY][yY](\d{3,5})[yY][yY]/") {
                 $payIn['kwota'] *= -1;
 
-                $payIn['operation_type'] = 'Wpłata/wypłata bankowa - zwrot za faktuę zakupową';
+                $payIn['operation_type'] = OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE;
             }
 
             if ($payInDto->orderId === null) {
@@ -377,7 +378,7 @@ class ImportBankPayIn implements ShouldQueue
         /** @var ?OrderPayment $payment */
         $payment = OrderPayment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
         $operationType = $operationType ?? 'Wpłata/wypłata bankowa';
-        $payer = $operationType === 'Wpłata/wypłata bankowa - zwrot za faktuę zakupową' ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
+        $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
 
         $payment = !isset($payment)
             ? $order->payments()->create([
