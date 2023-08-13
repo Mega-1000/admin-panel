@@ -30,8 +30,6 @@ class OrderUpdateRequest extends FormRequest
             'correction_amount' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'id' => 'required|array|min:1',
             'return_value_.*' => 'nullable|int',
-            'preliminary_buying_document_number' => 'nullable|string|max:255',
-            'buying_document_number' => 'nullable|date',
         ];
     }
 

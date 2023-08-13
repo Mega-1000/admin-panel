@@ -10,6 +10,7 @@ use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\MailReportController;
+use App\Http\Controllers\OrderInvoiceDocumentsController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
 use App\Http\Controllers\PackageProductOrderController;
@@ -691,3 +692,5 @@ Route::put('shipment-groups/{id}/update', [
 Route::delete('shipment/{id}/', [
     'uses' => 'ShipmentGroupController@destroy',
 ])->name('shipment-groups.destroy');
+Route::post('/order-invoice-documents/store', [OrderInvoiceDocumentsController::class, 'store'])->name('order-invoice-documents.store');
+Route::get('/order-invoice-documents/{id}/delete', [OrderInvoiceDocumentsController::class, 'destroy'])->name('order-invoice-documents.delete');

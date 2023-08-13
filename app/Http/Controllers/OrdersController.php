@@ -1125,18 +1125,12 @@ class OrdersController extends Controller
         }
 
         $warehouse = $this->warehouseRepository->findWhere(["symbol" => $request->input('delivery_warehouse')])->first();
-        if ($request->input('employee') == 'none') {
 
-            $employee = null;
-        } else {
-            $employee = $request->input('employee');
-        }
-        if ($order->status->id != $request->input('status')) {
-            $date = Carbon::now();
-            $statusUpdateDate = $date->toDateTimeString();
-        } else {
-            $statusUpdateDate = $order->last_status_update_date;
-        }
+        $employee = $request->input('employee') == 'none' ? null : $request->input('employee');
+
+        $statusUpdateDate = $order->status->id != $request->input('status')
+            ? Carbon::now()->toDateTimeString()
+            : $order->last_status_update_date;
 
         $oldStatus = $order->status_id;
 

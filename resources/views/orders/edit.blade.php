@@ -606,17 +606,36 @@
                         <input type="text" class="form-control" id="correction_description" name="correction_description"
                                value="{{ $order->correction_description }}">
                     </div>
+                </div>
+                <div class="order-data-column">
                     <h4>Dane dokumentów zakupowych</h4>
-                    <div class="order-data-input">
-                        <label for="preliminary_buying_document_number">@lang('orders.form.preliminary_buying_document_number')</label>
-                        <input type="text" class="form-control" id="preliminary_buying_document_number" name="preliminary_buying_document_number"
-                               value="{{ $order->preliminary_buying_document_number }}">
-                    </div>
-                    <div class="order-data-input">
-                        <label for="buying_document_number">@lang('orders.form.buying_document_number')</label>
-                        <input type="text" class="form-control" id="buying_document_number" name="buying_document_number"
-                               value="{{ $order->buying_document_number }}">
-                    </div>
+                    Wypełnij i dodaj brak możliwości korekty - w razie potrzeby usuń i dodaj na nowo
+                    @include('orders.create-invoice-document')
+                    @foreach($order->invoiceDocuments as $invoiceDocument)
+                        <hr>
+                        <div>
+                            <label for="preliminary_buying_document_number">@lang('orders.form.preliminary_buying_document_number')</label>
+                            <input type="text" class="form-control" id="preliminary_buying_document_number" name="preliminary_buying_document_number"
+                                   value="{{ $invoiceDocument->preliminary_buying_document_number }}">
+                        </div>
+                        <div>
+                            <label for="buying_document_number">@lang('orders.form.buying_document_number')</label>
+                            <input type="text" class="form-control" id="buying_document_number" name="buying_document_number"
+                                   value="{{ $invoiceDocument->buying_document_number }}">
+                        </div>
+                        <div>
+                            <label for="gross_value">Wartość brutto</label>
+                            <input type="text" class="form-control" id="gross_value" name="gross_value" placeholder="Wprowadź wartość brutto" value="{{ $invoiceDocument->gross_value }}">
+                        </div>
+                        <div>
+                            <label for="invoice_date">Data faktury</label>
+                            <input type="date" class="form-control" id="invoice_date" name="invoice_date" placeholder="Wprowadź datę faktury" value="{{ $invoiceDocument->invoice_date }}">
+                        </div>
+
+                        <a href="{{ route('order-invoice-documents.delete', ['id' => $invoiceDocument->id]) }}" class="btn btn-danger">
+                           Usuń
+                        </a>
+                    @endforeach
                 </div>
             </div>
             <div class="row">
@@ -2583,6 +2602,25 @@
 @section('datatable-scripts')
     <script type="application/javascript">
         $(document).ready(function () {
+            $('#ssbb').click(function () {
+                const postData = {
+                    preliminary_buying_document_number: $('#preliminary_buying_document_number').val(),
+                    buying_document_number: $('#buying_document_number').val(),
+                    gross_value: $('#gross_value').val(),
+                    invoice_date: $('#invoice_date').val(),
+                    order_id: {{ $order->id }},
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('order-invoice-documents.store') }}",
+                    data: postData,
+                    success: function () {
+                        window.location.reload();
+                    }
+                });
+            });
+
             const consultantComment = document.getElementById("consultant_comment");
 
             if (consultantComment) {
