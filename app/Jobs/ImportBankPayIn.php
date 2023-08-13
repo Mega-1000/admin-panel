@@ -380,6 +380,8 @@ class ImportBankPayIn implements ShouldQueue
         $operationType = $operationType ?? 'Wpłata/wypłata bankowa';
         $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
 
+        unset($payIn['operation_type']);
+
         $payment = !isset($payment)
             ? $order->payments()->create([
                 'amount' => $paymentAmount,
