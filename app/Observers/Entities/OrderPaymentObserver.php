@@ -53,7 +53,7 @@ class OrderPaymentObserver
      *
      * @return void
      */
-    public function deleted(OrderPayment $orderPayment): void
+    public function deleting(OrderPayment $orderPayment): void
     {
         if ($orderPayment->rebooked_order_payment_id) {
             OrderPayment::where('rebooked_order_payment_id', $orderPayment->rebooked_order_payment_id)->delete();
@@ -64,7 +64,6 @@ class OrderPaymentObserver
 
     /**
      * @param OrderPayment $orderPayment
-     * @param OrderService $orderService
      * @return void
      */
     public function updated(OrderPayment $orderPayment): void
