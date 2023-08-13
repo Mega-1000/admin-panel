@@ -155,9 +155,9 @@ class Orders
 
     public static function getSumOfBuyingInvoicesReturns(Order $order): float
     {
-        return $order->payments()->where('operation_type', 'Wpłata/wypłata bankowa - zwrot za faktuę zakupową')->sum('amount');
+        return $order->payments()->where('operation_type', OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE)->sum('amount');
     }
-  
+
     public function orderIsConstructed(Order $order): bool
     {
         return $order->labels()->where('label_id', Label::ORDER_ITEMS_CONSTRUCTED)->exists();

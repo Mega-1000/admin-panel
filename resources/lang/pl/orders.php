@@ -82,6 +82,8 @@ return [
 	    'invoice_address_change_failure' => 'Dane do faktury nie mogą być zmienione.'
     ],
     'form' => [
+        'preliminary_buying_document_number' => 'Wstępny numer dokumentu zakupowego',
+        'buying_document_number' => 'Numer dokumentu zakupowego',
         'buttons' => [
             'details' => 'Szczegóły',
             'payments' => 'Płatności',

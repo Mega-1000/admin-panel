@@ -104,7 +104,9 @@ class Order extends Model implements Transformable
         'search_on_lp',
         'production_date',
         'preferred_invoice_date',
-        'token'
+        'token',
+        'preliminary_buying_document_number',
+        'buying_document_number',
     ];
     /**
      * The attributes that are mass assignable.

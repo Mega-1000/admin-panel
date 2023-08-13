@@ -531,7 +531,7 @@
                 <div class="order-data-column">
                     <h4>Dane z allegro</h4>
                     <div class="order-data-input">
-                        <label 
+                        <label
                                for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
                         <input type="text" class="form-control" id="customer.nick_allegro"
                                 name="customer.nick_allegro"
@@ -549,7 +549,7 @@
                                 name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
                     </div>
                     <div class="order-data-input">
-                        <label 
+                        <label
                                for="allegro_transaction_id">Numer transakcji</label>
                         <input type="text" class="form-control" id="allegro_transaction_id"
                                 name="allegro_transaction_id"
@@ -605,6 +605,17 @@
                         <label for="correction_description">@lang('orders.form.correction_description')</label>
                         <input type="text" class="form-control" id="correction_description" name="correction_description"
                                value="{{ $order->correction_description }}">
+                    </div>
+                    <h4>Dane dokumentów zakupowych</h4>
+                    <div class="order-data-input">
+                        <label for="preliminary_buying_document_number">@lang('orders.form.preliminary_buying_document_number')</label>
+                        <input type="text" class="form-control" id="preliminary_buying_document_number" name="preliminary_buying_document_number"
+                               value="{{ $order->preliminary_buying_document_number }}">
+                    </div>
+                    <div class="order-data-input">
+                        <label for="buying_document_number">@lang('orders.form.buying_document_number')</label>
+                        <input type="text" class="form-control" id="buying_document_number" name="buying_document_number"
+                               value="{{ $order->buying_document_number }}">
                     </div>
                 </div>
             </div>
@@ -1001,7 +1012,7 @@
                                     @endforeach
                                 </tr>
                                 <tr class="selling-row row-{{$item->id}}">
-                                    
+
                                 </tr>
                                 @if(!empty($productsVariation[$item->product->id]))
                                     <tr>

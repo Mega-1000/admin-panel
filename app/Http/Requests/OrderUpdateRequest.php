@@ -11,7 +11,7 @@ class OrderUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,7 +21,7 @@ class OrderUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'packing_warehouse_cost' => 'nullable|regex:/^\d*(\.\d{2})?$/',
@@ -30,10 +30,12 @@ class OrderUpdateRequest extends FormRequest
             'correction_amount' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'id' => 'required|array|min:1',
             'return_value_.*' => 'nullable|int',
+            'preliminary_buying_document_number' => 'nullable|string|max:255',
+            'buying_document_number' => 'nullable|date',
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'id.required' => 'Musisz wybrać chociaż jeden produkt',

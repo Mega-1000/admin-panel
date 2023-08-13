@@ -275,8 +275,14 @@ class OrderService
 
     public function calculateInvoiceReturnsLabels(Order $order): void
     {
+        $sumOfReturns = Orders::getSumOfBuyingInvoicesReturns($order);
+
+        if ((int)$sumOfReturns === 0) {
+            return;
+        }
+
         $arr = [];
-        if (self::calculateTotalCost($order) !== Orders::getSumOfBuyingInvoicesReturns($order)) {
+        if (self::calculateTotalCost($order) !== $sumOfReturns) {
             AddLabelService::addLabels($order, [235], $arr, [], Auth::user()?->id);
 
             return;
