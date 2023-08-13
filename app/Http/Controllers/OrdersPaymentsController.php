@@ -1373,6 +1373,11 @@ class OrdersPaymentsController extends Controller
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         $deleted = DB::table('order_payments')->where('id', $id)->delete();
+
+        if ($orderPayment->rebooked_order_payment_id) {
+            OrderPayment::where('rebooked_order_payment_id', $orderPayment->rebooked_order_payment_id)->delete();
+        }
+
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
 

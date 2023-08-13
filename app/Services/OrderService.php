@@ -281,6 +281,7 @@ class OrderService
 
             return;
         }
+
         AddLabelService::addLabels($order, [236], $arr, [], Auth::user()?->id);
     }
 }
