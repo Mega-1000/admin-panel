@@ -114,6 +114,7 @@
 @endsection
 
 @section('datatable-scripts')
+    <script src="sweetalert2.all.min.js"></script>
     <script src="/js/helpers/fastResponseSendBox.js"></script>
     <script>
         const save = async (id, ) => {
