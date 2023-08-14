@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Your code here
     axios.get('/fast-response/jsonIndex').then((response) => {
         response.data.fastResponses.forEach((button) => {
-            const buttonElement = document.createElement('button');
+            const buttonElement = document.createElement('div');
 
             buttonElement.classList.add('btn', 'btn-primary', 'm-2');
 
