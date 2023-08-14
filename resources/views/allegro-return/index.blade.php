@@ -58,7 +58,7 @@
                                         <label for="undamagedDeduction-{{$item->product->symbol}}">Wartość potrącenia od towaru nieuszkodzonego</label>
                                     </div>
                                     <p>
-                                        Wartość zwrotu towaru nieuszkodzonego: 
+                                        Wartość zwrotu towaru nieuszkodzonego:
                                         <span id="undamagedValue-{{$item->product->symbol}}">{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}</span>
                                     </p>
                                 @else
@@ -78,7 +78,7 @@
                                         <label for="damagedDeduction-{{$item->product->symbol}}">Wartość potrącenia od towaru uszkodzonego</label>
                                     </div>
                                     <p>
-                                        Wartość zwrotu towaru uszkodzonego: 
+                                        Wartość zwrotu towaru uszkodzonego:
                                         <span id="damagedValue-{{$item->product->symbol}}">0.00</span>
                                     </p>
                                 @else
@@ -90,7 +90,7 @@
                                     Suma potrąceń dla asortymentu:
                                     <span id="deductionSum-{{$item->product->symbol}}">0.00</span>
                                 <p>
-                                    Wartość zwrotu dla asortymentu: 
+                                    Wartość zwrotu dla asortymentu:
                                     <span id="value-{{$item->product->symbol}}" class="returnValue">{{ $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged }}</span>
                                 </p>
                             </div>
@@ -106,6 +106,8 @@
                     </p>
                     <button type="submit" class="btn btn-primary">Zwróć</button>
                 </div>
+
+                @include('fast-response.partials.fast-response-send-box', ['order' => $order])
             </div>
         </form>
     @endif
@@ -127,7 +129,7 @@
 
                         const deductionInput = $(`#undamagedDeduction-${$.escapeSelector('{{$item->product->symbol}}')}`);
                         deductionInput.prop('disabled', !isChecked);
-                        
+
                         let newValue = {{$item->gross_selling_price_commercial_unit}} * {{$item->orderReturn->quantity_undamaged}};
                         newValue = isChecked ? newValue - parseFloat(deductionInput.val()) : newValue;
                         valueEl.text(newValue.toFixed(2));

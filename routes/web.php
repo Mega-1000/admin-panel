@@ -7,6 +7,7 @@ use App\Http\Controllers\ConfirmProductStockOrderController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\EmailSettingsController;
+use App\Http\Controllers\FastResponseController;
 use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\MailReportController;
@@ -694,3 +695,6 @@ Route::delete('shipment/{id}/', [
 ])->name('shipment-groups.destroy');
 Route::post('/order-invoice-documents/store', [OrderInvoiceDocumentsController::class, 'store'])->name('order-invoice-documents.store');
 Route::get('/order-invoice-documents/{id}/delete', [OrderInvoiceDocumentsController::class, 'destroy'])->name('order-invoice-documents.delete');
+Route::get('/fast-response/jsonIndex', [FastResponseController::class, 'jsonIndex'])->name('fast-response.jsonIndex');
+Route::resource('/fast-response', FastResponseController::class)->names('fast-response');
+Route::post('/fast-response/{fastResponse}/{order}/send', [FastResponseController::class, 'send'])->name('fast-response.send');
