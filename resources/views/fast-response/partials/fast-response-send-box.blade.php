@@ -11,23 +11,23 @@
 <script>
     const messagesSelectBox = document.getElementById('messages-select-box');
 
-    axios.get('{{ route('fast-response.jsonIndex') }}').then((response) => {
-        response.data.fastResponses.forEach((button) => {
-            const buttonElement = document.createElement('button');
+    setTimeout(() => {
+        axios.get('{{ route('fast-response.jsonIndex') }}').then((response) => {
+            response.data.fastResponses.forEach((button) => {
+                const buttonElement = document.createElement('button');
 
-            buttonElement.classList.add('btn', 'btn-primary', 'm-2');
+                buttonElement.classList.add('btn', 'btn-primary', 'm-2');
 
-            buttonElement.innerText = button.title;
+                buttonElement.innerText = button.title;
 
-            buttonElement.setAttribute('onclick', 'save(' + button.id + ')');
+                buttonElement.setAttribute('onclick', 'save(' + button.id + ')');
 
-            messagesSelectBox.appendChild(buttonElement);
-        })
-    });
+                messagesSelectBox.appendChild(buttonElement);
+            })
+        });
+    }, 1000);
 
     const save = async (id) => {
-        // /fast-response/{fastResponse}/{order}/send
-
         const response = await axios.post(`/fast-response/${id}/{{ $order->id }}/send`);
 
         if (response.data.success) {
