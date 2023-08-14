@@ -15,13 +15,3 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     });
 });
-
-const save = async (id) => {
-    const response = await axios.post(`/fast-response/${id}/{{ $order->id }}/send`);
-
-    if (response.data.success) {
-        swal.fire('Wysłano', 'Wysłano wiadomość', 'success');
-    } else {
-        alert('Wystąpił błąd');
-    }
-}

@@ -116,6 +116,16 @@
 @section('datatable-scripts')
     <script src="/js/helpers/fastResponseSendBox.js"></script>
     <script>
+        const save = async (id, ) => {
+            const response = await axios.post(`/fast-response/${id}/{{ $order->id }}/send`);
+
+            if (response.data.success) {
+                swal.fire('Wysłano', 'Wysłano wiadomość', 'success');
+            } else {
+                alert('Wystąpił błąd');
+            }
+        }
+
         $(document).ready(function() {
             @foreach($order->items as $item)
             @if($item->orderReturn != null)
