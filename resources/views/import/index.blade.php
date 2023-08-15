@@ -8,6 +8,18 @@
 
 @section('app-content')
 <div class="browse container-fluid">
+    <a class="btn btn-primary" href="{{ route('fast-response.index') }}">
+        Centrum zarządzania szybkimi odpowiedziami
+    </a>
+
+    <a class="btn btn-primary" href="/admin/set-logs-permissions">
+        Permisje logów
+    </a>
+
+    <a class="btn btn-primary" href="/admin/email-reports">
+        Raporty maili
+    </a>
+
     <div class="row">
         <div class="col-md-12">
             @if ($import->processing)
