@@ -28,7 +28,7 @@
                 <label for="name">ceny towarów pakowych 0,01 (Wszystkie zaznaczone towary będą posiadały ceny 0.01)</label>
                 <input type="checkbox" name="package-products-price-0-01">
                 <br>
-                <label for="name">ceny sprzedaży standardowe aczkolwiek z innych towarów i końcówkę ewentualnie z transportu</label>
+                <label for="name">ceny sprzedaży standardowe aczkolwiek wartość zaznaczonych towarów odejmij z innych towarów i końcówkę ewentualnie z transportu</label>
             </div>
 
             <label for="product">Produkt</label>
