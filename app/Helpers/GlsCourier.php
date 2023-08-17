@@ -42,10 +42,8 @@ class GlsCourier implements iCourier
                 case GlsPackageStatus::INTRANSIT:
                 case GlsPackageStatus::INWAREHOUSE:
                 case GlsPackageStatus::INDELIVERY:
-                    $package->status = PackageStatus::SENDING;
-                    break;
                 case GlsPackageStatus::PREADVICE:
-                    $package->status = PackageStatus::NEW;
+                    $package->status = PackageStatus::SENDING;
                     break;
             }
 
