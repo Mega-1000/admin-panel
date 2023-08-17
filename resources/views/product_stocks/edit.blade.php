@@ -20,6 +20,21 @@
         </div>
     @endif
     <div style="margin-bottom: 15px;" class="tab">
+        <div class="form-group">
+            <label for="quantity">@lang('product_stocks.form.quantity')</label>
+            @php
+                $quantity = 0;
+            @endphp
+            @foreach ($productStocks->position as $position)
+                @php
+                    $quantity += $position->position_quantity
+                @endphp
+            @endforeach
+            <input type="number" class="form-control" id="quantity" name="quantity"
+                   value="{{ $productStocks->quantity }}" disabled>
+            <input type="hidden" class="form-control" id="different" name="different"
+                   value="">
+        </div>
         <button class="btn btn-primary active"
                 name="change-button-form" id="button-general"
                 value="general">@lang('product_stocks.form.buttons.general')</button>
