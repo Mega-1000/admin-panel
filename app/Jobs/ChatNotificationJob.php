@@ -74,14 +74,5 @@ class ChatNotificationJob implements ShouldQueue
 
     public static function sendNewMessageEmail($email, MessagesHelper $helper): void
     {
-        Helper::sendEmail(
-            $email,
-            'chat-notification',
-            'Nowa wiadomość w ' . config('app.name'),
-            [
-                'url' => route('chat.show', ['token' => $helper->encrypt()]),
-                'title' => $helper->getTitle(false)
-            ]
-        );
     }
 }
