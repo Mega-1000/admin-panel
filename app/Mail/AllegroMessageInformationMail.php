@@ -17,10 +17,10 @@ class AllegroMessageInformationMail extends Mailable
     /**
      * Create a new message instance.
      *
-     * @return void
+     * @param $messageText
      */
     public function __construct(
-        protected readonly string $message,
+        protected $messageText,
     ) {}
 
     /**
@@ -45,7 +45,7 @@ class AllegroMessageInformationMail extends Mailable
         return new Content(
             view: 'emails.allegro_message_information',
             with: [
-                'message' => $this->message,
+                'messageText' => $this->messageText,
             ],
         );
     }
