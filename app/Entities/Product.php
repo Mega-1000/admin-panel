@@ -96,7 +96,8 @@ class Product extends Model implements Transformable
         'average_amount_of_product_in_package',
         'employees_ids',
         'is_package',
-        'save_name'
+        'save_name',
+        'save_image'
     ];
 
     public array $customColumnsVisibilities = [

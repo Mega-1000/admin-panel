@@ -25,7 +25,17 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'save_name' => 'required|boolean',
+            'save_name' => 'required',
+            'save_image' => 'required',
+            'image' => 'nullable',
         ];
+    }
+
+    public function validated($key = null, $default = null): array
+    {
+        $validated = parent::validated();
+        $validated['save_name'] = $validated['save_name'] === 'true';
+        $validated['save_image'] = $validated['save_image'] === 'true';
+        return $validated;
     }
 }

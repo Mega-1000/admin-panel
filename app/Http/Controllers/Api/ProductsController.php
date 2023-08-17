@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\Category;
-use App\Entities\ChimneyAttribute;
 use App\Entities\Product;
 use App\Entities\Warehouse;
-use App\Helpers\MessagesHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetHiddenProductsRequest;
 use App\Http\Requests\GetProductsForChimneyRequest;
@@ -15,7 +13,6 @@ use App\Repositories\Categories;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\Products;
-use App\Repositories\ProductStockLogs;
 use App\Repositories\WarehouseRepository;
 use App\Services\ProductsService;
 use App\Traits\Paginatable;
@@ -29,7 +26,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\NoReturn;
-use ParseError;
+use Illuminate\Support\Str;
 
 class ProductsController extends Controller
 {
@@ -290,8 +287,16 @@ class ProductsController extends Controller
         ]));
     }
 
-    public function update(Product $product, UpdateProductRequest $request): JsonResponse
+    public function update(Product $product, UpdateProductRequest $request)
     {
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = Str::random(10);
+            $image->move(public_path('images/products'), $imageName);
+            $product->url = asset('images/products/' . $imageName);
+            $product->save();
+        }
+
         $product->update($request->validated());
 
         return response()->json([
