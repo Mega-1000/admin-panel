@@ -370,10 +370,6 @@
                     name: 'damaged'
                 },
                 {
-                    data: 'comments',
-                    name: 'comments'
-                },
-                {
                     data: 'created_at',
                     name: 'created_at'
                 },
