@@ -35,7 +35,7 @@
                 <tbody>
 
                 <button wire:click.prevent="addPosition({{ $item }})" class="btn btn-primary">
-                    Add Position
+                     Dodaj pozycję
                 </button>
 
                 @foreach($item->product->stock->position as $productStockPosition)
