@@ -287,7 +287,7 @@ class ProductsController extends Controller
         ]));
     }
 
-    public function update(Product $product, UpdateProductRequest $request)
+    public function update(Product $product, UpdateProductRequest $request): JsonResponse
     {
         if ($request->hasFile('image')) {
             $image = $request->file('image');
