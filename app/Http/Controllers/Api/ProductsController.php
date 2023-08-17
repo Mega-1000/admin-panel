@@ -287,17 +287,18 @@ class ProductsController extends Controller
         ]));
     }
 
-    public function update(Product $product, UpdateProductRequest $request): JsonResponse
+    public function update(Product $product, UpdateProductRequest $request)
     {
+        $product->update($request->validated());
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = Str::random(10);
             $image->move(public_path('images/products'), $imageName);
-            $product->url = asset('images/products/' . $imageName);
-            $product->save();
-        }
+            $product->update(['url_for_website' => $product->url_for_website]);
 
-        $product->update($request->validated());
+            return Product::find($product->id)->url_for_website;
+        }
 
         return response()->json([
             'message' => 'success'

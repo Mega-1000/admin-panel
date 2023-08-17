@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AllegroMessageController;
 use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\OrderPackageController;
 use App\Http\Controllers\Api\ProductsController;
@@ -175,3 +176,4 @@ Route::prefix('discounts')->group(function () {
 
 Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'getByOrder'])
     ->name('api.get-packages-for-order');
+Route::post('/create-message', AllegroMessageController::class);
