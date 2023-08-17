@@ -75,6 +75,7 @@ class CheckPackagesStatusJob
                             $package->order,
                             [Label::BLUE_BATTERY_LABEL_ID],
                             $preventionArray,
+                            [],
                             Auth::user()?->id
                         );
                     });
