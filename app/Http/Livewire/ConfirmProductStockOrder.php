@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Entities\OrderItem;
+use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -37,11 +38,20 @@ class ConfirmProductStockOrder extends Component
 
     public function savePosition($itemId, $index): void
     {
-        ProductStockPosition::create($this->creatingPositions[$itemId][$index] + [
+        $productStock = ProductStockPosition::create($this->creatingPositions[$itemId][$index] + [
             'product_stock_id' => $this->order->items->find($itemId)->product->stock->id,
         ]);
 
         $this->order->items->find($itemId)->refresh();
+
+        ProductStockLog::create([
+            'product_stock_id' => $productStock->product_stock_id,
+            'product_stock_position_id' => $productStock->id,
+            'order_id' => $this->order->id,
+            'action' => 'ADD',
+            'quantity' => $productStock->position_quantity,
+            'user_id' => auth()->user()->id,
+        ]);
     }
 
     public function cancelAdding($itemId, $index): void

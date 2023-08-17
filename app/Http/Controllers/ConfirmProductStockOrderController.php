@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
+use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
 use App\Http\Requests\ConfirmProductStockOrderRequest;
 use Illuminate\Http\RedirectResponse;
@@ -35,6 +36,16 @@ class ConfirmProductStockOrderController extends Controller
                 $position = ProductStockPosition::find($key);
                 $position->position_quantity += $value;
                 $position->save();
+
+                ProductStockLog::create([
+                    'product_stock_id' => $position->product_stock_id,
+                    'product_stock_position_id' => $position->id,
+                    'order_id' => $order->id,
+                    'action' => 'ADD',
+                    'quantity' => 0,
+                    'user_id' => auth()->user()->id,
+                ]);
+
             }
         }
 
