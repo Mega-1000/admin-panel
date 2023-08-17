@@ -62,7 +62,8 @@
                 <input type="text" class="form-control" id="lastname" name="lastname"
                        value="{{ $productStockLog->user->lastname }}" disabled>
             </div>
-            <form action="{{ route('product-stock-logs.update', $productStockLog->id) }}">
+            <form method="post" action="{{ route('product-stock-logs.update', $productStockLog->id) }}">
+                @csrf
                 <div class="form-group">
                     <label for="comments">@lang('product_stock_logs.form.comments')</label>
                     <input type="text" class="form-control" id="comments" name="comments"
