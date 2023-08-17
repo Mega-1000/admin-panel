@@ -189,15 +189,6 @@ class ProductsController extends Controller
             ->orderBy('name')
             ->paginate($perPage)->toJson();
 
-        $products = json_decode($products, true, JSON_PRETTY_PRINT);
-
-        foreach ($products['data'] as $productKey => $productValue) {
-            if (array_key_exists('url_for_website', $productValue)) {
-                if (isset($productValue['url_for_website']) && !File::exists(public_path($productValue['url_for_website']))) {
-                    $products['data'][$productKey]['url_for_website'] = null;
-                }
-            }
-        }
 
         return response($products);
     }
@@ -295,7 +286,7 @@ class ProductsController extends Controller
             $image = $request->file('image');
             $imageName = Str::random(10);
             $image->move(public_path('images/products'), $imageName);
-            $product->update(['url_for_website' => $product->url_for_website]);
+            $product->update(['url_for_website' => '/images/products/' . $imageName]);
 
             return Product::find($product->id)->url_for_website;
         }
