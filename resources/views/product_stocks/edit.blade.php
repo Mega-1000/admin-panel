@@ -607,18 +607,13 @@
                     name: 'created_at'
                 },
                 {
-                    data: 'comments',
-                    name: 'comments'
-                },
-                {
                     data: 'id',
                     name: 'id',
                     render: function (id) {
-                        let html = '<a href="/admin/products/stocks/{{$productStocks->id}}/logs/' + id + '/show" class="btn btn-sm btn-primary edit">';
-                        html += '<i class="voyager-show"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('product_stock_logs.show')</span>';
-                        html += '</a>';
-                        return html;
+                        return `<a href="/admin/products/stocks/{{$productStocks->id}}/logs/${id}/show" class="btn btn-sm btn-primary edit">
+                        <i class="voyager-show"></i>
+                        <span class="hidden-xs hidden-sm"> @lang('product_stock_logs.show')</span>
+                        </a>`;
                     }
                 }
             ]
