@@ -607,6 +607,10 @@
                     name: 'created_at'
                 },
                 {
+                    data: 'comments',
+                    name: 'comments'
+                },
+                {
                     data: 'id',
                     name: 'id',
                     render: function (id) {
