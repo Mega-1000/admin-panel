@@ -603,12 +603,12 @@
                     name: 'user.lastname'
                 },
                 {
-                    data: 'created_at',
-                    name: 'created_at'
-                },
-                {
                     data: 'comments',
                     name: 'comments'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
                 },
                 {
                     data: 'id',
