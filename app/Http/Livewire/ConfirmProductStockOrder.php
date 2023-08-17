@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire;
 
-use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Entities\ProductStockPosition;
 use Illuminate\View\View;

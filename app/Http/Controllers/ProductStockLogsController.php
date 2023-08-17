@@ -71,6 +71,6 @@ class ProductStockLogsController extends Controller
     {
         $productStockLog->update($request->validated());
 
-        return redirect()->route('productStockLogs.index');
+        return redirect()->back();
     }
 }
