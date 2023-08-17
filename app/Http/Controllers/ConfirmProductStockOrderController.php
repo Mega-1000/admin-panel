@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
-use App\Entities\OrderItem;
 use App\Entities\ProductStockPosition;
 use App\Http\Requests\ConfirmProductStockOrderRequest;
-use App\Services\Label\AddLabelService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ConfirmProductStockOrderController extends Controller
@@ -33,19 +30,12 @@ class ConfirmProductStockOrderController extends Controller
      */
     public function store(Order $order, ConfirmProductStockOrderRequest $request): RedirectResponse
     {
-        $sum = 0;
         foreach ($request->input('position') as $k => $v) {
             foreach ($v as $key => $value) {
                 $position = ProductStockPosition::find($key);
                 $position->position_quantity += $value;
                 $position->save();
-
-                $sum += $value;
             }
-
-
-
-            $sum = 0;
         }
 
         return redirect()->route('orders.index');

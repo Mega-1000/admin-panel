@@ -1533,7 +1533,7 @@
                                     if (value.symbol) {
                                         name = value.symbol;
                                     }
-                                    html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
+                                    html += '<p style="margin: 8px 8px 0 8px;">' + name + '</p> </div> '
                                     html += value.sumOfCosts ? value.sumOfCosts.sum + ' zł' : '';
                                     if (value.delivery_cost_balance !== 0) {
                                         let color = '';
@@ -1983,7 +1983,7 @@
                             @endif
                                 html += `<a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>`;
                             if (data.is_buying_admin_side) {
-                                html += `<a class="btn btn-primary" href="/admin/accept-products/${id}" target="__blank">Zapisz produkty w magazynie</a>`
+                                html += `<a class="btn btn-primary" href="/admin/accept-products/${id}" target="__blank">Przyjmij na stany magazynowe</a>`
                             }
 
                             return html;

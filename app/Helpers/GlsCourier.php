@@ -29,7 +29,7 @@ class GlsCourier implements iCourier
             );
 
             if (empty($response->tuStatus)) {
-                Log::notice('Wystąpił problem przy sprawdzaniu statusu paczki: ' . $package->letter_number);
+                    Log::notice('Wystąpił problem przy sprawdzaniu statusu paczki: ' . $package->letter_number);
                 return;
             }
 

@@ -20,57 +20,12 @@
             background-color: #f2f2f2;
         }
     </style>
+
+    @livewireStyles
 @endsection
 
 @section('table')
-    <form action="" method="POST">
-        @csrf
-        @foreach($order->items as $item)
-            <h3>
-                {{ $item->product->name }} |
-                {{ $item->product->product_name_manufacturer }} |
-                {{ $item->product->supplier_product_symbol }} |
-                {{ $item->product->packing->unit_commercial }} |
-                {{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }} |
-                {{ $item->product->packing->unit_of_collective }} |
-                {{ $item->product->packing->number_of_sale_units_in_the_pack }}
-            </h3>
+    <livewire:confirm-product-stock-order :order="$order" >
 
-
-            <div class="mt-5">
-                <hr>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Checkbox</th>
-                        <th>Ilość produktów</th>
-                        <th>Aleja</th>
-                        <th>Regał</th>
-                        <th>Półka</th>
-                        <th>Pozycja</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($item->product->stock->position as $productStockPosition)
-                        <tr>
-                            <td>
-                                <input type="number" id="position[{{ $item->id }}][{{ $productStockPosition->id }}]" name="position[{{ $item->id }}][{{ $productStockPosition->id }}]">
-                            </td>
-                            <td>{{ $productStockPosition->position_quantity }}</td>
-                            <td>{{ $productStockPosition->lane }}</td>
-                            <td>{{ $productStockPosition->bookstand }}</td>
-                            <td>{{ $productStockPosition->shelf }}</td>
-                            <td>{{ $productStockPosition->position }}</td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-                <input class="form-control" type="text" name="quantity[{{ $item->id }}]" value="{{ $item->quantity }}">
-            </div>
-        @endforeach
-
-        <button class="mt-5 btn btn-primary">
-            Zapisz
-        </button>
-    </form>
+    @livewireScripts
 @endsection

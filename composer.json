@@ -30,6 +30,7 @@
         "laravel/passport": "v11.5.1",
         "laravel/tinker": "v2.8.0",
         "lcobucci/jwt": "4.3.0",
+        "livewire/livewire": "*",
         "maatwebsite/excel": "3.1.46",
         "mxl/laravel-job": "v1.3.0",
         "php-mime-mail-parser/php-mime-mail-parser": "8.0.0",
