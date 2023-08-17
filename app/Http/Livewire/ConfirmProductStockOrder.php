@@ -10,7 +10,7 @@ use Livewire\Component;
 
 class ConfirmProductStockOrder extends Component
 {
-    public Order $order;
+    public mixed $order;
     public array $creatingPositions = [];
 
     public function __construct($order)

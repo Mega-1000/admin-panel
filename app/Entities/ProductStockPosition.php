@@ -41,8 +41,6 @@ class ProductStockPosition extends Model implements Transformable
         return $this->belongsTo(ProductStock::class, 'product_stock_id', 'id');
     }
 
-
-
     /**
      * @return HasMany
      */

@@ -34,16 +34,10 @@ class OrderProformSendMailJob extends Job implements ShouldQueue
     protected $message;
 
     /**
-     * @var null
-     */
-    protected $oldStatus;
-
-    /**
      * Requires to pass id of Order that's status changed to ::dispatch()
      *
      * @param $order
-     * @param $message
-     * @param $oldStatus
+     * @param null $message
      */
     public function __construct($order, $message = null)
     {
