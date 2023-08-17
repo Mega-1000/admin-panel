@@ -7,7 +7,7 @@
 
     @foreach($this->order->items as $item)
         <h3>
-            {{ ++$lp }} |
+            {{ ++$lp }}. |
             {{ $item->product->name }} |
             {{ $item->product->product_name_manufacturer }} |
             {{ $item->product->supplier_product_symbol }} |
@@ -109,7 +109,7 @@
                 @endforeach
                 </tbody>
             </table>
-            <input class="form-control" type="text" name="quantity[{{ $item->id }}]" value="{{ $item->quantity }}">
+            <input disabled class="form-control" type="text" name="quantity[{{ $item->id }}]" value="{{ $item->quantity }}">
         </div>
     @endforeach
 
