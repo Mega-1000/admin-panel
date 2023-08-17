@@ -2,7 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ProductStockLog;
+use App\Http\Requests\UpdateProductStockLogsRequest;
 use App\Repositories\ProductStockLogRepository;
+use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -25,11 +34,11 @@ class ProductStockLogsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @param $logId
+     * @return Application|Factory|View
      */
-    public function show($id, $logId)
+    public function show(int $id, $logId): Application|Factory|View
     {
         $productStockLog = $this->repository->find($logId);
 
@@ -38,22 +47,30 @@ class ProductStockLogsController extends Controller
 
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @param $id
+     * @return JsonResponse
+     * @throws Exception
      */
-    public function datatable($id)
+    public function datatable($id): JsonResponse
     {
         $collection = $this->prepareCollection($id);
 
-        return DataTables::collection($collection)->make(true);
+        return DataTables::collection($collection)->make();
     }
 
     /**
+     * @param $id
      * @return mixed
      */
-    public function prepareCollection($id)
+    public function prepareCollection($id): mixed
     {
-        $collection = $this->repository->with('user')->findByField('product_stock_id', $id)->all();
+        return $this->repository->with('user')->findByField('product_stock_id', $id)->all();
+    }
 
-        return $collection;
+    public function update(UpdateProductStockLogsRequest $request, ProductStockLog $productStockLog): RedirectResponse
+    {
+        $productStockLog->update($request->validated());
+
+        return redirect()->route('productStockLogs.index');
     }
 }

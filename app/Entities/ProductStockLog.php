@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 use App\User;
@@ -28,21 +29,22 @@ class ProductStockLog extends Model implements Transformable
         'quantity',
         'user_id',
         'order_id',
-        'stock_quantity_after_action'
+        'stock_quantity_after_action',
+        'comments',
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function stock()
+    public function stock(): BelongsTo
     {
         return $this->belongsTo(ProductStock::class, 'product_stock_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

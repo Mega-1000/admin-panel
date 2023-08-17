@@ -62,12 +62,24 @@
                 <input type="text" class="form-control" id="lastname" name="lastname"
                        value="{{ $productStockLog->user->lastname }}" disabled>
             </div>
+            <form action="{{ route('product-stock-logs.update', $productStockLog->id) }}">
+                <div class="form-group">
+                    <label for="comments">@lang('product_stock_logs.form.comments')</label>
+                    <input type="text" class="form-control" id="comments" name="comments"
+                           value="{{ $productStockLog->comments }}">
+                </div>
+
+                <button class="btn btn-primary">
+                    Zapisz
+                </button>
+            </form>
+
             @endsection
 
             @section('javascript')
                 <script>
                     $(document).ready(function () {
-                        var breadcrumb = $('.breadcrumb:nth-child(2)');
+                        const breadcrumb = $('.breadcrumb:nth-child(2)');
 
                         breadcrumb.children().remove();
                         breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");

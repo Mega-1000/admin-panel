@@ -28,5 +28,6 @@ return [
         'lastname' => 'Nazwisko użytkownika',
         'add' => 'Dodawanie',
         'delete' => 'Odejmowanie',
+        'comments' => 'Komentarz',
     ],
 ];

@@ -65,6 +65,7 @@ class FastResponseController extends Controller
         ]);
     }
 
+
     public function jsonIndex(): JsonResponse
     {
         return response()->json([

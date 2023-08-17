@@ -15,6 +15,7 @@ use App\Http\Controllers\OrderInvoiceDocumentsController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
 use App\Http\Controllers\PackageProductOrderController;
+use App\Http\Controllers\ProductStockLogsController;
 use App\Http\Controllers\ProductStocksController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
@@ -698,3 +699,4 @@ Route::get('/order-invoice-documents/{id}/delete', [OrderInvoiceDocumentsControl
 Route::get('/fast-response/jsonIndex', [FastResponseController::class, 'jsonIndex'])->name('fast-response.jsonIndex');
 Route::resource('/fast-response', FastResponseController::class)->names('fast-response');
 Route::post('/fast-response/{fastResponse}/{order}/send', [FastResponseController::class, 'send'])->name('fast-response.send');
+Route::post('/product-stock-logs/{productStockLog}/edit', [ProductStockLogsController::class, 'update'])->name('product-stock-logs.update');

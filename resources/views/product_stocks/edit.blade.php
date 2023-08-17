@@ -172,18 +172,18 @@
 @section('datatable-scripts')
     <script>
         $(document).ready(function () {
-            var general = $('#general').show();
-            var stocks = $('#stocks').hide();
-            var positions = $('#positions').hide();
-            var logs = $('#logs').hide();
-            var pageTitle = $('.page-title').children('i');
-            var createButtonPosition = $('#create-button-position').hide();
-            var value;
-            var referrer = document.referrer;
-            var breadcrumb = $('.breadcrumb');
-            var item = '{{old('tab')}}';
-            var getUrlParameter = function getUrlParameter(sParam) {
-                var sPageURL = window.location.search.substring(1),
+            const general = $('#general').show();
+            const stocks = $('#stocks').hide();
+            const positions = $('#positions').hide();
+            const logs = $('#logs').hide();
+            const pageTitle = $('.page-title').children('i');
+            const createButtonPosition = $('#create-button-position').hide();
+            let value;
+            const referrer = document.referrer;
+            const breadcrumb = $('.breadcrumb');
+            const item = '{{old('tab')}}';
+            const getUrlParameter = function getUrlParameter(sParam) {
+                let sPageURL = window.location.search.substring(1),
                     sURLVariables = sPageURL.split('&'),
                     sParameterName,
                     i;
@@ -196,13 +196,13 @@
                     }
                 }
             };
-            var tabParam = getUrlParameter('tab');
+            const tabParam = getUrlParameter('tab');
 
             breadcrumb.children().remove();
             breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
             breadcrumb.append("<li class='active'><a href='/admin/products/stocks'>Stany magazynowe</a></li>");
             breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
-            if (referrer.search('positions') != -1 || tabParam === 'positions' || item === 'positions') {
+            if (referrer.search('positions') !== -1 || tabParam === 'positions' || item === 'positions') {
                 $('#button-general').removeClass('active');
                 $('#button-stocks').removeClass('active');
                 $('#button-positions').addClass('active');
@@ -219,7 +219,7 @@
                 breadcrumb.append("<li class='active'><a href='/admin/product/stocks/{{$productStocks->id}}/edit'>Stany magazynowe</a></li>");
                 breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
                 breadcrumb.append("<li class='active'><a href='/admin/product/stocks/{{$productStocks->id}}/edit#positions'>Pozycje magazynowe</a></li>");
-            } else if (referrer.search('logs') != -1 || tabParam === 'logs' || item === 'logs') {
+            } else if (referrer.search('logs') !== -1 || tabParam === 'logs' || item === 'logs') {
                 $('#button-general').removeClass('active');
                 $('#button-stocks').removeClass('active');
                 $('#button-positions').removeClass('active');
@@ -370,6 +370,10 @@
                     name: 'damaged'
                 },
                 {
+                    data: 'comments',
+                    name: 'comments'
+                },
+                {
                     data: 'created_at',
                     name: 'created_at'
                 },
@@ -411,7 +415,7 @@
             let res = buttonId.split("-")
             idToGet = res[1];
             let quantity = $('#moveButton-' + idToGet).data('quantity');
-            if (idToGet != idToSend) {
+            if (idToGet !== idToSend) {
                 $('#quantity__move').val(quantity);
                 $('#order_id_get').text(idToGet);
                 $('#order_id_send').text(idToSend);
