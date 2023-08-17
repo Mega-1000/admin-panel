@@ -599,10 +599,6 @@
                     name: 'user.lastname'
                 },
                 {
-                    data: 'comments',
-                    name: 'comments'
-                },
-                {
                     data: 'created_at',
                     name: 'created_at'
                 },
