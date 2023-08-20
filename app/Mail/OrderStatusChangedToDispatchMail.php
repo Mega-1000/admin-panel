@@ -28,11 +28,11 @@ class OrderStatusChangedToDispatchMail extends Mailable
 
     public $pathSecond;
 
-    public $customerShipmentDateFrom;
+    public mixed $customerShipmentDateFrom;
 
-    public $customerShipmentDateTo;
+    public mixed $customerShipmentDateTo;
 
-    public $chatLink;
+    public string $chatLink;
 
     /**
      * OrderStatusChangedToDispatchMail constructor.
@@ -65,8 +65,7 @@ class OrderStatusChangedToDispatchMail extends Mailable
         $helper->orderId = $order->id;
         $helper->currentUserId = Auth::user()?->id;
         $helper->currentUserType = MessagesHelper::TYPE_USER;
-        $userToken = $helper->encrypt();
-        // $this->chatLink = 'https://'.$_SERVER['HTTP_HOST'].'/chat/'.$userToken;
+        $helper->encrypt();
         $this->chatLink = '';
     }
 
@@ -83,7 +82,6 @@ class OrderStatusChangedToDispatchMail extends Mailable
         }
 
         return new Content('emails.reminder-order-status-changed-to-dispatch');
-        //->attach($this->path)->attach($this->pathSecond);
     }
 
     public function attachments(): array

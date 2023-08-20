@@ -7,16 +7,16 @@ use App\Repositories\OrderWarehouseNotificationRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class WarehouseDispatchPendingReminderJob extends Job implements ShouldQueue
 {
     /**
      * Execute the job.
      *
+     * @param OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository
      * @return void
      */
-    public function handle(OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository)
+    public function handle(OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository): void
     {
         $now = new Carbon('now');
 
@@ -34,12 +34,12 @@ class WarehouseDispatchPendingReminderJob extends Job implements ShouldQueue
         }
     }
 
-    protected function shouldNotifyWithEmail($orderWarehouseNotification, $now)
+    protected function shouldNotifyWithEmail($orderWarehouseNotification, $now): bool
     {
         return $orderWarehouseNotification->created_at->diff($now)->h >= 2; //only schedules that wait longer then 2h
     }
 
-    protected function canNotifyNow($now)
+    protected function canNotifyNow($now): bool
     {
         if (!($now->dayOfWeek == 6 || $now->dayOfWeek == 0)) {  //not Saturday nor Sunday
             if ($now->hour >= 7 && $now->hour < 17) {           //only between 9AM and 5PM

@@ -16,7 +16,7 @@ class AllegroApiController extends Controller
         $allegroService = new AllegroApiService();
         if ($device_code) {
             if (!($response = $allegroService->checkAuthorizationStatus($device_code))) {
-                response('something wrong');
+                response()->json('something wrong');
             }
 
             $authModel = Allegro_Auth::findOrNew(2);
@@ -26,7 +26,7 @@ class AllegroApiController extends Controller
             return null;
         }
         if (!($res = $allegroService->getAuthCodes())) {
-            response('something wrong');
+            response()->json('something wrong');
         }
 
         return view('allegro.api.auth-device', $res);
@@ -48,7 +48,7 @@ class AllegroApiController extends Controller
         }
 
         if (!($response = $allegroService->authToken($request->code))) {
-            response('fetch token error: token: ' . $request->code);
+            response()->json('fetch token error: token: ' . $request->code);
         }
 
         $authModel = Allegro_Auth::findOrNew(3);

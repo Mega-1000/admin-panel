@@ -224,6 +224,7 @@ class MessagesHelper
         if (!$withBold) {
             $title = strip_tags($title);
         }
+
         return $title;
     }
 
@@ -237,8 +238,7 @@ class MessagesHelper
     public function createOrGetBlankUser(Chat $chat): ChatUser {
         $chatUser = $chat->chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
 
-        if($chatUser === null) {
-
+        if ($chatUser === null) {
             $chatUser = new ChatUser();
             $chatUser->chat()->associate($chat);
             $chatUser->save();
@@ -770,7 +770,7 @@ class MessagesHelper
 
     public static function sendAsCurrentUser(Order $order, string $message, int $chatArea = UserRole::Consultant) {
         $messagesHelper = new self();
-            
+
         $chat = $order->chat()->firstOrCreate();
         $chatUser = $chat->chatUsers()->firstOrCreate(['user_id' => Auth::user()?->id]);
         $messagesHelper->currentUserType = MessagesHelper::TYPE_USER;

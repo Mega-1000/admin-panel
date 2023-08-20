@@ -11,11 +11,11 @@ class ProductPricesController extends Controller
     {
         $order = Order::find($id);
         if (empty($order)) {
-            return response(['error' => 'Zlecenie nie istnieje']);
+            return response()->json(['error' => 'Zlecenie nie istnieje']);
         }
         $newPrices = $order->items->map(function ($item) {
             return ['id' => $item->id, 'price' => $item->product->price->allegro_selling_gross_commercial_price];
         });
-        return response(['content' => $newPrices]);
+        return response()->json(['content' => $newPrices]);
     }
 }

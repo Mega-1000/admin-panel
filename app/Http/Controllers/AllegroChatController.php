@@ -102,7 +102,7 @@ class AllegroChatController extends Controller
 
         $res = $this->allegroChatService->listMessages($threadId, $lastDate);
 
-        if(!$res['messages']) return response('null', 200);
+        if(!$res['messages']) return response()->json('null', 200);
 
         $newMessages = collect( $this->allegroChatService->insertMsgsToDB($res['messages']) );
 
@@ -157,7 +157,7 @@ class AllegroChatController extends Controller
 
         $res = $this->allegroChatService->newAttachmentDeclaration($data);
 
-        if(!$res['id']) return response('null', 200);
+        if(!$res['id']) return response()->json('null', 200);
 
         return response($res['id']);
     }
@@ -170,7 +170,7 @@ class AllegroChatController extends Controller
 
         $res = $this->allegroChatService->uploadAttachment($attachmentId, $contents, $mimeType);
 
-        if(!$res['id']) return response('null', 200);
+        if(!$res['id']) return response()->json('null', 200);
 
         return response($res['id']);
     }

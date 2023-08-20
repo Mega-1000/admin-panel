@@ -193,6 +193,11 @@ class Order extends Model implements Transformable
         return $this->toPayPackages() - $sum;
     }
 
+    public function orderWarehouseNotifications(): HasMany
+    {
+        return $this->hasMany(OrderWarehouseNotification::class);
+    }
+
     /**
      * @return float|bool|int
      */

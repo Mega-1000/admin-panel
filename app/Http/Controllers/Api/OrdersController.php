@@ -12,6 +12,7 @@ use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
+use App\Entities\OrderPackage;
 use App\Entities\WorkingEvents;
 use App\Enums\PackageStatus;
 use App\Facades\Mailer;
@@ -540,33 +541,25 @@ class OrdersController extends Controller
     {
         $order = Order::find($orderId);
         if ($order == null) {
-            return response('Zamówienie nie zostało znalezione', 404);
+            return response()->json('Zamówienie nie zostało znalezione', 404);
         }
         $data = $request->all();
         $isDeliverModificationForbidden = $order->labels()->whereIn('labels.id', [52, 53, 77])->count();
         if ($data['address_type'] === 'DELIVERY_ADDRESS' && $isDeliverModificationForbidden) {
-            return response('Nie można edytować', 400);
+            return response()->json('Nie można edytować', 400);
         }
         $isInvoiceModificationForbidden = $order->labels()->whereIn('labels.id', [42, 120])->count();
         if ($data['address_type'] === 'INVOICE_ADDRESS' && $isInvoiceModificationForbidden) {
-            return response('Nie można edytować', 400);
+            return response()->json('Nie można edytować', 400);
         }
         OrderBuilder::updateOrderAddress($order, $data['order_params'] ?? [], $data['address_type'], $data['order_params']['phone'] ?? '', 'order');
-        return response('Success', 200);
+        return response()->json('Success', 200);
     }
 
     public function orderPackagesCancelled(Request $request, $id)
     {
         try {
-            $orderPackage = $this->orderPackageRepository->find($id);
-
-            if (empty($orderPackage)) {
-                Log::info(
-                    'Problem with find orderPackage item with id =' . $id,
-                    ['class' => get_class($this), 'line' => __LINE__]
-                );
-                abort(404);
-            }
+            $orderPackage = OrderPackage::findOrFail($id);
 
             if ($request->cancelled == 'true') {
                 $response = OrderPackageService::setPackageAsCancelled($orderPackage);
@@ -893,18 +886,18 @@ class OrdersController extends Controller
         return response()->json(Country::all());
     }
 
-    public function uploadProofOfPayment(Request $request)
+    public function uploadProofOfPayment(Request $request): JsonResponse
     {
         $orderId = $request->id;
         /** @var Order $order */
         $order = Order::query()->find($orderId);
-        if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
-        if ($order->customer_id != $request->user()->id) return response(['errorMessage' => 'Nie twoje zamówienie'], 400);
+        if (!$order) return response()->json(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+        if ($order->customer_id != $request->user()->id) return response()->json(['errorMessage' => 'Nie twoje zamówienie'], 400);
         $ordersController = App::make(OrdersControllerApp::class);
         $ordersController->addFile($request, $orderId);
         $prev = [];
         AddLabelService::addLabels($order, [Label::PROOF_OF_PAYMENT_UPLOADED], $prev, [], Auth::user()->id);
-        return response('success', 200);
+        return response()->json('success', 200);
     }
 
     /**

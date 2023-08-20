@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\Order;
+use App\Entities\OrderWarehouseNotification;
 use App\Entities\Warehouse;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
@@ -16,6 +17,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\OrderWarehouseNotificationRepository;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -24,34 +26,24 @@ class OrderWarehouseNotificationController extends Controller
 {
     use ApiResponsesTrait;
 
-    /** @var OrderWarehouseNotificationRepository */
-    protected $orderWarehouseNotificationRepository;
-
-    protected $orderRepository;
-
-    protected $orderInvoiceRepository;
-
     /**
      * OrderWarehouseNotificationController constructor.
      * @param OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository
+     * @param OrderRepository $orderRepository
+     * @param OrderInvoiceRepository $orderInvoiceRepository
      */
     public function __construct(
-        OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository,
-        OrderRepository                      $orderRepository,
-        OrderInvoiceRepository               $orderInvoiceRepository
-    )
+        protected readonly OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository,
+        protected readonly OrderRepository                      $orderRepository,
+        protected readonly OrderInvoiceRepository               $orderInvoiceRepository
+    ) {}
+
+    public function getNotification(int $notificationId): OrderWarehouseNotification
     {
-        $this->orderWarehouseNotificationRepository = $orderWarehouseNotificationRepository;
-        $this->orderRepository = $orderRepository;
-        $this->orderInvoiceRepository = $orderInvoiceRepository;
+        return OrderWarehouseNotification::find($notificationId);
     }
 
-    public function getNotification($notificationId)
-    {
-        return $this->orderWarehouseNotificationRepository->find($notificationId);
-    }
-
-    public function deny(DenyShipmentRequest $request, $notificationId)
+    public function deny(DenyShipmentRequest $request, int $notificationId): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -74,10 +66,9 @@ class OrderWarehouseNotificationController extends Controller
 
     /**
      * @param $data
-     * @param $notification
      * @throws ChatException
      */
-    private function sendMessage($data, $notification): void
+    private function sendMessage($data): void
     {
         $warehouse = Warehouse::findOrFail($data['warehouse_id']);
         $role_id = config('employees_roles')['zamawianie-towaru'];
@@ -98,7 +89,7 @@ class OrderWarehouseNotificationController extends Controller
         OrderLabelHelper::setYellowLabel($helper->getChat());
     }
 
-    public function accept(AcceptShipmentRequest $request, $notificationId)
+    public function accept(AcceptShipmentRequest $request, $notificationId): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -109,7 +100,7 @@ class OrderWarehouseNotificationController extends Controller
             $notification = $this->orderWarehouseNotificationRepository->update($data, $notificationId);
 
             if (!empty($data['customer_notices'])) {
-                $this->sendMessage($data, $notification);
+                $this->sendMessage($data);
             }
 
             $notification->order->shipment_date = $notification->realization_date;
@@ -134,31 +125,25 @@ class OrderWarehouseNotificationController extends Controller
         }
     }
 
-    public function sendInvoice(Request $request)
+    public function sendInvoice(Request $request): JsonResponse
     {
         try {
-            $orderId = $request->orderId;
-            $order = $this->orderRepository->find($orderId);
-
-            if (empty($order)) {
-                abort(404);
-            }
+            $order = Order::findOrFail($request->orderId);
 
             $file = $request->file('file');
             if ($file !== null) {
                 $filename = $file?->getClientOriginalName();
 
                 Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
-                $invoice = $order->invoices()->create([
+                $order->invoices()->create([
                     'invoice_type' => 'buy',
                     'invoice_name' => $filename,
                     'is_visible_for_client' => (boolean)$request->isVisibleForClient,
                 ]);
                 $invoiceRequest = $order->invoiceRequests()->first();
+
                 if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
-                    $invoiceRequest->update([
-                        'status' => 'SENT'
-                    ]);
+                    $invoiceRequest->update(['status' => 'SENT']);
                 }
 
                 dispatch(new DispatchLabelEventByNameJob($order, "new-file-added-to-order"));
@@ -177,23 +162,19 @@ class OrderWarehouseNotificationController extends Controller
         }
     }
 
-    public function changeStatus(Request $request)
+    public function changeStatus(Request $request): JsonResponse
     {
         try {
             $orderId = $request->orderId;
-            $order = $this->orderRepository->find($orderId);
+            $order = Order::findOrFail($orderId);
+            $packages = $order->packages()->where('statsu', 'NEW')->get();
 
-            if (empty($order)) {
-                abort(404);
+            foreach ($packages as $package) {
+                $package->update(['status' => 'SENDING']);
             }
 
-            foreach ($order->packages as $package) {
-                if ($package->status === 'NEW') {
-                    $package->status = 'SENDING';
-                    $package->save();
-                }
-            }
             dispatch(new DispatchLabelEventByNameJob($order, "all-shipments-went-out"));
+
             return $this->okResponse();
         } catch (Exception $e) {
             Log::error('Problem with change order status.',

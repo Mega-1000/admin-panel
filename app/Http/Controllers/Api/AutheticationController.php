@@ -20,7 +20,7 @@ class AutheticationController extends Controller
     {
         try {
             if (!$this->isCorrectRequestFromBrowser($request)) {
-                return response('success', 200);
+                return response()->json('success', 200);
             }
             $token = Auth_code::findOrFail($id);
             if ($token->created_at < Carbon::now()->subDays(1)) {
@@ -29,13 +29,13 @@ class AutheticationController extends Controller
             $user = $token->customer;
             $token->delete();
             $timestamp = Carbon::now()->addDay()->timestamp;
-            return response(['access_token' => $user->createToken('Api code')->accessToken,
+            return response()->json(['access_token' => $user->createToken('Api code')->accessToken,
                 'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE], 200);
         } catch (Exception $e) {
             if ($e->getMessage() != self::TOKEN_ERROR) {
                 Log::error('Error: authenticate user by code', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             }
-            return response('Something went wrong', 403);
+            return response()->json('Something went wrong', 403);
         }
     }
 
