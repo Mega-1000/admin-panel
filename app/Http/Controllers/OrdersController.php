@@ -686,7 +686,7 @@ class OrdersController extends Controller
 
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
         if ($this->putLockFile() === false) {
-            // return response(['error' => 'file_exist']);
+            // return response()->json(['error' => 'file_exist']);
         }
 
         try {
@@ -738,7 +738,7 @@ class OrdersController extends Controller
 
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
         if ($this->putLockFile() === false) {
-            // return response(['error' => 'file_exist']);
+            // return response()->json(['error' => 'file_exist']);
         }
         $skip = $data['skip'] ?? 0;
 
@@ -886,7 +886,7 @@ class OrdersController extends Controller
             $user = User::find($userId);
         }
         if (empty($user)) {
-            return response(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
+            return response()->json(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
         }
         $order = Order::find($request->order_id);
         WorkingEventsService::createEvent(WorkingEvents::NOTICE_MAPPER[$request->type], $order->id);
@@ -904,10 +904,10 @@ class OrdersController extends Controller
                 $order->financial_comment .= Order::formatMessage($user, $request->message);
                 break;
             default:
-                return response(['errors' => ['message' => "Zły typ komentarza"]], 400);
+                return response()->json(['errors' => ['message' => "Zły typ komentarza"]], 400);
         }
         $order->save();
-        return response('success');
+        return response()->json('success');
     }
 
     public function createQuickOrder()
@@ -979,38 +979,36 @@ class OrdersController extends Controller
         $orderId = $request->order_id;
         $warehouseId = $request->warehouse_id;
         if (empty($orderId)) {
-            return response('Błędne zamówienie', 404);
+            return response()->json('Błędne zamówienie', 404);
         }
         if (empty($warehouseId)) {
-            return response('Błędny magazyn', 404);
+            return response()->json('Błędny magazyn', 404);
         }
         $order = Order::find($orderId);
         $warehouse = Warehouse::find($warehouseId);
         if (empty($order)) {
-            return response('Błędne zamówienie', 404);
+            return response()->json('Błędne zamówienie', 404);
         }
         if (empty($warehouse)) {
-            return response('Błędny magazyn', 404);
+            return response()->json('Błędny magazyn', 404);
         }
         $order->warehouse()->associate($warehouse);
         $order->save();
         $loop = [];
         RemoveLabelService::removeLabels($order, [$request->label], $loop, $request->labelsToAddIds, Auth::user()->id);
-        return response('Usuwanie etykiety rozpoczęte', 200);
+        return response()->json('Usuwanie etykiety rozpoczęte', 200);
     }
 
-    public function setWarehouse(int $orderId, Request $request)
+    public function setWarehouse(int $orderId, Request $request): JsonResponse
     {
-        $order = Order::find($orderId);
-        if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+        $order = Order::findOrFail($orderId);
 
-        $warehouse = Warehouse::where('symbol', trim($request->warehouse))->first();
-        if (!$warehouse) return response(['errorMessage' => 'Nie można znaleźć magazynu'], 400);
+        $warehouse = Warehouse::where('symbol', trim($request->warehouse))->firstOrFail();
 
         $order->warehouse()->associate($warehouse->id);
         $order->save();
 
-        return new JsonResponse('Magazyn poprawnie zaktualizowany', 200);
+        return response()->json('Magazyn poprawnie zaktualizowany');
     }
 
     /**
@@ -1637,13 +1635,14 @@ class OrdersController extends Controller
             $d = Carbon::createFromDate($date['year'], $date['month'], $date['day']);
         } catch (Exception $ex) {
             if ($ex instanceof ModelNotFoundException) {
-                return response('Dane zamówienie nie istnieje', 400);
+                return response()->json('Dane zamówienie nie istnieje', 400);
             }
-            return response('Błędny format daty', 400);
+            return response()->json('Błędny format daty', 400);
         }
         $dat = $d->format('Y-m-d');
         $order->payment_deadline = $dat;
         $order->save();
+
         return ['status' => true];
     }
 
@@ -2616,7 +2615,7 @@ class OrdersController extends Controller
         $file = OrderFiles::find($id);
         Storage::disk('private')->delete('files/' . $file->order_id . '/' . $file->hash);
         $file->delete();
-        return response('success');
+        return response()->json('success');
     }
 
     public function getFiles(int $id)

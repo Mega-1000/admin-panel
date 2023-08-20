@@ -11,7 +11,7 @@ class AcceptShipmentRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,7 +21,7 @@ class AcceptShipmentRequest extends FormRequest
      *
      * @return array
      */
-    public function attributes()
+    public function attributes(): array
     {
         return [
             'order_id' => 'Numer oferty',
@@ -41,7 +41,7 @@ class AcceptShipmentRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'order_id' => 'required|numeric',

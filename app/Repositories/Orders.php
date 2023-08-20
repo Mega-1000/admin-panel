@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Entities\Label;
+use App\Entities\OrderWarehouseNotification;
 use App\Enums\OrderPaymentsEnum;
 use App\Enums\PackageStatus;
 use Illuminate\Support\Collection;
@@ -167,5 +168,15 @@ class Orders
     {
         $order->packages()->where('status', PackageStatus::NEW)->delete();
         $order->packages()->whereNot('status', PackageStatus::NEW)->update(['status' => 'CANCELLED']);
+    }
+
+    public static function getOrdersNotCheckedAsShippedButRealizationDateIsPassed(): Collection
+    {
+        return Order::whereHas('orderWarehouseNotification', function ($query) {
+                $query->where('realization_date', '<', now()->toDateString());
+            })
+            ->whereDoesntHave('labels', function ($query) {
+                $query->where('label_id', 66);
+            });
     }
 }
