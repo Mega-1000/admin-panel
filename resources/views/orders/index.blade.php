@@ -2259,14 +2259,14 @@
                             const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseFloat(ZP)).toFixed(2);
 
                             return `
-                                <p><span title="Zysk">Z: ${Z.toFixed(2)}</p>
-                                <p>RKTBO: ${RKTBO.toFixed(2)}</p>
-                                <p>BT: ${(row.shipment_price_for_client - RKTBO).toFixed(2)}</p>
-                                <p>PSIK: ${PSIK.toFixed(2)}</p>
-                                <p>PSW: ${PSW.toFixed(2)}</p>
-                                <p>WAC: ${WAC.toFixed(2)}</p>
-                                <p>ZP: ${ZP.toFixed(2)}</p>
-                                <p>BZO: ${BZO.toFixed(2)}</p>
+                                <p><span title="Zysk">Z: ${Math.round(Z * 100) / 100}</p>
+                                <p>RKTBO: ${Math.round(RKTBO * 100) / 100}</p>
+                                <p>BT: ${(Math.round(row.shipment_price_for_client - RKTBO * 100) / 100)}</p>
+                                <p>PSIK: ${Math.round(PSIK * 100) / 100}</p>
+                                <p>PSW: ${Math.round(PSW * 100) / 100}</p>
+                                <p>WAC: ${Math.round(WAC * 100) / 100}</p>
+                                <p>ZP: ${Math.round(ZP * 100) / 100}</p>
+                                <p>BZO: ${Math.round(BZO * 100) / 100}</p>
                                 <p><a href="/admin/allegro-billing?order-id=${row.orderId}" class="btn btn-primary" target="_blank">pokaz na liście</a></p>
                             `;
                         }
