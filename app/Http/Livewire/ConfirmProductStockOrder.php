@@ -79,7 +79,7 @@ class ConfirmProductStockOrder extends Component
             'product_stock_position_id' => $productStock->id,
             'order_id' => $this->order->id,
             'action' => 'ADD',
-            'quantity' => $productStock->position_quantity,
+            'quantity' => (int)$productStock->position_quantity,
             'user_id' => auth()->user()->id,
         ]);
 

@@ -37,14 +37,17 @@ class ConfirmProductStockOrderController extends Controller
                 $position->position_quantity += $value;
                 $position->save();
 
-                ProductStockLog::create([
-                    'product_stock_id' => $position->product_stock_id,
-                    'product_stock_position_id' => $position->id,
-                    'order_id' => $order->id,
-                    'action' => 'ADD',
-                    'quantity' => 0,
-                    'user_id' => auth()->user()->id,
-                ]);
+                if ($value < 0) {
+                    ProductStockLog::create([
+                        'product_stock_id' => $position->product_stock_id,
+                        'product_stock_position_id' => $position->id,
+                        'order_id' => $order->id,
+                        'action' => 'ADD',
+                        'quantity' => 0,
+                        'user_id' => auth()->user()->id,
+                    ]);
+                }
+
 
             }
         }
