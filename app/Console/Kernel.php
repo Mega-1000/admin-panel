@@ -87,6 +87,7 @@ class Kernel extends ConsoleKernel
         $schedule->job('set-logs-permissions')->dailyAt('01:00');
 
         $schedule->command('import:transactions')->dailyAt('02:30');
+        $schedule->job(Jobs\SendMonitoryNotesEmails::class)->everyThirtyMinutes()->between('7:00', '18:00');
     }
 
     /**

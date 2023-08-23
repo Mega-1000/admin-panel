@@ -178,7 +178,7 @@ class TasksController extends Controller
         $data = $request->validated();
 
         $task = $this->repository->find($id);
-        
+
         if (empty($task)) {
             abort(404);
         }
@@ -662,7 +662,7 @@ class TasksController extends Controller
     public function getForUser($id)
     {
         if (empty(User::find($id))) {
-            return response(['error' => 'Brak danego użytkownika'], 400);
+            return response()->json(['error' => 'Brak danego użytkownika'], 400);
         }
         $tasks = Task::where('tasks.user_id', $id)
             ->where(function ($query) {
@@ -817,11 +817,11 @@ class TasksController extends Controller
                 $task = Task::findOrFail($request->id);
                 $this->taskService->markTaskAsProduced($task);
             } catch (Exception $e) {
-                return response(['error' => true, 'message' => 'Nie znaleziono zadania']);
+                return response()->json(['error' => true, 'message' => 'Nie znaleziono zadania']);
             }
-            return response(['success' => true]);
+            return response()->json(['success' => true]);
         } else {
-            return response(['error' => true]);
+            return response()->json(['error' => true]);
         }
     }
 
@@ -1094,7 +1094,7 @@ class TasksController extends Controller
     public function getTask(int $id): JsonResponse
     {
         $task = Tasks::getTaskLabel($id);
-        
+
         if ($task === null) {
             abort(404);
         }

@@ -12,6 +12,7 @@ use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
+use App\Entities\OrderPackage;
 use App\Entities\WorkingEvents;
 use App\Enums\PackageStatus;
 use App\Facades\Mailer;
@@ -540,33 +541,25 @@ class OrdersController extends Controller
     {
         $order = Order::find($orderId);
         if ($order == null) {
-            return response('Zamówienie nie zostało znalezione', 404);
+            return response()->json('Zamówienie nie zostało znalezione', 404);
         }
         $data = $request->all();
         $isDeliverModificationForbidden = $order->labels()->whereIn('labels.id', [52, 53, 77])->count();
         if ($data['address_type'] === 'DELIVERY_ADDRESS' && $isDeliverModificationForbidden) {
-            return response('Nie można edytować', 400);
+            return response()->json('Nie można edytować', 400);
         }
         $isInvoiceModificationForbidden = $order->labels()->whereIn('labels.id', [42, 120])->count();
         if ($data['address_type'] === 'INVOICE_ADDRESS' && $isInvoiceModificationForbidden) {
-            return response('Nie można edytować', 400);
+            return response()->json('Nie można edytować', 400);
         }
         OrderBuilder::updateOrderAddress($order, $data['order_params'] ?? [], $data['address_type'], $data['order_params']['phone'] ?? '', 'order');
-        return response('Success', 200);
+        return response()->json('Success', 200);
     }
 
     public function orderPackagesCancelled(Request $request, $id)
     {
         try {
-            $orderPackage = $this->orderPackageRepository->find($id);
-
-            if (empty($orderPackage)) {
-                Log::info(
-                    'Problem with find orderPackage item with id =' . $id,
-                    ['class' => get_class($this), 'line' => __LINE__]
-                );
-                abort(404);
-            }
+            $orderPackage = OrderPackage::findOrFail($id);
 
             if ($request->cancelled == 'true') {
                 $response = OrderPackageService::setPackageAsCancelled($orderPackage);
@@ -635,43 +628,52 @@ class OrdersController extends Controller
         $products = [];
 
         foreach ($order->items as $item) {
-            foreach (OrderBuilder::getPriceColumns() as $column) {
-                $item->product->$column = $item->$column;
+            if ($item->product) {
+                foreach (OrderBuilder::getPriceColumns() as $column) {
+                    if (property_exists($item, $column) && property_exists($item->product, $column)) {
+                        $item->product->$column = $item->$column;
+                    }
+                }
+
+                $vat = 1 + $item->product->vat / 100;
+
+                foreach ([
+                             'selling_price_calculated_unit',
+                             'selling_price_basic_uni',
+                             'selling_price_aggregate_unit',
+                             'selling_price_the_largest_unit'
+                         ] as $column) {
+                    $kGross = "gross_$column";
+                    $kNet = "net_$column";
+                    if (property_exists($item, $kNet) && property_exists($item->product, $kGross)) {
+                        $item->product->$kGross = round($item->$kNet * $vat, 2);
+                    }
+                }
+
+                if (property_exists($item, 'gross_selling_price_commercial_unit') && property_exists($item, 'quantity')) {
+                    $item->product->gross_price_of_packing = $item->gross_selling_price_commercial_unit;
+                    $item->product->amount = $item->quantity;
+                }
+
+                $products[] = $item->product;
             }
-
-            $vat = 1 + $item->product->vat / 100;
-
-            foreach ([
-                         'selling_price_calculated_unit',
-                         'selling_price_basic_uni',
-                         'selling_price_aggregate_unit',
-                         'selling_price_the_largest_unit'
-                     ] as $column) {
-                $kGross = "gross_$column";
-                $kNet = "net_$column";
-                $item->product->$kGross = round($item->$kNet * $vat, 2);
-            }
-
-            $item->product->gross_price_of_packing = $item->gross_selling_price_commercial_unit;
-            $item->product->amount = $item->quantity;
-
-            $products[] = $item->product;
         }
 
         return response(json_encode($products));
     }
 
-    public function getPaymentDetailsForOrder(Request $request, $token)
+    public function getPaymentDetailsForOrder(Request $request, $token): JsonResponse|array
     {
         if (empty($token)) {
-            return response("Missing token", 400);
+            return response()->json("Missing token", 400);
         }
 
         $order = Order::where('token', $token)->first();
+
         return ['total_price' => $order->total_price, 'transport_price' => $order->getTransportPrice(), 'id' => $order->id];
     }
 
-    public function getDates(Order $order)
+    public function getDates(Order $order): array
     {
         /** @var OrderDates $dates */
         $dates = $order->dates;
@@ -839,7 +841,7 @@ class OrdersController extends Controller
 
     public function declineProform(
         DeclineProformRequest $request,
-                              $orderId
+        int                   $orderId
     )
     {
         if (!($order = $this->orderRepository->find($orderId))) {
@@ -854,7 +856,7 @@ class OrdersController extends Controller
         return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function acceptDeliveryInvoiceData($orderId)
+    public function acceptDeliveryInvoiceData($orderId): array|JsonResponse
     {
         if (!($order = $this->orderRepository->find($orderId))) {
             return [];
@@ -866,7 +868,7 @@ class OrdersController extends Controller
         return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function acceptReceivingOrder(AcceptReceivingOrderRequest $request, $orderId)
+    public function acceptReceivingOrder(AcceptReceivingOrderRequest $request, $orderId): JsonResponse|array
     {
         if (!($order = $this->orderRepository->find($orderId))) {
             return [];
@@ -888,23 +890,26 @@ class OrdersController extends Controller
     /**
      * Return countries.
      */
-    public function countries()
+    public function countries(): JsonResponse
     {
         return response()->json(Country::all());
     }
 
-    public function uploadProofOfPayment(Request $request)
+    public function uploadProofOfPayment(Request $request): JsonResponse
     {
-        $orderId = $request->id;
         /** @var Order $order */
-        $order = Order::query()->find($orderId);
-        if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
-        if ($order->customer_id != $request->user()->id) return response(['errorMessage' => 'Nie twoje zamówienie'], 400);
+        $order = Order::query()->find($request->id);
+
+        if (!$order) return response()->json(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+        if ($order->customer_id != $request->user()->id) return response()->json(['errorMessage' => 'Nie twoje zamówienie'], 400);
+
         $ordersController = App::make(OrdersControllerApp::class);
-        $ordersController->addFile($request, $orderId);
+        $ordersController->addFile($request, $order->id);
+
         $prev = [];
         AddLabelService::addLabels($order, [Label::PROOF_OF_PAYMENT_UPLOADED], $prev, [], Auth::user()->id);
-        return response('success', 200);
+
+        return response()->json('success', 200);
     }
 
     /**
@@ -1010,10 +1015,11 @@ class OrdersController extends Controller
                 'error_message' => $exception->getMessage()
             ]), 500);
         }
+
         return response()->json('Oferta została wysłana', 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getLatestDeliveryInfo(Order $order)
+    public function getLatestDeliveryInfo(Order $order): JsonResponse
     {
         $deliveryInfos = $order->customer->orders()->get();
         foreach ($deliveryInfos as $deliveryInfo) {
@@ -1023,7 +1029,7 @@ class OrdersController extends Controller
         return response()->json($deliveryInfos, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getLatestInvoiceInfo(Order $order)
+    public function getLatestInvoiceInfo(Order $order): JsonResponse
     {
         $invoiceInfos = $order->customer->orders()->get();
         foreach ($invoiceInfos as $invoiceInfo) {

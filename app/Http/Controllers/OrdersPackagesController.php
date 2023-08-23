@@ -436,7 +436,7 @@ class OrdersPackagesController extends Controller
         $deleted = $package->delete();
         if (empty($deleted)) {
             if (isset($request->redirect) && $request->redirect == 'false') {
-                return response('failure', 400);
+                return response()->json('failure', 400);
             }
 
             return redirect()->back()->with([
@@ -446,7 +446,7 @@ class OrdersPackagesController extends Controller
         }
 
         if (isset($request->redirect) && $request->redirect == 'false') {
-            return response('success');
+            return response()->json('success');
         }
 
         return redirect()->back()->with([

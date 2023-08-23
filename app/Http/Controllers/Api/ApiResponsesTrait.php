@@ -1,31 +1,28 @@
 <?php
-/**
- * Author: Sebastian Rogala
- * Mail: sebrogala@gmail.com
- * Created: 04.01.2019
- */
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Http\JsonResponse;
+
 trait ApiResponsesTrait
 {
-    protected function notFoundResponse($message = "Resource couldn't be found...")
+    protected function notFoundResponse($message = "Resource couldn't be found..."): JsonResponse
     {
-        return response()->make($message, 404);
+        return response()->json($message, 404);
     }
 
-    protected function createdResponse($message = null)
+    protected function createdResponse($message = null): JsonResponse
     {
-        return response()->make($message, 201);
+        return response()->json($message, 201);
     }
 
-    protected function createdErrorResponse($message)
+    protected function createdErrorResponse($message): JsonResponse
     {
-        return response()->make($message, 500);
+        return response()->json($message, 500);
     }
 
-    protected function okResponse()
+    protected function okResponse(): JsonResponse
     {
-        return response()->make(null, 200);
+        return response()->json(null, 200);
     }
 }

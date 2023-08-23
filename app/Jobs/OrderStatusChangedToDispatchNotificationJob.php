@@ -41,7 +41,10 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
     /**
      * OrderStatusChangedToDispatchNotificationJob constructor.
      * @param $orderId
-     * @param $self
+     * @param null $self
+     * @param null $path
+     * @param null $packageNumber
+     * @param null $pathSecond
      */
     public function __construct($orderId, $self = null, $path = null, $packageNumber = null, $pathSecond = null)
     {
@@ -57,7 +60,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         try {
             $order = Order::findOrFail($this->orderId);
