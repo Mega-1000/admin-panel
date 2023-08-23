@@ -12,9 +12,14 @@ class ConfirmProductStockOrder extends Component
 {
     public mixed $order;
     public array $creatingPositions = [];
+    public bool $isDeletionConfirmationModalOpen = false;
+    public int $deletingPositionId = 0;
+    public int $deletingPositionIndex = 0;
+
 
     public function __construct($order)
     {
+        $this->isDeletionConfirmationModalOpen = false;
         $this->order = $order;
 
         parent::__construct();
@@ -36,9 +41,36 @@ class ConfirmProductStockOrder extends Component
         ];
     }
 
+    public function confirmDeletion(): void
+    {
+        $this->savePosition($this->deletingPositionId, $this->deletingPositionIndex);
+    }
+
     public function savePosition($itemId, $index): void
     {
-        $productStock = ProductStockPosition::create($this->creatingPositions[$itemId][$index] + [
+        $creationData = $this->creatingPositions[$itemId][$index];
+
+        $existingRecord = ProductStockPosition::where('lane', '=', $creationData['lane'])
+            ->where('bookstand', '=', $creationData['bookstand'])
+            ->where('shelf', '=', $creationData['shelf'])
+            ->where('position', '=', $creationData['position'])
+            ->with(['stock' => function ($q) {
+                $q->with('product');
+            }])
+            ->first();
+
+        if ($existingRecord && !$this->isDeletionConfirmationModalOpen) {
+            $this->isDeletionConfirmationModalOpen = true;
+            $this->deletingPositionId = $existingRecord->id;
+            $this->deletingPositionIndex = $index;
+            return;
+        }
+
+        if ($existingRecord) {
+            $existingRecord->delete();
+        }
+
+        $productStock = ProductStockPosition::create($creationData + [
             'product_stock_id' => $this->order->items->find($itemId)->product->stock->id,
         ]);
 
@@ -52,6 +84,11 @@ class ConfirmProductStockOrder extends Component
             'quantity' => $productStock->position_quantity,
             'user_id' => auth()->user()->id,
         ]);
+    }
+
+    public function closeModal(): void
+    {
+        $this->isDeletionConfirmationModalOpen = false;
     }
 
     public function cancelAdding($itemId, $index): void

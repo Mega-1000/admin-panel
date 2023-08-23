@@ -113,6 +113,10 @@
         </div>
     @endforeach
 
+    @include('livewire.partials.deletion-modal', [
+        'submitFunction' => "confirmDeletion",
+    ])
+
     <button class="mt-5 btn btn-primary">
         Zapisz
     </button>
