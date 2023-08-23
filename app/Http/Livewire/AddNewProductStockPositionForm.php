@@ -2,9 +2,7 @@
 
 namespace App\Http\Livewire;
 
-use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
-use App\Services\ProductStockPositionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Livewire\Component;
