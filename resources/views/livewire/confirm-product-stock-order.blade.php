@@ -91,7 +91,7 @@
                         </td>
                         <td>
                             <input
-                                type="number"
+                                type="string"
                                 wire:model="creatingPositions.{{ $item->id }}.{{ $index }}.position"
                                 placeholder="półka"
                             >
