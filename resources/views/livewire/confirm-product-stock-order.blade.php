@@ -14,7 +14,11 @@
             {{ $item->product->packing->unit_commercial }} |
             {{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }} |
             {{ $item->product->packing->unit_of_collective }} |
-            {{ $item->product->packing->number_of_sale_units_in_the_pack }}
+            {{ $item->product->packing->number_of_sale_units_in_the_pack }} |
+
+            <a target="_blank" href="{{ route('product_stocks.edit', $item->product->stock->id)}}" class="btn btn-primary">
+                Pokaż stan magazynowy
+            </a>
         </h3>
 
 
