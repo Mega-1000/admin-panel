@@ -21,6 +21,8 @@
         }
     </style>
 
+    <script src="https://cdn.tailwindcss.com"></script>
+
     @livewireStyles
 @endsection
 
