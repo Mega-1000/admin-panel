@@ -2259,14 +2259,14 @@
                             const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseFloat(ZP)).toFixed(2);
 
                             return `
-                                <p><span title="Zysk">Z: ${Z}</p>
-                                <p>RKTBO: ${RKTBO}</p>
-                                <p>BT: ${row.shipment_price_for_client - RKTBO}</p>
-                                <p>PSIK: ${PSIK}</p>
-                                <p>PSW: ${PSW}</p>
-                                <p>WAC: ${WAC}</p>
-                                <p>ZP: ${ZP}</p>
-                                <p>BZO: ${BZO}</p>
+                                <p><span title="Zysk">Z: ${Z.toFixed(2)}</p>
+                                <p>RKTBO: ${RKTBO.toFixed(2)}</p>
+                                <p>BT: ${(row.shipment_price_for_client - RKTBO).toFixed(2)}</p>
+                                <p>PSIK: ${PSIK.toFixed(2)}</p>
+                                <p>PSW: ${PSW.toFixed(2)}</p>
+                                <p>WAC: ${WAC.toFixed(2)}</p>
+                                <p>ZP: ${ZP.toFixed(2)}</p>
+                                <p>BZO: ${BZO.toFixed(2)}</p>
                                 <p><a href="/admin/allegro-billing?order-id=${row.orderId}" class="btn btn-primary" target="_blank">pokaz na liście</a></p>
                             `;
                         }
