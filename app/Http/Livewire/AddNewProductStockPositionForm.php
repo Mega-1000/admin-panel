@@ -6,6 +6,7 @@ use App\Entities\ProductStockPosition;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\Redirector;
 
 class AddNewProductStockPositionForm extends Component
 {
@@ -30,7 +31,7 @@ class AddNewProductStockPositionForm extends Component
         return view('livewire.add-new-product-stock-position-form');
     }
 
-    public function submitForm(): RedirectResponse|null
+    public function submitForm(): Redirector|null
     {
         $data = [
             'position_quantity' => $this->position_quantity,
