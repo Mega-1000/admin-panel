@@ -74,8 +74,6 @@ class ConfirmProductStockOrder extends Component
             'product_stock_id' => $this->order->items->find($itemId)->product->stock->id,
         ]);
 
-        $this->order->items->find($itemId)->refresh();
-
         ProductStockLog::create([
             'product_stock_id' => $productStock->product_stock_id,
             'product_stock_position_id' => $productStock->id,
@@ -84,6 +82,8 @@ class ConfirmProductStockOrder extends Component
             'quantity' => $productStock->position_quantity,
             'user_id' => auth()->user()->id,
         ]);
+
+        $this->order->items->find($itemId)->refresh();
     }
 
     public function closeModal(): void
