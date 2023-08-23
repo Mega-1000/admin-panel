@@ -28,6 +28,7 @@ class UpdateProductRequest extends FormRequest
             'save_name' => 'required',
             'save_image' => 'required',
             'image' => 'nullable',
+            'description' => 'nullable|string',
         ];
     }
 

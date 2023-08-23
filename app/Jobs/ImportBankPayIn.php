@@ -379,7 +379,7 @@ class ImportBankPayIn implements ShouldQueue
         $operationType = $operationType ?? 'Wpłata/wypłata bankowa';
 
         /** @var ?OrderPayment $payment */
-        $payment = OrderPayment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
+        $payment = OrderPayment::where('comments', implode(" ", $payIn))->first();
         $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
 
 

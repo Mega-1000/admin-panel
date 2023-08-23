@@ -28,7 +28,8 @@
 @section('scripts')
     @livewireScripts
     <script>
-        var breadcrumb = $('.breadcrumb:nth-child(2)');
+        const breadcrumb = $('.breadcrumb:nth-child(2)');
+
         breadcrumb.children().remove();
         breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
         breadcrumb.append("<li class='active'><a href='/admin/product/stocks'>Stany magazynowe</a></li>");
