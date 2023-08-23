@@ -908,7 +908,7 @@ class OrdersController extends Controller
 
         $prev = [];
         AddLabelService::addLabels($order, [Label::PROOF_OF_PAYMENT_UPLOADED], $prev, [], Auth::user()->id);
-
+      
         return response()->json('success', 200);
     }
 
