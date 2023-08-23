@@ -62,6 +62,57 @@ class ProductStockPositionsController extends Controller
     }
 
     /**
+     * @param ProductStockPositionUpdate $request
+     * @param $id
+     * @param $position_id
+     * @return RedirectResponse
+     */
+    public function update(ProductStockPositionUpdate $request, $id, $position_id): RedirectResponse
+    {
+        $productStockPosition = ProductStockPosition::findOrFail($position_id);
+
+        $productStockPosition->fill([
+            'lane' => $request->lane,
+            'bookstand' => $request->bookstand,
+            'shelf' => $request->shelf,
+            'position' => $request->position
+        ]);
+
+        if (array_intersect(['lane', 'bookstand', 'shelf', 'position'], array_keys($productStockPosition->getDirty()))) {
+            $existingRecord = ProductStockPosition::query()
+                ->where('lane', '=', $request->lane)
+                ->where('bookstand', '=', $request->bookstand)
+                ->where('shelf', '=', $request->shelf)
+                ->where('position', '=', $request->position)
+                ->with(['stock' => function ($q) {
+                    $q->with('product');
+                }])
+                ->first();
+
+            if ($existingRecord) {
+                return redirect()->back()->with([
+                    'message' => __('product_stock_positions.message.position_exist') . ' Symbol:' . $existingRecord->stock->product->symbol,
+                    'alert-type' => 'error'
+                ]);
+            }
+        }
+
+        $productStock = ProductStock::where(['product_id' => $id])->first();
+
+        if ($request->different !== null) {
+            $this->createLog($request->different, $productStock->id, $productStockPosition->id);
+        }
+        $productStockPosition->update($request->all());
+
+        ProductStockPositionService::calculateQuantityForProductStock($productStock);
+
+        return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
+            'message' => __('product_stock_positions.message.update'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @param $id
