@@ -26,4 +26,10 @@ return [
         'quantity_set' => 'Pozycja posiada stan różny od 0.',
         'position_exist' => 'W tym miejscu znajduje się już towar.'
     ],
+    'confirmation_modal' => [
+        'title' => 'Usuwanie pozycji magazynowej',
+        'message' => 'W bazie danych istnieje już pozycja magazynowa z tymi danymi, czy chcesz usunąć starą?',
+        'cancel' => 'Anuluj',
+        'confirm' => 'Akceptuj',
+    ],
 ];

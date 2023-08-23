@@ -375,12 +375,13 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function saveOrderPayment(Order $order, float $paymentAmount, array $payIn, $declaredSum = false, string $operationType): Model
     {
+        unset($payIn['operation_type']);
+        $operationType = $operationType ?? 'Wpłata/wypłata bankowa';
+
         /** @var ?OrderPayment $payment */
         $payment = OrderPayment::where('order_id', $order->id)->where('comments', implode(" ", $payIn))->first();
-        $operationType = $operationType ?? 'Wpłata/wypłata bankowa';
         $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
 
-        unset($payIn['operation_type']);
 
         $payment = !isset($payment)
             ? $order->payments()->create([
