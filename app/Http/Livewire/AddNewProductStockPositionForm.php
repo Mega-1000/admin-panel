@@ -65,10 +65,7 @@ class AddNewProductStockPositionForm extends Component
             array_merge(['product_stock_id' => $this->productStockId], $data)
         );
 
-        return redirect()->route('product_stocks.edit', ['id' => $this->productStockId, 'tab' => 'positions'])->with([
-            'message' => __('product_stock_positions.message.store'),
-            'alert-type' => 'success'
-        ]);
+        return redirect()->to(route('product_stocks.edit', ['id' => $this->productStockId, 'tab' => 'positions']));
     }
 
     public function closeModal(): void
