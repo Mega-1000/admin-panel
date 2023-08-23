@@ -174,7 +174,7 @@ class MessagesController extends Controller
             } else {
                 $this->notifyModerator($helper);
             }
-            return response('ok');
+            return response()->json('ok');
         } catch (ChatException $e) {
             $e->log();
             return response($e->getMessage(), 400);
@@ -239,7 +239,7 @@ class MessagesController extends Controller
             }
             $helper->setLastRead();
 
-            return response(['messages' => $out, 'users' => $chat->chatUsers]);
+            return response()->json(['messages' => $out, 'users' => $chat->chatUsers]);
         } catch (ChatException $e) {
             $e->log();
             return response($e->getMessage(), 400);
@@ -457,7 +457,7 @@ class MessagesController extends Controller
             error_log('test2');
             Log::error('Brak przedmiotu',
                 ['message' => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()]);
-            return response('Edytowany przedmiot nie istnieje', 400);
+            return response()->json('Edytowany przedmiot nie istnieje', 400);
         }
         $url = route('chat.show', ['token' => $token]);
 

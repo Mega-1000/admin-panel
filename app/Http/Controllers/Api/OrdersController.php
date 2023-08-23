@@ -662,18 +662,17 @@ class OrdersController extends Controller
         return response(json_encode($products));
     }
 
-    public function getPaymentDetailsForOrder(Request $request, $token): JsonResponse|array
+    public function getPaymentDetailsForOrder(Request $request, $token)
     {
         if (empty($token)) {
-            return response()->json("Missing token", 400);
+            return response("Missing token", 400);
         }
 
         $order = Order::where('token', $token)->first();
-
         return ['total_price' => $order->total_price, 'transport_price' => $order->getTransportPrice(), 'id' => $order->id];
     }
 
-    public function getDates(Order $order): array
+    public function getDates(Order $order)
     {
         /** @var OrderDates $dates */
         $dates = $order->dates;
@@ -841,7 +840,7 @@ class OrdersController extends Controller
 
     public function declineProform(
         DeclineProformRequest $request,
-        int                   $orderId
+                              $orderId
     )
     {
         if (!($order = $this->orderRepository->find($orderId))) {
@@ -856,7 +855,7 @@ class OrdersController extends Controller
         return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function acceptDeliveryInvoiceData($orderId): array|JsonResponse
+    public function acceptDeliveryInvoiceData($orderId)
     {
         if (!($order = $this->orderRepository->find($orderId))) {
             return [];
@@ -868,7 +867,7 @@ class OrdersController extends Controller
         return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function acceptReceivingOrder(AcceptReceivingOrderRequest $request, $orderId): JsonResponse|array
+    public function acceptReceivingOrder(AcceptReceivingOrderRequest $request, $orderId)
     {
         if (!($order = $this->orderRepository->find($orderId))) {
             return [];
@@ -890,25 +889,22 @@ class OrdersController extends Controller
     /**
      * Return countries.
      */
-    public function countries(): JsonResponse
+    public function countries()
     {
         return response()->json(Country::all());
     }
 
     public function uploadProofOfPayment(Request $request): JsonResponse
     {
+        $orderId = $request->id;
         /** @var Order $order */
-        $order = Order::query()->find($request->id);
-
+        $order = Order::query()->find($orderId);
         if (!$order) return response()->json(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
         if ($order->customer_id != $request->user()->id) return response()->json(['errorMessage' => 'Nie twoje zamówienie'], 400);
-
         $ordersController = App::make(OrdersControllerApp::class);
-        $ordersController->addFile($request, $order->id);
-
+        $ordersController->addFile($request, $orderId);
         $prev = [];
         AddLabelService::addLabels($order, [Label::PROOF_OF_PAYMENT_UPLOADED], $prev, [], Auth::user()->id);
-
         return response()->json('success', 200);
     }
 
@@ -1015,11 +1011,10 @@ class OrdersController extends Controller
                 'error_message' => $exception->getMessage()
             ]), 500);
         }
-
         return response()->json('Oferta została wysłana', 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getLatestDeliveryInfo(Order $order): JsonResponse
+    public function getLatestDeliveryInfo(Order $order)
     {
         $deliveryInfos = $order->customer->orders()->get();
         foreach ($deliveryInfos as $deliveryInfo) {
@@ -1029,7 +1024,7 @@ class OrdersController extends Controller
         return response()->json($deliveryInfos, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getLatestInvoiceInfo(Order $order): JsonResponse
+    public function getLatestInvoiceInfo(Order $order)
     {
         $invoiceInfos = $order->customer->orders()->get();
         foreach ($invoiceInfos as $invoiceInfo) {

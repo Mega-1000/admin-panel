@@ -116,7 +116,7 @@ class LabelsController extends Controller
         return $arr;
     }
 
-    public function detachLabelFromOrder(OrderEditLabel $request)
+    public function detachLabelFromOrder(OrderEditLabel $request): JsonResponse
     {
         try {
             $request->validated();
@@ -126,10 +126,10 @@ class LabelsController extends Controller
             $label = Label::find($request->label_id);
             $order->labels_log .= Order::formatMessage($user, "usunął etykietę: $label->name");
             $order->save();
-            return response('success');
+            return response()->json('success');
         } catch (Exception $exception) {
             Log::error('Nie udało się usunąć etykiety', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
-            return response(['errors' => ['message' => "Niespodziewany błąd prosimy spróbować później"]], 400);
+            return response()->json(['errors' => ['message' => "Niespodziewany błąd prosimy spróbować później"]], 400);
         }
     }
 
