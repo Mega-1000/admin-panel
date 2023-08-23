@@ -50,6 +50,8 @@ class ConfirmProductStockOrder extends Component
     {
         $creationData = $this->creatingPositions[$itemId][$index];
 
+        unset($this->creatingPositions[$itemId][$index]);
+
         $existingRecord = ProductStockPosition::where('lane', '=', $creationData['lane'])
             ->where('bookstand', '=', $creationData['bookstand'])
             ->where('shelf', '=', $creationData['shelf'])
