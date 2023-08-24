@@ -25,14 +25,8 @@ class AllegroBillingController
             $query->where('order_id', $orderId);
         }
 
-        $realCostsForCompany = OrderPackageRealCostsForCompany::getAllCostsByOrder($orderId);
-
-        $expenses = !$orderId
-            ? $query->paginate(30)
-            :  $query->get()->toArray() + $realCostsForCompany->toArray();
-
         return view('allegro-billing.index', [
-            'expenses' => $expenses,
+            'expenses' => $query->paginate(30),
         ]);
     }
 }
