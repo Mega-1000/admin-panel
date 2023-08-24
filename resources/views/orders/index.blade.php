@@ -1395,8 +1395,7 @@
                         'redirect': false
                     }
                 }).done(function (data) {
-                    urlRefresh = '{{route('orders.index', ['order_id' => 'replace'])}}'
-                    window.location.href = urlRefresh.replace('replace', orderId)
+                    table.ajax.reload(null, false);
                 }).fail(function () {
                     alert('Coś poszło nie tak')
                 });
@@ -3505,13 +3504,12 @@
                 $('#order_move_data_success').modal('show');
 
                 $('#order_move_data_ok').on('click', function () {
-                    window.location.href = '/admin/orders';
+                    table.ajax.reload(null, false);
                 });
             }).fail(function () {
                 $('#order_move_data_error').modal('show');
                 $('#order_move_data_ok_error').on('click', function () {
-                    window.location.href = '/admin/orders';
-
+                    table.ajax.reload(null, false);
                 });
             });
         });
