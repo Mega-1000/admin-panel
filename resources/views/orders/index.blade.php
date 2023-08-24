@@ -1421,7 +1421,6 @@
                 $('#success-ok').on('click', function () {
                     setTimeout(() => {
                         table.ajax.reload(null, false);
-                        window.location.href = '/admin/orders?order_id=' + orderId;
                     }, 500);
                 });
             }).fail(function () {
