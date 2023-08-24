@@ -1,9 +1,11 @@
 <?php
 
+use App\Entities\ShippingPayInReport;
 use App\Http\Controllers\AllegroMessageController;
 use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\OrderPackageController;
 use App\Http\Controllers\Api\ProductsController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -177,3 +179,6 @@ Route::prefix('discounts')->group(function () {
 Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'getByOrder'])
     ->name('api.get-packages-for-order');
 Route::post('/create-message', AllegroMessageController::class);
+Route::get('/shipment-pay-in-report', fn (Request $request) =>
+    response()->json(ShippingPayInReport::where('nr_faktury_do_ktorej_dany_lp_zostal_przydzielony', $request->invoice_number)->get()))
+    ->name('shipment-pay-in-report');

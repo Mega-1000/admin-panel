@@ -18,23 +18,18 @@
     showHide();
 </script>
 @section('table')
+    <form id="form">
+        <input id="invoice-number" type="text" class="form-control mt-4 mb-2" placeholder="Wpisz numer faktury">
+        <button class="btn btn-primary">
+            Szukaj
+        </button>
+
+        <div id="results-container">
+
+        </div>
+    </form>
+
     <table class="table table-bordered">
-        <!--
-                'symbol_spedytora',
-        'numer_listu',
-        'nr_faktury_do_ktorej_dany_lp_zostal_przydzielony',
-        'data_nadania_otrzymania',
-        'nr_i_d',
-        'rzeczywisty_koszt_transportu_brutto',
-        'wartosc_pobrania',
-        'file',
-        'reszta',
-        'rodzaj',
-        'invoice_date',
-        'content',
-        'surcharge',
-        'found',
-        -->
         <tr>
             <th>
                 ID
@@ -93,4 +88,39 @@
     <div style="display: block !important;" class="d-flex justify-content-center">
         {{ $report->links() }}
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+
+    <script>
+        $('document').ready(() => {
+            document.getElementById('form').addEventListener('submit', searchByInvoiceNumber);
+        });
+
+        function searchByInvoiceNumber(e) {
+            e.preventDefault();
+            const invoiceNumber = document.getElementById('invoice-number').value;
+
+            fetch(`/api/shipment-pay-in-report?invoice_number=${invoiceNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('results-container');
+
+                    container.innerHTML = '';
+
+                    data.forEach(entry => {
+                        const row = document.createElement('tr');
+
+                        Object.keys(entry).forEach(key => {
+                            const cell = document.createElement('td');
+
+                            cell.innerText = entry[key];
+
+                            row.appendChild(cell);
+                        });
+
+                        container.appendChild(row);
+                    });
+                });
+        };
+    </script>
 @endsection
