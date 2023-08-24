@@ -212,6 +212,7 @@ class ImportCsvFileJob implements ShouldQueue
         /** @var Category $category */
         $category = Category::query()->create([
             'name' => end($categoryTree),
+            'description' => $existingCategory?->description ?? $line[310],
             'img' => $image,
             'rewrite' => $this->rewrite(end($categoryTree)),
             'is_visible' => $this->getShowOnPageParameter($line, $categoryColumn),
@@ -512,7 +513,6 @@ class ImportCsvFileJob implements ShouldQueue
             'video_url' => $line[305],
             'calculator_type' => $line[306],
             'meta_price' => $line[309],
-            'description' => $line[310],
             'meta_description' => $line[311],
             'meta_keywords' => $line[312],
             'status' => $line[313],
