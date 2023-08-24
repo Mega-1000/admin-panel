@@ -82,7 +82,7 @@ final class PackageProductOrderService
      * @param array $orderItems
      * @return array
      */
-    private function applyAdditionalOptions(Order $order, array $productArray, float $quantity, array &$orderItems): array
+    private function applyAdditionalOptions(Order $order, array &$productArray, float $quantity, array &$orderItems): array
     {
         $this->applySingleOption(
             option: 'subtract-from-shipping-cost',
