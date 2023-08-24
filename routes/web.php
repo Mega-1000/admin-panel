@@ -12,6 +12,7 @@ use App\Http\Controllers\FastResponseController;
 use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\MailReportController;
+use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\OrderInvoiceDocumentsController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
@@ -267,6 +268,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::group(['as' => ''], __DIR__ . '/web/ProductStocksRoutes.php');
 
         Route::post('differenceInShipmentCostCookies', DifferenceInShipmentCostCookiesController::class)->name('differenceInShipmentCostCookies');
+        //addUsersFromCompanyToChat
+        Route::post('addUsersFromCompanyToChat/{chat}', [MessagesController::class, 'addUsersFromCompanyToChat'])->name('addUsersFromCompanyToChat');
 
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');

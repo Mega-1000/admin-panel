@@ -23,9 +23,13 @@ use App\Services\Label\AddLabelService;
 use App\Services\MessageService;
 use App\User;
 use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +40,7 @@ class MessagesController extends Controller
         readonly protected MessageService $messageService,
     ) {}
 
-    public function postNewMessage(PostMessageRequest $request, string $token): Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
+    public function postNewMessage(PostMessageRequest $request, string $token): Response|Application|ResponseFactory
     {
         try {
             $message = $this->messageService->addMessage(
@@ -59,15 +63,20 @@ class MessagesController extends Controller
         try {
             $helper = new MessagesHelper($token);
             $chat = $helper->getChat();
+
             if (!$chat) {
                 $chat = $helper->createNewChat();
             }
+
             list($user, $chatUser) = $this->findCustomerOrEmployeeInTrash($request, $chat);
+
             if ($chatUser) {
                 $chatUser->restore();
                 return 'ok';
             }
-            $this->createNewCustomerOrEmployee($chat, $request, $user);
+
+            MessageService::createNewCustomerOrEmployee($chat, $request, $user);
+
             if (is_a($user, Customer::class)) {
                 $email = $user->login;
                 ChatNotificationJob::sendNewMessageEmail($email, $helper);
@@ -102,24 +111,6 @@ class MessagesController extends Controller
         }
 
         return array($user, $chatUser);
-    }
-
-    /**
-     * @param $chat
-     * @param Request $request
-     * @param $user
-     */
-    private function createNewCustomerOrEmployee($chat, Request $request, $user): void
-    {
-        $chatUser = new ChatUser();
-        $chatUser->chat()->associate($chat);
-        if ($request->type == Employee::class) {
-            $chatUser->employee()->associate($user);
-        }
-        if ($request->type == Customer::class) {
-            $chatUser->customer()->associate($user);
-        }
-        $chatUser->save();
     }
 
     public function removeUser(Request $request, string $token): string|JsonResponse
@@ -161,7 +152,7 @@ class MessagesController extends Controller
         return $chatUser;
     }
 
-    public function askForIntervention($token): Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
+    public function askForIntervention($token): Response|Application|ResponseFactory
     {
         try {
             $helper = new MessagesHelper($token);
@@ -402,7 +393,7 @@ class MessagesController extends Controller
         $helper->sendComplaintEmail($email);
     }
 
-    public function getHistory(Request $request): Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
+    public function getHistory(Request $request): Response|Application|ResponseFactory
     {
         $user = $request->user();
         $out = [];
@@ -421,7 +412,7 @@ class MessagesController extends Controller
         return response($out);
     }
 
-    public function editPrices(Request $request, $token): Response|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
+    public function editPrices(Request $request, $token): Response|Redirector|RedirectResponse|Application|ResponseFactory
     {
         try {
             $helper = new MessagesHelper($token);

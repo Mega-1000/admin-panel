@@ -21,6 +21,16 @@
     <link href="{{ asset('css/views/chat/style.css') }}" rel="stylesheet">
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     <script type="text/javascript" src="{{ URL::asset('js/helpers/helpers.js') }}"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.default.min.css"
+        integrity="sha512-pTaEn+6gF1IeWv3W1+7X7eM60TFu/agjgoHmYhAfLEU8Phuf6JKiiE8YmsNC0aCgQv4192s4Vai8YZ6VNM6vyQ=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+    <!-- Select2 JS -->
 </head>
 
 <body>
@@ -203,6 +213,22 @@
                                 'class'            => 'bg-info alert alert-info',
                             ])
                         @endif
+                        <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="post">
+                            @csrf
+                            <h2>
+                                Dodaj firmę
+                            </h2>
+                            <select class="select2" data-live-search="true" name="company_id" id="select2">
+                                <option>Dodaj użytkownika</option>
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->symbol }}</option>
+                                @endforeach
+                            </select>
+
+                            <button class="btn btn-primary">
+                                Dodaj użytkowników
+                            </button>
+                        </form>
                     </table>
                 </div>
                 @if ($userType == MessagesHelper::TYPE_USER)
@@ -234,6 +260,11 @@
         </div>
     </div>
 
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".select2").select2();
+        });
+    </script>
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"
@@ -243,10 +274,18 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
         integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous">
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
     <script src="{{ asset('js/vue-chunk.js') }}"></script>
     <script src="{{ asset('js/vue-scripts.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/libs/blink-title.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"
+        integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    ></script>
     <script>
         const askForPermision = () => {
             Notification.requestPermission().then((permission) => {
@@ -297,7 +336,11 @@
             });
         });
 
-        $(document).ready(function() {
+            $(document).ready(function() {
+                $(function () {
+                    console.log($("select").selectize());
+                });
+
             $('#new-message').removeClass('loader-2');
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';

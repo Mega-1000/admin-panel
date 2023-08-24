@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Chat;
+use App\Entities\Customer;
 use App\Entities\Firm;
 use App\Entities\Order;
 use App\Enums\UserRole;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
+use App\Jobs\ChatNotificationJob;
+use App\Services\MessageService;
 use App\Services\ProductService;
 use App\Services\StyrofoarmAuctionService;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -24,7 +27,9 @@ class MessagesController extends Controller
 {
     public function __construct(
         private readonly ProductService $productService,
-    ) {}
+    )
+    {
+    }
 
     /**
      * Display a listing of the resource.
@@ -250,7 +255,8 @@ class MessagesController extends Controller
             'routeRefresh' => route('api.messages.get-messages', ['token' => $token]),
             'routeCallComplaint' => route('api.messages.callComplaint', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
-            'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
+            'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token]),
+            'companies' => Firm::all(),
         ], compact('allEmployeesFromRelatedOrders') ?? []);
     }
 
@@ -281,5 +287,24 @@ class MessagesController extends Controller
         $userToken = $helper->encrypt();
 
         return redirect()->route('chat.show', ['token' => $userToken]);
+    }
+
+    /**
+     * @throws ChatException
+     */
+    public function addUsersFromCompanyToChat(Chat $chat, Request $request): RedirectResponse
+    {
+        $company = Firm::find($request->get('company_id'));
+
+        foreach ($company->employees as $employee) {
+            $chatHelper = new MessagesHelper($chat->token);
+
+            MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+
+            ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
+        }
+
+
+        return redirect()->back();
     }
 }
