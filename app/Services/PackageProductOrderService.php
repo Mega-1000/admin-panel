@@ -67,8 +67,8 @@ final class PackageProductOrderService
             ->toArray();
 
         foreach ($orderItems as &$orderItem) {
-   	    $orderItem['amount'] = 0;
-	    $orderItem['amount'] = $orderItem['quantity'];
+            $orderItem['amount'] = 0;
+            $orderItem['amount'] = $orderItem['quantity'];
             $orderItem['id'] = $orderItem['product']['id'];
         }
 
@@ -182,9 +182,10 @@ final class PackageProductOrderService
             );
 
         $order->items->each(
-            fn (OrderItem $item) => $item->update(
-                ['gross_selling_price_commercial_unit',$newProduct['gross_selling_price_commercial_unit']]
-            )
+            function (OrderItem $item) use ($newProduct) {
+                $item->gross_selling_price_commercial_unit = $newProduct['gross_selling_price_commercial_unit'];
+                $item->save();
+            }
         );
     }
 }
