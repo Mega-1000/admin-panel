@@ -212,7 +212,6 @@ class ImportCsvFileJob implements ShouldQueue
         /** @var Category $category */
         $category = Category::query()->create([
             'name' => end($categoryTree),
-            'description' => $existingCategory?->description ?? $line[310],
             'img' => $image,
             'rewrite' => $this->rewrite(end($categoryTree)),
             'is_visible' => $this->getShowOnPageParameter($line, $categoryColumn),
