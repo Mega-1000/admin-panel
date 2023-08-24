@@ -593,10 +593,10 @@ class ImportCsvFileJob implements ShouldQueue
                 }
             }
             /** MT-19 checking if url for product image exists and changing prefix of path to match server path */
-            if (!empty($array['url']) && strpos($array['url'], "\\")
-            ) {
-                $array['url_for_website'] = $this->getUrl($array['url']);
-            }
+//            if (!empty($array['url']) && strpos($array['url'], "\\")
+//            ) {
+//                $array['url_for_website'] = $this->getUrl($array['url']);
+//            }
         }
 
         return $array;
