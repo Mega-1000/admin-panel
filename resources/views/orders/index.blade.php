@@ -843,8 +843,31 @@
                 <label class="form-label">ostatnich dni</label>
                 <input type="submit" value="Zapisz ustawienia limitów" class="btn btn-warning">
             </div>
+
         </div>
     </form>
+
+    <div>
+        <form method="post" action="{{ route('differenceInShipmentCostCookies') }}">
+            @csrf
+            RWKTAP:
+            <br>
+            <br>
+            Większe lub mniejsze od:
+            <select name="gratherOrLess" class="form-control">
+                <option value="<" {{ cookie('gratherOrLess') === '<' ? 'selected' : '' }}><</option>
+                <option value=">" {{ cookie('gratherOrLess') === '>' ? 'selected' : '' }}>></option>
+            </select>
+
+            Ilość:
+            <input class="form-control" id="differenceInShipmentCost" name="differenceInShipmentCost" value="{{ \Illuminate\Support\Facades\Cookie::get('differenceInShipmentCost') }}" type="number" >
+            <button id="difference-shipment-button" class="btn btn-primary">
+                Zapisz
+            </button>
+        </form>
+    </div>
+
+
     <button name="selectOnlyWrongInvoiceBilansOrders" id="selectOnlyWrongInvoiceBilansOrders"
             class="btn btn-primary"></button>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
@@ -1102,6 +1125,20 @@
         const customerId = '{{ $customerId }}';
 
         $(document).ready(() => {
+            $('#difference-shipment-button', (e) => {
+                e.preventDefault();
+                $('#difference-shipment-button').attr('disabled', true);
+
+                // set cookies
+                // gratherOrLess and differenceInShipmentCost
+                let gratherOrLess = $('#gratherOrLess').val();
+                let differenceInShipmentCost = $('#differenceInShipmentCost').val();
+
+                // create or update cookies
+                window.cookies.set('gratherOrLess', gratherOrLess, { expires: 365 });
+                window.cookies.set('differenceInShipmentCost', differenceInShipmentCost, { expires: 365 });
+            });
+
             let nof = getUrlParameter('nof');
             if (nof) {
                 filterByPhone(nof);
