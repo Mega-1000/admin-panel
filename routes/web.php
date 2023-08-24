@@ -19,6 +19,7 @@ use App\Http\Controllers\OrdersPackagesController;
 use App\Http\Controllers\PackageProductOrderController;
 use App\Http\Controllers\ProductStockLogsController;
 use App\Http\Controllers\ProductStocksController;
+use App\Http\Controllers\ShippingPayInReportController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -270,6 +271,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('differenceInShipmentCostCookies', DifferenceInShipmentCostCookiesController::class)->name('differenceInShipmentCostCookies');
         //addUsersFromCompanyToChat
         Route::post('addUsersFromCompanyToChat/{chat}', [MessagesController::class, 'addUsersFromCompanyToChat'])->name('addUsersFromCompanyToChat');
+
+        Route::get('shipping-payin-report', ShippingPayinReportController::class)->name('shipping-payin-report');
 
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');

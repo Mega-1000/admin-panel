@@ -9,6 +9,7 @@ use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
 use App\Entities\ProviderTransaction;
+use App\Entities\ShippingPayInReport;
 use App\Entities\Transaction;
 use App\Factory\ShippingPayInCsvDataFactory;
 use App\Helpers\PdfCharactersHelper;
@@ -80,6 +81,12 @@ final class ShippingPayInService
                 $orderPackage = $this->findOrderPackageByLetterNumber($payIn->numer_listu);
 
                 if (!empty($orderPackage)) {
+                    $existingPayInReport = ShippingPayInReport::where('numer_listu', $payIn->numer_listu)->first();
+
+                    if (!empty($existingPayInReport)) {
+                        $existingPayInReport->update(['found' => true]);
+                    }
+
                     $realCost = $this->addRealCost($orderPackage, $payIn);
 
                     if (!$realCost) {
@@ -88,6 +95,7 @@ final class ShippingPayInService
 
                     $order = $orderPackage->order;
                 } else {
+                    $this->addToReport($payIn->toArray());
                     fputcsv($file, $payIn->toArray());
                     continue;
                 }
@@ -128,6 +136,11 @@ final class ShippingPayInService
     private function findOrderPackageByLetterNumber(string $letterNumber): ?OrderPackage
     {
         return OrderPackage::where('letter_number', $letterNumber)->first();
+    }
+
+    public function addToReport(array $data): void
+    {
+        ShippingPayInReport::create($data);
     }
 
     private function addRealCost(OrderPackage $orderPackage, ShippingPayInCsvDataDTO $payIn): bool

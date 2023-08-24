@@ -15,6 +15,10 @@
 @endsection
 
 @section('table')
+    <a href="{{ route('shipping-payin-report') }}" class="btn btn-primary">
+        Raport płatności za wysyłki
+    </a>
+
     <div class="modal fade" tabindex="-1" id="changePackageCostModal" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -866,7 +870,6 @@
             </button>
         </form>
     </div>
-
 
     <button name="selectOnlyWrongInvoiceBilansOrders" id="selectOnlyWrongInvoiceBilansOrders"
             class="btn btn-primary"></button>
