@@ -9,9 +9,9 @@ use App\Entities\OrderPayment;
 use App\Repositories\OrderPackageRealCostsForCompany;
 use App\Repositories\SpeditionExchangeRepository;
 use Carbon\Carbon;
-use Cookie;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 
 readonly class OrderDatatableService
@@ -41,7 +41,8 @@ readonly class OrderDatatableService
      */
     private function getQueryForDataTables($selectAllDates = null): Builder
     {
-        return DB::table('orders')
+
+        $query = DB::table('orders')
             ->distinct()
             ->select(
                 '*',
@@ -58,12 +59,10 @@ readonly class OrderDatatableService
                 'taskUser.firstname as taskUserFirstName',
                 'taskUser.lastname as taskUserLastName'
             )
-            //poniższe left joiny mają na celu wyświetlenie czasów oraz wykonwaców zadań z tabeli tasks na "gridzie"
             ->leftJoin('tasks', 'orders.id', '=', 'tasks.order_id')
             ->leftJoin('tasks as parentTask', 'parentTask.id', '=', 'tasks.parent_id')
             ->leftJoin('users as taskUser', DB::raw('COALESCE(parentTask.user_id, tasks.user_id)'), '=', 'taskUser.id')
             ->leftJoin('task_times', 'task_times.task_id', '=', DB::raw('COALESCE(parentTask.id, tasks.id)'))
-            //tasks - koniec
             ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
             ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
@@ -73,12 +72,30 @@ readonly class OrderDatatableService
             ->leftJoin('customer_addresses', function ($join) {
                 $join->on('customers.id', '=', 'customer_addresses.customer_id')
                     ->where('type', '=', 'STANDARD_ADDRESS');
-            })->where(function ($query) {
-                if (Auth::user()->role_id == 4) {
-                    $query->where('orders.employee_id', '=', Auth::user()->id);
-                }
             });
+
+        if (Auth::user()->role_id == 4) {
+            $query->where('orders.employee_id', '=', Auth::user()->id);
+        }
+
+        $gratherOrLess = Cookie::get('gratherOrLess');
+        $differenceInShipmentCost = Cookie::get('differenceInShipmentCost');
+
+        if (!is_null($differenceInShipmentCost) && !is_null($gratherOrLess)) {
+            $query->whereExists(function ($query) use ($gratherOrLess, $differenceInShipmentCost) {
+                $query->select(DB::raw(1))
+                    ->from('order_packages')
+                    ->join('order_packages_real_cost_for_company', 'order_packages.id', '=', 'order_packages_real_cost_for_company.order_package_id')
+                    ->join('orders', 'orders.id', '=', 'order_packages.order_id')
+                    ->groupBy('orders.id')
+                    ->havingRaw('SUM(order_packages_real_cost_for_company.cost) ' . ($gratherOrLess ? '>' : '<') . ' ?', [$differenceInShipmentCost]);
+            });
+        }
+
+
+        return $query;
     }
+
 
     /**
      * @param $data

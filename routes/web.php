@@ -6,6 +6,7 @@ use App\Http\Controllers\AllegroReturnPaymentController;
 use App\Http\Controllers\ConfirmProductStockOrderController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
+use App\Http\Controllers\DifferenceInShipmentCostCookiesController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FastResponseController;
 use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
@@ -264,6 +265,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 
         Route::group(['as' => ''], __DIR__ . '/web/ProductStocksRoutes.php');
+
+        Route::post('differenceInShipmentCostCookies', DifferenceInShipmentCostCookiesController::class)->name('differenceInShipmentCostCookies');
 
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
