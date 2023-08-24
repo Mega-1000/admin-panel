@@ -1427,7 +1427,7 @@
                 $('#package-' + id).attr("disabled", false);
                 $('#order_courier_problem').modal('show');
                 $('#problem-ok').on('click', function () {
-                    window.location.href = '/admin/orders?order_id=' + orderId;
+                    table.ajax.reload(null, false);
                 });
             });
         }
