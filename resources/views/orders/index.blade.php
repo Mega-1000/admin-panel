@@ -1369,6 +1369,7 @@
             action = action.replace('%id', id)
             $.ajax({
                 url: action,
+                method: 'POST'
             }).done(function (data) {
                 table.ajax.reload(null, false);
             }).fail(function () {
