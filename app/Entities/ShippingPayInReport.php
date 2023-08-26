@@ -25,4 +25,24 @@ class ShippingPayInReport extends Model
         'surcharge',
         'found',
     ];
+
+    public static function getColumns(): array
+    {
+        return [
+            'symbol_spedytora',
+            'numer_listu',
+            'nr_faktury_do_ktorej_dany_lp_zostal_przydzielony',
+            'data_nadania_otrzymania',
+            'nr_i_d',
+            'rzeczywisty_koszt_transportu_brutto',
+            'wartosc_pobrania',
+            'file',
+            'reszta',
+            'rodzaj',
+            'invoice_date',
+            'content',
+            'surcharge',
+            'found',
+        ];
+    }
 }

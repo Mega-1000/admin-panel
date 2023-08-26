@@ -76,7 +76,7 @@
         </tr>
         @foreach($report as $entry)
             <tr>
-                @foreach(ShippingPayInReport::fillable as $title)
+                @foreach(\App\Entities\ShippingPayInReport::getColumns() as $title)
                     <td>
                         {{ $entry->$title }}
                     </td>
