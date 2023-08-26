@@ -41,6 +41,9 @@
                     ID
                 </th>
                 <th>
+                    Firma obsługująca przesyłkę
+                </th>
+                <th>
                     Numer listu
                 </th>
                 <th>
@@ -85,7 +88,6 @@
             </tr>
             @foreach($report as $entry)
                 <tr>
-
                     @foreach(\App\Entities\ShippingPayInReport::getColumns() as $title)
                         <td>
                             {{ $entry->$title }}
