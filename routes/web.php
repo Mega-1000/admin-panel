@@ -19,6 +19,7 @@ use App\Http\Controllers\OrdersPackagesController;
 use App\Http\Controllers\PackageProductOrderController;
 use App\Http\Controllers\ProductStockLogsController;
 use App\Http\Controllers\ProductStocksController;
+use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
@@ -45,6 +46,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('orderPackages/duplicate/{packageId}', 'OrdersPackagesController@duplicate')->name('order_packages.duplicate');
 
     Route::group(['middleware' => 'admin'], function () {
+        Route::post('shipmentCostFilterCookie', ShipmentCostFilterCookieController::class)->name('shipmentCostFilterCookie');
         Route::get('/allegro-api/auth/device/{code?}', 'AllegroApiController@auth_device');
         Route::get('/allegro-api/auth/oauth2', 'AllegroApiController@auth_oauth2');
 
