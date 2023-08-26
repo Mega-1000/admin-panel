@@ -94,7 +94,7 @@ readonly class OrderDatatableService
 
         $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
         if (!is_null($shipmentCostFilter)) {
-            $query->whereExists(function ($query) use ($shipmentCostFilter) {
+            $query = $query->whereExists(function ($query) use ($shipmentCostFilter) {
                 $query->select(DB::raw(1))
                     ->from('order_packages')
                     ->join('order_packages_real_cost_for_company', 'order_packages.id', '=', 'order_packages_real_cost_for_company.order_package_id')
