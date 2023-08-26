@@ -94,7 +94,6 @@
 
                     <livewire:shipment-pay-in-report-datatable :reportId="$entry->id" />
                 </tr>
-
             @endforeach
         </table>
     </div>
