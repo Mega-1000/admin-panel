@@ -24,8 +24,8 @@ class ShipmentCostFilterCookieRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'from' => 'required|date',
-            'to' => 'required|date',
+            'from' => 'required',
+            'to' => 'required',
         ];
     }
 }
