@@ -4,6 +4,7 @@ namespace App\Services\Orders;
 
 use App\Entities\Order;
 use App\Entities\OrderFiles;
+use App\Entities\OrderPackage;
 use App\Entities\OrderPackageRealCostForCompany;
 use App\Entities\OrderPayment;
 use App\Repositories\OrderPackageRealCostsForCompany;
@@ -288,7 +289,7 @@ readonly class OrderDatatableService
                 ->get();
 
             foreach ($collection as $row) {
-                $row->packages = DB::table('order_packages')->where('order_id', $row->orderId)->get();
+                $row->packages = OrderPackage::query()->where('order_id', $row->orderId)->with('realCostsForCompany')->get();
             }
 
             $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
