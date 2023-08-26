@@ -36,7 +36,6 @@
     </form>
     <div>
         <table class="table table-bordered">
-            {{ $report->links() }}
             <tr>
                 <th>
                     ID
@@ -85,13 +84,16 @@
                 </th>
             </tr>
             @foreach($report as $entry)
-                @foreach(\App\Entities\ShippingPayInReport::getColumns() as $title)
-                    <td>
-                        {{ $entry->$title }}
-                    </td>
-                @endforeach
+                <tr>
 
-                <livewire:shipment-pay-in-report-datatable :reportId="$entry->id" />
+                    @foreach(\App\Entities\ShippingPayInReport::getColumns() as $title)
+                        <td>
+                            {{ $entry->$title }}
+                        </td>
+                    @endforeach
+
+                    <livewire:shipment-pay-in-report-datatable :reportId="$entry->id" />
+                </tr>
 
             @endforeach
         </table>
