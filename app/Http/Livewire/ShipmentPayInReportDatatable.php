@@ -12,6 +12,7 @@ use Livewire\Component;
 {
     public int $reportId;
     public $report;
+
     public string|null $comment;
 
     public function render(): View
