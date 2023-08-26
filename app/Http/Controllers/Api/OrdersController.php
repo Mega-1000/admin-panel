@@ -655,6 +655,8 @@ class OrdersController extends Controller
                     $item->product->amount = $item->quantity;
                 }
 
+                $item->product->amount = $item->quantity;
+
                 $products[] = $item->product;
             }
         }
@@ -908,7 +910,7 @@ class OrdersController extends Controller
 
         $prev = [];
         AddLabelService::addLabels($order, [Label::PROOF_OF_PAYMENT_UPLOADED], $prev, [], Auth::user()->id);
-      
+
         return response()->json('success', 200);
     }
 
