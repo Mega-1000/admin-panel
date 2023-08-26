@@ -12,6 +12,7 @@ class ShipmentPayInReportByInvoiceNumber extends Controller
     {
         return response()->json(
             ShippingPayInReport::where('nr_faktury_do_ktorej_dany_lp_zostal_przydzielony', $request->invoice_number)
+                ->select(array_diff(ShippingPayInReport::getColumns(), ['reszta']))
                 ->get()
                 ->toArray()
         );

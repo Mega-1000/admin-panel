@@ -123,7 +123,11 @@
 
                     container.innerHTML = '';
 
+                    let sum = 0;
+
                     data.forEach(entry => {
+                        sum += parseFloat(entry['Rzeczywisty koszt transportu brutto']);
+
                         const row = document.createElement('tr');
 
                         Object.keys(entry).forEach(key => {
@@ -133,6 +137,9 @@
 
                             row.appendChild(cell);
                         });
+
+                        const sumCell = document.createElement('h1');
+                        sumCell.innerText = sum;
 
                         container.appendChild(row);
                     });
