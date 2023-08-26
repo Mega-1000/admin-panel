@@ -105,7 +105,18 @@ class OrdersPackagesController extends Controller
         $data['delivery_date'] = new DateTime($data['delivery_date']);
         $data['shipment_date'] = new DateTime($data['shipment_date']);
 
-        $this->saveOrderPackage($data, $id);
+        $package = $this->saveOrderPackage($data, $id);
+
+        // of is cookie package then update package
+        if (cookie()->has('package')) {
+            $cookieData = json_decode(cookie('package'), true);
+            $package->status = $cookieData['status'];
+            $package->letter_number = $cookieData['letter_number'];
+            $package->shipment_date = $cookieData['shipment_date'];
+            $package->save();
+
+            cookie()->queue(cookie()->forget('package'));
+        }
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_packages.message.update'),
@@ -335,15 +346,7 @@ class OrdersPackagesController extends Controller
         $order = $this->orderRepository->find($order_id);
         WorkingEventsService::createEvent(WorkingEvents::ORDER_PACKAGES_STORE_EVENT, $order->id);
         if (empty($packageNumber)) {
-            $isAdditionalDKPExists = false;
-            $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
-            foreach ($connectedOrders as $connectedOrder) {
-                if ($connectedOrder->additional_cash_on_delivery_cost == 50) {
-                    $isAdditionalDKPExists = true;
-                }
-            }
-
-            if($data['cash_on_delivery'] < 0) {
+            if ($data['cash_on_delivery'] < 0) {
                 $data['cash_on_delivery'] = 0;
             }
 
@@ -387,7 +390,9 @@ class OrdersPackagesController extends Controller
                 'packing_type' => $request->input('packing_type')
             ]
         ];
+
         $request->session()->put('multi', $multi);
+
         return redirect()->route('order_packages.create', ['order_id' => $order_id, 'multi' => $token]);
 
     }

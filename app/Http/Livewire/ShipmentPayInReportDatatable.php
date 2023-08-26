@@ -2,17 +2,18 @@
 
 namespace App\Http\Livewire;
 
-use AllowDynamicProperties;
-use App\Entities\Report;
 use App\Entities\ShippingPayInReport;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\Redirector;
 
-#[AllowDynamicProperties] class ShipmentPayInReportDatatable extends Component
+class ShipmentPayInReportDatatable extends Component
 {
     public int $reportId;
-    public $report;
-    public string|null $comment;
+    public ?ShippingPayInReport $report;
+    public ?string $comment;
+    public bool $isModalOpen = false;
+    public int $packageOfferId;
 
     public function render(): View
     {
@@ -26,5 +27,23 @@ use Livewire\Component;
     {
         $this->report->comments = $this->comment;
         $this->report->save();
+    }
+
+    public function savePackage(): ?Redirector
+    {
+        if (!$this->isModalOpen) {
+            $this->isModalOpen = true;
+            return null;
+        }
+
+        cookie('package', json_encode([
+            'status' => 'dostarczone',
+            'letter_number' => $this->report->numer_listu,
+            'shipment_date' => $this->report->data_nadania_otrzymania,
+        ]), 60 * 24 * 30);
+
+        return redirect()->to(route('order_packages.create',[
+            'id' => $this->packageOfferId,
+        ]));
     }
 }

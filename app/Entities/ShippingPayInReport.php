@@ -29,6 +29,7 @@ class ShippingPayInReport extends Model
     public static function getColumns(): array
     {
         return [
+            'id',
             'symbol_spedytora',
             'numer_listu',
             'nr_faktury_do_ktorej_dany_lp_zostal_przydzielony',
