@@ -28,7 +28,7 @@ class ProductStockLogs
                 ->whereHas('items', function ($query) use ($product) {
                     $query->where('product_id', $product->id);
                 })
-                ->with('items', 'labels', 'orderReturns')
+                ->with('items', 'labels', 'orderReturn')
                 ->where('created_at', '>=', Carbon::now()->subDays($daysBack))
                 ->where('created_at', '<=', Carbon::now())
                 ->get();
@@ -36,7 +36,7 @@ class ProductStockLogs
             foreach ($orders as $order) {
                 $labels = $order->labels->pluck('id')->toArray();
                 if (in_array(50, $labels) && in_array(179, $labels)) {
-                    $returns[] = $order->orderReturns->flatten();
+                    $returns[] = $order->orderReturn->flatten();
                 }
 
                 foreach ($order->items as $item) {
