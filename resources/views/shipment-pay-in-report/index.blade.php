@@ -143,7 +143,7 @@
 
                     const sumCell = document.createElement('h1');
                     sumCell.innerText = sum;
-                    row.appendChild(sumCell);
+                    container.appendChild(sumCell);
                 });
         };
     </script>
