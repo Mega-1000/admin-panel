@@ -2794,15 +2794,19 @@ class OrdersController extends Controller
 
             $code = Str::random(60);
             Auth_code::where('customer_id', $order->customer->id)->delete();
+
             $authCode = new Auth_code();
             $authCode->token = $code;
             $authCode->customer_id = $order->customer->id;
             $authCode->save();
+
             $query = http_build_query([
                 'cart_token' => $order->getToken(),
                 'user_code' => $code
             ]);
+
             $frontUrl = config('app.front_url') . '/koszyk.html?' . $query;
+
             return redirect($frontUrl);
         } catch (Exception $exception) {
             Log::notice('Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);

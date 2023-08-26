@@ -11,7 +11,7 @@ class CreateTableWithAuthCodes extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('auth_codes', function (Blueprint $table) {
             $table->string('token')->unique();
@@ -25,7 +25,7 @@ class CreateTableWithAuthCodes extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('auth_codes');
     }

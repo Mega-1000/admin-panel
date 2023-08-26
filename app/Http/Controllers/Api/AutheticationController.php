@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -16,25 +17,29 @@ class AutheticationController extends Controller
 {
     const TOKEN_ERROR = 'token timed out';
 
-    public function getToken(Request $request, $id)
+    public function getToken(Request $request, $id): JsonResponse
     {
         try {
             if (!$this->isCorrectRequestFromBrowser($request)) {
-                return response()->json('success', 200);
+                return response()->json('success');
             }
-            $token = Auth_code::findOrFail($id);
-            if ($token->created_at < Carbon::now()->subDays(1)) {
+
+            $token = Auth_code::where('token', $id)->first();
+
+            if ($token->created_at < Carbon::now()->subDays()) {
                 throw new Exception(self::TOKEN_ERROR);
             }
+
             $user = $token->customer;
             $token->delete();
-            $timestamp = Carbon::now()->addDay()->timestamp;
+
             return response()->json(['access_token' => $user->createToken('Api code')->accessToken,
                 'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE], 200);
         } catch (Exception $e) {
             if ($e->getMessage() != self::TOKEN_ERROR) {
                 Log::error('Error: authenticate user by code', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             }
+
             return response()->json('Something went wrong', 403);
         }
     }
