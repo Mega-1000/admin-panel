@@ -126,7 +126,7 @@
                     let sum = 0;
 
                     data.forEach(entry => {
-                        sum += parseFloat(entry['Rzeczywisty koszt transportu brutto']);
+                        sum += parseFloat(entry['rzeczywisty_koszt_transportu_brutto']);
 
                         const row = document.createElement('tr');
 
@@ -138,12 +138,12 @@
                             row.appendChild(cell);
                         });
 
-                        const sumCell = document.createElement('h1');
-                        sumCell.innerText = sum;
-                        row.appendChild(sumCell);
-
                         container.appendChild(row);
                     });
+
+                    const sumCell = document.createElement('h1');
+                    sumCell.innerText = sum;
+                    row.appendChild(sumCell);
                 });
         };
     </script>
