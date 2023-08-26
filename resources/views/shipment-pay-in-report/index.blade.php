@@ -30,9 +30,7 @@
             Szukaj
         </button>
 
-        <div id="results-container">
-
-        </div>
+        <div id="results-container"></div>
     </form>
     <div>
         <table class="table table-bordered">

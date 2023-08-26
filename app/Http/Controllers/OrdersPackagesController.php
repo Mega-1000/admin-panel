@@ -92,11 +92,7 @@ class OrdersPackagesController extends Controller
      */
     public function update(OrderPackageUpdateRequest $request, $id): RedirectResponse
     {
-        $orderPackage = OrderPackage::find($id);
-
-        if (empty($orderPackage)) {
-            abort(404);
-        }
+        $orderPackage = OrderPackage::findOrFail($id);
 
         $orderId = $orderPackage->order_id;
         WorkingEventsService::createEvent(WorkingEvents::ORDER_PACKAGES_UPDATE_EVENT, $orderId);
