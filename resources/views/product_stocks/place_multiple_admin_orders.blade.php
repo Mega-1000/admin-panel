@@ -131,7 +131,8 @@
                         const packing = product.packing;
                         const orderQuantity = item.orderQuantity;
                         const calculatedQuantity = Number(orderQuantity.calculatedQuantity).toFixed(2);
-                        const numSaleUnitsInPack = Number(packing.number_of_sale_units_in_the_pack ?? 1).toFixed(2);
+                        let numSaleUnitsInPack = Number(packing.number_of_sale_units_in_the_pack).toFixed(2);
+                        if (numSaleUnitsInPack == 0) numSaleUnitsInPack = 1;
                         const ceilCalcQuantity = Math.ceil(calculatedQuantity / numSaleUnitsInPack);
                         const floorCalcQuantity = Math.floor(calculatedQuantity / numSaleUnitsInPack);
                         const ceilPackUnits = (ceilCalcQuantity * numSaleUnitsInPack).toFixed(2);
