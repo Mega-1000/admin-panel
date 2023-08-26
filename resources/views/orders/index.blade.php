@@ -2299,7 +2299,7 @@
 
                             const Z = (sumOfSelling + parseFloat(row.additional_cash_on_delivery_cost ?? 0) - (sumOfPurchase * 1.23)).toFixed(2);
 
-                            const BZO = (parseInt(Z) + parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseFloat(ZP)).toFixed(2);
+                            const BZO = (parseInt(Z) - parseInt(RKTBO) + parseInt(PSIK) - parseInt(PSW) + parseInt(WAC) + parseFloat(ZP)).toFixed(2);
 
                             return `
                                 <p><span title="Zysk">Z: ${Math.round(Z * 100) / 100}</p>

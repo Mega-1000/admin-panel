@@ -19,6 +19,7 @@ class ProductStockLogs
     public static function getTotalQuantityForProductStockInLastDays(ProductStock $productStock, int $daysBack): int
     {
         $product = $productStock->product;
+        $returns = [];
 
         if ($product) {
             $res = 0;
@@ -27,15 +28,28 @@ class ProductStockLogs
                 ->whereHas('items', function ($query) use ($product) {
                     $query->where('product_id', $product->id);
                 })
-                ->with('items')
+                ->with('items', 'labels', 'orderReturns')
                 ->where('created_at', '>=', Carbon::now()->subDays($daysBack))
                 ->where('created_at', '<=', Carbon::now())
                 ->get();
 
             foreach ($orders as $order) {
+                $labels = $order->labels->pluck('id')->toArray();
+                if (in_array(50, $labels) && in_array(179, $labels)) {
+                    $returns[] = $order->orderReturns->flatten();
+                }
+
                 foreach ($order->items as $item) {
                     if ($item->product_id == $product->id) {
                         $res += $item->quantity;
+                    }
+                }
+
+                foreach ($returns as $return) {
+                    foreach ($return as $item) {
+                        if ($item->product_id == $product->id) {
+                            $res -= $item->quantity;
+                        }
                     }
                 }
             }
