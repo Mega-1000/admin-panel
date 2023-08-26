@@ -286,6 +286,33 @@ readonly class OrderDatatableService
             $collection = $query
                 ->limit($data['length'])->offset($data['start'])
                 ->get();
+
+            foreach ($collection as $row) {
+                $row->packages = DB::table('order_packages')->where('order_id', $row->orderId)->get();
+            }
+
+            $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
+            $to = $shipmentCostFilter->to ?? null;
+            $from = $shipmentCostFilter->from ?? null;
+            if ($shipmentCostFilter) {
+                foreach ($collection as $item) {
+                    $found = false;
+                    foreach ($item->packages as $package) {
+
+                        $shipmentCost = $package->realCostsForCompany->sum('cost');
+
+                        if ($shipmentCost < $from || $shipmentCost < $to) {} else {
+                            $found = true;
+                        }
+                    }
+
+                    if (!$found) {
+                        $collection = $collection->reject(function ($value, $key) use ($item) {
+                            return $value->orderId === $item->orderId;
+                        });
+                    }
+                }
+            }
         }
 
         foreach ($collection as $row) {
@@ -295,7 +322,6 @@ readonly class OrderDatatableService
             $row->items = DB::table('order_items')->where('order_id', $row->orderId)->get();
             $row->connected = DB::table('orders')->where('master_order_id', $row->orderId)->get();
             $row->payments = OrderPayment::withTrashed()->where('order_id', $row->orderId)->get();
-            $row->packages = DB::table('order_packages')->where('order_id', $row->orderId)->get();
 
             foreach ($row->packages as $package) {
                 $package->realSpecialCosts = OrderPackageRealCostForCompany::query()
@@ -387,21 +413,6 @@ readonly class OrderDatatableService
             $item->rc = OrderPackageRealCostsForCompany::getAllByOrderId(
                 $item->orderId
             );
-        }
-
-        $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
-        $to = $shipmentCostFilter->to ?? null;
-        $from = $shipmentCostFilter->from ?? null;
-        if ($shipmentCostFilter) {
-            foreach ($collection as $item) {
-                $shipmentCost = $item->rc;
-
-                if ($shipmentCost < $from || $shipmentCost < $to) {
-                    $collection = $collection->reject(function ($value, $key) use ($item) {
-                            return $value->orderId === $item->orderId;
-                    });
-                }
-            }
         }
 
         return [$collection, $count];
