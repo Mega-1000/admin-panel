@@ -37,10 +37,12 @@ use TCG\Voyager\Facades\Voyager;
 Route::redirect('/', '/admin');
 
 Route::group(['prefix' => 'admin'], function () {
+
     Voyager::routes();
     Route::prefix('jobs')->group(function () {
         Route::queueMonitor();
     });
+    Route::post('orderPackages/duplicate/{packageId}', 'OrdersPackagesController@duplicate')->name('order_packages.duplicate');
 
     Route::group(['middleware' => 'admin'], function () {
         Route::get('/allegro-api/auth/device/{code?}', 'AllegroApiController@auth_device');
@@ -388,7 +390,6 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@datatable')->name('order_packages.datatable');
         Route::get('orderPackages/create/{id}/{multi?}', 'OrdersPackagesController@create')->name('order_packages.create');
         Route::post('orderPackages/store', 'OrdersPackagesController@store')->name('order_packages.store');
-        Route::post('orderPackages/duplicate/{packageId}', 'OrdersPackagesController@duplicate')->name('order_packages.duplicate');
         Route::get('orderPackages/{id}/edit', 'OrdersPackagesController@edit')->name('order_packages.edit');
         Route::put('orderPackages/{id}/update', [
             'uses' => 'OrdersPackagesController@update',

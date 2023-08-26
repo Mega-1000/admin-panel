@@ -1367,8 +1367,14 @@
         function createSimilar(id, orderId) {
             let action = "{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
             action = action.replace('%id', id)
-            $('#createSimilarPackForm').attr('action', action)
-            $('#createSimilarPackage').modal()
+            $.ajax({
+                url: action,
+                method: 'POST'
+            }).done(function (data) {
+                table.ajax.reload(null, false);
+            }).fail(function () {
+                alert('Coś poszło nie tak')
+            });
         }
 
         function cancelPackage(id, orderId) {
@@ -1377,8 +1383,7 @@
                 $.ajax({
                     url: url.replace('%id', id),
                 }).done(function (data) {
-                    urlRefresh = '{{route('orders.index', ['order_id' => 'replace'])}}'
-                    window.location.href = urlRefresh.replace('replace', orderId)
+                    table.ajax.reload(null, false);
                 }).fail(function () {
                     alert('Coś poszło nie tak')
                 });
