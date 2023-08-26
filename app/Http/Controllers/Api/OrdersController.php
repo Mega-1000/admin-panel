@@ -655,7 +655,7 @@ class OrdersController extends Controller
                     $item->product->amount = $item->quantity;
                 }
 
-                $item->product->amount = $item->z;
+                $item->product->amount = $item->quantity;
 
                 $products[] = $item->product;
             }
