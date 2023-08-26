@@ -393,7 +393,7 @@ readonly class OrderDatatableService
         if ($shipmentCostFilter) {
             $collection = $collection->filter(function ($item) use ($shipmentCostFilter) {
                 $shipmentCost = $item->rc;
-                if ($shipmentCost >= $shipmentCostFilter->from && $shipmentCost <= $shipmentCostFilter->to) {
+                if ($shipmentCost >= $shipmentCostFilter->from && $shipmentCost >= $shipmentCostFilter->to) {
                     return true;
                 }
                 return false;
