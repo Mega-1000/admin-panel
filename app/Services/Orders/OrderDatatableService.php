@@ -390,14 +390,18 @@ readonly class OrderDatatableService
         }
 
         $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
+        $to = $shipmentCostFilter->to ?? null;
+        $from = $shipmentCostFilter->from ?? null;
         if ($shipmentCostFilter) {
-            $collection = $collection->filter(function ($item) use ($shipmentCostFilter) {
+            foreach ($collection as $item) {
                 $shipmentCost = $item->rc;
-                if ($shipmentCost >= $shipmentCostFilter->from && $shipmentCost >= $shipmentCostFilter->to) {
-                    return true;
+
+                if ($shipmentCost < $from || $shipmentCost < $to) {
+                    $collection = $collection->reject(function ($value, $key) use ($item) {
+                            return $value->orderId === $item->orderId;
+                    });
                 }
-                return false;
-            });
+            }
         }
 
         return [$collection, $count];
