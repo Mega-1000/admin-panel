@@ -92,19 +92,6 @@ readonly class OrderDatatableService
             });
         }
 
-        $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
-        if (!is_null($shipmentCostFilter)) {
-            $query = $query->whereExists(function ($query) use ($shipmentCostFilter) {
-                $query->select(DB::raw(1))
-                    ->from('order_packages')
-                    ->join('order_packages_real_cost_for_company', 'order_packages.id', '=', 'order_packages_real_cost_for_company.order_package_id')
-                    ->join('orders', 'orders.id', '=', 'order_packages.order_id')
-                    ->groupBy('orders.id')
-                    ->havingRaw('SUM(order_packages_real_cost_for_company.cost) BETWEEN ? AND ?', [$shipmentCostFilter->from, $shipmentCostFilter->to]);
-            });
-        }
-
-
         return $query;
     }
 
@@ -400,6 +387,17 @@ readonly class OrderDatatableService
             $item->rc = OrderPackageRealCostsForCompany::getAllByOrderId(
                 $item->orderId
             );
+        }
+
+        $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
+        if ($shipmentCostFilter) {
+            $collection = $collection->filter(function ($item) use ($shipmentCostFilter) {
+                $shipmentCost = $item->rc;
+                if ($shipmentCost >= $shipmentCostFilter->from && $shipmentCost <= $shipmentCostFilter->to) {
+                    return true;
+                }
+                return false;
+            });
         }
 
         return [$collection, $count];
