@@ -30,9 +30,7 @@
             Szukaj
         </button>
 
-        <div id="results-container">
-
-        </div>
+        <div id="results-container"></div>
     </form>
     <div>
         <table class="table table-bordered">
@@ -96,6 +94,7 @@
 
                     <livewire:shipment-pay-in-report-datatable :reportId="$entry->id" />
                 </tr>
+
             @endforeach
         </table>
     </div>
