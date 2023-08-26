@@ -879,11 +879,18 @@
             <br>
             <br>
 
-            <input placeholder="od" class="form-control" id="shipmentCostFrom" name="from" value="{{ \Illuminate\Support\Facades\Cookie::get('shipmentCostFrom') }}" type="number" >
-            <input placeholder="do" class="form-control" id="shipmentCostTo" name="to" value="{{ \Illuminate\Support\Facades\Cookie::get('shipmentCostTo') }}" type="number" >
+            @php
+                $shipmentCostFilter = json_decode(\Illuminate\Support\Facades\Cookie::get('shipment_cost_filter'));
+
+                $shipmentCostFrom = $shipmentCostFilter->from ?? null;
+                $shipmentCostTo = $shipmentCostFilter->to ?? null;
+            @endphp
+
+            <input placeholder="od" class="form-control" id="shipmentCostFrom" name="from" value="{{ $shipmentCostFrom }}" type="number" >
+            <input placeholder="do" class="form-control" id="shipmentCostTo" name="to" value="{{ $shipmentCostTo }}" type="number" >
 
             <button class="btn btn-primary">
-                Zapisz
+                Pokaż
             </button>
         </form>
     </div>
