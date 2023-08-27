@@ -31,6 +31,7 @@ class ProductStockLogs
                 ->with('items', 'labels', 'orderReturn')
                 ->where('created_at', '>=', Carbon::now()->subDays($daysBack))
                 ->where('created_at', '<=', Carbon::now())
+                ->where('delivery_warehouse2', 'MEGA-OLAWA')
                 ->get();
 
             foreach ($orders as $order) {
