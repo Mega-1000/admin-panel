@@ -18,7 +18,7 @@
         </div>
         <div class="mt-5">
             <label for="days-interval">interwal liczenia dla okresów sprzedaży</label>
-            <input id="days-interval" class="form-control" value="7" placeholder="interwal liczenia dla okresów sprzedaży">
+            <input id="days-interval" class="form-control" value="1" placeholder="interwal liczenia dla okresów sprzedaży">
         </div>
         <div class="mt-5">
             <div class="form-group">

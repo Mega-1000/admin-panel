@@ -91,6 +91,7 @@ class OrderService
                 ->setPriceCalculator(new OrderPriceCalculator())
                 ->setProductService($productService);
             $orderBuilder->assignItemsToOrder($order, $products);
+
         });
 
         return $order;

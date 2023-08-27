@@ -31,9 +31,6 @@ class ProductStockLogs
                 ->with('items', 'labels', 'orderReturn')
                 ->where('created_at', '>=', Carbon::now()->subDays($daysBack))
                 ->where('created_at', '<=', Carbon::now())
-                ->whereHas('warehouse', function ($query) use ($productStock) {
-                    $query->where('symbol', 'MEGA-OLAWA');
-                })
                 ->get();
 
             foreach ($orders as $order) {
