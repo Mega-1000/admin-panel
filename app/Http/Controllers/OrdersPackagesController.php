@@ -10,6 +10,7 @@ use App\Entities\ContentType;
 use App\Entities\Order;
 use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
+use App\Entities\OrderPackageRealCostForCompany;
 use App\Entities\PackageTemplate;
 use App\Entities\PackingType;
 use App\Entities\SelAddress;
@@ -362,7 +363,13 @@ class OrdersPackagesController extends Controller
             $package->status = 'DELIVERED';
             $package->letter_number = $cookieData['letter_number'];
             $package->shipment_date = $cookieData['shipment_date'];
+            $package->delivery_date = $cookieData['shipment_date'];
             $package->save();
+
+            OrderPackageRealCostForCompany::create([
+                'order_package_id' => $package->id,
+                'cost' => $cookieData['real_cost'],
+            ]);
 
             cookie()->queue(cookie()->forget('package'));
         }

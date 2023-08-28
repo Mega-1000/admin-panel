@@ -38,6 +38,7 @@ class ShipmentPayInReportDatatable extends Component
             'status' => 'dostarczone',
             'letter_number' => $this->report->numer_listu,
             'shipment_date' => $this->report->data_nadania_otrzymania,
+            'real_cost' => $this->report->rzeczywisty_koszt_transportu_brutto,
         ]);
     }
 
