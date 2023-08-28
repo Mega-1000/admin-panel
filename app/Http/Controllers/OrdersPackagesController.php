@@ -356,7 +356,7 @@ class OrdersPackagesController extends Controller
 
         $package = $this->saveOrderPackage($data);
 
-        if (!empty(cookie('package'))) {
+        if (!empty(\Illuminate\Support\Facades\Cookie::get('package'))) {
             $cookieData = json_decode(\Illuminate\Support\Facades\Cookie::get('package'), true);
 
             $package->status = $cookieData['status'];
