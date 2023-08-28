@@ -11,10 +11,11 @@
         <div>
             Wpisz numer zamówienia:
             <input type="number" wire:model="packageOfferId">
-            <button class="btn btn-success" wire:click="savePackage">
+            <a href="{{ $this->url }}" target="__blank" class="btn btn-success" wire:click="savePackage">
                 Stwórz paczkę
-            </button>
+            </a>
         </div>
     @endif
+
 
 </td>
