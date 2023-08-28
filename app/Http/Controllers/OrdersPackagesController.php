@@ -359,7 +359,7 @@ class OrdersPackagesController extends Controller
         if (!empty(\Illuminate\Support\Facades\Cookie::get('package'))) {
             $cookieData = json_decode(\Illuminate\Support\Facades\Cookie::get('package'), true);
 
-            $package->status = $cookieData['status'];
+            $package->status = 'DELIVERED';
             $package->letter_number = $cookieData['letter_number'];
             $package->shipment_date = $cookieData['shipment_date'];
             $package->save();
