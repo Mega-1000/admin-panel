@@ -25,10 +25,9 @@ class ShipmentPayInReportDatatable extends Component
         return view('livewire.shipment-pay-in-report-datatable');
     }
 
-    // on update packageOfferId
     public function updatedPackageOfferId(): void
     {
-        cookie('package', json_encode([
+        cookie()->queue('package', json_encode([
             'status' => 'dostarczone',
             'letter_number' => $this->report->numer_listu,
             'shipment_date' => $this->report->data_nadania_otrzymania,
@@ -36,6 +35,9 @@ class ShipmentPayInReportDatatable extends Component
 
         $this->url = route('order_packages.create',[
             'id' => $this->packageOfferId,
+            'status' => 'dostarczone',
+            'letter_number' => $this->report->numer_listu,
+            'shipment_date' => $this->report->data_nadania_otrzymania,
         ]);
     }
 

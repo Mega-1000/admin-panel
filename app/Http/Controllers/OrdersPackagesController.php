@@ -41,6 +41,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use DateTime;
 use Exception;
+use http\Cookie;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Foundation\Application;
@@ -102,17 +103,6 @@ class OrdersPackagesController extends Controller
         $data['shipment_date'] = new DateTime($data['shipment_date']);
 
         $package = $this->saveOrderPackage($data, $id);
-
-        // of is cookie package then update package
-        if (cookie()->has('package')) {
-            $cookieData = json_decode(cookie('package'), true);
-            $package->status = $cookieData['status'];
-            $package->letter_number = $cookieData['letter_number'];
-            $package->shipment_date = $cookieData['shipment_date'];
-            $package->save();
-
-            cookie()->queue(cookie()->forget('package'));
-        }
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_packages.message.update'),
@@ -255,6 +245,16 @@ class OrdersPackagesController extends Controller
 
         $supportedServices = SupportedService::getDictionary();
 
+        if ($request->status) {
+            $cookie = cookie()->forever('package', json_encode([
+                'status' => $request->status,
+                'letter_number' => $request->letter_number,
+                'shipment_date' => $request->shipment_date,
+            ]));
+
+            return redirect(request()->url())->withCookie($cookie);
+        }
+
         return view('orderPackages.create',
             compact(
                 'id',
@@ -354,7 +354,18 @@ class OrdersPackagesController extends Controller
             }
         }
 
-        $this->saveOrderPackage($data);
+        $package = $this->saveOrderPackage($data);
+
+        if (!empty(cookie('package'))) {
+            $cookieData = json_decode(\Illuminate\Support\Facades\Cookie::get('package'), true);
+
+            $package->status = $cookieData['status'];
+            $package->letter_number = $cookieData['letter_number'];
+            $package->shipment_date = $cookieData['shipment_date'];
+            $package->save();
+
+            cookie()->queue(cookie()->forget('package'));
+        }
 
         if (empty($request->input('quantity')) || $request->input('quantity') <= 1) {
             return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
@@ -362,6 +373,7 @@ class OrdersPackagesController extends Controller
                 'alert-type' => 'success'
             ]);
         }
+
         $token = md5(uniqid((string)rand(), true));
         $multi = [
             'token' => $token,
