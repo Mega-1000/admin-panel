@@ -20,7 +20,7 @@
         Raporty maili
     </a>
 
-    <a href="btn btn-primary" href="{{ route('orderPayments.recalculateAllOrders') }}">
+    <a class="btn btn-primary" href="{{ route('orderPayments.recalculateAllOrders') }}">
         Przelicz wszystkie zamówienia pod względem bilansu
     </a>
 
