@@ -20,6 +20,10 @@
         Raporty maili
     </a>
 
+    <a href="btn btn-primary" href="{{ route('orderPayments.recalculateAllOrders') }}">
+        Przelicz wszystkie zamówienia pod względem bilansu
+    </a>
+
     <div class="row">
         <div class="col-md-12">
             @if ($import->processing)
