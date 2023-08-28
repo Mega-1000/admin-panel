@@ -1051,9 +1051,6 @@ class OrdersController extends Controller
     {
         try {
             $order->labels()->attach(225);
-
-            $order->status_id = 8;
-            $order->save();
         } catch (Throwable $exception) {
             return response()->json([
                 'status' => false,

@@ -29,7 +29,7 @@ class Status extends Model implements Transformable
     /**
      * @return HasOne
      */
-    public function status()
+    public function status(): HasOne
     {
         return $this->hasOne(Order::class);
     }
