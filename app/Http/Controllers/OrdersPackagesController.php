@@ -251,6 +251,7 @@ class OrdersPackagesController extends Controller
                 'status' => $request->status,
                 'letter_number' => $request->letter_number,
                 'shipment_date' => $request->shipment_date,
+                'real_cost' => $request->real_cost,
             ]));
 
             return redirect(request()->url())->withCookie($cookie);
