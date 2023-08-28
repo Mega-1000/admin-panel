@@ -14,7 +14,7 @@ class ShipmentPayInReportDatatable extends Component
     public ?ShippingPayInReport $report;
     public ?string $comment;
     public bool $isModalOpen = false;
-    public int $packageOfferId;
+    public mixed $packageOfferId;
     public string $url = '';
 
     public function render(): View
