@@ -16,6 +16,17 @@ class OrderPackageRealCostForCompany extends Model
 {
     protected $table = 'order_packages_real_cost_for_company';
 
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            $model->orderPackage->update([
+                'real_cost_for_company_sum' => $model->orderPackage->real_cost_for_company_sum + $model->cost,
+            ]);
+        });
+    }
+
     protected $fillable = [
         'order_package_id',
         'deliverer_id',
