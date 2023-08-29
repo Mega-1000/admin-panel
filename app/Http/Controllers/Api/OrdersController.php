@@ -613,6 +613,7 @@ class OrdersController extends Controller
         if (empty($token)) {
             return response("Missing token", 400);
         }
+
         $order = Order::where('token', $token)
             ->with(['items' => function ($q) {
                 $q->with(['product' => function ($q) {
@@ -621,6 +622,7 @@ class OrdersController extends Controller
                 }]);
             }])
             ->first();
+
         if (!$order) {
             return response("Order doesn't exist", 400);
         }
@@ -655,7 +657,7 @@ class OrdersController extends Controller
                     $item->product->amount = $item->quantity;
                 }
 
-                $item->product->amount = $item->z;
+                $item->product->amount = $item->quantity;
 
                 $products[] = $item->product;
             }
