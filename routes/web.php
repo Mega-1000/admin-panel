@@ -21,6 +21,7 @@ use App\Http\Controllers\ProductStockLogsController;
 use App\Http\Controllers\ProductStocksController;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
+use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -644,6 +645,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/transactions/rebook/{order}/{payment}', 'OrdersPaymentsController@rebookStore')->name('orderPayments.rebookStore');
     Route::post('/transactions/rebook/{payment}', 'OrdersPaymentsController@rebookStoreSingle')->name('orderPayments.rebookStoreSingle');
     Route::get('/transactions/recalculate-all-orders', 'OrdersPaymentsController@recalculateAllOrders')->name('orderPayments.recalculateAllOrders');
+    Route::get('table-of-shipment-payments-errors', TableOfShipmentPaymentsErrorsController::class)->name('table-of-shipment-payments-errors');
 
     Route::post('/upload-invoice', 'InvoicesController@uploadInvoice')->name('uploadInvoice');
 

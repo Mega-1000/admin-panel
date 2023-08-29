@@ -19,6 +19,10 @@
         Raport płatności za wysyłki
     </a>
 
+    <a href="{{ route('table-of-shipment-payments-errors') }}" class="btn btn-primary">
+        Tabela błedów transportowych pod względem wartości
+    </a>
+
     <div class="modal fade" tabindex="-1" id="changePackageCostModal" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
