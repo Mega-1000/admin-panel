@@ -96,6 +96,7 @@ class OrderPackage extends Model implements Transformable
         'symbol',
         'protection_method',
         'services',
+        'real_cost_for_company_sum'
     ];
 
     /**
