@@ -407,6 +407,9 @@ class ImportCsvFileJob implements ShouldQueue
             $array['product_group_for_change_price'] = '';
         }
 
+        $product->assortment_quantity = $array['assortment_quantity'] ?? null;
+        $product->delivery_type = $array['delivery_type'] ?? null;
+
         $product->fill($array);
         $product->save();
         $product->restore();
@@ -574,6 +577,8 @@ class ImportCsvFileJob implements ShouldQueue
             'priority' => $this->getProductsOrder($line, $categoryColumn),
             'average_amount_of_product_in_package' => $line[244],
             'newsletter' => $line[13],
+            'assortment_quantity' => $line[216],
+            'delivery_type' => $line[11],
         ];
 
         foreach ($array as $key => $value) {
