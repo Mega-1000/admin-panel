@@ -352,7 +352,6 @@ class ImportCsvFileJob implements ShouldQueue
                 $productNumber = trim($line[$i + 1], "[]");
                 if (!isset($replacements[$productNumber])) {
                     $replacements[$productNumber] = [
-                        'description' => $line[$i],
                         'img' => $this->getUrl($line[$i + 3]),
                         'products' => []
                     ];
@@ -578,10 +577,6 @@ class ImportCsvFileJob implements ShouldQueue
         ];
 
         foreach ($array as $key => $value) {
-            if ($key === 'description' || $key === 'name' || $key === 'url') {
-                $value = iconv("utf-8", "ascii//IGNORE", $value);
-                $array[$key] = $value;
-            }
             if ($value === '#ARG!' || $value === '#DZIEL/0!' || $value === '$ADR!') {
                 unset($array[$key]);
             }
