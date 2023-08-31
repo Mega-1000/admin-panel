@@ -1396,14 +1396,8 @@
         function createSimilar(id, orderId) {
             let action = "{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
             action = action.replace('%id', id)
-            $.ajax({
-                url: action,
-                method: 'POST'
-            }).done(function (data) {
-                table.ajax.reload(null, false);
-            }).fail(function () {
-                alert('Coś poszło nie tak')
-            });
+            $('#createSimilarPackForm').attr('action', action)
+            $('#createSimilarPackage').modal()
         }
 
         function cancelPackage(id, orderId) {
