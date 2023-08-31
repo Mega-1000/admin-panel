@@ -367,6 +367,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function saveProduct($array, $categoryTree, $isChildProduct)
     {
+        var_dump($array);
         $product = null;
         if (!empty($array['symbol'])) {
             $product = Entities\Product::withTrashed()->where('symbol', $array['symbol'])->first();
@@ -407,10 +408,11 @@ class ImportCsvFileJob implements ShouldQueue
             $array['product_group_for_change_price'] = '';
         }
 
+        $product->fill($array);
+
         $product->assortment_quantity = $array['assortment_quantity'] ?? null;
         $product->delivery_type = $array['delivery_type'] ?? null;
 
-        $product->fill($array);
         $product->save();
         $product->restore();
 

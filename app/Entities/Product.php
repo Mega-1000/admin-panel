@@ -97,7 +97,9 @@ class Product extends Model implements Transformable
         'employees_ids',
         'is_package',
         'save_name',
-        'save_image'
+        'save_image',
+        'assortment_quantity',
+        'delivery_type'
     ];
 
     public array $customColumnsVisibilities = [
