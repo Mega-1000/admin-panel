@@ -252,7 +252,7 @@ class CustomersController extends Controller
         $roleName = $role->name;
         $this->roleName = $roleName;
 
-        $emails = MailReport::where('email', $customer->login);
+        $emails = MailReport::where('email', $customer->login)->get();
 
         return view('customers.edit', compact(
                 'customer',
