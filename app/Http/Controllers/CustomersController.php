@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
 use App\Entities\CustomerAddress;
+use App\Entities\EmailSending;
 use App\Entities\Order;
 use App\Helpers\Helper;
 use App\Http\Requests\CustomerCreateRequest;
 use App\Http\Requests\CustomerUpdateRequest;
+use App\MailReport;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +51,7 @@ class CustomersController extends Controller
      * CustomersController constructor.
      *
      * @param CustomerRepository $repository
+     * @param CustomerAddressRepository $customerAddressRepository
      */
     public function __construct(CustomerRepository $repository, CustomerAddressRepository $customerAddressRepository)
     {
@@ -231,7 +234,7 @@ class CustomersController extends Controller
      */
     public function edit(int $id): View
     {
-        $customer = $this->repository->find($id);
+        $customer = Customer::query()->findOrFail($id);
         $customerAddressStandard = $this->customerAddressRepository->findWhere([
             'customer_id' => $customer->id,
             'type' => 'STANDARD_ADDRESS'
@@ -249,12 +252,15 @@ class CustomersController extends Controller
         $roleName = $role->name;
         $this->roleName = $roleName;
 
+        $emails = MailReport::where('email', $customer->login);
+
         return view('customers.edit', compact(
                 'customer',
                 'customerAddressStandard',
                 'customerAddressInvoice',
                 'customerAddressDelivery',
                 'roleName',
+                'emails',
         ));
     }
 

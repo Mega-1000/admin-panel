@@ -76,7 +76,7 @@
                                     <select class="form-control text-uppercase" name="is_staff">
                                         <option value="0" {{ $customer->is_staff == 0 ? 'selected' : '' }}>@lang('customers.form.no')</option>
                                         <option value="1" {{ $customer->is_staff == 1 ? 'selected' : '' }}>@lang('customers.form.yes')</option>
-                                    </select>                                    
+                                    </select>
                                 </div>
                             </div>
                             <div class="customer-address" id="standard-address">
@@ -321,6 +321,27 @@
                             <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
                         </form>
 
+                        <div>
+                            <table class="table-bordered table">
+                                <thead>
+                                    <tr>
+                                        <th>Tytuł wiadomości</th>
+                                        <th>Zawatrość wiadomości</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach($emails as $email)
+                                        <tr>
+                                            <td>{{ $email->subject }}</td>
+                                            <td>
+                                                {{ $email->body }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
