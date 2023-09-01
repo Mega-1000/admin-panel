@@ -2802,7 +2802,8 @@ class OrdersController extends Controller
 
             $query = http_build_query([
                 'cart_token' => $order->getToken(),
-                'user_code' => $code
+                'user_code' => $code,
+                'reloadCart' => 'true',
             ]);
 
             $frontUrl = config('app.front_url') . '/koszyk.html?' . $query;

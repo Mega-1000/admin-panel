@@ -1400,6 +1400,7 @@
             $('#createSimilarPackage').modal()
         }
 
+
         function cancelPackage(id, orderId) {
             if (confirm('Potwierdź anulację paczki')) {
                 url = '{{route('order_packages.sendRequestForCancelled', ['orderPackage' => '%id'])}}';
