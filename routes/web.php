@@ -13,6 +13,7 @@ use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\MailReportController;
 use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\NewsletterMessageController;
 use App\Http\Controllers\OrderInvoiceDocumentsController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
@@ -73,6 +74,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/bonus/close/{id}', 'BonusController@resolve')->name('bonus.close');
         Route::get('/bonus/order-chat/{id}', 'BonusController@firstOrderChat')->name('bonus.order-chat');
         Route::post('/bonus/send/{id}', 'BonusController@sendMessage')->name('bonus.send_message');
+
+        Route::get('/newsletter-messages/create', [NewsletterMessageController::class, 'create'])->name('newsletter_messages.create');
 
         Route::get('prices/allegro-prices/{id}', 'ProductPricesController@getAllegroPrices')->name('prices.allegroPrices');
         Route::get('orders/{id}/get-basket', 'OrdersController@goToBasket')->name('orders.goToBasket');
