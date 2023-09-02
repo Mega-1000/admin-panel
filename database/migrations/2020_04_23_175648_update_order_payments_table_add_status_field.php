@@ -11,7 +11,7 @@ class UpdateOrderPaymentsTableAddStatusField extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('order_payments', function (Blueprint $table) {
             $table->enum('status', ['ACCEPTED', 'PENDING', 'DECLINED'])->nullable()->comment('Payment status - depending on warehouse action.');
@@ -23,7 +23,7 @@ class UpdateOrderPaymentsTableAddStatusField extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('order_payments', function (Blueprint $table) {
             $table->dropColumn('status');
