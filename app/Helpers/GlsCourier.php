@@ -29,7 +29,7 @@ class GlsCourier implements iCourier
             );
 
             if (empty($response->tuStatus)) {
-                    Log::notice('Wystąpił problem przy sprawdzaniu statusu paczki: ' . $package->letter_number);
+                Log::notice('Wystąpił problem przy sprawdzaniu statusu paczki: ' . $package->letter_number);
                 return;
             }
 
@@ -42,10 +42,8 @@ class GlsCourier implements iCourier
                 case GlsPackageStatus::INTRANSIT:
                 case GlsPackageStatus::INWAREHOUSE:
                 case GlsPackageStatus::INDELIVERY:
-                    $package->status = PackageStatus::SENDING;
-                    break;
                 case GlsPackageStatus::PREADVICE:
-                    $package->status = PackageStatus::NEW;
+                    $package->status = PackageStatus::SENDING;
                     break;
             }
 
