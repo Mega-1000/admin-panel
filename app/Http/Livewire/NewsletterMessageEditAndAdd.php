@@ -25,8 +25,8 @@ class NewsletterMessageEditAndAdd extends Component
         $this->message = $this->message ?? NewsletterMessage::find($this->messageId ?? 0) ?? new Message();
         $this->messages = NewsletterMessage::all();
 
-        $this->title = $this->title ?? $this->message->title;
-        $this->content = $this->content ?? $this->message->content;
+        $this->title = $this->title === '' ? $this->message->title : $this->title;
+        $this->content = $this->content === '' ? $this->message->content : $this->content;
 
         return view('livewire.newsletter-message-edit-and-add');
     }

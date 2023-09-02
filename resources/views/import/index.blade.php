@@ -24,6 +24,10 @@
         Przelicz wszystkie zamówienia pod względem bilansu
     </a>
 
+    <a href="{{ route('newsletter_messages.create') }}" class="btn btn-primary">
+        Zarządzanie newsletterem
+    </a>
+
     <div class="row">
         <div class="col-md-12">
             @if ($import->processing)
