@@ -45,7 +45,7 @@
                     {{ $order->created_at }}
                 </td>
                 <td>
-                    <a href="{{ route('orders.edit', ['id' => $order->id]) }}" class="btn btn-primary">Zobacz</a>
+                    <a href="{{ route('orders.edit', ['order_id' => $order->id]) }}" class="btn btn-primary">Zobacz</a>
                 </td>
             </tr>
         @endforeach
