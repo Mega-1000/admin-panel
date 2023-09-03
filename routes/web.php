@@ -17,6 +17,7 @@ use App\Http\Controllers\NewsletterMessageController;
 use App\Http\Controllers\OrderInvoiceDocumentsController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
+use App\Http\Controllers\OrderWithDeclaredPaymentsListingController;
 use App\Http\Controllers\PackageProductOrderController;
 use App\Http\Controllers\ProductStockLogsController;
 use App\Http\Controllers\ProductStocksController;
@@ -76,6 +77,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/bonus/send/{id}', 'BonusController@sendMessage')->name('bonus.send_message');
 
         Route::get('/newsletter-messages/create', [NewsletterMessageController::class, 'create'])->name('newsletter_messages.create');
+        Route::get('/order-with-declared-payments-listing', OrderWithDeclaredPaymentsListingController::class)->name('order-with-declared-payments-listing');
 
         Route::get('prices/allegro-prices/{id}', 'ProductPricesController@getAllegroPrices')->name('prices.allegroPrices');
         Route::get('orders/{id}/get-basket', 'OrdersController@goToBasket')->name('orders.goToBasket');
