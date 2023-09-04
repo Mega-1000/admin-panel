@@ -35,6 +35,11 @@ class OrderPackagesCalculator
 
     public static function getFullCost(Order $order): float
     {
-        return array_sum(self::calculate($order));
+        $data= self::calculate($order);
+        return array_sum([
+            $data['GLSks'] * 18,
+            $data['GLSkd'] * 18,
+            $data['DPDd'] * 48
+        ]);
     }
 }
