@@ -36,21 +36,14 @@ class CheckPackagesStatusJob
 
         $orders = Order::whereHas('packages', function ($query) {
             $query
-                ->whereIn('status', ['SENDING', 'WAITING_FOR_SENDING'])
+                ->whereNotIn('status', [PackageStatus::DELIVERED, PackageStatus::WAITING_FOR_CANCELLED, PackageStatus::CANCELLED, PackageStatus::REJECT_CANCELLED])
+                ->whereNull('letter_number')
                 ->whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString());
         })->get();
 
         foreach ($orders as $order) {
             try {
                 foreach ($order->packages as $package) {
-                    if ($package->status == PackageStatus::DELIVERED ||
-                        $package->status == PackageStatus::WAITING_FOR_CANCELLED ||
-                        $package->status == PackageStatus::CANCELLED ||
-                        $package->status == PackageStatus::REJECT_CANCELLED ||
-                        empty($package->letter_number)) {
-                        continue;
-                    }
-
                     $courier = CourierFactory::create($package->service_courier_name);
                     $courier->checkStatus($package);
                 }
