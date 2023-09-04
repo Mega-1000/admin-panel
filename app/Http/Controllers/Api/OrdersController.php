@@ -239,6 +239,7 @@ class OrdersController extends Controller
 
             $order = Order::query()->find($builderData['id']);
             $order->firm_source_id = FirmSource::byFirmAndSource(config('orders.firm_id'), 2)->value('id');
+            $order->packages_values = json_encode($data['packages']  ?? null);
             $order->save();
 
             $orderAddresses = $order->addresses()->get();
@@ -250,6 +251,7 @@ class OrdersController extends Controller
             }
 
             $builderData['token'] = $order->getToken();
+
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
             ]);
