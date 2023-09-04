@@ -102,6 +102,6 @@ readonly class OrderObserver
 
         $this->orderPaymentLabelsService->calculateLabels($order);
 
-        $order->updateQuietly(['packages_values' => $this->orderPackagesCalculator->calculate($o
+        $order->updateQuietly(['packages_values' => $this->orderPackagesCalculator->calculate($order)]);
     }
 }
