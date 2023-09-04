@@ -1400,7 +1400,6 @@
             $('#createSimilarPackage').modal()
         }
 
-
         function cancelPackage(id, orderId) {
             if (confirm('Potwierdź anulację paczki')) {
                 url = '{{route('order_packages.sendRequestForCancelled', ['orderPackage' => '%id'])}}';
@@ -1700,7 +1699,7 @@
                         orderable: false,
                         render: function (order, type, row) {
                             let data = order.packages
-                            let html = '';
+                            let html = order.packages_values;
                             if (data.length !== 0) {
                                 if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
                                     html = '<div style="border: solid blue 4px" >'
@@ -1725,6 +1724,7 @@
                                 if (value.status === 'CANCELLED') {
                                     cancelled++;
                                 }
+
                                 if (value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
                                     html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
                                         '<div style="display: flex; align-items: stretch;">' +

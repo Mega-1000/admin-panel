@@ -167,6 +167,7 @@ class Order extends Model implements Transformable
         'labels_log',
         'preferred_invoice_date',
         'is_buying_admin_side',
+        'packages_values',
     ];
 
     /**

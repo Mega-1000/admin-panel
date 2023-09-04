@@ -218,6 +218,7 @@
                             <h2>
                                 Dodaj firmę
                             </h2>
+
                             <select class="select2" data-live-search="true" name="company_id" id="select2">
                                 <option>Dodaj użytkownika</option>
                                 @foreach ($companies as $company)
