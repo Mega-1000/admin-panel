@@ -97,7 +97,7 @@ class OrderItem extends Model implements Transformable
     {
         parent::boot();
 
-        static::created(fn ($model) => $this->updateOrderPackage($model));
-        static::updated(fn ($model) => $this->updateOrderPackage($model));
+        static::created(fn ($model) => self::updateOrderPackage($model));
+        static::updated(fn ($model) => self::updateOrderPackage($model));
     }
 }
