@@ -90,7 +90,7 @@ class OrderItem extends Model implements Transformable
 
     public static function updateOrderPackage($model): void
     {
-        $model->order->update(['packages_values' => OrderPackagesCalculator::calculate($model->order)]);
+        $model->order->updateQuietly(['packages_values' => OrderPackagesCalculator::calculate($model->order)]);
     }
 
     public static function boot(): void
