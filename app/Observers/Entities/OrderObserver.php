@@ -103,5 +103,13 @@ readonly class OrderObserver
         $this->orderPaymentLabelsService->calculateLabels($order);
 
         $order->updateQuietly(['packages_values' => $this->orderPackagesCalculator->calculate($order)]);
+
+        $fullCost = OrderPackagesCalculator::getFullCost($order);
+
+        if ($order->shipment_price_for_client > $fullCost) {
+            return;
+        }
+
+        $order->updateQuietly(['shipment_price_for_client' => $fullCost]);
     }
 }
