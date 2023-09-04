@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\Helpers\OrderPackagesCalculator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -85,5 +86,18 @@ class OrderItem extends Model implements Transformable
     public function realProductPositions(): ?Collection
     {
         return $this->product?->stock?->position ?? new Collection();
+    }
+
+    public static function updateOrderPackage($model): void
+    {
+        $model->order->update(['packages_values' => OrderPackagesCalculator::calculate($model->order)]);
+    }
+
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::created(fn ($model) => $this->updateOrderPackage($model));
+        static::updated(fn ($model) => $this->updateOrderPackage($model));
     }
 }
