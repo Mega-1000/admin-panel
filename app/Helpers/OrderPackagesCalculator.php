@@ -32,4 +32,9 @@ class OrderPackagesCalculator
             'DPDd' => ceil($dpdd)
         ];
     }
+
+    public static function getFullCost(Order $order): float
+    {
+        return array_sum(self::calculate($order));
+    }
 }
