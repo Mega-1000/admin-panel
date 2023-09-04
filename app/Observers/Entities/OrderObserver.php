@@ -5,6 +5,7 @@ namespace App\Observers\Entities;
 use App\Entities\Order;
 use App\Entities\Status;
 use App\Facades\Mailer;
+use App\Helpers\OrderPackagesCalculator;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\Orders;
@@ -20,16 +21,11 @@ use Illuminate\Support\Str;
 
 readonly class OrderObserver
 {
-    /**
-     * OrderObserver constructor.
-     * @param StatusRepository $statusRepository
-     * @param OrderPaymentLabelsService $orderPaymentLabelsService
-     * @param OrderService $orderService
-     */
     public function __construct(
         protected StatusRepository          $statusRepository,
         protected OrderPaymentLabelsService $orderPaymentLabelsService,
         protected OrderService              $orderService,
+        protected OrderPackagesCalculator   $orderPackagesCalculator,
     ) {}
 
     public function created(Order $order): void
@@ -105,5 +101,7 @@ readonly class OrderObserver
         }
 
         $this->orderPaymentLabelsService->calculateLabels($order);
+
+        $order->update(['packages_values' => $this->orderPackagesCalculator->calculate($order)]);
     }
 }
