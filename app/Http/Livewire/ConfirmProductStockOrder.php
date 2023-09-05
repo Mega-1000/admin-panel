@@ -61,6 +61,10 @@ class ConfirmProductStockOrder extends Component
             }])
             ->first();
 
+        if ($existingRecord->position_quantity !== 0) {
+            dd('nie można usunąć pozycji, która ma już ilość');
+        }
+
         if ($existingRecord && !$this->isDeletionConfirmationModalOpen) {
             $this->isDeletionConfirmationModalOpen = true;
             $this->deletingPositionId = $existingRecord->id;
