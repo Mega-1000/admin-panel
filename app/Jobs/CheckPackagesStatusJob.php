@@ -39,7 +39,7 @@ class CheckPackagesStatusJob
 
         $ordersQuery = Order::whereHas('packages', function (Builder $query) {
             $query
-                ->whereNotIn('status', [PackageStatus::blockedStatusVerification()])
+                ->whereNotIn('status', PackageStatus::blockedStatusVerification())
                 ->whereRaw("COALESCE(service_courier_name, '') != '' ")
                 ->whereRaw("COALESCE(letter_number, '') != ''")
                 ->whereDate('shipment_date', '>', Carbon::today()->addDays(-30));
