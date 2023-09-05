@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Route;
   | is assigned the "api" middleware group. Enjoy building your API!
   |
  */
-
 Route::middleware('auth:api')->group(function () {
     Route::prefix('user')->name('api.customers.')->group(function () {
         Route::get('/', 'Api\CustomersController@getDetails')->name('show');
@@ -33,11 +32,9 @@ Route::middleware('auth:api')->group(function () {
         Route::get('getAll', 'Api\OrdersController@getAll')->name('getall');
         Route::post('uploadProofOfPayment', 'Api\OrdersController@uploadProofOfPayment')->name('proof-of-payment');
         Route::post('update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('update-order-addresses');
-        Route::get('get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('getPayments');
         Route::post('move-to-unactive/{order}', 'Api\OrdersController@moveToUnactive')->name('moveToUnactive');
         Route::post('remind-about-offer/{order}', 'Api\OrdersController@scheduleOrderReminder')->name('remindAboutOffer');
     });
-
     Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
     Route::get('invoices/get/{id}', 'Api\InvoicesController@getInvoice')->name('api.invoices.get');
     Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
@@ -182,3 +179,4 @@ Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'g
 Route::post('/create-message', AllegroMessageController::class);
 
 Route::get('/shipment-pay-in-report', ShipmentPayInReportByInvoiceNumber::class)->name('shipment-pay-in-report');
+Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('getPayments');

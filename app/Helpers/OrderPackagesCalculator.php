@@ -13,15 +13,15 @@ class OrderPackagesCalculator
         $dpdd = 0;
 
         foreach ($order->items as $item) {
-            switch ($item->delivery_type) {
+            switch ($item->product->delivery_type) {
                 case 'GLS':
-                    $glsks += $item->amount / $item->assortment_quantity;
+                    $glsks += $item->quantity / $item->product->assortment_quantity;
                     break;
                 case 'GLSd':
-                    $glskd += $item->amount / $item->assortment_quantity;
+                    $glskd += $item->quantity / $item->product->assortment_quantity;
                     break;
                 case 'DPDd':
-                    $dpdd += $item->amount / $item->assortment_quantity;
+                    $dpdd += $item->quantity / $item->product->assortment_quantity;
                     break;
             }
         }
@@ -31,5 +31,15 @@ class OrderPackagesCalculator
             'GLSkd' => ceil($glskd),
             'DPDd' => ceil($dpdd)
         ];
+    }
+
+    public static function getFullCost(Order $order): float
+    {
+        $data= self::calculate($order);
+        return array_sum([
+            $data['GLSks'] * 18,
+            $data['GLSkd'] * 18,
+            $data['DPDd'] * 48
+        ]);
     }
 }

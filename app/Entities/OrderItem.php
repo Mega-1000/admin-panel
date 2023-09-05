@@ -91,6 +91,16 @@ class OrderItem extends Model implements Transformable
     public static function updateOrderPackage($model): void
     {
         $model->order->updateQuietly(['packages_values' => OrderPackagesCalculator::calculate($model->order)]);
+
+        $fullCost = OrderPackagesCalculator::getFullCost($model->order);
+
+        $model->order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
+
+        if ($model->order->shipment_price_for_client > $fullCost) {
+            return;
+        }
+
+        $model->order->updateQuietly(['shipment_price_for_client' => $fullCost]);
     }
 
     public static function boot(): void

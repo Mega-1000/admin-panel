@@ -92,7 +92,7 @@ readonly class OrderObserver
             }
         }
 
-        $hasMissingDeliveryAddressLabel = $order->labels()->where('label_id', 75)->get();    //brak danych do dostawy
+        $hasMissingDeliveryAddressLabel = $order->labels()->where('label_id', 75)->get();
 
         if (count($hasMissingDeliveryAddressLabel) > 0) {
             if ($order->isDeliveryDataComplete()) {
@@ -103,5 +103,9 @@ readonly class OrderObserver
         $this->orderPaymentLabelsService->calculateLabels($order);
 
         $order->updateQuietly(['packages_values' => $this->orderPackagesCalculator->calculate($order)]);
+
+        $fullCost = OrderPackagesCalculator::getFullCost($order);
+
+        $order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
     }
 }
