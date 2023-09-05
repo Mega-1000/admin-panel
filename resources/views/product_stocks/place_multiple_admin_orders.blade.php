@@ -95,7 +95,7 @@
             const orders = this.orders;
             const item = orders.find((item) => item.product.id === id);
 
-            const resultBox = document.getElementById(`quantity-pack-units-${id}`).value;
+            let resultBox = document.getElementById(`quantity-pack-units-${id}`);
             let quantity = document.getElementById(`quantity-${id}`)?.value;
 
             let value;
@@ -103,10 +103,10 @@
                 const value = Math.round(quantity * Number(item.product.packing.number_of_sale_units_in_the_pack)) / Number(item.product.packing.number_of_sale_units_in_the_pack) * Number(item.product.packing.number_of_sale_units_in_the_pack);
                 document.getElementById(`quantity-${id}`).value = value / Number(item.product.packing.number_of_sale_units_in_the_pack);
             } else {
-                value = Number(resultBox);
+                value = Number(resultBox.value);
             }
 
-            resultBox = value;
+            resultBox.value = value;
 
             item.orderQuantity.calculatedQuantity = value;
         }
