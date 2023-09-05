@@ -95,11 +95,16 @@
             const orders = this.orders;
             const item = orders.find((item) => item.product.id === id);
 
-            const resultBox = document.getElementById(`quantity-pack-units-${id}`);
-            let quantity = document.getElementById(`quantity-${id}`).value;
+            const resultBox = document.getElementById(`quantity-pack-units-${id}`).value;
+            let quantity = document.getElementById(`quantity-${id}`)?.value;
 
-            const value = Math.round(quantity * Number(item.product.packing.number_of_sale_units_in_the_pack)) / Number(item.product.packing.number_of_sale_units_in_the_pack) * Number(item.product.packing.number_of_sale_units_in_the_pack);
-            document.getElementById(`quantity-${id}`).value = value / Number(item.product.packing.number_of_sale_units_in_the_pack);
+            let value;
+            if (quantity != null) {
+                const value = Math.round(quantity * Number(item.product.packing.number_of_sale_units_in_the_pack)) / Number(item.product.packing.number_of_sale_units_in_the_pack) * Number(item.product.packing.number_of_sale_units_in_the_pack);
+                document.getElementById(`quantity-${id}`).value = value / Number(item.product.packing.number_of_sale_units_in_the_pack);
+            } else {
+                value = Number(resultBox);
+            }
 
             resultBox.innerHTML = value;
 
@@ -132,11 +137,17 @@
                         const orderQuantity = item.orderQuantity;
                         const calculatedQuantity = Number(orderQuantity.calculatedQuantity).toFixed(2);
                         let numSaleUnitsInPack = Number(packing.number_of_sale_units_in_the_pack).toFixed(2);
-                        if (numSaleUnitsInPack == 0) numSaleUnitsInPack = 1;
                         const ceilCalcQuantity = Math.ceil(calculatedQuantity / numSaleUnitsInPack);
                         const floorCalcQuantity = Math.floor(calculatedQuantity / numSaleUnitsInPack);
                         const ceilPackUnits = (ceilCalcQuantity * numSaleUnitsInPack).toFixed(2);
                         const floorPackUnits = (floorCalcQuantity * numSaleUnitsInPack).toFixed(2);
+
+                        const ceilPackUnitsHtml = numSaleUnitsInPack == 0
+                            ? `<input type="text" class="form-control" id="quantity-pack-units-${product.id}" onChange="updateUnitsBox(${product.id})">`
+                            : `<span type="text" class="form-control" id="quantity-pack-units-${product.id}">${ceilPackUnits}</span>`
+                        const ceilCalcQuantityHtml = numSaleUnitsInPack != 0
+                            ? `<input type="text" onChange="updateUnitsBox(${product.id})" class="form-control" id="quantity-${product.id}" value="${ceilCalcQuantity}">>`
+                            : ``
 
                         res += `
                             ${orderQuantity.soldInLastDays}
@@ -160,10 +171,10 @@
                               <td>${floorPackUnits}</td> <!-- ilość jednostek handlowych mniej po zaokrągleniu w dół jednostek zbiorczych -->
                               <td>${Math.floor((Number(floorPackUnits) + Number(item.currentQuantity))  / orderQuantity.inOneDay)}</td> <!--- okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w dół -->
                               <td>
-                                <input type="text" onChange="updateUnitsBox(${product.id})" class="form-control" id="quantity-${product.id}" value="${ceilCalcQuantity}">
+                                ${ceilCalcQuantityHtml}
                               </td>
                               <td>
-                                <span id="quantity-pack-units-${product.id}">${ceilPackUnits}</span>
+                                ${ceilPackUnitsHtml}
                               </td>
                               <td>
                                 <a class="btn btn-primary" target="_blank" href='/admin/products/stocks/place-multiple-admin-orders/intervals/${JSON.stringify(item.intervals)}'>pokaż wykres</a>
