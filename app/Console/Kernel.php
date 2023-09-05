@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\CheckGlsPackageStatusCommand;
 use App\Jobs;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -14,7 +15,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        CheckGlsPackageStatusCommand::class,
     ];
 
     /**
@@ -29,7 +30,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckStatusInpostPackagesJob::class)->everyFiveMinutes();
 
         $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFiveMinutes()->between('13:00', '16:00');
-        $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFifteenMinutes()->unlessBetween('16:00', '13:00');
+        $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFifteenMinutes()->between('16:01', '12:59');
 
 //        $schedule->job(Jobs\ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
         //$schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");

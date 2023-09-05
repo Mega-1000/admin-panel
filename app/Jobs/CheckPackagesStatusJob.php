@@ -10,6 +10,7 @@ use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -34,25 +35,28 @@ class CheckPackagesStatusJob
             Auth::loginUsingId($this->userId);
         }
 
-        $orders = Order::whereHas('packages', function ($query) {
+        Log::info('Testing check packages status job');
+
+        $ordersQuery = Order::whereHas('packages', function (Builder $query) {
             $query
-                ->whereIn('status', ['SENDING', 'WAITING_FOR_SENDING'])
-                ->whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString());
-        })->get();
+                ->whereNotIn('status', PackageStatus::blockedStatusVerification())
+                ->whereRaw("COALESCE(service_courier_name, '') != '' ")
+                ->whereRaw("COALESCE(letter_number, '') != ''")
+                ->whereDate('shipment_date', '>', Carbon::today()->addDays(-30));
+        });
+
+        $orders = $ordersQuery->get();
+
+        Log::info('Query for packages: ' . $ordersQuery->toSql());
+        Log::info('Orders with packages to update: ' . $orders->count());
 
         foreach ($orders as $order) {
             try {
+                Log::info('Order: ' . $order->id . ' ma paczek: ' . $order->packages->count());
                 foreach ($order->packages as $package) {
-                    if ($package->status == PackageStatus::DELIVERED ||
-                        $package->status == PackageStatus::WAITING_FOR_CANCELLED ||
-                        $package->status == PackageStatus::CANCELLED ||
-                        $package->status == PackageStatus::REJECT_CANCELLED ||
-                        empty($package->letter_number)) {
-                        continue;
-                    }
-
                     $courier = CourierFactory::create($package->service_courier_name);
                     $courier->checkStatus($package);
+                    Log::info('Order package letter number: ' . $package->letter_number);
                 }
 
                 $preventionArray = [];
