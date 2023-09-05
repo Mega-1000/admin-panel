@@ -160,7 +160,7 @@ class OrderBuilder
                 $this->attachFileToOrder($file, $order);
             }
         }
-//        $chatUserToken = '';
+        $chatUserToken = '';
 //        if ( isset($data['need_support']) && $data['need_support'] === true ) {
 //            $helper = new MessagesHelper();
 //            $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
