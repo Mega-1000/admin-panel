@@ -13,4 +13,14 @@ final class PackageStatus extends Enum
     const WAITING_FOR_CANCELLED = 'WAITING_FOR_CANCELLED';
     const NEW = 'NEW';
     const REJECT_CANCELLED = 'REJECT_CANCELLED';
+
+    public static function blockedStatusVerification(): array
+    {
+        return [
+            self::DELIVERED,
+            self::WAITING_FOR_CANCELLED,
+            self::CANCELLED,
+            self::REJECT_CANCELLED,
+        ];
+    }
 }
