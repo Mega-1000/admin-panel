@@ -107,11 +107,5 @@ readonly class OrderObserver
         $fullCost = OrderPackagesCalculator::getFullCost($order);
 
         $order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
-
-        if ($order->shipment_price_for_client > $fullCost) {
-            return;
-        }
-
-        $order->updateQuietly(['shipment_price_for_client' => $fullCost]);
     }
 }
