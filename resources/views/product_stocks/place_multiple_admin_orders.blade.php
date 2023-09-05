@@ -106,7 +106,7 @@
                 value = Number(resultBox);
             }
 
-            resultBox.innerHTML = value;
+            resultBox.value = value;
 
             item.orderQuantity.calculatedQuantity = value;
         }
