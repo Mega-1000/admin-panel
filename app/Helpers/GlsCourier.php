@@ -18,7 +18,7 @@ class GlsCourier implements iCourier
     /**
      * @throws GuzzleException
      */
-    public function checkStatus(OrderPackage $package): void
+    public function checkStatus(OrderPackage $package, bool $printDebug = false): void
     {
         $url = $this->config['gls']['tracking_url'] . $package->letter_number;
         try {
@@ -28,12 +28,23 @@ class GlsCourier implements iCourier
                     ->getContents()
             );
 
+            if ($printDebug === true) {
+                echo "URL: " . $url . "\r\n";
+                echo "Response data: \r\n";
+                print_r($response);
+                echo "\r\nend response \r\n";
+            }
+
             if (empty($response->tuStatus)) {
                 Log::notice('Wystąpił problem przy sprawdzaniu statusu paczki: ' . $package->letter_number);
                 return;
             }
 
             $packageStatus = $response->tuStatus[0]->progressBar->statusInfo;
+
+            if ($printDebug === true) {
+                echo "Package status in GLS Service: " . $packageStatus . "\r\n";
+            }
 
             switch ($packageStatus) {
                 case GlsPackageStatus::DELIVERED:
