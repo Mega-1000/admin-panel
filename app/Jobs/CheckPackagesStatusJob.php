@@ -35,8 +35,6 @@ class CheckPackagesStatusJob
             Auth::loginUsingId($this->userId);
         }
 
-        Log::info('Testing check packages status job');
-
         $ordersQuery = Order::whereHas('packages', function (Builder $query) {
             $query
                 ->whereNotIn('status', PackageStatus::blockedStatusVerification())
@@ -47,16 +45,11 @@ class CheckPackagesStatusJob
 
         $orders = $ordersQuery->get();
 
-        Log::info('Query for packages: ' . $ordersQuery->toSql());
-        Log::info('Orders with packages to update: ' . $orders->count());
-
         foreach ($orders as $order) {
             try {
-                Log::info('Order: ' . $order->id . ' ma paczek: ' . $order->packages->count());
                 foreach ($order->packages as $package) {
                     $courier = CourierFactory::create($package->service_courier_name);
                     $courier->checkStatus($package);
-                    Log::info('Order package letter number: ' . $package->letter_number);
                 }
 
                 $preventionArray = [];
