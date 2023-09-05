@@ -36,7 +36,7 @@ class GlsCourier implements iCourier
             }
 
             if (empty($response->tuStatus)) {
-                Log::notice('Brak odpowiedzi z statusem paczki nr: ' . $package->letter_number);
+                Log::notice('Wystąpił problem przy sprawdzaniu statusu paczki: ' . $package->letter_number);
                 return;
             }
 
