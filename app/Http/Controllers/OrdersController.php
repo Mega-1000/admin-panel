@@ -157,9 +157,7 @@ class OrdersController extends Controller
         private readonly ProductStockPacketRepository   $productStockPacketRepository,
         private readonly TaskService                    $taskService,
         private readonly OrderDatatableService          $orderDatatableService
-    )
-    {
-    }
+    ) {}
 
     /**
      * @param Request $request
@@ -1262,7 +1260,7 @@ class OrdersController extends Controller
         if (!empty($request->input('id'))) {
             foreach ($request->input('id') as $id) {
                 if ($request->input('quantity_commercial')[$id] > 0) {
-                    $this->orderItemRepository->update([
+                    OrderItem::find($id)->updateQuietly([
                         'net_purchase_price_commercial_unit_after_discounts' => (float)$request->input('net_purchase_price_commercial_unit')[$id],
                         'net_purchase_price_basic_unit_after_discounts' => (float)$request->input('net_purchase_price_basic_unit')[$id],
                         'net_purchase_price_calculated_unit_after_discounts' => (float)$request->input('net_purchase_price_calculated_unit')[$id],
@@ -1277,7 +1275,7 @@ class OrdersController extends Controller
                         'net_selling_price_aggregate_unit' => (float)$request->input('net_selling_price_aggregate_unit')[$id],
                         'quantity' => (int)$request->input('quantity_commercial')[$id],
                         'price' => (float)$request->input('gross_selling_price_commercial_unit')[$id] * (int)$request->input('quantity_commercial')[$id],
-                    ], $id);
+                    ]);
                 } else {
                     $orderItem = $this->orderItemRepository->find($id);
                     $orderItem->delete();

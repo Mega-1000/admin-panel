@@ -94,6 +94,8 @@ class OrderItem extends Model implements Transformable
 
         $fullCost = OrderPackagesCalculator::getFullCost($model->order);
 
+        $model->order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
+
         if ($model->order->shipment_price_for_client > $fullCost) {
             return;
         }
