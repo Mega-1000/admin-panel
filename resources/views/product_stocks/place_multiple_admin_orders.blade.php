@@ -146,7 +146,7 @@
                             ? `<input type="text" class="form-control" id="quantity-pack-units-${product.id}" onChange="updateUnitsBox(${product.id})">`
                             : `<span type="text" class="form-control" id="quantity-pack-units-${product.id}">${ceilPackUnits}</span>`
                         const ceilCalcQuantityHtml = numSaleUnitsInPack != 0
-                            ? `<input type="text" onChange="updateUnitsBox(${product.id})" class="form-control" id="quantity-${product.id}" value="${ceilCalcQuantity}">>`
+                            ? `<input type="text" onChange="updateUnitsBox(${product.id})" class="form-control" id="quantity-${product.id}" value="${ceilCalcQuantity}">`
                             : ``
 
                         res += `
