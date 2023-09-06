@@ -15,13 +15,13 @@ class OrderPackagesCalculator
         foreach ($order->items as $item) {
             switch ($item->product->delivery_type) {
                 case 'GLS':
-                    $glsks += $item->quantity / $item->product->assortment_quantity;
+                    $glsks += $item->quantity / (int)$item->product->assortment_quantity;
                     break;
                 case 'GLSd':
-                    $glskd += $item->quantity / $item->product->assortment_quantity;
+                    $glskd += $item->quantity / (int)$item->product->assortment_quantity;
                     break;
                 case 'DPDd':
-                    $dpdd += $item->quantity / $item->product->assortment_quantity;
+                    $dpdd += $item->quantity / (int)$item->product->assortment_quantity;
                     break;
             }
         }
