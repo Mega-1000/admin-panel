@@ -15,7 +15,7 @@ class TableOfShipmentPaymentsErrors extends Component
 
     public function render(): View
     {
-        $this->orders = collect();
+        $this->orders = $this->orders ?? collect();
         return view('livewire.table-of-shipment-payments-errors');
     }
 
