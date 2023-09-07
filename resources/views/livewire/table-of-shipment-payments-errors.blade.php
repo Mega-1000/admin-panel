@@ -38,7 +38,7 @@
                         </td>
                         <td>
                             <button class="btn btn-primary">
-                                <a href="{{ route('orders.show', $order->id) }}">
+                                <a href="{{ route('orders.edit', $order->id) }}">
                                     Wyświetl
                                 </a>
                             </button>
