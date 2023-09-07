@@ -1,5 +1,6 @@
 <?php
 
+use App\Entities\OrderPackage;
 use App\Http\Controllers\AddLabelsCSVController;
 use App\Http\Controllers\AllegroBillingController;
 use App\Http\Controllers\AllegroReturnPaymentController;
@@ -119,6 +120,18 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('users/{id}/change-status', [
             'uses' => 'UserController@changeStatus',
         ])->name('users.change.status');
+
+        Route::get('calc_real_cost_for_company_sum', function () {
+            $orderPackage = OrderPackage::all();
+
+            foreach ($orderPackage as $package) {
+                $package->update([
+                    'real_cost_for_company_sum' => $package->realCostsForCompany->sum('cost')
+                ]);
+
+                echo $package;
+            }
+        });
 
         Route::get('firms', 'FirmsController@index')->name('firms.index');
         Route::get('firms/datatable', 'FirmsController@datatable')->name('firms.datatable');
