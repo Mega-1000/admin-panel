@@ -24,7 +24,7 @@ class TableOfShipmentPaymentsErrors extends Component
         $this->showTable = true;
 
         $this->orders = Order::query()->wherehas('packages', function ($query) {
-            $query->whereBetween('real_cost_for_company_sum', [$this->from, $this->to]);
+            $query->whereBetween('real_cost_for_company_sum', [(int)$this->to, (int)$this->from]);
         })->get()->toArray();
     }
 }
