@@ -8,7 +8,6 @@ use App\Facades\Mailer;
 use App\Helpers\OrderPackagesCalculator;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
-use App\Repositories\Orders;
 use App\Repositories\StatusRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\OrderPaymentLabelsService;
@@ -101,13 +100,5 @@ readonly class OrderObserver
         }
 
         $this->orderPaymentLabelsService->calculateLabels($order);
-
-        $order->updateQuietly(['packages_values' => $this->orderPackagesCalculator->calculate($order)]);
-
-        $fullCost = OrderPackagesCalculator::getFullCost($order);
-
-        $order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
-        $order->updateQuietly(['shipment_price_for_client' => $fullCost]);
-
     }
 }

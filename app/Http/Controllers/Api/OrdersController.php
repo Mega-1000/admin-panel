@@ -22,6 +22,7 @@ use App\Helpers\GetCustomerForAdminEdit;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
+use App\Helpers\OrderPackagesCalculator;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\TransportSumCalculator;
 use App\Http\Controllers\Controller;
@@ -189,10 +190,10 @@ class OrdersController extends Controller
      *
      * @param StoreOrderRequest $request
      * @param ProductService $productService
+     * @param OrderPackagesCalculator $orderPackagesCalculator
      * @return JsonResponse
-     * @throws Throwable
      */
-    public function newOrder(StoreOrderRequest $request, ProductService $productService): JsonResponse
+    public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
         $data = $request->all();
 
@@ -237,7 +238,7 @@ class OrdersController extends Controller
 
             DB::commit();
 
-            $order = Order::query()->find($builderData['id']);
+            $order = Order::find($builderData['id']);
             $order->firm_source_id = FirmSource::byFirmAndSource(config('orders.firm_id'), 2)->value('id');
             $order->packages_values = json_encode($data['packages']  ?? null);
             $order->save();
@@ -251,6 +252,13 @@ class OrdersController extends Controller
             }
 
             $builderData['token'] = $order->getToken();
+
+            $order->updateQuietly(['packages_values' => $orderPackagesCalculator->calculate($order)]);
+
+            $fullCost = OrderPackagesCalculator::getFullCost($order);
+
+            $order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
+            $order->updateQuietly(['shipment_price_for_client' => $fullCost]);
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
