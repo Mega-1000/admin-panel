@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Entities\Order;
 use App\Entities\OrderOffer;
 use App\Entities\Status;
+use App\Entities\Tag;
 use App\Facades\Mailer;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Jobs\Orders\GenerateOrderProformJob;
@@ -56,15 +58,24 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Execute the job.z
      *
+     * @param EmailTagHandlerHelper $emailTagHandler
+     * @param OrderRepository $orderRepository
+     * @param TagRepository $tagRepository
+     * @param StatusRepository $statusRepository
      * @return void
      */
-    public function handle(EmailTagHandlerHelper $emailTagHandler, OrderRepository $orderRepository, TagRepository $tagRepository, StatusRepository $statusRepository)
+    public function handle(
+        EmailTagHandlerHelper $emailTagHandler,
+        OrderRepository $orderRepository,
+        TagRepository $tagRepository,
+        StatusRepository $statusRepository
+    ): void
     {
-        $order = $orderRepository->find($this->orderId);
+        $order = Order::find($this->orderId);
 
-        $tags = $tagRepository->all();
+        $tags = Tag::all();
         $oldStatus = Status::find($this->oldStatus);
 
         $message = $this->message !== null ? $this->message : $order->status->message;
@@ -76,7 +87,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
         $status = explode('-', $order->status->name)[0];
-        $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . str_replace('-', '', $oldStatus->name)
+        $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . str_replace('-', '', $oldStatus?->name ?? 'nie znany')
             . " na: " . str_replace('-', '', $status);
 
         $mail_to = $order->customer->login;
