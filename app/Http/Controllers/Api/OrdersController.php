@@ -33,6 +33,7 @@ use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Http\Requests\ScheduleOrderReminderRequest;
+use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\SendReminderAboutOfferJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
@@ -261,6 +262,8 @@ class OrdersController extends Controller
             $order->updateQuietly(['shipment_price_for_client' => $fullCost]);
 
             $order->update(['status_id' => 18]);
+
+            dispatch_now(new OrderStatusChangedNotificationJob($order->id));
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
