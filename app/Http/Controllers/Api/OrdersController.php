@@ -423,9 +423,9 @@ class OrdersController extends Controller
         )->first();
     }
 
-    public function getReadyToShipFormAutocompleteData($orderId)
+    public function getReadyToShipFormAutocompleteData($orderId): array
     {
-        $order = $this->orderRepository->find($orderId);
+        $order = Order::find($orderId);
         list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
 
         if (!empty($order->dates)) {
@@ -461,13 +461,13 @@ class OrdersController extends Controller
         $invoiceLock[] = config('labels-map')['list']['faktura wystawiona'];
         $invoiceLock[] = config('labels-map')['list']['faktura wystawiona z odlozonym skutkiem magazynowym'];
         $isDeliveryChangeLocked = $order->labels
-                ->filter(function ($label) use ($deliveryLock) {
-                    return in_array($label->id, $deliveryLock);
+                ->filter(function ($label) use ($invoiceLock) {
+                    return in_array($label->id, [48, 50, 52, 53]);
                 })
                 ->count() > 0;
         $isInvoiceChangeLocked = $order->labels
                 ->filter(function ($label) use ($invoiceLock) {
-                    return in_array($label->id, $invoiceLock);
+                    return in_array($label->id, [121]);
                 })
                 ->count() > 0;
         return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
