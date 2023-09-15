@@ -261,7 +261,7 @@ class OrdersController extends Controller
             $order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
             $order->updateQuietly(['shipment_price_for_client' => $fullCost]);
 
-            $order->update(['status_id' => 18]);
+            $order->update(['status_id' => 3]);
 
             dispatch_now(new OrderStatusChangedNotificationJob($order->id));
 
