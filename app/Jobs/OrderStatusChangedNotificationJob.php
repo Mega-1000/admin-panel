@@ -65,7 +65,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
         $order = $orderRepository->find($this->orderId);
 
         $tags = $tagRepository->all();
-        $oldStatus = $statusRepository->find($this->oldStatus);
+        $oldStatus = Status::find($this->oldStatus);
 
         $message = $this->message !== null ? $this->message : $order->status->message;
 
