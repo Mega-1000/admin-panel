@@ -260,6 +260,8 @@ class OrdersController extends Controller
             $order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
             $order->updateQuietly(['shipment_price_for_client' => $fullCost]);
 
+            $order->update(['status_id' => 18]);
+
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
             ]);

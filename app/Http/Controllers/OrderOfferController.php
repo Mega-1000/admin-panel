@@ -7,17 +7,20 @@ use App\Helpers\EmailTagHandlerHelper;
 use App\Repositories\TagRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class OrderOfferController extends Controller
 {
-    public function getPdf(TagRepository $tagRepository, EmailTagHandlerHelper $emailTagHandler, $id)
+    public function getPdf(TagRepository $tagRepository, EmailTagHandlerHelper $emailTagHandler, $id): View
     {
         $order = OrderOffer::findorFail($id)->order()->with('employee', 'items')->first();
 
         $tags = $tagRepository->all();
         $emailTagHandler->setOrder($order);
         $message = OrderOffer::findorFail($id)->message;
+
         foreach ($tags as $tag) {
             $method = $tag->handler;
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
@@ -32,7 +35,7 @@ class OrderOfferController extends Controller
         return view('pdf.order_offer', compact('message', 'order'));
     }
 
-    public function getProform(TagRepository $tagRepository, EmailTagHandlerHelper $emailTagHandler, $id)
+    public function getProform(TagRepository $tagRepository, EmailTagHandlerHelper $emailTagHandler, $id): JsonResponse
     {
         $order = OrderOffer::findorFail($id)->order()->with('employee', 'status')->first();
         $order->labels_log .= 'Proforma została wyświetlona dnia ' . date('Y-m-d H:i:s') . ' przez ' . $order->customer()->first()->login . PHP_EOL;
@@ -47,6 +50,7 @@ class OrderOfferController extends Controller
         Storage::disk('local')->put('/archive-files/' . $name, $pdf->output());
 
         $file = Storage::disk('local')->get('/archive-files/' . $name);
-        return response($file, 200)->header('Content-Type', 'application/pdf');
+
+        return response()->json($file)->header('Content-Type', 'application/pdf');
     }
 }
