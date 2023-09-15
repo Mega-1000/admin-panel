@@ -117,10 +117,10 @@ class AddLabelService
                 }
 
                 if ($label->id == Label::ORDER_ITEMS_REDEEMED_LABEL) {
-
                     $emailSendingService = new EmailSendingService();
                     $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP);
                     $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP_2);
+                    $emailSendingService->addNewScheduledEmail($order, EmailSetting::PRODUCED);
 
 
                     $order->preferred_invoice_date = $now;

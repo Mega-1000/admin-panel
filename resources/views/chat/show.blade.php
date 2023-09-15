@@ -213,20 +213,22 @@
                                 'class'            => 'bg-info alert alert-info',
                             ])
                         @endif
-                        <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="post">
-                            @csrf
+
+                        <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST">
+                            @csrf <!-- Add this line if you're using CSRF protection -->
+
                             <h2>
                                 Dodaj firmę
                             </h2>
 
-                            <select class="select2" data-live-search="true" name="company_id" id="select2">
+                            <select class="select2" data-live-search="true" name="companyId" id="companyId">
                                 <option>Dodaj użytkownika</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->id }}">{{ $company->symbol }}</option>
                                 @endforeach
                             </select>
 
-                            <button class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary"> <!-- Use type="submit" to submit the form -->
                                 Dodaj użytkowników
                             </button>
                         </form>

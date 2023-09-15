@@ -26,14 +26,13 @@ class EmailSendingService
      */
     public function addAllegroMsg(string $threadId, string $email): void
     {
-
         $emailTagHandlerHelper = new EmailTagHandlerHelper();
 
         $allegroChatService = new AllegroChatService();
 
         $emailSetting = EmailSetting::where('status', EmailSetting::NEW_ALLEGRO_MSG)->get();
 
-        foreach($emailSetting as $setting) {
+        foreach ($emailSetting as $setting) {
 
             $order = Order::whereHas('customer', function($q) use ($email) {
                 $q->where('login', $email);

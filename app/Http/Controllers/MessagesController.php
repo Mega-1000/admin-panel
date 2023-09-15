@@ -27,9 +27,7 @@ class MessagesController extends Controller
 {
     public function __construct(
         private readonly ProductService $productService,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.

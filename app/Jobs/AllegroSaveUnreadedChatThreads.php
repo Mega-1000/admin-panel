@@ -48,7 +48,7 @@ class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
         Log::channel('allegro_chat')->info("Unreaded Threads: ".json_encode($this->unreadedThreads));
     }
 
-    private function getThreads($offset)
+    private function getThreads($offset): bool
     {
         $allegroChatService = new AllegroChatService();
         $allegroThreads = $allegroChatService->listThreads($offset);
