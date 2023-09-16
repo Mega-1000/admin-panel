@@ -38,6 +38,7 @@ use Log;
 use Mockery\Exception;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 use Smalot\PdfParser\Parser;
+use SoapFault;
 use SoapVar;
 
 /**
@@ -213,6 +214,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
     /**
      * @return array
      *
+     * @throws SoapFault
      */
     public function createPackageForDpd()
     {
@@ -495,8 +497,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
             $order->createShipment('PACZKA', $width, $length, $height, $weight);
 
-            $date = Carbon::now();
-
             if (isset($this->data['pickup_address'])) {
                 $order->setSenderAddress(
                     $this->data['pickup_address']['firmname'], $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'], $this->data['pickup_address']['address'], $this->data['pickup_address']['flat_number'], $this->data['pickup_address']['city'], 0, $this->data['pickup_address']['postal_code'], '', $this->data['pickup_address']['email'], $this->data['pickup_address']['phone']
@@ -576,14 +576,9 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         }
         $xml .= '/>';
         $xml .= '</przesylki>';
-        $soapXML = new SoapVar($xml, XSD_STRING);
-        //   $integration->__call('addShipment', $soapXML);
-        //     Log::debug($integration->__getLastRequest());
-
-        //      $package->miejsceDoreczenia = $address;
+        new SoapVar($xml, XSD_STRING);
 
         $tag['guid'] = $this->getGuid();
-        $tag['_'] = '';
 
         $dom = new DOMDocument("1.0", "utf-8");
         $dom->preserveWhiteSpace = false;

@@ -13,12 +13,6 @@ use App\Repositories\OrderPackageRepository;
 class OrderPackageService
 {
     const RESPONSE_OK = 'ok';
-    protected $orderPackageRepository;
-
-    public function __construct(OrderPackageRepository $orderPackageRepository)
-    {
-        $this->orderPackageRepository = $orderPackageRepository;
-    }
 
     public static function setPackageAsCancelled(OrderPackage $orderPackage): string
     {
@@ -26,6 +20,7 @@ class OrderPackageService
         if ($orderPackage->delivery_courier_name === CourierName::DB_SCHENKER) {
             return self::schnkerPackageCancell($orderPackage->sending_number);
         }
+
         $orderPackage->save();
 
         return self::RESPONSE_OK;
@@ -48,8 +43,5 @@ class OrderPackageService
         return self::RESPONSE_OK;
     }
 
-    public function getPackageInfo(int $id)
-    {
-        return $this->orderPackageRepository->find($id);
-    }
+
 }

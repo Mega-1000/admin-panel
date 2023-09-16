@@ -714,7 +714,7 @@ class OrdersPackagesController extends Controller
      *
      * @return mixed
      */
-    protected function getPackagesToSent($courier_name)
+    protected function getPackagesToSent($courier_name): Collection
     {
         return OrderPackage::where('delivery_courier_name', 'like', $courier_name)
             ->whereNotNull('letter_number')
@@ -729,7 +729,7 @@ class OrdersPackagesController extends Controller
             ->get();
     }
 
-    public function prepareGroupPackageToSend($courierName)
+    public function prepareGroupPackageToSend($courierName): RedirectResponse
     {
         ini_set('max_execution_time', '600');
         if ($courierName == 'APACZKA' || $courierName == 'INPOST' || $courierName == 'DPD' || $courierName == 'POCZTEX' || $courierName == 'JAS' || $courierName == 'GLS' || $courierName == 'ALL') {
@@ -793,6 +793,7 @@ class OrdersPackagesController extends Controller
         $result = $this->preparePackageToSend($package->order->id, $package->id);
         $resArr = $result->getData();
         $itemMessage = 'ID Zamówienia ' . $package->order->id . ' | Numer paczki: ' . $package->id;
+
         if ($resArr->message != null) {
             foreach ($resArr->message as $msg) {
                 $itemMessage .= ' ' . $msg;
@@ -801,31 +802,24 @@ class OrdersPackagesController extends Controller
                 'message' => $itemMessage
             ];
         }
-        // Todo here was something mess with the variables
-        return array($itemMessage, $messages);
+
+        return [$itemMessage, $messages];
     }
 
     public function preparePackageToSend($orderId, $packageId)
     {
-        $order = Order::find($orderId);
-        if (empty($order)) {
-            abort(404);
-        }
-        $package = $this->repository->find($packageId);
-        if (empty($package)) {
-            abort(404);
-        }
-        $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS');
-        $deliveryAddress = $deliveryAddress->first();
-        if (empty($deliveryAddress)) {
-            abort(404);
-        }
+        $order = Order::findOrFail($orderId);
+        $package = OrderPackage::findOrFail($packageId);
+
+        $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->firstOrFail();
+
         if ($order->sello_id) {
             $transaction = SelTransaction::find($order->sello_id);
             $addressAllegro = SelAddress::where('adr_TransId', $order->sello_id)->where('adr_Type', 1)->first();
             $order->allegro_transaction_id = $transaction->tr_CheckoutFormId;
             $order->save();
         }
+
         $data = [
             'warehouse' => $order->warehouse->symbol,
             'order_id' => $order->id,
@@ -886,29 +880,30 @@ class OrdersPackagesController extends Controller
                 ],
             ];
 
-            if ($package->shipment_date !== null) {
-                $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->toDateString();
-            } else {
-                $pickupAddress['pickup_address']['parcel_date'] = null;
-            }
+            $pickupAddress['pickup_address']['parcel_date'] = $package->shipment_date === null
+                ? $shipmentDate->toDateString()
+                : null;
 
             $data = array_merge($data, $pickupAddress);
         }
         $validator = $this->validatePackage($data);
+
         if ($data['price_for_cash_on_delivery'] == '0.00') {
             $data['cash_on_delivery'] = false;
             unset($data['price_for_cash_on_delivery']);
         }
+
         if ($validator === true) {
             dispatch_now(new OrdersCourierJobs($data));
             $message = ['status' => 200, 'message' => null];
         } else {
             $message = ['status' => 200, 'message' => $validator->getData()];
         }
-        return new JsonResponse($message, 200);
+
+        return response()->json($message);
     }
 
-    protected function validatePackage($data)
+    protected function validatePackage($data): true|JsonResponse
     {
         $validator = Validator::make($data, [
             'courier_name' => 'required|min:2|in:' . implode(',', CourierName::DELIVERY_TYPE_TO_SEND_PACKAGE),
@@ -950,9 +945,12 @@ class OrdersPackagesController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $message = ['status' => 422, 'message' => $validator->errors()->all()];
-            return response()->json($message);
+            return response()->json([
+                'status' => 422,
+                'message' => $validator->errors()->all()
+            ]);
         }
+
         return true;
     }
 

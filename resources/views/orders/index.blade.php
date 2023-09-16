@@ -1434,8 +1434,9 @@
             $('#package-' + id).attr("disabled", true);
             $('#order_courier > div > div > div.modal-header > h4 > span').remove();
             $('#order_courier > div > div > div.modal-header > span').remove();
+
             $.ajax({
-                url: '/admin/orders/' + orderId + '/package/' + id + '/send',
+                url: `/admin/orders/${orderId}/package/${id}/send`,
             }).done(function (data) {
                 $('#order_courier').modal('show');
                 if (data.message == 'Kurier zostanie zamówiony w przeciągu kilku minut' || data.message == null) {
@@ -1451,15 +1452,22 @@
                     }, 500);
                 });
             }).fail(function () {
+                $('#order_courier').modal('show');
+                if (data.message == 'Kurier zostanie zamówiony w przeciągu kilku minut' || data.message == null) {
+                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Kurier zostanie zamówiony w przeciągu kilku minut</span>');
+                } else {
+                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Jedno z wymaganych pól nie zostało zdefiniowane:</span>');
+                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">' + data.message.message + '</span><br>');
+                }
                 $('#package-' + id).attr("disabled", false);
-                $('#order_courier_problem').modal('show');
-                $('#problem-ok').on('click', function () {
-                    table.ajax.reload(null, false);
+                $('#success-ok').on('click', function () {
+                    setTimeout(() => {
+                        table.ajax.reload(null, false);
+                    }, 500);
                 });
             });
         }
 
-        // DataTable
         let datatable = function (ajaxParams = null) {
             return $('#dataTable').DataTable({
                 language: {!! json_encode( __('voyager.datatable'), true) !!},
