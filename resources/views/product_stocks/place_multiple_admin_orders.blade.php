@@ -98,7 +98,7 @@
             let resultBox = document.getElementById(`quantity-pack-units-${id}`);
             let quantity = document.getElementById(`quantity-${id}`)?.value;
 
-            var value;
+            let value;
             if (quantity != null) {
                 value = Math.round(quantity * Number(item.product.packing.number_of_sale_units_in_the_pack)) / Number(item.product.packing.number_of_sale_units_in_the_pack) * Number(item.product.packing.number_of_sale_units_in_the_pack);
                 document.getElementById(`quantity-${id}`).value = value / Number(item.product.packing.number_of_sale_units_in_the_pack);
@@ -106,7 +106,8 @@
                 value = Number(resultBox.value);
             }
 
-            resultBox.value = value;
+            resultBox.textContent = value;
+            console.log(resultBox);
 
             item.orderQuantity.calculatedQuantity = value;
         }
