@@ -92,6 +92,22 @@ class OrderService
                 ->setProductService($productService);
             $orderBuilder->assignItemsToOrder($order, $products);
 
+            $order->getDeliveryAddress()->update([
+                'firstname' => 'dimitr',
+                'lastname' => 'Bolbot',
+                'address' => ' ul lotnicza 9',
+                'postal_code' => '55-200',
+                'flat_number' => '9',
+                'city' => 'stanowice',
+            ]);
+
+            $order->getInvoiceAddress()->update([
+                'firmname' => 'Elektroniczna Platforma handlowa Sp z o o',
+                'address' => 'ul.  Jaracza 22/12',
+                'postal_code' => '50-305 ',
+                'city' => 'Wrocław',
+                'nip' => '8982272269',
+            ]);
         });
 
         return $order;
