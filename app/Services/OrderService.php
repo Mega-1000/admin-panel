@@ -108,6 +108,8 @@ class OrderService
                 'city' => 'Wrocław',
                 'nip' => '8982272269',
             ]);
+
+            $order->employee()->associate(12);
         });
 
         return $order;

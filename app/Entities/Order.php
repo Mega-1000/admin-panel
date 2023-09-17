@@ -488,7 +488,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsTo
      */
-    public function status()
+    public function status(): BelongsTo
     {
         return $this->belongsTo(Status::class);
     }
@@ -496,7 +496,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsTo
      */
-    public function employee()
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
