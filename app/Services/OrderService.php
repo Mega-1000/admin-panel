@@ -110,6 +110,12 @@ class OrderService
             ]);
 
             $order->employee()->associate(12);
+            $order->update('status_id', 3);
+
+            $order->labels()->detach();
+            $arr = [];
+
+            AddLabelService::addLabels($order, [93], $arr, []);
         });
 
         return $order;
