@@ -678,7 +678,7 @@ class OrdersController extends Controller
             }
         }
 
-        return response()->json(json_encode($products));
+        return response()->json($products);
     }
 
     public function getPaymentDetailsForOrder(Request $request, $token): JsonResponse|array
