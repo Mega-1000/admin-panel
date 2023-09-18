@@ -1444,10 +1444,10 @@
                     }
                 }).done(function (data) {
                     swal.fire('Pomyślnie usunięto paczkę', '', 'success');
-                    table.ajax.reload(null, false);
+                    table.ajax.reload();
                 }).fail(function () {
                     swal.fire('Pomyślnie usunięto paczkę', '', 'success');
-                    table.ajax.reload(null, false);
+                    table.ajax.reload();
                 });
             }
         }

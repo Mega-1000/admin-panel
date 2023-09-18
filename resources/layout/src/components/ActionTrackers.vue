@@ -6,8 +6,8 @@
     to related views
     -->
     <div class="c-actionTracker">
-      <ModalActionTrackers v-if="showModal && time >= finalTime" @close="toggleShowModal()"
-                           :time="time"></ModalActionTrackers>
+<!--      <ModalActionTrackers v-if="showModal && time >= finalTime" @close="toggleShowModal()"
+                           :time="time"></ModalActionTrackers>-->
     </div>
   </div>
 </template>
