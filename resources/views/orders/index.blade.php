@@ -1129,6 +1129,8 @@
 @endsection
 
 @section('datatable-scripts')
+    sweetalert2
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script src="{{ URL::asset('js/views/orders/taksWithChildren.js') }}"></script>
     <script>
@@ -1397,6 +1399,22 @@
             let action = "{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
             action = action.replace('%id', id)
             $('#createSimilarPackForm').attr('action', action)
+            $('#createSimilarPackForm').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'post',
+                    data: $(this).serialize(),
+                    success: function (data) {
+                        $('#createSimilarPackage').modal('hide')
+                        swal.fire('Pomyślnie dodano paczkę', '', 'success')
+                        setTimeout(() => table.ajax.reload(null, false), 100);
+                    },
+                    error: function (data) {
+                        alert('Coś poszło nie tak')
+                    }
+                });
+            });
             $('#createSimilarPackage').modal()
         }
 

@@ -956,7 +956,7 @@ class OrdersPackagesController extends Controller
         return true;
     }
 
-    public function duplicate(Request $request, $packageId)
+    public function duplicate(Request $request, $packageId): RedirectResponse
     {
         try {
             $template = PackageTemplate::findOrFail($request->templateList);
@@ -1012,6 +1012,7 @@ class OrdersPackagesController extends Controller
         } else if ($package->status == PackageTemplate::STATUS_NEW) {
             $package->delete();
         }
+        
         return redirect()->back()->with([
             'message' => __('order_packages.message.store'),
             'alert-type' => 'success'
