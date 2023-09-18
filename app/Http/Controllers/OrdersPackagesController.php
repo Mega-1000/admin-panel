@@ -429,7 +429,7 @@ class OrdersPackagesController extends Controller
      *
      * @return Application|Response|ResponseFactory|RedirectResponse
      */
-    public function destroy(Request $request, int $id): Response|RedirectResponse|Application|ResponseFactory
+    public function destroy(Request $request, int $id): RedirectResponse|JsonResponse
     {
         $package = OrderPackage::findOrFail($id);
 
@@ -1012,7 +1012,7 @@ class OrdersPackagesController extends Controller
         } else if ($package->status == PackageTemplate::STATUS_NEW) {
             $package->delete();
         }
-        
+
         return redirect()->back()->with([
             'message' => __('order_packages.message.store'),
             'alert-type' => 'success'
