@@ -880,9 +880,11 @@ class OrdersPackagesController extends Controller
                 ],
             ];
 
-            $pickupAddress['pickup_address']['parcel_date'] = $package->shipment_date === null
-                ? $shipmentDate->toDateString()
-                : null;
+            if ($package->shipment_date !== null) {
+                $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->toDateString();
+            } else {
+                $pickupAddress['pickup_address']['parcel_date'] = null;
+            }
 
             $data = array_merge($data, $pickupAddress);
         }
