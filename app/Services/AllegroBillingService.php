@@ -7,11 +7,13 @@ use App\Factory\AllegroBilling\ImportAllegroBillingDTOFactory;
 class AllegroBillingService extends AllegroApiService
 {
 
+    protected $auth_record_id = 2;
+
     public function getAllBillingsData(): void
     {
         $data = [];
 
-        $limit = 100;
+        $limit = 1000;
         $offset = 0;
 
         $importBillingService = app(ImportAllegroBillingService::class);

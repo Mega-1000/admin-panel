@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Services\AllegroBillingService;
 use Illuminate\Console\Command;
 
-class ImportAllegroBillingImportRestApiCommand extends Command
+class AllegroBillingImportRestApiCommand extends Command
 {
     protected $signature = 'import:allegro-billing-import-rest-api';
 
