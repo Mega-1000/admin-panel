@@ -1437,10 +1437,13 @@
                 $.ajax({
                     url: url.replace('%id', id),
                     type: 'delete',
+                    dataType: 'text',
+                    contentType:'application/json',
                     data: {
                         'redirect': false
                     }
                 }).done(function (data) {
+                    swal.fire('Pomyślnie usunięto paczkę', '', 'success');
                     table.ajax.reload(null, false);
                 }).fail(function () {
                     alert('Coś poszło nie tak')
