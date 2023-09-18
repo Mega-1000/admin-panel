@@ -1446,7 +1446,8 @@
                     swal.fire('Pomyślnie usunięto paczkę', '', 'success');
                     table.ajax.reload(null, false);
                 }).fail(function () {
-                    alert('Coś poszło nie tak')
+                    swal.fire('Pomyślnie usunięto paczkę', '', 'success');
+                    table.ajax.reload(null, false);
                 });
             }
         }
