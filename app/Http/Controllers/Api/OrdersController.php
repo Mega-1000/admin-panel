@@ -623,7 +623,7 @@ class OrdersController extends Controller
         return $orders->toJson();
     }
 
-    public function getByToken(Request $request, $token)
+    public function getByToken(Request $request, $token): JsonResponse
     {
         if (empty($token)) {
             return response("Missing token", 400);
@@ -639,7 +639,7 @@ class OrdersController extends Controller
             ->first();
 
         if (!$order) {
-            return response("Order doesn't exist", 400);
+            return response()->json("Order doesn't exist", 400);
         }
 
         $products = [];
@@ -674,7 +674,7 @@ class OrdersController extends Controller
 
                 $item->product->amount = $item->quantity;
 
-                foreach ($item as $key => $value) {
+                foreach ($item->getAttributes() as $key => $value) {
                     $item->product->$key = $value;
                 }
 
@@ -682,7 +682,7 @@ class OrdersController extends Controller
             }
         }
 
-        return response(json_encode($products));
+        return response()->json(json_encode($products));
     }
 
     public function getPaymentDetailsForOrder(Request $request, $token): JsonResponse|array
