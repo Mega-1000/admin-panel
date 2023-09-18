@@ -7,7 +7,7 @@ use App\Factory\AllegroBilling\ImportAllegroBillingDTOFactory;
 class AllegroBillingService extends AllegroApiService
 {
 
-    public static function getAllBillingsData(): void
+    public function getAllBillingsData(): void
     {
         $data = [];
 
@@ -20,7 +20,7 @@ class AllegroBillingService extends AllegroApiService
             $data['limit'] = $limit;
             $data['offset'] = 0;
 
-            $response = self::getData($data);
+            $response = $this->getData($data);
 
             $data['offset'] += $limit;
             $records = [];
