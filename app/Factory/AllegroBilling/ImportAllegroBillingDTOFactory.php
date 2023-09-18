@@ -2,8 +2,8 @@
 
 namespace App\Factory\AllegroBilling;
 
-use Illuminate\Http\UploadedFile;
 use App\DTO\AllegroBilling\ImportAllegroBillingDTO;
+use Illuminate\Http\UploadedFile;
 
 final class ImportAllegroBillingDTOFactory
 {
@@ -17,10 +17,10 @@ final class ImportAllegroBillingDTOFactory
 
         fgetcsv($handle, 0, ';');
 
-        $dtos = [];
+        $importAllegroBillingDTO = [];
 
         while (($data = fgetcsv($handle, 0, ';')) !== false) {
-            $dtos[] = new ImportAllegroBillingDTO(
+            $importAllegroBillingDTO[] = new ImportAllegroBillingDTO(
                 $data[0] ?? null,
                 $data[1] ?? null,
                 $data[2] ?? null,
@@ -34,6 +34,34 @@ final class ImportAllegroBillingDTOFactory
 
         fclose($handle);
 
-        return $dtos;
+        return $importAllegroBillingDTO;
+    }
+
+    /**
+     * @param array $billingEntries
+     * @return array<ImportAllegroBillingDTO>
+     */
+    public static function createFromRestApi(array $billingEntries): array
+    {
+        $importAllegroBillingDTO = [];
+
+        foreach ($billingEntries as $billingEntry) {
+
+            $amount = floatval($billingEntry['value']['amount'] ?? 0);
+
+            $importAllegroBillingDTO[] = new ImportAllegroBillingDTO(
+                data: json_encode($billingEntry),
+                offerName: $billingEntry['offer']['name'] ?? null,
+                offerId: $billingEntry['offer']['id'] ?? null,
+                operationType: $billingEntry['type']['name'] ?? null,
+                incomeAmount: max($amount, 0),
+                outcomeAmount: min($amount, 0),
+                balance: $billingEntry['balance']['amount'] ?? 0,
+                operationDetails: '',
+            );
+
+        }
+
+        return $importAllegroBillingDTO;
     }
 }
