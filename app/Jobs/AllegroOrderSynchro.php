@@ -174,6 +174,8 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->status_id = 1;
                 $order->allegro_operation_date = $allegroOrder['lineItems'][0]['boughtAt'];
                 $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
+                $order->customer_delivery_date_to = $allegroOrder['delivery']['time']['to'];
+                $order->consultant_delivery_date_to = $allegroOrder['delivery']['time']['to'];
                 $order->preferred_invoice_date = Carbon::now();
                 $order->payment_channel = $allegroOrder['payment']['provider'];
                 $order->allegro_payment_id = $allegroOrder['payment']['id'];
@@ -555,7 +557,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $country = Country::firstOrCreate(['iso2' => $data['address']['countryCode'] ?? $data['countryCode']], ['name' => $data['address']['countryCode'] ?? $data['countryCode']]);
 
         $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber'] ?? $data['address']['phoneNumber']);
-        
+
         $customerAddressData = [
             'type' => $type,
             'firstname' => $data['firstName'] ?? $data['address']['naturalPerson']['firstName'] ?? null,
@@ -576,7 +578,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $customerAddress->save();
     }
 
-    private function getAddressOneWord(string $address): array 
+    private function getAddressOneWord(string $address): array
     {
         $flatNo = "";
         $lettersInARow = 0;
@@ -589,12 +591,12 @@ class AllegroOrderSynchro implements ShouldQueue
                     $charactersToAdd = array_slice($addressReverseArray, $i - $lettersInARow, $lettersInARow);
                     $flatNo = StringHelper::addCharactersInReverseOrder($flatNo, $charactersToAdd);
                 }
-                
+
                 $lettersInARow = 0;
                 $flatNo = $character . $flatNo;
                 continue;
-            } 
-            
+            }
+
             $lettersInARow++;
             if ($lettersInARow >= 3) {
                 break;
@@ -607,7 +609,7 @@ class AllegroOrderSynchro implements ShouldQueue
         return [$street, $flatNo];
     }
 
-    private function getAddressMultipleWords(string $address): array 
+    private function getAddressMultipleWords(string $address): array
     {
         $address = StringHelper::removeMultipleSpaces($address);
 
@@ -641,10 +643,10 @@ class AllegroOrderSynchro implements ShouldQueue
 
             $flatNo = $part . " " . $flatNo;
         }
-        
+
         $street = trim(substr($address, 0, strlen($address) - strlen($flatNo)));
         $flatNo = trim($flatNo);
-        
+
         return [$street, $flatNo];
     }
 
@@ -665,7 +667,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
         return $this->getAddressOneWord($address);
     }
-    
+
 
     /**
      * Create or update order address.
@@ -730,9 +732,9 @@ class AllegroOrderSynchro implements ShouldQueue
         if (
             ($type === OrderAddress::TYPE_INVOICE && empty($address['company']['taxId'])) &&
             (empty($orderAddress->firstName) || empty($orderAddress->lastName) || empty($orderAddress->address))
-        ) {         
+        ) {
             $deliveryAddress = $order->getDeliveryAddress();
-            
+
             if (!empty($deliveryAddress)) {
                 $orderAddress->fill([
                     'firstname' => $deliveryAddress->firstname,
