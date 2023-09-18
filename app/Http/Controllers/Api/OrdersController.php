@@ -674,10 +674,6 @@ class OrdersController extends Controller
 
                 $item->product->amount = $item->quantity;
 
-                foreach ($item->getAttributes() as $key => $value) {
-                    $item->product->$key = $value;
-                }
-
                 $products[] = $item->product;
             }
         }
