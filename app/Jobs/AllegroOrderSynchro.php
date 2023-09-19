@@ -150,7 +150,9 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->allegro_payment_id = $allegroOrder['payment']['id'];
                 $order->saveQuietly();
 
-                $order->dates->update([
+
+
+                $order->orderDates->update([
                     'customer_delivery_date_to' => $allegroOrder['delivery']['time']['to'],
                     'consultant_delivery_date_to' => $allegroOrder['delivery']['time']['to'],
                 ]);

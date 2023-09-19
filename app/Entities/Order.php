@@ -821,7 +821,7 @@ class Order extends Model implements Transformable
         ]);
     }
 
-    public function dates()
+    public function orderDates(): HasOne
     {
         return $this->hasOne(OrderDates::class);
     }
