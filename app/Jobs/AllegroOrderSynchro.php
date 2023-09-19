@@ -59,44 +59,15 @@ class AllegroOrderSynchro implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     protected ?int $userId;
-    /**
-     * @var CustomerRepository
-     */
-    private $customerRepository;
-    /**
-     * @var AllegroOrderService
-     */
-    private $allegroOrderService;
-    /**
-     * @var ProductRepository
-     */
-    private $productRepository;
-    /**
-     * @var ProductService
-     */
-    private $productService;
-
-    /**
-     * @var EmailSendingService
-     */
-    private $emailSendingService;
-
-    /**
-     * @var OrderRepository
-     */
-    private $orderRepository;
-    /**
-     * @var OrderPackagesDataHelper
-     */
-    private $orderPackagesDataHelper;
-    /**
-     * @var float
-     */
-    private $tax;
-    /**
-     * @var boolean
-     */
-    private $synchronizeAll;
+    private CustomerRepository $customerRepository;
+    private AllegroOrderService $allegroOrderService;
+    private ProductRepository $productRepository;
+    private ProductService $productService;
+    private EmailSendingService $emailSendingService;
+    private OrderRepository $orderRepository;
+    private OrderPackagesDataHelper $orderPackagesDataHelper;
+    private float $tax;
+    private bool $synchronizeAll;
 
     /**
      * Create a new job instance.
@@ -174,12 +145,15 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->status_id = 1;
                 $order->allegro_operation_date = $allegroOrder['lineItems'][0]['boughtAt'];
                 $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
-                $order->customer_delivery_date_to = $allegroOrder['delivery']['time']['to'];
-                $order->consultant_delivery_date_to = $allegroOrder['delivery']['time']['to'];
                 $order->preferred_invoice_date = Carbon::now();
                 $order->payment_channel = $allegroOrder['payment']['provider'];
                 $order->allegro_payment_id = $allegroOrder['payment']['id'];
                 $order->saveQuietly();
+
+                $order->dates->update([
+                    'customer_delivery_date_to' => $allegroOrder['delivery']['time']['to'],
+                    'consultant_delivery_date_to' => $allegroOrder['delivery']['time']['to'],
+                ]);
 
                 $this->emailSendingService->addNewScheduledEmail($order);
 
