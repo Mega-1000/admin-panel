@@ -826,6 +826,11 @@ class Order extends Model implements Transformable
         return $this->hasOne(OrderDates::class);
     }
 
+    public function dates(): HasOne
+    {
+        return $this->hasOne(OrderDates::class);
+    }
+
     public function getProformStoragePathAttribute(): string
     {
         return self::PROFORM_DIR . $this->proforma_filename;
