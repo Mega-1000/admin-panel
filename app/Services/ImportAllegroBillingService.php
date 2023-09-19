@@ -7,16 +7,18 @@ use App\Entities\AllegroGeneralExpense;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Enums\AllegroImport\AllegroBillingAttachedValueParameterEnum;
+use App\Helpers\AllegroBillingImportHelper;
 use App\Repositories\AllegroGeneralExpenses;
 use App\Repositories\OrderPackages;
-use App\Helpers\AllegroBillingImportHelper;
 
 class ImportAllegroBillingService
 {
     public function __construct(
         protected OrderPackages              $orderPackagesRepository,
         protected AllegroBillingImportHelper $billingHelper,
-    ) {}
+    )
+    {
+    }
 
     /**
      * Import billing entries
@@ -26,8 +28,20 @@ class ImportAllegroBillingService
      */
     public function import(array $data): void
     {
-        AllegroGeneralExpenses::deleteAll();
+        $this->clearAllegroGeneralExpenses();
 
+        foreach ($data as $dto) {
+            $this->importSingle($dto);
+        }
+    }
+
+    public function clearAllegroGeneralExpenses(): void
+    {
+        AllegroGeneralExpenses::deleteAll();
+    }
+
+    public function importAppendData(array $data): void
+    {
         foreach ($data as $dto) {
             $this->importSingle($dto);
         }

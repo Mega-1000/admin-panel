@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\AllegroBillingImportRestApiCommand;
 use App\Console\Commands\CheckGlsPackageStatusCommand;
 use App\Jobs;
 use Illuminate\Console\Scheduling\Schedule;
@@ -16,6 +17,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         CheckGlsPackageStatusCommand::class,
+        AllegroBillingImportRestApiCommand::class,
     ];
 
     /**
