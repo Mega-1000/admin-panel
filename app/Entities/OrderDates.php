@@ -69,7 +69,7 @@ class OrderDates extends Model implements Transformable
     /**
      * @return BelongsTo
      */
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }

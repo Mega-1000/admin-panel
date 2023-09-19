@@ -826,12 +826,12 @@ class Order extends Model implements Transformable
         return $this->hasOne(OrderDates::class);
     }
 
-    public function getProformStoragePathAttribute()
+    public function getProformStoragePathAttribute(): string
     {
         return self::PROFORM_DIR . $this->proforma_filename;
     }
 
-    public function getIsAllegroOrderAttribute()
+    public function getIsAllegroOrderAttribute(): bool
     {
         return $this->allegro_form_id != null;
     }
