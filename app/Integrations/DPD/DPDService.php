@@ -13,7 +13,6 @@ class DPDService extends SoapClient
     const PKG_NUMS_GEN_ERR_POLICY = "ALL_OR_NOTHING"; //STOP_ON_FIRST_ERROR, IGNORE_ERRORS
     const PKG_SPLB_GEN_ERR_POLICY = "STOP_ON_FIRST_ERROR"; // IGNORE_ERRORS
     const PKG_PROT_GEN_ERR_POLICY = "IGNORE_ERRORS";
-    const PKG_PICK_GEN_ERR_POLICY = "IGNORE_ERRORS";
 
     protected $config = null;
     protected $sender = null;
@@ -110,7 +109,6 @@ class DPDService extends SoapClient
      */
     public function sendPackage(array $parcels, array $receiver, string $payer = 'SENDER', array $services = [], string $ref = ''): ?StdClass
     {
-
         $params = [
             'openUMLFeV3' => [
                 'packages' => $this->createPackage($parcels, $receiver, $payer, $services, $ref),
@@ -123,8 +121,6 @@ class DPDService extends SoapClient
         $obj = new StdClass;
         $obj->method = 'generatePackagesNumbersV' . $this->apiVersion;
         try {
-
-            // api method call
             $result = $this->__soapCall('generatePackagesNumbersV' . $this->apiVersion, [$params]);
 
             // debug results
@@ -136,7 +132,6 @@ class DPDService extends SoapClient
 
             // check status
             if ($status == 'OK') {
-
                 $this->sessionId = ($this->apiVersion > 1) ? $result->return->SessionId : $result->return->sessionId;
 
                 $obj->success = true;
@@ -178,7 +173,7 @@ class DPDService extends SoapClient
         if (count($receiver) == 0)
             throw new Exception('Receiver data are missing', 102);
 
-        if (is_null($this->sender) || !is_array($this->sender) || count($this->sender) == 0)
+        if (!is_array($this->sender) || count($this->sender) == 0)
             throw new Exception('Sender data are required', 103);
 
         if (strlen($ref) > 27)
@@ -202,7 +197,6 @@ class DPDService extends SoapClient
 
         $this->validatePackage($package);
 
-        // return validated data
         return $package;
     }
 
@@ -211,7 +205,7 @@ class DPDService extends SoapClient
      * @param array $array
      * @return array
      */
-    private function _arrayCopy(array $array)
+    private function _arrayCopy(array $array): array
     {
         $result = array();
 
@@ -226,7 +220,7 @@ class DPDService extends SoapClient
      * Get sender data
      * @return array
      */
-    public function getSender()
+    public function getSender(): ?array
     {
         return $this->sender;
     }
@@ -244,8 +238,9 @@ class DPDService extends SoapClient
      * Validate package
      * @param array $package
      * @return boolean
+     * @throws Exception
      */
-    public function validatePackage(array $package)
+    public function validatePackage(array $package): bool
     {
         if (!isset($package['parcels']) || count($package['parcels']) == 0)
             throw new Exception('Package validation error - missing `parcels` data in package', 101);
@@ -285,7 +280,7 @@ class DPDService extends SoapClient
      * Get auth data
      * @return array
      */
-    private function _authData()
+    private function _authData(): array
     {
         return [
             'masterFid' => $this->config->fid,

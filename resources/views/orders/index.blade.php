@@ -1132,7 +1132,6 @@
     sweetalert2
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
-    <script src="{{ URL::asset('js/views/orders/taksWithChildren.js') }}"></script>
     <script>
         let getUrlParameter = function getUrlParameter(sParam) {
             var sPageURL = window.location.search.substring(1),
@@ -1460,33 +1459,13 @@
             $.ajax({
                 url: `/admin/orders/${orderId}/package/${id}/send`,
             }).done(function (data) {
-                $('#order_courier').modal('show');
-                if (data.message == 'Kurier zostanie zamówiony w przeciągu kilku minut' || data.message == null) {
-                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Kurier zostanie zamówiony w przeciągu kilku minut</span>');
-                } else {
-                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Jedno z wymaganych pól nie zostało zdefiniowane:</span>');
-                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">' + data.message.message + '</span><br>');
-                }
-                $('#package-' + id).attr("disabled", false);
-                $('#success-ok').on('click', function () {
-                    setTimeout(() => {
-                        table.ajax.reload(null, false);
-                    }, 500);
-                });
+                setTimeout(() => {
+                    table.ajax.reload(null, false);
+                }, 50);
             }).fail(function () {
-                $('#order_courier').modal('show');
-                if (data.message == 'Kurier zostanie zamówiony w przeciągu kilku minut' || data.message == null) {
-                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Kurier zostanie zamówiony w przeciągu kilku minut</span>');
-                } else {
-                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Jedno z wymaganych pól nie zostało zdefiniowane:</span>');
-                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">' + data.message.message + '</span><br>');
-                }
-                $('#package-' + id).attr("disabled", false);
-                $('#success-ok').on('click', function () {
-                    setTimeout(() => {
-                        table.ajax.reload(null, false);
-                    }, 500);
-                });
+                setTimeout(() => {
+                    table.ajax.reload(null, false);
+                }, 50);
             });
         }
 
@@ -1773,11 +1752,11 @@
                                     }
                                     if (value.letter_number === null) {
                                         if (value.status !== 'CANCELLED' && value.status !== 'WAITING_FOR_CANCELLED' && value.delivery_courier_name !== 'GIELDA' && value.service_courier_name !== 'GIELDA' && value.delivery_courier_name !== 'ODBIOR_OSOBISTY' && value.service_courier_name !== 'ODBIOR_OSOBISTY') {
-                                            html += '<div style="display: flex;">'
+                                            html += `<div style="display: flex;">'
                                             html += '<button class="btn btn-success" id="package-' + value.id + '" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
                                             html += '<button class="btn btn-danger" onclick="deletePackage(' + value.id + ', ' + value.order_id + ')">Usuń</button>'
                                             html += '<button class="btn btn-info" onclick="createSimilar(' + value.id + ', ' + value.order_id + ')">Podobna</button>'
-                                            html += '</div>'
+                                            html += '</div>`
                                         }
                                     }
                                     if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
@@ -4271,6 +4250,7 @@
             return status;
         }
     </script>
+    <script src="{{ URL::asset('js/views/orders/taksWithChildren.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/render-calendar.js') }}"></script>
     <script>
