@@ -297,7 +297,7 @@ class MessagesController extends Controller
         $customer = $request->user();
 
         $arr = [];
-        AddLabelService::addLabels($order,[59], $arr, []);
+        AddLabelService::addLabels($order, [59], $arr, []);
 
         DB::transaction(function () use ($order, $customer, $helper, $complaintForm, &$chatUserToken) {
             if ($order->customer_id !== $customer->id) {
