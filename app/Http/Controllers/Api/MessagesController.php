@@ -300,10 +300,6 @@ class MessagesController extends Controller
         AddLabelService::addLabels($order, [59], $arr, []);
 
         DB::transaction(function () use ($order, $customer, $helper, $complaintForm, &$chatUserToken) {
-            if ($order->customer_id !== $customer->id) {
-                throw new ChatException('Customer ID is different than in the order');
-            }
-
             $chat = $order->chat;
 
             if ($chat !== null) {
