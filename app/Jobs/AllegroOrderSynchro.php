@@ -151,10 +151,10 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->saveQuietly();
 
                 $order->orderDates()->create([
-                    'customer_delivery_date_from' => $allegroOrder['delivery']['time']['from'],
-                    'customer_delivery_date_to' => $allegroOrder['delivery']['time']['to'],
-                    'consultant_delivery_date_from' => $allegroOrder['delivery']['time']['from'],
-                    'consultant_delivery_date_to' => $allegroOrder['delivery']['time']['to'],
+                    'customer_shipment_date_from' => $allegroOrder['delivery']['time']['from'],
+                    'customer_shipment_date_to' => $allegroOrder['delivery']['time']['to'],
+                    'consultant_shipment_date_from' => $allegroOrder['delivery']['time']['from'],
+                    'consultant_shipment_date_to' => $allegroOrder['delivery']['time']['to'],
                 ]);
 
                 $this->emailSendingService->addNewScheduledEmail($order);
