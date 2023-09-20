@@ -403,6 +403,7 @@ class OrderBuilder
                     $address = new OrderAddress();
                     $address->phone = $phone;
                     $address->type = $type;
+                    $address->country_id = 1;
                 }
                 if (!empty($login) && (!$exists || $forceUpdateEmail)) {
                     $address->email = $login;
