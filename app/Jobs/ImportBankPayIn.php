@@ -396,6 +396,10 @@ class ImportBankPayIn implements ShouldQueue
                 'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]) : $payment;
 
+        if ($order->payments()->count() === 1) {
+            $order->labels()->attach(45);
+        }
+
         $this->orderPaymentLabelsService->calculateLabels($payment->order);
 
         return $payment;

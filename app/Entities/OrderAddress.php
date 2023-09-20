@@ -16,8 +16,6 @@ class OrderAddress extends Model implements Transformable
 {
     use TransformableTrait;
 
-    const TYPE_GENERAL = 'GENERAL';
-    const TYPE_STANDARD = 'STANDARD_ADDRESS';
     const TYPE_DELIVERY = 'DELIVERY_ADDRESS';
     const TYPE_INVOICE = 'INVOICE_ADDRESS';
 
@@ -48,27 +46,28 @@ class OrderAddress extends Model implements Transformable
     /**
      * @return BelongsTo
      */
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function getPhoneFullAttribute()
+    public function getPhoneFullAttribute(): string
     {
         return $this->phone_code . $this->phone;
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
     public function getAllegroEmailAddress(): string
     {
         $emailRaw = explode('@', $this->email, 2);
         $emailFirstPart = explode('+', $emailRaw[0], 2);
+
         return $emailFirstPart[0] . '@' . $emailRaw[1];
     }
 
-    public function country()
+    public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
     }

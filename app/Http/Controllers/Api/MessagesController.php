@@ -376,6 +376,7 @@ class MessagesController extends Controller
     /**
      * Send complaint email to employee
      *
+     * @param Request $request
      * @param string $token
      *
      * @return void
