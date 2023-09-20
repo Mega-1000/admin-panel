@@ -36,7 +36,7 @@ class CustomerComplaintRequest extends FormRequest
             'offerId'                                       => 'integer',
             'date'                                          => 'required|date|date_format:Y-m-d\TH:i',
             'image'                                         => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
-            'driverPhone'                                   => 'nullable|regex:/[\+0-9]{8,15}/',
+            'driverPhone'                                   => '',
             'trackingNumber'                                => 'nullable|string',
             'nameOfPersonHandlingTheComplaint'              => 'required|string|max:255',
             'surnameOfPersonHandlingTheComplaint'           => 'required|string|max:255',
