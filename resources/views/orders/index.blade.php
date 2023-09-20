@@ -1400,21 +1400,36 @@
             $('#createSimilarPackForm').attr('action', action)
             $('#createSimilarPackForm').submit(function (e) {
                 e.preventDefault();
+
+                // Disable the submit button to prevent multiple submissions
+                var submitButton = $(this).find('button[type="submit"]');
+                submitButton.prop('disabled', true);
+
+                var form = $(this);
+
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: form.attr('action'),
                     type: 'post',
-                    data: $(this).serialize(),
+                    data: form.serialize(),
                     success: function (data) {
-                        $('#createSimilarPackage').modal('hide')
-                        swal.fire('Pomyślnie dodano paczkę', '', 'success')
-                        setTimeout(() => table.ajax.reload(null, false), 100);
+                        $('#createSimilarPackage').modal('hide');
+                        setTimeout(function () {
+                            // Re-enable the submit button after a delay
+                            submitButton.prop('disabled', false);
+                            table.ajax.reload(null, false);
+                        }, 10);
                     },
                     error: function (data) {
-                        alert('Coś poszło nie tak')
+                        alert('Coś poszło nie tak');
+
+                        // Re-enable the submit button in case of an error
+                        submitButton.prop('disabled', false);
                     }
                 });
             });
-            $('#createSimilarPackage').modal()
+
+            $('#createSimilarPackage').modal();
+
         }
 
         function cancelPackage(id, orderId) {
