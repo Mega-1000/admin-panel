@@ -203,7 +203,7 @@ class MessagesController extends Controller
         }
     }
 
-    public function getMessages(GetMessagesRequest $request, string $token): Response
+    public function getMessages(GetMessagesRequest $request, string $token): JsonResponse
     {
         try {
             $helper = new MessagesHelper($token);
@@ -216,6 +216,7 @@ class MessagesController extends Controller
             if (!$chat) {
                 throw new ChatException('Wrong chat token');
             }
+
             $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
             $assignedMessagesIds = array_flip($assignedMessagesIds);
             $out = '';
@@ -234,7 +235,7 @@ class MessagesController extends Controller
             return response()->json(['messages' => $out, 'users' => $chat->chatUsers]);
         } catch (ChatException $e) {
             $e->log();
-            return response($e->getMessage(), 400);
+            return response()->json($e->getMessage(), 400);
         }
     }
 
