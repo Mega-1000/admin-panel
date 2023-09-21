@@ -17,7 +17,7 @@ class CreateChatsTables extends DatabaseRelations
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->increments('id');
@@ -53,7 +53,7 @@ class CreateChatsTables extends DatabaseRelations
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         $this->downRelations();
 

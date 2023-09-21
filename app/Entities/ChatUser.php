@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChatUser extends Model
@@ -11,8 +12,6 @@ class ChatUser extends Model
     use SoftDeletes;
 
     protected $table = 'chat_user';
-
-    protected $softDelete = true;
 
     protected $casts = [
         'assigned_messages_ids' => 'json',
@@ -26,27 +25,27 @@ class ChatUser extends Model
         'user_id',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function customer()
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    public function employee()
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }
 
-    public function chat()
+    public function chat(): BelongsTo
     {
         return $this->belongsTo(Chat::class);
     }
 
-    public function messages()
+    public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
     }

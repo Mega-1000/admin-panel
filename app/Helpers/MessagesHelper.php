@@ -490,7 +490,7 @@ class MessagesHelper
             return $this->getAdminChatUser();
         }
 
-        return $chatUser ?? $this->getChat()->chatUsers()->where('type', self::TYPE_CUSTOMER)->first();
+        return $chatUser ?? $this->getChat()->chatUsers()->customer()->first();
     }
 
     public function setLastRead(): void

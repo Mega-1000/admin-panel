@@ -11,7 +11,7 @@ class Message extends Model
         return $this->belongsTo(ChatUser::class)->withTrashed();
     }
 
-    public function chat()
+    public function chat(): BelongsTo
     {
         return $this->belongsTo(Chat::class);
     }

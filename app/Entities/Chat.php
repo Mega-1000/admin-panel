@@ -2,46 +2,50 @@
 
 namespace App\Entities;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Chat extends Model
 {
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function employee()
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
-        return $this->belongsToMany(\App\User::class, 'chat_user')->withTimestamps();
+        return $this->belongsToMany(User::class, 'chat_user')->withTimestamps();
     }
 
-    public function customers()
+    public function customers(): BelongsToMany
     {
         return $this->belongsToMany(Customer::class, 'chat_user')->withTimestamps();
     }
 
-    public function employees()
+    public function employees():HasMany
     {
         return $this->belongsToMany(Employee::class, 'chat_user')->withTimestamps();
     }
 
-    public function messages()
+    public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
     }
 
-    public function chatUsers()
+    public function chatUsers(): HasMany
     {
         return $this->hasMany(ChatUser::class);
     }
@@ -51,12 +55,12 @@ class Chat extends Model
         return $this->hasMany(ChatUser::class)->withTrashed();
     }
 
-    public function getLastMessage()
+    public function getLastMessage(): mixed
     {
         return $this->messages()->orderBy('id', 'desc')->first();
     }
 
-    public function auctions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function auctions(): HasMany
     {
         return $this->hasMany(ChatAuction::class);
     }

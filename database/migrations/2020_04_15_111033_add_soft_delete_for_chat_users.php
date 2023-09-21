@@ -11,7 +11,7 @@ class AddSoftDeleteForChatUsers extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('chat_user', function (Blueprint $table) {
             $table->softDeletes();
@@ -23,7 +23,7 @@ class AddSoftDeleteForChatUsers extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('chat_user', function (Blueprint $table) {
             $table->dropSoftDeletes();
