@@ -486,18 +486,18 @@ class MessagesHelper
 
         $chatUser = $this->getChat()->chatUsers()->where($column, $this->currentUserId)->first();
 
-        if (!$chatUser && $this->currentUserType == self::TYPE_USER) {
+        if (!$chatUser && $this->cunrrentUserType == self::TYPE_USER) {
             return $this->getAdminChatUser();
         }
 
         return $chatUser ?? $this->getChat()->whereHas('chatUsers', function ($query) {
             $query->whereHas('customer');
-        })->first();
+        })->chatUsers()->first();
     }
 
     public function setLastRead(): void
     {
-        $chatUser = $this->getCurrentChatUser();
+        $chatUser = $this->getCurretChatUser();
 
         if (!$chatUser) {
             return;
