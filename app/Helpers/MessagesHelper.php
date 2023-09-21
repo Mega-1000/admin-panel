@@ -479,22 +479,28 @@ class MessagesHelper
     public function getCurrentChatUser()
     {
         $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
+
         if (!$this->getChat()) {
             return null;
         }
+
         $chatUser = $this->getChat()->chatUsers()->where($column, $this->currentUserId)->first();
+
         if (!$chatUser && $this->currentUserType == self::TYPE_USER) {
             return $this->getAdminChatUser();
         }
-        return $chatUser;
+
+        return $chatUser ?? $this->getChat()->chatUsers()->where('type', self::TYPE_CUSTOMER)->first();
     }
 
     public function setLastRead(): void
     {
         $chatUser = $this->getCurrentChatUser();
+
         if (!$chatUser) {
             return;
         }
+
         $chatUser->last_read_time = now();
         $chatUser->save();
     }
@@ -527,12 +533,12 @@ class MessagesHelper
             return false;
         }
 
-        for ($i = count($chat->messages) - 1; $i >= 0; $i--) {
-            $message = $chat->messages[$i];
+        foreach (array_reverse($chat->messages) as $message) {
             if ($message->created_at > $chatUser->last_read_time && $message->chat_user_id != $chatUser->id) {
                 if (!$notification) {
                     return true;
                 }
+
                 if (strtotime($chatUser->last_notification_time) + self::NOTIFICATION_TIME < strtotime($message->created_at)) {
                     return true;
                 }

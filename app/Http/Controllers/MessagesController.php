@@ -168,12 +168,12 @@ class MessagesController extends Controller
 
         $possibleEmployees = collect();
         $possibleCustomers = collect();
-        $productList = collect();
         $notices = '';
+
         if ($chatType == 'order') {
             $productList = $helper->prepareOrderItemsCollection($helper);
             $products = $productList->pluck('product');
-        } else if ($chatType == 'product') {
+        } else {
             $productList = $products = collect([$helper->getProduct()]);
         }
 

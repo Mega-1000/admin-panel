@@ -165,6 +165,7 @@ class MessagesController extends Controller
             } else {
                 $this->notifyModerator($helper);
             }
+
             return response()->json('ok');
         } catch (ChatException $e) {
             $e->log();
