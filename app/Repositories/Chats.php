@@ -57,7 +57,7 @@ class Chats
      * @param int $chatId
      * @return Chat
      */
-    public static function getFullChatObject(int $chatId): Chat
+    public static function getFullChatObject(mixed $chatId): Chat
     {
         return Chat::with(['messages' => function ($q) {
             $q->with(['chatUser' => function ($q) {
