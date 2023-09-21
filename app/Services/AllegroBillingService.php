@@ -11,25 +11,20 @@ class AllegroBillingService extends AllegroApiService
 
     public function getAllBillingsData(): void
     {
-        $data = [];
+        $limit = 100;
 
-        $limit = 1000;
-        $offset = 0;
+        $data = ['offset' => 0, 'limit' => $limit];
+
 
         $importBillingService = app(ImportAllegroBillingService::class);
         $importBillingService->clearAllegroGeneralExpenses();
         do {
-            $data['limit'] = $limit;
-            $data['offset'] = 0;
-
             $response = $this->getData($data);
 
             $data['offset'] += $limit;
             $records = [];
-            if (array_key_exists('billingEntries', $response) && count($response['billingEntries'])) {
-                foreach ($response['billingEntries'] as $billingEntry) {
-                    $records[] = ImportAllegroBillingDTOFactory::createFromRestApi($billingEntry);
-                }
+            if (is_array($response) && array_key_exists('billingEntries', $response) && count($response['billingEntries'])) {
+                $records = ImportAllegroBillingDTOFactory::createFromRestApi($response['billingEntries']);
                 $importBillingService->importAppendData($records);
             }
         } while (count($records) > 0);

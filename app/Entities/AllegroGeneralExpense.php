@@ -30,6 +30,7 @@ class AllegroGeneralExpense extends Model
         'operation_details',
         'attached_value_parameter',
         'order_id',
+        'date_of_commitment_creation',
     ];
 
     protected $casts = [

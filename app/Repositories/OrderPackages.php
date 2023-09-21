@@ -13,6 +13,9 @@ class OrderPackages
      */
     public function getByLetterNumber(array|string|null $trackingNumber): ?OrderPackage
     {
-        return OrderPackage::where('letter_number', $trackingNumber)->first();
+        if ($trackingNumber !== '' && $trackingNumber !== null) {
+            return OrderPackage::where('letter_number', $trackingNumber)->first();
+        }
+        return null;
     }
 }

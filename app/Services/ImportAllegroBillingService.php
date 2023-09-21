@@ -86,14 +86,16 @@ class ImportAllegroBillingService
 
     private function getOrderFromAllegroId($operationDetails): ?Order
     {
-        $allegroId = $this->billingHelper->extractAllegroId($operationDetails);
-
+        $allegroId = $this->billingHelper->extractAllegroId($operationDetails) ?? '';
+        if ($allegroId === '') {
+            return null;
+        }
         return Order::where('allegro_form_id', $allegroId)->first();
     }
 
     private function associateOrderToBillingEntry(AllegroGeneralExpense $billingEntry, ?Order $order): void
     {
-        if (!empty($order) && empty($billingEntry->order)) {
+        if ($order !== null && empty($billingEntry->order)) {
             $billingEntry->update(['order_id' => $order->id]);
         }
     }

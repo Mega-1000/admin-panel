@@ -153,13 +153,13 @@ class AllegroApiService
                 $data
             );
         } catch (Exception $e) {
-            if ($e->getCode() == 401 && $first) {
+            if ($e->getCode() == 401 && $first === true) {
                 if ($this->getRefreshToken()) {
                     $this->refreshTokens();
                 } else {
                     $this->fetchAccessToken();
                 }
-                return $response = $this->request($method, $url, $params, $attachment, false);
+                return $this->request($method, $url, $params, $attachment, false);
             } else {
                 Log::error('AllegroApiService: request: ' . $e->getMessage());
                 return $this->cantGetAlert();

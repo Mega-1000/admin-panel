@@ -5,7 +5,7 @@ namespace App\DTO\AllegroBilling;
 final class ImportAllegroBillingDTO
 {
     public function __construct(
-        protected ?string $data,
+        protected ?string $date,
         protected ?string $offerName,
         protected ?string $offerId,
         protected ?string $operationType,
@@ -19,7 +19,7 @@ final class ImportAllegroBillingDTO
 
     public function getDate(): ?string
     {
-        return $this->data;
+        return $this->date;
     }
 
     public function getOfferName(): ?string

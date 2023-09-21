@@ -48,16 +48,17 @@ final class ImportAllegroBillingDTOFactory
         foreach ($billingEntries as $billingEntry) {
 
             $amount = floatval($billingEntry['value']['amount'] ?? 0);
+            $orderId = $billingEntry['order']['id'] ?? '';
 
             $importAllegroBillingDTO[] = new ImportAllegroBillingDTO(
-                data: json_encode($billingEntry),
+                date: $billingEntry['occurredAt'],
                 offerName: $billingEntry['offer']['name'] ?? null,
                 offerId: $billingEntry['offer']['id'] ?? null,
                 operationType: $billingEntry['type']['name'] ?? null,
                 incomeAmount: max($amount, 0),
                 outcomeAmount: min($amount, 0),
-                balance: $billingEntry['balance']['amount'] ?? 0,
-                operationDetails: '',
+                balance: ($billingEntry['balance']['amount'] ?? 0),
+                operationDetails: ($orderId !== '' ? 'Identyfikator zamówienia: ' . $orderId : ''),
             );
 
         }
