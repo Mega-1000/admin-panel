@@ -240,14 +240,15 @@ class MessagesController extends Controller
     /**
      * Create chat used to contact between customer and consultant
      *
+     * @param int $orderId
      * @param ChatRequest $request
      *
      * @return JsonResponse
      */
-    public function createContactChat(Request $request): JsonResponse
+    public function createContactChat(int $orderId, Request $request): JsonResponse
     {
         $questionsTree = $request->input('questionsTree') ?: '';
-        $customer = $request->user();
+        $customer = Order::findOrFail($orderId)->customer;
 
         try {
             $helper = new MessagesHelper();
@@ -294,7 +295,7 @@ class MessagesController extends Controller
     public function createCustomerComplaintChat(CustomerComplaintRequest $request, Order $order, MessagesHelper $helper): JsonResponse
     {
         $complaintForm = $request->validated();
-        $customer = $request->user();
+        $customer = $order->customer;
 
         $arr = [];
         AddLabelService::addLabels($order, [59], $arr, []);

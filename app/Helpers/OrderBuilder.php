@@ -405,9 +405,11 @@ class OrderBuilder
                     $address->type = $type;
                     $address->country_id = 1;
                 }
+
                 if (!empty($login) && (!$exists || $forceUpdateEmail)) {
                     $address->email = $login;
                 }
+
                 break;
             case 'customer':
                 $address = $order->customer->addresses()->where('type', $type)->first();
