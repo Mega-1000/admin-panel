@@ -104,14 +104,6 @@ class OrderPackage extends Model implements Transformable
      */
     public function order(): BelongsTo
     {
-        $realCostsForCompany = OrderPackageRealCostForCompany::limit(20)->get();
-        foreach ($realCostsForCompany as $item) {
-            $item->orderPackage->real_cost_for_company_sum = $item->orderPackage->real_cost_for_company_sum ?? 0;
-                         $item->orderPackage->real_cost_for_company_sum += $item->cost;
-                         $item->orderPackage->save();
-
-                         echo $item->orderPackage->real_cost_for_company_sum;
-                     }
         return $this->belongsTo(Order::class);
     }
 
