@@ -17,9 +17,7 @@ class Chats
      */
     public static function getCustomerChats(int $customerId): Collection
     {
-        $customerChatIds = ChatUser::where('customer_id', $customerId)->get()->pluck('chat_id');
-
-        return $customerChatIds;
+        return ChatUser::where('customer_id', $customerId)->get()->pluck('chat_id');
     }
 
     /**
@@ -31,9 +29,7 @@ class Chats
      */
     public static function getContactChat(Collection|array $customerChatIds): ?Chat
     {
-        $contactChat = Chat::whereNull(['order_id', 'product_id'])->whereIn('id', $customerChatIds)->first();
-
-        return $contactChat;
+        return Chat::whereNull(['order_id', 'product_id'])->whereIn('id', $customerChatIds)->first();
     }
     /**
      * Get contact chats with need_intervention set to true, and where user == current auth user
@@ -42,9 +38,7 @@ class Chats
      */
     public static function getChatsNeedIntervention(): Collection
     {
-        $chatsNeedIntervention = Chat::where('need_intervention', true)->whereNull(['product_id', 'order_id', 'user_id'])->get();
-
-        return $chatsNeedIntervention;
+        return Chat::where('need_intervention', true)->whereNull(['product_id', 'order_id', 'user_id'])->get();
     }
     /**
      * Get blank user, can only be one blank user per chat
@@ -54,8 +48,30 @@ class Chats
      * @return ChatUser|null $blankChatUser
      */
     public static function getBlankChatUser(Collection $chatUsers): ?ChatUser {
-        $blankChatUser = $chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
+        return $chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
+    }
 
-        return $blankChatUser;
+    /**
+     * Get full chat object including messages, chat users, and order
+     *
+     * @param int $chatId
+     * @return Chat
+     */
+    public static function getFullChatObject(int $chatId): Chat
+    {
+        return Chat::with(['messages' => function ($q) {
+            $q->with(['chatUser' => function ($q) {
+                $q->with(['customer' => function ($q) {
+                    $q->with(['addresses' => function ($q) {
+                        $q->whereNotNull('phone');
+                    }]);
+                }]);
+                $q->with('user');
+                $q->with('employee');
+            }]);
+            $q->oldest();
+        }])
+        ->with('order')
+        ->find($chatId);
     }
 }

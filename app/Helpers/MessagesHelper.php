@@ -19,6 +19,7 @@ use App\Helpers\Exceptions\ChatException;
 use App\Http\Controllers\OrdersController;
 use App\Http\Requests\NoticesRequest;
 use App\Jobs\ChatNotificationJob;
+use App\Repositories\Chats;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\WarehouseRepository;
@@ -38,10 +39,10 @@ use App\Entities\ChatUser;
 
 class MessagesHelper
 {
-    public $chatId = 0;
+    public int $chatId = 0;
     public array $users = [];
-    public $productId = 0;
-    public $orderId = 0;
+    public int $productId = 0;
+    public int $orderId = 0;
     public $currentUserType;
 
     /**
@@ -173,6 +174,7 @@ class MessagesHelper
         if (!array_key_exists('chat', $this->cache)) {
             $this->cache['chat'] = $this->chatId ? $this->getChatObject() : null;
         }
+
         return $this->cache['chat'];
     }
 
@@ -200,22 +202,9 @@ class MessagesHelper
         return $this->cache['order'];
     }
 
-    private function getChatObject()
+    private function getChatObject(): Chat
     {
-        return Chat::with(['messages' => function ($q) {
-                $q->with(['chatUser' => function ($q) {
-                    $q->with(['customer' => function ($q) {
-                        $q->with(['addresses' => function ($q) {
-                            $q->whereNotNull('phone');
-                        }]);
-                    }]);
-                    $q->with('user');
-                    $q->with('employee');
-                }]);
-                $q->oldest();
-            }])
-            ->with('order')
-            ->find($this->chatId);
+        return Chats::getFullChatObject($this->chatId);
     }
 
     public function getTitle($withBold = false): string
@@ -451,7 +440,7 @@ class MessagesHelper
      * @return void
      * @throws ChatException
      */
-    private function sendWaitingMessage(Chat $chat)
+    private function sendWaitingMessage(Chat $chat): void
     {
         $content = "Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
                     Zajmuje to zwykle do kilku minut.";
@@ -473,6 +462,7 @@ class MessagesHelper
             return null;
         }
         $chat->users()->attach(Auth::user());
+
         return $this->getAdminChatUser(true);
     }
 
@@ -492,7 +482,7 @@ class MessagesHelper
 
         return $chatUser ?? $this->getChat()->whereHas('chatUsers', function ($query) {
             $query->whereHas('customer');
-        })->chatUsers()->first();
+        })->first()->chatUsers()->first();
     }
 
     public function setLastRead(): void
