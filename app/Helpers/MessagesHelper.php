@@ -497,7 +497,7 @@ class MessagesHelper
 
     public function setLastRead(): void
     {
-        $chatUser = $this->getCurretChatUser();
+        $chatUser = $this->getCurrentChatUser();
 
         if (!$chatUser) {
             return;
