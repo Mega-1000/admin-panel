@@ -28,6 +28,10 @@
         Zarządzanie newsletterem
     </a>
 
+    <a href="{{ route('low-quantity-alerts.index') }}" class="btn btn-primary">
+        Zarządzanie alertami o niskich stanach magazynowych
+    </a>
+
     <div class="row">
         <div class="col-md-12">
             @if ($import->processing)
