@@ -13,8 +13,9 @@ class AllegroBillingImportRestApiCommand extends Command
 
     public function handle(): void
     {
+
         $allegroBillingService = app(AllegroBillingService::class);
-        $allegroBillingService->getAllBillingsData();
+        $allegroBillingService->getAllBillingsData(truncateData: true);
 
     }
 }
