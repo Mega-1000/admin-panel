@@ -3,5 +3,5 @@
 @endphp
 
 <div>
-    {{ LowOrderQuantityAlertService::parseToken($alert->message, $order) }}
+    {{ LowOrderQuantityAlertService::parseToken($alert->message, $order->id) }}
 </div>

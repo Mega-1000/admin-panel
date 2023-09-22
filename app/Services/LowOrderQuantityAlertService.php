@@ -22,12 +22,14 @@ class LowOrderQuantityAlertService
                 ->get();
 
             foreach ($orderItems as $item) {
-                $finalQuantity += $item->quantity;
+                if ($item->product->low_order_quantity_alert_text === $alert->item_names) {
+                    $finalQuantity += $item->quantity;
+                }
             }
 
-//            if ($finalQuantity < $alert->min_quantity) {
-                dispatch_now(new AlertForOrderLowQuantityJob($order, $alert));
-//            }
+            if ($finalQuantity < $alert->min_quantity) {
+                dispatch(new AlertForOrderLowQuantityJob($order, $alert))->delay(now()->addHours($alert->delay_time));
+            }
         });
     }
 
