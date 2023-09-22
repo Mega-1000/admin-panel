@@ -12,6 +12,7 @@ use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FastResponseController;
 use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
+use App\Http\Controllers\LowOrderQuantityAlertController;
 use App\Http\Controllers\MailReportController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\NewsletterMessageController;
@@ -632,6 +633,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('return-payment/{order}', [AllegroReturnPaymentController::class, 'index'])->name('returnPaymentPreview');
             Route::post('return-payment/{order}', [AllegroReturnPaymentController::class, 'store'])->name('returnPayment');
         });
+
+        Route::resource('low-quantity-alerts', LowOrderQuantityAlertController::class)->names('low-quantity-alerts');
     });
 
     Route::get('/generate-real-cost-for-company-invoice-report', GenerateRealCostsForCompanyReportController::class)

@@ -16,9 +16,7 @@ class ImportAllegroBillingService
     public function __construct(
         protected OrderPackages              $orderPackagesRepository,
         protected AllegroBillingImportHelper $billingHelper,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Import billing entries

@@ -10,6 +10,7 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\StatusRepository;
 use App\Services\Label\AddLabelService;
+use App\Services\LowOrderQuantityAlertService;
 use App\Services\OrderPaymentLabelsService;
 use App\Services\OrderService;
 use Carbon\Carbon;
@@ -21,13 +22,14 @@ use Illuminate\Support\Str;
 readonly class OrderObserver
 {
     public function __construct(
-        protected StatusRepository          $statusRepository,
-        protected OrderPaymentLabelsService $orderPaymentLabelsService,
-        protected OrderService              $orderService,
-        protected OrderPackagesCalculator   $orderPackagesCalculator,
+        protected StatusRepository             $statusRepository,
+        protected OrderPaymentLabelsService    $orderPaymentLabelsService,
+        protected OrderService                 $orderService,
+        protected OrderPackagesCalculator      $orderPackagesCalculator,
+        protected LowOrderQuantityAlertService $lowOrderQuantityAlertService
     ) {}
 
-    public function created(Order $order): void
+    public function created(Order $order,): void
     {
         dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
 
@@ -35,6 +37,8 @@ readonly class OrderObserver
 
         $order->token = Str::random(32);
         $order->save();
+
+        $this->lowOrderQuantityAlertService->dispatchAlertsForOrder($order);
     }
 
     public function updating(Order $order): void

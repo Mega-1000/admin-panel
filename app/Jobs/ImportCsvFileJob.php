@@ -412,6 +412,7 @@ class ImportCsvFileJob implements ShouldQueue
 
         $product->assortment_quantity = $array['assortment_quantity'] ?? null;
         $product->delivery_type = $array['delivery_type'] ?? null;
+        $product->low_order_quantity_alert_text = $array['low_order_quantity_alert_text'] ?? null;
 
         $product->save();
         $product->restore();
@@ -581,6 +582,7 @@ class ImportCsvFileJob implements ShouldQueue
             'newsletter' => $line[13],
             'assortment_quantity' => $line[216],
             'delivery_type' => $line[11],
+            'low_order_quantity_alert_text' => $line[13],
         ];
 
         foreach ($array as $key => $value) {
@@ -593,11 +595,6 @@ class ImportCsvFileJob implements ShouldQueue
                     $array[$key] = $value;
                 }
             }
-            /** MT-19 checking if url for product image exists and changing prefix of path to match server path */
-//            if (!empty($array['url']) && strpos($array['url'], "\\")
-//            ) {
-//                $array['url_for_website'] = $this->getUrl($array['url']);
-//            }
         }
 
         return $array;

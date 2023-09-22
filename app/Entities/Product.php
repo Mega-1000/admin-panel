@@ -2,9 +2,9 @@
 
 namespace App\Entities;
 
+use FontLib\TrueType\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,6 +18,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property string $symbol
  * @property ProductStock $stock
  * @property string $manufacturer
+ * @property string $low_order_quantity_alert_text
  */
 class Product extends Model implements Transformable
 {
@@ -99,7 +100,8 @@ class Product extends Model implements Transformable
         'save_name',
         'save_image',
         'assortment_quantity',
-        'delivery_type'
+        'delivery_type',
+        'low_order_quantity_alert_text'
     ];
 
     public array $customColumnsVisibilities = [
@@ -309,5 +311,10 @@ class Product extends Model implements Transformable
     public function discounts(): HasMany
     {
         return $this->hasMany(Discount::class);
+    }
+
+    public function lowQuantityAlerts(): Collection
+    {
+        return LowOrderQuantityAlert::where('item_names', $this->low_order_quantity_alert_text);
     }
 }
