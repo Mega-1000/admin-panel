@@ -16,6 +16,7 @@ class FormCreator extends Component
     public array $newElement = [];
     public string $type = '';
     public array $editElement = [];
+    public mixed $forms = null;
 
     public array $elementTypes = [
         'button' => [
@@ -109,6 +110,8 @@ class FormCreator extends Component
 
         $this->name = !empty($this->name) ? $this->name : $this->form?->name;
         $this->description = !empty($this->description) ? $this->description : $this->form?->description;
+
+        $this->forms = Form::all();
 
         return view('livewire.form-creator');
     }
@@ -216,5 +219,10 @@ class FormCreator extends Component
         $this->closeModal();
 
         $this->reloafForm();
+    }
+
+    public function deleteForm(int $formId): void
+    {
+        Form::where('id', $formId)->delete();
     }
 }

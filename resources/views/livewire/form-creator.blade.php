@@ -158,4 +158,18 @@
             @endif
         @endforeach
     </div>
+
+    <div>
+        @foreach($this->forms as $form)
+            <div style="margin: 10px; border: black 1px solid; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between">
+                <a href="?form_id={{ $form->id }}" class="form-link">
+                    {{ $form->name }}
+                </a>
+
+                <button class="btn btn-danger" wire:click="deleteForm({{ $form->id }})">
+                    Usuń formularz
+                </button>
+            </div>
+        @endforeach
+    </div>
 </div>
