@@ -9,7 +9,7 @@ use Livewire\Component;
 
 class FormCreator extends Component
 {
-    public string $name = '';
+    public ?string $name = '';
     public string $description = '';
     public ?Form $form = null;
     public bool $isModalOpen = false;
