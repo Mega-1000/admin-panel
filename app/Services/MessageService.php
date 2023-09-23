@@ -51,10 +51,6 @@ readonly class MessageService
             $helper->createNewChat();
         }
 
-        if (!$helper->canUserSendMessage()) {
-            throw new ChatException('User not allowed to send message');
-        }
-
         $file = $data->file ?? null;
         $message = $helper->addMessage($data->message, $data->area, $file);
         $helper->setLastRead();
