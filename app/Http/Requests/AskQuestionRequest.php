@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateAllegroMessageRequest extends FormRequest
+class AskQuestionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,12 @@ class CreateAllegroMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'message' => 'required|string',
-            'user' => 'required',
-            'questionsTree' => 'required',
+            'firstName' => 'required|string',
+            'lastName' => 'required|string',
+            'details' => 'required|string',
+            'phone' => 'required|string',
+            'email' => 'required|email',
+            'orderId' => 'integer',
         ];
     }
 }

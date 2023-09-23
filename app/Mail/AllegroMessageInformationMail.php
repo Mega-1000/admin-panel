@@ -2,25 +2,28 @@
 
 namespace App\Mail;
 
-use App\Entities\Order;
+use App\Entities\Customer;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AllegroMessageInformationMail extends Mailable
+final class AllegroMessageInformationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      *
-     * @param $messageText
+     * @param string $messageText
+     * @param string $questionsTree
+     * @param Customer $customer
      */
     public function __construct(
-        protected $messageText,
+        protected readonly string   $messageText,
+        protected readonly string   $questionsTree,
+        protected readonly Customer $customer,
     ) {}
 
     /**
@@ -46,6 +49,8 @@ class AllegroMessageInformationMail extends Mailable
             view: 'emails.allegro_message_information',
             with: [
                 'messageText' => $this->messageText,
+                'questionsTree' => $this->questionsTree,
+                'user' => $this->customer,
             ],
         );
     }

@@ -42,23 +42,21 @@ class MessagesHelper
     public mixed $chatId = 0;
     public array $users = [];
     public mixed $productId = 0;
-    public int $orderId = 0;
-    public $currentUserType;
+    public ?int $orderId = 0;
+    public mixed $currentUserType;
 
     /**
      * User's or Customer's or Employee's id
      **/
-    public $currentUserId;
+    public mixed $currentUserId;
     private array $cache = [];
 
     const TYPE_CUSTOMER = 'c';
     const TYPE_EMPLOYEE = 'e';
     const TYPE_USER = 'u';
-
     const SHOW_FRONT = 'f';
     const SHOW_VAR = 'v';
     const NOTIFICATION_TIME = 300;
-
     const MESSAGE_RED_LABEL_ID = 55;
     const MESSAGE_BLUE_LABEL_ID = 56;
     const MESSAGE_YELLOW_LABEL_ID = 57;
@@ -525,7 +523,9 @@ class MessagesHelper
             return false;
         }
 
-        foreach (array_reverse($chat->messages) as $message) {
+        $chat->messages = $chat->messages->sortByDesc('created_at');
+
+        foreach ($chat->messages as $message) {
             if ($message->created_at > $chatUser->last_read_time && $message->chat_user_id != $chatUser->id) {
                 if (!$notification) {
                     return true;

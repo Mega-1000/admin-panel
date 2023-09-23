@@ -3,16 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\MessagesHelper;
+use App\Http\Requests\AskQuestionRequest;
 use App\Mail\AskQuestion;
 use App\Repositories\FaqRepository;
 use App\Repositories\OrderAllegroRepository;
 use App\Repositories\OrderRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Entities\FaqCategoryIndex;
 use Illuminate\Support\Arr;
 use App\Entities\Faq;
 use App\Http\Requests\SetPositionRequest;
+use Mailer;
+use Psy\Util\Json;
 
 /**
  * Klasa kontrolera obsługująca
@@ -20,51 +24,25 @@ use App\Http\Requests\SetPositionRequest;
  *
  * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
  */
-class FaqController
+readonly final class FaqController
 {
     use ApiResponsesTrait;
 
-    /**
-     * @var FaqRepository
-     */
-    protected $faqRepository;
-
-    /**
-     * @var OrderRepository
-     */
-    protected $orderRepository;
-
-    /**
-     * @var OrderAllegroRepository
-     */
-    protected $orderAllegroRepository;
-
-    /**
-     * FaqController constructor.
-     *
-     * @param FaqRepository          $faqRepository
-     * @param OrderRepository        $orderRepository
-     * @param OrderAllegroRepository $orderAllegroRepository
-     */
     public function __construct(
-        FaqRepository $faqRepository,
-        OrderRepository $orderRepository,
-        OrderAllegroRepository $orderAllegroRepository)
-    {
-        $this->faqRepository = $faqRepository;
-        $this->orderRepository = $orderRepository;
-        $this->orderAllegroRepository = $orderAllegroRepository;
-    }
+        protected FaqRepository $faqRepository,
+        protected OrderRepository $orderRepository,
+        protected OrderAllegroRepository $orderAllegroRepository
+    ) {}
 
     /**
      * Akcja do zapisywania pytań
      *
      * @param Request $request
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $response = [];
         try {
@@ -90,11 +68,11 @@ class FaqController
     /**
      * Pobranie zestawów pytań i odpowiedzi.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
      */
-    public function getQuestions()
+    public function getQuestions(): JsonResponse
     {
         $result = [];
         $rawQuestions = $this->faqRepository->all(['id', 'category', 'questions']);
@@ -109,7 +87,7 @@ class FaqController
         foreach ($result as &$value) {
             foreach ($value as &$item) {
                 $index = FaqCategoryIndex::where('faq_id', $item['id']);
-                $item['index'] = $index->exists() ? $index->first()->faq_category_index : null; 
+                $item['index'] = $index->exists() ? $index->first()->faq_category_index : null;
             }
         }
 
@@ -119,13 +97,13 @@ class FaqController
     /**
      * Pobranie listy pytań i odpowiedzi do tabeli
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json($this->faqRepository->all(), 200);
+        return response()->json(Faq::all());
     }
 
 
@@ -133,13 +111,11 @@ class FaqController
      * Pobranie pojedynczego rekordu.
      *
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
-     *
-     * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        return response()->json($this->faqRepository->find($id), 200);
+        return response()->json(Faq::find($id));
     }
 
 
@@ -148,15 +124,14 @@ class FaqController
      *
      * @param integer $id Identyfikator ścieżki.
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     *
-     * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
+     * @return JsonResponse
      */
-    public function update($id, Request $request)
+    public function update(int $id, Request $request): JsonResponse
     {
         $response = [];
+
         try {
-            $result = $this->faqRepository->update([
+            $result = Faq::update([
                 'questions' => $request->get('questions'),
             ], $id);
             if ($result) {
@@ -169,6 +144,7 @@ class FaqController
                 'error' => $exception->getMessage()
             ];
         }
+
         return response()->json($response);
     }
 
@@ -178,11 +154,9 @@ class FaqController
      *
      * @param integer $id Identyfikator ścieżki
      *
-     * @return \Illuminate\Http\JsonResponse
-     *
-     * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         $response = [];
         try {
@@ -201,53 +175,45 @@ class FaqController
                 'error' => $exception->getMessage()
             ];
         }
+
         return response()->json($response);
     }
 
 
-    public function askQuestion(Request $request)
+    public function askQuestion(AskQuestionRequest $request): JsonResponse
     {
         $response = [];
-        try {
-            if ($request->filled('orderId')) {
-                $order = $this->orderRepository->find($request->get('orderId'));
-            } elseif ($request->filled('allegroOrderId')) {
-//                $order = $this->orderAllegroRepository->findByField('order_id', $request->get('orderId'))->order;
-            } else {
-                $result = \Mailer::create()
-                    ->to('info@mega1000.pl')
-                    ->send(new AskQuestion(
-                        $request->get('firstName'),
-                        $request->get('lastName'),
-                        $request->get('details'),
-                        $request->get('phone'),
-                        $request->get('email')
-                    ));
-            }
+        if ($request->filled('orderId')) {
+            $order = Order::find($request->validated('orderId'));
+        } else {
+            $result = Mailer::create()
+                ->to('info@mega1000.pl')
+                ->send(new AskQuestion(
+                    $request->validated('firstName'),
+                    $request->validated('lastName'),
+                    $request->validated('details'),
+                    $request->validated('phone'),
+                    $request->validated('email')
+                ));
+        }
 
-            if (!empty($order)) {
-                $helper = new MessagesHelper();
-                $helper->orderId = $order->id;
-                $helper->currentUserId = $order->customer_id;
-                $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
-                $helper->createNewChat();
-                $helper->addMessage($request->get('details'));
-                $result = true;
-            }
-            if ($result) {
-                $response['status'] = 200;
-            }
-        } catch (\Exception $exception) {
-            $response = [
-                'status' => 500,
-                'error' => $exception->getMessage()
-            ];
+        if (!empty($order)) {
+            $helper = new MessagesHelper();
+            $helper->orderId = $order->id;
+            $helper->currentUserId = $order->customer_id;
+            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $helper->createNewChat();
+            $helper->addMessage($request->validated('details'));
+            $result = true;
+        }
+        if ($result) {
+            $response['status'] = 200;
         }
 
         return response()->json($response);
     }
 
-    public function getCategories()
+    public function getCategories(): JsonResponse
     {
         $result = [];
         $categories = DB::table('faqs')
@@ -266,7 +232,7 @@ class FaqController
         return response()->json($result);
     }
 
-    public function setCategoryPosition(SetPositionRequest $request)
+    public function setCategoryPosition(SetPositionRequest $request): JsonResponse
     {
         FaqCategoryIndex::where('faq_category_type', 'category')->delete();
 
@@ -280,11 +246,9 @@ class FaqController
         return response()->json(['status' => 200]);
     }
 
-    public function setQuestionsPosition(SetPositionRequest $request) {
+    public function setQuestionsPosition(SetPositionRequest $request): void
+    {
         foreach ($request->validated('categories') as $key => $question) {
-        
-            $faq = Faq::find($question['id']);
-
             FaqCategoryIndex::where('faq_category_type', 'question')
                 ->where('faq_id', $question['id'])
                 ->delete();

@@ -15,18 +15,18 @@ class AskQuestion extends Mailable
     /**
      * @var DateTime
      */
-    protected $date;
+    protected DateTime $date;
 
     public $subject = 'Zapytanie od klienta';
 
     /**
      * AskQuestion constructor.
      *
-     * @param $firstName
-     * @param $lastName
-     * @param $details
-     * @param $phone
-     * @param $emailAddress
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $details
+     * @param string $phone
+     * @param string $emailAddress
      */
     public function __construct(
         public readonly string $firstName,
@@ -43,7 +43,7 @@ class AskQuestion extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
+     * @return Content
      */
     public function content(): Content
     {

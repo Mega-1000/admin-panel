@@ -57,6 +57,8 @@ Route::middleware('auth:api')->group(function () {
 
         Route::post('products/{product}', [ProductsController::class, 'update'])->name('api.products.update');
     });
+
+    Route::post('/create-message', AllegroMessageController::class);
 });
 
 Route::get('order/invoice/{order}', 'Api\InvoiceController@getInvoicesForOrder')->name('api.orders.invoice');
@@ -176,7 +178,6 @@ Route::prefix('discounts')->group(function () {
 
 Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'getByOrder'])
     ->name('api.get-packages-for-order');
-Route::post('/create-message', AllegroMessageController::class);
 
 Route::get('/shipment-pay-in-report', ShipmentPayInReportByInvoiceNumber::class)->name('shipment-pay-in-report');
 Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('getPayments');
