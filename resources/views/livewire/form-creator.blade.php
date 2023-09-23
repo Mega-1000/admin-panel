@@ -134,7 +134,7 @@
     </h3>
 
     <div>
-        @foreach($form->elements as $element)
+    @foreach($form?->elements ?? [] as $element)
             @if($element->type === 'button')
                 <button class="btn" style="background-color: {{ $element->color }}; font-size: {{ $element->size }}; width: 100%">
                     {{ $element->text }}
