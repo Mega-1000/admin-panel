@@ -10,6 +10,7 @@ use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\DifferenceInShipmentCostCookiesController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FastResponseController;
+use App\Http\Controllers\FormCreatorController;
 use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\LowOrderQuantityAlertController;
@@ -635,6 +636,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
         Route::resource('low-quantity-alerts', LowOrderQuantityAlertController::class)->names('low-quantity-alerts');
+        Route::resource('/form-creator', FormCreatorController::class)->names('form-creator');
     });
 
     Route::get('/generate-real-cost-for-company-invoice-report', GenerateRealCostsForCompanyReportController::class)

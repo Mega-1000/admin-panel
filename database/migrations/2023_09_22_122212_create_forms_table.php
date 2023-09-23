@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('task_times', function (Blueprint $table) {
-            $table->datetime('transfer_date')->nullable();
+        Schema::create('forms', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('description');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('task_times', function (Blueprint $table) {
-            $table->dropColumn('transfer_date');
-        });
+        Schema::dropIfExists('forms');
     }
 };
