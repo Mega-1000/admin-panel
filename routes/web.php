@@ -4,12 +4,14 @@ use App\Entities\OrderPackage;
 use App\Http\Controllers\AddLabelsCSVController;
 use App\Http\Controllers\AllegroBillingController;
 use App\Http\Controllers\AllegroReturnPaymentController;
+use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\ConfirmProductStockOrderController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\DifferenceInShipmentCostCookiesController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FastResponseController;
+use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormCreatorController;
 use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
 use App\Http\Controllers\ImportAllegroBillingController;
@@ -737,3 +739,6 @@ Route::get('/fast-response/jsonIndex', [FastResponseController::class, 'jsonInde
 Route::resource('/fast-response', FastResponseController::class)->names('fast-response');
 Route::post('/fast-response/{fastResponse}/{order}/send', [FastResponseController::class, 'send'])->name('fast-response.send');
 Route::post('/product-stock-logs/{productStockLog}/edit', [ProductStockLogsController::class, 'update'])->name('product-stock-logs.update');
+
+Route::get('/form/{form:name}/{order}', [FormController::class, 'index'])->name('form');
+Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction'])->name('execute-form-action');

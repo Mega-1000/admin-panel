@@ -15,6 +15,7 @@ class FormCreator extends Component
     public bool $isModalOpen = false;
     public array $newElement = [];
     public string $type = '';
+    public array $editElement = [];
 
     public array $elementTypes = [
         'button' => [
@@ -27,7 +28,7 @@ class FormCreator extends Component
                     'required' => true,
                 ],
                 [
-                    'type' => 'text',
+                    'type' => 'color',
                     'label' => 'Color',
                     'placeholder' => 'Color',
                     'name' => 'color',
@@ -59,7 +60,46 @@ class FormCreator extends Component
                     'required' => true,
                 ],
             ]
-        ]
+        ],
+        'link' => [
+            'inputs' => [
+                [
+                    'type' => 'text',
+                    'label' => 'Text',
+                    'placeholder' => 'Text',
+                    'name' => 'text',
+                    'required' => true,
+                ],
+                [
+                    'type' => 'color',
+                    'label' => 'Color',
+                    'placeholder' => 'Color',
+                    'name' => 'color',
+                    'required' => true,
+                ],
+                [
+                    'type' => 'text',
+                    'label' => 'Size',
+                    'placeholder' => 'Size',
+                    'name' => 'size',
+                    'required' => true,
+                ],
+                [
+                    'type' => 'text',
+                    'label' => 'Link',
+                    'placeholder' => 'link',
+                    'name' => 'action',
+                    'required' => true,
+                ],
+                [
+                    'type' => 'checkbox',
+                    'label' => 'Otwórz w nowej karcie',
+                    'placeholder' => 'Otwórz w nowej karcie',
+                    'name' => 'new_tab',
+                    'required' => false,
+                ],
+            ]
+        ],
     ];
 
     public function render(): View
@@ -67,8 +107,8 @@ class FormCreator extends Component
         $formId = request()->query('form_id');
         $this->form = $this->form ?? Form::find($formId);
 
-        $this->name = $this->form?->name ?? $this->name;
-        $this->description = $this->form?->description ?? $this->description;
+        $this->name = !empty($this->name) ? $this->name : $this->form?->name;
+        $this->description = !empty($this->description) ? $this->description : $this->form?->description;
 
         return view('livewire.form-creator');
     }
@@ -80,13 +120,18 @@ class FormCreator extends Component
             'description' => 'required',
         ]);
 
-
-        $this->form = Form::create([
+        $data = [
             'name' => $this->name,
             'description' => $this->description,
-        ]);
+        ];
 
-        return redirect()->to('/admin/form-creator/create?form_id=' . $this->form->id);
+        if (empty($this->form)) {
+            $this->form = Form::create($data);
+
+            return redirect()->to('/admin/form-creator/create?form_id=' . $this->form->id);
+        }
+
+        return $this->form->update($data);
     }
 
     public function selectType(): void
@@ -107,8 +152,6 @@ class FormCreator extends Component
     public function showModal(): void
     {
         $this->isModalOpen = true;
-
-        $this->createNewElement();
     }
 
     public function closeModal(): void
@@ -147,6 +190,28 @@ class FormCreator extends Component
             $element = FormElement::where('id', (int)$item['value'])->first();
             $element->update(['order' => $item['order']]);
         }
+
+        $this->reloafForm();
+    }
+
+    public function editElement(int $itemId): void
+    {
+        $this->editElement = $this->form->elements()->where('id', $itemId)->first()->toArray();
+        $this->type = $this->editElement['type'];
+        $this->showModal();
+    }
+
+    public function updateElement(): void
+    {
+        $this->validate([
+            'editElement' => 'required',
+        ]);
+
+        $this->form->elements()->where('id', $this->editElement['id'])->update($this->editElement);
+
+        $this->editElement = [];
+
+        $this->closeModal();
 
         $this->reloafForm();
     }

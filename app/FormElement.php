@@ -11,10 +11,15 @@ class FormElement extends Model
 
     public $fillable = [
         'type',
+        'text',
         'label',
         'placeholder',
         'required',
         'form_id',
         'order',
+        'color',
+        'size',
+        'action',
+        'new_tab',
     ];
 }
