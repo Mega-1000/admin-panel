@@ -53,7 +53,7 @@ class FormCreator extends Component
         'text' => [
             'inputs' => [
                 [
-                    'type' => 'text',
+                    'type' => 'textarea',
                     'label' => 'Zawartość tekstu',
                     'placeholder' => 'Zawartość tekstu',
                     'name' => 'text',
@@ -164,6 +164,8 @@ class FormCreator extends Component
         $this->validate([
             'newElement' => 'required',
         ]);
+
+        $this->newElement['text'] = nl2br($this->newElement['text']);
 
         $this->form->elements()->create($this->newElement + ['type' => $this->type]);
 

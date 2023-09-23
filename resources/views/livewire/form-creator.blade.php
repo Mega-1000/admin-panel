@@ -95,11 +95,19 @@
                                     {{ $input['label'] }}
                                 </label>
 
-                                <input
-                                    type="{{ $input['type'] }}"
-                                    class="{{ $input['type'] !== 'checkbox' ? 'form-control' : '' }}" wire:model="newElement.{{$input['name']}}"
-                                    placeholder="{{$input['placeholder']}}"
-                                >
+                                @if($input['type'] === 'textarea')
+                                    <textarea
+                                        class="form-control"
+                                        wire:model="newElement.{{$input['name']}}"
+                                        placeholder="{{$input['placeholder']}}"
+                                    ></textarea>
+                                @else
+                                    <input
+                                        type="{{ $input['type'] }}"
+                                        class="{{ $input['type'] !== 'checkbox' ? 'form-control' : '' }}" wire:model="newElement.{{$input['name']}}"
+                                        placeholder="{{$input['placeholder']}}"
+                                    >
+                                @endif
                             @endforeach
                         @else
                             @foreach($this->type ? $this->elementTypes[$this->type]['inputs'] : [] as $input)
@@ -141,7 +149,7 @@
                 </button>
             @elseif($element->type === 'text')
                 <div>
-                    {{ $element->text }}
+                    {!! $element->text !!}
                 </div>
             @elseif($element->type === 'link')
                 <a href="{{ $element->action }}" target="{{ $element->new_tab ? '_blank' : '' }}" style="font-size: {{ $element->size }}; color: {{ $element->color }};">

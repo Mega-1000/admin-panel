@@ -13,7 +13,7 @@
             </form>
         @elseif($element->type === 'text')
             <div>
-                {{ $element->text }}
+                {!! $element->text !!}
             </div>
         @elseif($element->type === 'link')
             <a href="{{ $element->action }}" target="{{ $element->new_tab ? '_blank' : '' }}" style="font-size: {{ $element->size }}; color: {{ $element->color }};">

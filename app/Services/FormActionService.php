@@ -7,13 +7,8 @@ use Illuminate\Http\JsonResponse;
 
 class FormActionService
 {
-    public static function okej(Order $order): JsonResponse
+    public static function cuttingAgreement(): void
     {
-        dd('okej');
-    }
 
-    public static function cancel(Order $order):  JsonResponse
-    {
-        dd($order);
     }
 }
