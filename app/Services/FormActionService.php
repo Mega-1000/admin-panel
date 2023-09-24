@@ -7,8 +7,12 @@ use Illuminate\Http\JsonResponse;
 
 class FormActionService
 {
-    public static function cuttingAgreement(): void
+    public static function agreeForCut(): void
     {
+        // mega oława wiersz planer
+        // dodaje niebieski młotek
+        // kasuje pomarańczowy wykszyknik info dział
+        // dopisuje dla magazynu tniemy na 50cm i wysyłamy
 
     }
 }
