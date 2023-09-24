@@ -2,15 +2,17 @@
 
 namespace App\Services;
 
-use App\Entities\Message;
 use App\Entities\Order;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Services\Label\AddLabelService;
-use Illuminate\Http\JsonResponse;
 
 class FormActionService
 {
 
+    /**
+     * @throws ChatException
+     */
     public static function agreeForCut(Order $order): void
     {
         $arr = [];
@@ -23,6 +25,6 @@ class FormActionService
         $order->labels()->detach(152);
 
         $messageService = new MessagesHelper();
-        $messageService->addMessage('tniemy na 50cm i wysyłamy', 2, null, null, $order->chat);
+        $messageService->addMessage('tniemy na 50cm i wysyłamy', 5, null, null, $order->chat);
     }
 }
