@@ -27,4 +27,25 @@ class FormActionService
         $messageService = new MessagesHelper();
         $messageService->addMessage('tniemy na 50cm i wysyłamy', 5, null, null, $order->chat);
     }
+
+    public function agreeForAdditionalPay(Order $order): void
+    {
+        $arr = [];
+
+        $task = $order->task;
+        $task->user_id = 37;
+        $task->save();
+
+        $order->additional_cash_on_delivery_cost += 29.90;
+        $order->save();
+
+
+        AddLabelService::addLabels($order, [47], $arr, []);
+        $order->labels()->detach(152);
+
+
+        $package = $order->packages()->first();
+        $package->cash_on_delivery += 29.90;
+        $package->save();
+    }
 }
