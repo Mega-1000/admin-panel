@@ -43,7 +43,7 @@ class Message extends Model
         return $this->chatUser->employee;
     }
 
-    public function customer(): Customer
+    public function customer(): ?Customer
     {
         return $this->chatUser?->customer;
     }
