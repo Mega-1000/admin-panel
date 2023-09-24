@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entities\Message;
 use App\Entities\Order;
+use App\Helpers\MessagesHelper;
 use App\Services\Label\AddLabelService;
 use Illuminate\Http\JsonResponse;
 
@@ -21,7 +22,7 @@ class FormActionService
         AddLabelService::addLabels($order, [47], $arr, []);
         $order->labels()->detach(152);
 
-        $messageService = new MessageService();
+        $messageService = new MessagesHelper();
         $messageService->createMessage($order->chat, $order->chat->employee, 'tniemy na 50cm i wysyłamy', 'order', $arr);
     }
 }
