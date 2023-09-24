@@ -322,7 +322,7 @@ class MessagesHelper
     public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null, ?ChatUser $customChatUser = null, mixed $chat = null): Message
     {
         $chat = $chat ?? $this->getChat();
-        $chatUser = $customChatUser ?? $this->getCurrentChatUser();
+        $chatUser = $customChatUser ?? $this->getCurrentChatUser() ?? $this->createOrGetBlankUser($chat);
         if (!$chatUser) {
             throw new ChatException('Cannot save message - User not added to chat');
         }
