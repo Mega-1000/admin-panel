@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
+use App\DTO\AllegroPayment\AllegroReturnDTO;
 use App\Entities\Order;
+use App\Helpers\AllegroReturnPaymentHelper;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Services\Label\AddLabelService;
 
 class FormActionService
 {
-
     /**
      * @throws ChatException
      */
@@ -47,5 +48,28 @@ class FormActionService
         $package = $order->packages()->first();
         $package->cash_on_delivery += 29.90;
         $package->save();
+    }
+
+    public static function cancelOrder(Order $order): void
+    {
+        $arr = [];
+        AddLabelService::addLabels($order, [178], $arr, []);
+        $allegroOrderService = app(AllegroOrderService::class);
+        $allegroPaymentService = app(AllegroPaymentService::class);
+
+        $allegroPaymentId = $order->allegro_payment_id;
+        $allegroOrder = $allegroOrderService->getOrderByPaymentId($allegroPaymentId);
+
+        $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, []);
+
+        list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
+
+        $data = new AllegroReturnDTO(
+            paymentId: $allegroPaymentId,
+            reason: $request->reason,
+            lineItems: $lineItemsForPaymentRefund,
+        );
+
+        $allegroPaymentService->initiatePaymentRefund($data);
     }
 }
