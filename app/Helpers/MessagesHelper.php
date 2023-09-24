@@ -43,7 +43,7 @@ class MessagesHelper
     public array $users = [];
     public mixed $productId = 0;
     public ?int $orderId = 0;
-    public mixed $currentUserType;
+    public $currentUserType;
 
     /**
      * User's or Customer's or Employee's id
