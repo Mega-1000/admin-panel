@@ -23,6 +23,6 @@ class FormActionService
         $order->labels()->detach(152);
 
         $messageService = new MessagesHelper();
-        $messageService->createMessage($order->chat, $order->chat->employee, 'tniemy na 50cm i wysyłamy', 'order', $arr);
+        $messageService->addMessage($order->chat, $order->chat->employee, 'tniemy na 50cm i wysyłamy', 'order', $arr);
     }
 }
