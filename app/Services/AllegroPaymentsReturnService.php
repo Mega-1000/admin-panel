@@ -31,7 +31,7 @@ readonly class AllegroPaymentsReturnService
         if (
             in_array(Label::RETURN_ALLEGRO_PAYMENTS, $orderLabels) &&
             !in_array(Label::ORDER_ITEMS_REDEEMED_LABEL, $orderLabels) &&
-            dd(!in_array(50, $orderLabels)) &&
+            !in_array(50, $orderLabels) &&
             false &&
             !self::checkIfOrderHasKwonPayment($order)
         ) {
