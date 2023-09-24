@@ -28,7 +28,7 @@ class FormActionService
         $messageService->addMessage('tniemy na 50cm i wysyłamy', 5, null, null, $order->chat);
     }
 
-    public function agreeForAdditionalPay(Order $order): void
+    public static function agreeForAdditionalPay(Order $order): void
     {
         $arr = [];
 
