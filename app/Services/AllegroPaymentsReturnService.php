@@ -28,7 +28,7 @@ readonly class AllegroPaymentsReturnService
         /** @var $orderLabels */
         $orderLabels = $order->labels()->pluck('labels.id')->toArray();
 
-        dd($orderLabels);
+        dd($orderLabels, !in_array(50, $orderLabels));
 
         if (
             in_array(Label::RETURN_ALLEGRO_PAYMENTS, $orderLabels) &&
