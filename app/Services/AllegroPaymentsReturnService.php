@@ -29,7 +29,7 @@ readonly class AllegroPaymentsReturnService
         $orderLabels = $order->labels()->pluck('labels.id')->toArray();
 
         if (in_array(50, $orderLabels) &&) {
-            dd('okej')
+            dd('okej');
         }
 
         if (
