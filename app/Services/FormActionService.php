@@ -17,12 +17,12 @@ class FormActionService
         $task->user_id = 37;
         $task->save();
 
-        AddLabelService::addLabels($order, [47], $arr, [], );
+        AddLabelService::addLabels($order, [47], $arr, []);
         $order->labels()->detach(152);
         $order->chat->messages()->create([
             'user_id' => $order->chat,
             'message' => 'Tniemy na 50cm i wysyłamy',
-            'type' => 'WAREHOUSE',
+            'area' => 'warehouse_comment',
         ]);
     }
 }

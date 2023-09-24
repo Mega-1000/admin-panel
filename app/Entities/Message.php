@@ -20,7 +20,7 @@ class Message extends Model
         'chat_id',
         'chat_user_id',
         'message',
-        'type',
+        'area',
     ];
 
     public function chatUser()
