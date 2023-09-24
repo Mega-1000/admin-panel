@@ -45,6 +45,6 @@ class Message extends Model
 
     public function customer(): Customer
     {
-        return $this->chatUser->customer;
+        return $this->chatUser?->customer;
     }
 }
