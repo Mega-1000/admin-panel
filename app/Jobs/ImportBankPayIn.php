@@ -121,8 +121,6 @@ class ImportBankPayIn implements ShouldQueue
             } else if ($payInDto->message === "/[zZ][zZ](\d{3,5})[zZ][zZ]/") {
                 $payIn['kwota'] *= -1;
             } else if ($payInDto->message === "/[yY][yY](\d{3,5})[yY][yY]/") {
-                $payIn['kwota'] *= -1;
-
                 $payIn['operation_type'] = OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE;
             }
 
