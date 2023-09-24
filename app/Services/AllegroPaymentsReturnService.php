@@ -11,6 +11,7 @@ use App\Repositories\Orders;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 readonly class AllegroPaymentsReturnService
 {
@@ -27,6 +28,9 @@ readonly class AllegroPaymentsReturnService
     {
         /** @var $orderLabels */
         $orderLabels = $order->labels()->pluck('labels.id')->toArray();
+
+        // add entry to log
+        Log::notice('Test log' . in_array(50, $orderLabels));
 
         if (in_array(50, $orderLabels)) {
             return;
