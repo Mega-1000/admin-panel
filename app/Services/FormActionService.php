@@ -20,5 +20,8 @@ class FormActionService
 
         AddLabelService::addLabels($order, [47], $arr, []);
         $order->labels()->detach(152);
+
+        $messageService = new MessageService();
+        $messageService->createMessage($order->chat, $order->chat->employee, 'tniemy na 50cm i wysyłamy', 'order', $arr);
     }
 }
