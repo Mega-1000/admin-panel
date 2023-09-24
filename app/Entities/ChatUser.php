@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property User $user
+ * @property Customer $customer
+ * @property Employee $employee
+ */
 class ChatUser extends Model
 {
     use SoftDeletes;

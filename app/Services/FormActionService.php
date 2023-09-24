@@ -3,16 +3,24 @@
 namespace App\Services;
 
 use App\Entities\Order;
+use App\Services\Label\AddLabelService;
 use Illuminate\Http\JsonResponse;
 
 class FormActionService
 {
-    public static function agreeForCut(): void
-    {
-        // mega oława wiersz planer
-        // dodaje niebieski młotek
-        // kasuje pomarańczowy wykszyknik info dział
-        // dopisuje dla magazynu tniemy na 50cm i wysyłamy
 
+    public static function agreeForCut(Order $order): void
+    {
+        $arr = [];
+
+        $order->task->user()->detach();
+        $order->task->user()->attach(37);
+        AddLabelService::addLabels($order, [47], $arr, [], []);
+        $order->labels()->detach(152);
+        $order->chat->messages()->create([
+            'user_id' => $order->chat,
+            'message' => 'Tniemy na 50cm i wysyłamy',
+            'type' => 'WAREHOUSE',
+        ]);
     }
 }

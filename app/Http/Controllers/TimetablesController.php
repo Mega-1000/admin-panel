@@ -8,19 +8,19 @@ use App\Repositories\TaskRepository;
 use App\Repositories\WarehouseRepository;
 use App\Services\TaskService;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
-class TimetablesController extends Controller
+final class TimetablesController extends Controller
 {
     public function __construct(
         protected readonly WarehouseRepository $warehouseRepository,
         protected readonly TaskRepository      $taskRepository,
         protected readonly TaskService         $taskService
-    )
-    {
-    }
+    ) {}
 
-    public function index(Request $request)
+    public function index(Request $request): View|RedirectResponse
     {
         $activeDay = null;
         $viewType = null;
@@ -55,13 +55,10 @@ class TimetablesController extends Controller
         return view('planning.timetable.index', compact(['warehouses', 'viewType', 'activeDay', 'selectId', 'taskDiffInMins', 'taskHour']));
     }
 
-    public function getStorekeepers($id)
+    public function getStorekeepers($id): JsonResponse
     {
-        $warehouse = Warehouse::find($id);
+        $warehouse = Warehouse::findOrFail($id);
 
-        if (empty($warehouse)) {
-            abort(404);
-        }
         $array = [];
         foreach ($warehouse->users as $user) {
             $date = Carbon::today();
@@ -80,10 +77,10 @@ class TimetablesController extends Controller
             ];
         }
 
-        return response()->json($array, 200);
+        return response()->json($array);
     }
 
-    public function getStorekeepersToModal($id)
+    public function getStorekeepersToModal($id): JsonResponse
     {
         $date = Carbon::today();
         $warehouse = $this->warehouseRepository->with([
@@ -93,9 +90,6 @@ class TimetablesController extends Controller
             }
         ])->find($id);
 
-        if (empty($warehouse)) {
-            abort(404);
-        }
 
         return response()->json($warehouse->users);
     }

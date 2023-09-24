@@ -28,6 +28,8 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property int $status_id
  * @property \Illuminate\Database\Eloquent\Collection<OrderItem>
  * @property string $shipment_price_for_client
+ * @property Chat $chat
+ * @property Task $task
  *
  * @property Carbon $created_at
  * @property ?Warehouse $warehouse
@@ -477,98 +479,63 @@ class Order extends Model implements Transformable
         return $this->belongsTo(Customer::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
-    public function allegroOrder()
+    public function allegroOrder(): BelongsTo
     {
         return $this->belongsTo(AllegroOrder::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function status(): BelongsTo
     {
         return $this->belongsTo(Status::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function employee(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
+
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
     }
 
-    /**
-     * @return HasMany
-     */
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    /**
-     * @return HasMany
-     */
-    public function messages()
+    public function messages(): HasMany
     {
         return $this->hasMany(OrderMessage::class);
     }
 
-    /**
-     * @return HasOne
-     */
-    public function monitorNote()
+    public function monitorNote(): HasOne
     {
         return $this->hasOne(OrderMonitorNote::class);
     }
 
-    /**
-     * @return HasOne
-     */
     public function task(): HasOne
     {
         return $this->hasOne(OrderTask::class);
     }
 
-    /**
-     * @return HasOne
-     */
-    public function deliveryAddress()
+    public function deliveryAddress(): HasOne
     {
         return $this->hasOne(OrderAddress::class)->where('type', 'DELIVERY_ADDRESS');
     }
 
-    /**
-     * @return BelongsToMany
-     */
-    public function invoices()
+    public function invoices(): BelongsToMany
     {
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id');
     }
 
-    /**
-     * @return BelongsToMany
-     */
-    public function buyInvoices()
+    public function buyInvoices(): BelongsToMany
     {
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id')->where('invoice_type', 'buy');
     }
 
-    /**
-     * @return BelongsToMany
-     */
-    public function sellInvoices()
+    public function sellInvoices(): BelongsToMany
     {
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id')->where('invoice_type', 'sell');
     }
