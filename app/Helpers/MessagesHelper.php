@@ -332,7 +332,6 @@ class MessagesHelper
         $messageObj->chat_id = $chat->id;
         $messageObj->area = $area;
         if ($area != 0 && $this->currentUserType != self::TYPE_USER) {
-            throw new ChatException('You don\'t have permission to write in other area');
         } else if ($area != 0 && $this->currentUserType == self::TYPE_USER && $chat->order_id) {
 
             // map UserRole Enum to Order constants
