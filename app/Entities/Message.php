@@ -33,12 +33,12 @@ class Message extends Model
         return $this->belongsTo(Chat::class);
     }
 
-    public function user(): User
+    public function user(): ?User
     {
         return $this->chatUser->user;
     }
 
-    public function employee(): Employee
+    public function employee(): ?Employee
     {
         return $this->chatUser->employee;
     }
