@@ -13,8 +13,10 @@ class FormActionService
     {
         $arr = [];
 
-        $order->task->user()->detach();
-        $order->task->user()->attach(37);
+        $task = $order->task;
+        $task->user_id = 37;
+        $task->save();
+
         AddLabelService::addLabels($order, [47], $arr, [], []);
         $order->labels()->detach(152);
         $order->chat->messages()->create([
