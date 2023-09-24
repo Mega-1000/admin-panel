@@ -30,7 +30,7 @@ readonly class AllegroPaymentsReturnService
         $orderLabels = $order->labels()->pluck('labels.id')->toArray();
 
         // add entry to log
-        Log::notice('Test log' . in_array(50, $orderLabels));
+        Log::notice('Test log' . in_array(50, $orderLabels) ? 'true' : 'false');
 
         if (in_array(50, $orderLabels)) {
             return;
