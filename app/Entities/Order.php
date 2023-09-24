@@ -517,7 +517,7 @@ class Order extends Model implements Transformable
 
     public function task(): HasOne
     {
-        return $this->hasOne(OrderTask::class);
+        return $this->hasOne(Task::class);
     }
 
     public function deliveryAddress(): HasOne
