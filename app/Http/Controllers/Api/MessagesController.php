@@ -302,7 +302,7 @@ class MessagesController extends Controller
         $arr = [];
         AddLabelService::addLabels($order, [59], $arr, []);
 
-        DB::transaction(function () use ($order, $customer, $helper, $complaintForm, &$chatUserToken) {
+        DB::transaction(function () use ($request, $order, $customer, $helper, $complaintForm, &$chatUserToken) {
             $chat = $order->chat;
 
             if ($chat !== null) {
@@ -313,15 +313,25 @@ class MessagesController extends Controller
 
             $chat = $chat === null ? $helper->createNewChat() : $chat;
 
-            if (array_key_exists('image', $complaintForm) && !empty($complaintForm['image'])) {
-                $originalFileName = $complaintForm['image']->getClientOriginalName();
-                $hashedFileName = Hash::make($originalFileName);
-                $path = $complaintForm['image']->storeAs('chat_files/' . $chat->id, $hashedFileName, 'public');
-                if ($path) {
-                    $complaintForm['image'] = $path;
-                    $complaintForm['image_name'] = $originalFileName;
+            if ($request->hasFile('image')) {
+                $imagePaths = [];
+
+                foreach ($request->file('image') as $imageFile) {
+                    $originalFileName = $imageFile->getClientOriginalName();
+                    $hashedFileName = Hash::make($originalFileName);
+                    $path = $imageFile->storeAs('chat_files/' . $chat->id, $hashedFileName, 'public');
+
+                    if ($path) {
+                        $imagePaths[] = [
+                            'path' => $path,
+                            'name' => $originalFileName,
+                        ];
+                    }
                 }
+
+                $complaintForm['images'] = $imagePaths;
             }
+
 
             $chat->complaint_form = json_encode($complaintForm);
             $chat->save();
