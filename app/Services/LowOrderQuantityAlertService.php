@@ -27,7 +27,7 @@ class LowOrderQuantityAlertService
                 }
             }
 
-            if ($finalQuantity < $alert->min_quantity) {
+            if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
                 dispatch(new AlertForOrderLowQuantityJob($order, $alert))->delay(now()->addHours($alert->delay_time));
             }
         });
