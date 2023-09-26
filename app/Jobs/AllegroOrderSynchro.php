@@ -60,10 +60,8 @@ class AllegroOrderSynchro implements ShouldQueue
 
     protected ?int $userId;
     private CustomerRepository $customerRepository;
-    private AllegroOrderService $allegroOrderService;
     private ProductRepository $productRepository;
     private ProductService $productService;
-    private EmailSendingService $emailSendingService;
     private OrderRepository $orderRepository;
     private OrderPackagesDataHelper $orderPackagesDataHelper;
     private float $tax;
@@ -92,20 +90,20 @@ class AllegroOrderSynchro implements ShouldQueue
             Auth::loginUsingId($this->userId);
         }
         $this->customerRepository = app(CustomerRepository::class);
-        $this->allegroOrderService = app(AllegroOrderService::class);
+        $allegroOrderService = app(AllegroOrderService::class);
         $this->productRepository = app(ProductRepository::class);
         $this->productService = app(ProductService::class);
         $this->orderRepository = app(OrderRepository::class);
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
-        $this->emailSendingService = app(EmailSendingService::class);
+        $emailSendingService = app(EmailSendingService::class);
         $this->tax = (float)(1 + config('orders.vat'));
 
         $cancelledOrders = [];
         if ($this->synchronizeAll) {
-            $allegroOrders = $this->allegroOrderService->getOrdersOutsideSystem();
+            $allegroOrders = $allegroOrderService->getOrdersOutsideSystem();
         } else {
-            $allegroOrders = $this->allegroOrderService->getPendingOrders();
-            $cancelledOrders = $this->allegroOrderService->getCancelledOrders();
+            $allegroOrders = $allegroOrderService->getPendingOrders();
+            $cancelledOrders = $allegroOrderService->getCancelledOrders();
         }
         $allegroOrders = array_merge($allegroOrders, $cancelledOrders);
 
@@ -150,16 +148,16 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->allegro_payment_id = $allegroOrder['payment']['id'];
                 $order->saveQuietly();
 
-                $order->orderDates()->create([
+                $order->orderDates()->updateOrCreate([
                     'customer_shipment_date_from' => $allegroOrder['delivery']['time']['from'],
                     'customer_shipment_date_to' => $allegroOrder['delivery']['time']['to'],
                     'consultant_shipment_date_from' => $allegroOrder['delivery']['time']['from'],
-                    'consultant_shipment_date_to' => $allegroOrder['delivery']['time']['to'],
+                    'consultant_shipment_date_to' => $allegroOrder['delivery']['time']['to'],\
                 ]);
 
-                $this->emailSendingService->addNewScheduledEmail($order);
+                $emailSendingService->addNewScheduledEmail($order);
 
-                if ($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
+                if ($allegroOrder['status'] === $allegroOrderService::STATUS_CANCELLED) {
                     $prev = [];
                     AddLabelService::addLabels($order, [176], $prev, []);
                 }
@@ -241,7 +239,6 @@ class AllegroOrderSynchro implements ShouldQueue
                 $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? ImportOrdersFromSelloJob::DEFAULT_WAREHOUSE;
                 $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
                 $order->warehouse()->associate($warehouse);
-                $order->setDefaultDates('allegro');
 
                 $order->saveQuietly();
                 $this->addLabels($order);
@@ -261,7 +258,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
                 $prev = [];
                 AddLabelService::addLabels($order, [177], $prev, [], Auth::user()?->id);
-                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+                $allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
                 DB::commit();
             } catch (Throwable $ex) {
                 DB::rollBack();
