@@ -32,7 +32,7 @@ class ProductStockLogs
                 ->where('created_at', '>=', Carbon::now()->subDays($daysBack))
                 ->where('created_at', '<=', Carbon::now())
                 ->whereDoesntHave('customer', function ($query) {
-                    $query->where('login', 'info@mega1000.pl');
+                    $query->where('login', 'info@ephpolska.pl');
                 })
                 ->get();
 
