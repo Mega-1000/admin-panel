@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $message
  * @property int $delay_time
  * @property string $title
+ * @property string $space
  */
 class LowOrderQuantityAlert extends Model
 {
@@ -22,10 +23,19 @@ class LowOrderQuantityAlert extends Model
         'message',
         'delay_time',
         'title',
+        'space',
     ];
 
     public function products(): mixed
     {
         return Product::where('low_order_quantity_alert_text', $this->item_names);
+    }
+
+    public static function findForEdition(int $id): self
+    {
+        $result = self::where('id', $id)->first();
+        $result->message = str_replace('<br />', "\n", $result->message);
+
+        return $result;
     }
 }

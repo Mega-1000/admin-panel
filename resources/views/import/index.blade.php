@@ -29,7 +29,11 @@
     </a>
 
     <a href="{{ route('low-quantity-alerts.index') }}" class="btn btn-primary">
-        Zarządzanie alertami o niskich stanach magazynowych
+        Zarzadzanine automatycznymi powiadomieniami na e maila
+    </a>
+
+    <a href="{{ route('form-creator.index') }}" class="btn btn-primary">
+        Kreator formularzy
     </a>
 
     <div class="row">
