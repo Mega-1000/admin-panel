@@ -29,6 +29,16 @@ class CreateLowOrderQuantityAlertRequest extends FormRequest
             'message' => 'required',
             'delay_time' => 'required|numeric',
             'title' => 'required|string',
+            'space' => 'required|string',
         ];
+    }
+
+    public function validated($key = null, $default = null): array
+    {
+        $data = parent::validated();
+        $data['message'] = str_replace("\n", '<br />',  $data['message']);
+
+
+        return array_merge($data);
     }
 }

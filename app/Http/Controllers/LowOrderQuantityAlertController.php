@@ -61,7 +61,7 @@ class LowOrderQuantityAlertController extends Controller
     public function edit(int $lowOrderQuantityAlert): View
     {
         return view('low-order-quantity-alert.show', [
-            'message' => LowOrderQuantityAlert::find($lowOrderQuantityAlert),
+            'message' => LowOrderQuantityAlert::findForEdition($lowOrderQuantityAlert),
         ]);
     }
 
