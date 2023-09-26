@@ -27,7 +27,7 @@
                     {{ $message->id }}
                 </td>
                 <td>
-                    {{ $message->message }}
+                    {!! $message->message !!}
                 </td>
                 <td>
                     {{ $message->min_quantity }}
