@@ -15,24 +15,22 @@ class ChangeOrderStatusJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $order;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($order)
-    {
-        $this->order = $order;
-    }
+    public function __construct(
+        public readonly Order $order
+    ) {}
 
     /**
      * Execute the job.
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->order->status->generate_order_offer === 1) {
             $orderOfferMessage = Status::find(18)->message;

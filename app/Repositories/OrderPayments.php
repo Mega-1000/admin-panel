@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Model;
 class OrderPayments
 {
     /**
-     * @param $order
-     * @param $payIn
+     * @param Order $order
+     * @param BankPayInDTO $payIn
      *
      * @return integer
      */
@@ -34,15 +34,12 @@ class OrderPayments
     }
 
     /**
-     * @param $externalPaymentId
-     *
-     * @return OrderPayment|null
+     * @param Order|Model $order
+     * @param OrderPaymentDTO $fromArray
+     * @param $operationType
+     * @param OrderPayment $payment
+     * @return void
      */
-    public static function getByExternalPaymentId($externalPaymentId): ?OrderPayment
-    {
-        return OrderPayment::where('external_payment_id', $externalPaymentId)->first();
-    }
-
     public static function createRebookedOrderPayment(Order|Model $order, OrderPaymentDTO $fromArray, $operationType, OrderPayment $payment): void
     {
         $order->payments()->create([

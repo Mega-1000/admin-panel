@@ -12,6 +12,8 @@ use Prettus\Repository\Traits\TransformableTrait;
  * Class Status.
  *
  * @package namespace App\Entities;
+ *
+ * @property float|int $generate_order_offer
  */
 class Status extends Model implements Transformable
 {
