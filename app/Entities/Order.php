@@ -334,26 +334,25 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderAddress::class);
     }
 
-    public function isInvoiceDataComplete()
+    /**
+     * @return Model
+     */
+    public function getDeliveryAddress(): Model
     {
-        $invoiceAddress = $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
-        return (!(
-            empty($invoiceAddress->firstname) ||
-            empty($invoiceAddress->lastname) ||
-            empty($invoiceAddress->phone) ||
-            empty($invoiceAddress->address) ||
-            empty($invoiceAddress->flat_number) ||
-            empty($invoiceAddress->city) ||
-            empty($invoiceAddress->postal_code)
-        ));
+        return $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first() ?? $this->createEmptyDeliveryAddress();
     }
 
     /**
-     * @return object|HasMany
+     * Create empty delivery address for this order
+     *
+     * @return Model
      */
-    public function getDeliveryAddress(): Model|HasMany
+    private function createEmptyDeliveryAddress(): Model
     {
-        return $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
+        return OrderAddress::create([
+            'type' => 'DELIVERY_ADDRESS',
+            'order_id' => $this->id,
+        ]);
     }
 
     /**
