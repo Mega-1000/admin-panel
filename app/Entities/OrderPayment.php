@@ -12,6 +12,9 @@ use Prettus\Repository\Traits\TransformableTrait;
  * Class OrderPayment.
  *
  * @package namespace App\Entities;
+ *
+ * @property int $id
+ * @property string $payer
  */
 class OrderPayment extends Model implements Transformable
 {

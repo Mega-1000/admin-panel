@@ -35,14 +35,6 @@ class OrderStatusChanged extends Mailable
 
     public function attachments(): array
     {
-        if ($this->pdfPath !== '') {
-            return [
-                Attachment::fromPath($this->pdfPath)
-                    ->as('proforma.pdf')
-                    ->withMime('application/pdf')
-            ];
-        }
-
         return [];
     }
 

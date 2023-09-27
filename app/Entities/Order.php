@@ -30,6 +30,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property string $shipment_price_for_client
  * @property Chat $chat
  * @property Task $task
+ * @property Status $status
  *
  * @property Carbon $created_at
  * @property ?Warehouse $warehouse
