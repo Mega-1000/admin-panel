@@ -38,6 +38,8 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property ?Carbon $preferred_invoice_date
  * @property string $labels_log
  * @property string $consultant_notices
+ * @property mixed $factoryDelivery
+ * @property Collection $labels
  *
  * @property Collection<OrderPackage> $packages
  *
@@ -51,7 +53,6 @@ class Order extends Model implements Transformable
     use SaveQuietlyTrait;
 
     const STATUS_WITHOUT_REALIZATION = 8;
-    const STATUS_ORDER_FINISHED = 6;
     const COMMENT_SHIPPING_TYPE = 'shipping_comment';
     const COMMENT_WAREHOUSE_TYPE = 'warehouse_comment';
     const COMMENT_CONSULTANT_TYPE = 'consultant_comment';
@@ -60,7 +61,7 @@ class Order extends Model implements Transformable
 
     const PROFORM_DIR = 'public/proforma/';
 
-    public $customColumnsVisibilities = [
+    public array $customColumnsVisibilities = [
         'mark',
         'spedition_exchange_invoiced_selector',
         'packages_sent',
@@ -363,7 +364,7 @@ class Order extends Model implements Transformable
         return $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
     }
 
-    public function hasLabel($labelId)
+    public function hasLabel($labelId): int
     {
         if (!is_array($labelId)) {
             $labelId = [$labelId];
@@ -380,19 +381,17 @@ class Order extends Model implements Transformable
         return $this->belongsToMany(Label::class, 'order_labels')->withPivot(['added_type', 'created_at']);
     }
 
-    public function orderLabels()
+    public function orderLabels(): HasMany
     {
         return $this->hasMany(OrderLabel::class);
     }
 
-    public function promisePayments()
+    public function promisePayments(): \Illuminate\Database\Eloquent\Collection
     {
-        $promisePayments = $this->payments()->where('promise', 'like', '1')->get();
-
-        return $promisePayments;
+        return $this->payments()->where('promise', 'like', '1')->get();
     }
 
-    public function hasPromisePayments()
+    public function hasPromisePayments(): int
     {
         return $this->payments()->where('promise', 'like', '1')->count();
     }
@@ -435,6 +434,7 @@ class Order extends Model implements Transformable
     public function getOfferFinanceBilans()
     {
         $bilans = $this->payments()->where('operation_type', '!=', 'Zwrot towaru')->sum('amount');
+
         return $this->getValue() - $bilans + $this->payments()->where('operation_type', 'Zwrot towaru')->sum('amount');
     }
 
@@ -547,28 +547,29 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderFiles::class);
     }
 
-    public function taskSchedule()
+    public function taskSchedule(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
-    public function getToken()
+    public function getToken(): string
     {
         if (empty($this->token)) {
             $this->token = Str::random(32);
             static::where('id', $this->id)->update(['token' => $this->token]);
         }
+
         return $this->token;
     }
 
-    public function factoryDelivery()
+    public function factoryDelivery(): HasMany
     {
-        return $this->hasMany('App\Entities\OrderOtherPackage')->where('type', 'from_factory');
+        return $this->hasMany(OrderOtherPackage::class)->where('type', 'from_factory');
     }
 
     public function notCalculable()
     {
-        return $this->hasMany('App\Entities\OrderOtherPackage')->where('type', 'not_calculable');
+        return $this->hasMany(OrderOtherPackage::class)->where('type', 'not_calculable');
     }
 
     public function getTransportPrice()

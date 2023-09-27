@@ -22,5 +22,17 @@ class EmailSending extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'order_id',
+        'email_setting_id',
+        'email',
+        'title',
+        'content',
+        'attachment',
+        'scheduled_date',
+        'send_date',
+        'message_send',
+    ];
+
     protected $table = 'email_sending';
 }

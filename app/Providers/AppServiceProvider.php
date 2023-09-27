@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Entities\OrderLabel;
 use App\Entities\OrderPackage;
+use App\Observers\Entities\OrderLabelsObserver;
 use App\Observers\OrderPackageObserver;
 use App\Repositories\FileInvoiceRepository;
 use App\Repositories\InvoiceRepositoryInterface;
@@ -20,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         if (config('app.debug_query')) {
             DB::listen(function ($sql) {
@@ -35,7 +37,6 @@ class AppServiceProvider extends ServiceProvider
         }
         // TODO Check solutions for deprecated functions
         Carbon::setWeekendDays([CarbonInterface::SUNDAY, CarbonInterface::SATURDAY]);
-//        TaskTime::observe(TaskTimeObserver::class);
 
         OrderPackage::observe(OrderPackageObserver::class);
     }
@@ -45,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         Schema::defaultStringLength(191);
     }

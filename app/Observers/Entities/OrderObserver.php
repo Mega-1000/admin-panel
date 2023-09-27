@@ -85,7 +85,6 @@ readonly class OrderObserver
 
     public function updated(Order $order): void
     {
-        $this->orderService->calculateInvoiceReturnsLabels($order);
 
         if (count($order->payments)) {
             if ($order->isPaymentRegulated()) {
@@ -105,4 +104,13 @@ readonly class OrderObserver
 
         $this->orderPaymentLabelsService->calculateLabels($order);
     }
+
+    public function labelsAttached(Order $order): void
+    {
+        dd('okej');
+        if ($order->labels->contains(50)) {
+            dd('parabole ja pierdole');
+        }
+    }
+
 }

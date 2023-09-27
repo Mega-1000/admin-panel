@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use App\Enums\EmailSettingsEnum;
+use App\Facades\Mailer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -40,6 +41,17 @@ class EmailSetting extends Model
 
     public function getStatusUserFriendlyName(): string
     {
-        return EmailSettingsEnum::fromKey( $this->status );
+        return EmailSettingsEnum::fromKey($this->status);
+    }
+
+    public function sendEmail(string $email): void
+    {
+        EmailSending::create([
+            'email' => $email,
+            'title' => $this->title,
+            'content' => $this->content,
+            'email_setting_id' => $this->id,
+            'scheduled_date' => now(),
+        ]);
     }
 }
