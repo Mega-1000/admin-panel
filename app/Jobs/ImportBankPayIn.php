@@ -3,13 +3,16 @@
 namespace App\Jobs;
 
 use App\DTO\PayInDTO;
+use App\DTO\PayInImport\BankPayInDTO;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
 use App\Enums\OrderPaymentsEnum;
 use App\Enums\OrderTransactionEnum;
+use App\Factory\BankPayInDTOFactory;
 use App\Factory\PayInDTOFactory;
-use App\Helpers\PdfCharactersHelper;
+use App\Helpers\Exceptions\ChatException;
+use App\Http\Controllers\CreateTWSOOrdersDTO;
 use App\Repositories\FileInvoiceRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
@@ -18,6 +21,7 @@ use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
 use App\Services\OrderPaymentLabelsService;
 use App\Services\OrderPaymentService;
+use App\Services\OrderService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,47 +34,35 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ImportBankPayIn implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected TransactionRepository                $transactionRepository;
-
     protected LabelService                         $labelService;
     protected FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService;
-
     protected OrderPaymentService                  $orderPaymentService;
-    protected                                      $orderPaymentLabelsService;
+    protected orderPaymentLabelsService            $orderPaymentLabelsService;
 
     public function __construct(
-        protected UploadedFile                         $file,
+        protected UploadedFile $file,
     ) {}
 
     /**
      * Execute the job.
      *
-     * @param TransactionRepository $transaction
-     * @param LabelService $labelService
-     * @param FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService
-     * @param OrderPaymentService $orderPaymentService
-     * @param OrderPaymentLabelsService $orderPaymentLabelsService
      * @return string
+     * @throws ChatException
      */
-    public function handle(
-        TransactionRepository                $transaction,
-        LabelService                         $labelService,
-        FindOrCreatePaymentForPackageService $findOrCreatePaymentForPackageService,
-        OrderPaymentService                  $orderPaymentService,
-        OrderPaymentLabelsService            $orderPaymentLabelsService,
-    ): string
+    public function handle(): string
     {
-        $this->findOrCreatePaymentForPackageService = $findOrCreatePaymentForPackageService;
-        $this->orderPaymentService = $orderPaymentService;
-        $this->orderPaymentLabelsService = $orderPaymentLabelsService;
+        $this->findOrCreatePaymentForPackageService = app(FindOrCreatePaymentForPackageService::class);
+        $this->orderPaymentService = app(OrderPaymentService::class);
+        $this->orderPaymentLabelsService = app(OrderPaymentLabelsService::class);
+        $this->labelService = app(LabelService::class);
+        $this->transactionRepository = app(TransactionRepository::class);
 
-        $header = NULL;
         $fileName = 'bankTransactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');
 
@@ -79,53 +71,36 @@ class ImportBankPayIn implements ShouldQueue
         Storage::put($reportPath, '');
         $report = fopen(storage_path('app/' . $reportPath), 'w');
 
-        $this->labelService = $labelService;
-        $this->transactionRepository = $transaction;
-        $data = array();
-        if (($handle = fopen($this->file, 'r')) !== FALSE) {
-            while (($row = fgetcsv($handle, 5000, ';')) !== FALSE) {
-                if (count(array_filter($row)) < 5) {
-                    continue;
-                }
-
-                if (!$header) {
-                    foreach ($row as &$headerName) {
-                        if (!empty($headerName)) {
-                            $headerName = str_replace('#', '', iconv('ISO-8859-2', 'UTF-8', $headerName));
-                            $headerName = Str::snake(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName));
-                        }
-                    }
-                    $header = $row;
-                    fputcsv($file, $row);
-                } else {
-                    foreach ($row as &$text) {
-                        $text = iconv('ISO-8859-2', 'UTF-8', $text);
-                    }
-                    $data[] = array_combine($header, $row);
-                }
-            }
-            fclose($handle);
-        }
+        $data = BankPayInDTOFactory::fromFile($this->file);
 
         foreach ($data as $payIn) {
-            $payInDto = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
-            $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
+            $payInDto = $this->checkOrderNumberFromTitle($payIn->tytul, $payIn);
+            $payIn->kwota = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn->kwota));
 
-            $payIn['operation_type'] = 'Wpłata/wypłata bankowa';
+            $payIn->operation_type = 'Wpłata/wypłata bankowa';
 
-            if ($payInDto->message === "Brak dopasowania") {
-                continue;
-            } else if ($payInDto->message === "Brak numeru zamówienia") {
-                fputcsv($file, $payIn);
-                continue;
-            } else if ($payInDto->message === "/[zZ][zZ](\d{3,5})[zZ][zZ]/") {
-                $payIn['kwota'] *= -1;
-            } else if ($payInDto->message === "/[yY][yY](\d{3,5})[yY][yY]/") {
-                $payIn['operation_type'] = OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE;
+            switch($payInDto->message) {
+                case 'Brak dopasowania':
+                    continue;
+                case 'Brak numeru zamówienia':
+                    if ($payIn->contains('TECHN.;')) {
+                        fputcsv($file, $payIn->toArray());
+                        continue;
+                    }
+
+                    $this->createTWSUOrder($payIn);
+
+                    break;
+                case '/[zZ][zZ](\d{3,5})[zZ][zZ]/':
+                    $payIn->kwota *= -1;
+                    break;
+                case '/[yY][yY](\d{3,5})[yY][yY]/':
+                    $payIn->setOperationType(OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE);
+                    break;
             }
 
             if ($payInDto->orderId === null) {
-                fputcsv($file, $payIn);
+                fputcsv($file, $payIn->toArray());
                 continue;
             }
 
@@ -133,7 +108,7 @@ class ImportBankPayIn implements ShouldQueue
 
             $order = Order::find($orderId);
             if ($order == null) {
-                fputcsv($file, $payIn);
+                fputcsv($file, $payIn->toArray());
                 continue;
             }
 
@@ -144,7 +119,7 @@ class ImportBankPayIn implements ShouldQueue
 
                     $this->settleOrders($orders, $payIn);
                 } else {
-                    fputcsv($file, $payIn);
+                    fputcsv($file, $payIn->toArray());
                 }
             } catch (Exception $exception) {
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__, 'error_line' => $exception->getLine()]);
@@ -164,10 +139,10 @@ class ImportBankPayIn implements ShouldQueue
      * Search order number.
      *
      * @param string $fileLine Line in csv file.
-     * @param $payIn
+     * @param BankPayInDTO $payIn
      * @return PayInDTO
      */
-    private function checkOrderNumberFromTitle(string $fileLine, $payIn): PayInDTO
+    private function checkOrderNumberFromTitle(string $fileLine, BankPayInDTO $payIn): PayInDTO
     {
         $fileLine = str_replace(' ', '', $fileLine);
 
@@ -192,7 +167,7 @@ class ImportBankPayIn implements ShouldQueue
         ];
 
         foreach ($notPossibleOperationDescriptions as $notPossibleOperationDescription) {
-            if (str_contains(implode(' ', $payIn), $notPossibleOperationDescription)) {
+            if (str_contains($payIn->stringify(), $notPossibleOperationDescription)) {
                 return PayInDTOFactory::createPayInDTO([
                     'data' => $payIn,
                     'message' => 'Brak dopasowania',
@@ -204,7 +179,7 @@ class ImportBankPayIn implements ShouldQueue
             return str_replace('Ą', 'Ľ', $description);
         }, $possibleOperationDescriptions);
 
-        if (!in_array($payIn['opis_operacji'], $possibleOperationDescriptions)) {
+        if (!in_array($payIn->opis_operacji, $possibleOperationDescriptions)) {
             return PayInDTOFactory::createPayInDTO([
                 'data' => $payIn,
                 'message' => 'Brak dopasowania',
@@ -227,7 +202,7 @@ class ImportBankPayIn implements ShouldQueue
                 return new PayInDTO(
                     orderId: (int)$matches[0],
                     data: $payIn,
-                    message: $pattern
+                    message: $pattern,
                 );
             }
         }
@@ -237,7 +212,6 @@ class ImportBankPayIn implements ShouldQueue
         if (count($matches)) {
             foreach ($matches[0] as $orderId) {
                 $order = Order::query()->find($orderId);
-                Log::notice($order);
                 if (!empty($order) && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
                     return PayInDTOFactory::createPayInDTO([
                         'orderId' => (int)$order->id,
@@ -245,7 +219,6 @@ class ImportBankPayIn implements ShouldQueue
                     ]);
                 }
 
-                // if order value does not match, throw exception
                 if (!empty($order)) {
                     return PayInDTOFactory::createPayInDTO([
                         'data' => $payIn,
@@ -256,7 +229,7 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         $allegoIdPattern = '/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/';
-        if (preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
+        if (preg_match($allegoIdPattern, $payIn->tytul, $matches)) {
         $order = Order::query()->where('allegro_form_id', $matches[0])->first();
 
         if (!empty($order)) {
@@ -268,7 +241,7 @@ class ImportBankPayIn implements ShouldQueue
     }
 
         $invoicePattern = '/\b(?:\d{1,6}\s*\/\s*(?:sta|mag|tra|kos)\s*\/\s*\d{2}\s*\/\s*\d{2}\s*\d{2})\b/';
-        if (preg_match($invoicePattern, mb_strtolower($payIn['tytul']), $matches)) {
+        if (preg_match($invoicePattern, mb_strtolower($payIn->tytul), $matches)) {
             $matches[0] = str_replace(' ', '', $matches[0]);
             $orderId = FileInvoiceRepository::getInvoiceIdFromNumber(str_replace('/', '_', $matches[0]));
             $order = Order::query()->find($orderId);
@@ -281,39 +254,21 @@ class ImportBankPayIn implements ShouldQueue
             }
         }
 
-        // No matching order id found
         return PayInDTOFactory::createPayInDTO([
             'data' => $payIn,
         ]);
     }
 
     /**
-     * Calculate balance
-     *
-     * @param integer $customerId Customer id
-     * @return float
-     */
-    private function getCustomerBalance(int $customerId): float
-    {
-        if (!empty($lastCustomerTransaction = $this->transactionRepository->findWhere([
-            ['customer_id', '=', $customerId]
-        ])->last())) {
-            return $lastCustomerTransaction->balance;
-        }
-
-        return 0;
-    }
-
-    /**
      * Settle promise.
      *
      * @param Order $order Order object.
-     * @param array $payIn Pay in row.
+     * @param BankPayInDTO $payIn Pay in row.
      */
-    private function settlePromisePayments(Order $order, array $payIn): void
+    private function settlePromisePayments(Order $order, BankPayInDTO $payIn): void
     {
         foreach ($order->payments()->where('promise', '1')->whereNull('deleted_at')->get() as $payment) {
-            if ($payIn['kwota'] === (float)$payment->amount) {
+            if ($payIn->kwota === (float)$payment->amount) {
                 $payment->delete();
             } else {
                 $preventionArray = [];
@@ -337,11 +292,11 @@ class ImportBankPayIn implements ShouldQueue
      * Settle orders.
      *
      * @param Collection $orders Orders collection
-     * @param array $payIn
+     * @param BankPayInDTO $payIn
      */
-    private function settleOrders(Collection $orders, array $payIn): void
+    private function settleOrders(Collection $orders, BankPayInDTO $payIn): void
     {
-        $amount = $payIn['kwota'];
+        $amount = $payIn->kwota;
         $order = $orders[0];
 
         $this->findOrCreatePaymentForPackageService->execute(
@@ -349,14 +304,14 @@ class ImportBankPayIn implements ShouldQueue
         );
 
         if ($amount < 0) {
-            $this->saveOrderPayment($order, $amount, $payIn, false, $payIn['operation_type']);
+            $this->saveOrderPayment($order, $amount, $payIn, false, $payIn->operation_type);
             return;
         }
 
         $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
         OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
 
-        $orderPayment = $this->saveOrderPayment($order, $amount, $payIn, $declaredSum, $payIn['operation_type']);
+        $orderPayment = $this->saveOrderPayment($order, $amount, $payIn, $declaredSum, $payIn->operation_type);
 
         if ($orderPayment instanceof OrderPayment) {
             $this->orderPaymentService->dispatchLabelsForPaymentAmount($orderPayment);
@@ -366,18 +321,18 @@ class ImportBankPayIn implements ShouldQueue
     /**
      * @param Order $order
      * @param float $paymentAmount
-     * @param array $payIn
+     * @param BankPayInDTO $payIn
      * @param false $declaredSum
      * @param string $operationType
      * @return Model
      */
-    private function saveOrderPayment(Order $order, float $paymentAmount, array $payIn, $declaredSum = false, string $operationType): Model
+    private function saveOrderPayment(Order $order, float $paymentAmount, BankPayInDTO $payIn, $declaredSum = false, string $operationType): Model
     {
-        unset($payIn['operation_type']);
+        unset($payIn->operation_type);
         $operationType = $operationType ?? 'Wpłata/wypłata bankowa';
 
         /** @var ?OrderPayment $payment */
-        $payment = OrderPayment::where('comments', implode(" ", $payIn))->first();
+        $payment = OrderPayment::where('comments', $payIn->stringify())->first();
         $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
 
 
@@ -387,9 +342,9 @@ class ImportBankPayIn implements ShouldQueue
                 'type' => 'CLIENT',
                 'promise' => '',
                 'payer' => $payer,
-                'operation_date' => $payIn['data_ksiegowania'],
+                'operation_date' => $payIn->data_ksiegowania,
                 'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
-                'comments' => implode(" ", $payIn),
+                'comments' => implode(" ", $payIn->toArray()),
                 'operation_type' => $operationType,
                 'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]) : $payment;
@@ -402,5 +357,20 @@ class ImportBankPayIn implements ShouldQueue
 
         return $payment;
     }
-}
 
+    /**
+     * Create twsu order if not found
+     *
+     * @param BankPayInDTO $data
+     * @return void
+     * @throws ChatException
+     */
+    public static function createTWSUOrder(BankPayInDTO $data): void
+    {
+        OrderService::createTWSOOrders(new CreateTWSOOrdersDTO(
+            clientEmail: 'info@ephpolska.pl',
+            purchaseValue: $data->kwota,
+            consultantDescription: $data->stringify(),
+        ));
+    }
+}

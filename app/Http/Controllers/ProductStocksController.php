@@ -431,11 +431,7 @@ class ProductStocksController extends Controller
         MessageService              $messageService,
     ): RedirectResponse
     {
-        $this->orderService->createTWSOOrders(
-            CreateTWSOOrdersDTO::fromRequest($request->validated()),
-            $productService,
-            $messageService,
-        );
+        $this->orderService->createTWSOOrders(CreateTWSOOrdersDTO::fromRequest($request->validated()));
 
         return redirect()->route('orders.index')->with([
             'message' => 'stworzono zamówienie TWSU',

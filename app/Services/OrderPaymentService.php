@@ -11,7 +11,6 @@ use App\Enums\OrderPaymentStatus;
 use App\Enums\OrderStatus;
 use App\Helpers\PriceHelper;
 use App\Helpers\TokenHelper;
-use App\Http\Controllers\OrdersPaymentsController;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;

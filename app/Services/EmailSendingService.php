@@ -1,18 +1,17 @@
 <?php namespace App\Services;
 
-use App\Enums\EmailSettingsEnum;
-use App\Entities\Order;
 use App\Entities\AllegroOrder;
 use App\Entities\EmailSending;
 use App\Entities\EmailSetting;
+use App\Entities\Order;
+use App\Enums\EmailSettingsEnum;
+use App\Facades\Mailer;
+use App\Helpers\EmailTagHandlerHelper;
 use App\Mail\MailSending;
+use DateTime;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use App\Helpers\EmailTagHandlerHelper;
-use App\Facades\Mailer;
-use DateTime;
-use App\Services\AllegroChatService;
 
 class EmailSendingService
 {

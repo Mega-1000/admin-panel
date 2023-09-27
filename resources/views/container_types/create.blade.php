@@ -48,15 +48,15 @@
                                 <option value="">Wybierz kuriera</option>
                                 @foreach(CourierName::NAMES_FOR_DAY_CLOSE as $code => $courierName)
                                     <option
-                                        @if (!empty($containerType) && $containerType->shipping_provider === $code)  selected="selected"
-                                        @endif value="{{ $code }}">{{ $courierName }}</option>
+                                            @if (!empty($containerType) && $containerType->shipping_provider === $code)  selected="selected"
+                                            @endif value="{{ $code }}">{{ $courierName }}</option>
                                 @endforeach
                             </select>
                         </div>
                         @if(!empty($containerType) && $containerType->additional_informations)
                             <div class="form-group">
                                 <label
-                                    for="additional_informations">@lang('order_packages.form.container_type_additional_informations')</label>
+                                        for="additional_informations">@lang('order_packages.form.container_type_additional_informations')</label>
                                 <table>
                                     @foreach($containerType->additional_informations as $description => $value )
                                         <tr>

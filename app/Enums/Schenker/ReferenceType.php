@@ -4,10 +4,6 @@ namespace App\Enums\Schenker;
 
 class ReferenceType
 {
-
-    const TRACKING_NUMBER = 'DWB';
-    const REFERENCE_NUMBER = 'COR';
-
     const TYPE_FORWARDING_ORDER = 1;
     const TYPE_WZ_DOCUMENT = 2;
     const TYPE_INVOICE = 3;

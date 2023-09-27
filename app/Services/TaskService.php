@@ -8,7 +8,6 @@ use App\Entities\Task;
 use App\Entities\TaskTime;
 use App\Enums\CourierName;
 use App\Helpers\OrderCalcHelper;
-use App\Helpers\OrdersHelper;
 use App\Helpers\TaskHelper;
 use App\Helpers\TaskTimeHelper;
 use App\Http\Requests\TaskUpdateRequest;
@@ -17,12 +16,11 @@ use App\Repositories\TaskRepository;
 use App\Repositories\Tasks;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\TaskTimes;
-use App\Services\Label\RemoveLabelService;
 use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -414,7 +412,7 @@ class TaskService
         } else {
             $customId = 'task-' . $task->id;
         }
-        
+
         if (isset($data['new_group'])) {
             $newGroup = Task::whereIn('id', $data['new_group'])->get();
             $this->updateOldAndCreateNewGroup($newGroup, $request, $task);
@@ -485,7 +483,7 @@ class TaskService
             }
             return $customId;
         }
-        
+
         return null;
     }
 

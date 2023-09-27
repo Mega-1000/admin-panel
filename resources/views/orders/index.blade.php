@@ -1,9 +1,6 @@
 @php
-    use App\Entities\Label;
-    use App\Entities\Warehouse;
-    use App\Enums\OrderPaymentsEnum;
-    use App\Enums\ProductStockError;
-    use App\User; @endphp
+    use App\Entities\Label;use App\Entities\Warehouse;use App\Enums\OrderPaymentsEnum;use App\Enums\ProductStockError;use App\User;
+@endphp
 
 @extends('layouts.datatable')
 
@@ -868,7 +865,8 @@
             </select>
 
             Ilość:
-            <input class="form-control" id="differenceInShipmentCost" name="differenceInShipmentCost" value="{{ \Illuminate\Support\Facades\Cookie::get('differenceInShipmentCost') }}" type="number" >
+            <input class="form-control" id="differenceInShipmentCost" name="differenceInShipmentCost"
+                   value="{{ \Illuminate\Support\Facades\Cookie::get('differenceInShipmentCost') }}" type="number">
             <button id="difference-shipment-button" class="btn btn-primary">
                 Zapisz
             </button>
@@ -890,8 +888,10 @@
                 $shipmentCostTo = $shipmentCostFilter->to ?? null;
             @endphp
 
-            <input placeholder="od" class="form-control" id="shipmentCostFrom" name="from" value="{{ $shipmentCostFrom }}" type="number" >
-            <input placeholder="do" class="form-control" id="shipmentCostTo" name="to" value="{{ $shipmentCostTo }}" type="number" >
+            <input placeholder="od" class="form-control" id="shipmentCostFrom" name="from"
+                   value="{{ $shipmentCostFrom }}" type="number">
+            <input placeholder="do" class="form-control" id="shipmentCostTo" name="to" value="{{ $shipmentCostTo }}"
+                   type="number">
 
             <button class="btn btn-primary">
                 Pokaż
@@ -1168,8 +1168,8 @@
                 let differenceInShipmentCost = $('#differenceInShipmentCost').val();
 
                 // create or update cookies
-                window.cookies.set('gratherOrLess', gratherOrLess, { expires: 365 });
-                window.cookies.set('differenceInShipmentCost', differenceInShipmentCost, { expires: 365 });
+                window.cookies.set('gratherOrLess', gratherOrLess, {expires: 365});
+                window.cookies.set('differenceInShipmentCost', differenceInShipmentCost, {expires: 365});
             });
 
             let nof = getUrlParameter('nof');
@@ -1452,7 +1452,7 @@
                     url: url.replace('%id', id),
                     type: 'delete',
                     dataType: 'text',
-                    contentType:'application/json',
+                    contentType: 'application/json',
                     data: {
                         'redirect': false
                     }

@@ -2,10 +2,10 @@
 
 namespace App\Entities;
 
+use App\Enums\EmailSettingsEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\EmailSettingsEnum;
 use phpDocumentor\Reflection\Types\Boolean;
 
 /**

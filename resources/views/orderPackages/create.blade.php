@@ -1,4 +1,4 @@
-@php use App\Enums\CourierName; @endphp
+@php  @endphp
 @extends('layouts.datatable')
 @section('app-header')
     <h1 class="page-title">
@@ -96,13 +96,13 @@
                         INPOST
                     </option>
                     <option
-                        {{ old('service_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                            {{ old('service_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
                         POCZTEX
                     </option>
                     <option {{ old('service_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
                     </option>
                     <option
-                        {{ old('service_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                            {{ old('service_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
                         APACZKA
                     </option>
                     <option {{ old('service_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
@@ -115,11 +115,11 @@
                     <option {{ old('service_courier_name') == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS
                     </option>
                     <option
-                        {{ old('service_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                            {{ old('service_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                     <option
-                        {{ old('service_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            {{ old('service_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                     <option {{ old('service_courier_name') == 'DB' ? 'selected="selected"' : '' }} value="DB">
@@ -134,13 +134,13 @@
                         INPOST
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                            {{ old('delivery_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
                         POCZTEX
                     </option>
                     <option {{ old('delivery_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                            {{ old('delivery_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
                         APACZKA
                     </option>
                     <option {{ old('delivery_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
@@ -153,15 +153,15 @@
                     <option {{ old('delivery_courier_name') == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                            {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
+                            {{ old('delivery_courier_name') == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
                         PACZKOMAT
                     </option>
                     <option {{ old('delivery_courier_name') == 'DB' ? 'selected="selected"' : '' }} value="DB">
@@ -185,7 +185,7 @@
                             </option>
                         @else
                             <option
-                                value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
+                                    value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
                         @endif
                     @endforeach
                 </select>
@@ -468,7 +468,7 @@
                     {{ csrf_field() }}
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Zmiana wartości przesyłki <span
-                                class="package_id"></span></h5>
+                                    class="package_id"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>

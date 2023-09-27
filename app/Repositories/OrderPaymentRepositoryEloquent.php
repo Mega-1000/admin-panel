@@ -2,10 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Enums\OrderPaymentPromiseType;
-use Prettus\Repository\Eloquent\BaseRepository;
-use Prettus\Repository\Criteria\RequestCriteria;
 use App\Entities\OrderPayment;
+use App\Enums\OrderPaymentPromiseType;
+use Prettus\Repository\Criteria\RequestCriteria;
+use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
  * Class OrderPaymentRepositoryEloquent.

@@ -136,14 +136,4 @@ class ImportAllegroBillingService
             'type' => $type,
         ]);
     }
-
-    /**
-     * @param AllegroGeneralExpense $billingEntry
-     * @param ImportAllegroBillingDTO $data
-     * @return void
-     */
-    private function handleNoTrackingNumber(AllegroGeneralExpense $billingEntry, ImportAllegroBillingDTO $data): void
-    {
-        return;
-    }
 }

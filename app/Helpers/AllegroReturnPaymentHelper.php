@@ -47,7 +47,7 @@ final class AllegroReturnPaymentHelper
                     amount: $amount,
                 );
                 continue;
-            } 
+            }
 
             $lineItemsForPaymentRefund[] = new AllegroReturnItemDTO(
                 id: $allegroId,

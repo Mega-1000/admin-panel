@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 readonly class CreateTWSOOrdersDTO
 {
     public function __construct(
-        protected string $warehousesSymbols,
+        protected ?string $warehousesSymbols = null,
         protected string $clientEmail,
         protected float $purchaseValue,
         protected ?string $consultantDescription,

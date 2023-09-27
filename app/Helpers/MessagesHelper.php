@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\ChatStatus;
 use App\Entities\Chat;
+use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\CustomerAddress;
 use App\Entities\Employee;
@@ -20,12 +21,8 @@ use App\Http\Controllers\OrdersController;
 use App\Http\Requests\NoticesRequest;
 use App\Jobs\ChatNotificationJob;
 use App\Repositories\Chats;
-use App\Repositories\OrderAddressRepository;
-use App\Repositories\ProductRepository;
-use App\Repositories\WarehouseRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
-use App\Services\ProductService;
 use App\Services\WorkingEventsService;
 use App\User;
 use Exception;
@@ -35,7 +32,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use App\Entities\ChatUser;
 
 class MessagesHelper
 {

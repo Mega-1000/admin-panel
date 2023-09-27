@@ -4,14 +4,13 @@ namespace App\Jobs;
 
 use App\Entities\Order;
 use App\Entities\ShipmentGroup;
-use App\Enums\CourierName;
 use App\Repositories\ShipmentGroupRepository;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 /**
  * Save package group job

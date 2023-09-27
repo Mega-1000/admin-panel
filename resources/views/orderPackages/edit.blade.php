@@ -1,4 +1,4 @@
-@php use App\Enums\CourierName; @endphp
+@php  @endphp
 @extends('layouts.datatable')
 @section('app-header')
     <h1 class="page-title">
@@ -74,31 +74,31 @@
                 <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
                 <select class="form-control" id="service_courier_name" name="service_courier_name">
                     <option
-                        {{ $orderPackage->service_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                            {{ $orderPackage->service_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
                         INPOST
                     </option>
                     <option
-                        {{ $orderPackage->service_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                            {{ $orderPackage->service_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
                         POCZTEX
                     </option>
                     <option
-                        {{ $orderPackage->service_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
+                            {{ $orderPackage->service_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
                         DPD
                     </option>
                     <option
-                        {{ $orderPackage->service_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                            {{ $orderPackage->service_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
                         APACZKA
                     </option>
                     <option
-                        {{ $orderPackage->service_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
+                            {{ $orderPackage->service_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
                         JAS
                     </option>
                     <option
-                        {{ $orderPackage->service_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                            {{ $orderPackage->service_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
                     <option
-                        {{ $orderPackage->service_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                            {{ $orderPackage->service_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                     <option {{ $orderPackage->service_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">
@@ -108,7 +108,7 @@
                         UPS
                     </option>
                     <option
-                        {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                     <option {{ $orderPackage->service_courier_name == 'DB' ? 'selected="selected"' : '' }} value="DB">
@@ -120,47 +120,47 @@
                 <label for="delivery_courier_name">@lang('order_packages.form.delivery_courier_name')</label>
                 <select class="form-control" id="delivery_courier_name" name="delivery_courier_name">
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                            {{ $orderPackage->delivery_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
                         INPOST
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                            {{ $orderPackage->delivery_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
                         POCZTEX
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
+                            {{ $orderPackage->delivery_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
                         DPD
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                            {{ $orderPackage->delivery_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
                         APACZKA
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
+                            {{ $orderPackage->delivery_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
                         JAS
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                            {{ $orderPackage->delivery_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">
+                            {{ $orderPackage->delivery_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">
                         GLS
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">
+                            {{ $orderPackage->delivery_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">
                         UPS
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                            {{ $orderPackage->delivery_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
+                            {{ $orderPackage->delivery_courier_name === 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
                         PACZKOMAT
                     </option>
                     <option
-                        {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                     <option {{ $orderPackage->delivery_courier_name == 'DB' ? 'selected="selected"' : '' }} value="DB">
@@ -187,7 +187,7 @@
                                     selected="selected">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{$orderPackage->container_type}}</option>
                         @else
                             <option
-                                value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
+                                    value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
                         @endif
                     @endforeach
                 </select>
@@ -247,21 +247,21 @@
                                 selected>@lang('order_packages.form.status_type.waiting_for_sending')</option>
                     @else
                         <option
-                            value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
+                                value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
                     @endif
                     @if($orderPackage->status == 'WAITING_FOR_CANCELLED')
                         <option value="WAITING_FOR_CANCELLED"
                                 selected>@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
                     @else
                         <option
-                            value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
+                                value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
                     @endif
                     @if($orderPackage->status == 'REJECT_CANCELLED')
                         <option value="REJECT_CANCELLED"
                                 selected>@lang('order_packages.form.status_type.reject_cancelled')</option>
                     @else
                         <option
-                            value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
+                                value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
                     @endif
                 </select>
             </div>
