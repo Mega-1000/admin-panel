@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Entities\EmailSetting;
+use App\Entities\Tag;
 use App\Enums\EmailSettingsEnum;
 use App\Http\Requests\EmailSettingsCreateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
-use App\Entities\Tag;
+use Illuminate\Http\RedirectResponse;
 
 class EmailSettingsController extends Controller
 {

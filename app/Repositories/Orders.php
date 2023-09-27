@@ -3,11 +3,10 @@
 namespace App\Repositories;
 
 use App\Entities\Label;
-use App\Entities\OrderWarehouseNotification;
+use App\Entities\Order;
 use App\Enums\OrderPaymentsEnum;
 use App\Enums\PackageStatus;
 use Illuminate\Support\Collection;
-use App\Entities\Order;
 
 class Orders
 {

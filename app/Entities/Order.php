@@ -36,6 +36,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property ?Customer $customer
  * @property ?Carbon $preferred_invoice_date
  * @property string $labels_log
+ * @property string $consultant_notices
  *
  * @property Collection<OrderPackage> $packages
  *

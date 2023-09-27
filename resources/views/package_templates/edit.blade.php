@@ -1,4 +1,4 @@
-@php use App\Enums\CourierName; @endphp
+@php  @endphp
 @extends('layouts.datatable')
 @section('app-header')
     <h1 class="page-title">
@@ -110,11 +110,11 @@
                     <option {{ $old->delivery_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS
                     </option>
                     <option
-                        {{ $old->service_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                            {{ $old->service_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                     <option
-                        {{ $old->service_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            {{ $old->service_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                     <option {{ $old->service_courier_name == 'DB' ? 'selected="selected"' : '' }} value="DB">
@@ -146,15 +146,15 @@
                     <option {{ $old->delivery_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS
                     </option>
                     <option
-                        {{ $old->delivery_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                            {{ $old->delivery_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                     <option
-                        {{ $old->delivery_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            {{ $old->delivery_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                     <option
-                        {{ $old->delivery_courier_name == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
+                            {{ $old->delivery_courier_name == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
                         PACZKOMAT
                     </option>
                     <option {{ $old->delivery_courier_name == 'DB' ? 'selected="selected"' : '' }} value="DB">DB
@@ -187,7 +187,7 @@
                             <option value="PACZKA" selected="selected">PACZKA</option>
                         @else
                             <option
-                                value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
+                                    value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
                         @endif
                     @endforeach
                 </select>

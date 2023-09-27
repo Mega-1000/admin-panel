@@ -1,4 +1,4 @@
-@php use App\Enums\CourierName; @endphp
+@php  @endphp
 @extends('layouts.datatable')
 @section('app-header')
     <h1 class="page-title">
@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    <livewire:newsletter-message-edit-and-add :messageId="$message?->id" />
+    <livewire:newsletter-message-edit-and-add :messageId="$message?->id"/>
 
     @livewireScripts
 @endsection

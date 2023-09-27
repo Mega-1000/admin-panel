@@ -7,8 +7,6 @@ use App\DTO\orderPayments\OrderPaymentDTO;
 use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
-use App\Entities\Chat;
-use App\Entities\ChatUser;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Product;
@@ -29,7 +27,6 @@ use App\Repositories\ProductStockLogs;
 use App\Repositories\Warehouses;
 use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
-use http\Message;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -226,21 +223,20 @@ class OrderService
     /**
      * @throws ChatException
      */
-    public function createTWSOOrders(
-        CreateTWSOOrdersDTO $fromRequest,
-        ProductService      $productService,
-        MessageService      $messageService
-    ): string
+    public static function createTWSOOrders(CreateTWSOOrdersDTO $data): string
     {
-        $customer = Customers::getFirstCustomerWithLogin($fromRequest->getClientEmail());
+        $messageService = app(MessageService::class);
+        $productService = app(ProductService::class);
 
-        DB::transaction(function () use ($fromRequest, $customer, $productService, &$order) {
+        $customer = Customers::getFirstCustomerWithLogin($data->getClientEmail());
+
+        DB::transaction(function () use ($data, $customer, $productService, &$order) {
             $order = Order::query()->create([
                 'customer_id' => $customer->id,
                 'status_id' => 1,
                 'last_status_update_date' => Carbon::now(),
                 'customer_notices' => 'Zamówienie stworzone przez administratora',
-                'warehouse_id' => Warehouses::getIdFromSymbol($fromRequest->getWarehouseSymbol()),
+                'warehouse_id' => Warehouses::getIdFromSymbol($data->getWarehouseSymbol()),
             ]);
 
             $orderBuilder = (new OrderBuilder())
@@ -251,7 +247,7 @@ class OrderService
             $orderBuilder->assignItemsToOrder($order, [
                 [
                     'amount' => 1,
-                    'gross_selling_price_commercial_unit' => $fromRequest->getPurchaseValue(),
+                    'gross_selling_price_commercial_unit' => $data->getPurchaseValue(),
                     'recalculate' => true,
                 ] + $product->toArray()
             ]);
@@ -265,7 +261,7 @@ class OrderService
 
         $messageService->addMessage(
             new CreateMessageDTO(
-                message: $fromRequest->getConsultantDescription(),
+                message: $data->getConsultantDescription(),
                 area: UserRole::Consultant,
                 token: (new MessagesHelper)->getChatToken($order->id, auth()->user()->id),
             ),

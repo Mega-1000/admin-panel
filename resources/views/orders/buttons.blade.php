@@ -71,10 +71,10 @@
             prośbę o aktualizację cen</a>
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
-        <a  class="btn btn-success" href="/admin/quick-order">
+        <a class="btn btn-success" href="/admin/quick-order">
             Szybkie zadanie
         </a>&nbsp;
-        <a  class="btn btn-success" href="{{ route('allegro.edit-terms') }}">
+        <a class="btn btn-success" href="{{ route('allegro.edit-terms') }}">
             Edytuj regulamin allegro
         </a>
     </div>
@@ -93,10 +93,10 @@
                 {{csrf_field()}}
                 <label for="protocols">Protokoły z dnia</label>
                 <input name="date_from" class="protocol_datepicker" id="protocol_datepicker_from"
-                        style="width: 100px;"/>
+                       style="width: 100px;"/>
                 do dnia
                 <input name="date_to" class="protocol_datepicker" id="protocol_datepicker_to"
-                        style="width: 100px;"/>
+                       style="width: 100px;"/>
                 z magazynu:
                 <input type="text" id="delivery_warehouse" name="delivery_warehouse"
                        value="MEGA-OLAWA"/>
@@ -171,7 +171,7 @@
                             <option disabled selected value="">Grupa przesyłek</option>
                             @foreach(\App\Entities\ShipmentGroup::getOpenGroups() as $group)
                                 <option
-                                    value="{{ $group->id }}">{{ $group->getLabel()}}</option>
+                                        value="{{ $group->id }}">{{ $group->getLabel()}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -280,7 +280,8 @@
             <a id="upload-allegro-pays" name="print_orders" class="btn btn-success"
                onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
             <button id="upload-allegro-commission-button" name="print_orders" class="btn btn-success"
-                    onclick="$('#upload-allegro-commission-modal').modal('show')">Aktualizuj prowizje Allegro</button>
+                    onclick="$('#upload-allegro-commission-modal').modal('show')">Aktualizuj prowizje Allegro
+            </button>
             @if(!empty(session('allegro_new_letters')))
                 @foreach(session('allegro_new_letters') as $letter)
                     <div class="alert-info">
@@ -301,7 +302,8 @@
                 @endforeach
                 <form method="POST" action="{{ route('orders.newOrdersFromAllegroComissions') }}">
                     @csrf
-                    <input type="hidden" name="ids" value="{{ json_encode(session('allegro_new_orders_from_comission'))}}">
+                    <input type="hidden" name="ids"
+                           value="{{ json_encode(session('allegro_new_orders_from_comission'))}}">
                     <button id="create-new-lists-from-allegro" class="btn btn-success">Utwórz nowe zlecenia</button>
                 </form>
             @endif
@@ -375,7 +377,7 @@
                 {{ csrf_field() }}
                 <label for="products-stocks-changes">Wygeneruj płatności allegro dla zamówień od:</label>
                 <input name="allegro_from" class="allegro__order--from" id="allegro__order--from"
-                        style="width: 100px;" type="text"/>
+                       style="width: 100px;" type="text"/>
                 do zamówienia
                 <input name="allegro_to" class="allegro__order--to" id="allegro__order--to"
                        style="width: 100px;" type="text"/>
@@ -384,7 +386,8 @@
         </div>
         <div style="display: flex; align-items: center;" id="add-label-container">
             <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
-            <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true" id="choosen-label">
+            <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true"
+                    id="choosen-label">
                 <option value="" selected="selected">@lang('orders.table.choose_label')</option>
                 @foreach($groupedLabels as $groupName => $group)
                     <optgroup label="{{ $groupName }}">
@@ -479,9 +482,11 @@
                         <option value="tomorrow">Jutro</option>
                         <option value="from_tomorrow">Wszystkie od jutra</option>
                     </select>
-                    <input type="text" id="dates_from" name="dates_from" value="" class="form-control default-date-picker-now">
+                    <input type="text" id="dates_from" name="dates_from" value=""
+                           class="form-control default-date-picker-now">
                     -
-                    <input type="text" id="dates_to" name="dates_to" value="" class="form-control default-date-picker-now">
+                    <input type="text" id="dates_to" name="dates_to" value=""
+                           class="form-control default-date-picker-now">
                     <button class="btn btn-success" id="findByDates">Znajdź</button>
                 </div>
             </div>
@@ -491,30 +496,32 @@
         <h4>Drukuj paczki z grupy:</h4>
         @foreach($couriersTasks as $courierCode => $tasksInDay)
             @if(isset(\App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode]))
-            <div class="row">
-                <div class="col-lg-12 print-group">
+                <div class="row">
+                    <div class="col-lg-12 print-group">
                         {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
-                    <div>
-                        <form target="_blank" method="POST" id="print-auto-package-form" action="{{ route('orders.findPackageAuto') }}">
-                            @csrf()
-                            <input name="package_type" id="print-package-type" value="{{ $courierCode }}" type="hidden">
-                            <button type="submit" class="print-auto btn btn-success">Automat</button>
-                        </form>
-                        <span class="print-list btn btn-primary"
-                        name="{{ $courierCode }}"
-                        data-courierTasks="{{ json_encode($tasksInDay) }}">Z listy</span>
-                        <span class="badge"
-                              style="color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>
-                        @foreach($tasksInDay as $date => $tasks)
-                            @if(preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/', $date))
-                                <span class="badge badge-light">{{ count($tasks) }}</span>
-                            @endif
-                        @endforeach
-                        <span class="badge"
-                              style="color:#fff !important; background-color:#526069 !important;">{{ count($tasksInDay['future']) }}</span>
+                        <div>
+                            <form target="_blank" method="POST" id="print-auto-package-form"
+                                  action="{{ route('orders.findPackageAuto') }}">
+                                @csrf()
+                                <input name="package_type" id="print-package-type" value="{{ $courierCode }}"
+                                       type="hidden">
+                                <button type="submit" class="print-auto btn btn-success">Automat</button>
+                            </form>
+                            <span class="print-list btn btn-primary"
+                                  name="{{ $courierCode }}"
+                                  data-courierTasks="{{ json_encode($tasksInDay) }}">Z listy</span>
+                            <span class="badge"
+                                  style="color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>
+                            @foreach($tasksInDay as $date => $tasks)
+                                @if(preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/', $date))
+                                    <span class="badge badge-light">{{ count($tasks) }}</span>
+                                @endif
+                            @endforeach
+                            <span class="badge"
+                                  style="color:#fff !important; background-color:#526069 !important;">{{ count($tasksInDay['future']) }}</span>
+                        </div>
                     </div>
-</div>
-            </div>
+                </div>
             @endif
         @endforeach
         <div class="row">

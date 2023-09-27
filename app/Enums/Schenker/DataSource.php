@@ -6,5 +6,5 @@ class DataSource
 {
     const API = 'API';
     const WS = 'WS';
-    
+
 }

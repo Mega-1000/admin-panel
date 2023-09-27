@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\DTO\orderPayments\OrderPaymentDTO;
+use App\DTO\PayInImport\BankPayInDTO;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Payment;
@@ -16,20 +17,20 @@ class OrderPayments
      *
      * @return integer
      */
-   public static function getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn): int
+   public static function getCountOfPaymentsWithDeclaredSumFromOrder(Order $order, BankPayInDTO $payIn): int
    {
-       return $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->count();
+       return $order->payments()->where('declared_sum', $payIn->kwota)->whereNull('deleted_at')->count();
    }
 
     /**
-     * @param $order
-     * @param $payIn
+     * @param Order $order
+     * @param BankPayInDTO $payIn
      *
      * @return void
      */
-    public static function updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn): void
+    public static function updatePaymentsStatusWithDeclaredSumFromOrder(Order $order, BankPayInDTO $payIn): void
     {
-        $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
+        $order->payments()->where('declared_sum', $payIn->kwota)->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
     }
 
     /**

@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Chat;
-use App\Entities\Customer;
 use App\Entities\Firm;
 use App\Entities\Order;
-use App\Enums\UserRole;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Jobs\ChatNotificationJob;
+use App\Repositories\Chats;
 use App\Services\MessageService;
 use App\Services\ProductService;
 use App\Services\StyrofoarmAuctionService;
@@ -21,7 +20,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\Chats;
 
 class MessagesController extends Controller
 {

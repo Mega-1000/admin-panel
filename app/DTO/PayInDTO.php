@@ -2,13 +2,13 @@
 
 namespace App\DTO;
 
-use App\Entities\Order;
+use App\DTO\PayInImport\BankPayInDTO;
 
 class PayInDTO
 {
     public function __construct(
         public ?int $orderId,
-        public array $data,
+        public BankPayInDTO $data,
         public ?string $message
     ) {}
 }

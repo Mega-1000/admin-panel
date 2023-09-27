@@ -1,5 +1,5 @@
-@php use App\Entities\Order;use Carbon\Carbon; @endphp
-@php use App\Enums\UserRole; @endphp
+@php use Carbon\Carbon; @endphp
+@php  @endphp
 @extends('layouts.datatable')
 @section('app-header')
     <link rel="stylesheet" href="{{ URL::asset('css/views/orders/edit.css') }}">
@@ -21,8 +21,9 @@
     <button type="submit" form="orders" id="submitOrderAndStay" name="submit"
             value="updateAndStay" class="btn btn-primary header-button">@lang('voyager.generic.saveAndStay')</button>
     <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
-    <a target="_blank" class="btn btn-primary header-button" href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
-        for="add-item">
+    <a target="_blank" class="btn btn-primary header-button"
+       href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
+       for="add-item">
         Edytuj zamówienie w koszyku
     </a>
     <button type="button" class="btn btn-primary header-button" data-toggle="modal" data-target="#exampleModal">
@@ -103,14 +104,14 @@
                     <div class="order-data-input">
                         <label for="order_id">@lang('orders.form.order_id')</label>
                         <input type="text" class="form-control" id="order_id" name="order_id"
-                            value="{{ $order->id }}" disabled>
+                               value="{{ $order->id }}" disabled>
                     </div>
                     <div class="order-data-input">
                         <label for="status">@lang('orders.form.status')</label>
                         <select name="status" id="status" class="form-control">
                             @foreach($statuses as $status)
                                 <option
-                                    {{$order->status_id === $status->id ? 'selected="selected"' : ''}} value="{{ $status->id }}">{{ $status->name }}</option>
+                                        {{$order->status_id === $status->id ? 'selected="selected"' : ''}} value="{{ $status->id }}">{{ $status->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -145,48 +146,50 @@
                     <div class="order-data-input">
                         <label for="customer_address.firstname">@lang('customers.table.firstname')</label>
                         <input type="text" class="form-control" id="customer_address.firstname"
-                            name="customer_address.firstname"
-                            value="{{ $customerInfo->firstname ?? '' }}" disabled>
+                               name="customer_address.firstname"
+                               value="{{ $customerInfo->firstname ?? '' }}" disabled>
                     </div>
                     <div class="order-data-input">
                         <label for="customer_address.lastname">@lang('customers.table.lastname')</label>
                         <input type="text" class="form-control" id="customer_address.firstname"
-                            name="customer_address.lastname"
-                            value="{{ $customerInfo->lastname ?? '' }}" disabled>
+                               name="customer_address.lastname"
+                               value="{{ $customerInfo->lastname ?? '' }}" disabled>
                     </div>
                     <div class="order-data-input">
                         <label for="customer_address.phone">@lang('customers.table.phone')</label>
-                        <input type="text" class="form-control" id="customer_address.phone" name="customer_address.phone"
-                            value="{{ $customerInfo->phone ?? '' }}" disabled>
+                        <input type="text" class="form-control" id="customer_address.phone"
+                               name="customer_address.phone"
+                               value="{{ $customerInfo->phone ?? '' }}" disabled>
                     </div>
                     <div class="order-data-input">
                         <label for="customer.login">@lang('orders.form.login')</label>
                         <input type="text" class="form-control" id="customer.login" name="customer.login"
-                            value="{{ $order->customer->login ?? ''}}" disabled>
+                               value="{{ $order->customer->login ?? ''}}" disabled>
                     </div>
                     <div class="order-data-input">
                         <label for="customer_address.email">@lang('customers.table.email')</label>
-                        <input type="email" class="form-control" id="customer_address.email" name="customer_address.email"
-                            value="{{ $order->customer->login ?? '' }}" disabled>
+                        <input type="email" class="form-control" id="customer_address.email"
+                               name="customer_address.email"
+                               value="{{ $order->customer->login ?? '' }}" disabled>
                     </div>
                     @foreach($selInvoices as $selInvoice)
                         <div class="order-data-input">
                             <label for="document_number">@lang('orders.form.document_number_sell')
                                 <a target="_blank"
-                                href="{{ route('invoices.getInvoice', ['id' => $selInvoice->id]) }}">plik</a>
+                                   href="{{ route('invoices.getInvoice', ['id' => $selInvoice->id]) }}">plik</a>
                             </label>
                             <input disabled class="form-control" id="document_number_sell"
-                                value="{{$selInvoice->invoice_name}}">
+                                   value="{{$selInvoice->invoice_name}}">
                         </div>
                     @endforeach
                     @foreach($subiektInvoices as $subInvoice)
                         <div class="order-data-input">
                             <label for="document_number">@lang('orders.form.document_number_sell_subiekt')
                                 <a target="_blank"
-                                href="{{ route('invoices.subiektInvoices', ['id' => $subInvoice->id]) }}">plik</a>
+                                   href="{{ route('invoices.subiektInvoices', ['id' => $subInvoice->id]) }}">plik</a>
                             </label>
                             <input disabled class="form-control" id="document_number_sell"
-                                value="{{$subInvoice->gt_invoice_number}}">
+                                   value="{{$subInvoice->gt_invoice_number}}">
                         </div>
                     @endforeach
                     @if($order->last_status_update_date)
@@ -197,9 +200,10 @@
                     @endif
                     <div class="order-data-input">
                         <label for="production_date">@lang('orders.form.production_date')</label>
-                        <input disabled type="text" class="form-control default-date-time-picker-now" id="production_date"
-                            name="production_date"
-                            value="{{ $order->taskSchedule->first()->taskTime->date_start ?? '' }}">
+                        <input disabled type="text" class="form-control default-date-time-picker-now"
+                               id="production_date"
+                               name="production_date"
+                               value="{{ $order->taskSchedule->first()->taskTime->date_start ?? '' }}">
                     </div>
                 </div>
                 <div class="order-data-column">
@@ -207,17 +211,17 @@
                     <div class="order-data-input">
                         <label for="profitInfo">@lang('orders.form.profit')</label>
                         <input type="text" class="form-control priceChange" id="profitInfo" disabled
-                            value="">
+                               value="">
                     </div>
                     <div class="order-data-input">
                         <label for="totalPriceInfo">Wartość zamówienia</label>
                         <input type="text" class="form-control" id="orderValueSum" name="orderValueSum"
-                            value="" disabled>
+                               value="" disabled>
                     </div>
                     <div class="order-data-input">
                         <label for="value_of_items_gross">@lang('orders.form.value_of_items_gross')</label>
                         <input type="text" class="form-control priceChange sumChange" id="totalPriceInfo" disabled=""
-                            name="totalPriceInfo">
+                               name="totalPriceInfo">
 
                     </div>
                     <div class="order-data-input">
@@ -233,24 +237,24 @@
                     <div class="order-data-input">
                         <label for="additional_service_cost">@lang('orders.form.additional_service_cost')</label>
                         <input type="text" class="form-control priceChange sumChange" id="additional_service_cost"
-                            name="additional_service_cost"
-                            value="{{ $order->additional_service_cost }}">
+                               name="additional_service_cost"
+                               value="{{ $order->additional_service_cost }}">
                     </div>
                     <div class="order-data-input">
                         <label for="packing_warehouse_cost">@lang('orders.form.packing_warehouse_cost')</label>
                         <input class="form-control priceChange sumChange" id="additional_cash_on_delivery_cost"
-                            name="additional_cash_on_delivery_cost"
-                            value="{{ $order->additional_cash_on_delivery_cost }}">
+                               name="additional_cash_on_delivery_cost"
+                               value="{{ $order->additional_cash_on_delivery_cost }}">
                     </div>
                     <div class="order-data-input">
                         <label for="warehouse_value">@lang('orders.form.warehouse_value')</label>
                         <input type="number" class="form-control" id="warehouse_value" name="warehouse_value"
-                            value="{{ $order->warehouse_value ?? ''}}">
+                               value="{{ $order->warehouse_value ?? ''}}">
                     </div>
                     <div class="order-data-input">
                         <label for="consultant_value">@lang('orders.form.consultant_value')</label>
                         <input type="number" class="form-control" id="consultant_value" name="consultant_value"
-                            value="{{ $order->consultant_value ?? ''}}">
+                               value="{{ $order->consultant_value ?? ''}}">
                     </div>
                     <div class="order-data-input">
                         <label for="warehouse_cost">@lang('orders.form.warehouse_cost')</label>
@@ -258,16 +262,16 @@
                                value="{{ $order->warehouse_cost }}">
                     </div>
                     @if($order->cash_on_dalivery_amount > 0)
-                    <div class="order-data-input">
-                        <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
-                        <input type="text" class="form-control" id="cash_on_delivery" name="cash_on_delivery"
-                               value="@lang('orders.form.true')" disabled>
-                    </div>
+                        <div class="order-data-input">
+                            <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
+                            <input type="text" class="form-control" id="cash_on_delivery" name="cash_on_delivery"
+                                   value="@lang('orders.form.true')" disabled>
+                        </div>
                     @else
                         <div class="order-data-input">
                             <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
                             <input type="text" class="form-control" id="cash_on_delivery" name="cash_on_delivery"
-                                value="@lang('orders.form.false')" disabled>
+                                   value="@lang('orders.form.false')" disabled>
                         </div>
                     @endif
                 </div>
@@ -286,8 +290,9 @@
                     </div>
                     <div class="order-data-input">
                         <label
-                            for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
-                        <input disabled type="text" class="form-control sumChange" id="shipment_price_for_client_automatic"
+                                for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
+                        <input disabled type="text" class="form-control sumChange"
+                               id="shipment_price_for_client_automatic"
                                name="shipment_price_for_client_automatic"
                                value="{{ $clientTotalCost ?? '' }}">
                     </div>
@@ -297,7 +302,7 @@
                                name="shipment_price_for_us"
                                value="{{ $order->shipment_price_for_us ?? '' }}">
                         <label
-                            for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
+                                for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
                         <input disabled type="text" class="form-control priceChange sumChange"
                                id="shipment_price_for_us_automatic"
                                name="shipment_price_for_us_automatic"
@@ -317,165 +322,165 @@
                     <h4 class="pl-23px">Dane zamówienia</h4>
                     <table class="table-spacing">
                         <thead>
-                          <tr>
+                        <tr>
                             <th>Dane</th>
                             <th>Wysyłka</th>
                             <th>Faktura</th>
-                          </tr>
+                        </tr>
                         </thead>
                         <tbody>
-                          <tr>
+                        <tr>
                             <td>Imię</td>
                             <td>
                                 <input type="text" class="form-control" id="order_delivery_address_firstname"
-                                    name="order_delivery_address_firstname"
-                                    value="{{ $orderDeliveryAddress?->firstname ?? ''}}">
+                                       name="order_delivery_address_firstname"
+                                       value="{{ $orderDeliveryAddress?->firstname ?? ''}}">
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="order_invoice_address_firstname"
-                                    name="order_invoice_address_firstname"
-                                    value="{{ $orderInvoiceAddress?->firstname ?? ''}}">
+                                       name="order_invoice_address_firstname"
+                                       value="{{ $orderInvoiceAddress?->firstname ?? ''}}">
                             </td>
-                          </tr>
-                          <tr>
-                              <td>Nazwisko</td>
-                              <td>
+                        </tr>
+                        <tr>
+                            <td>Nazwisko</td>
+                            <td>
                                 <input type="text" class="form-control" id="order_delivery_address_lastname"
-                                    name="order_delivery_address_lastname"
-                                    value="{{ $orderDeliveryAddress?->lastname ?? ''}}">
-                              </td>
-                              <td>
+                                       name="order_delivery_address_lastname"
+                                       value="{{ $orderDeliveryAddress?->lastname ?? ''}}">
+                            </td>
+                            <td>
                                 <input type="text" class="form-control" id="order_invoice_address_lastname"
-                                    name="order_invoice_address_lastname"
-                                    value="{{ $orderInvoiceAddress?->lastname ?? ''}}">
-                              </td>
-                            </tr>
-                            <tr>
+                                       name="order_invoice_address_lastname"
+                                       value="{{ $orderInvoiceAddress?->lastname ?? ''}}">
+                            </td>
+                        </tr>
+                        <tr>
                         <tr>
                             <td>Nazwa firmy</td>
                             <td>
                                 <input type="text" class="form-control" id="order_delivery_address_firmname"
-                                    name="order_delivery_address_firmname"
-                                    value="{{ $orderDeliveryAddress?->firmname ?? ''}}">
+                                       name="order_delivery_address_firmname"
+                                       value="{{ $orderDeliveryAddress?->firmname ?? ''}}">
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="order_invoice_address_firmname"
-                                    name="order_invoice_address_firmname"
-                                    value="{{ $orderInvoiceAddress?->firmname ?? ''}}">
+                                       name="order_invoice_address_firmname"
+                                       value="{{ $orderInvoiceAddress?->firmname ?? ''}}">
                             </td>
                         </tr>
-                            <td>Email</td>
-                            <td>
-                                <input type="email" class="form-control" id="order_delivery_address_email"
-                                    name="order_delivery_address_email"
-                                    value="{{ $orderDeliveryAddress?->email ?? '' }}">
-                            </td>
-                            <td>
-                                <input type="email" class="form-control" id="order_invoice_address_email"
-                                    name="order_invoice_address_email"
-                                    value="{{ $orderInvoiceAddress?->email }}">
-                            </td>
-                          </tr>
-                          <tr>
+                        <td>Email</td>
+                        <td>
+                            <input type="email" class="form-control" id="order_delivery_address_email"
+                                   name="order_delivery_address_email"
+                                   value="{{ $orderDeliveryAddress?->email ?? '' }}">
+                        </td>
+                        <td>
+                            <input type="email" class="form-control" id="order_invoice_address_email"
+                                   name="order_invoice_address_email"
+                                   value="{{ $orderInvoiceAddress?->email }}">
+                        </td>
+                        </tr>
+                        <tr>
                             <td>Nr tel kier.</td>
                             <td>
                                 <input type="text" class="form-control" id="order_delivery_address_phone_code"
-                                    name="order_delivery_address_phone_code"
-                                    value="{{ $orderDeliveryAddress?->phone_code ?? ''}}">
+                                       name="order_delivery_address_phone_code"
+                                       value="{{ $orderDeliveryAddress?->phone_code ?? ''}}">
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="order_invoice_address_phone_code"
-                                    name="order_invoice_address_phone_code"
-                                    value="{{ $orderInvoiceAddress?->phone_code ?? ''}}">
+                                       name="order_invoice_address_phone_code"
+                                       value="{{ $orderInvoiceAddress?->phone_code ?? ''}}">
                             </td>
-                          </tr>
-                          <tr>
+                        </tr>
+                        <tr>
                             <td>Nr tel</td>
                             <td>
                                 <input type="text" class="form-control" id="order_delivery_address_phone"
-                                    name="order_delivery_address_phone"
-                                    value="{{ $orderDeliveryAddress?->phone ?? ''}}">
+                                       name="order_delivery_address_phone"
+                                       value="{{ $orderDeliveryAddress?->phone ?? ''}}">
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="order_invoice_address_phone"
-                                    name="order_invoice_address_phone"
-                                    value="{{ $orderInvoiceAddress?->phone ?? ''}}">
+                                       name="order_invoice_address_phone"
+                                       value="{{ $orderInvoiceAddress?->phone ?? ''}}">
                             </td>
-                          </tr>
-                          <tr>
+                        </tr>
+                        <tr>
                             <td>Państwo</td>
                             <td>
                                 <select class="form-control" id="order_delivery_address_country_id"
-                                    name="order_delivery_address_country_id">
-                                @foreach($countries as $country)
-                                    <option value="{{$country->id}}"
-                                            @if ($country->id == $orderDeliveryAddress?->country_id) selected @endif>{{$country->name}}</option>
-                                @endforeach
+                                        name="order_delivery_address_country_id">
+                                    @foreach($countries as $country)
+                                        <option value="{{$country->id}}"
+                                                @if ($country->id == $orderDeliveryAddress?->country_id) selected @endif>{{$country->name}}</option>
+                                    @endforeach
                                 </select>
                             </td>
                             <td>
                                 <select class="form-control" id="order_delivery_address_country_id"
-                                    name="order_invoice_address_country_id">
-                                @foreach($countries as $country)
-                                    <option value="{{$country->id}}"
-                                            @if ($country->id == $orderInvoiceAddress?->country_id) selected @endif>{{$country->name}}</option>
-                                @endforeach
+                                        name="order_invoice_address_country_id">
+                                    @foreach($countries as $country)
+                                        <option value="{{$country->id}}"
+                                                @if ($country->id == $orderInvoiceAddress?->country_id) selected @endif>{{$country->name}}</option>
+                                    @endforeach
                                 </select>
                             </td>
-                          </tr>
-                          <tr>
+                        </tr>
+                        <tr>
                             <td>Miasto</td>
                             <td>
                                 <input type="text" class="form-control" id="order_delivery_address_city"
-                                    name="order_delivery_address_city"
-                                    value="{{ $orderDeliveryAddress?->city ?? ''}}">
+                                       name="order_delivery_address_city"
+                                       value="{{ $orderDeliveryAddress?->city ?? ''}}">
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="order_invoice_address_city"
-                                    name="order_invoice_address_city"
-                                    value="{{ $orderInvoiceAddress?->city ?? ''}}">
+                                       name="order_invoice_address_city"
+                                       value="{{ $orderInvoiceAddress?->city ?? ''}}">
                             </td>
-                          </tr>
-                          <tr>
+                        </tr>
+                        <tr>
                             <td>Ulica/wioska</td>
                             <td>
                                 <input type="text" class="form-control" id="order_delivery_address_address"
-                                    name="order_delivery_address_address"
-                                    value="{{ $orderDeliveryAddress?->address ?? ''}}">
+                                       name="order_delivery_address_address"
+                                       value="{{ $orderDeliveryAddress?->address ?? ''}}">
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="order_invoice_address_address"
-                                    name="order_invoice_address_address"
-                                    value="{{ $orderInvoiceAddress?->address ?? ''}}">
+                                       name="order_invoice_address_address"
+                                       value="{{ $orderInvoiceAddress?->address ?? ''}}">
                             </td>
-                          </tr>
-                          <tr>
+                        </tr>
+                        <tr>
                             <td>Nr budynku</td>
                             <td>
                                 <input type="text" class="form-control" id="order_delivery_address_flat_number"
-                                    name="order_delivery_address_flat_number"
-                                    value="{{ $orderDeliveryAddress?->flat_number ?? ''}}">
+                                       name="order_delivery_address_flat_number"
+                                       value="{{ $orderDeliveryAddress?->flat_number ?? ''}}">
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="order_invoice_address_flat_number"
-                                    name="order_invoice_address_flat_number"
-                                    value="{{ $orderInvoiceAddress?->flat_number ?? ''}}">
+                                       name="order_invoice_address_flat_number"
+                                       value="{{ $orderInvoiceAddress?->flat_number ?? ''}}">
                             </td>
-                          </tr>
-                          <tr>
+                        </tr>
+                        <tr>
                             <td>Kod pocztowy</td>
                             <td>
                                 <input type="text" class="form-control" id="order_delivery_address_postal_code"
-                                    name="order_delivery_address_postal_code"
-                                    value="{{ $orderDeliveryAddress?->postal_code ?? ''}}">
+                                       name="order_delivery_address_postal_code"
+                                       value="{{ $orderDeliveryAddress?->postal_code ?? ''}}">
                             </td>
                             <td>
                                 <input type="text" class="form-control" id="order_invoice_address_postal_code"
-                                    name="order_invoice_address_postal_code"
-                                    value="{{ $orderInvoiceAddress?->postal_code ?? ''}}">
+                                       name="order_invoice_address_postal_code"
+                                       value="{{ $orderInvoiceAddress?->postal_code ?? ''}}">
                             </td>
-                          </tr>
-                          <tr>
+                        </tr>
+                        <tr>
                             <td></td>
                             <td>
                                 <div class="order-data-input">
@@ -486,7 +491,7 @@
                                            name="order_delivery_address_isAbroad" value="1"
                                            @if ($orderDeliveryAddress?->isAbroad)
                                                checked
-                                        @endif
+                                            @endif
                                     >
                                 </div>
                             </td>
@@ -498,30 +503,33 @@
                                            value="{{ $orderInvoiceAddress?->nip ?? ''}}">
                                 </div>
                             </td>
-                          </tr>
+                        </tr>
                         </tbody>
                     </table>
                     <div class="pl-23px">
-                    @if($orderDeliveryAddressErrors->any())
-                        <div class="order-data-input-error">
-                            Błędy danych do wysyłki: {!! implode(' ', $orderDeliveryAddressErrors->all(':message')) !!}
-                        </div>
-                    @endif
-                    @if($orderInvoiceAddressErrors->any())
-                        <div class="order-data-input-error">
-                            Błędy danych do faktury: {!! implode(' ', $orderInvoiceAddressErrors->all(':message')) !!}
-                        </div>
-                    @endif
+                        @if($orderDeliveryAddressErrors->any())
+                            <div class="order-data-input-error">
+                                Błędy danych do
+                                wysyłki: {!! implode(' ', $orderDeliveryAddressErrors->all(':message')) !!}
+                            </div>
+                        @endif
+                        @if($orderInvoiceAddressErrors->any())
+                            <div class="order-data-input-error">
+                                Błędy danych do
+                                faktury: {!! implode(' ', $orderInvoiceAddressErrors->all(':message')) !!}
+                            </div>
+                        @endif
                     </div>
                     <div class="pl-23px" style="margin-top: 3px;">
-                        <a href="/admin/orders/{{$order->id}}/getDataFromLastOrder" class="btn btn-success">Pobierz dane z
+                        <a href="/admin/orders/{{$order->id}}/getDataFromLastOrder" class="btn btn-success">Pobierz dane
+                            z
                             ostatniego zamówienia</a>
                         <a href="/admin/orders/{{$order->id}}/getDataFromCustomer" class="btn btn-success">Pobierz dane
                             klienta</a>
                         <div style="width: 50%">
                             <label for="firms_data">Symbol firmy</label>
                             <input type="text" class="form-control" id="firms_data" name="firms_data"
-                                value="MEGA-OLAWA">
+                                   value="MEGA-OLAWA">
                         </div>
                         <button type="button" class="btn btn-success" onclick="getFirmData({{$order->id}})">Pobierz dane
                             firmy o danym symbolu
@@ -532,54 +540,54 @@
                     <h4>Dane z allegro</h4>
                     <div class="order-data-input">
                         <label
-                               for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
+                                for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
                         <input type="text" class="form-control" id="customer.nick_allegro"
-                                name="customer.nick_allegro"
-                                value="{{ $order->customer->nick_allegro ?? ''}}" disabled readonly>
+                               name="customer.nick_allegro"
+                               value="{{ $order->customer->nick_allegro ?? ''}}" disabled readonly>
                     </div>
                     <div class="order-data-input">
                         <label for="allegro_form_id">ID zamówienia</label>
                         <input type="text" class="form-control" id="allegro_form_id"
-                                name="allegro_form_id"
-                                value="{{ $order->allegro_form_id ?? '' }}">
+                               name="allegro_form_id"
+                               value="{{ $order->allegro_form_id ?? '' }}">
                     </div>
                     <div class="order-data-input">
                         <label for="allegro_payment_id">ID płatności</label>
                         <input type="text" class="form-control" id="allegro_payment_id"
-                                name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
+                               name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
                     </div>
                     <div class="order-data-input">
                         <label
-                               for="allegro_transaction_id">Numer transakcji</label>
+                                for="allegro_transaction_id">Numer transakcji</label>
                         <input type="text" class="form-control" id="allegro_transaction_id"
-                                name="allegro_transaction_id"
-                                value="{{ $order->allegro_transaction_id ?? '' }}">
+                               name="allegro_transaction_id"
+                               value="{{ $order->allegro_transaction_id ?? '' }}">
                     </div>
                     <div class="order-data-input">
                         <label for="allegro_operation_date">Data operacji</label>
                         <input type="date" class="form-control" id="allegro_operation_date"
-                                name="allegro_operation_date"
-                                value="{{ (isset($order->allegro_operation_date)) ? Carbon::parse($order->allegro_operation_date)->format('Y-m-d') : null }}">
+                               name="allegro_operation_date"
+                               value="{{ (isset($order->allegro_operation_date)) ? Carbon::parse($order->allegro_operation_date)->format('Y-m-d') : null }}">
                     </div>
                     <div class="order-data-input">
                         <label for="refund_id">Numer zwrotu</label>
                         <input type="text" class="form-control" id="refund_id"
-                                name="to_refund" value="{{ $order->refund_id }}">
+                               name="to_refund" value="{{ $order->refund_id }}">
                     </div>
                     <div class="order-data-input">
                         <label for="to_refund">Wartość zwrotu</label>
                         <input type="text" class="form-control" id="to_refund"
-                                name="to_refund" value="{{ $order->to_refund }}">
+                               name="to_refund" value="{{ $order->to_refund }}">
                     </div>
                     <div class="order-data-input">
                         <label for="refunded">Zwrócono</label>
                         <input type="text" class="form-control" id="refunded"
-                                name="refunded" value="{{ $order->refunded }}">
+                               name="refunded" value="{{ $order->refunded }}">
                     </div>
                     <div class="order-data-input">
                         <label for="return_payment_id">ID zwrotu płatności</label>
                         <input type="text" class="form-control" id="return_payment_id"
-                                name="return_payment_id" value="{{ $order->return_payment_id }}">
+                               name="return_payment_id" value="{{ $order->return_payment_id }}">
                     </div>
                 </div>
                 <div class="order-data-column">
@@ -587,23 +595,25 @@
                     <div class="order-data-input">
                         <label for="document_number">@lang('orders.form.document_number')</label>
                         <input class="form-control" id="document_number"
-                            name="document_number"
-                            value="{{ $order->document_number }}">
+                               name="document_number"
+                               value="{{ $order->document_number }}">
                     </div>
                     <div class="order-data-input">
                         <label class="col-md-6" for="preferred_invoice_date">Pref. data wyst. faktury</label>
                         <input type="date" class="form-control" id="preferred_invoice_date"
-                                name="preferred_invoice_date"
-                                value="{{ ($order->preferred_invoice_date !== null) ? Carbon::parse($order->preferred_invoice_date)->format('Y-m-d') : null }}">
+                               name="preferred_invoice_date"
+                               value="{{ ($order->preferred_invoice_date !== null) ? Carbon::parse($order->preferred_invoice_date)->format('Y-m-d') : null }}">
                     </div>
                     <div class="order-data-input">
                         <label for="correction_amount">@lang('orders.form.correction_amount')</label>
-                        <input type="text" class="form-control priceChange" id="correction_amount" name="correction_amount"
+                        <input type="text" class="form-control priceChange" id="correction_amount"
+                               name="correction_amount"
                                value="{{ $order->correction_amount }}">
                     </div>
                     <div class="order-data-input">
                         <label for="correction_description">@lang('orders.form.correction_description')</label>
-                        <input type="text" class="form-control" id="correction_description" name="correction_description"
+                        <input type="text" class="form-control" id="correction_description"
+                               name="correction_description"
                                value="{{ $order->correction_description }}">
                     </div>
                 </div>
@@ -615,25 +625,30 @@
                         <hr>
                         <div>
                             <label for="preliminary_buying_document_number">@lang('orders.form.preliminary_buying_document_number')</label>
-                            <input type="text" class="form-control" id="preliminary_buying_document_number" name="preliminary_buying_document_number"
+                            <input type="text" class="form-control" id="preliminary_buying_document_number"
+                                   name="preliminary_buying_document_number"
                                    value="{{ $invoiceDocument->preliminary_buying_document_number }}">
                         </div>
                         <div>
                             <label for="buying_document_number">@lang('orders.form.buying_document_number')</label>
-                            <input type="text" class="form-control" id="buying_document_number" name="buying_document_number"
+                            <input type="text" class="form-control" id="buying_document_number"
+                                   name="buying_document_number"
                                    value="{{ $invoiceDocument->buying_document_number }}">
                         </div>
                         <div>
                             <label for="gross_value">Wartość brutto</label>
-                            <input type="text" class="form-control" id="gross_value" name="gross_value" placeholder="Wprowadź wartość brutto" value="{{ $invoiceDocument->gross_value }}">
+                            <input type="text" class="form-control" id="gross_value" name="gross_value"
+                                   placeholder="Wprowadź wartość brutto" value="{{ $invoiceDocument->gross_value }}">
                         </div>
                         <div>
                             <label for="invoice_date">Data faktury</label>
-                            <input type="date" class="form-control" id="invoice_date" name="invoice_date" placeholder="Wprowadź datę faktury" value="{{ $invoiceDocument->invoice_date }}">
+                            <input type="date" class="form-control" id="invoice_date" name="invoice_date"
+                                   placeholder="Wprowadź datę faktury" value="{{ $invoiceDocument->invoice_date }}">
                         </div>
 
-                        <a href="{{ route('order-invoice-documents.delete', ['id' => $invoiceDocument->id]) }}" class="btn btn-danger">
-                           Usuń
+                        <a href="{{ route('order-invoice-documents.delete', ['id' => $invoiceDocument->id]) }}"
+                           class="btn btn-danger">
+                            Usuń
                         </a>
                     @endforeach
                 </div>
@@ -688,9 +703,13 @@
                             Obszar:
                             @include('chat/msg_area')
                         </label>
-                        <div class="quick-msg-area" style="display: flex; align-items: center; justify-content: flex-start;">
+                        <div class="quick-msg-area"
+                             style="display: flex; align-items: center; justify-content: flex-start;">
                             <textarea id="quick_msg_content" cols="30" rows="3" style="width: 85%;"></textarea>
-                            <button class="btn btn-success" style="margin-left: 10px;" id="quick_msg_send" data-url="{{ route('api.messages.post-new-message', ['token' => $chatUserToken]) }}">Wyślij</button>
+                            <button class="btn btn-success" style="margin-left: 10px;" id="quick_msg_send"
+                                    data-url="{{ route('api.messages.post-new-message', ['token' => $chatUserToken]) }}">
+                                Wyślij
+                            </button>
                         </div>
                     </div>
                     <div class="col-md-5">
@@ -711,516 +730,517 @@
                         <div class="form-group">
                             <label>@lang('orders.form.labels_log')</label>
                             <textarea id="labels_log" disabled class="form-control scrollable-notice"
-                                    name="financial_comment"
-                                    id="labels_log"
-                                    rows="5">{{ $order->labels_log ?? ''}}</textarea>
+                                      name="financial_comment"
+                                      id="labels_log"
+                                      rows="5">{{ $order->labels_log ?? ''}}</textarea>
                         </div>
                     </div>
                 </div>
             </div>
-                <h3 style="clear: both;">Produkty</h3>
-                <button type="button" class="btn btn-success" onclick="loadAllegroPrices()">
-                    Przelicz po cenach allegro
-                </button>
-                <select name="" id="packetList" class="form-control">
-                    @foreach($packets as $packet)
-                        <option value="{{ $packet->id }}">{{ $packet->packet_name }}</option>
-                    @endforeach
-                </select>
-                <button type="button" class="btn btn-default" id="usePackageButton">
-                    Przydziel pakiet
-                </button>
-                @php
-                    $gross_purchase_sum = 0;
-                    $net_purchase_sum = 0;
-                    $gross_selling_sum = 0;
-                    $net_selling_sum = 0;
-                    $weight = 0;
-                @endphp
-                @foreach($order->items as $item)
-                    @php
-                        $gross_purchase_sum += ($item->gross_purchase_price_commercial_unit_after_discounts * $item->quantity);
-                        $net_purchase_sum += $item->net_purchase_price_commercial_unit_after_discounts * $item->quantity ;
-                        $gross_selling_sum += ($item->gross_selling_price_commercial_unit * $item->quantity);
-                        $net_selling_sum += $item->net_selling_price_commercial_unit * $item->quantity;
-                        $weight += $item->product->weight_trade_unit_after_discounts * $item->quantity;
-                    @endphp
-                    <div class="flex2">
-                        <table id="productsTable" class="table-spacing">
-                            <tbody id="products-tbody">
-                                <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
-                                    <td colspan="5"><h4><img src="{!! $item->product->url_for_website !!}"
-                                                            style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
-                                                . </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }})
-                                        </h4>
-                                        <div class="vue-components">
-                                            <products-sets product-id="{{$item->product->id}}"></products-sets>
-                                        </div>
-                                    </td>
-                                    <input name="id[{{$item->id}}]"
-                                        value="{{ $item->id }}" type="hidden"
-                                        class="form-control" id="id[{{$item->id}}]">
-                                    <input name="product_id[{{$item->id}}]"
-                                        value="{{ $item->product_id }}" type="hidden"
-                                        class="form-control" id="product_id[{{$item->id}}]">
-
-                                    <input
-                                        value="{{ $item->quantity }}" type="hidden"
-                                        class="form-control item_quantity" name="item_quantity[{{$item->id}}]"
-                                        data-item-id="{{$item->id}}">
-
-                                    <input name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
-                                        data-item-id="{{$item->id}}"
-                                        value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }}"
-                                        type="hidden"
-                                        class="form-control numbers_of_basic_commercial_units_in_pack"
-                                        id="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]">
-                                    <input name="number_of_sale_units_in_the_pack[{{$item->id}}]"
-                                        data-item-id="{{$item->id}}"
-                                        value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}" type="hidden"
-                                        class="form-control number_of_sale_units_in_the_pack"
-                                        id="number_of_sale_units_in_the_pack[{{$item->id}}]">
-                                    <input name="number_of_trade_items_in_the_largest_unit[{{$item->id}}]"
-                                        data-item-id="{{$item->id}}"
-                                        value="{{ $item->product->packing->number_of_trade_items_in_the_largest_unit }}"
-                                        type="hidden"
-                                        class="form-control number_of_trade_items_in_the_largest_unit"
-                                        id="number_of_trade_items_in_the_largest_unit[{{$item->id}}]">
-                                    <input name="unit_consumption[{{$item->id}}]"
-                                        data-item-id="{{$item->id}}" value="{{ $item->product->packing->unit_consumption }}"
-                                        type="hidden"
-                                        class="form-control unit_consumption" id="unit_consumption[{{$item->id}}]">
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td>Jednostka handlowa ({{ $item->product->packing->unit_commercial }})</td>
-                                    <td>Jednostka podstawowa ({{$item->product->packing->unit_basic}})</td>
-                                    <td>Jednostka obliczeniowa ({{$item->product->packing->calculation_unit}})</td>
-                                    <td>Jednostka zbiorcza ({{$item->product->packing->unit_of_collective}})</td>
-                                </tr>
-                                <tr class="selling-row row-{{$item->id}}">
-                                    <th>Cena sprzedaży netto</th>
-                                    <td>
-                                        <input name="net_selling_price_commercial_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_selling_price_commercial_unit }}"
-                                            type="text"
-                                            class="form-control price net_selling_price_commercial_unit priceChange change-order"
-                                            id="net_selling_price_commercial_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="net_selling_price_basic_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}" value="{{ $item->net_selling_price_basic_unit }}"
-                                            type="text"
-                                            class="form-control price net_selling_price_basic_unit priceChange change-order"
-                                            id="net_selling_price_basic_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="net_selling_price_calculated_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_selling_price_calculated_unit }}"
-                                            type="text"
-                                            class="form-control price net_selling_price_calculated_unit priceChange change-order"
-                                            id="net_selling_price_calculated_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="net_selling_price_aggregate_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_selling_price_aggregate_unit }}"
-                                            type="text"
-                                            class="form-control price net_selling_price_aggregate_unit priceChange change-order"
-                                            id="net_selling_price_aggregate_unit[{{$item->id}}]">
-                                    </td>
-                                </tr>
-                                <tr class="selling-row row-{{$item->id}}">
-                                    <th>Cena sprzedaży brutto</th>
-                                    <td>
-                                        <input name="gross_selling_price_commercial_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{$item->gross_selling_price_commercial_unit}}"
-                                            type="text"
-                                            class="form-control price gross_selling_price_commercial_unit priceChange change-order"
-                                            id="gross_selling_price_commercial_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="gross_selling_price_basic_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}" value="{{$item->gross_selling_price_basic_unit}}"
-                                            type="text"
-                                            class="form-control price gross_selling_price_basic_unit priceChange change-order"
-                                            id="gross_selling_price_basic_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="gross_selling_price_calculated_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{$item->gross_selling_price_calculated_unit}}"
-                                            type="text"
-                                            class="form-control price gross_selling_price_calculated_unit priceChange change-order"
-                                            id="gross_selling_price_calculated_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="gross_selling_price_aggregate_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{$item->gross_selling_price_aggregate_unit}}"
-                                            type="text"
-                                            class="form-control price gross_selling_price_aggregate_unit priceChange change-order"
-                                            id="gross_selling_price_aggregate_unit[{{$item->id}}]">
-                                    </td>
-                                </tr>
-                                <tr class="purchase-row row-{{$item->id}}">
-                                    <th>Cena zakupu po rabatach netto</th>
-                                    <td>
-                                        <input name="net_purchase_price_commercial_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_purchase_price_commercial_unit_after_discounts }}"
-                                            type="text"
-                                            class="form-control price net_purchase_price_commercial_unit priceChange"
-                                            id="net_purchase_price_commercial_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="net_purchase_price_basic_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_purchase_price_basic_unit_after_discounts }}" type="text"
-                                            class="form-control price net_purchase_price_basic_unit priceChange"
-                                            id="net_purchase_price_basic_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="net_purchase_price_calculated_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_purchase_price_calculated_unit_after_discounts }}"
-                                            type="text"
-                                            class="form-control price net_purchase_price_calculated_unit priceChange"
-                                            id="net_purchase_price_calculated_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="net_purchase_price_aggregate_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_purchase_price_aggregate_unit_after_discounts }}"
-                                            type="text"
-                                            class="form-control price net_purchase_price_aggregate_unit priceChange"
-                                            id="net_purchase_price_aggregate_unit[{{$item->id}}]">
-                                    </td>
-                                </tr>
-                                <tr class="purchase-row row-{{$item->id}}">
-                                    <th>Cena zakupu po rabatach brutto</th>
-                                    <td>
-                                        <input name="gross_purchase_price_commercial_unit[{{$item->id}}]"
-                                            value="{{$item->gross_purchase_price_commercial_unit_after_discounts}}"
-                                            type="text"
-                                            data-item-id="{{$item->id}}"
-                                            class="form-control price gross_purchase_price_commercial_unit priceChange inTable"
-                                            id="gross_purchase_price_commercial_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="gross_purchase_price_basic_unit[{{$item->id}}]"
-                                            value="{{$item->gross_purchase_price_basic_unit_after_discounts}}" type="text"
-                                            data-item-id="{{$item->id}}"
-                                            class="form-control price gross_purchase_price_basic_unit priceChange"
-                                            id="gross_purchase_price_basic_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="gross_purchase_price_calculated_unit[{{$item->id}}]"
-                                            value="{{$item->gross_purchase_price_calculated_unit_after_discounts}}"
-                                            type="text"
-                                            data-item-id="{{$item->id}}"
-                                            class="form-control price gross_purchase_price_calculated_unit priceChange"
-                                            id="gross_purchase_price_calculated_unit[{{$item->id}}]">
-                                    </td>
-                                    <td>
-                                        <input name="gross_purchase_price_aggregate_unit[{{$item->id}}]"
-                                            value="{{$item->gross_purchase_price_aggregate_unit}}" type="text"
-                                            data-item-id="{{$item->id}}"
-                                            class="form-control price gross_purchase_price_aggregate_unit priceChange"
-                                            id="gross_purchase_price_aggregate_unit[{{$item->id}}]">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Wagi produktu</th>
-                                    <td>
-                                        <input value="{{ $item->product->weight_trade_unit }} kg" type="text"
-                                            class="form-control price net_purchase_price_commercial_unit priceChange"
-                                            name="weight_trade_unit[{{$item->id}}]" disabled>
-                                        <input type="hidden" name="weight_trade_unit[{{$item->id}}]"
-                                            value="{{ $item->product->weight_trade_unit }}">
-                                    </td>
-                                    <td>
-                                        @if($item->product->numbers_of_basic_commercial_units_in_pack == 0)
-                                            <input value="0 kg" type="text"
-                                                class="form-control price net_purchase_price_commercial_unit priceChange"
-                                                disabled>
-                                        @else
-                                            <input
-                                                value="{{ $item->product->weight_trade_unit / $item->product->numbers_of_basic_commercial_units_in_pack  }} kg"
-                                                type="text"
-                                                class="form-control price net_purchase_price_commercial_unit priceChange"
-                                                disabled>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($item->product->numbers_of_basic_commercial_units_in_pack == 0)
-                                            <input value="0 kg" type="text"
-                                                class="form-control price net_purchase_price_commercial_unit priceChange"
-                                                disabled>
-                                        @else
-                                            <input
-                                                value="{{ ($item->product->packing->number_of_sale_units_in_the_pack / $item->product->numbers_of_basic_commercial_units_in_pack ?? 1) * $item->product->unit_consumption }} kg"
-                                                type="text"
-                                                class="form-control price net_purchase_price_commercial_unit priceChange"
-                                                disabled>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <input
-                                            value="{{ $item->product->packing->number_of_sale_units_in_the_pack * $item->product->number_of_sale_units_in_the_pack }} kg"
-                                            type="text"
-                                            class="form-control price net_purchase_price_commercial_unit priceChange" disabled>
-                                    </td>
-                                </tr>
-                                <tr class="selling-row row-{{$item->id}}">
-                                    <th>Zamawiana ilość</th>
-                                    @foreach($productPacking as $packing)
-                                        @if($packing->product_id === $item->product_id)
-                                            <td>
-                                                <input name="unit_commercial[{{$item->id}}]"
-                                                    value="{{$item->quantity . ' ' . $packing->unit_commercial }}"
-                                                    type="text"
-                                                    class="form-control" id="unit_commercial" disabled>
-                                                <input type="hidden" name="unit_commercial_quantity[{{$item->id}}]"
-                                                    value="{{ $item->quantity }}">
-                                                <input type="hidden" name="unit_commercial_name[{{$item->id}}]"
-                                                    value="{{ $packing->unit_commercial }}">
-                                            </td>
-                                            <td>
-                                                <input name="unit_basic"
-                                                    value="@if($item->product->packing->numbers_of_basic_commercial_units_in_pack != 0){{$item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack  .' '.$packing->unit_basic }} @else {{0}} @endif"
-                                                    type="text"
-                                                    class="form-control" id="unit_basic" disabled>
-                                                <input type="hidden" name="unit_basic_units[{{$item->id}}]"
-                                                    value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack}}">
-                                                <input type="hidden" name="unit_basic_name[{{$item->id}}]"
-                                                    value="{{ $packing->unit_basic }}">
-                                            </td>
-                                            <td>
-                                                <input name="calculation_unit[{{$item->id}}]"
-                                                    value="@if(is_numeric($item->product->packing->numbers_of_basic_commercial_units_in_pack) && is_numeric($item->product->packing->unit_consumption)){{ number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption, 2) .' '.$packing->calculation_unit }} @else {{0}} @endif"
-                                                    type="text"
-                                                    class="form-control" id="calculation_unit" disabled>
-                                                <input type="hidden" name="calculation_unit_units[{{$item->id}}]"
-                                                    value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack}}">
-                                                <input type="hidden" name="calculation_unit_consumption[{{$item->id}}]"
-                                                    value="{{ $item->product->packing->unit_consumption }}">
-                                                <input type="hidden" name="calculation_unit_name[{{$item->id}}]"
-                                                    value="{{ $packing->calculation_unit }}">
-                                            </td>
-                                            <td>
-                                                @php
-                                                    if ($item->product->packing->number_of_sale_units_in_the_pack == 0)
-                                                        $a = 0;
-                                                    else
-                                                        $a = $item->quantity / $item->product->packing->number_of_sale_units_in_the_pack;
-                                                @endphp
-                                                <input name="unit_of_collective[{{$item->id}}]"
-                                                    value="{{ number_format($a, 4) .' '.$packing->unit_of_collective}} "
-                                                    type="text"
-                                                    class="form-control" id="unit_of_collective" disabled>
-                                                <input type="hidden" name="unit_of_collective_units[{{$item->id}}]"
-                                                    value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}">
-                                                <input type="hidden" name="unit_of_collective_name[{{$item->id}}]"
-                                                    value="{{ $packing->unit_of_collective }}">
-                                            </td>
-                                        @endif
-                                    @endforeach
-                                </tr>
-                                <tr class="selling-row row-{{$item->id}}">
-
-                                </tr>
-                                @if(!empty($productsVariation[$item->product->id]))
-                                    <tr>
-                                        <td colspan="4"><h3>Wariacje produktów:</h3></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <strong>Nazwa</strong>
-                                        </td>
-                                        <td>
-                                            <strong>Cena sprzedaży brutto jednostki handlowej</strong>
-                                        </td>
-                                        <td>
-                                            <strong>Cena sprzedaży brutto jednostki podstawowej</strong>
-                                        </td>
-                                        <td>
-                                            <strong>Cena sprzedaży brutto jednostki obliczeniowej</strong>
-                                        </td>
-                                        <td>
-                                            <strong>Wartość danego asortymentu</strong>
-                                        </td>
-                                        <td>
-                                            <strong>Różnica</strong>
-                                        </td>
-                                        <td>
-                                            <strong>Odległość</strong>
-                                        </td>
-                                    </tr>
-                                    @foreach($productsVariation[$item->product->id] as $variation)
-                                        <tr class="row-{{$variation['id']}}">
-                                            <td>
-                                                {{$variation['name']}}
-                                            </td>
-                                            <td>
-                                                {{$variation['gross_selling_price_commercial_unit']}}
-                                            </td>
-                                            <td>
-                                                {{$variation['gross_selling_price_basic_unit']}}
-                                            </td>
-                                            <td>
-                                                {{$variation['gross_selling_price_calculated_unit']}}
-                                            </td>
-                                            <td>
-                                                {{$variation['sum']}}
-                                            </td>
-                                            <td>
-                                                @if(strstr($variation['different'], '-') != false)
-                                                    <span style="color:red;">{{(float)$variation['different']}}</span>
-                                                @else
-                                                    <span style="color:green;">+{{(float)$variation['different']}}</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                {{(int)$variation['radius']}} km
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                        <div class="pl-23px mt-5 row-{{$item->id}}">
-                            <p>
-                                Obliczenia dokonano przy
-                                założeniu {{$item->product->packing->unit_consumption}}  {{$item->product->packing->unit_basic}}
-                                / {{$item->product->packing->calculation_unit}}
-                                <br> 1 {{$item->product->packing->unit_of_collective}}
-                                = {{$item->product->packing->number_of_sale_units_in_the_pack}}
-                                ({{$item->product->packing->unit_commercial}})
-                                = @if(is_numeric($item->product->packing->number_of_sale_units_in_the_pack) && is_numeric($item->product->packing->unit_consumption))
-                                    {{$item->product->packing->number_of_sale_units_in_the_pack / $item->product->packing->unit_consumption}}
-                                @else
-                                    {{0}}
-                                @endif ({{$item->product->packing->calculation_unit}} / {{$item->product->packing->unit_of_collective}})
-                            </p>
-                            <div>
-                                <label for="item-value">Wartość asortymentu</label>
-                                <input type="text" class="form-control item-value priceChange" id="item-value"
-                                    data-item-id="{{$item->id}}"
-                                    disabled name="item-value"
-                                    value="{{ number_format(($item->gross_selling_price_commercial_unit_after_discounts * $item->quantity), 2) }} zł">
-                            </div>
-                            <div>
-                                <label for="item-weight">Waga asortymentu</label>
-                                <input type="text" class="form-control item-weight priceChange"
-                                    data-item-id="{{$item->id}}"
-                                    disabled name="item-weight"
-                                    value="{{ number_format(($item->product->weight_trade_unit * $item->quantity), 2) }} kg">
-                            </div>
-                            <div>
-                                <label for="item-profit">Zysk asortymentu</label>
-                                <input type="text" class="form-control item-profit priceChange"
-                                    data-item-id="{{$item->id}}"
-                                    disabled name="item-profit"
-                                    value="{{ number_format(($item->gross_selling_price_commercial_unit_after_discounts * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }} zł">
-                            </div>
-                            <div class="flex2">
-                                <div style="width: 20%">
-                                    <label for="quantity_commercial[{{$item->id}}]">Ilość</label>
-                                    <input name="quantity_commercial[{{$item->id}}]"
-                                        value="{{ $item->quantity }}" type="text" data-item-id="{{$item->id}}"
-                                        class="form-control price change-order quantityChange"
-                                        id="quantity_commercial[{{$item->id}}]">
-                                </div>
-                                <div style="width: 80%">
-                                    @php
-                                        $quantityAll = 0;
-                                    @endphp
-                                    @foreach($item->realProductPositions() as $position)
-                                        <p>
-                                            Pozycja: {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }}
-                                            Ilość na pozycji: {{ $position->position_quantity }}</p>
-                                        @php
-                                            $quantityAll += $position->position_quantity;
-                                        @endphp
-                                    @endforeach
-                                    Ilość wszystkich: {{ $quantityAll }} <br/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr />
+            <h3 style="clear: both;">Produkty</h3>
+            <button type="button" class="btn btn-success" onclick="loadAllegroPrices()">
+                Przelicz po cenach allegro
+            </button>
+            <select name="" id="packetList" class="form-control">
+                @foreach($packets as $packet)
+                    <option value="{{ $packet->id }}">{{ $packet->packet_name }}</option>
                 @endforeach
-                <div class="form-group">
-                    <input type="hidden" class="form-control" id="weight" name="weight"
-                           value="{{ $order->weight ?? '' }}">
-                </div>
-                <div class="form-group">
-                    <input type="hidden" class="form-control" id="profit" disabled name="profit"
-                           value="{{ number_format($gross_selling_sum - $gross_purchase_sum, 2) }}">
-                    <input type="hidden" class="form-control" id="orderItemsSum" disabled name="orderItemsSum"
-                           value="{{ number_format($gross_selling_sum, 2) }}">
-                </div>
-                <div class="form-group">
-                    <input type="hidden" class="form-control priceChange" id="total_price" disabled name="total_price"
-                           value="{{ $order->total_price ?? '' }}">
-                </div>
-                @if(!empty($allProductsFromSupplier))
-                    <h3>Suma wszystkich towarów dla danych producentów</h3>
-                    <table class="table table1 table-venice-blue productsTableEdit">
-                        <thead>
-                        <tr>
-                            <th>Symbol dostawcy</th>
-                            <th>Wartość całości towaru u dostawcy</th>
-                            <th>Różnica wartości do wskazanego producenta w zamówieniu</th>
-                            <th>Odległość od magazynu</th>
-                            <th>Numer telefonu do przedstawiciela fabryki</th>
+            </select>
+            <button type="button" class="btn btn-default" id="usePackageButton">
+                Przydziel pakiet
+            </button>
+            @php
+                $gross_purchase_sum = 0;
+                $net_purchase_sum = 0;
+                $gross_selling_sum = 0;
+                $net_selling_sum = 0;
+                $weight = 0;
+            @endphp
+            @foreach($order->items as $item)
+                @php
+                    $gross_purchase_sum += ($item->gross_purchase_price_commercial_unit_after_discounts * $item->quantity);
+                    $net_purchase_sum += $item->net_purchase_price_commercial_unit_after_discounts * $item->quantity ;
+                    $gross_selling_sum += ($item->gross_selling_price_commercial_unit * $item->quantity);
+                    $net_selling_sum += $item->net_selling_price_commercial_unit * $item->quantity;
+                    $weight += $item->product->weight_trade_unit_after_discounts * $item->quantity;
+                @endphp
+                <div class="flex2">
+                    <table id="productsTable" class="table-spacing">
+                        <tbody id="products-tbody">
+                        <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
+                            <td colspan="5"><h4><img src="{!! $item->product->url_for_website !!}"
+                                                     style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
+                                        . </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }})
+                                </h4>
+                                <div class="vue-components">
+                                    <products-sets product-id="{{$item->product->id}}"></products-sets>
+                                </div>
+                            </td>
+                            <input name="id[{{$item->id}}]"
+                                   value="{{ $item->id }}" type="hidden"
+                                   class="form-control" id="id[{{$item->id}}]">
+                            <input name="product_id[{{$item->id}}]"
+                                   value="{{ $item->product_id }}" type="hidden"
+                                   class="form-control" id="product_id[{{$item->id}}]">
+
+                            <input
+                                    value="{{ $item->quantity }}" type="hidden"
+                                    class="form-control item_quantity" name="item_quantity[{{$item->id}}]"
+                                    data-item-id="{{$item->id}}">
+
+                            <input name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
+                                   data-item-id="{{$item->id}}"
+                                   value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }}"
+                                   type="hidden"
+                                   class="form-control numbers_of_basic_commercial_units_in_pack"
+                                   id="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]">
+                            <input name="number_of_sale_units_in_the_pack[{{$item->id}}]"
+                                   data-item-id="{{$item->id}}"
+                                   value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}" type="hidden"
+                                   class="form-control number_of_sale_units_in_the_pack"
+                                   id="number_of_sale_units_in_the_pack[{{$item->id}}]">
+                            <input name="number_of_trade_items_in_the_largest_unit[{{$item->id}}]"
+                                   data-item-id="{{$item->id}}"
+                                   value="{{ $item->product->packing->number_of_trade_items_in_the_largest_unit }}"
+                                   type="hidden"
+                                   class="form-control number_of_trade_items_in_the_largest_unit"
+                                   id="number_of_trade_items_in_the_largest_unit[{{$item->id}}]">
+                            <input name="unit_consumption[{{$item->id}}]"
+                                   data-item-id="{{$item->id}}" value="{{ $item->product->packing->unit_consumption }}"
+                                   type="hidden"
+                                   class="form-control unit_consumption" id="unit_consumption[{{$item->id}}]">
                         </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($allProductsFromSupplier as $productSupplier)
+                        <tr>
+                            <td></td>
+                            <td>Jednostka handlowa ({{ $item->product->packing->unit_commercial }})</td>
+                            <td>Jednostka podstawowa ({{$item->product->packing->unit_basic}})</td>
+                            <td>Jednostka obliczeniowa ({{$item->product->packing->calculation_unit}})</td>
+                            <td>Jednostka zbiorcza ({{$item->product->packing->unit_of_collective}})</td>
+                        </tr>
+                        <tr class="selling-row row-{{$item->id}}">
+                            <th>Cena sprzedaży netto</th>
+                            <td>
+                                <input name="net_selling_price_commercial_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{ $item->net_selling_price_commercial_unit }}"
+                                       type="text"
+                                       class="form-control price net_selling_price_commercial_unit priceChange change-order"
+                                       id="net_selling_price_commercial_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="net_selling_price_basic_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}" value="{{ $item->net_selling_price_basic_unit }}"
+                                       type="text"
+                                       class="form-control price net_selling_price_basic_unit priceChange change-order"
+                                       id="net_selling_price_basic_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="net_selling_price_calculated_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{ $item->net_selling_price_calculated_unit }}"
+                                       type="text"
+                                       class="form-control price net_selling_price_calculated_unit priceChange change-order"
+                                       id="net_selling_price_calculated_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="net_selling_price_aggregate_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{ $item->net_selling_price_aggregate_unit }}"
+                                       type="text"
+                                       class="form-control price net_selling_price_aggregate_unit priceChange change-order"
+                                       id="net_selling_price_aggregate_unit[{{$item->id}}]">
+                            </td>
+                        </tr>
+                        <tr class="selling-row row-{{$item->id}}">
+                            <th>Cena sprzedaży brutto</th>
+                            <td>
+                                <input name="gross_selling_price_commercial_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{$item->gross_selling_price_commercial_unit}}"
+                                       type="text"
+                                       class="form-control price gross_selling_price_commercial_unit priceChange change-order"
+                                       id="gross_selling_price_commercial_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="gross_selling_price_basic_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}" value="{{$item->gross_selling_price_basic_unit}}"
+                                       type="text"
+                                       class="form-control price gross_selling_price_basic_unit priceChange change-order"
+                                       id="gross_selling_price_basic_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="gross_selling_price_calculated_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{$item->gross_selling_price_calculated_unit}}"
+                                       type="text"
+                                       class="form-control price gross_selling_price_calculated_unit priceChange change-order"
+                                       id="gross_selling_price_calculated_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="gross_selling_price_aggregate_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{$item->gross_selling_price_aggregate_unit}}"
+                                       type="text"
+                                       class="form-control price gross_selling_price_aggregate_unit priceChange change-order"
+                                       id="gross_selling_price_aggregate_unit[{{$item->id}}]">
+                            </td>
+                        </tr>
+                        <tr class="purchase-row row-{{$item->id}}">
+                            <th>Cena zakupu po rabatach netto</th>
+                            <td>
+                                <input name="net_purchase_price_commercial_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{ $item->net_purchase_price_commercial_unit_after_discounts }}"
+                                       type="text"
+                                       class="form-control price net_purchase_price_commercial_unit priceChange"
+                                       id="net_purchase_price_commercial_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="net_purchase_price_basic_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{ $item->net_purchase_price_basic_unit_after_discounts }}" type="text"
+                                       class="form-control price net_purchase_price_basic_unit priceChange"
+                                       id="net_purchase_price_basic_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="net_purchase_price_calculated_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{ $item->net_purchase_price_calculated_unit_after_discounts }}"
+                                       type="text"
+                                       class="form-control price net_purchase_price_calculated_unit priceChange"
+                                       id="net_purchase_price_calculated_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="net_purchase_price_aggregate_unit[{{$item->id}}]"
+                                       data-item-id="{{$item->id}}"
+                                       value="{{ $item->net_purchase_price_aggregate_unit_after_discounts }}"
+                                       type="text"
+                                       class="form-control price net_purchase_price_aggregate_unit priceChange"
+                                       id="net_purchase_price_aggregate_unit[{{$item->id}}]">
+                            </td>
+                        </tr>
+                        <tr class="purchase-row row-{{$item->id}}">
+                            <th>Cena zakupu po rabatach brutto</th>
+                            <td>
+                                <input name="gross_purchase_price_commercial_unit[{{$item->id}}]"
+                                       value="{{$item->gross_purchase_price_commercial_unit_after_discounts}}"
+                                       type="text"
+                                       data-item-id="{{$item->id}}"
+                                       class="form-control price gross_purchase_price_commercial_unit priceChange inTable"
+                                       id="gross_purchase_price_commercial_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="gross_purchase_price_basic_unit[{{$item->id}}]"
+                                       value="{{$item->gross_purchase_price_basic_unit_after_discounts}}" type="text"
+                                       data-item-id="{{$item->id}}"
+                                       class="form-control price gross_purchase_price_basic_unit priceChange"
+                                       id="gross_purchase_price_basic_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="gross_purchase_price_calculated_unit[{{$item->id}}]"
+                                       value="{{$item->gross_purchase_price_calculated_unit_after_discounts}}"
+                                       type="text"
+                                       data-item-id="{{$item->id}}"
+                                       class="form-control price gross_purchase_price_calculated_unit priceChange"
+                                       id="gross_purchase_price_calculated_unit[{{$item->id}}]">
+                            </td>
+                            <td>
+                                <input name="gross_purchase_price_aggregate_unit[{{$item->id}}]"
+                                       value="{{$item->gross_purchase_price_aggregate_unit}}" type="text"
+                                       data-item-id="{{$item->id}}"
+                                       class="form-control price gross_purchase_price_aggregate_unit priceChange"
+                                       id="gross_purchase_price_aggregate_unit[{{$item->id}}]">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Wagi produktu</th>
+                            <td>
+                                <input value="{{ $item->product->weight_trade_unit }} kg" type="text"
+                                       class="form-control price net_purchase_price_commercial_unit priceChange"
+                                       name="weight_trade_unit[{{$item->id}}]" disabled>
+                                <input type="hidden" name="weight_trade_unit[{{$item->id}}]"
+                                       value="{{ $item->product->weight_trade_unit }}">
+                            </td>
+                            <td>
+                                @if($item->product->numbers_of_basic_commercial_units_in_pack == 0)
+                                    <input value="0 kg" type="text"
+                                           class="form-control price net_purchase_price_commercial_unit priceChange"
+                                           disabled>
+                                @else
+                                    <input
+                                            value="{{ $item->product->weight_trade_unit / $item->product->numbers_of_basic_commercial_units_in_pack  }} kg"
+                                            type="text"
+                                            class="form-control price net_purchase_price_commercial_unit priceChange"
+                                            disabled>
+                                @endif
+                            </td>
+                            <td>
+                                @if($item->product->numbers_of_basic_commercial_units_in_pack == 0)
+                                    <input value="0 kg" type="text"
+                                           class="form-control price net_purchase_price_commercial_unit priceChange"
+                                           disabled>
+                                @else
+                                    <input
+                                            value="{{ ($item->product->packing->number_of_sale_units_in_the_pack / $item->product->numbers_of_basic_commercial_units_in_pack ?? 1) * $item->product->unit_consumption }} kg"
+                                            type="text"
+                                            class="form-control price net_purchase_price_commercial_unit priceChange"
+                                            disabled>
+                                @endif
+                            </td>
+                            <td>
+                                <input
+                                        value="{{ $item->product->packing->number_of_sale_units_in_the_pack * $item->product->number_of_sale_units_in_the_pack }} kg"
+                                        type="text"
+                                        class="form-control price net_purchase_price_commercial_unit priceChange"
+                                        disabled>
+                            </td>
+                        </tr>
+                        <tr class="selling-row row-{{$item->id}}">
+                            <th>Zamawiana ilość</th>
+                            @foreach($productPacking as $packing)
+                                @if($packing->product_id === $item->product_id)
+                                    <td>
+                                        <input name="unit_commercial[{{$item->id}}]"
+                                               value="{{$item->quantity . ' ' . $packing->unit_commercial }}"
+                                               type="text"
+                                               class="form-control" id="unit_commercial" disabled>
+                                        <input type="hidden" name="unit_commercial_quantity[{{$item->id}}]"
+                                               value="{{ $item->quantity }}">
+                                        <input type="hidden" name="unit_commercial_name[{{$item->id}}]"
+                                               value="{{ $packing->unit_commercial }}">
+                                    </td>
+                                    <td>
+                                        <input name="unit_basic"
+                                               value="@if($item->product->packing->numbers_of_basic_commercial_units_in_pack != 0){{$item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack  .' '.$packing->unit_basic }} @else {{0}} @endif"
+                                               type="text"
+                                               class="form-control" id="unit_basic" disabled>
+                                        <input type="hidden" name="unit_basic_units[{{$item->id}}]"
+                                               value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack}}">
+                                        <input type="hidden" name="unit_basic_name[{{$item->id}}]"
+                                               value="{{ $packing->unit_basic }}">
+                                    </td>
+                                    <td>
+                                        <input name="calculation_unit[{{$item->id}}]"
+                                               value="@if(is_numeric($item->product->packing->numbers_of_basic_commercial_units_in_pack) && is_numeric($item->product->packing->unit_consumption)){{ number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption, 2) .' '.$packing->calculation_unit }} @else {{0}} @endif"
+                                               type="text"
+                                               class="form-control" id="calculation_unit" disabled>
+                                        <input type="hidden" name="calculation_unit_units[{{$item->id}}]"
+                                               value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack}}">
+                                        <input type="hidden" name="calculation_unit_consumption[{{$item->id}}]"
+                                               value="{{ $item->product->packing->unit_consumption }}">
+                                        <input type="hidden" name="calculation_unit_name[{{$item->id}}]"
+                                               value="{{ $packing->calculation_unit }}">
+                                    </td>
+                                    <td>
+                                        @php
+                                            if ($item->product->packing->number_of_sale_units_in_the_pack == 0)
+                                                $a = 0;
+                                            else
+                                                $a = $item->quantity / $item->product->packing->number_of_sale_units_in_the_pack;
+                                        @endphp
+                                        <input name="unit_of_collective[{{$item->id}}]"
+                                               value="{{ number_format($a, 4) .' '.$packing->unit_of_collective}} "
+                                               type="text"
+                                               class="form-control" id="unit_of_collective" disabled>
+                                        <input type="hidden" name="unit_of_collective_units[{{$item->id}}]"
+                                               value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}">
+                                        <input type="hidden" name="unit_of_collective_name[{{$item->id}}]"
+                                               value="{{ $packing->unit_of_collective }}">
+                                    </td>
+                                @endif
+                            @endforeach
+                        </tr>
+                        <tr class="selling-row row-{{$item->id}}">
+
+                        </tr>
+                        @if(!empty($productsVariation[$item->product->id]))
                             <tr>
-                                <td>{{$productSupplier['product_name_supplier']}}</td>
-                                <td>{{$productSupplier['sum']}}</td>
-                                <td>
-                                    @if(strstr($productSupplier['different'], '-') != false)
-                                        <span style="color:red;">{{(float)$productSupplier['different']}}</span>
-                                    @else
-                                        <span style="color:green;">+{{(float)$productSupplier['different']}}</span>
-                                    @endif
-                                </td>
-                                <td>{{(int)$productSupplier['radius']}} km</td>
-                                <td>{{$productSupplier['phone']}}</td>
+                                <td colspan="4"><h3>Wariacje produktów:</h3></td>
                             </tr>
-                        @endforeach
+                            <tr>
+                                <td>
+                                    <strong>Nazwa</strong>
+                                </td>
+                                <td>
+                                    <strong>Cena sprzedaży brutto jednostki handlowej</strong>
+                                </td>
+                                <td>
+                                    <strong>Cena sprzedaży brutto jednostki podstawowej</strong>
+                                </td>
+                                <td>
+                                    <strong>Cena sprzedaży brutto jednostki obliczeniowej</strong>
+                                </td>
+                                <td>
+                                    <strong>Wartość danego asortymentu</strong>
+                                </td>
+                                <td>
+                                    <strong>Różnica</strong>
+                                </td>
+                                <td>
+                                    <strong>Odległość</strong>
+                                </td>
+                            </tr>
+                            @foreach($productsVariation[$item->product->id] as $variation)
+                                <tr class="row-{{$variation['id']}}">
+                                    <td>
+                                        {{$variation['name']}}
+                                    </td>
+                                    <td>
+                                        {{$variation['gross_selling_price_commercial_unit']}}
+                                    </td>
+                                    <td>
+                                        {{$variation['gross_selling_price_basic_unit']}}
+                                    </td>
+                                    <td>
+                                        {{$variation['gross_selling_price_calculated_unit']}}
+                                    </td>
+                                    <td>
+                                        {{$variation['sum']}}
+                                    </td>
+                                    <td>
+                                        @if(strstr($variation['different'], '-') != false)
+                                            <span style="color:red;">{{(float)$variation['different']}}</span>
+                                        @else
+                                            <span style="color:green;">+{{(float)$variation['different']}}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{(int)$variation['radius']}} km
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
                         </tbody>
                     </table>
-                @endif
-                <div class="form-group">
-                    <label for="mail_message">@lang('orders.form.message')</label>
-                    <textarea cols="40" rows="50" style="height: 300px;" class="form-control editor" id="mail_message"
-                              name="mail_message"></textarea>
+                    <div class="pl-23px mt-5 row-{{$item->id}}">
+                        <p>
+                            Obliczenia dokonano przy
+                            założeniu {{$item->product->packing->unit_consumption}}  {{$item->product->packing->unit_basic}}
+                            / {{$item->product->packing->calculation_unit}}
+                            <br> 1 {{$item->product->packing->unit_of_collective}}
+                            = {{$item->product->packing->number_of_sale_units_in_the_pack}}
+                            ({{$item->product->packing->unit_commercial}})
+                            = @if(is_numeric($item->product->packing->number_of_sale_units_in_the_pack) && is_numeric($item->product->packing->unit_consumption))
+                                {{$item->product->packing->number_of_sale_units_in_the_pack / $item->product->packing->unit_consumption}}
+                            @else
+                                {{0}}
+                            @endif ({{$item->product->packing->calculation_unit}} / {{$item->product->packing->unit_of_collective}})
+                        </p>
+                        <div>
+                            <label for="item-value">Wartość asortymentu</label>
+                            <input type="text" class="form-control item-value priceChange" id="item-value"
+                                   data-item-id="{{$item->id}}"
+                                   disabled name="item-value"
+                                   value="{{ number_format(($item->gross_selling_price_commercial_unit_after_discounts * $item->quantity), 2) }} zł">
+                        </div>
+                        <div>
+                            <label for="item-weight">Waga asortymentu</label>
+                            <input type="text" class="form-control item-weight priceChange"
+                                   data-item-id="{{$item->id}}"
+                                   disabled name="item-weight"
+                                   value="{{ number_format(($item->product->weight_trade_unit * $item->quantity), 2) }} kg">
+                        </div>
+                        <div>
+                            <label for="item-profit">Zysk asortymentu</label>
+                            <input type="text" class="form-control item-profit priceChange"
+                                   data-item-id="{{$item->id}}"
+                                   disabled name="item-profit"
+                                   value="{{ number_format(($item->gross_selling_price_commercial_unit_after_discounts * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }} zł">
+                        </div>
+                        <div class="flex2">
+                            <div style="width: 20%">
+                                <label for="quantity_commercial[{{$item->id}}]">Ilość</label>
+                                <input name="quantity_commercial[{{$item->id}}]"
+                                       value="{{ $item->quantity }}" type="text" data-item-id="{{$item->id}}"
+                                       class="form-control price change-order quantityChange"
+                                       id="quantity_commercial[{{$item->id}}]">
+                            </div>
+                            <div style="width: 80%">
+                                @php
+                                    $quantityAll = 0;
+                                @endphp
+                                @foreach($item->realProductPositions() as $position)
+                                    <p>
+                                        Pozycja: {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }}
+                                        Ilość na pozycji: {{ $position->position_quantity }}</p>
+                                    @php
+                                        $quantityAll += $position->position_quantity;
+                                    @endphp
+                                @endforeach
+                                Ilość wszystkich: {{ $quantityAll }} <br/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h3>Etykiety (kasowanie etykiet nie wywołuje dodatkowych konsekwencji)</h3>
-                @foreach($order->labels as $label)
-                    <div class="border" id="label_{{ $label->id }}">
-                        <i onclick="removeLabel({{ $label->id }})" style="cursor: pointer; color: red"
-                           class="fas fa-times-circle"></i>
-                        <span
+                <hr/>
+            @endforeach
+            <div class="form-group">
+                <input type="hidden" class="form-control" id="weight" name="weight"
+                       value="{{ $order->weight ?? '' }}">
+            </div>
+            <div class="form-group">
+                <input type="hidden" class="form-control" id="profit" disabled name="profit"
+                       value="{{ number_format($gross_selling_sum - $gross_purchase_sum, 2) }}">
+                <input type="hidden" class="form-control" id="orderItemsSum" disabled name="orderItemsSum"
+                       value="{{ number_format($gross_selling_sum, 2) }}">
+            </div>
+            <div class="form-group">
+                <input type="hidden" class="form-control priceChange" id="total_price" disabled name="total_price"
+                       value="{{ $order->total_price ?? '' }}">
+            </div>
+            @if(!empty($allProductsFromSupplier))
+                <h3>Suma wszystkich towarów dla danych producentów</h3>
+                <table class="table table1 table-venice-blue productsTableEdit">
+                    <thead>
+                    <tr>
+                        <th>Symbol dostawcy</th>
+                        <th>Wartość całości towaru u dostawcy</th>
+                        <th>Różnica wartości do wskazanego producenta w zamówieniu</th>
+                        <th>Odległość od magazynu</th>
+                        <th>Numer telefonu do przedstawiciela fabryki</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($allProductsFromSupplier as $productSupplier)
+                        <tr>
+                            <td>{{$productSupplier['product_name_supplier']}}</td>
+                            <td>{{$productSupplier['sum']}}</td>
+                            <td>
+                                @if(strstr($productSupplier['different'], '-') != false)
+                                    <span style="color:red;">{{(float)$productSupplier['different']}}</span>
+                                @else
+                                    <span style="color:green;">+{{(float)$productSupplier['different']}}</span>
+                                @endif
+                            </td>
+                            <td>{{(int)$productSupplier['radius']}} km</td>
+                            <td>{{$productSupplier['phone']}}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @endif
+            <div class="form-group">
+                <label for="mail_message">@lang('orders.form.message')</label>
+                <textarea cols="40" rows="50" style="height: 300px;" class="form-control editor" id="mail_message"
+                          name="mail_message"></textarea>
+            </div>
+            <h3>Etykiety (kasowanie etykiet nie wywołuje dodatkowych konsekwencji)</h3>
+            @foreach($order->labels as $label)
+                <div class="border" id="label_{{ $label->id }}">
+                    <i onclick="removeLabel({{ $label->id }})" style="cursor: pointer; color: red"
+                       class="fas fa-times-circle"></i>
+                    <span
                             style="color: {{ $label->font_color }}; margin-top: 5px; background-color:{{ $label->color }}"><i
                                 style="font-size: 1rem" class="{{ $label->icon_name }}"></i> {{ $label->name }}</span>
-                    </div>
-                @endforeach
-            </div>
+                </div>
+            @endforeach
+        </div>
 
-            <button type="submit" form="orders" id="submit" name="submit" value="update"
-                    class="btn btn-primary">@lang('voyager.generic.save')</button>
-            <button type="submit" form="orders" id="new-order" name="submit" value="store" class="btn btn-success">Dodaj
-                nowe zamówienie
-            </button>
+        <button type="submit" form="orders" id="submit" name="submit" value="update"
+                class="btn btn-primary">@lang('voyager.generic.save')</button>
+        <button type="submit" form="orders" id="new-order" name="submit" value="store" class="btn btn-success">Dodaj
+            nowe zamówienie
+        </button>
         </div>
     </form>
     <div class="order-payments" id="order-payments">
@@ -1806,15 +1826,15 @@
                             <tr>
                                 <td colspan="4" style="border: 0px;"></td>
                                 <td style="border: 0px;" class="firstOrder">Zamówienie 1 <input
-                                        type="hidden" name="firstOrderExist" value="0"></td>
+                                            type="hidden" name="firstOrderExist" value="0"></td>
                                 <td style="border: 0px;" class="secondOrder">Zamówienie 2 <input
-                                        type="hidden" name="secondOrderExist" value="0"></td>
+                                            type="hidden" name="secondOrderExist" value="0"></td>
                                 <td style="border: 0px;" class="thirdOrder">Zamówienie 3 <input
-                                        type="hidden" name="thirdOrderExist" value="0"></td>
+                                            type="hidden" name="thirdOrderExist" value="0"></td>
                                 <td style="border: 0px;" class="fourthOrder">Zamówienie 4 <input
-                                        type="hidden" name="fourthOrderExist" value="0"></td>
+                                            type="hidden" name="fourthOrderExist" value="0"></td>
                                 <td style="border: 0px;" class="fifthOrder">Zamówienie 5 <input
-                                        type="hidden" name="fifthOrderExist" value="0"></td>
+                                            type="hidden" name="fifthOrderExist" value="0"></td>
                             </tr>
                             <tr>
                                 <td colspan="4" style="border: 0px;"></td>
@@ -1844,8 +1864,9 @@
                                 @endphp
                                 <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
                                     <td colspan="4"><h4><img
-                                                src="{!! $item->product->getImageUrl() !!}"
-                                                style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }}
+                                                    src="{!! $item->product->getImageUrl() !!}"
+                                                    style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
+                                                . </strong>{{ $item->product->name }}
                                             (symbol: {{ $item->product->symbol }}) </h4></td>
 
 
@@ -1857,18 +1878,18 @@
                                            class="form-control" id="product_id[{{$item->id}}]">
 
                                     <input
-                                        value="{{ $item->quantity }}" type="hidden"
-                                        class="form-control item_quantity"
-                                        name="item_quantity[{{$item->id}}]"
-                                        data-item-id="{{$item->id}}">
+                                            value="{{ $item->quantity }}" type="hidden"
+                                            class="form-control item_quantity"
+                                            name="item_quantity[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}">
 
                                     <input
-                                        name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
-                                        data-item-id="{{$item->id}}"
-                                        value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }}"
-                                        type="hidden"
-                                        class="form-control numbers_of_basic_commercial_units_in_pack"
-                                        id="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]">
+                                            name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }}"
+                                            type="hidden"
+                                            class="form-control numbers_of_basic_commercial_units_in_pack"
+                                            id="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]">
                                     <input name="number_of_sale_units_in_the_pack[{{$item->id}}]"
                                            data-item-id="{{$item->id}}"
                                            value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}"
@@ -1876,12 +1897,12 @@
                                            class="form-control number_of_sale_units_in_the_pack"
                                            id="number_of_sale_units_in_the_pack[{{$item->id}}]">
                                     <input
-                                        name="number_of_trade_items_in_the_largest_unit[{{$item->id}}]"
-                                        data-item-id="{{$item->id}}"
-                                        value="{{ $item->product->packing->number_of_trade_items_in_the_largest_unit }}"
-                                        type="hidden"
-                                        class="form-control number_of_trade_items_in_the_largest_unit"
-                                        id="number_of_trade_items_in_the_largest_unit[{{$item->id}}]">
+                                            name="number_of_trade_items_in_the_largest_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->product->packing->number_of_trade_items_in_the_largest_unit }}"
+                                            type="hidden"
+                                            class="form-control number_of_trade_items_in_the_largest_unit"
+                                            id="number_of_trade_items_in_the_largest_unit[{{$item->id}}]">
                                     <input name="unit_consumption[{{$item->id}}]"
                                            data-item-id="{{$item->id}}"
                                            value="{{ $item->product->packing->unit_consumption }}"
@@ -1924,12 +1945,12 @@
                                 <tr class="purchase-row row-{{$item->id}}">
                                     <td>
                                         <input
-                                            name="net_purchase_price_commercial_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_purchase_price_commercial_unit_after_discounts }}"
-                                            type="text"
-                                            class="form-control price net_purchase_price_commercial_unit priceChange"
-                                            id="net_purchase_price_commercial_unit[{{$item->id}}]">
+                                                name="net_purchase_price_commercial_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}"
+                                                value="{{ $item->net_purchase_price_commercial_unit_after_discounts }}"
+                                                type="text"
+                                                class="form-control price net_purchase_price_commercial_unit priceChange"
+                                                id="net_purchase_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input name="net_purchase_price_basic_unit[{{$item->id}}]"
@@ -1941,31 +1962,31 @@
                                     </td>
                                     <td>
                                         <input
-                                            name="net_purchase_price_calculated_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_purchase_price_calculated_unit_after_discounts }}"
-                                            type="text"
-                                            class="form-control price net_purchase_price_calculated_unit priceChange"
-                                            id="net_purchase_price_calculated_unit[{{$item->id}}]">
+                                                name="net_purchase_price_calculated_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}"
+                                                value="{{ $item->net_purchase_price_calculated_unit_after_discounts }}"
+                                                type="text"
+                                                class="form-control price net_purchase_price_calculated_unit priceChange"
+                                                id="net_purchase_price_calculated_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input
-                                            name="net_purchase_price_aggregate_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_purchase_price_aggregate_unit_after_discounts }}"
-                                            type="text"
-                                            class="form-control price net_purchase_price_aggregate_unit priceChange"
-                                            id="net_purchase_price_aggregate_unit[{{$item->id}}]">
+                                                name="net_purchase_price_aggregate_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}"
+                                                value="{{ $item->net_purchase_price_aggregate_unit_after_discounts }}"
+                                                type="text"
+                                                class="form-control price net_purchase_price_aggregate_unit priceChange"
+                                                id="net_purchase_price_aggregate_unit[{{$item->id}}]">
                                     </td>
                                 </tr>
                                 <tr class="purchase-row row-{{$item->id}}">
                                     <td>
                                         <input
-                                            name="gross_purchase_price_commercial_unit[{{$item->id}}]"
-                                            value="" type="text"
-                                            data-item-id="{{$item->id}}"
-                                            class="form-control price gross_purchase_price_commercial_unit priceChange"
-                                            id="gross_purchase_price_commercial_unit[{{$item->id}}]">
+                                                name="gross_purchase_price_commercial_unit[{{$item->id}}]"
+                                                value="" type="text"
+                                                data-item-id="{{$item->id}}"
+                                                class="form-control price gross_purchase_price_commercial_unit priceChange"
+                                                id="gross_purchase_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input name="gross_purchase_price_basic_unit[{{$item->id}}]"
@@ -1976,19 +1997,19 @@
                                     </td>
                                     <td>
                                         <input
-                                            name="gross_purchase_price_calculated_unit[{{$item->id}}]"
-                                            value="" type="text"
-                                            data-item-id="{{$item->id}}"
-                                            class="form-control price gross_purchase_price_calculated_unit priceChange"
-                                            id="gross_purchase_price_calculated_unit[{{$item->id}}]">
+                                                name="gross_purchase_price_calculated_unit[{{$item->id}}]"
+                                                value="" type="text"
+                                                data-item-id="{{$item->id}}"
+                                                class="form-control price gross_purchase_price_calculated_unit priceChange"
+                                                id="gross_purchase_price_calculated_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input
-                                            name="gross_purchase_price_aggregate_unit[{{$item->id}}]"
-                                            value="" type="text"
-                                            data-item-id="{{$item->id}}"
-                                            class="form-control price gross_purchase_price_aggregate_unit priceChange"
-                                            id="gross_purchase_price_aggregate_unit[{{$item->id}}]">
+                                                name="gross_purchase_price_aggregate_unit[{{$item->id}}]"
+                                                value="" type="text"
+                                                data-item-id="{{$item->id}}"
+                                                class="form-control price gross_purchase_price_aggregate_unit priceChange"
+                                                id="gross_purchase_price_aggregate_unit[{{$item->id}}]">
                                     </td>
                                 </tr>
                                 <tr class="row-{{$item->id}}">
@@ -1997,12 +2018,12 @@
                                 <tr class="selling-row row-{{$item->id}}">
                                     <td>
                                         <input
-                                            name="net_selling_price_commercial_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_selling_price_commercial_unit }}"
-                                            type="text"
-                                            class="form-control price net_selling_price_commercial_unit priceChange change-order"
-                                            id="net_selling_price_commercial_unit[{{$item->id}}]">
+                                                name="net_selling_price_commercial_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}"
+                                                value="{{ $item->net_selling_price_commercial_unit }}"
+                                                type="text"
+                                                class="form-control price net_selling_price_commercial_unit priceChange change-order"
+                                                id="net_selling_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input name="net_selling_price_basic_unit[{{$item->id}}]"
@@ -2014,30 +2035,30 @@
                                     </td>
                                     <td>
                                         <input
-                                            name="net_selling_price_calculated_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_selling_price_calculated_unit }}"
-                                            type="text"
-                                            class="form-control price net_selling_price_calculated_unit priceChange change-order"
-                                            id="net_selling_price_calculated_unit[{{$item->id}}]">
+                                                name="net_selling_price_calculated_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}"
+                                                value="{{ $item->net_selling_price_calculated_unit }}"
+                                                type="text"
+                                                class="form-control price net_selling_price_calculated_unit priceChange change-order"
+                                                id="net_selling_price_calculated_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input
-                                            name="net_selling_price_aggregate_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->net_selling_price_aggregate_unit }}"
-                                            type="text"
-                                            class="form-control price net_selling_price_aggregate_unit priceChange change-order"
-                                            id="net_selling_price_aggregate_unit[{{$item->id}}]">
+                                                name="net_selling_price_aggregate_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}"
+                                                value="{{ $item->net_selling_price_aggregate_unit }}"
+                                                type="text"
+                                                class="form-control price net_selling_price_aggregate_unit priceChange change-order"
+                                                id="net_selling_price_aggregate_unit[{{$item->id}}]">
                                     </td>
                                 </tr>
                                 <tr class="selling-row row-{{$item->id}}">
                                     <td>
                                         <input
-                                            name="gross_selling_price_commercial_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}" value="" type="text"
-                                            class="form-control price gross_selling_price_commercial_unit priceChange change-order"
-                                            id="gross_selling_price_commercial_unit[{{$item->id}}]">
+                                                name="gross_selling_price_commercial_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}" value="" type="text"
+                                                class="form-control price gross_selling_price_commercial_unit priceChange change-order"
+                                                id="gross_selling_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input name="gross_selling_price_basic_unit[{{$item->id}}]"
@@ -2047,17 +2068,17 @@
                                     </td>
                                     <td>
                                         <input
-                                            name="gross_selling_price_calculated_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}" value="" type="text"
-                                            class="form-control price gross_selling_price_calculated_unit priceChange change-order"
-                                            id="gross_selling_price_calculated_unit[{{$item->id}}]">
+                                                name="gross_selling_price_calculated_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}" value="" type="text"
+                                                class="form-control price gross_selling_price_calculated_unit priceChange change-order"
+                                                id="gross_selling_price_calculated_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input
-                                            name="gross_selling_price_aggregate_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}" value="" type="text"
-                                            class="form-control price gross_selling_price_aggregate_unit priceChange change-order"
-                                            id="gross_selling_price_aggregate_unit[{{$item->id}}]">
+                                                name="gross_selling_price_aggregate_unit[{{$item->id}}]"
+                                                data-item-id="{{$item->id}}" value="" type="text"
+                                                class="form-control price gross_selling_price_aggregate_unit priceChange change-order"
+                                                id="gross_selling_price_aggregate_unit[{{$item->id}}]">
                                     </td>
                                 </tr>
                                 <tr class="selling-row row-{{$item->id}}">
@@ -2116,11 +2137,11 @@
                                     </td>
                                     <td colspan="3"></td>
                                     <td class="firstOrder"><input
-                                            name="firstOrderQuantity[{{$item->id}}]"
-                                            type="text" data-item-id="{{$item->id}}"
-                                            data-order-type="first"
-                                            class="form-control splitQuantity"
-                                            id="firstOrderQuantity[{{$item->id}}]">
+                                                name="firstOrderQuantity[{{$item->id}}]"
+                                                type="text" data-item-id="{{$item->id}}"
+                                                data-order-type="first"
+                                                class="form-control splitQuantity"
+                                                id="firstOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="first">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2130,10 +2151,10 @@
                                         </p>
                                         </p>
                                         <p>Zostało: <span
-                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                name="firstOrderWeight[{{$item->id}}]"></span>
+                                                    name="firstOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="firstWeightValue"
                                                    name="firstOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2143,11 +2164,11 @@
                                         </p>
                                     </td>
                                     <td class="secondOrder"><input
-                                            name="secondOrderQuantity[{{$item->id}}]"
-                                            type="text" data-item-id="{{$item->id}}"
-                                            data-order-type="second"
-                                            class="form-control splitQuantity"
-                                            id="secondOrderQuantity[{{$item->id}}]">
+                                                name="secondOrderQuantity[{{$item->id}}]"
+                                                type="text" data-item-id="{{$item->id}}"
+                                                data-order-type="second"
+                                                class="form-control splitQuantity"
+                                                id="secondOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="second">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2157,10 +2178,10 @@
                                         </p>
                                         </p>
                                         <p>Zostało: <span
-                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                name="secondOrderWeight[{{$item->id}}]"></span>
+                                                    name="secondOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="secondWeightValue"
                                                    name="secondOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2170,11 +2191,11 @@
                                         </p>
                                     </td>
                                     <td class="thirdOrder"><input
-                                            name="thirdOrderQuantity[{{$item->id}}]"
-                                            type="text" data-item-id="{{$item->id}}"
-                                            data-order-type="third"
-                                            class="form-control splitQuantity"
-                                            id="thirdOrderQuantity[{{$item->id}}]">
+                                                name="thirdOrderQuantity[{{$item->id}}]"
+                                                type="text" data-item-id="{{$item->id}}"
+                                                data-order-type="third"
+                                                class="form-control splitQuantity"
+                                                id="thirdOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="third">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2183,10 +2204,10 @@
                                             </button>
                                         </p>
                                         <p>Zostało: <span
-                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                name="thirdOrderWeight[{{$item->id}}]"></span>
+                                                    name="thirdOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="thirdWeightValue"
                                                    name="thirdOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2196,11 +2217,11 @@
                                         </p>
                                     </td>
                                     <td class="fourthOrder"><input
-                                            name="fourthOrderQuantity[{{$item->id}}]"
-                                            type="text" data-item-id="{{$item->id}}"
-                                            data-order-type="fourth"
-                                            class="form-control splitQuantity"
-                                            id="fourthOrderQuantity[{{$item->id}}]">
+                                                name="fourthOrderQuantity[{{$item->id}}]"
+                                                type="text" data-item-id="{{$item->id}}"
+                                                data-order-type="fourth"
+                                                class="form-control splitQuantity"
+                                                id="fourthOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="fourth">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2209,10 +2230,10 @@
                                             </button>
                                         </p>
                                         <p>Zostało: <span
-                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                name="fourthOrderWeight[{{$item->id}}]"></span>
+                                                    name="fourthOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="fourthWeightValue"
                                                    name="fourthOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2222,11 +2243,11 @@
                                         </p>
                                     </td>
                                     <td class="fifthOrder"><input
-                                            name="fifthOrderQuantity[{{$item->id}}]"
-                                            type="text" data-item-id="{{$item->id}}"
-                                            data-order-type="fifth"
-                                            class="form-control splitQuantity"
-                                            id="fifthOrderQuantity[{{$item->id}}]">
+                                                name="fifthOrderQuantity[{{$item->id}}]"
+                                                type="text" data-item-id="{{$item->id}}"
+                                                data-order-type="fifth"
+                                                class="form-control splitQuantity"
+                                                id="fifthOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="fifth">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2235,10 +2256,10 @@
                                             </button>
                                         </p>
                                         <p>Zostało: <span
-                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                name="fifthOrderWeight[{{$item->id}}]"></span>
+                                                    name="fifthOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="fifthWeightValue"
                                                    name="fifthOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2289,7 +2310,7 @@
                                                id="additional_service_cost_firstOrder"
                                                name="additional_service_cost_firstOrder">
                                         <p>Zostało: <span
-                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2299,7 +2320,7 @@
                                                id="additional_cash_on_delivery_cost_firstOrder"
                                                name="additional_cash_on_delivery_cost_firstOrder">
                                         <p>Zostało: <span
-                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2309,7 +2330,7 @@
                                                id="shipment_price_for_client_firstOrder"
                                                name="shipment_price_for_client_firstOrder">
                                         <p>Zostało: <span
-                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2319,7 +2340,7 @@
                                                id="shipment_price_for_us_firstOrder"
                                                name="shipment_price_for_us_firstOrder">
                                         <p>Zostało: <span
-                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2338,7 +2359,7 @@
                                                id="additional_service_cost_secondOrder"
                                                name="additional_service_cost_secondOrder">
                                         <p>Zostało: <span
-                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2348,7 +2369,7 @@
                                                id="additional_cash_on_delivery_cost_secondOrder"
                                                name="additional_cash_on_delivery_cost_secondOrder">
                                         <p>Zostało: <span
-                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2358,7 +2379,7 @@
                                                id="shipment_price_for_client_secondOrder"
                                                name="shipment_price_for_client_secondOrder">
                                         <p>Zostało: <span
-                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2368,7 +2389,7 @@
                                                id="shipment_price_for_us_secondOrder"
                                                name="shipment_price_for_us_secondOrder">
                                         <p>Zostało: <span
-                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2387,7 +2408,7 @@
                                                id="additional_service_cost_thirdOrder"
                                                name="additional_service_cost_thirdOrder">
                                         <p>Zostało: <span
-                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2397,7 +2418,7 @@
                                                id="additional_cash_on_delivery_cost_thirdOrder"
                                                name="additional_cash_on_delivery_cost_thirdOrder">
                                         <p>Zostało: <span
-                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2407,7 +2428,7 @@
                                                id="shipment_price_for_client_thirdOrder"
                                                name="shipment_price_for_client_thirdOrder">
                                         <p>Zostało: <span
-                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2417,7 +2438,7 @@
                                                id="shipment_price_for_us_thirdOrder"
                                                name="shipment_price_for_us_thirdOrder">
                                         <p>Zostało: <span
-                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2436,7 +2457,7 @@
                                                id="additional_service_cost_fourthOrder"
                                                name="additional_service_cost_fourthOrder">
                                         <p>Zostało: <span
-                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2446,7 +2467,7 @@
                                                id="additional_cash_on_delivery_cost_fourthOrder"
                                                name="additional_cash_on_delivery_cost_fourthOrder">
                                         <p>Zostało: <span
-                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2456,7 +2477,7 @@
                                                id="shipment_price_for_client_fourthOrder"
                                                name="shipment_price_for_client_fourthOrder">
                                         <p>Zostało: <span
-                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2466,7 +2487,7 @@
                                                id="shipment_price_for_us_fourthOrder"
                                                name="shipment_price_for_us_fourthOrder">
                                         <p>Zostało: <span
-                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2485,7 +2506,7 @@
                                                id="additional_service_cost_fifthOrder"
                                                name="additional_service_cost_fifthOrder">
                                         <p>Zostało: <span
-                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2495,7 +2516,7 @@
                                                id="additional_cash_on_delivery_cost_fifthOrder"
                                                name="additional_cash_on_delivery_cost_fifthOrder">
                                         <p>Zostało: <span
-                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2505,7 +2526,7 @@
                                                id="shipment_price_for_client_fifthOrder"
                                                name="shipment_price_for_client_fifthOrder">
                                         <p>Zostało: <span
-                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2515,7 +2536,7 @@
                                                id="shipment_price_for_us_fifthOrder"
                                                name="shipment_price_for_us_fifthOrder">
                                         <p>Zostało: <span
-                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2545,7 +2566,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
-                            aria-hidden="true">&times;</span></button>
+                                aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <table id="paymentsTable" class="table table-hover">
@@ -2645,7 +2666,7 @@
 
             const res = await ajaxPost(data, url);
 
-            if(res) {
+            if (res) {
                 $('.chat-panel').append(res);
                 scrollBottom();
             }
@@ -3805,6 +3826,7 @@
                     ).toFixed(2))
                 $("#weightInfo").val($("#weight").val());
             }
+
             $('#additional_cash_on_delivery_cost').on('change', function () {
                 updateProfit();
             });
@@ -3820,47 +3842,47 @@
             $(document).on('change', 'input.price', function () {
                     commaReplace('.priceChange');
 
-                const itemId = $(this).data('item-id');
+                    const itemId = $(this).data('item-id');
 
-                const net_purchase_price_commercial_unit = $('.net_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
-                const net_purchase_price_basic_unit = $('.net_purchase_price_basic_unit[data-item-id="' + itemId + '"');
-                const net_purchase_price_calculated_unit = $('.net_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
-                const net_purchase_price_aggregate_unit = $('.net_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
-                const net_selling_price_commercial_unit = $('.net_selling_price_commercial_unit[data-item-id="' + itemId + '"');
-                const net_selling_price_basic_unit = $('.net_selling_price_basic_unit[data-item-id="' + itemId + '"');
-                const net_selling_price_calculated_unit = $('.net_selling_price_calculated_unit[data-item-id="' + itemId + '"');
-                const net_selling_price_aggregate_unit = $('.net_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+                    const net_purchase_price_commercial_unit = $('.net_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
+                    const net_purchase_price_basic_unit = $('.net_purchase_price_basic_unit[data-item-id="' + itemId + '"');
+                    const net_purchase_price_calculated_unit = $('.net_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
+                    const net_purchase_price_aggregate_unit = $('.net_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
+                    const net_selling_price_commercial_unit = $('.net_selling_price_commercial_unit[data-item-id="' + itemId + '"');
+                    const net_selling_price_basic_unit = $('.net_selling_price_basic_unit[data-item-id="' + itemId + '"');
+                    const net_selling_price_calculated_unit = $('.net_selling_price_calculated_unit[data-item-id="' + itemId + '"');
+                    const net_selling_price_aggregate_unit = $('.net_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
 
-                const gross_purchase_price_commercial_unit = $('.gross_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
-                const gross_purchase_price_basic_unit = $('.gross_purchase_price_basic_unit[data-item-id="' + itemId + '"');
-                const gross_purchase_price_calculated_unit = $('.gross_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
-                const gross_purchase_price_aggregate_unit = $('.gross_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
-                const gross_selling_price_commercial_unit = $('.gross_selling_price_commercial_unit[data-item-id="' + itemId + '"');
-                const gross_selling_price_basic_unit = $('.gross_selling_price_basic_unit[data-item-id="' + itemId + '"');
-                const gross_selling_price_calculated_unit = $('.gross_selling_price_calculated_unit[data-item-id="' + itemId + '"');
-                const gross_selling_price_aggregate_unit = $('.gross_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+                    const gross_purchase_price_commercial_unit = $('.gross_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
+                    const gross_purchase_price_basic_unit = $('.gross_purchase_price_basic_unit[data-item-id="' + itemId + '"');
+                    const gross_purchase_price_calculated_unit = $('.gross_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
+                    const gross_purchase_price_aggregate_unit = $('.gross_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
+                    const gross_selling_price_commercial_unit = $('.gross_selling_price_commercial_unit[data-item-id="' + itemId + '"');
+                    const gross_selling_price_basic_unit = $('.gross_selling_price_basic_unit[data-item-id="' + itemId + '"');
+                    const gross_selling_price_calculated_unit = $('.gross_selling_price_calculated_unit[data-item-id="' + itemId + '"');
+                    const gross_selling_price_aggregate_unit = $('.gross_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
 
-                const numbers_of_basic_commercial_units_in_pack = $('.numbers_of_basic_commercial_units_in_pack[data-item-id="' + itemId + '"');
-                const number_of_sale_units_in_the_pack = $('.number_of_sale_units_in_the_pack[data-item-id="' + itemId + '"');
-                const number_of_trade_items_in_the_largest_unit = $('.number_of_trade_items_in_the_largest_unit[data-item-id="' + itemId + '"');
-                const unit_consumption = $('.unit_consumption[data-item-id="' + itemId + '"');
+                    const numbers_of_basic_commercial_units_in_pack = $('.numbers_of_basic_commercial_units_in_pack[data-item-id="' + itemId + '"');
+                    const number_of_sale_units_in_the_pack = $('.number_of_sale_units_in_the_pack[data-item-id="' + itemId + '"');
+                    const number_of_trade_items_in_the_largest_unit = $('.number_of_trade_items_in_the_largest_unit[data-item-id="' + itemId + '"');
+                    const unit_consumption = $('.unit_consumption[data-item-id="' + itemId + '"');
 
-                let net_purchase_price_commercial_unit_value = 0;
-                if (!$(this).hasClass('gross_purchase_price_commercial_unit')) {
-                    net_purchase_price_commercial_unit_value = parseFloat(net_purchase_price_commercial_unit.val());
-                } else {
-                    net_purchase_price_commercial_unit_value = parseFloat(gross_purchase_price_commercial_unit.val() / 1.23);
-                }
+                    let net_purchase_price_commercial_unit_value = 0;
+                    if (!$(this).hasClass('gross_purchase_price_commercial_unit')) {
+                        net_purchase_price_commercial_unit_value = parseFloat(net_purchase_price_commercial_unit.val());
+                    } else {
+                        net_purchase_price_commercial_unit_value = parseFloat(gross_purchase_price_commercial_unit.val() / 1.23);
+                    }
 
-                let net_purchase_price_basic_unit_value = 0;
-                if (!$(this).hasClass('gross_purchase_price_basic_unit')) {
-                    net_purchase_price_basic_unit_value = parseFloat(net_purchase_price_basic_unit.val());
-                } else {
-                    net_purchase_price_basic_unit_value = parseFloat(gross_purchase_price_basic_unit.val() / 1.23);
-                }
+                    let net_purchase_price_basic_unit_value = 0;
+                    if (!$(this).hasClass('gross_purchase_price_basic_unit')) {
+                        net_purchase_price_basic_unit_value = parseFloat(net_purchase_price_basic_unit.val());
+                    } else {
+                        net_purchase_price_basic_unit_value = parseFloat(gross_purchase_price_basic_unit.val() / 1.23);
+                    }
 
-                let net_purchase_price_aggregate_unit_value = 0;
-                if (!$(this).hasClass('gross_purchase_price_aggregate_unit')) {
+                    let net_purchase_price_aggregate_unit_value = 0;
+                    if (!$(this).hasClass('gross_purchase_price_aggregate_unit')) {
                         net_purchase_price_aggregate_unit_value = parseFloat(net_purchase_price_aggregate_unit.val());
                     } else {
                         net_purchase_price_aggregate_unit_value = parseFloat(gross_purchase_price_aggregate_unit.val() / 1.23);
@@ -4399,6 +4421,7 @@
             $('#orderValueSum').val(sum.toFixed(2));
             $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
         }
+
         setTimeout(() => {
             updateTransportBilans();
         }, 1000);
@@ -4913,7 +4936,7 @@
         }
 
         const filterMessages = () => {
-            $('.message-row').each(function() {
+            $('.message-row').each(function () {
                 const area = String($(this).data('area'));
 
                 selectedArea === area ? $(this).show() : $(this).hide();
@@ -4926,7 +4949,7 @@
 
         filterMessages();
 
-        $('#area').change(function() {
+        $('#area').change(function () {
             selectedArea = $(this).val();
             filterMessages();
         });

@@ -5,9 +5,9 @@ namespace App\Exports;
 
 use App\Enums\AllegroExcel\SheetNames;
 use App\Exports\Sheets\AllegroOrdersSheet;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use \Illuminate\Support\Collection;
 
 class OrdersAllegroExport implements FromCollection, WithMultipleSheets
 {
