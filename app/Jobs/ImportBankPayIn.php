@@ -80,16 +80,14 @@ class ImportBankPayIn implements ShouldQueue
             $payIn->operation_type = 'Wpłata/wypłata bankowa';
 
             switch($payInDto->message) {
-                case 'Brak dopasowania':
-                    continue;
                 case 'Brak numeru zamówienia':
+                case 'Brak dopasowania':
                     if ($payIn->contains('TECHN.;')) {
                         fputcsv($file, $payIn->toArray());
                         continue;
                     }
 
                     $this->createTWSUOrder($payIn);
-
                     break;
                 case '/[zZ][zZ](\d{3,5})[zZ][zZ]/':
                     $payIn->kwota *= -1;
