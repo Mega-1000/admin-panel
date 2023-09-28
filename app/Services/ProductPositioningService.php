@@ -34,15 +34,24 @@ class ProductPositioningService
      */
     private static function handleNonZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
+        // Ensure that denominators are not zero before performing divisions
         $IWK = $product->packing->number_on_a_layer !== 0 ? floor($productStockPosition->position_quantity / $product->packing->number_on_a_layer) : 0;
         $IJZNWOK = $product->packing->number_of_sale_units_in_the_pack !== 0 ? floor(
             ($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer)
             / $product->packing->number_of_sale_units_in_the_pack
         ) : 0;
 
-        $IJZNWK = $product->layers_in_package !== 0 ? $product->packing->number_of_trade_items_in_the_largest_unit / ($product->layers_in_package * $product->packing->number_of_sale_units_in_the_pack) : 0;
+        // Calculate IJZNWK only if necessary to avoid division by zero
+        $IJZNWK = 0;
+        if ($product->layers_in_package !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) {
+            $IJZNWK = $product->packing->number_of_trade_items_in_the_largest_unit / ($product->layers_in_package * $product->packing->number_of_sale_units_in_the_pack);
+        }
 
-        $IJHWOZ = ($product->packing->number_on_a_layer !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) ? floor($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack) : 0;
+        // Calculate IJHWOZ only if necessary to avoid division by zero
+        $IJHWOZ = 0;
+        if ($product->packing->number_on_a_layer !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) {
+            $IJHWOZ = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack);
+        }
 
         return self::convertArrayToDTO([
             'IJZNWK' => $IJZNWK,
@@ -62,9 +71,14 @@ class ProductPositioningService
      */
     private static function handleZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
+        // Ensure that denominators are not zero before performing divisions
         $IWK = $product->packing->number_of_sale_units_in_the_pack !== 0 ? floor($productStockPosition->position_quantity / $product->packing->number_of_sale_units_in_the_pack) : 0;
 
-        $IJZHWO = ($product->packing->number_of_sale_units_in_the_pack !== 0) ? floor($productStockPosition->position_quantity - $IWK * $product->packing->number_of_sale_units_in_the_pack) : 0;
+        // Calculate IJZHWO only if necessary to avoid division by zero
+        $IJZHWO = 0;
+        if ($product->packing->number_of_sale_units_in_the_pack !== 0) {
+            $IJZHWO = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_of_sale_units_in_the_pack);
+        }
 
         return self::convertArrayToDTO([
             'IWK' => $IWK,
