@@ -16,13 +16,17 @@ class ProductPositioningService
      */
     public static function getPositioning(ProductStockPosition $productStockPosition): ProductPositioningDTO
     {
-        $product = $productStockPosition->stock->product;
+        try {
+            $product = $productStockPosition->stock->product;
 
-        if ($product->number_of_trade_items_in_the_largest_unit !== 0) {
-            return self::handleNonZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product);
+            if ($product->number_of_trade_items_in_the_largest_unit !== 0) {
+                return self::handleNonZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product);
+            }
+
+            return self::handleZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
         }
-
-        return self::handleZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product);
     }
 
     /**
@@ -34,30 +38,34 @@ class ProductPositioningService
      */
     private static function handleNonZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
-        $IWK = $product->packing->number_on_a_layer !== 0 ? floor($productStockPosition->position_quantity / $product->packing->number_on_a_layer) : 0;
-        $IJZNWOK = $product->packing->number_of_sale_units_in_the_pack !== 0 ? floor(
-            ($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer)
-            / $product->packing->number_of_sale_units_in_the_pack
-        ) : 0;
+        try {
+            $IWK = $product->packing->number_on_a_layer !== 0 ? floor($productStockPosition->position_quantity / $product->packing->number_on_a_layer) : 0;
+            $IJZNWOK = $product->packing->number_of_sale_units_in_the_pack !== 0 ? floor(
+                ($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer)
+                / $product->packing->number_of_sale_units_in_the_pack
+            ) : 0;
 
-        // Handle division by zero errors
-        $IJZNWK = 0;
-        if ($product->layers_in_package !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) {
-            $IJZNWK = $product->packing->number_of_trade_items_in_the_largest_unit / ($product->layers_in_package * $product->packing->number_of_sale_units_in_the_pack);
+            // Handle division by zero errors
+            $IJZNWK = 0;
+            if ($product->layers_in_package !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) {
+                $IJZNWK = $product->packing->number_of_trade_items_in_the_largest_unit / ($product->layers_in_package * $product->packing->number_of_sale_units_in_the_pack);
+            }
+
+            $IJHWOZ = 0;
+            if ($product->packing->number_on_a_layer !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) {
+                $IJHWOZ = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack);
+            }
+
+            return self::convertArrayToDTO([
+                'IJZNWK' => $IJZNWK,
+                'IJHWOZ' => $IJHWOZ,
+                'IWK' => $IWK,
+                'IJZNWOK' => $IJZNWOK,
+                'IJHWROZ' => 0,
+            ]);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
         }
-
-        $IJHWOZ = 0;
-        if ($product->packing->number_on_a_layer !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) {
-            $IJHWOZ = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack);
-        }
-
-        return self::convertArrayToDTO([
-            'IJZNWK' => $IJZNWK,
-            'IJHWOZ' => $IJHWOZ,
-            'IWK' => $IWK,
-            'IJZNWOK' => $IJZNWOK,
-            'IJHWROZ' => 0,
-        ]);
     }
 
     /**
@@ -69,23 +77,30 @@ class ProductPositioningService
      */
     private static function handleZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
-        // Handle division by zero errors
-        $IWK = $product->packing->number_of_sale_units_in_the_pack !== 0 ? floor($productStockPosition->position_quantity / $product->packing->number_of_sale_units_in_the_pack) : 0;
+        try {
+            $IWK = $product->packing->number_of_sale_units_in_the_pack !== 0 ? floor($productStockPosition->position_quantity / $product->packing->number_of_sale_units_in_the_pack) : 0;
 
-        $IJZHWO = 0;
-        if ($product->packing->number_of_sale_units_in_the_pack !== 0) {
-            $IJZHWO = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_of_sale_units_in_the_pack);
+            $IJZHWO = 0;
+            if ($product->packing->number_of_sale_units_in_the_pack !== 0) {
+                $IJZHWO = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_of_sale_units_in_the_pack);
+            }
+
+            return self::convertArrayToDTO([
+                'IWK' => $IWK,
+                'IJZNWOK' => 0,
+                'IJZHWO' => $IJZHWO,
+            ]);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
         }
-
-        return self::convertArrayToDTO([
-            'IWK' => $IWK,
-            'IJZNWOK' => 0,
-            'IJZHWO' => $IJZHWO,
-        ]);
     }
 
     private static function convertArrayToDTO(array $data): ProductPositioningDTO
     {
-        return ProductPositioningDTO::fromAcronymsArray($data);
+        try {
+            return ProductPositioningDTO::fromAcronymsArray($data);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
+        }
     }
 }
