@@ -365,11 +365,15 @@ class ImportBankPayIn implements ShouldQueue
      */
     public static function createTWSUOrder(BankPayInDTO $data): void
     {
-        OrderService::createTWSOOrders(new CreateTWSOOrdersDTO(
+        $orderId = OrderService::createTWSOOrders(new CreateTWSOOrdersDTO(
             warehousesSymbols: null,
             clientEmail: 'info@ephpolska.pl',
             purchaseValue: $data->kwota,
             consultantDescription: $data->stringify(),
         ));
+
+        $order = Order::find($orderId);
+
+        $order->labels()->detach([83, 237, 92]);
     }
 }
