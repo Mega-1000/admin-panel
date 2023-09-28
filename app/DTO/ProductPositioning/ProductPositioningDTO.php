@@ -33,4 +33,29 @@ readonly final class ProductPositioningDTO
             numberOfCommercialUnitsInLastLayerOfStartedBulk: $data['IJHNOWWOZR'],
         );
     }
+
+    public function getNumberOfCompleteLayers(): int
+    {
+        return $this->numberOfCompleteLayers;
+    }
+
+    public function getNumberOfItemsPerLayer(): int
+    {
+        return $this->numberOfItemsPerLayer;
+    }
+
+    public function getNumberOfCommercialUnitsInBulk(): int
+    {
+        return $this->numberOfCommercialUnitsInBulk;
+    }
+
+    public function getNumberOfBulkUnitsInLastLayer(): int
+    {
+        return $this->numberOfBulkUnitsInLastLayer;
+    }
+
+    public function getNumberOfCommercialUnitsInLastLayerOfStartedBulk(): int
+    {
+        return $this->numberOfCommercialUnitsInLastLayerOfStartedBulk;
+    }
 }

@@ -10,6 +10,27 @@ use Exception;
 class ProductPositioningService
 {
     /**
+     * @throws Exception
+     */
+    public static function renderPositioningViewHtml(ProductStockPosition $productStockPosition): string
+    {
+        return self::getPositioningViewHtml(self::getPositioning($productStockPosition));
+    }
+
+    /**
+     * Get positioning view html
+     *
+     * @param ProductPositioningDTO $productPositioningDTO
+     * @return string
+     */
+    private static function getPositioningViewHtml(ProductPositioningDTO $productPositioningDTO): string
+    {
+        return view('product-positioning', [
+            'productPositioningDTO' => $productPositioningDTO,
+        ])->render();
+    }
+
+    /**
      * Get positioning of product based on its stock position
      *
      * @param ProductStockPosition $productStockPosition
@@ -21,7 +42,7 @@ class ProductPositioningService
         try {
             $product = $productStockPosition->stock->product;
 
-            if ($product->number_of_trade_items_in_the_largest_unit !== 0) {
+            if ($product->number_of_trade_items_in_the_largest_unit != 0) {
                 return self::handleNonZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product);
             }
 
@@ -42,20 +63,19 @@ class ProductPositioningService
     private static function handleNonZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
         try {
-            $IWK = $product->packing->number_on_a_layer !== 0 ? floor($productStockPosition->position_quantity / $product->packing->number_on_a_layer) : 0;
-            $IJZNWOK = $product->packing->number_of_sale_units_in_the_pack !== 0 ? floor(
+            $IWK = $product->packing->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity / $product->packing->number_on_a_layer) : 0;
+            $IJZNWOK = $product->packing->number_of_sale_units_in_the_pack != 0 ? floor(
                 ($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer)
                 / $product->packing->number_of_sale_units_in_the_pack
             ) : 0;
 
-            // Handle division by zero errors
             $IJZNWK = 0;
-            if ($product->layers_in_package !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) {
+            if ($product->layers_in_package != 0 && $product->packing->number_of_sale_units_in_the_pack != 0) {
                 $IJZNWK = $product->packing->number_of_trade_items_in_the_largest_unit / ($product->layers_in_package * $product->packing->number_of_sale_units_in_the_pack);
             }
 
             $IJHWOZ = 0;
-            if ($product->packing->number_on_a_layer !== 0 && $product->packing->number_of_sale_units_in_the_pack !== 0) {
+            if ($product->packing->number_on_a_layer != 0 && $product->packing->number_of_sale_units_in_the_pack != 0) {
                 $IJHWOZ = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack);
             }
 
@@ -82,10 +102,10 @@ class ProductPositioningService
     private static function handleZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
         try {
-            $IWK = $product->packing->number_of_sale_units_in_the_pack !== 0 ? floor($productStockPosition->position_quantity / $product->packing->number_of_sale_units_in_the_pack) : 0;
+            $IWK = $product->packing->number_of_sale_units_in_the_pack != 0 ? floor($productStockPosition->position_quantity / $product->packing->number_of_sale_units_in_the_pack) : 0;
 
             $IJZHWO = 0;
-            if ($product->packing->number_of_sale_units_in_the_pack !== 0) {
+            if ($product->packing->number_of_sale_units_in_the_pack != 0) {
                 $IJZHWO = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_of_sale_units_in_the_pack);
             }
 
@@ -104,10 +124,6 @@ class ProductPositioningService
      */
     private static function convertArrayToDTO(array $data): ProductPositioningDTO
     {
-        try {
-            return ProductPositioningDTO::fromAcronymsArray($data);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
-        }
+        return ProductPositioningDTO::fromAcronymsArray($data);
     }
 }
