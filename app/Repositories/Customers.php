@@ -14,7 +14,6 @@ class Customers
      */
     public static function getFirstCustomerWithLogin(string $login): Customer
     {
-        dd($login);
-        return Customer::where('login', $login)->firstOrFail();
+        return Customer::where('login', "info@ephpolska.pl")->firstOrFail();
     }
 }
