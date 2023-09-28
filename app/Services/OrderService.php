@@ -264,7 +264,7 @@ class OrderService
             new CreateMessageDTO(
                 message: $data->getConsultantDescription(),
                 area: UserRole::Consultant,
-                token: (new MessagesHelper)->getChatToken($order->id, auth()->user()->id),
+                token: (new MessagesHelper)->getChatToken($order->id, auth()->user()?->id),
             ),
         );
 
