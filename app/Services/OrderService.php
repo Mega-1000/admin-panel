@@ -236,7 +236,7 @@ class OrderService
                 'status_id' => 1,
                 'last_status_update_date' => Carbon::now(),
                 'customer_notices' => 'Zamówienie stworzone przez administratora',
-                'warehouse_id' => Warehouses::getIdFromSymbol($data->getWarehouseSymbol()),
+                'warehouse_id' => Warehouses::getIdFromSymbol($data->getWarehouseSymbol() ?? Warehouse::fist()->symbol),
             ]);
 
             $orderBuilder = (new OrderBuilder())

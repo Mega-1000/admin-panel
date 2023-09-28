@@ -25,7 +25,7 @@ readonly class CreateTWSOOrdersDTO
         return $this->clientEmail;
     }
 
-    public function getWarehouseSymbol(): string
+    public function getWarehouseSymbol(): ?string
     {
         return $this->warehousesSymbols;
     }
