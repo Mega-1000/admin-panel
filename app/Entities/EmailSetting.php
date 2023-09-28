@@ -50,7 +50,6 @@ class EmailSetting extends Model
             'email' => $email,
             'title' => $this->title,
             'content' => $this->content,
-            'email_setting_id' => $this->id,
             'scheduled_date' => now(),
         ]);
     }

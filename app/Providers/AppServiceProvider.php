@@ -2,11 +2,8 @@
 
 namespace App\Providers;
 
-use App\Entities\OrderLabel;
 use App\Entities\OrderPackage;
-use App\Observers\Entities\OrderLabelsObserver;
 use App\Observers\OrderPackageObserver;
-use App\Repositories\FileInvoiceRepository;
 use App\Repositories\InvoiceRepositoryInterface;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
