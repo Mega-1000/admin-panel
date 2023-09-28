@@ -413,6 +413,7 @@ class ImportCsvFileJob implements ShouldQueue
         $product->assortment_quantity = $array['assortment_quantity'] ?? null;
         $product->delivery_type = $array['delivery_type'] ?? null;
         $product->low_order_quantity_alert_text = $array['low_order_quantity_alert_text'] ?? null;
+        $product->layers_in_package = $array['layers_in_package'] ?? null;
 
         $product->save();
         $product->restore();
@@ -583,6 +584,7 @@ class ImportCsvFileJob implements ShouldQueue
             'assortment_quantity' => $line[216],
             'delivery_type' => $line[11],
             'low_order_quantity_alert_text' => $line[13],
+            'layers_in_package' => $line[64],
         ];
 
         foreach ($array as $key => $value) {

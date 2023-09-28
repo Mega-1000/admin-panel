@@ -10,6 +10,10 @@ use Prettus\Repository\Traits\TransformableTrait;
  * Class ProductPacking.
  *
  * @package namespace App\Entities;
+ * @property numeric $number_of_trade_items_in_the_largest_unit
+ * @property numeric $number_of_sale_units_in_the_pack
+ * @property numeric $number_on_a_layer
+ *
  */
 class ProductPacking extends Model implements Transformable
 {

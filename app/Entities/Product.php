@@ -19,6 +19,11 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property ProductStock $stock
  * @property string $manufacturer
  * @property string $low_order_quantity_alert_text
+ * @property numeric $number_of_trade_items_in_the_largest_unit
+ * @property numeric $layers_in_package
+ * @property numeric $number_of_sale_units_in_the_pack
+ * @property numeric $number_on_a_layer
+ * @property ProductPacking $packing
  */
 class Product extends Model implements Transformable
 {

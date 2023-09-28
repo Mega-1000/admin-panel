@@ -13,6 +13,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property int $id
  * @property int $position_quantity
  * @property int $product_stock_id
+ * @property ProductStock $stock
  * @package namespace App\Entities;
  */
 class ProductStockPosition extends Model implements Transformable
@@ -49,7 +50,7 @@ class ProductStockPosition extends Model implements Transformable
         return $this->hasMany(OrderReturn::class, 'product_stock_position_id', 'id');
     }
 
-    public $customColumnsVisibilities = [
+    public array $customColumnsVisibilities = [
         'lane',
         'bookstand',
         'shelf',
