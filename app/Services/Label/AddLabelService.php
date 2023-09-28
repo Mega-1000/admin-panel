@@ -99,7 +99,7 @@ class AddLabelService
                     LabelNotificationService::addLabelSentNotification($order, $label);
                 }
 
-                if ($label->id == 52) {  //wyslana do awizacji
+                if ($label->id == 52) {
                     LabelNotificationService::orderStatusChangeToDispatchNotification($order, $order->customer->id == 4128);
                 }
 
