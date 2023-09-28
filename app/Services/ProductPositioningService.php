@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTO\ProductPositioning\ProductPositioningDTO;
 use App\Entities\Product;
 use App\Entities\ProductStockPosition;
+use Exception;
 
 class ProductPositioningService
 {
@@ -13,6 +14,7 @@ class ProductPositioningService
      *
      * @param ProductStockPosition $productStockPosition
      * @return ProductPositioningDTO
+     * @throws Exception
      */
     public static function getPositioning(ProductStockPosition $productStockPosition): ProductPositioningDTO
     {
@@ -24,8 +26,8 @@ class ProductPositioningService
             }
 
             return self::handleZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
         }
     }
 
@@ -35,6 +37,7 @@ class ProductPositioningService
      * @param ProductStockPosition $productStockPosition
      * @param Product $product
      * @return ProductPositioningDTO
+     * @throws Exception
      */
     private static function handleNonZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
@@ -63,8 +66,8 @@ class ProductPositioningService
                 'IJZNWOK' => $IJZNWOK,
                 'IJHWROZ' => 0,
             ]);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
         }
     }
 
@@ -74,6 +77,7 @@ class ProductPositioningService
      * @param ProductStockPosition $productStockPosition
      * @param Product $product
      * @return ProductPositioningDTO
+     * @throws Exception
      */
     private static function handleZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
@@ -90,17 +94,20 @@ class ProductPositioningService
                 'IJZNWOK' => 0,
                 'IJZHWO' => $IJZHWO,
             ]);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private static function convertArrayToDTO(array $data): ProductPositioningDTO
     {
         try {
             return ProductPositioningDTO::fromAcronymsArray($data);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
         }
     }
 }
