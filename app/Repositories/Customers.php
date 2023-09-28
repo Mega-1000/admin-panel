@@ -12,7 +12,7 @@ class Customers
      * @param String $login
      * @return Customer
      */
-    public static function getFirstCustomerWithLogin(String $login): Customer
+    public static function getFirstCustomerWithLogin(string $login): Customer
     {
         return Customer::where('login', $login)->firstOrFail();
     }
