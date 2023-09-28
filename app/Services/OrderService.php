@@ -12,6 +12,7 @@ use App\Entities\OrderPayment;
 use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
+use App\Entities\Warehouse;
 use App\Enums\OrderPaymentsEnum;
 use App\Enums\UserRole;
 use App\Helpers\BackPackPackageDivider;
