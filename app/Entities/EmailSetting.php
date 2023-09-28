@@ -44,12 +44,14 @@ class EmailSetting extends Model
         return EmailSettingsEnum::fromKey($this->status);
     }
 
-    public function sendEmail(string $email): void
+    public function sendEmail(string $email, Order $order): void
     {
         EmailSending::create([
             'email' => $email,
             'title' => $this->title,
             'content' => $this->content,
+            'email_setting_id' => $this->id,
+            'order_id' => $order->id,
             'scheduled_date' => now(),
         ]);
     }
