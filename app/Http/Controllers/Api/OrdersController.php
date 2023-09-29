@@ -13,6 +13,7 @@ use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Entities\OrderPackage;
+use App\Entities\Status;
 use App\Entities\WorkingEvents;
 use App\Enums\PackageStatus;
 use App\Facades\Mailer;
@@ -264,6 +265,11 @@ class OrdersController extends Controller
             $order->update(['status_id' => 3]);
 
             dispatch_now(new OrderStatusChangedNotificationJob($order->id));
+
+            $order->orderOffer()->firstOrNew([
+                'order_id' => $order->id,
+                'message' => Status::find(18)->message,
+            ]);
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),

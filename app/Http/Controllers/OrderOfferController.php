@@ -37,7 +37,7 @@ class OrderOfferController extends Controller
         return view('pdf.order_offer', compact('message', 'order'));
     }
 
-    public function getProform(TagRepository $tagRepository, EmailTagHandlerHelper $emailTagHandler, $id): RedirectResponse
+    public function getProform(int $id): RedirectResponse
     {
         $order = OrderOffer::findorFail($id)->order()->with('employee', 'status')->first();
         $order->labels_log .= 'Proforma została wyświetlona dnia ' . date('Y-m-d H:i:s') . ' przez ' . $order->customer()->first()->login . PHP_EOL;
@@ -51,9 +51,6 @@ class OrderOfferController extends Controller
 
         Storage::disk('public')->put('/archive-files/' . $name, $pdf->output());
 
-        $file = Storage::disk('local')->get('/archive-files/' . $name);
-
-        //redirect to archive
         return redirect('/storage/archive-files/' . $name);
     }
 }
