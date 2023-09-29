@@ -77,7 +77,7 @@ class ImportBankPayIn implements ShouldQueue
             $payInDto = $this->checkOrderNumberFromTitle($payIn->tytul, $payIn);
             $payIn->kwota = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn->kwota));
 
-            $payIn->operation_type = 'Wpłata/wypłata bankowa';
+            $payIn->setOperationType('Wpłata/wypłata bankowa');
 
             switch($payInDto->message) {
                 case 'Brak numeru zamówienia':
