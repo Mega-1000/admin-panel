@@ -9,6 +9,7 @@ use App\Repositories\TagRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -36,7 +37,7 @@ class OrderOfferController extends Controller
         return view('pdf.order_offer', compact('message', 'order'));
     }
 
-    public function getProform(TagRepository $tagRepository, EmailTagHandlerHelper $emailTagHandler, $id): JsonResponse
+    public function getProform(TagRepository $tagRepository, EmailTagHandlerHelper $emailTagHandler, $id): RedirectResponse
     {
         $order = OrderOffer::findorFail($id)->order()->with('employee', 'status')->first();
         $order->labels_log .= 'Proforma została wyświetlona dnia ' . date('Y-m-d H:i:s') . ' przez ' . $order->customer()->first()->login . PHP_EOL;
@@ -48,10 +49,11 @@ class OrderOfferController extends Controller
         $name = Utf8Helper::sanitizeString('Proforma dla: ' . $order->customer()->first()->login . '_' . $order->id . '_' . date('Y-m-d_H-i-s') . '.pdf');
         $pdf = Pdf::loadView('pdf.proform', compact('date', 'proformDate', 'order'))->setPaper('a4');
 
-        Storage::disk('local')->put('/archive-files/' . $name, $pdf->output());
+        Storage::disk('public')->put('/archive-files/' . $name, $pdf->output());
 
         $file = Storage::disk('local')->get('/archive-files/' . $name);
 
-        return response()->json($file)->header('Content-Type', 'application/pdf')->header('charset', 'utf-8');
+        //redirect to archive
+        return redirect('/storage/archive-files/' . $name);
     }
 }
