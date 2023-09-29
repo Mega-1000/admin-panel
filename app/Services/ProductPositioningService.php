@@ -113,6 +113,9 @@ class ProductPositioningService
                 'IWK' => $IWK,
                 'IJZNWOK' => 0,
                 'IJZHWO' => $IJZHWO,
+                'IJHWOZ' => 0,
+                'IJZNOWK' => 0,
+                'IJHWROZ' => 0,
             ]);
         } catch (Exception $e) {
             throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
