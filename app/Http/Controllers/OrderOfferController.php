@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\OrderOffer;
 use App\Helpers\EmailTagHandlerHelper;
+use App\Helpers\Utf8Helper;
 use App\Repositories\TagRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -51,6 +52,6 @@ class OrderOfferController extends Controller
 
         $file = Storage::disk('local')->get('/archive-files/' . $name);
 
-        return response()->json(sanitizeString($file))->header('Content-Type', 'application/pdf');
+        return response()->json(Utf8Helper::sanitizeString($file))->header('Content-Type', 'application/pdf');
     }
 }
