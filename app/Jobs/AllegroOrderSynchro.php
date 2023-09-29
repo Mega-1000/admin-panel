@@ -191,7 +191,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $invoiceAddress = array_key_exists('nip', $invoiceAddress)
                     ? $invoiceAddress
-                    : $allegroOrder['buyer']['address'];
+                    : $allegroOrder['delivery'];
 
                 $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
 
