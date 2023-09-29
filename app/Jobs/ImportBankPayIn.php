@@ -83,7 +83,6 @@ class ImportBankPayIn implements ShouldQueue
                 case 'Brak numeru zamówienia':
                 case 'Brak dopasowania':
                     if ($payIn->contains('TECHN.;')) {
-                        fputcsv($file, $payIn->toArray());
                         continue;
                     }
 
