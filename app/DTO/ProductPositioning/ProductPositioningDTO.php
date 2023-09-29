@@ -6,7 +6,6 @@ use App\Traits\ArrayOperations;
 
 /**
  * IWK - ilosc warst kompletnych
- * IJDNW - ilosc jednsotek dotyczacych na warstwie
  * IJHWOZ - ilosc jednostek handlowych w opakowniu zbiorczym
  * IJZNOWK - ilosc jednostek zbiorczych na ostatniej warstwie kompletnych
  * IJHWROZ - ilosc jednostek handlowych na ostatniej warstwie w opakowaniu zbiorczym rozpoczetym
@@ -17,7 +16,6 @@ readonly final class ProductPositioningDTO
 
     public function __construct(
         private int $numberOfCompleteLayers,
-        private int $numberOfItemsPerLayer,
         private int $numberOfCommercialUnitsInBulk,
         private int $numberOfCommercialUnitsInBulkOnLastCompleteLayer,
         private int $numberOfCommercialUnitsInBulkOnLastIncompleteLayer,
@@ -27,7 +25,6 @@ readonly final class ProductPositioningDTO
     {
         return new self(
             $data['IWK'],
-            $data['IJDNW'],
             $data['IJHWOZ'],
             $data['IJZNOWK'],
             $data['IJHWROZ'],
