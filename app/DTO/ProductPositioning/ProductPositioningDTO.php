@@ -26,14 +26,14 @@ readonly final class ProductPositioningDTO
     public static function fromAcronymsArray(array $data): self
     {
         return new self(
-            numberOfCompleteLayers: $data['IWK'],
-            numberOfItemsPerLayer: $data['IJDNW'],
-            numberOfCommercialUnitsInBulk: $data['IJHWOZ'],
-            numberOfCommercialUnitsInBulkOnLastCompleteLayer: $data['IJZNOWK'],
-            numberOfCommercialUnitsInBulkOnLastIncompleteLayer: $data['IJHWROZ'],
+            $data['IWK'],
+            $data['IJDNW'],
+            $data['IJHWOZ'],
+            $data['IJZNOWK'],
+            $data['IJHWROZ'],
         );
     }
-    
+
     public function getNumberOfCompleteLayers(): int
     {
         return $this->numberOfCompleteLayers;
