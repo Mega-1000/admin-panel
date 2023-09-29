@@ -1,14 +1,14 @@
 <div>
-    <p>
+    <span>
         IWK: {{ $productPositioningDTO->getNumberOfCompleteLayers() }}
-    </p>
-    <p>
+    </span>
+    <span>
         IJHWOZ: {{ $productPositioningDTO->getNumberOfCommercialUnitsInBulkOnLastCompleteLayer() }}
-    </p>
-    <p>
+    </span>
+    <span>
         IJZNOWK: {{ $productPositioningDTO->getNumberOfCommercialUnitsInBulkOnLastCompleteLayer() }}
-    </p>
-    <p>
+    </span>
+    <span>
         IJHWROZ: {{ $productPositioningDTO->getNumberOfCommercialUnitsInBulkOnLastIncompleteLayer() }}
-    </p>
+    </span>
 </div>
