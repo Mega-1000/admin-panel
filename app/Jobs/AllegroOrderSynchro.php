@@ -812,11 +812,6 @@ class AllegroOrderSynchro implements ShouldQueue
         } else {
             $date = Carbon::today()->addWeekday();
         }
-//        else if ($packTemplate->accept_time) {
-//            $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
-//        } else {
-//            $date = $helper->calculateShipmentDate(9, 9);
-//        }
         $pack->shipment_date = $date;
         $pack->cost_for_client = $packTemplate->approx_cost_client;
         $pack->quantity = 1;

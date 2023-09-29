@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
+use Mailer;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class CheckIfInvoicesExistInOrders implements ShouldQueue
@@ -32,14 +33,14 @@ class CheckIfInvoicesExistInOrders implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $orders = Order::whereDoesntHave('invoices')->whereHas('labels', function ($query) {
             $query->where('labels.id', Label::ORDER_ITEMS_REDEEMED_LABEL);
         })->get();
         foreach($orders as $order) {
             try {
-                \Mailer::create()
+                Mailer::create()
                     ->to($order->warehouse->warehouse_email)
                     ->send(new InvoiceRequest($order->id));
             } catch (\Swift_TransportException $e) {
