@@ -1163,6 +1163,7 @@
                                     <p>
                                         Pozycja: {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }}
                                         Ilość na pozycji: {{ $position->position_quantity }}</p>
+                                        {{ \App\Services\ProductPositioningService::renderPositioningViewHtml($position) }}
                                     @php
                                         $quantityAll += $position->position_quantity;
                                     @endphp
