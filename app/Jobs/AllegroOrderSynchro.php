@@ -193,7 +193,6 @@ class AllegroOrderSynchro implements ShouldQueue
                     ? $invoiceAddress
                     : $allegroOrder['delivery'];
 
-                $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
 
                 if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && $allegroOrder['delivery']['pickupPoint'] !== null) {
                     $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
