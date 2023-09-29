@@ -9,7 +9,7 @@ use App\Traits\ArrayOperations;
  * IJDNW - ilosc jednsotek dotyczacych na warstwie
  * IJHWOZ - ilosc jednostek handlowych w opakowniu zbiorczym
  * IJZNOWK - ilosc jednostek zbiorczych na ostatniej warstwie kompletnych
- * IJHNOWWOZR - ilosc jednostek handlowych na ostatniej warstwie w opakowaniu zbiorczym rozpoczetym
+ * IJHWROZ - ilosc jednostek handlowych na ostatniej warstwie w opakowaniu zbiorczym rozpoczetym
  */
 readonly final class ProductPositioningDTO
 {
@@ -19,6 +19,8 @@ readonly final class ProductPositioningDTO
         private int $numberOfCompleteLayers,
         private int $numberOfItemsPerLayer,
         private int $numberOfCommercialUnitsInBulk,
+        private int $numberOfCommercialUnitsInBulkOnLastCompleteLayer,
+        private int $numberOfCommercialUnitsInBulkOnLastIncompleteLayer,
     ) {}
 
     public static function fromAcronymsArray(array $data): self
@@ -27,9 +29,11 @@ readonly final class ProductPositioningDTO
             numberOfCompleteLayers: $data['IWK'],
             numberOfItemsPerLayer: $data['IJDNW'],
             numberOfCommercialUnitsInBulk: $data['IJHWOZ'],
+            numberOfCommercialUnitsInBulkOnLastCompleteLayer: $data['IJZNOWK'],
+            numberOfCommercialUnitsInBulkOnLastIncompleteLayer: $data['IJHWROZ'],
         );
     }
-
+    
     public function getNumberOfCompleteLayers(): int
     {
         return $this->numberOfCompleteLayers;
@@ -45,4 +49,13 @@ readonly final class ProductPositioningDTO
         return $this->numberOfCommercialUnitsInBulk;
     }
 
+    public function getNumberOfCommercialUnitsInBulkOnLastCompleteLayer(): int
+    {
+        return $this->numberOfCommercialUnitsInBulkOnLastCompleteLayer;
+    }
+
+    public function getNumberOfCommercialUnitsInBulkOnLastIncompleteLayer(): int
+    {
+        return $this->numberOfCommercialUnitsInBulkOnLastIncompleteLayer;
+    }
 }

@@ -38,13 +38,6 @@ class ImportAllegroBillingService
         AllegroGeneralExpenses::deleteAll();
     }
 
-    public function importAppendData(array $data): void
-    {
-        foreach ($data as $dto) {
-            $this->importSingle($dto);
-        }
-    }
-
     /**
      * Import single billing entry
      *

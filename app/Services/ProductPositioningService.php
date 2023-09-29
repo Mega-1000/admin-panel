@@ -83,8 +83,8 @@ class ProductPositioningService
                 'IJZNWK' => $IJZNWK,
                 'IJHWOZ' => $IJHWOZ,
                 'IWK' => $IWK,
-                'IJZNWOK' => $IJZNWOK,
-                'IJHWROZ' => 0,
+                'IJZNOWK' => $IJZNWOK,
+                'IJHWROZ' => floor($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack),
             ]);
         } catch (Exception $e) {
             throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
