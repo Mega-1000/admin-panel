@@ -19,8 +19,6 @@ readonly final class ProductPositioningDTO
         private int $numberOfCompleteLayers,
         private int $numberOfItemsPerLayer,
         private int $numberOfCommercialUnitsInBulk,
-        private int $numberOfBulkUnitsInLastLayer,
-        private int $numberOfCommercialUnitsInLastLayerOfStartedBulk,
     ) {}
 
     public static function fromAcronymsArray(array $data): self
@@ -29,8 +27,6 @@ readonly final class ProductPositioningDTO
             numberOfCompleteLayers: $data['IWK'],
             numberOfItemsPerLayer: $data['IJDNW'],
             numberOfCommercialUnitsInBulk: $data['IJHWOZ'],
-            numberOfBulkUnitsInLastLayer: $data['IJZNOWK'],
-            numberOfCommercialUnitsInLastLayerOfStartedBulk: $data['IJHNOWWOZR'],
         );
     }
 
@@ -49,13 +45,4 @@ readonly final class ProductPositioningDTO
         return $this->numberOfCommercialUnitsInBulk;
     }
 
-    public function getNumberOfBulkUnitsInLastLayer(): int
-    {
-        return $this->numberOfBulkUnitsInLastLayer;
-    }
-
-    public function getNumberOfCommercialUnitsInLastLayerOfStartedBulk(): int
-    {
-        return $this->numberOfCommercialUnitsInLastLayerOfStartedBulk;
-    }
 }
