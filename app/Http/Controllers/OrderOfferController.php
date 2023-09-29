@@ -45,13 +45,13 @@ class OrderOfferController extends Controller
         $proformDate = Carbon::now()->format('m/Y');
         $date = Carbon::now()->toDateString();
 
-        $name = 'Proforma dla: ' . $order->customer()->first()->login . '_' . $order->id . '_' . date('Y-m-d_H-i-s') . '.pdf';
+        $name = Utf8Helper::sanitizeString('Proforma dla: ' . $order->customer()->first()->login . '_' . $order->id . '_' . date('Y-m-d_H-i-s') . '.pdf');
         $pdf = Pdf::loadView('pdf.proform', compact('date', 'proformDate', 'order'))->setPaper('a4');
 
         Storage::disk('local')->put('/archive-files/' . $name, $pdf->output());
 
         $file = Storage::disk('local')->get('/archive-files/' . $name);
 
-        return response()->json(Utf8Helper::sanitizeString($file))->header('Content-Type', 'application/pdf');
+        return response()->json($file)->header('Content-Type', 'application/pdf');
     }
 }
