@@ -26,7 +26,7 @@ final class BankPayInDTO
             'data' => $this->data,
             'message' => $this->message,
             'kwota' => $this->kwota,
-            'operation_type' => $this->operation_type,
+            'operation_type' => $this->operation_type ?? '',
             'opis_operacji' => $this->opis_operacji,
             'tytul' => $this->tytul,
             'data_ksiegowania' => $this->data_ksiegowania,
