@@ -52,6 +52,6 @@ class OrderOfferController extends Controller
 
         $file = Storage::disk('local')->get('/archive-files/' . $name);
 
-        return response()->json($file)->header('Content-Type', 'application/pdf');
+        return response()->json($file)->header('Content-Type', 'application/pdf')->header('charset', 'utf-8');
     }
 }
