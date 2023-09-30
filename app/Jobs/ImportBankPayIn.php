@@ -82,7 +82,7 @@ class ImportBankPayIn implements ShouldQueue
             switch($payInDto->message) {
                 case 'Brak numeru zamówienia':
                 case 'Brak dopasowania':
-                    if ($payIn->contains('TECHN.;')) {
+                    if ($payIn->contains('TECHN.')) {
                         continue;
                     }
 
