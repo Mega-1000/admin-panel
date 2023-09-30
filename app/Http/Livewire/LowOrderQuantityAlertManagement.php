@@ -83,6 +83,8 @@ class LowOrderQuantityAlertManagement extends Component
             ->where('delay_time', $this->messages[$key]['delay_time'])
             ->first();
 
+        $this->messages = array_filter($this->messages, fn (array $message) => $message['title'] !== $this->messages[$key]['title'])
+
         $message->delete();
     }
 
