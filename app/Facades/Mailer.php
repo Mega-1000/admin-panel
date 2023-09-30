@@ -29,7 +29,7 @@ class Mailer
         }
         $userRepository = app(UserRepository::class);
         if (empty($user)) {
-            $user = $userRepository->findWhere(['name' => '001'])->first();
+            $user = User::first();
         }
 
         if (config('app.env') === 'development') {
@@ -39,12 +39,12 @@ class Mailer
         Config::set([
             'mail.mailers.default' => [
                 'transport' => 'smtp',
-                'host' => $user->userEmailData?->host,
-                'port' => $user->userEmailData?->port,
-                'username' => $user->userEmailData?->username,
-                'password' => $user->userEmailData?->password,
-                'encryption' => $user->userEmailData?->encryption,
-                'from' => ['address' => $user->userEMailData?->username, 'name' => $user->userEMailData?->username],
+                'host' => $user->userEmailData->host,
+                'port' => $user->userEmailData->port,
+                'username' => $user->userEmailData->username,
+                'password' => $user->userEmailData->password,
+                'encryption' => $user->userEmailData->encryption,
+                'from' => ['address' => $user->userEMailData->username, 'name' => $user->userEMailData->username],
             ]
         ]);
 
