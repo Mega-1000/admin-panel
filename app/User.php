@@ -11,6 +11,7 @@ use App\Entities\UserEmail;
 use App\Entities\UserWork;
 use App\Entities\Warehouse;
 use App\Entities\Order;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
@@ -95,9 +96,9 @@ class User extends \TCG\Voyager\Models\User
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
-    public function userEmailData()
+    public function userEmailData(): HasOne
     {
         return $this->hasOne(UserEmail::class);
     }

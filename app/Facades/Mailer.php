@@ -24,9 +24,7 @@ class Mailer
 
     public static function create(User $user = null): \Illuminate\Contracts\Mail\Mailer
     {
-        if (empty($user)) {
-            $user = User::first();
-        }
+        $user = User::whereHas('userEmailData')->first();
 
         if (config('app.env') === 'development') {
             return Mail::mailer('dev');
