@@ -25,10 +25,6 @@ class Mailer
     public static function create(User $user = null): \Illuminate\Contracts\Mail\Mailer
     {
         if (empty($user)) {
-            $user = Auth::user();
-        }
-        $userRepository = app(UserRepository::class);
-        if (empty($user)) {
             $user = User::first();
         }
 
