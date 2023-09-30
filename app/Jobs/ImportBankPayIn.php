@@ -364,6 +364,10 @@ class ImportBankPayIn implements ShouldQueue
      */
     public static function createTWSUOrder(BankPayInDTO $data): void
     {
+        if (self::checkIfTWSUOrderExists($data)) {
+            return;
+        }
+
         $orderId = OrderService::createTWSOOrders(new CreateTWSOOrdersDTO(
             warehousesSymbols: null,
             clientEmail: 'info@ephpolska.pl',
@@ -374,5 +378,20 @@ class ImportBankPayIn implements ShouldQueue
         $order = Order::find($orderId);
 
         $order->labels()->detach([83, 237, 92]);
+    }
+
+    /**
+     * Check if twsu order exists based on comments given in chat
+     *
+     * @param BankPayInDTO $data
+     * @return bool
+     */
+    public static function checkIfTWSUOrderExists(BankPayInDTO $data): bool
+    {
+        return Order::query()->whereHas('chat', function ($query) use ($data) {
+            $query->whereHas('messages', function ($query) use ($data) {
+                $query->where('message', 'like', '%' . $data->stringify() . '%');
+            });
+        })->exists();
     }
 }
