@@ -143,46 +143,6 @@ class ImportBankPayIn implements ShouldQueue
     {
         $fileLine = str_replace(' ', '', $fileLine);
 
-        $possibleOperationDescriptions = [
-            'PP/PRZELEW EXPRESS ELIXIR PRZYCH.',
-            'PP/PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
-            'PP/PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
-            'PRZELEW EXPRESS ELIXIR PRZYCH.',
-            'PRZELEW EXPRESSOWY PRZELEW PRZYCH.',
-            'PRZELEW SEPA PRZYCHODZĄCY',
-            'PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
-            'PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
-            'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
-            'PP/PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
-        ];
-
-        $notPossibleOperationDescriptions = [
-            'WYPŁATA PAYPRO',
-            'Wyplata PayPro',
-            'Wypłata PayU',
-            'INFODEMOS',
-        ];
-
-        foreach ($notPossibleOperationDescriptions as $notPossibleOperationDescription) {
-            if (str_contains($payIn->stringify(), $notPossibleOperationDescription)) {
-                return PayInDTOFactory::createPayInDTO([
-                    'data' => $payIn,
-                    'message' => 'Brak dopasowania',
-                ]);
-            }
-        }
-
-        $possibleOperationDescriptions = array_map(function($description) {
-            return str_replace('Ą', 'Ľ', $description);
-        }, $possibleOperationDescriptions);
-
-        if (!in_array($payIn->opis_operacji, $possibleOperationDescriptions)) {
-            return PayInDTOFactory::createPayInDTO([
-                'data' => $payIn,
-                'message' => 'Brak dopasowania',
-            ]);
-        }
-
         $patterns = [
             '/[qQ][qQ](\d{3,5})[qQ][qQ]/',
             '/[zZ][zZ](\d{3,5})[zZ][zZ]/',
