@@ -27,9 +27,8 @@ class Mailer
         if (empty($user)) {
             $user = Auth::user();
         }
-        $userRepository = app(UserRepository::class);
         if (empty($user)) {
-            $user = $userRepository->findWhere(['name' => '001'])->first();
+            $user = User::find(12);
         }
 
         if (config('app.env') === 'development') {
