@@ -8,7 +8,7 @@
     </div>
 
 
-    <livewire:low-order-quantity-alert-managment :alertId="$message->id" />
+    <livewire:low-order-quantity-alert-management :alertId="$message->id" />
 
     @livewireScripts
 @endsection

@@ -9,7 +9,7 @@
     </div>
 
 
-    <livewire:low-order-quantity-alert-managment />
+    <livewire:low-order-quantity-alert-management />
 
     @livewireScripts
 @endsection
