@@ -42,7 +42,7 @@
                 Opóźnienie wysłania wiadomości
                 <input type="text" class="form-control" wire:model="messages.{{ $k }}.delay_time">
 
-                <button class="btn btn-danger" wire:click="deleteMessage({{ $k }})">
+                <button class="btn btn-danger" wire:click.prevent="deleteMessage({{ $k }})">
                     Usuń wiadomość
                 </button>
             </form>
