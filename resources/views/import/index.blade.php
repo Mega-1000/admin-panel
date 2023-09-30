@@ -32,7 +32,7 @@
         Zarzadzanine automatycznymi powiadomieniami na e maila
     </a>
 
-    <a href="{{ route('form-creator.index') }}" class="btn btn-primary">
+    <a href="{{ route('form-creator.create') }}" class="btn btn-primary">
         Kreator formularzy
     </a>
 
