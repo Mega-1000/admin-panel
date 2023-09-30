@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Entities\LowOrderQuantityAlert;
+use App\Entities\LowOrderQuantityAlertMessage;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\Redirector;
@@ -73,6 +74,16 @@ class LowOrderQuantityAlertManagement extends Component
         return redirect()->route('low-quantity-alerts.index')
             ->with(['message' => 'Stworzono alert o niskiej ilości produktów',
                 'alert-type' => 'success']);
+    }
+
+    public function deleteMessage(int $key): void
+    {
+        $message = LowOrderQuantityAlertMessage::where('title', $this->messages[$key]['title'])
+            ->where('message', $this->messages[$key]['message'])
+            ->where('delay_time', $this->messages[$key]['delay_time'])
+            ->first();
+
+        $message->delete();
     }
 
     public function addMessage(): void
