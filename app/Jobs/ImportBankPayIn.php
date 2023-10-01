@@ -59,7 +59,7 @@ class ImportBankPayIn implements ShouldQueue
     public function handle(): string
     {
         $this->setServices();
-        [$data, $file, $report, $reportPath] = $this->preprocessFile();
+        [$data, $file, $report, $reportPath, $fileName] = $this->preprocessFile();
 
         foreach ($data as $payIn) {
             $payInDto = $this->checkOrderNumberFromTitle($payIn->tytul, $payIn);
@@ -127,7 +127,7 @@ class ImportBankPayIn implements ShouldQueue
         Storage::put($reportPath, '');
         $report = fopen(storage_path('app/' . $reportPath), 'w');
 
-        return [BankPayInDTOFactory::fromFile($this->file), $file, $report, $reportPath];
+        return [BankPayInDTOFactory::fromFile($this->file), $file, $report, $reportPath, $fileName];
     }
 
     public function setServices(): void
