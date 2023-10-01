@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $delay_time
  * @property string $title
  * @property string $space
+ * @property string $column_name
  */
 class LowOrderQuantityAlert extends Model
 {
@@ -25,6 +26,7 @@ class LowOrderQuantityAlert extends Model
         'title',
         'space',
         'php_code',
+        'column_name',
     ];
 
     public function products(): mixed

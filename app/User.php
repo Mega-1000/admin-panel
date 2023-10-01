@@ -12,6 +12,7 @@ use App\Entities\UserWork;
 use App\Entities\Warehouse;
 use App\Entities\Order;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
@@ -116,7 +117,7 @@ class User extends \TCG\Voyager\Models\User
     /**
      * @return HasMany
      */
-    public function userWorks()
+    public function userWorks(): HasMany
     {
         return $this->hasMany(UserWork::class);
     }
@@ -138,7 +139,7 @@ class User extends \TCG\Voyager\Models\User
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function reportProperties()
     {

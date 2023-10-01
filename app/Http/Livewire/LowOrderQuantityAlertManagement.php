@@ -15,11 +15,14 @@ class LowOrderQuantityAlertManagement extends Component
     public int $alertId = 0;
     public ?string $phpCode = '';
     public string $title = '';
+    public string $columnName = '';
+    public ?string $area = '';
     public array $messages = [
         [
             'title' => '',
             'message' => '',
             'delay_time' => 0,
+            'attachment_name' => '',
         ],
     ];
     public bool $beenRendered = false;
@@ -33,6 +36,8 @@ class LowOrderQuantityAlertManagement extends Component
             $this->title = empty($this->title) ? $lowQuantityAlert->title : $this->title;
             $this->itemNames = empty($this->itemNames) ? $lowQuantityAlert->item_names : $this->itemNames;
             $this->phpCode = empty($this->phpCode) ? $lowQuantityAlert->php_code : $this->phpCode;
+            $this->columnName = empty($this->columnName) ? $lowQuantityAlert->column_name : $this->columnName;
+            $this->area = empty($this->area) ? $lowQuantityAlert->space : $this->area;
             $this->minQuantity = $this->minQuantity == 0 ? $lowQuantityAlert->min_quantity : $this->minQuantity;
         }
 
@@ -54,6 +59,8 @@ class LowOrderQuantityAlertManagement extends Component
             'item_names' => $this->itemNames,
             'min_quantity' => $this->minQuantity,
             'php_code' => $this->phpCode,
+            'column_name' => $this->columnName,
+            'space' => $this->area,
         ];
 
         if ($alert = LowOrderQuantityAlert::find($this->alertId)) {
@@ -68,6 +75,7 @@ class LowOrderQuantityAlertManagement extends Component
                 'title' => $message['title'],
                 'message' => $message['message'],
                 'delay_time' => $message['delay_time'],
+                'attachment_name' => $message['attachment_name'],
             ]);
         }
 
@@ -94,6 +102,7 @@ class LowOrderQuantityAlertManagement extends Component
             'title' => '',
             'message' => '',
             'delay_time' => 0,
+            'attachment_name' => '',
         ];
     }
 }

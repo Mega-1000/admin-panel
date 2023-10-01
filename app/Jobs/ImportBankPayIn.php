@@ -68,6 +68,8 @@ class ImportBankPayIn implements ShouldQueue
             $payIn->setOperationType('Wpłata/wypłata bankowa');
 
             switch($payInDto->message) {
+                case '/[qQ][qQ](\d{3,5})[qQ][qQ]/':
+                    break;
                 case '/[zZ][zZ](\d{3,5})[zZ][zZ]/':
                     $payIn->kwota *= -1;
                     break;
@@ -106,6 +108,7 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         fclose($file);
+
         fclose($report);
 
         Storage::disk('transactionsDisk')

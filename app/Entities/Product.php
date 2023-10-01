@@ -106,7 +106,9 @@ class Product extends Model implements Transformable
         'save_image',
         'assortment_quantity',
         'delivery_type',
-        'low_order_quantity_alert_text'
+        'low_order_quantity_alert_text',
+        'automatic_email_messages_14_column',
+        'automatic_email_messages_15_column'
     ];
 
     public array $customColumnsVisibilities = [

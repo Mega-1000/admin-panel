@@ -1,4 +1,4 @@
-<div>
+<!DOCTYP<div>
     <form wire:submit.prevent="submitForm" method="post">
         @csrf
 
@@ -21,6 +21,25 @@
         </div>
         <textarea placeholder="Kod php" class="form-control" wire:model="phpCode"></textarea>
 
+        <div>
+            Kolumna z CSV kóra ma być brana pod uwagę
+        </div>
+        <select class="form-control" wire:model="columnName">
+            @foreach(\App\Enums\AutomaticEmailMessagesColumnsEnum::COLUMNS as $key => $column)
+                <option value="{{ $column }}" {{ $this->columnName === $column ? 'selected' : '' }}>{{ $key }}</option>
+            @endforeach
+        </select>
+
+        <div>
+            Obszar wysyłania wiadomości
+        </div>
+        <select wire:model="area" class="form-control">
+            <option>Allegro</option>
+            <option>Wszyscy</option>
+            <option>Eph</option>
+        </select>
+
+
         <br>
         <br>
 
@@ -41,6 +60,9 @@
 
                 Opóźnienie wysłania wiadomości
                 <input type="text" class="form-control" wire:model="messages.{{ $k }}.delay_time">
+
+                Nazwa pliku z załącznikiem
+                <input type="text" class="form-control" wire:model="messages.{{ $k }}.attachment_name">
 
                 <button class="btn btn-danger" wire:click.prevent="deleteMessage({{ $k }})">
                     Usuń wiadomość
