@@ -11,6 +11,8 @@ use App\Entities\UserEmail;
 use App\Entities\UserWork;
 use App\Entities\Warehouse;
 use App\Entities\Order;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
@@ -88,7 +90,7 @@ class User extends \TCG\Voyager\Models\User
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function logs()
     {
@@ -104,15 +106,15 @@ class User extends \TCG\Voyager\Models\User
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function tasks()
+    public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function userWorks()
     {
@@ -120,15 +122,15 @@ class User extends \TCG\Voyager\Models\User
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function reports()
+    public function reports(): HasMany
     {
         return $this->hasMany(Report::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function warehouse()
     {
@@ -144,7 +146,7 @@ class User extends \TCG\Voyager\Models\User
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function reportDaily()
     {

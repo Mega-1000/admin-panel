@@ -54,24 +54,12 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @return string
      * @throws ChatException
+     * @throws Exception
      */
     public function handle(): string
     {
-        $this->findOrCreatePaymentForPackageService = app(FindOrCreatePaymentForPackageService::class);
-        $this->orderPaymentService = app(OrderPaymentService::class);
-        $this->orderPaymentLabelsService = app(OrderPaymentLabelsService::class);
-        $this->labelService = app(LabelService::class);
-        $this->transactionRepository = app(TransactionRepository::class);
-
-        $fileName = 'bankTransactionWithoutOrder.csv';
-        $file = fopen($fileName, 'w');
-
-        $reportName = 'bankTransactionReport' . date('Y-m-d H:i:s') . '.csv';
-        $reportPath = 'public/reports/' . $reportName;
-        Storage::put($reportPath, '');
-        $report = fopen(storage_path('app/' . $reportPath), 'w');
-
-        $data = BankPayInDTOFactory::fromFile($this->file);
+        $this->setServices();
+        [$data, $file, $report, $reportPath] = $this->preprocessFile();
 
         foreach ($data as $payIn) {
             $payInDto = $this->checkOrderNumberFromTitle($payIn->tytul, $payIn);
@@ -80,25 +68,19 @@ class ImportBankPayIn implements ShouldQueue
             $payIn->setOperationType('Wpłata/wypłata bankowa');
 
             switch($payInDto->message) {
-                case 'Brak numeru zamówienia':
-                case 'Brak dopasowania':
-                    if ($payIn->contains('TECHN.')) {
-                        continue;
-                    }
-
-                    $this->createTWSUOrder($payIn);
-                    break;
                 case '/[zZ][zZ](\d{3,5})[zZ][zZ]/':
                     $payIn->kwota *= -1;
                     break;
                 case '/[yY][yY](\d{3,5})[yY][yY]/':
                     $payIn->setOperationType(OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE);
                     break;
-            }
+                default:
+                    if ($payIn->contains('TECHN.')) {
+                        continue;
+                    }
 
-            if ($payInDto->orderId === null) {
-                fputcsv($file, $payIn->toArray());
-                continue;
+                    $this->createTWSUOrder($payIn);
+                    break;
             }
 
             $orderId = $payInDto->orderId;
@@ -130,6 +112,31 @@ class ImportBankPayIn implements ShouldQueue
             ->put("bankTransactionWithoutOrder" . date('Y-m-d') . '.csv', file_get_contents($fileName));
 
         return Storage::url($reportPath);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function preprocessFile(): array
+    {
+        $fileName = 'bankTransactionWithoutOrder.csv';
+        $file = fopen($fileName, 'w');
+
+        $reportName = 'bankTransactionReport' . date('Y-m-d H:i:s') . '.csv';
+        $reportPath = 'public/reports/' . $reportName;
+        Storage::put($reportPath, '');
+        $report = fopen(storage_path('app/' . $reportPath), 'w');
+
+        return [BankPayInDTOFactory::fromFile($this->file), $file, $report, $reportPath];
+    }
+
+    public function setServices(): void
+    {
+        $this->findOrCreatePaymentForPackageService = app(FindOrCreatePaymentForPackageService::class);
+        $this->orderPaymentService = app(OrderPaymentService::class);
+        $this->orderPaymentLabelsService = app(OrderPaymentLabelsService::class);
+        $this->labelService = app(LabelService::class);
+        $this->transactionRepository = app(TransactionRepository::class);
     }
 
     /**
