@@ -66,6 +66,9 @@ class ImportBankPayIn implements ShouldQueue
             $payIn->kwota = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn->kwota));
 
             $payIn->setOperationType('Wpłata/wypłata bankowa');
+            if ($payIn->contains('TECHN.')) {
+                continue;
+            }
 
             switch($payInDto->message) {
                 case '/[qQ][qQ](\d{3,5})[qQ][qQ]/':
@@ -77,10 +80,6 @@ class ImportBankPayIn implements ShouldQueue
                     $payIn->setOperationType(OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE);
                     break;
                 default:
-                    if ($payIn->contains('TECHN.')) {
-                        continue;
-                    }
-
                     $this->createTWSUOrder($payIn);
                     break;
             }
