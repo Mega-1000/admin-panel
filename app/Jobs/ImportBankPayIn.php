@@ -62,7 +62,7 @@ class ImportBankPayIn implements ShouldQueue
         [$data, $file, $report, $reportPath, $fileName] = $this->preprocessFile();
 
         foreach ($data as $payIn) {
-            $payInDto = $this->checkOrderNumberFromTitle($payIn->tytul, $payIn);
+            $payInDto = $this->checkOrderNumberFromTitle($payIn);
             $payIn->kwota = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn->kwota));
 
             $payIn->setOperationType('Wpłata/wypłata bankowa');
@@ -142,13 +142,12 @@ class ImportBankPayIn implements ShouldQueue
     /**
      * Search order number.
      *
-     * @param string $fileLine Line in csv file.
      * @param BankPayInDTO $payIn
      * @return PayInDTO
      */
-    private function checkOrderNumberFromTitle(string $fileLine, BankPayInDTO $payIn): PayInDTO
+    private function checkOrderNumberFromTitle(BankPayInDTO $payIn): PayInDTO
     {
-        $fileLine = str_replace(' ', '', $fileLine);
+        $fileLine = $payIn->stringify();
 
         $patterns = [
             '/[qQ][qQ](\d{3,5})[qQ][qQ]/',
