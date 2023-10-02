@@ -6,7 +6,7 @@ trait ArrayOperations
 {
     public function stringify(): string
     {
-        return implode(' ', $this->toArray());
+        return implode('', $this->toArray());
     }
 
     public function contains(string $value): bool
