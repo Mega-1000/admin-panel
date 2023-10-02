@@ -444,8 +444,8 @@ class ImportCsvFileJob implements ShouldQueue
             ]);
         }
 
-        $product->stock->update(['number_on_a_layer' => $array['number_on_a_layer'] ?? null]);
-        $product->packing->update(['number_of_layers_of_trade_units_in_vertical' => $array['number_of_layers_of_trade_units_in_vertical'] ?? null]);
+//        $product->stock->update(['number_on_a_layer' => $array['number_on_a_layer'] ?? null]);
+//        $product->packing->update(['number_of_layers_of_trade_units_in_vertical' => $array['number_of_layers_of_trade_units_in_vertical'] ?? null]);
 
         return $product;
     }
