@@ -419,8 +419,6 @@ class ImportCsvFileJob implements ShouldQueue
 
         $product->save();
         $product->restore();
-        $product->stock->update(['number_on_a_layer' => $array['number_on_a_layer'] ?? null]);
-        $product->packing->update(['number_of_layers_of_trade_units_in_vertical' => $array['number_of_layers_of_trade_units_in_vertical'] ?? null]);
 
         if (!empty($array['newsletter'])) {
             $product->discounts()->create([
@@ -445,6 +443,9 @@ class ImportCsvFileJob implements ShouldQueue
                 'quantity' => 0
             ]);
         }
+
+        $product->stock->update(['number_on_a_layer' => $array['number_on_a_layer'] ?? null]);
+        $product->packing->update(['number_of_layers_of_trade_units_in_vertical' => $array['number_of_layers_of_trade_units_in_vertical'] ?? null]);
 
         return $product;
     }
