@@ -9,9 +9,7 @@ readonly class CreateMultipleOrdersDTO
     public function __construct(
         public string $clientEmail,
         public array $products
-    )
-    {
-    }
+    ) {}
 
     public static function fromRequest(CreateMultipleAdminOrdersRequest $request): self
     {

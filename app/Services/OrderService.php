@@ -90,25 +90,6 @@ class OrderService
                 ->setProductService($productService);
             $orderBuilder->assignItemsToOrder($order, $products);
 
-            $order->getDeliveryAddress()->creat([
-                'firstname' => 'Dimitr',
-                'lastname' => 'Bolbot',
-                'address' => ' ul lotnicza 9',
-                'postal_code' => '55-200',
-                'flat_number' => '9',
-                'city' => 'stanowice',
-                'type' => 'DELIVERY_ADDRESS'
-            ]);
-
-            $order->getInvoiceAddress()->create([
-                'firmname' => 'Elektroniczna Platforma handlowa Sp z o o',
-                'address' => 'ul.  Jaracza 22/12',
-                'postal_code' => '50-305 ',
-                'city' => 'Wrocław',
-                'nip' => '8982272269',
-                'type' => 'INVOICE_ADDRESS'
-            ]);
-
             $order->employee()->associate(12);
             $order->update('status_id', 3);
 
@@ -154,6 +135,28 @@ class OrderService
                 ->setPriceCalculator(new OrderPriceCalculator())
                 ->setProductService($productService);
             $orderBuilder->assignItemsToOrder($order, $products);
+
+            $order->labels()->unassign([89, 92, 160]);
+
+            $order->getDeliveryAddress()->creat([
+                'firstname' => 'Dimitr',
+                'lastname' => 'Bolbot',
+                'address' => ' ul lotnicza 9',
+                'postal_code' => '55-200',
+                'flat_number' => '9',
+                'city' => 'stanowice',
+                'type' => 'DELIVERY_ADDRESS'
+            ]);
+
+            $order->getInvoiceAddress()->create([
+                'firmname' => 'Elektroniczna Platforma handlowa Sp z o o',
+                'address' => 'ul.  Jaracza 22/12',
+                'postal_code' => '50-305 ',
+                'city' => 'Wrocław',
+                'nip' => '8982272269',
+                'type' => 'INVOICE_ADDRESS'
+            ]);
+
         });
 
         return $order;
