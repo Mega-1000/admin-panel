@@ -17,20 +17,12 @@ final class BankPayInDTO
         public ?string           $opis_operacji = '',
         public ?string           $tytul = '',
         public ?string           $data_ksiegowania = '',
+        public array             $wholeDataArray = [],
     ) {}
 
     public function toArray(): array
     {
-        return [
-            'orderId' => $this->orderId,
-            'data' => $this->data,
-            'message' => $this->message,
-            'kwota' => $this->kwota,
-            'operation_type' => $this->operation_type ?? '',
-            'opis_operacji' => $this->opis_operacji,
-            'tytul' => $this->tytul,
-            'data_ksiegowania' => $this->data_ksiegowania,
-        ];
+        return $this->wholeDataArray;
     }
 
     public function setOperationType(string $operation_type): void

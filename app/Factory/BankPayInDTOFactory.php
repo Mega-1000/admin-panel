@@ -70,7 +70,8 @@ class BankPayInDTOFactory
                 operation_type: $value['operation_type'] ?? '',
                 opis_operacji: $value['opis_operacji'] ?? null,
                 tytul: $value['tytul'] ?? null,
-                data_ksiegowania: $value['data_ksiegowania'] ?? null
+                data_ksiegowania: $value['data_ksiegowania'] ?? null,
+                wholeDataArray: $value
             );
 
             $response[] = $dto;
