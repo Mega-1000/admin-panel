@@ -298,7 +298,6 @@ class ImportBankPayIn implements ShouldQueue
 
         $payIn->wholeDataArray['kwota'] = str_replace(',', '.', $payIn->kwota);
 
-
         /** @var ?OrderPayment $payment */
         $payment = OrderPayment::where('comments', $payIn->stringify())->first();
         $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
