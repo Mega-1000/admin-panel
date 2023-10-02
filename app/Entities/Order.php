@@ -189,6 +189,11 @@ class Order extends Model implements Transformable
             . ': ' . $message;
     }
 
+    public function orderOffer(): HasOne
+    {
+        return $this->hasOne(OrderOffer::class);
+    }
+
     public function getPackagesCashOnSum()
     {
         $sum = 0;
