@@ -21,11 +21,11 @@ class LowOrderQuantityAlertService
     public function dispatchAlertsForOrder(Order $order): void
     {
         LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order) {
-            if ($alert->php_code != '.') {
-                eval($alert->php_code);
-
-                return;
-            }
+//            if ($alert->php_code != '.') {
+//                eval($alert->php_code);
+//
+//                return;
+//            }
 
             $finalQuantity = 0;
 
