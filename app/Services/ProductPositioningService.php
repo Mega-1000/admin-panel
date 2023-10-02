@@ -81,7 +81,7 @@ class ProductPositioningService
 
             return self::convertArrayToDTO([
                 'IJZNWK' => $IJZNWK,
-                'IJHWOZ' => $IJHWOZ,
+                'IJHWOZ' => $product->number_of_sale_units_in_the_pack,
                 'IWK' => $IWK,
                 'IJZNOWK' => $IJZNWOK,
                 'IJHWROZ' => floor($productStockPosition->position_quantity - $IWK * $product->stock->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack),
