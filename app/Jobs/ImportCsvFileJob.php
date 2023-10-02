@@ -419,6 +419,7 @@ class ImportCsvFileJob implements ShouldQueue
 
         $product->save();
         $product->restore();
+        $product->stock->update(['number_on_a_layer' => $array['number_on_a_layer'] ?? null]);
 
         if (!empty($array['newsletter'])) {
             $product->discounts()->create([

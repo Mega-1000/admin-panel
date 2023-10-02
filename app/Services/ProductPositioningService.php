@@ -63,9 +63,9 @@ class ProductPositioningService
     private static function handleNonZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
         try {
-            $IWK = $product->packing->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity / $product->packing->number_on_a_layer) : 0;
+            $IWK = $product->stock->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity / $product->stock->number_on_a_layer) : 0;
             $IJZNWOK = $product->packing->number_of_sale_units_in_the_pack != 0 ? floor(
-                ($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer)
+                ($productStockPosition->position_quantity - $IWK * $product->stock->number_on_a_layer)
                 / $product->packing->number_of_sale_units_in_the_pack
             ) : 0;
 
@@ -75,8 +75,8 @@ class ProductPositioningService
             }
 
             $IJHWOZ = 0;
-            if ($product->packing->number_on_a_layer != 0 && $product->packing->number_of_sale_units_in_the_pack != 0) {
-                $IJHWOZ = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack);
+            if ($product->stock->number_on_a_layer != 0 && $product->packing->number_of_sale_units_in_the_pack != 0) {
+                $IJHWOZ = floor($productStockPosition->position_quantity - $IWK * $product->stock->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack);
             }
 
             return self::convertArrayToDTO([
@@ -84,7 +84,7 @@ class ProductPositioningService
                 'IJHWOZ' => $IJHWOZ,
                 'IWK' => $IWK,
                 'IJZNOWK' => $IJZNWOK,
-                'IJHWROZ' => floor($productStockPosition->position_quantity - $IWK * $product->packing->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack),
+                'IJHWROZ' => floor($productStockPosition->position_quantity - $IWK * $product->stock->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack),
             ]);
         } catch (Exception $e) {
             throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
