@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -13,7 +14,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property numeric $number_of_trade_items_in_the_largest_unit
  * @property numeric $number_of_sale_units_in_the_pack
  * @property numeric $number_on_a_layer
- *
+ * @property string $number_of_layers_of_trade_units_in_vertical_column
  */
 class ProductPacking extends Model implements Transformable
 {
@@ -54,13 +55,14 @@ class ProductPacking extends Model implements Transformable
         'allegro_courier',
         'paczkomat_size_a',
         'paczkomat_size_b',
-        'paczkomat_size_c'
+        'paczkomat_size_c',
+        'number_of_layers_of_trade_units_in_vertical',
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
