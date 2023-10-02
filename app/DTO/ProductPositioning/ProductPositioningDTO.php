@@ -15,7 +15,7 @@ readonly final class ProductPositioningDTO
     use ArrayOperations;
 
     public function __construct(
-        private int $numberOfCompleteLayers,
+        private float $numberOfCompleteLayers,
         private int $numberOfCommercialUnitsInBulk,
         private int $numberOfCommercialUnitsInBulkOnLastCompleteLayer,
         private int $numberOfCommercialUnitsInBulkOnLastIncompleteLayer,
