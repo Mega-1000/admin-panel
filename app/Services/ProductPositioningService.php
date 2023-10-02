@@ -63,7 +63,7 @@ class ProductPositioningService
     private static function handleNonZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
     {
         try {
-            $IWK = $product->stock->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity / $product->stock->number_on_a_layer) : 0;
+            $IWK = $product->stock->number_on_a_layer != 0 ? $productStockPosition->position_quantity / $product->stock->number_on_a_layer : 0;
             $IJZNWOK = $product->packing->number_of_sale_units_in_the_pack != 0 ? floor(
                 ($productStockPosition->position_quantity - $IWK * $product->stock->number_on_a_layer)
                 / $product->packing->number_of_sale_units_in_the_pack
