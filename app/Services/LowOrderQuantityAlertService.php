@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entities\LowOrderQuantityAlert;
+use App\Entities\LowOrderQuantityAlertMessage;
 use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Helpers\LowOrderQuantityAlertsSpacesHelper;
@@ -11,9 +12,21 @@ use App\Repositories\OrderItems;
 
 class LowOrderQuantityAlertService
 {
+    /**
+     * Dispatch alerts for order
+     *
+     * @param Order $order
+     * @return void
+     */
     public function dispatchAlertsForOrder(Order $order): void
     {
         LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order) {
+            if ($alert->php_code != '.') {
+                eval($alert->php_code);
+
+                return;
+            }
+
             $finalQuantity = 0;
 
             $orderItems = OrderItems::getItemsWithProductsWithLowOrderQuantityAlertText($order->id);
@@ -28,8 +41,8 @@ class LowOrderQuantityAlertService
 
                 if (
                     in_array(
-                        $alert->item_names,
-                        explode($item->product->low_order_quantity_alert_text, ',')
+                        $item->product->$alert->column_name,
+                        explode($alert->item_names, ',')
                     )
                 ) {
                     $finalQuantity += $item->quantity;
@@ -37,8 +50,11 @@ class LowOrderQuantityAlertService
             }
 
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
-                dispatch(new AlertForOrderLowQuantityJob($order, $alert))
-                    ->delay(now()->addHours($alert->delay_time));
+                /** @var LowOrderQuantityAlertMessage $message */
+                foreach ($alert->messages as $message) {
+                    dispatch(new AlertForOrderLowQuantityJob($order, $message))
+                        ->delay(now()->addHours($message->delay_time));
+                }
             }
         });
     }

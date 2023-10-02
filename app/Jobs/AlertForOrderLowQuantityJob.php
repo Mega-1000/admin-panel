@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Entities\LowOrderQuantityAlert;
+use App\Entities\LowOrderQuantityAlertMessage;
 use App\Entities\Order;
 use App\Facades\Mailer;
 use App\Mail\AlertForLowOrderQuantityMail;
@@ -22,8 +23,8 @@ class AlertForOrderLowQuantityJob implements ShouldQueue
      * @return void
      */
     public function __construct(
-        public readonly Order                 $order,
-        public readonly LowOrderQuantityAlert $alert,
+        public readonly Order                        $order,
+        public readonly LowOrderQuantityAlertMessage $alert,
     ) {}
 
     /**

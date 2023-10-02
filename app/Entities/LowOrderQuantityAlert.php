@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use FontLib\TrueType\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $title
  * @property string $space
  * @property string $column_name
+ * @property string $php_code
+ * @property Collection $messages
  */
 class LowOrderQuantityAlert extends Model
 {

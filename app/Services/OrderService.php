@@ -244,7 +244,7 @@ class OrderService
                 ->setPackageGenerator(new BackPackPackageDivider())
                 ->setPriceCalculator(new OrderPriceCalculator())
                 ->setProductService($productService);
-            $product = Product::query()->where('symbol', 'TWSUGIPS')->first();
+            $product = Product::query()->where('symbol', 'TWSU')->first();
             $orderBuilder->assignItemsToOrder($order, [
                 [
                     'amount' => 1,
