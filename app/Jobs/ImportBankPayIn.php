@@ -296,10 +296,12 @@ class ImportBankPayIn implements ShouldQueue
         unset($payIn->operation_type);
         $operationType = $operationType ?? 'Wpłata/wypłata bankowa';
 
+        $payIn->wholeDataArray['kwota'] = str_replace(',', '.', $payIn->kwota);
+
+
         /** @var ?OrderPayment $payment */
         $payment = OrderPayment::where('comments', str_replace('.', ',', $payIn->stringify()))->first();
         $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
-
 
         $payment = !isset($payment)
             ? $order->payments()->create([
