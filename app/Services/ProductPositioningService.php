@@ -44,7 +44,7 @@ class ProductPositioningService
             $product = $productStockPosition->stock->product;
             $productPacking = $product->packing;
 
-            if ($product->packing->number_of_trade_items_in_the_largest_unit != 0) {
+            if ($productPacking->number_of_trade_items_in_the_largest_unit != 0) {
                 return self::handleNonZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product, $productPacking);
             }
 
@@ -69,7 +69,7 @@ class ProductPositioningService
         ProductPacking $productPacking
     ): ProductPositioningDTO
     {
-        $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package;
+        $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package != 0 ? floor($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) : 0;
 
         $IPJZNRWWOG = $product->stock->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) / $product->stock->number_on_a_layer : 0;
 
@@ -78,10 +78,11 @@ class ProductPositioningService
         return self::convertArrayToDTO([
             'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
             'IJHWOG' => $productPacking->number_of_trade_items_in_the_largest_unit,
-            'IKWJZWOG' => $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package,
+            'IKWJZWOG' => $IKWJZWOG,
             'IPJZNRWWOG' => $IPJZNRWWOG,
             'IJHWROZNRWZWJG' => $IJHWROZNRWZWJG,
-            'IJHNPWWOZ' => $product->stock->number_on_a_layer
+            'IJHNPWWOZ' => $product->stock->number_on_a_layer,
+            'IJZNKWWOG' => $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package,
         ]);
     }
 
