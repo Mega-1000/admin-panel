@@ -78,7 +78,7 @@ class ProductPositioningService
         return self::convertArrayToDTO([
             'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
             'IJHWOG' => $productPacking->number_of_trade_items_in_the_largest_unit,
-            'IKWJZWOG' => $IKWJZWOG,
+            'IKWJZWOG' => $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package,
             'IPJZNRWWOG' => $IPJZNRWWOG,
             'IJHWROZNRWZWJG' => $IJHWROZNRWZWJG,
             'IJHNPWWOZ' => $product->stock->number_on_a_layer
