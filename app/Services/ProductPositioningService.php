@@ -71,9 +71,9 @@ class ProductPositioningService
     {
         $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package != 0 ? floor($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) : 0;
 
-        $IPJZNRWWOG = $productPacking->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) / $productPacking->number_on_a_layer : 0;
+        $IPJZNRWWOG = $product->stock->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) / $product->stock->number_on_a_layer : 0;
 
-        $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $productPacking->number_on_a_layer - $IPJZNRWWOG * $productPacking->number_on_a_layer;
+        $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $product->stock->number_on_a_layer - $IPJZNRWWOG * $product->stock->number_on_a_layer;
 
         return self::convertArrayToDTO([
             'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
@@ -100,9 +100,9 @@ class ProductPositioningService
         ProductPacking $productPacking
     ): ProductPositioningDTO
     {
-        $IKWTWJHWOZ = $productPacking->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity / $productPacking->number_on_a_layer) : 0;
+        $IKWTWJHWOZ = $product->stock->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity / $product->stock->number_on_a_layer) : 0;
 
-        $IJHNOWWROZ = $productStockPosition->position_quantity - $IKWTWJHWOZ * $productPacking->number_on_a_layer;
+        $IJHNOWWROZ = $productStockPosition->position_quantity - $IKWTWJHWOZ * $product->stock->number_on_a_layer;
 
         $IPROHPDWOWWOZ = $productPacking->number_of_trade_units_in_package_width != 0 ? floor($IJHNOWWROZ / $productPacking->number_of_trade_units_in_package_width) : 0;
 
