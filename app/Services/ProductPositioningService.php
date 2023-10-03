@@ -69,9 +69,12 @@ class ProductPositioningService
         ProductPacking $productPacking
     ): ProductPositioningDTO
     {
-        $IKWTWJHWOZ = floor($productStockPosition->position_quantity / $productPacking->number_on_a_layer);
+        $IKWTWJHWOZ = $productPacking->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity / $productPacking->number_on_a_layer) : 0;
+
         $IJHNOWWROZ = $productStockPosition->position_quantity - $IKWTWJHWOZ * $productPacking->number_on_a_layer;
-        $IPROHPDWOWWOZ = floor($IJHNOWWROZ / $productPacking->number_of_trade_units_in_package_width);
+
+        $IPROHPDWOWWOZ = $productPacking->number_of_trade_units_in_package_width != 0 ? floor($IJHNOWWROZ / $productPacking->number_of_trade_units_in_package_width) : 0;
+
         $IOHWRRNOWWOZ = $IJHNOWWROZ - $IPROHPDWOWWOZ * $productPacking->number_of_trade_units_in_package_width;
 
         return self::convertArrayToDTO([
@@ -97,9 +100,10 @@ class ProductPositioningService
         ProductPacking $productPacking
     ): ProductPositioningDTO
     {
-        $IKWJZWOG = floor($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package);
-        $IPJZNRWWOG = floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package)
-            / $productPacking->number_on_a_layer;
+        $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package != 0 ?floor($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) : 0;
+
+        $IPJZNRWWOG = $productPacking->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) / $productPacking->number_on_a_layer : 0;
+
         $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $productPacking->number_on_a_layer - $IPJZNRWWOG * $productPacking->number_on_a_layer;
 
         return self::convertArrayToDTO([

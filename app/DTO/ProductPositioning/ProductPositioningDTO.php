@@ -52,19 +52,19 @@ readonly final class ProductPositioningDTO
     public static function fromAcronymsArray(array $data): self
     {
         return new self(
-            $data['IJHWOZ'],
-            $data['IJHWOG'],
-            $data['IJZNKWWOG'],
-            $data['IKWJZWOG'],
-            $data['IPJZNRWWOG'],
-            $data['IJHWROZNRWZWJG'],
-            $data['PPROZPDWRWOG'],
-            $data['IOZWRRNRWWOG'],
-            $data['IJHNPWWOZ'],
-            $data['IKWTWJHWOZ'],
-            $data['IJHNOWWROZ'],
-            $data['IPROHPDWOWWOZ'],
-            $data['IOHWRRNOWWOZ'],
+            $data['IJHWOZ'] ?? 0,
+            $data['IJHWOG'] ?? 0,
+            $data['IJZNKWWOG'] ?? 0,
+            $data['IKWJZWOG'] ?? 0,
+            $data['IPJZNRWWOG'] ?? 0,
+            $data['IJHWROZNRWZWJG'] ?? 0,
+            $data['PPROZPDWRWOG'] ?? 0,
+            $data['IOZWRRNRWWOG'] ?? 0,
+            $data['IJHNPWWOZ'] ?? 0,
+            $data['IKWTWJHWOZ'] ?? 0,
+            $data['IJHNOWWROZ'] ?? 0,
+            $data['IPROHPDWOWWOZ'] ?? 0,
+            $data['IOHWRRNOWWOZ'] ?? 0,
         );
     }
 
