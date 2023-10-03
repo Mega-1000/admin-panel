@@ -239,6 +239,8 @@ class OrderService
 
             $order->employee_id = 12;
             $order->save();
+
+            $order->labels()->detach([89, 92, 160]);
         });
 
         $messageService->addMessage(
