@@ -44,7 +44,7 @@ class ProductPositioningService
             $product = $productStockPosition->stock->product;
             $productPacking = $product->packing;
 
-            if ($product->number_of_trade_items_in_the_largest_unit != 0) {
+            if ($product->packing->number_of_trade_items_in_the_largest_unit != 0) {
                 return self::handleNonZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product, $productPacking);
             }
 
@@ -70,7 +70,6 @@ class ProductPositioningService
     ): ProductPositioningDTO
     {
         $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package;
-        dd($IKWJZWOG);
 
         $IPJZNRWWOG = $product->stock->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) / $product->stock->number_on_a_layer : 0;
 
