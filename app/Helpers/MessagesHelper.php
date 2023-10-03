@@ -474,7 +474,7 @@ class MessagesHelper
         }
 
         return $chatUser ?? $this->getChat()->whereHas('chatUsers', function ($query) {
-            $query->whereHas('customer');
+            $query->whereHas('employee');
         })->first()->chatUsers()->first();
     }
 

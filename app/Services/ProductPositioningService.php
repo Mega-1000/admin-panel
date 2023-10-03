@@ -100,7 +100,7 @@ class ProductPositioningService
         ProductPacking $productPacking
     ): ProductPositioningDTO
     {
-        $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package != 0 ?floor($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) : 0;
+        $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package != 0 ? floor($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) : 0;
 
         $IPJZNRWWOG = $productPacking->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) / $productPacking->number_on_a_layer : 0;
 
