@@ -84,7 +84,7 @@ class ProductPositioningService
             'IJHNOWWROZ' => $IJHNOWWROZ,
             'IPROHPDWOWWOZ' => $IPROHPDWOWWOZ,
             'IOHWRRNOWWOZ' => $IOHWRRNOWWOZ,
-            'IJHNPWWOZ' => $productPacking->number_on_a_layer
+            'IJHNPWWOZ' => $product->stock->number_on_a_layer
         ]);
     }
 
@@ -115,7 +115,7 @@ class ProductPositioningService
             'IKWJZWOG' => $IKWJZWOG,
             'IPJZNRWWOG' => $IPJZNRWWOG,
             'IJHWROZNRWZWJG' => $IJHWROZNRWZWJG,
-            'IJHNPWWOZ' => $productPacking->number_on_a_layer
+            'IJHNPWWOZ' => $product->stock->number_on_a_layer
         ]);
     }
 
