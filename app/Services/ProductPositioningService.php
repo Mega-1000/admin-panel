@@ -69,7 +69,7 @@ class ProductPositioningService
         ProductPacking $productPacking
     ): ProductPositioningDTO
     {
-        $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package != 0 ? floor($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) : 0;
+        $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package;
 
         $IPJZNRWWOG = $product->stock->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) / $product->stock->number_on_a_layer : 0;
 
@@ -115,7 +115,7 @@ class ProductPositioningService
             'IJHNOWWROZ' => $IJHNOWWROZ,
             'IPROHPDWOWWOZ' => $IPROHPDWOWWOZ,
             'IOHWRRNOWWOZ' => $IOHWRRNOWWOZ,
-            'IJHNPWWOZ' => $product->stock->number_on_a_layer
+            'IJHNPWWOZ' => $product->stock->number_on_a_layer,
         ]);
     }
 
