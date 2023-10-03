@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTO\ProductPositioning\ProductPositioningDTO;
 use App\Entities\Product;
+use App\Entities\ProductPacking;
 use App\Entities\ProductStockPosition;
 use Exception;
 
@@ -41,12 +42,13 @@ class ProductPositioningService
     {
         try {
             $product = $productStockPosition->stock->product;
+            $productPacking = $product->packing;
 
             if ($product->number_of_trade_items_in_the_largest_unit != 0) {
-                return self::handleNonZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product);
+                return self::handleNonZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product, $productPacking);
             }
 
-            return self::handleZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product);
+            return self::handleZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product, $productPacking);
         } catch (Exception $e) {
             throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
         }
@@ -57,38 +59,27 @@ class ProductPositioningService
      *
      * @param ProductStockPosition $productStockPosition
      * @param Product $product
+     * @param ProductPacking $productPacking
      * @return ProductPositioningDTO
      * @throws Exception
      */
-    private static function handleNonZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
+    private static function handleNonZeroNumberOfTradeItemsInLargestUnit(
+        ProductStockPosition $productStockPosition,
+        Product $product,
+        ProductPacking $productPacking
+    ): ProductPositioningDTO
     {
-        try {
-            $IWK = $product->stock->number_on_a_layer != 0 ? $productStockPosition->position_quantity / $product->stock->number_on_a_layer : 0;
-            $IJZNWOK = $product->packing->number_of_sale_units_in_the_pack != 0 ? floor(
-                ($productStockPosition->position_quantity - $IWK * $product->stock->number_on_a_layer)
-                / $product->packing->number_of_sale_units_in_the_pack
-            ) : 0;
+        $IKWTWJHWOZ = floor($productStockPosition->position_quantity / $productPacking->number_on_a_layer);
+        $IJHNOWWROZ = $productStockPosition->position_quantity - $IKWTWJHWOZ * $productPacking->number_on_a_layer;
+        $IPROHPDWOWWOZ = floor($IJHNOWWROZ / $productPacking->number_of_trade_units_in_package_width);
+        $IOHWRRNOWWOZ = $IJHNOWWROZ - $IPROHPDWOWWOZ * $productPacking->number_of_trade_units_in_package_width;
 
-            $IJZNWK = 0;
-            if ($product->layers_in_package != 0 && $product->packing->number_of_sale_units_in_the_pack != 0) {
-                $IJZNWK = $product->packing->number_of_trade_items_in_the_largest_unit / ($product->layers_in_package * $product->packing->number_of_sale_units_in_the_pack);
-            }
-
-            $IJHWOZ = 0;
-            if ($product->stock->number_on_a_layer != 0 && $product->packing->number_of_sale_units_in_the_pack != 0) {
-                $IJHWOZ = floor($productStockPosition->position_quantity - $IWK * $product->stock->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack);
-            }
-
-            return self::convertArrayToDTO([
-                'IJZNWK' => $IJZNWK,
-                'IJHWOZ' => $product->number_of_sale_units_in_the_pack,
-                'IWK' => $IWK,
-                'IJZNOWK' => $IJZNWOK,
-                'IJHWROZ' => floor($productStockPosition->position_quantity - $IWK * $product->stock->number_on_a_layer - $IJZNWOK * $product->packing->number_of_sale_units_in_the_pack),
-            ]);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
-        }
+        return self::convertArrayToDTO([
+            'IKWTWJHWOZ' => $IKWTWJHWOZ,
+            'IJHNOWWROZ' => $IJHNOWWROZ,
+            'IPROHPDWOWWOZ' => $IPROHPDWOWWOZ,
+            'IOHWRRNOWWOZ' => $IOHWRRNOWWOZ,
+        ]);
     }
 
     /**
@@ -96,30 +87,26 @@ class ProductPositioningService
      *
      * @param ProductStockPosition $productStockPosition
      * @param Product $product
+     * @param ProductPacking $productPacking
      * @return ProductPositioningDTO
      * @throws Exception
      */
-    private static function handleZeroNumberOfTradeItemsInLargestUnit(ProductStockPosition $productStockPosition, Product $product): ProductPositioningDTO
+    private static function handleZeroNumberOfTradeItemsInLargestUnit(
+        ProductStockPosition $productStockPosition,
+        Product $product,
+        ProductPacking $productPacking
+    ): ProductPositioningDTO
     {
-        try {
-            $IWK = $product->packing->number_of_sale_units_in_the_pack != 0 ? floor($productStockPosition->position_quantity / $product->packing->number_of_sale_units_in_the_pack) : 0;
+        $IKWJZWOG = floor($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package);
+        $IPJZNRWWOG = floor($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package)
+            / $productPacking->number_on_a_layer;
+        $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $productPacking->number_on_a_layer - $IPJZNRWWOG * $productPacking->number_on_a_layer;
 
-            $IJZHWO = 0;
-            if ($product->packing->number_of_sale_units_in_the_pack != 0) {
-                $IJZHWO = floor($productStockPosition->position_quantity - $IWK * $product->packing->number_of_sale_units_in_the_pack);
-            }
-
-            return self::convertArrayToDTO([
-                'IWK' => $IWK,
-                'IJZNWOK' => 0,
-                'IJZHWO' => $IJZHWO,
-                'IJHWOZ' => 0,
-                'IJZNOWK' => 0,
-                'IJHWROZ' => 0,
-            ]);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
-        }
+        return self::convertArrayToDTO([
+            'IKWJZWOG' => $IKWJZWOG,
+            'IPJZNRWWOG' => $IPJZNRWWOG,
+            'IJHWROZNRWZWJG' => $IJHWROZNRWZWJG,
+        ]);
     }
 
     /**

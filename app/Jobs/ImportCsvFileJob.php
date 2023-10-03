@@ -416,7 +416,6 @@ class ImportCsvFileJob implements ShouldQueue
         $product->layers_in_package = $array['layers_in_package'] ?? null;
         $product->automatic_email_messages_15_column = $array['automatic_email_messages_15_column'] ?? null;
         $product->automatic_email_messages_14_column = $array['automatic_email_messages_14_column'] ?? null;
-
         $product->save();
         $product->restore();
 
@@ -444,7 +443,8 @@ class ImportCsvFileJob implements ShouldQueue
             ]);
         }
 
-        $product->stock()->update(['number_on_a_layer' => $array['number_on_a_layer'] ?? null]);
+        $product->stock()->update([
+            'number_on_a_layer' => $array['number_on_a_layer'] ?? null,]);
 
         return $product;
     }
@@ -592,6 +592,11 @@ class ImportCsvFileJob implements ShouldQueue
             'automatic_email_messages_14_column' => $line[14],
             'automatic_email_messages_15_column' => $line[15],
             'number_of_layers_of_trade_units_in_vertical' => $line[63],
+            'number_of_trade_units_in_package_width' => $line[65],
+            'number_of_trade_units_in_full_horizontal_layer_in_global_package' => $line[66],
+            'number_of_layers_of_trade_units_in_height_in_global_package' => $line[67],
+            'number_of_trade_units_in_length_in_global_package' => $line[68],
+            'number_of_trade_units_in_width_in_global_package' => $line[69],
         ];
 
         foreach ($array as $key => $value) {

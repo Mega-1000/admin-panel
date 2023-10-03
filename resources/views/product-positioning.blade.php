@@ -1,14 +1,41 @@
 <div>
     <span>
-        IWK: {{ $productPositioningDTO->getNumberOfCompleteLayers() }}
+        {{ $productPositioningDTO->getQuantityOfTradeItemsInLargestUnit() }}
     </span>
     <span>
-        IJHWOZ: {{ $productPositioningDTO->getNumberOfCommercialUnitsInBulkOnLastCompleteLayer() }}
+        {{ $productPositioningDTO->getQuantityOfTradeItemsInGlobalUnit() }}
     </span>
     <span>
-        IJZNOWK: {{ $productPositioningDTO->getNumberOfCommercialUnitsInBulkOnLastCompleteLayer() }}
+        {{ $productPositioningDTO->getQuantityOfGlobalUnitsInCompleteLayer() }}
     </span>
     <span>
-        IJHWROZ: {{ $productPositioningDTO->getNumberOfCommercialUnitsInBulkOnLastIncompleteLayer() }}
+        {{ $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfTradeItemsInStartedGlobalUnitInStartedLayer() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfCompleteRowsOfGlobalUnitsInStartedLayer() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfGlobalUnitsInStartedRowInStartedLayer() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfTradeItemsInCompleteLayerInLargestUnit() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfCompleteLayersOfTradeItemsInLargestUnitInGlobalUnit() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfTradeItemsInStartedLayerInLargestUnit() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInLargestUnit() }}
+    </span>
+    <span>
+        {{ $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInLargestUnit() }}
     </span>
 </div>
