@@ -78,6 +78,8 @@ class ProductPositioningService
         $IOHWRRNOWWOZ = $IJHNOWWROZ - $IPROHPDWOWWOZ * $productPacking->number_of_trade_units_in_package_width;
 
         return self::convertArrayToDTO([
+            'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
+            'IJHWOG' => $productPacking->number_of_trade_items_in_the_largest_unit,
             'IKWTWJHWOZ' => $IKWTWJHWOZ,
             'IJHNOWWROZ' => $IJHNOWWROZ,
             'IPROHPDWOWWOZ' => $IPROHPDWOWWOZ,
@@ -107,6 +109,8 @@ class ProductPositioningService
         $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $productPacking->number_on_a_layer - $IPJZNRWWOG * $productPacking->number_on_a_layer;
 
         return self::convertArrayToDTO([
+            'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
+            'IJHWOG' => $productPacking->number_of_trade_items_in_the_largest_unit,
             'IKWJZWOG' => $IKWJZWOG,
             'IPJZNRWWOG' => $IPJZNRWWOG,
             'IJHWROZNRWZWJG' => $IJHWROZNRWZWJG,
