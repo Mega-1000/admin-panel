@@ -15,10 +15,10 @@
         <span>
             IJZNKWWOG: {{ $productPositioningDTO->getQuantityOfGlobalUnitsInCompleteLayer() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IKWJZWOG: {{ $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IPJZNRWWOG: {{ $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() }}
         </span>
         <span>
@@ -27,29 +27,29 @@
         <span>
             PPROZPDWRWOG: {{ $productPositioningDTO->getQuantityOfCompleteRowsOfGlobalUnitsInStartedLayer() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IOZWRRNRWWOG: {{ $productPositioningDTO->getQuantityOfGlobalUnitsInStartedRowInStartedLayer() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IKRPDOHWOOZNRWWOG: {{ $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IOHWRRROZWRWOG: {{ $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() }}
         </span>
     @else
         <span>
             IJHNPWWOZ: {{ $productPositioningDTO->getQuantityOfTradeItemsInCompleteLayerInLargestUnit() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IKWTWJHWOZ: {{ $productPositioningDTO->getQuantityOfCompleteLayersOfTradeItemsInLargestUnitInGlobalUnit() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IJHNOWWROZ: {{ $productPositioningDTO->getQuantityOfTradeItemsInStartedLayerInLargestUnit() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IPROHPDWOWWOZ: {{ $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInLargestUnit() }}
         </span>
-        <span class="bold">
+        <span style="font-weight: bold">
             IOHWRRNOWWOZ: {{ $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInLargestUnit() }}
         </span>
     @endif
