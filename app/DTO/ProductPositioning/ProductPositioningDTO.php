@@ -27,6 +27,9 @@ use App\Traits\ArrayOperations;
  *
  * IPROHPDWOWWOZ - ilosc pelnych rzedow opakowan handlowych po dlugosci  w ostatniej warstwie w opakowaniu zbiorczym
  * IOHWRRNOWWOZ - ilosc opakowan handlowych w rozpoczetym rzedzie na ostatniej warstwie w opakowaniu zbiorcczym
+ *
+ * IKRPDOHWOOZNRWWOG - ilosc kompletnych rzedow po dlugosci opakowan handlowcy w otwartym opaowaniu zbiorczym na rozpoczetej warstwie w opakowaniu globalnym
+ * IOHWRRROZWRWOG - ilosc opakowan handlowych w rozpocztym rzedzie rozpoczetego opakowania zbiorczego w rozpczetej warstwie opakowania globalnego
  */
 readonly final class ProductPositioningDTO
 {
@@ -46,6 +49,8 @@ readonly final class ProductPositioningDTO
         private float $quantityOfTradeItemsInStartedLayerInLargestUnit, // IJHNOWWROZ
         private float $quantityOfCompleteRowsOfTradeItemsInStartedLayerInLargestUnit, // IPROHPDWOWWOZ
         private float $quantityOfTradeItemsInStartedRowInStartedLayerInLargestUnit, // IOHWRRNOWWOZ
+        private float $quantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit, // IKRPDOHWOOZNRWWOG
+        private float $quantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit, // IOHWRRROZWRWOG
 
     ) {}
 
@@ -65,6 +70,8 @@ readonly final class ProductPositioningDTO
             $data['IJHNOWWROZ'] ?? 0,
             $data['IPROHPDWOWWOZ'] ?? 0,
             $data['IOHWRRNOWWOZ'] ?? 0,
+            $data['IKRPDOHWOOZNRWWOG'] ?? 0,
+            $data['IOHWRRROZWRWOG'] ?? 0,
         );
     }
 
@@ -132,5 +139,15 @@ readonly final class ProductPositioningDTO
     public function getQuantityOfTradeItemsInStartedRowInStartedLayerInLargestUnit(): float
     {
         return $this->quantityOfTradeItemsInStartedRowInStartedLayerInLargestUnit;
+    }
+
+    public function getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(): float
+    {
+        return $this->quantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit;
+    }
+
+    public function getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit(): float
+    {
+        return $this->quantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit;
     }
 }
