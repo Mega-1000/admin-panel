@@ -77,9 +77,9 @@ class ProductPositioningService
 
         $PPROZPDWRWOG = floor($IPJZNRWWOG / $productPacking->number_of_trade_units_in_width_in_global_package);
 
-        $IKRPDOHWOOZNRWWOG = floor($IJHWROZNRWZWJG / $productPacking->number_of_trade_units_in_package_width);
+        $IKRPDOHWOOZNRWWOG = $productPacking->number_of_trade_units_in_package_width != 0 ? floor($IJHWROZNRWZWJG / $productPacking->number_of_trade_units_in_package_width) : 0;
 
-        $IOHWRRROZWRWOG = $IJHWROZNRWZWJG - $IKRPDOHWOOZNRWWOG * $productPacking->number_of_trade_units_in_package_width;
+        $IOHWRRROZWRWOG = $productPacking->number_of_trade_units_in_package_width != 0 ? $IJHWROZNRWZWJG - $IKRPDOHWOOZNRWWOG * $productPacking->number_of_trade_units_in_package_width : 0;
 
         return self::convertArrayToDTO([
             'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
