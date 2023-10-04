@@ -75,7 +75,7 @@ class ProductPositioningService
 
         $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $product->stock->number_on_a_layer - $IPJZNRWWOG * $product->stock->number_on_a_layer;
 
-        $PPROZPDWRWOG = floor($IPJZNRWWOG / $productPacking->number_of_trade_units_in_width_in_global_package);
+        $PPROZPDWRWOG =  $productPacking->number_of_trade_units_in_width_in_global_package != 0 ? floor($IPJZNRWWOG / $productPacking->number_of_trade_units_in_width_in_global_package) : 0;
 
         $IKRPDOHWOOZNRWWOG = $productPacking->number_of_trade_units_in_package_width != 0 ? floor($IJHWROZNRWZWJG / $productPacking->number_of_trade_units_in_package_width) : 0;
 
