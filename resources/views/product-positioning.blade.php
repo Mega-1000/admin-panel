@@ -1,3 +1,9 @@
+<style>
+    .bold {
+        font-weight: bold;
+    }
+</style>
+
 <div>
     @if(!$productPositioningDTO->isZero())
         <span>
