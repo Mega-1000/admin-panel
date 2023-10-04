@@ -51,7 +51,7 @@ readonly final class ProductPositioningDTO
         private float $quantityOfTradeItemsInStartedRowInStartedLayerInLargestUnit, // IOHWRRNOWWOZ
         private float $quantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit, // IKRPDOHWOOZNRWWOG
         private float $quantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit, // IOHWRRROZWRWOG
-
+        private bool $isZero = false,
     ) {}
 
     public static function fromAcronymsArray(array $data): self
@@ -72,6 +72,7 @@ readonly final class ProductPositioningDTO
             $data['IOHWRRNOWWOZ'] ?? 0,
             $data['IKRPDOHWOOZNRWWOG'] ?? 0,
             $data['IOHWRRROZWRWOG'] ?? 0,
+            $data['isZero'] ?? false,
         );
     }
 
@@ -149,5 +150,10 @@ readonly final class ProductPositioningDTO
     public function getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit(): float
     {
         return $this->quantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit;
+    }
+
+    public function isZero(): bool
+    {
+        return $this->isZero;
     }
 }

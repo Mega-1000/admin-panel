@@ -127,6 +127,7 @@ class ProductPositioningService
             'IPROHPDWOWWOZ' => $IPROHPDWOWWOZ,
             'IOHWRRNOWWOZ' => $IOHWRRNOWWOZ,
             'IJHNPWWOZ' => $product->stock->number_on_a_layer,
+            'isZero' => true,
         ]);
     }
 
