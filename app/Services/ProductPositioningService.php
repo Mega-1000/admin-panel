@@ -75,6 +75,8 @@ class ProductPositioningService
 
         $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $product->stock->number_on_a_layer - $IPJZNRWWOG * $product->stock->number_on_a_layer;
 
+        $PPROZPDWRWOG = floor($IPJZNRWWOG / $productPacking->number_of_trade_units_in_width_in_global_package);
+
         return self::convertArrayToDTO([
             'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
             'IJHWOG' => $productPacking->number_of_trade_items_in_the_largest_unit,
@@ -83,7 +85,8 @@ class ProductPositioningService
             'IJHWROZNRWZWJG' => $IJHWROZNRWZWJG,
             'IJHNPWWOZ' => $product->stock->number_on_a_layer,
             'IJZNKWWOG' => $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package,
-            'PPROZPDWRWOG' => floor($IPJZNRWWOG / $productPacking->number_of_trade_units_in_width_in_global_package),
+            'PPROZPDWRWOG' => $PPROZPDWRWOG,
+            'IOZWRRNRWWOG' => floor($IPJZNRWWOG - $PPROZPDWRWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package),
         ]);
     }
 
