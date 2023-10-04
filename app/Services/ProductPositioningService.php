@@ -90,7 +90,7 @@ class ProductPositioningService
             'IJHNPWWOZ' => $product->stock->number_on_a_layer,
             'IJZNKWWOG' => $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package,
             'PPROZPDWRWOG' => $PPROZPDWRWOG,
-            'IOZWRRNRWWOG' => floor($IPJZNRWWOG - $PPROZPDWRWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package),
+            'IOZWRRNRWWOG' => floor($IPJZNRWWOG - $PPROZPDWRWOG * $productPacking->number_of_trade_units_in_width_in_global_package),
             'IKRPDOHWOOZNRWWOG' => $IKRPDOHWOOZNRWWOG,
             'IOHWRRROZWRWOG' => $IOHWRRROZWRWOG,
         ]);
