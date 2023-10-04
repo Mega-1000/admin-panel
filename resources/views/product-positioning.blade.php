@@ -1,5 +1,5 @@
 <div>
-    @if(!$productPositioningDTO->getIsZero())
+    @if(!$productPositioningDTO->isZero())
         <span>
             IJHWOZ: {{ $productPositioningDTO->getQuantityOfTradeItemsInLargestUnit() }}
         </span>
