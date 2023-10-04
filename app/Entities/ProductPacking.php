@@ -78,14 +78,14 @@ class ProductPacking extends Model implements Transformable
         return $this->belongsTo(Product::class);
     }
 
-    public function isLong()
+    public function isLong(): bool
     {
         return $this->dimension_x > self::LONG_VALUE
             || $this->dimension_y > self::LONG_VALUE
             || $this->dimension_z > self::LONG_VALUE;
     }
 
-    public function getVolume($maxLength = false)
+    public function getVolume($maxLength = false): float|int
     {
         if ($maxLength) {
             $longDimension = $maxLength;
