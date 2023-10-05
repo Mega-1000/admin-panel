@@ -107,6 +107,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Js;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
@@ -675,7 +676,7 @@ class OrdersController extends Controller
         $tsk->save();
     }
 
-    public function findPackage(OrdersFindPackageRequest $request)
+    public function findPackage(OrdersFindPackageRequest $request): Response|RedirectResponse|Application|ResponseFactory
     {
         $finalPdfFileName = self::ALL_SMALL_PRINTS_PDF;
 
@@ -683,9 +684,6 @@ class OrdersController extends Controller
         $skip = $data['skip'] ?? 0;
 
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
-        if ($this->putLockFile() === false) {
-            // return response()->json(['error' => 'file_exist']);
-        }
 
         try {
             if (empty($data['task_id'])) {
@@ -726,6 +724,7 @@ class OrdersController extends Controller
             ]);
         }
         $view = view('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
+
         return response($views . $view, 200);
     }
 
