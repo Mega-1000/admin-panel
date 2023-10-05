@@ -52,7 +52,7 @@
         <br>
         <br>
 
-    <div>
+    <div style="display: grid">
         <div>
             @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
                 <div style="font-weight: bold; font-size: larger">
