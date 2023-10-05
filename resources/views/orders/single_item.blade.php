@@ -15,7 +15,7 @@
     @if(isset($showPosition) && $showPosition)
         @if(count($item->getPositions()))
             @foreach($item->getPositions() as $position)
-                <td class="wz__position">
+                <td class="wz__position" style="width: fit-content">
                     <div style="">
                         {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
                         {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
