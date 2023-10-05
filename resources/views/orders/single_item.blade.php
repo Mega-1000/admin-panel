@@ -16,8 +16,11 @@
         @if(count($item->getPositions()))
             @foreach($item->getPositions() as $position)
                 <td class="wz__position">
-                    {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
-                    {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
+                    <div style="">
+                        {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
+                        {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
+                    </div>
+
                     JZ:
                     @if($orderItem->product->packing->number_of_sale_units_in_the_pack != 0)
                         {{ floor($position->position_quantity / $orderItem->product->packing->number_of_sale_units_in_the_pack) }}
