@@ -831,7 +831,6 @@ class OrdersController extends Controller
             File::delete(public_path("spec_usr_$i.pdf"));
             $i--;
         }
-        unlink(public_path(self::LOCK_NAME));
         return $views;
     }
 
