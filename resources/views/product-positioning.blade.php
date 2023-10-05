@@ -54,7 +54,9 @@
 
     <div style="display: flex">
         @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit(); $i <= 0; $i++)
-            -
+            <div style="font-weight: bold; font-size: larger">
+                -
+            </div>
         @endfor
 
         <div style="display: grid; margin-left: 15px; grid-template-columns: repeat({{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package }}, 1fr); grid-gap: 10px;">
