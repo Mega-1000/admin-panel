@@ -127,6 +127,17 @@
     display:inline-block;
 }
 
+.position-content {
+    width: 150px; /* Adjust the width as needed */
+    overflow: hidden;
+}
+
+.position-html {
+    overflow: hidden;
+    white-space: nowrap; /* Prevent wrapping of long lines */
+    text-overflow: ellipsis; /* Show ellipsis for overflowed content */
+}
+
 .wz__container {
     width: 300px;
     display:inline-block;
