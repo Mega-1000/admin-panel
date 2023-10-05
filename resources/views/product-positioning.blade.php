@@ -68,7 +68,7 @@
                     <div style="padding: 10px; border: 1px black solid"></div>
                 @endfor
 
-                @if(($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1 === 0)
+                @if(($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1 != 0)
                     <div style="padding: 10px; border: 1px black solid; border-radius: 100%"></div>
                 @endif
             </div>
