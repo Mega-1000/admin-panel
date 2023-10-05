@@ -1,4 +1,4 @@
-<div>
+<div style="display: ">
     @if(!$productPositioningDTO->isZero())
         <span>
             IJHWOZ: {{ $productPositioningDTO->getQuantityOfTradeItemsInLargestUnit() }}
