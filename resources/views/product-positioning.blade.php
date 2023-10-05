@@ -56,6 +56,7 @@
         @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit(); $i >= 0; $i--)
             <div style="font-weight: bold; font-size: larger">
                 --
+                <br>
             </div>
         @endfor
 
