@@ -52,7 +52,7 @@
         <br>
         <br>
 
-    <div style="display: flex; lign-items: flex-start;">
+    <div style="display: flex; align-items: flex-start;">
         <div>
             @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
                 <div style="font-weight: bold; font-size: larger">
