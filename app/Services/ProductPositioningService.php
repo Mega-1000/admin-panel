@@ -93,6 +93,7 @@ class ProductPositioningService
             'IOZWRRNRWWOG' => floor($IPJZNRWWOG - $PPROZPDWRWOG * $productPacking->number_of_trade_units_in_width_in_global_package),
             'IKRPDOHWOOZNRWWOG' => $IKRPDOHWOOZNRWWOG,
             'IOHWRRROZWRWOG' => $IOHWRRROZWRWOG,
+            'product' => $product,
         ]);
     }
 
@@ -128,6 +129,7 @@ class ProductPositioningService
             'IOHWRRNOWWOZ' => $IOHWRRNOWWOZ,
             'IJHNPWWOZ' => $product->stock->number_on_a_layer,
             'isZero' => true,
+            'product' => $product,
         ]);
     }
 

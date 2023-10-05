@@ -2,6 +2,7 @@
 
 namespace App\DTO\ProductPositioning;
 
+use App\Entities\Product;
 use App\Traits\ArrayOperations;
 
 /**
@@ -52,6 +53,7 @@ readonly final class ProductPositioningDTO
         private float $quantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit, // IKRPDOHWOOZNRWWOG
         private float $quantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit, // IOHWRRROZWRWOG
         private bool $isZero = false,
+        private Product $product
     ) {}
 
     public static function fromAcronymsArray(array $data): self
@@ -73,6 +75,7 @@ readonly final class ProductPositioningDTO
             $data['IKRPDOHWOOZNRWWOG'] ?? 0,
             $data['IOHWRRROZWRWOG'] ?? 0,
             $data['isZero'] ?? false,
+            $data['product'],
         );
     }
 
@@ -155,5 +158,10 @@ readonly final class ProductPositioningDTO
     public function isZero(): bool
     {
         return $this->isZero;
+    }
+
+    public function getProduct(): Product
+    {
+        return $this->product;
     }
 }
