@@ -52,7 +52,7 @@
         <br>
         <br>
 
-    <div style="display: grid">
+    <div style="display: inline-grid;">
         <div>
             @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
                 <div style="font-weight: bold; font-size: larger">
@@ -73,7 +73,7 @@
 
         <div style="display: flex">
             <div style="display: grid; margin-left: 15px; grid-template-columns: repeat({{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }}, 1fr); grid-gap: 10px;">
-                @for($i = $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit(); $i >= 0; $i--)
+                @for($i = ($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1; $i >= 0; $i--)
                     <div style="padding: 10px; border: 1px black solid"></div>
                 @endfor
             </div>
