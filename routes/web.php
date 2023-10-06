@@ -749,8 +749,9 @@ Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction
 Route::get('test-pdf-generation/{id}', function (int $positionId) {
     $htmlContent = \App\Services\ProductPositioningService::renderPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId)); // Replace with your HTML content
 
-    // Save the HTML content to a temporary file
-    $fileName = public_path(\Illuminate\Support\Str::random(32) . '.html');
+    $name = \Illuminate\Support\Str::random(32) . '.html';
+    // Save the HTML content to a\ temporary file
+    $fileName = public_path($name);
     file_put_contents($fileName, $htmlContent);
 
     // Define the output image file path
@@ -758,10 +759,9 @@ Route::get('test-pdf-generation/{id}', function (int $positionId) {
     $outputImageFile = public_path('okej.png');
 
     // Execute wkhtmltoimage command to convert HTML to an image
-    $command = "wkhtmltoimage --format png $fileName $outputImageFile";
+    $command = "wkhtmltoimage --format png https://admin.mega1000.pl/$name $outputImageFile";
     exec($command);
 
-    return '<img src="/okej.png" />';
     // Check if the conversion was successful
     if (file_exists($outputImageFile)) {
         // Read the image file and encode it to base64
@@ -774,7 +774,5 @@ Route::get('test-pdf-generation/{id}', function (int $positionId) {
         echo 'Conversion failed.';
     }
 
-    // Clean up temporary files
-    unlink($tempHtmlFile);
-    unlink($outputImageFile);
+    //
 });
