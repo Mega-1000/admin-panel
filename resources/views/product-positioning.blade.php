@@ -86,7 +86,7 @@
             @if ($productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() > 0)
                 <tr>
                     @for ($k = 0; $k < $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit(); $k++)
-                        <td style="padding: 10px; border: 1px black solid;"></td>
+                        <td style="padding: 10px; border: 1px black solid;  border-radius: 100%"></td>
                     @endfor
                 </tr>
             @endif
