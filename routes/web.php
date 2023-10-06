@@ -753,5 +753,6 @@ Route::get('test-pdf-generation/{id}', function (int $positionId) {
 
     $dompdf->loadHTML($html);
 
+    return $html;
     return $dompdf->stream();
 });
