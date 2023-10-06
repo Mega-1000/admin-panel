@@ -24,7 +24,7 @@ class ProductPositioningService
      * @param ProductPositioningDTO $productPositioningDTO
      * @return string
      */
-    private static function getPositioningViewHtml(ProductPositioningDTO $productPositioningDTO): string
+    public static function getPositioningViewHtml(ProductPositioningDTO $productPositioningDTO): string
     {
         return view('product-positioning', [
             'productPositioningDTO' => $productPositioningDTO,

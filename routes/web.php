@@ -29,6 +29,7 @@ use App\Http\Controllers\ProductStocksController;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -742,3 +743,11 @@ Route::post('/product-stock-logs/{productStockLog}/edit', [ProductStockLogsContr
 
 Route::get('/form/{form:name}/{order}', [FormController::class, 'index'])->name('form');
 Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction'])->name('execute-form-action');
+
+
+Route::get('test-pdf-generation/{id}', function (int $positionId) {
+    $html = \App\Services\ProductPositioningService::getPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId));
+
+    $pdf = PDF::loadHTML($html);
+    return $pdf->stream();
+});
