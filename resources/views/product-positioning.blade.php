@@ -79,28 +79,25 @@
             @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)
                 <tr>
                     @for ($j = 0; $j < $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width; $j++)
-                        <td style="padding: 10px; border: 1px black solid;"></td>
+                        <td style="padding: 10px; border: 1px black solid @if ($i == ($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() - 1) && $j == ($productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() - 1)) none @else solid @endif;"></td>
                     @endfor
                 </tr>
             @endfor
-            @if ($productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() > 0)
-                <tr>
-                    @for ($k = 0; $k < $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit(); $k++)
-                        <td style="padding: 10px; border: 1px black solid;  border-radius: 100%"></td>
-                    @endfor
-                </tr>
-            @endif
             </tbody>
         </table>
-        {{($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1}}
 
-        <div style="display: flex">
-            <div style="display: grid; margin-left: 15px; grid-template-columns: repeat({{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }}, 1fr); grid-gap: 10px;">
-                @for($i = ($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1; $i >= 0; $i--)
-                    <div style="padding: 10px; border: 1px black solid"></div>
-                @endfor
-            </div>
-        </div>
+        <table>
+            <tbody>
+            @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)
+                <tr>
+                    @for ($j = 0; $j < $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width; $j++)
+                        <td style="padding: 10px; border: 1px solid @if ($i == ($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() - 1) && $j == ($productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width - 1)) black @else none @endif;"></td>
+                    @endfor
+                </tr>
+            @endfor
+            </tbody>
+        </table>
+
     </div>
 
 </div>
