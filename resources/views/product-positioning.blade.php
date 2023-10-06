@@ -87,7 +87,7 @@
 
     {{ $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() }} ,
     {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package }} *
-    {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package !== 0 ? floor($productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package) : 0 }},
+    {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package != 0 ? floor($productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package) : 0 }},
     // reszta z dzielenia
     {{ $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() % $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package }}
 
