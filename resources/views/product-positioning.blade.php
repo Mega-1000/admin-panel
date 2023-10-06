@@ -95,5 +95,5 @@
     {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }} *
     {{ floor(($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width ) }},
     // reszta z dzielenia
-    {{ $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) % $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }}
+    {{ $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() % $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }}
 {{--</div>--}}
