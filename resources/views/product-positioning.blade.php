@@ -81,9 +81,9 @@
                     @for ($j = 0; $j < $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width - 1; $j++)
                         <td style="padding: 10px; border: 1px black solid;"></td>
                     @endfor
-                    <td style="padding: 10px; border: 1px black solid; border-radius: 100%"></td>
                 </tr>
             @endfor
+                <td style="padding: 10px; border: 1px black solid; border-radius: 100%"></td>
             </tbody>
         </table>
         {{($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1}}
