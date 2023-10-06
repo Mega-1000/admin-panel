@@ -1,14 +1,15 @@
 <div style="width: 1000px">
-
     <div>
-        <div>
-            @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
-                <div style="font-weight: bold; font-size: larger">
-                    --
-                </div>
-                <br>
-            @endfor
-        </div>
+        @if($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() != 0)
+            <div>
+                @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
+                    <div style="font-weight: bold; font-size: larger">
+                        --
+                    </div>
+                    <br>
+                @endfor
+            </div>
+        @endif
 
         <table>
             <tbody>
@@ -21,7 +22,6 @@
             @endfor
             </tbody>
         </table>
-        {{($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1}}
 
         <table>
             <tbody>

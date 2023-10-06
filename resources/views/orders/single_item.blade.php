@@ -20,20 +20,6 @@
                         <div class="position-html">
                             {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
                         </div>
-
-{{--                    JZ:--}}
-{{--                    @if($orderItem->product->packing->number_of_sale_units_in_the_pack != 0)--}}
-{{--                        {{ floor($position->position_quantity / $orderItem->product->packing->number_of_sale_units_in_the_pack) }}--}}
-{{--                    @else--}}
-{{--                        0--}}
-{{--                    @endif--}}
-{{--                    <br/>--}}
-{{--                    JH:--}}
-{{--                    @if($orderItem->product->packing->number_of_sale_units_in_the_pack == 0 || $position->position_quantity < 0)--}}
-{{--                        {{ $position->position_quantity }}--}}
-{{--                    @else--}}
-{{--                        {{ $position->position_quantity - (floor($position->position_quantity / $orderItem->product->packing->number_of_sale_units_in_the_pack) * $orderItem->product->packing->number_of_sale_units_in_the_pack) }}--}}
-{{--                    @endif--}}
                     </div>
                     <br/><br/>
             @endforeach
