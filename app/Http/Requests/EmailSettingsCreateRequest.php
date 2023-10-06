@@ -17,11 +17,11 @@ class EmailSettingsCreateRequest extends FormRequest
         $validStatuses = array_flip(EmailSettingsEnum::getAllStatuses());
 
         return [
-            'status' => 'required|in:'.implode(',', $validStatuses),
-            'time' => 'required|numeric',
-            'title' => 'required',
-            'content' => 'required',
-            'is_allegro' => 'required|in:on,of'
+//            'status' => 'required|in:'.implode(',', $validStatuses),
+//            'time' => 'required|numeric',
+//            'title' => 'required',
+//            'content' => 'required',
+//            'is_allegro' => 'required|in:on,of'
         ];
     }
 

@@ -208,7 +208,6 @@ class ImportCsvFileJob implements ShouldQueue
             $image = $this->getUrl($image);
         }
 
-
         /** @var Category $category */
         $category = Category::query()->create([
             'name' => end($categoryTree),
