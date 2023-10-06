@@ -1,4 +1,4 @@
-<div style="width: 1000px; display: flex">
+<div style="width: 1000px">
     <div>
         @if($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() != 0)
             <div>
