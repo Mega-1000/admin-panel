@@ -30,6 +30,7 @@ use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
 use Barryvdh\DomPDF\PDF;
+use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -748,6 +749,9 @@ Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction
 Route::get('test-pdf-generation/{id}', function (int $positionId) {
     $html = \App\Services\ProductPositioningService::renderPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId));
 
-    $pdf = PDF::loadHTML($html);
-    return $pdf->stream();
+    $dompdf = new Dompdf(['enable_remote' => true]);
+
+    $dompdf->loadHTML($html);
+
+    return $dompdf->stream();
 });
