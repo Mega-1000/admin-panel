@@ -87,13 +87,13 @@
 
     {{ $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() }} ,
     {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package }} *
-    {{ floor($productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package) }},
+    {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package !== 0 ? floor($productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package) : 0 }},
     // reszta z dzielenia
     {{ $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() % $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package }}
 
 
     {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }} *
-    {{ floor(($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width ) }},
+    {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width != 0 ? floor(($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width ) : 0 }},
     // reszta z dzielenia
     {{ $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() % $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }}
 {{--</div>--}}
