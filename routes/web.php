@@ -747,21 +747,21 @@ Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction
 
 
 Route::get('test-pdf-generation/{id}', function (int $positionId) {
-    $htmlContent = '<html><body><h1>Hello, World!</h1></body></html>'; // Replace with your HTML content
+    $htmlContent = \App\Services\ProductPositioningService::renderPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId)); // Replace with your HTML content
 
     // Save the HTML content to a temporary file
-    $tempHtmlFile = tempnam(sys_get_temp_dir(), 'html');
-    file_put_contents($tempHtmlFile, $htmlContent);
+    $fileName = public_path(str_random(32) . '.html');
+    file_put_contents($fileName, $htmlContent);
 
     // Define the output image file path
     // public path is: /var/www/html/public
     $outputImageFile = public_path('okej.png');
 
     // Execute wkhtmltoimage command to convert HTML to an image
-    $command = "wkhtmltoimage --format png $tempHtmlFile $outputImageFile";
+    $command = "wkhtmltoimage --format png $fileName $outputImageFile";
     exec($command);
 
-    return "<img src=okej.png />";
+    return '<img src="/okej.png" />';
     // Check if the conversion was successful
     if (file_exists($outputImageFile)) {
         // Read the image file and encode it to base64
