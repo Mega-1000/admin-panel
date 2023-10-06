@@ -18,7 +18,7 @@
                     <div class="position-content">
                         {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
                         <div class="position-html">
-{{--                            {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}--}}
+                            {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
                         </div>
 
 {{--                    JZ:--}}
