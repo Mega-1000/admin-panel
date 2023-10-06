@@ -79,12 +79,13 @@
             @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)
                 <tr>
                     @for ($j = 0; $j < $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width; $j++)
-                        <td style="padding: 10px; border: 1px black solid @if ($i == ($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() - 1) && $j == ($productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() - 1)) none @else solid @endif;"></td>
+                        <td style="padding: 10px; border: 1px black solid @if( ($i == ($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() - 1) && $j == ($productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() - 1))) none @else solid @endif;"></td>
                     @endfor
                 </tr>
             @endfor
             </tbody>
         </table>
+        {{($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1}}
 
         <table>
             <tbody>
@@ -98,6 +99,13 @@
             </tbody>
         </table>
 
+        <div style="display: flex">
+            <div style="display: grid; margin-left: 15px; grid-template-columns: repeat({{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }}, 1fr); grid-gap: 10px;">
+                @for($i = ($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1; $i >= 0; $i--)
+                    <div style="padding: 10px; border: 1px black solid"></div>
+                @endfor
+            </div>
+        </div>
     </div>
 
 </div>
