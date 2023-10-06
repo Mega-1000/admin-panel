@@ -83,4 +83,17 @@
             </div>
         </div>
     </div>
+
+
+    {{ $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() }} ,
+    {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package }} *
+    {{ floor($productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package) }},
+    // reszta z dzielenia
+    {{ $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() % $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package }}
+
+
+    {{ $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }} *
+    {{ floor(($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) / $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width ) }},
+    // reszta z dzielenia
+    {{ $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) % $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width }}
 </div>
