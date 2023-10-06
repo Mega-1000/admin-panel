@@ -747,12 +747,32 @@ Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction
 
 
 Route::get('test-pdf-generation/{id}', function (int $positionId) {
-    $html = \App\Services\ProductPositioningService::renderPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId));
+    $htmlContent = '<html><body><h1>Hello, World!</h1></body></html>'; // Replace with your HTML content
 
-    $dompdf = new Dompdf(['enable_remote' => true]);
+    // Save the HTML content to a temporary file
+    $tempHtmlFile = tempnam(sys_get_temp_dir(), 'html');
+    file_put_contents($tempHtmlFile, $htmlContent);
 
-    $dompdf->loadHTML($html);
+    // Define the output image file path
+    $outputImageFile = tempnam(sys_get_temp_dir(), 'image');
 
-    return $html;
-    return $dompdf->stream();
+    // Execute wkhtmltoimage command to convert HTML to an image
+    $command = "wkhtmltoimage --format png $tempHtmlFile $outputImageFile";
+    exec($command);
+
+    // Check if the conversion was successful
+    if (file_exists($outputImageFile)) {
+        // Read the image file and encode it to base64
+        $imageData = file_get_contents($outputImageFile);
+        $base64Image = base64_encode($imageData);
+
+        // Display the base64-encoded image
+        echo '<img src="data:image/png;base64,' . $base64Image . '" alt="Generated Image" />';
+    } else {
+        echo 'Conversion failed.';
+    }
+
+    // Clean up temporary files
+    unlink($tempHtmlFile);
+    unlink($outputImageFile);
 });
