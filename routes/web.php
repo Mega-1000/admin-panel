@@ -746,7 +746,7 @@ Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction
 
 
 Route::get('test-pdf-generation/{id}', function (int $positionId) {
-    $html = \App\Services\ProductPositioningService::getPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId));
+    $html = \App\Services\ProductPositioningService::renderPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId));
 
     $pdf = PDF::loadHTML($html);
     return $pdf->stream();
