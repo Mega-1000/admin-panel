@@ -754,12 +754,14 @@ Route::get('test-pdf-generation/{id}', function (int $positionId) {
     file_put_contents($tempHtmlFile, $htmlContent);
 
     // Define the output image file path
-    $outputImageFile = tempnam(sys_get_temp_dir(), 'image');
+    // public path is: /var/www/html/public
+    $outputImageFile = public_path('okej.png');
 
     // Execute wkhtmltoimage command to convert HTML to an image
     $command = "wkhtmltoimage --format png $tempHtmlFile $outputImageFile";
     exec($command);
 
+    return "<img src=okej.png />";
     // Check if the conversion was successful
     if (file_exists($outputImageFile)) {
         // Read the image file and encode it to base64
