@@ -62,17 +62,25 @@
             @endfor
         </div>
 
-        <div style="display: flex" style="margin-left: 20px;">
-            <div style="display: grid; margin-left: 15px; grid-template-columns: repeat(3, 1fr); grid-gap: 10px;">
-                @for($i = $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() - 1; $i >= 0; $i--)
-                    <div style="padding: 10px; border: 1px black solid"></div>
-                @endfor
+        <table>
+            <tbody>
+            @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)
+                <tr>
+                    @for ($j = 0; $j < $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width; $j++)
+                        <td style="padding: 10px; border: 1px black solid;"></td>
+                    @endfor
+                </tr>
+            @endfor
+            @if ($productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit() > 0)
+                <tr>
+                    @for ($k = 0; $k < $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit(); $k++)
+                        <td style="padding: 10px; border: 1px black solid;"></td>
+                    @endfor
+                </tr>
+            @endif
+            </tbody>
+        </table>
 
-                @if(($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1 >= 0)
-                    <div style="padding: 10px; border: 1px black solid; border-radius: 100%"></div>
-                @endif
-            </div>
-        </div>
         {{($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1}}
 
         <div style="display: flex">
