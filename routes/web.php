@@ -750,7 +750,7 @@ Route::get('test-pdf-generation/{id}', function (int $positionId) {
     $htmlContent = \App\Services\ProductPositioningService::renderPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId)); // Replace with your HTML content
 
     // Save the HTML content to a temporary file
-    $fileName = public_path(str_random(32) . '.html');
+    $fileName = public_path(\Illuminate\Support\Str::random(32) . '.html');
     file_put_contents($fileName, $htmlContent);
 
     // Define the output image file path
