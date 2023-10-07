@@ -60,7 +60,7 @@
 
     {{--<b>uwagi klienta:</b> <br/>--}}
     <b>uwagi spedycja:</b> {!! $tagHelper->commentsToShipping(" | ") !!}<br/>
-    <div style="font-weight: bold; font-size:  30px">uwagi magazyn:</div> {!! $order->warehouse_notice !!}
+    <div style="font-weight: bold; font-size:  15px">uwagi magazyn:</div> {!! $order->warehouse_notice !!}
     <br/><br/>
 
     @if(count($order->packages) > 0)
