@@ -15,7 +15,7 @@
             $borderRadius = $maxNumberOfSquares != 0 ? false : true;
         @endphp
 
-        <table style="align-self: flex-start;">
+        <table style="align-self: flex-start; float: left">
             <thead></thead>
             <tbody>
             @while($maxNumberOfSquares > 0)
