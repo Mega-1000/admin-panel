@@ -1,4 +1,11 @@
 @foreach($items as $item)
-    @include('orders.single_item', ['item' => $item->product, 'quantity' => $item->quantity, 'orderItem' => $item])
+    <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
+        @include('orders.single_item', ['item' => $item->product, 'quantity' => $item->quantity, 'orderItem' => $item])
+        <tr>
+            <td colspan="3">
+                <hr/>
+            </td>
+        </tr>
+    </table>
 
 @endforeach
