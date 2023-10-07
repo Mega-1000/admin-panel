@@ -12,19 +12,28 @@
             Pozostało do wydania poza pakietem: <span class="quantity">{{ $quantity - $orderItem->packet->packet_product_quantity }}</span>
         @endif
     </td>
+    @if(isset($showPosition) && $showPosition)
+        @if(count($item->getPositions()))
+            @php($i = 0)
 
-    <td colspan="2">
-        @if(isset($showPosition) && $showPosition)
-            @if(count($item->getPositions()))
-                @foreach($item->getPositions() as $position)
+            @foreach($item->getPositions() as $position)
+                @if($i < 1)
+                    <td colspan="2">
+                @endif
+
+                    <div>
+                        {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
                         <div>
-                            {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
-                            <div>
-                                {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
-                            </div>
+                            {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
                         </div>
-                @endforeach
-            @endif
+                    </div>
+
+                @if($i <= 1)
+                    </td>
+                @endif
+
+                @php($i++)
+            @endforeach
         @endif
-    </td>
+    @endif
 </tr>
