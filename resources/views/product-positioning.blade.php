@@ -39,7 +39,7 @@
             </tbody>
         </table>
 
-        <table>
+        <table style="margin-top: 10px">
             <tbody>
             @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)
                 <tr>
