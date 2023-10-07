@@ -23,7 +23,7 @@
             <tbody>
                 @while($maxNumberOfSquares > 0)
                     <tr>
-                        @for ($j = 0; $j <= $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package - 1; $j++)
+                        @for ($j = 0; $j <= $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package; $j++)
                             @if ($maxNumberOfSquares == 0)
                                 <td style="padding: 10px; border: 1px black solid; border-radius: 100%"></td>
                                 @php($maxNumberOfSquares--)
