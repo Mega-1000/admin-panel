@@ -11,15 +11,43 @@
             </div>
         @endif
 
+            <div style="display: grid; margin-left: 15px; grid-template-columns: repeat({{ }}, 1fr); grid-gap: 10px;">
+                @for($i = $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() - 1; $i >= 0; $i--)
+                    <div style="padding: 10px; border: 1px black solid"></div>
+                @endfor
+
+                @if(($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() * $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width + $productPositioningDTO->getQuantityOfTradeItemsInStartedRowInStartedLayerInStartedGlobalUnit()) - 1 >= 0)
+                    <div style="padding: 10px; border: 1px black solid; border-radius: 100%"></div>
+                @endif
+            </div>
+
+
+            @php
+                $maxNumberOfSquares = $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer() - 1;
+            @endphp
+
         <table>
-            <tbody>
-            @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)
+            <thead>
                 <tr>
-                    @for ($j = 0; $j < $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width - 1; $j++)
-                        <td style="padding: 10px; border: 1px black solid;"></td>
-                    @endfor
+                    @for ($j = 0; $j <= $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package; $j++)@endfor
                 </tr>
-            @endfor
+            </thead>
+            <tbody>
+                @while($maxNumberOfSquares <= 0)
+                    <tr>
+                        @for ($j = 0; $j <= $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_width_in_global_package; $j++)
+                            @if ($maxNumberOfSquares == 0)
+                                <td style="padding: 10px; border: 1px black solid; border-radius: 100%"></td>
+                                @php($maxNumberOfSquares--)
+                            @elseif($maxNumberOfSquares < 0)
+                                @break
+                            @endif
+                            <td style="padding: 10px; border: 1px black solid;"></td>
+
+                            @php($maxNumberOfSquares--)
+                        @endfor
+                    </tr>
+                @endwhile
             </tbody>
         </table>
 
@@ -35,5 +63,4 @@
             </tbody>
         </table>
     </div>
-
 </div>
