@@ -22,7 +22,7 @@
                     <td>
                 @endif
 
-                    <div style="width: 200px">
+                    <div style="width: 120px">
                         {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
                         <div>
                             {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
