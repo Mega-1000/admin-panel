@@ -1,4 +1,4 @@
-<div style="width: 1000px; float: left">
+<div style="width: 1000px; float: left; margin-left: 15px">
     <div>
         @if($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() != 0)
             <div style="float: left">
@@ -18,7 +18,7 @@
             $borderRadius = $maxNumberOfSquares != 0 ? false : true;
         @endphp
 
-        <table style="float: left">
+        <table style="float: left; margin-left: 15px">
             <thead>
             </thead>
             <tbody>
@@ -47,7 +47,7 @@
             </tbody>
         </table>
 
-        <table style="margin-top: 10px; float: left">
+        <table style="margin-top: 10px; float: left; margin-left: 15px">
             <tbody>
             @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)
                 <tr>
