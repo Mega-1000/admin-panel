@@ -13,16 +13,19 @@
         @endif
     </td>
 
-    @if(isset($showPosition) && $showPosition)
-        @if(count($item->getPositions()))
-            @foreach($item->getPositions() as $position)
-                    <div>
-                        {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
+    <td>
+
+        @if(isset($showPosition) && $showPosition)
+            @if(count($item->getPositions()))
+                @foreach($item->getPositions() as $position)
                         <div>
-                            {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
+                            {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
+                            <div>
+                                {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
+                            </div>
                         </div>
-                    </div>
-            @endforeach
+                @endforeach
+            @endif
         @endif
-    @endif
+    </td>
 </tr>
