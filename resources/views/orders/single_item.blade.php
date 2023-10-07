@@ -12,13 +12,14 @@
             Pozostało do wydania poza pakietem: <span class="quantity">{{ $quantity - $orderItem->packet->packet_product_quantity }}</span>
         @endif
     </td>
+
     @if(isset($showPosition) && $showPosition)
         @if(count($item->getPositions()))
             @php($i = 0)
 
             @foreach($item->getPositions() as $position)
                 @if($i < 1)
-                    <td colspan="2">
+                    <td>
                 @endif
 
                     <div>
