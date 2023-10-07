@@ -1,7 +1,7 @@
-<div style="width: 1000px">
+<div style="width: 1000px; float: left">
     <div>
         @if($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() != 0)
-            <div>
+            <div style="float: left">
                 @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
                     <div style="font-weight: bold; font-size: larger">
                         --
@@ -18,7 +18,7 @@
             $borderRadius = $maxNumberOfSquares != 0 ? false : true;
         @endphp
 
-        <table>
+        <table style="float: left">
             <thead>
             </thead>
             <tbody>
@@ -47,7 +47,7 @@
             </tbody>
         </table>
 
-        <table style="margin-top: 10px">
+        <table style="margin-top: 10px; float: left">
             <tbody>
             @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)
                 <tr>
