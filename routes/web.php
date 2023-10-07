@@ -744,35 +744,3 @@ Route::post('/product-stock-logs/{productStockLog}/edit', [ProductStockLogsContr
 
 Route::get('/form/{form:name}/{order}', [FormController::class, 'index'])->name('form');
 Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction'])->name('execute-form-action');
-
-
-Route::get('test-pdf-generation/{id}', function (int $positionId) {
-    $htmlContent = \App\Services\ProductPositioningService::renderPositioningViewHtml(\App\Entities\ProductStockPosition::find($positionId)); // Replace with your HTML content
-
-    $name = \Illuminate\Support\Str::random(32) . '.html';
-    // Save the HTML content to a\ temporary file
-    $fileName = public_path($name);
-    file_put_contents($fileName, $htmlContent);
-
-    // Define the output image file path
-    // public path is: /var/www/html/public
-    $outputImageFile = public_path('okej.png');
-
-    // Execute wkhtmltoimage command to convert HTML to an image
-    $command = "wkhtmltoimage --format png https://admin.mega1000.pl/$name $outputImageFile";
-    exec($command);
-
-    // Check if the conversion was successful
-    if (file_exists($outputImageFile)) {
-        // Read the image file and encode it to base64
-        $imageData = file_get_contents($outputImageFile);
-        $base64Image = base64_encode($imageData);
-
-        // Display the base64-encoded image
-        echo '<img src="data:image/png;base64,' . $base64Image . '" alt="Generated Image" />';
-    } else {
-        echo 'Conversion failed.';
-    }
-
-    //
-});
