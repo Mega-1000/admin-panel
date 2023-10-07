@@ -13,8 +13,7 @@
         @endif
     </td>
 
-    <td>
-
+    <td colspan="2">
         @if(isset($showPosition) && $showPosition)
             @if(count($item->getPositions()))
                 @foreach($item->getPositions() as $position)
