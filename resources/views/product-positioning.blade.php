@@ -88,21 +88,6 @@
                 $maxNumberOfSquares = $productPositioningDTO->getQuantityOfCompleteLayersOfTradeItemsInLargestUnitInGlobalUnit() + $productPositioningDTO->getQuantityOfTradeItemsInStartedLayerInLargestUnit();
             @endphp
         </td>
-        <td>
-            <table style="align-self: flex-start;">
-                <thead></thead>
-                <tbody>
-                @while($maxNumberOfSquares > 0)
-                    <tr>
-                        @for ($j = 0; $j <= $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width; $j++)
-                            <td style="padding: 10px; border: 1px black solid;"></td>
-                            @php($maxNumberOfSquares--)
-                        @endfor
-                    </tr>
-                @endwhile
-                </tbody>
-            </table>
-        </td>
     </tr>
     </tbody>
 </table>
