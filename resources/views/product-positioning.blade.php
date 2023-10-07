@@ -15,7 +15,7 @@
 
         @php
             $maxNumberOfSquares = $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer();
-            $borderRadius = false;
+            $borderRadius = $maxNumberOfSquares != 0 ? false : true;
         @endphp
 
         <table>
