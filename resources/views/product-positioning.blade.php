@@ -66,7 +66,7 @@
             </tbody>
         </table>
     </div>
-@else
+@endif
 
 
     <table>
@@ -110,4 +110,3 @@
         </tr>
         </tbody>
     </table>
-@endif
