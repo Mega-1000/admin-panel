@@ -11,7 +11,7 @@
             padding: 10px;
             background: transparent;
             position: relative;
-            font: 9px Arial, Helvetica, sans-serif;
+            font-family: DejaVu Sans;
         }
 
         h2 {
