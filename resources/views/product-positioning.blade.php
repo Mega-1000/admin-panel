@@ -31,6 +31,7 @@
 
                             @php($maxNumberOfSquares--)
                         @endfor
+                        <td style="padding: 10px; border: 1px black solid; border-radius: 100%"></td>
                     </tr>
                 @endwhile
             </tbody>
