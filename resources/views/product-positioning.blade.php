@@ -27,6 +27,7 @@
                             @if ($maxNumberOfSquares == 0)
                                 <td style="padding: 10px; border: 1px black solid; border-radius: 100%"></td>
                                 @php($maxNumberOfSquares--)
+                                @break
                             @elseif($maxNumberOfSquares < 0)
                                 @break
                             @endif
