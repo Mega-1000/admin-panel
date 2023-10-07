@@ -12,6 +12,7 @@
             Pozostało do wydania poza pakietem: <span class="quantity">{{ $quantity - $orderItem->packet->packet_product_quantity }}</span>
         @endif
     </td>
+
     @if(isset($showPosition) && $showPosition)
         @if(count($item->getPositions()))
             @foreach($item->getPositions() as $position)
@@ -21,7 +22,6 @@
                             {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
                         </div>
                     </div>
-                    <br/><br/>
             @endforeach
         @endif
     @endif
