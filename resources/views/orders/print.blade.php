@@ -50,7 +50,7 @@
             <br>
             Watrość oferty brutto: {{ $order->getValue() }}
             <br>
-            Czy jest to smart: {{ $order->shipment_price_for_client == 0 ? 'tak' : 'nie' }}
+            Koszt transportu dla klienta brutto: {{ $order->shipment_price_for_client }}
         </h2>
     </div>
 
