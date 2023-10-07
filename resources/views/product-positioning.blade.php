@@ -1,9 +1,12 @@
 <div style="display: flex; flex-direction: row;">
 
      <table>
+            <thead>
+
+            </thead>
          <tbody>
              <tr>
-
+                <td>
                 @if($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() != 0)
                     <div style="align-self: flex-start;">
                         @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
@@ -19,8 +22,8 @@
                     $maxNumberOfSquares = $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer();
                     $borderRadius = $maxNumberOfSquares != 0 ? false : true;
                 @endphp
-             </tr>
-             <tr>
+                </td>
+                 <td>
                 <table style="align-self: flex-start;">
                     <thead></thead>
                     <tbody>
@@ -45,6 +48,7 @@
                     @endif
                 </tbody>
             </table>
+                 </td>
          </tr>
          </tbody>
      </table>
