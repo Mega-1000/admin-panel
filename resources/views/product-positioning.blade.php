@@ -1,4 +1,3 @@
-@if($productPositioningDTO->getProduct()->packing->number_of_trade_items_in_the_largest_unit != 0)
     <div style="display: flex; flex-direction: row;">
 
      <table>
@@ -66,7 +65,6 @@
             </tbody>
         </table>
     </div>
-@endif
 
 
     <table>
@@ -110,4 +108,3 @@
         </tr>
         </tbody>
     </table>
-@endif
