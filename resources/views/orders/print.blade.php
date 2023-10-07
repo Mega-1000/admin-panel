@@ -41,9 +41,16 @@
     <div style="position:absolute; right:40px; top:0px;">
         <h2 style="display: inline-block">
             ELEKTRONICZNA PLATFORMA HANDLOWA<br/>
-            UL. IWASZKIEWICZA 15A<br/>
-            55-200 OŁAWA<br/>
-            NIP: 9121027907
+            EPH POLSKA
+            <br>
+            <br>
+            Wykonano: {{ $order->task->employee_id }}
+            <br>
+            Data: {{ now() }}
+            <br>
+            Watrość oferty brutto: {{ $order->getValue() }}
+            <br>
+            Czy jest to smart: {{ $order->shipment_price_for_client == 0 ? 'tak' : 'nie' }}
         </h2>
     </div>
 
@@ -53,7 +60,7 @@
 
     {{--<b>uwagi klienta:</b> <br/>--}}
     <b>uwagi spedycja:</b> {!! $tagHelper->commentsToShipping(" | ") !!}<br/>
-    <b>uwagi magazyn:</b> {!! $order->warehouse_notice !!}
+    <div style="font-weight: bold; font-size:  30px">uwagi magazyn:</div> {!! $order->warehouse_notice !!}
     <br/><br/>
 
     @if(count($order->packages) > 0)

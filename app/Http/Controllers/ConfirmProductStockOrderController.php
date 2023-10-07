@@ -47,8 +47,6 @@ class ConfirmProductStockOrderController extends Controller
                         'user_id' => auth()->user()->id,
                     ]);
                 }
-
-
             }
         }
 

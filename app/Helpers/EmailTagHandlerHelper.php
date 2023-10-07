@@ -44,7 +44,7 @@ class EmailTagHandlerHelper
     {
         $address = $this->order->addresses->where('type', 'DELIVERY_ADDRESS')->first();
 
-        return ($address === null ? ' ' : $address->firstname) . ' ' . ($address === null ?  ' ' : $address->lastname) . '<br/> Email: ' . ($address === null ? ' ' : $address->email) . '<br/>' .($address === null ? ' ' : $address->address) . ' ' . ($address === null ? ' ' : $address->flat_number) . '<br/>' . ($address === null ? ' ' : $address->postal_code) . '<br/>' . ($address === null ? ' ' : $address->city) . '<br/>';
+        return ($address === null ? ' ' : $address->firstname) . ' ' . ($address === null ?  ' ' : $address->lastname) . '<br/> Email: ' . ($address === null ? ' ' : $address->email) . '<br/>' .($address === null ? ' ' : $address->address) . ' ' . ($address === null ? ' ' : $address->flat_number) . '<br/>' . ($address === null ? ' ' : $address->postal_code) . '<br/>' . ($address === null ? ' ' : $address->city) . '<br/>' . 'Telefon: ' . $address->phone;
     }
 
     //[DANE-DO-FAKTURY]
@@ -52,7 +52,7 @@ class EmailTagHandlerHelper
     {
         $address = $this->order->addresses->where('type', 'INVOICE_ADDRESS')->first();
 
-        return ($address === null ? ' ' : $address->firstname) . ' ' . ($address === null ?  ' ' : $address->lastname) . '<br/> Email: ' . ($address === null ? ' ' : $address->email) . '<br/>' .($address === null ? ' ' : $address->address) . '<br/>' . ($address === null ? ' ' : $address->flat_number) . '<br/>' . ($address === null ? ' ' : $address->postal_code) . '<br/>' . ($address === null ? ' ' : $address->city) . '<br/>' . ($address === null ? ' ' : $address->nip);
+        return ($address === null ? ' ' : $address->firstname) . ' ' . ($address === null ?  ' ' : $address->lastname) . '<br/> Email: ' . ($address === null ? ' ' : $address->email) . '<br/>' .($address === null ? ' ' : $address->address) . '<br/>' . ($address === null ? ' ' : $address->flat_number) . '<br/>' . ($address === null ? ' ' : $address->postal_code) . '<br/>' . ($address === null ? ' ' : $address->city) . '<br/>' . ($address === null ? ' ' : $address->nip . 'Telefon: ' . $address->phone);
     }
 
     //[WARTOSC-TOWARU-WRAZ-Z-TRANSPORTEM-DLA-NAS-W-CENACH-NETTO]
