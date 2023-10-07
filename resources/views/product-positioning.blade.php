@@ -74,6 +74,9 @@
     <tr>
         <td>
 
+            @php
+                $maxNumberOfSquares = $productPositioningDTO->getQuantityOfCompleteLayersOfTradeItemsInLargestUnitInGlobalUnit() + $productPositioningDTO->getQuantityOfTradeItemsInStartedLayerInLargestUnit();
+            @endphp
         </td>
         <td>
             <table style="align-self: flex-start;">
