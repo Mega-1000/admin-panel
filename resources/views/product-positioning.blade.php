@@ -1,5 +1,5 @@
-<div style="width: 1000px">
-    <div>
+<div style="width: 1000px;">
+    <div style="display: flex; flex-direction: row;">
         @if($productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit() != 0)
             <div>
                 @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
