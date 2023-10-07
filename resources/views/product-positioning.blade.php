@@ -15,6 +15,7 @@
 
         @php
             $maxNumberOfSquares = $productPositioningDTO->getQuantityOfCompleteGlobalUnitsInStartedLayer();
+            $borderRadius = false;
         @endphp
 
         <table>
@@ -27,6 +28,7 @@
 
                             @if($maxNumberOfSquares <= 0)
                                 <td style="padding: 10px; border: 1px black solid; border-radius: 100%"></td>
+                                @php($borderRadius = true)
                                 @break
                             @endif
 
@@ -35,7 +37,13 @@
                             @php($maxNumberOfSquares--)
                         @endfor
                     </tr>
-                @endwhile
+                @endwhile'
+
+                @if(!$borderRadius)
+                    <tr>
+                        <td style="padding: 10px; border: 1px black solid; border-radius: 100%"></td>
+                    </tr>
+                @endif
             </tbody>
         </table>
 
