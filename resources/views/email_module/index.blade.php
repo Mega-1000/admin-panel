@@ -18,8 +18,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($emailSettings as $s)
-
+        @foreach($emailSettings as $s)\
             <tr data-toggle="tooltip" data-placement="top" data-html="true"
                 title="{{ \Illuminate\Support\Str::limit($s->content, 200, '...')}}">
                 <td>{{ $s->id }}</td>
