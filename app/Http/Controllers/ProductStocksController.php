@@ -112,7 +112,6 @@ class ProductStocksController extends Controller
     {
         $query = DB::table('product_stocks')
             ->distinct()
-            ->groupBy('product_stocks.id')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
             ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
