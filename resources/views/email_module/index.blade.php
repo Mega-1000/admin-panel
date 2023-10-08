@@ -6,7 +6,6 @@
 @endsection
 
 @section('table')
-    @use
 
     <table class="table table-hover">
         <thead>
