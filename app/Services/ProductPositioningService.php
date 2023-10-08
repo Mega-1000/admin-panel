@@ -28,9 +28,10 @@ class ProductPositioningService
     {
         return $productPositioningDTO->getProduct()->packing->number_of_trade_items_in_the_largest_unit != 0 ? view('product-positioning', [
             'productPositioningDTO' => $productPositioningDTO,
-        ])->render() : view('product-positioning-zero', [
-            'productPositioningDTO' => $productPositioningDTO,
-        ])->render();
+        ])->render() : '';
+//        view('product-positioning-zero', [
+//            'productPositioningDTO' => $productPositioningDTO,
+//        ])->render();
     }
 
     /**

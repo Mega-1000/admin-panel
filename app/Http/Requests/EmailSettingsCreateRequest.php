@@ -21,7 +21,7 @@ class EmailSettingsCreateRequest extends FormRequest
 //            'time' => 'required|numeric',
 //            'title' => 'required',
 //            'content' => 'required',
-//            'is_allegro' => 'required|in:on,of'
+            'is_allegro' => 'required|in:on,of'
         ];
     }
 
