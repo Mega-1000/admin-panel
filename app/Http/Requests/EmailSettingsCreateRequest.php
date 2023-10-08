@@ -28,7 +28,7 @@ class EmailSettingsCreateRequest extends FormRequest
     public function validated($key = null, $default = null): array
     {
         $validated = parent::validated();
-        $validated['is_allegro'] = $validated['is_allegro'] === 'on';
+        $validated['is_allegro'] = $validated['is_allegro'] ?? 'of' === 'on';
         return $validated;
     }
 }
