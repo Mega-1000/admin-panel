@@ -112,7 +112,10 @@ class ProductStocksController extends Controller
     {
         $query = DB::table('product_stocks')
             ->distinct()
-            ->select('*', 'product_stocks.id as stock_id')
+            ->select(
+                'product_stocks.id as stock_id',
+                DB::raw('GROUP_CONCAT(products.column_name) as concatenated_values')
+            )
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
             ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
