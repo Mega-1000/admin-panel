@@ -118,6 +118,7 @@ class ProductStocksController extends Controller
             ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
             ->whereNull('products.deleted_at');
 
+        dd($query->get());
         $notSearchable = [17, 19];
 
         foreach ($data['columns'] as $column) {
