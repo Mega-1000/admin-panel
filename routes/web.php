@@ -5,6 +5,7 @@ use App\Http\Controllers\AddLabelsCSVController;
 use App\Http\Controllers\AllegroBillingController;
 use App\Http\Controllers\AllegroReturnPaymentController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\ConfirmProductStockOrderController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
 use App\Http\Controllers\DeleteOrderInvoiceValueController;
@@ -694,6 +695,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'store']);
 
     Route::get('/set-logs-permissions', fn() => \Illuminate\Support\Facades\Artisan::call('set-logs-permissions'));
+
+    Route::get('complaint-index', [ComplaintController::class, 'index'])->name('complaint.index');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
