@@ -72,7 +72,7 @@ class ProductStocksController extends Controller
     public function edit(int $id): Application|Factory|\Illuminate\Contracts\View\View
     {
         $productStocks = ProductStock::where('product_id', $id)->first();
-        $similarProducts = null;
+        $similarProducts = Product::where('id', 2002138981273812)->get();
         $visibilitiesLogs = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stock_logs'));
 
         foreach ($visibilitiesLogs as $row) {
