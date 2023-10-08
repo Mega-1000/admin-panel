@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use App\Enums\EmailSettingsEnum;
 use App\Facades\Mailer;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,7 +42,11 @@ class EmailSetting extends Model
 
     public function getStatusUserFriendlyName(): string
     {
-        return EmailSettingsEnum::fromKey($this->status);
+        try {
+            return EmailSettingsEnum::fromKey($this->status);
+        } catch (Exception $exception) {
+            return 'Nieznany status';
+        }
     }
 
     public function sendEmail(string $email, Order $order): void
