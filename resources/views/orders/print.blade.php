@@ -44,7 +44,7 @@
             EPH POLSKA
             <br>
             <br>
-            Wykonano: {{ $order->employee_id }}
+            Wykonano: {{ $order->employee->name }}
             <br>
             Data: {{ now() }}
             <br>
