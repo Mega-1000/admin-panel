@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('product_packing', function (Blueprint $table) {
+        Schema::table('product_packings', function (Blueprint $table) {
             $table->float('number_of_trade_items_in_p1')->nullable();
         });
     }
