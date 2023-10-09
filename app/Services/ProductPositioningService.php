@@ -15,7 +15,7 @@ class ProductPositioningService
      */
     public static function renderPositioningViewHtml(ProductStockPosition $productStockPosition): string
     {
-        if ($productStockPosition === $productStockPosition->stock->position()->first()) {
+        if ($productStockPosition->id === $productStockPosition->stock->position()->first()->id ) {
             return self::getPositioningViewHtml(self::getPositioning($productStockPosition));
         }
 
