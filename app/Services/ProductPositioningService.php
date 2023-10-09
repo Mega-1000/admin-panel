@@ -26,9 +26,9 @@ class ProductPositioningService
      */
     public static function getPositioningViewHtml(ProductPositioningDTO $productPositioningDTO): string
     {
-        return $productPositioningDTO->getProduct()->packing->number_of_trade_items_in_the_largest_unit != 0 ? view('product-positioning', [
+        return view('product-positioning', [
             'productPositioningDTO' => $productPositioningDTO,
-        ])->render() : '';
+        ])->render();
     }
 
     /**
