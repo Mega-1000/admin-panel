@@ -15,7 +15,11 @@ class ProductPositioningService
      */
     public static function renderPositioningViewHtml(ProductStockPosition $productStockPosition): string
     {
-        return self::getPositioningViewHtml(self::getPositioning($productStockPosition));
+        if ($productStockPosition === $productStockPosition->stock->position()->first()) {
+            return self::getPositioningViewHtml(self::getPositioning($productStockPosition));
+        }
+
+        return '';
     }
 
     /**
