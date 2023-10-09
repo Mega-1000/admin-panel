@@ -8,6 +8,7 @@ use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
 use App\Entities\Order;
+use App\Entities\OrderAddress;
 use App\Entities\OrderPayment;
 use App\Entities\Product;
 use App\Entities\ProductStock;
@@ -136,7 +137,7 @@ class OrderService
                 ->setProductService($productService);
             $orderBuilder->assignItemsToOrder($order, $products);
 
-            $order->getDeliveryAddress()->create([
+            OrderAddress::create([
                 'firstname' => 'Dimitr',
                 'lastname' => 'Bolbot',
                 'address' => ' ul lotnicza 9',
@@ -147,7 +148,7 @@ class OrderService
                 'order_id' => $order->id,
             ]);
 
-            $order->getInvoiceAddress()->create([
+            OrderAddress::create([
                 'firmname' => 'Elektroniczna Platforma handlowa Sp z o o',
                 'address' => 'ul.  Jaracza 22/12',
                 'postal_code' => '50-305 ',
