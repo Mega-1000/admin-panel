@@ -143,7 +143,8 @@ class OrderService
                 'postal_code' => '55-200',
                 'flat_number' => '9',
                 'city' => 'stanowice',
-                'type' => 'DELIVERY_ADDRESS'
+                'type' => 'DELIVERY_ADDRESS',
+                'order_id' => $order->id,
             ]);
 
             $order->getInvoiceAddress()->create([
@@ -152,7 +153,8 @@ class OrderService
                 'postal_code' => '50-305 ',
                 'city' => 'Wrocław',
                 'nip' => '8982272269',
-                'type' => 'INVOICE_ADDRESS'
+                'type' => 'INVOICE_ADDRESS',
+                'order_id' => $order->id,
             ]);
         });
 
