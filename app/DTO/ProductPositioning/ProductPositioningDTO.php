@@ -70,7 +70,7 @@ readonly final class ProductPositioningDTO
 
     public static function getFloatValue(array $data, string $key): float
     {
-        if (array_key_exists($data, $key)) {
+        if (array_key_exists($key, $data)) {
             return (float) $data[$key];
         }
 
