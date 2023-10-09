@@ -68,6 +68,15 @@ readonly final class ProductPositioningDTO
         public Product $product,
     ) {}
 
+    public function getFloatValue(array $data, string $key): float
+    {
+        if (array_key_exists($data, $key)) {
+            return (float) $data[$key];
+        }
+
+        return 0.0;
+    }
+
     public static function fromAcronymsArray(array $data): self
     {
         return new self(
