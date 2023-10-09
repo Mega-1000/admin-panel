@@ -43,16 +43,16 @@ class ProductPositioningService
         $product = $productStockPosition->stock->product;
         $productPacking = $product->packing;
 
-        $IJHWOG = $product->packing->number_of_trade_items_in_the_largest_unit ?? 0;
-        $IJHWOZ = $product->packing->number_of_sale_units_in_the_pack ?? 0;
-        $IOHWOP1 = $product->packing->number_of_trade_items_in_p1 ?? 0;
-        $IJHNKWWOZ = $product->stock->number_on_a_layer ?? 0;
-        $IJZNKWWOG = $product->packing->number_of_trade_units_in_full_horizontal_layer_in_global_package ?? 0;
-        $IWJHWPWOZ = $product->packing->number_of_layers_of_trade_units_in_vertical ?? 0;
-        $IPHWOZPD = $product->layers_in_package ?? 0;
-        $IPHWOZPS = $product->packing->number_of_trade_units_in_package_width ?? 0;
-        $IJZPDWOG = $product->packing->number_of_trade_units_in_length_in_global_package ?? 0;
-        $IJZPSWOG = $product->packing->number_of_trade_units_in_width_in_global_package ?? 0;
+        $IJHWOG = (float)$product->packing->number_of_trade_items_in_the_largest_unit ?? 0;
+        $IJHWOZ = (float)$product->packing->number_of_sale_units_in_the_pack ?? 0;
+        $IOHWOP1 = (float)$product->packing->number_of_trade_items_in_p1 ?? 0;
+        $IJHNKWWOZ = (float)$product->stock->number_on_a_layer ?? 0;
+        $IJZNKWWOG = (float)$product->packing->number_of_trade_units_in_full_horizontal_layer_in_global_package ?? 0;
+        $IWJHWPWOZ = (float)$product->packing->number_of_layers_of_trade_units_in_vertical ?? 0;
+        $IPHWOZPD = (float)$product->layers_in_package ?? 0;
+        $IPHWOZPS = (float)$product->packing->number_of_trade_units_in_package_width ?? 0;
+        $IJZPDWOG = (float)$product->packing->number_of_trade_units_in_length_in_global_package ?? 0;
+        $IJZPSWOG = (float)$product->packing->number_of_trade_units_in_width_in_global_package ?? 0;
 
         $IOHKSPWZIP1NPWW1WOH = $IOHWOP1 * $IPHWOZPD * $IPHWOZPS;
 
