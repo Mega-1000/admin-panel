@@ -157,6 +157,8 @@ class OrderService
                 'type' => 'INVOICE_ADDRESS',
                 'order_id' => $order->id,
             ]);
+
+            $order->employee()->associate(12);
         });
 
         return $order;
