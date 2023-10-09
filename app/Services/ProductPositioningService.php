@@ -29,9 +29,6 @@ class ProductPositioningService
         return $productPositioningDTO->getProduct()->packing->number_of_trade_items_in_the_largest_unit != 0 ? view('product-positioning', [
             'productPositioningDTO' => $productPositioningDTO,
         ])->render() : '';
-//        view('product-positioning-zero', [
-//            'productPositioningDTO' => $productPositioningDTO,
-//        ])->render();
     }
 
     /**
@@ -43,98 +40,66 @@ class ProductPositioningService
      */
     public static function getPositioning(ProductStockPosition $productStockPosition): ProductPositioningDTO
     {
-        try {
-            $product = $productStockPosition->stock->product;
-            $productPacking = $product->packing;
+        $product = $productStockPosition->stock->product;
+        $productPacking = $product->packing;
 
-            if ($productPacking->number_of_trade_items_in_the_largest_unit != 0) {
-                return self::handleNonZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product, $productPacking);
-            }
+        $IJHWOG = $product->packing->number_of_trade_items_in_the_largest_unit;
+        $IJHWOZ = $product->packing->number_of_sale_units_in_the_pack;
+        $IOHWOP1 = $product->packing->number_of_trade_items_in_p1;
+        $IJHNKWWOZ = $product->stock->number_on_a_layer;
+        $IJZNKWWOG = $product->packing->number_of_trade_units_in_full_horizontal_layer_in_global_package;
+        $IWJHWPWOZ = $product->packing->number_of_layers_of_trade_units_in_vertical;
+        $IPHWOZPD = $product->layers_in_package;
+        $IPHWOZPS = $product->packing->number_of_trade_units_in_package_width;
+        $IJZPDWOG = $product->packing->number_of_trade_units_in_length_in_global_package;
+        $IJZPSWOG = $product->packing->number_of_trade_units_in_width_in_global_package;
 
-            return self::handleZeroNumberOfTradeItemsInLargestUnit($productStockPosition, $product, $productPacking);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage() . " (Line: " . $e->getLine() . ")");
-        }
-    }
+        $IOHKSPWZIP1NPWW1WOH = $IOHWOP1 * $IPHWOZPD * $IPHWOZPS;
 
-    /**
-     * Handle not zero number of trade items in the largest unit
-     *
-     * @param ProductStockPosition $productStockPosition
-     * @param Product $product
-     * @param ProductPacking $productPacking
-     * @return ProductPositioningDTO
-     * @throws Exception
-     */
-    private static function handleNonZeroNumberOfTradeItemsInLargestUnit(
-        ProductStockPosition $productStockPosition,
-        Product $product,
-        ProductPacking $productPacking
-    ): ProductPositioningDTO
-    {
-        $IKWJZWOG = $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package != 0 && $product->stock->number_on_a_layer != 0 ? floor(($productStockPosition->position_quantity / $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package) / $product->stock->number_on_a_layer) : 0;
+        $IKWJZWOG = $IJZNKWWOG != 0 && $IJHWOZ != 0 ? floor(($productStockPosition->number_of_trade_items_in_position / $IJHWOZ) / $IJZNKWWOG) : 0;
+        $IPJZNRWWOG = $IJHWOZ != 0 && floor(($productStockPosition->number_of_trade_items_in_position - $IKWJZWOG * $IJZNKWWOG * $IJHWOZ) / $IJHWOZ);
+        $IJHWROZNRWZWJG = $productStockPosition->number_of_trade_items_in_position - $IKWJZWOG * $IJZNKWWOG * $IJHWOZ - $IPJZNRWWOG * $IJHWOZ;
 
-        $IPJZNRWWOG = $product->stock->number_on_a_layer != 0 ? floor(($productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $product->stock->number_on_a_layer) / $product->stock->number_on_a_layer) : 0;
+        $IKROZPDWRWOG = $IJZPSWOG != 0 ? floor($IPJZNRWWOG / $IJZPSWOG) : 0;
+        $IKOZWRRNRWWOG = $IPJZNRWWOG - $IKROZPDWRWOG * $IJZPSWOG;
 
-        $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package * $product->stock->number_on_a_layer - $IPJZNRWWOG * $product->stock->number_on_a_layer;
+        $IPWJHWROZWOG = floor($IJHWROZNRWZWJG / $IWJHWPWOZ);
+        $IKRPDOHWOOZNRWWOG = floor(($IJHWROZNRWZWJG - $IPWJHWROZWOG * $IWJHWPWOZ) / $IPHWOZPS);
+        $IOHWRRWROZWRWWOG = $IJHWROZNRWZWJG - $IPWJHWROZWOG * $IWJHWPWOZ - $IKRPDOHWOOZNRWWOG * $IPHWOZPS;
 
-        $PPROZPDWRWOG =  $productPacking->number_of_trade_units_in_width_in_global_package != 0 ? floor($IPJZNRWWOG / $productPacking->number_of_trade_units_in_width_in_global_package) : 0;
+        $IKWW1WROZWRWWROG = floor($IJHWROZNRWZWJG / $IOHKSPWZIP1NPWW1WOH);
+        $IKOP1WRWWW1WOG = floor(($IJHWROZNRWZWJG - $IKWW1WROZWRWWROG * $IOHKSPWZIP1NPWW1WOH) / $IOHWOP1);
+        $IOHWROP1WRWWOG = $IJHWROZNRWZWJG - $IKWW1WROZWRWWROG * $IOHKSPWZIP1NPWW1WOH - $IKOP1WRWWW1WOG * $IOHWOP1;
 
-        $IKRPDOHWOOZNRWWOG = $productPacking->number_of_trade_units_in_package_width != 0 ? floor($IJHWROZNRWZWJG / $productPacking->number_of_trade_units_in_package_width) : 0;
-
-        $IOHWRRROZWRWOG = $productPacking->number_of_trade_units_in_package_width != 0 ? $IJHWROZNRWZWJG - $IKRPDOHWOOZNRWWOG * $productPacking->number_of_trade_units_in_package_width : 0;
 
         return self::convertArrayToDTO([
-            'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
-            'IJHWOG' => $productPacking->number_of_trade_items_in_the_largest_unit,
+            'IJHWOZ' => $IJHWOZ,
+            'IJHWOG' => $IJHWOG,
+            'IOHWOP1' => $IOHWOP1,
+            'IJHNKWWOZ' => $IJHNKWWOZ,
+            'IJZNKWWOG' => $IJZNKWWOG,
+            'IWJHWPWOZ' => $IWJHWPWOZ,
+            'IPHWOZPD' => $IPHWOZPD,
+            'IPHWOZPS' => $IPHWOZPS,
+            'IJZPDWOG' => $IJZPDWOG,
+            'IJZPSWOG' => $IJZPSWOG,
+            'IOHKSPWZIP1NPWW1WOH' => $IOHKSPWZIP1NPWW1WOH,
             'IKWJZWOG' => $IKWJZWOG,
             'IPJZNRWWOG' => $IPJZNRWWOG,
             'IJHWROZNRWZWJG' => $IJHWROZNRWZWJG,
-            'IJHNPWWOZ' => $product->stock->number_on_a_layer,
-            'IJZNKWWOG' => $productPacking->number_of_trade_units_in_full_horizontal_layer_in_global_package,
-            'PPROZPDWRWOG' => $PPROZPDWRWOG,
-            'IOZWRRNRWWOG' => floor($IPJZNRWWOG - $PPROZPDWRWOG * $productPacking->number_of_trade_units_in_width_in_global_package),
+            'IKROZPDWRWOG' => $IKROZPDWRWOG,
+            'IKOZWRRNRWWOG' => $IKOZWRRNRWWOG,
+            'IPWJHWROZWOG' => $IPWJHWROZWOG,
             'IKRPDOHWOOZNRWWOG' => $IKRPDOHWOOZNRWWOG,
-            'IOHWRRROZWRWOG' => $IOHWRRROZWRWOG,
-            'product' => $product,
-        ]);
-    }
-
-    /**
-     * Handle zero number of trade items in the largest unit
-     *
-     * @param ProductStockPosition $productStockPosition
-     * @param Product $product
-     * @param ProductPacking $productPacking
-     * @return ProductPositioningDTO
-     * @throws Exception
-     */
-    private static function handleZeroNumberOfTradeItemsInLargestUnit(
-        ProductStockPosition $productStockPosition,
-        Product $product,
-        ProductPacking $productPacking
-    ): ProductPositioningDTO
-    {
-        $IKWTWJHWOZ = $product->stock->number_on_a_layer != 0 ? floor($productStockPosition->position_quantity / $product->stock->number_on_a_layer) : 0;
-
-        $IJHNOWWROZ = $productStockPosition->position_quantity - $IKWTWJHWOZ * $product->stock->number_on_a_layer;
-
-        $IPROHPDWOWWOZ = $productPacking->number_of_trade_units_in_package_width != 0 ? floor($IJHNOWWROZ / $productPacking->number_of_trade_units_in_package_width) : 0;
-
-        $IOHWRRNOWWOZ = $IJHNOWWROZ - $IPROHPDWOWWOZ * $productPacking->number_of_trade_units_in_package_width;
-
-        return self::convertArrayToDTO([
-            'IJHWOZ' => $productPacking->number_of_sale_units_in_the_pack,
-            'IJHWOG' => $productPacking->number_of_trade_items_in_the_largest_unit,
-            'IKWTWJHWOZ' => $IKWTWJHWOZ,
-            'IJHNOWWROZ' => $IJHNOWWROZ,
-            'IPROHPDWOWWOZ' => $IPROHPDWOWWOZ,
-            'IOHWRRNOWWOZ' => $IOHWRRNOWWOZ,
-            'IJHNPWWOZ' => $product->stock->number_on_a_layer,
+            'IOHWRRWROZWRWWOG' => $IOHWRRWROZWRWWOG,
+            'IKWW1WROZWRWWROG' => $IKWW1WROZWRWWROG,
+            'IKOP1WRWWW1WOG' => $IKOP1WRWWW1WOG,
+            'IOHWROP1WRWWOG' => $IOHWROP1WRWWOG,
             'isZero' => true,
             'product' => $product,
         ]);
     }
+
 
     /**
      * @throws Exception

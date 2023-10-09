@@ -12,9 +12,7 @@ class AddingTaskResponseDTO extends BaseDTO implements JsonSerializable
         private readonly int    $taskId,
         private readonly int    $deliveryWarehouseId,
         private readonly string $message
-    )
-    {
-    }
+    ) {}
 
     public function jsonSerialize(): array
     {

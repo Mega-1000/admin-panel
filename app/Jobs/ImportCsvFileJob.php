@@ -596,6 +596,7 @@ class ImportCsvFileJob implements ShouldQueue
             'number_of_layers_of_trade_units_in_height_in_global_package' => $line[67],
             'number_of_trade_units_in_length_in_global_package' => $line[68],
             'number_of_trade_units_in_width_in_global_package' => $line[69],
+            'number_of_trade_items_in_p1' => $line[70],
         ];
 
         foreach ($array as $key => $value) {

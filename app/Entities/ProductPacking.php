@@ -15,11 +15,13 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property numeric $number_of_sale_units_in_the_pack
  * @property numeric $number_on_a_layer
  * @property string $number_of_layers_of_trade_units_in_vertical_column
- * @property numeric number_of_trade_units_in_package_width
- * @property numeric number_of_trade_units_in_full_horizontal_layer_in_global_package
- * @property numeric number_of_layers_of_trade_units_in_height_in_global_package
- * @property numeric number_of_trade_units_in_length_in_global_package
- * @property numeric number_of_trade_units_in_width_in_global_package
+ * @property numeric $number_of_trade_units_in_package_width
+ * @property numeric $number_of_trade_units_in_full_horizontal_layer_in_global_package
+ * @property numeric $number_of_layers_of_trade_units_in_height_in_global_package
+ * @property numeric $number_of_trade_units_in_length_in_global_package
+ * @property numeric $number_of_trade_units_in_width_in_global_package
+ * @property numeric $number_of_trade_items_in_p1
+ * @property numeric $number_of_trade_items_in_complete_layer_in_largest_unit
  */
 class ProductPacking extends Model implements Transformable
 {
@@ -68,6 +70,8 @@ class ProductPacking extends Model implements Transformable
         'number_of_layers_of_trade_units_in_height_in_global_package',
         'number_of_trade_units_in_length_in_global_package',
         'number_of_trade_units_in_width_in_global_package',
+        'number_of_trade_items_in_p1',
+        'number_of_trade_items_in_complete_layer_in_largest_unit',
     ];
 
     /**
