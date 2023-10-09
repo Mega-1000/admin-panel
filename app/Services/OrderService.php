@@ -114,7 +114,7 @@ class OrderService
         $customer = Customers::getFirstCustomerWithLogin($dto->clientEmail);
 
         DB::transaction(function () use ($dto, $customer, $productService, &$order) {
-            $order = Order::query()->create([
+            $order = Order::create([
                 'customer_id' => $customer->id,
                 'status_id' => 1,
                 'last_status_update_date' => Carbon::now(),
@@ -136,9 +136,7 @@ class OrderService
                 ->setProductService($productService);
             $orderBuilder->assignItemsToOrder($order, $products);
 
-            $order->labels()->unassign([89, 92, 160]);
-
-            $order->getDeliveryAddress()->creat([
+            $order->getDeliveryAddress()->create([
                 'firstname' => 'Dimitr',
                 'lastname' => 'Bolbot',
                 'address' => ' ul lotnicza 9',
