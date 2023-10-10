@@ -32,6 +32,7 @@ use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
 use Barryvdh\DomPDF\PDF;
 use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -694,7 +695,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'create']);
     Route::post('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'store']);
 
-    Route::get('/set-logs-permissions', fn() => \Illuminate\Support\Facades\Artisan::call('set-logs-permissions'));
+    Route::get('/set-logs-permissions', function () { Artisan::call('set-logs-permissions'); });
 
     Route::get('complaint-index', [ComplaintController::class, 'index'])->name('complaint.index');
 });
