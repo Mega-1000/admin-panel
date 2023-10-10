@@ -60,9 +60,9 @@ class ProductPositioningService
 
         $IOHKSPWZIP1NPWW1WOH = $IOHWOP1 * $IPHWOZPD * $IPHWOZPS;
 
-        $IKWJZWOG = $IJZNKWWOG != 0 && $IJHWOZ != 0 ? floor(($productStockPosition->number_of_trade_items_in_position / $IJHWOZ) / $IJZNKWWOG) : 0;
-        $IPJZNRWWOG = $IJHWOZ != 0 && floor(($productStockPosition->number_of_trade_items_in_position - $IKWJZWOG * $IJZNKWWOG * $IJHWOZ) / $IJHWOZ);
-        $IJHWROZNRWZWJG = $productStockPosition->number_of_trade_items_in_position - $IKWJZWOG * $IJZNKWWOG * $IJHWOZ - $IPJZNRWWOG * $IJHWOZ;
+        $IKWJZWOG = $IJZNKWWOG != 0 && $IJHWOZ != 0 ? floor(($productStockPosition->position_quantity / $IJHWOZ) / $IJZNKWWOG) : 0;
+        $IPJZNRWWOG = $IJHWOZ != 0 && floor(($productStockPosition->position_quantity - $IKWJZWOG * $IJZNKWWOG * $IJHWOZ) / $IJHWOZ);
+        $IJHWROZNRWZWJG = $productStockPosition->position_quantity - $IKWJZWOG * $IJZNKWWOG * $IJHWOZ - $IPJZNRWWOG * $IJHWOZ;
 
         $IKROZPDWRWOG = $IJZPSWOG != 0 ? floor($IPJZNRWWOG / $IJZPSWOG) : 0;
         $IKOZWRRNRWWOG = $IPJZNRWWOG - $IKROZPDWRWOG * $IJZPSWOG;
