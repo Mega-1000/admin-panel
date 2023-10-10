@@ -28,7 +28,7 @@
     </tr>
     <tr>
         <td>pelne</td>
-        <td>{{ $productPositioningDTO->IKWJZWOG }}</td>
+        <td>{{ $productPositioningDTO->IKROZPDWRWOG }}</td>
         <td>{{ $productPositioningDTO->IKRPDOHNRWWRIZBRWWOG }}</td>
         <td>{{ $productPositioningDTO->IKOP1WRWWW1WOG }}</td>
     </tr>
