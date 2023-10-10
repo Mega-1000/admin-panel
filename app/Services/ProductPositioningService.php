@@ -76,6 +76,8 @@ class ProductPositioningService
         $IKOP1WRWWW1WOG = $IOHWOP1 != 0 ? floor(($IJHWROZNRWZWJG - $IKWW1WROZWRWWROG * $IOHKSPWZIP1NPWW1WOH) / $IOHWOP1) : 0;
         $IOHWROP1WRWWOG = $IJHWROZNRWZWJG - $IKWW1WROZWRWWROG * $IOHKSPWZIP1NPWW1WOH - $IKOP1WRWWW1WOG * $IOHWOP1;
 
+        $IKRPDOHNRWWRIZBRWWOG = $IPHWOZPS != 0 ? floor(($IJHWROZNRWZWJG - $IPWJHWROZWOG * $IWJHWPWOZ) / $IPHWOZPS) : 0;
+
 
         return self::convertArrayToDTO([
             'IJHWOZ' => $IJHWOZ,
@@ -100,6 +102,7 @@ class ProductPositioningService
             'IKWW1WROZWRWWROG' => $IKWW1WROZWRWWROG,
             'IKOP1WRWWW1WOG' => $IKOP1WRWWW1WOG,
             'IOHWROP1WRWWOG' => $IOHWROP1WRWWOG,
+            'IKRPDOHNRWWRIZBRWWOG' => $IKRPDOHNRWWRIZBRWWOG,
             'isZero' => true,
             'product' => $product,
         ]);
