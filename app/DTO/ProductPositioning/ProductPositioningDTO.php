@@ -85,7 +85,7 @@ readonly final class ProductPositioningDTO
             IOHWOP1: self::getFloatValue($data, 'IOHWOP1'),
             IJHNKWWOZ: self::getFloatValue($data, 'IJHNKWWOZ'),
             IJZNKWWOG: self::getFloatValue($data, 'IJZNKWWOG'),
-            IWJNWPWOZ: self::getFloatValue($data, 'IWJNWPWOZ'),
+            IWJNWPWOZ: self::getFloatValue($data, 'IWJHWPWOZ'),
             IPHWOZPD: self::getFloatValue($data, 'IPHWOZPD'),
             IPHWOZPS: self::getFloatValue($data, 'IPHWOZPS'),
             IJZPDWOG: self::getFloatValue($data, 'IJZPDWOG'),
