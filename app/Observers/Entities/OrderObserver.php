@@ -13,6 +13,7 @@ use App\Services\Label\AddLabelService;
 use App\Services\LowOrderQuantityAlertService;
 use App\Services\OrderPaymentLabelsService;
 use App\Services\OrderService;
+use App\Services\ProductPacketService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,7 @@ readonly class OrderObserver
         protected LowOrderQuantityAlertService $lowOrderQuantityAlertService
     ) {}
 
-    public function created(Order $order,): void
+    public function created(Order $order): void
     {
         dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
 
@@ -39,6 +40,8 @@ readonly class OrderObserver
         $order->save();
 
         $this->lowOrderQuantityAlertService->dispatchAlertsForOrder($order);
+
+        ProductPacketService::executeForOrder($order);
     }
 
     public function updating(Order $order): void

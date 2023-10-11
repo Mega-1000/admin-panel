@@ -25,6 +25,7 @@ use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
 use App\Http\Controllers\OrderWithDeclaredPaymentsListingController;
 use App\Http\Controllers\PackageProductOrderController;
+use App\Http\Controllers\ProductPacketController;
 use App\Http\Controllers\ProductStockLogsController;
 use App\Http\Controllers\ProductStocksController;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
@@ -698,6 +699,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/set-logs-permissions', function () { Artisan::call('set-logs-permissions'); });
 
     Route::get('complaint-index', [ComplaintController::class, 'index'])->name('complaint.index');
+
+    Route::resource('product-packets', ProductPacketController::class)->names('product-packets');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
