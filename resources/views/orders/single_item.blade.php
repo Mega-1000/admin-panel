@@ -18,21 +18,12 @@
             @php($i = 0)
 
             @foreach($item->getPositions() as $position)
-                @if($i < 1)
-                    <td>
-                @endif
-
                     <div style="width: 120px">
                         {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} - {{ $position->position_quantity }}
                         <div>
                             {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
                         </div>
                     </div>
-
-                @if($i <= 1)
-                    </td>
-                @endif
-
                 @php($i++)
             @endforeach
         @endif
