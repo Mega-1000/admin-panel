@@ -399,7 +399,6 @@ class OrdersController extends Controller
         $chatMessages = $chat?->messages;
 
         $userType = MessagesHelper::TYPE_USER;
-        throw new Exception('Not implemented');
         foreach ($order->packages as $package) {
             $package->realCostForCompany = $package->realCostsForCompany();
         }
@@ -408,6 +407,8 @@ class OrdersController extends Controller
             $order->id
         );
 
+
+        throw new Exception('Not implemented');
         if ($order->customer_id == 4128) {
             return view(
                 'orders.edit_self',
