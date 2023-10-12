@@ -266,7 +266,6 @@ class OrdersController extends Controller
      */
     public function edit(int $id): Application|Factory|\Illuminate\Contracts\View\View
     {
-        throw new Exception('Not implemented');
         $order = Order::with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
 
         $orderId = $id;
@@ -400,7 +399,7 @@ class OrdersController extends Controller
         $chatMessages = $chat?->messages;
 
         $userType = MessagesHelper::TYPE_USER;
-
+        throw new Exception('Not implemented');
         foreach ($order->packages as $package) {
             $package->realCostForCompany = $package->realCostsForCompany();
         }
