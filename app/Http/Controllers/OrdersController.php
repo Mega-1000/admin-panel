@@ -262,9 +262,11 @@ class OrdersController extends Controller
      * @param int $id
      *
      * @return Application|\Illuminate\Contracts\View\View|Factory
+     * @throws Exception
      */
     public function edit(int $id): Application|Factory|\Illuminate\Contracts\View\View
     {
+        throw new Exception('Not implemented');
         $order = Order::with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
 
         $orderId = $id;
