@@ -408,8 +408,7 @@ class OrdersController extends Controller
         );
 
 
-        throw new Exception('Not implemented');
-        if ($order->customer_id == 4128) {
+        if ($order->customer_id == `4128`) {
             return view(
                 'orders.edit_self',
                 compact(
