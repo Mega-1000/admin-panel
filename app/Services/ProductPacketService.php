@@ -23,7 +23,7 @@ class ProductPacketService
 
         $orderProducts->each(function (OrderItem $product) use (&$toAddArray) {
             $productPacking = ProductPacking::query()->where('product_symbol', $product->product->symbol)->first();
-            $toAddArray->push(json_decode($productPacking->packet_products_symbols));
+            $toAddArray->push(explode(' ', json_decode($productPacking->packet_products_symbols)));
             $product->delete();
         });
 
@@ -32,7 +32,10 @@ class ProductPacketService
         $orderBuilder = OrderBuilderFactory::create();
 
         foreach ($toAddArray as $productToAddSymbol) {
-            $productToAdd = Product::query()->where('symbol', $productToAddSymbol)->first()->toArray();
+            $productToAdd = Product::query()->where('symbol', $productToAddSymbol[0])->first()->toArray();
+
+            $productPrice = $productToAdd[1];
+            $productToAdd['gross_selling_price_commercial_unit'] = $productPrice;
 
             $orderBuilder->assignItemsToOrder($order, $productToAdd);
         }

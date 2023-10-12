@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Entities\ProductPacket;
 use App\Http\Requests\CreateProductPacketRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class ProductPacketController extends Controller
