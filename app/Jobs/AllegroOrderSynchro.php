@@ -159,7 +159,7 @@ class AllegroOrderSynchro implements ShouldQueue
                         $allegroOrder
                     );
                     continue;
-                }
+                }address
 
                 DB::beginTransaction();
                 $orderModel = AllegroOrder::query()->firstOrNew(['order_id' => $allegroOrder['id']]);
@@ -213,7 +213,9 @@ class AllegroOrderSynchro implements ShouldQueue
                 $invoiceAddress['address']['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
                 $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
 
+                dd($allegroOrder['buyer']);
                 $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $invoiceAddress, OrderAddress::TYPE_INVOICE);
+
                 $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
                 if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && $allegroOrder['delivery']['pickupPoint'] !== null) {
                     $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
@@ -677,7 +679,7 @@ class AllegroOrderSynchro implements ShouldQueue
      *
      * @return void
      */
-    private function createOrUpdateOrderAddress(Order $order, array $buyer, array $address, string $type = OrderAddress::TYPE_DELIVERY): void
+    private function    createOrUpdateOrderAddress(Order $order, array $buyer, array $address, string $type = OrderAddress::TYPE_DELIVERY): void
     {
         if (isset($address['address'])) {
             $address = array_merge($address, $address['address']);
