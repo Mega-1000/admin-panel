@@ -726,27 +726,26 @@ class AllegroOrderSynchro implements ShouldQueue
             'country_Id' => $country->id,
             'isAbroad' => $country->id != 1
         ];
-        dd($addressData);
         $orderAddress->fill($addressData);
 
         if (
             ($type === OrderAddress::TYPE_INVOICE && empty($address['company']['taxId'])) &&
             (empty($orderAddress->firstName) || empty($orderAddress->lastName) || empty($orderAddress->address))
         ) {
-            $deliveryAddress = $order->getDeliveryAddress();
-
-            if (!empty($deliveryAddress)) {
-                $orderAddress->fill([
-                    'firstname' => $deliveryAddress->firstname,
-                    'lastname' => $deliveryAddress->lastname,
-                    'address' => $deliveryAddress->address,
-                    'flat_number' => $deliveryAddress->flat_number,
-                    'city' => $deliveryAddress->city,
-                    'postal_code' => $deliveryAddress->postal_code,
-                    'phone' => $deliveryAddress->phone,
-                    'phone_code' => $deliveryAddress->phone_code,
-                ]);
-            }
+//            $deliveryAddress = $order->getDeliveryAddress();
+//
+////            if (!empty($deliveryAddress)) {
+////                $orderAddress->fill([
+////                    'firstname' => $deliveryAddress->firstname,
+////                    'lastname' => $deliveryAddress->lastname,
+////                    'address' => $deliveryAddress->address,
+////                    'flat_number' => $deliveryAddress->flat_number,
+////                    'city' => $deliveryAddress->city,
+////                    'postal_code' => $deliveryAddress->postal_code,
+////                    'phone' => $deliveryAddress->phone,
+////                    'phone_code' => $deliveryAddress->phone_code,
+////                ]);
+////            }
         }
 
         $orderAddress->save();
