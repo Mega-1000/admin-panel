@@ -15,7 +15,7 @@ class FilePermissionsController extends Controller
      */
     public function __invoke(): RedirectResponse
     {
-        $process = new Process(['chmod', '-R', '777', '/var/www/admin-mega/']);
+        $process = new Process(['sudo', 'chmod', '-R', '777', '/var/www/admin-mega/']);
         $process->run();
 
         if (!$process->isSuccessful()) {
