@@ -2,14 +2,14 @@
     <thead>
     <tr>
         <th></th>
-        <th>GLOBLANE</th>
-        <th>HANDLOWE</th>
+        <th>GLOB.</th>
+        <th>HANDL.</th>
         <th>P1</th>
     </tr>
     </thead>
     <tbody>
     <tr>
-        <td>ilosc pelnych warstw</td>
+        <td>il. p. warstw</td>
         <td>{{ $productPositioningDTO->IKWJZWOG }}</td>
         <td>{{ $productPositioningDTO->IPWJHWROZWOG }}</td>
         <td>{{ $productPositioningDTO->IKWW1WROZWRWWROG }}</td>
