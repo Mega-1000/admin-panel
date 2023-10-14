@@ -33,7 +33,7 @@
         <td>{{ $productPositioningDTO->IKOP1WRWWW1WOG }}</td>
     </tr>
     <tr>
-        <td>pelne na rozpoczetej</td>
+        <td>p. rozp.</td>
         <td>{{ $productPositioningDTO->IKOZWRRNRWWOG }}</td>
         <td>{{ $productPositioningDTO->IOHWRRWROZWRWWOG }}</td>
         <td>{{ $productPositioningDTO->IOHWROP1WRWWOG }}</td>
