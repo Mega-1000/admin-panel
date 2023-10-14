@@ -41,42 +41,40 @@
     </tbody>
 </table>
 
-    <div style="display: flex; flex-direction: row;">
-        @php
-            $maxNumberOfSquares = $productPositioningDTO->IKWJZWOG + $productPositioningDTO->IPJZNRWWOG;
-            $borderRadius = $maxNumberOfSquares == 0;
-        @endphp
+<div style="display: flex; flex-direction: row;">
+    @php
+        $maxNumberOfSquares = ($productPositioningDTO->IKWJZWOG + $productPositioningDTO->IPJZNRWWOG);
+        $borderRadius = $maxNumberOfSquares == 0;
+    @endphp
 
-        <td>
-            <table style="align-self: flex-start;">
-                <thead></thead>
-                <tbody>
-                @while($maxNumberOfSquares > 0)
-                    <tr>
-                        @for ($j = 0; $j <= $productPositioningDTO->IJZPSWOG; $j++)
-                            @if($maxNumberOfSquares <= 0)
-                                <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
-                                @php($borderRadius = true)
-                                @break
-                            @endif
+    <td>
+        <table style="align-self: flex-start;">
+            <thead></thead>
+            <tbody>
+            @while($maxNumberOfSquares > 0)
+                <tr>
+                    @for ($j = 0; $j <= $productPositioningDTO->IJZPSWOG - 1; $j++)
+                        @if($maxNumberOfSquares <= 0)
+                            <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
+                            @php($borderRadius = true)
+                            @break
+                        @endif
 
-                            <td style="padding: 10px; border: 1px black solid;"></td>
-                            @php($maxNumberOfSquares--)
-                        @endfor
-                    </tr>
-                @endwhile
+                        <td style="padding: 10px; border: 1px black solid;"></td>
+                        @php($maxNumberOfSquares--)
+                    @endfor
+                </tr>
+            @endwhile
 
-                @if(!$borderRadius)
-                    <tr>
-                        <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
-                    </tr>
-                @endif
-                </tbody>
-            </table>
-        </td>
-    </div>
-
-
+            @if(!$borderRadius)
+                <tr>
+                    <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
+                </tr>
+            @endif
+            </tbody>
+        </table>
+    </td>
+</div>
 
 {{--IJHWOZ: {{ $productPositioningDTO->IJHWOZ }}<br>--}}
 {{--IJHWOG: {{ $productPositioningDTO->IJHWOG }}<br>--}}
