@@ -15,13 +15,13 @@
         <td>{{ $productPositioningDTO->IKWW1WROZWRWWROG }}</td>
     </tr>
     <tr>
-        <td>po szerokosci</td>
+        <td>po szerok</td>
         <td>{{ $productPositioningDTO->IJZPSWOG }}</td>
         <td>{{ $productPositioningDTO->IPHWOZPS }}</td>
         <td>{{ $productPositioningDTO->IPHWOZPS }}</td>
     </tr>
     <tr>
-        <td>po dlugosci</td>
+        <td>po dlugo</td>
         <td>{{ $productPositioningDTO->IJZPDWOG }}</td>
         <td>{{ $productPositioningDTO->IPHWOZPD }}</td>
         <td>{{ $productPositioningDTO->IPHWOZPD }}</td>
