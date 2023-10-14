@@ -213,7 +213,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 $invoiceAddress['address']['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
                 $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
 
-                $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer']['address'], $invoiceAddress, OrderAddress::TYPE_INVOICE);
+                $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $invoiceAddress['address'], OrderAddress::TYPE_INVOICE);
 
                 $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
                 if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && $allegroOrder['delivery']['pickupPoint'] !== null) {
