@@ -680,6 +680,7 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     private function createOrUpdateOrderAddress(Order $order, array $buyer, array $address, string $type = OrderAddress::TYPE_DELIVERY): void
     {
+        dd($address);
         if (isset($address['address'])) {
             $address = array_merge($address, $address['address']);
         }
@@ -722,7 +723,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'phone_code' => $code,
             'phone' => $phone,
             'order_id' => $order->id,
-            'email' => $buyer['email'] . 'okej',
+            'email' => $buyer['email'],
             'country_Id' => $country->id,
             'isAbroad' => $country->id != 1
         ];
