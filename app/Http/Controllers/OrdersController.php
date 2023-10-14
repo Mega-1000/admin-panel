@@ -408,7 +408,7 @@ class OrdersController extends Controller
         );
 
 
-        if ($order->customer_id == `4128`) {
+        if ($order->customer_id == 4128) {
             return view(
                 'orders.edit_self',
                 compact(
@@ -447,6 +447,7 @@ class OrdersController extends Controller
                 )
             );
         }
+
         return view(
             'orders.edit',
             compact(

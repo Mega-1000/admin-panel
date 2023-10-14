@@ -696,7 +696,14 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'create']);
     Route::post('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'store']);
 
-    Route::get('/set-logs-permissions', function () { Artisan::call('set-logs-permissions'); });
+    Route::get('/set-logs-permissions', function () {
+        shell_exec('chmod -R 777 /var/www/admin-mega/');
+
+        return redirect()->back()->with([
+            'message' => 'Ponownie ustawiono uprawnienia do plików.',
+            'alert-type' => 'success',
+        ]);
+    });
 
     Route::get('complaint-index', [ComplaintController::class, 'index'])->name('complaint.index');
 
