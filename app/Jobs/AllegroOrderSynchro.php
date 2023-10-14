@@ -225,7 +225,7 @@ class AllegroOrderSynchro implements ShouldQueue
                         $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
                     }
                 }
-                $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address'] ?? []);
+                $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery'] ?? []);
 
 
                 $orderDeliveryAddress = OrderAddress::where('order_id', $order->id)
@@ -722,7 +722,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'phone_code' => $code,
             'phone' => $phone,
             'order_id' => $order->id,
-            'email' => $buyer['email'],
+            'email' => $buyer['email'] . 'okej',
             'country_Id' => $country->id,
             'isAbroad' => $country->id != 1
         ];
