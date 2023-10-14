@@ -2,8 +2,8 @@
     <thead>
     <tr>
         <th></th>
-        <th>GLOB.</th>
-        <th>HANDL.</th>
+        <th>GLOB</th>
+        <th>HAN.</th>
         <th>P1</th>
     </tr>
     </thead>
