@@ -159,7 +159,7 @@ class AllegroOrderSynchro implements ShouldQueue
                         $allegroOrder
                     );
                     continue;
-                }address
+                }
 
                 DB::beginTransaction();
                 $orderModel = AllegroOrder::query()->firstOrNew(['order_id' => $allegroOrder['id']]);
