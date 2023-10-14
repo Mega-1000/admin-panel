@@ -38,6 +38,6 @@ class ImportOrdersFromAllegro extends Command
      */
     public function handle()
     {
-        dispatch(new AllegroOrderSynchro());
+        dispatch_now(new AllegroOrderSynchro());
     }
 }
