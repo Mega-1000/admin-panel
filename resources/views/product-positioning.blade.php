@@ -34,7 +34,7 @@
     </tr>
     <tr>
         <td>p. rozp.</td>
-        <td>{{ $productPositioningDTO->IKOZWRRNRWWOG }}</td>
+        <td>{{ $productPositioningDTO->IPJZNRWWOG }}</td>
         <td>{{ $productPositioningDTO->IOHWRRWROZWRWWOG }}</td>
         <td>{{ $productPositioningDTO->IOHWROP1WRWWOG }}</td>
     </tr>
