@@ -1,7 +1,7 @@
 <table border="1">
     <thead>
     <tr>
-        <th colspan="2"></th>
+        <th style="width: 100px"></th>
         <th>GLO</th>
         <th>HAN</th>
         <th>P1</th>
