@@ -9,7 +9,7 @@
     </thead>
     <tbody>
     <tr>
-        <td>il. p. warstw</td>
+        <td>il p warstw</td>
         <td>{{ $productPositioningDTO->IKWJZWOG }}</td>
         <td>{{ $productPositioningDTO->IPWJHWROZWOG }}</td>
         <td>{{ $productPositioningDTO->IKWW1WROZWRWWROG }}</td>
