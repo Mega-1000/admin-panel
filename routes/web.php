@@ -697,6 +697,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'store']);
 
     Route::get('/set-logs-permissions', function () {
+        putenv('PATH=/usr/local/bin');
         shell_exec('chmod -R 777 /var/www/admin-mega/');
 
         return redirect()->back()->with([
