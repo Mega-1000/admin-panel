@@ -12,6 +12,7 @@ use App\Http\Controllers\DeleteOrderInvoiceValueController;
 use App\Http\Controllers\DifferenceInShipmentCostCookiesController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FastResponseController;
+use App\Http\Controllers\FilePermissionsController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\FormCreatorController;
 use App\Http\Controllers\GenerateRealCostsForCompanyReportController;
@@ -696,15 +697,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'create']);
     Route::post('/accept-products/{order}', [ConfirmProductStockOrderController::class, 'store']);
 
-    Route::get('/set-logs-permissions', function () {
-        putenv('PATH=/usr/local/bin');
-        shell_exec('chmod -R 777 /var/www/admin-mega/');
-
-        return redirect()->back()->with([
-            'message' => 'Ponownie ustawiono uprawnienia do plików.',
-            'alert-type' => 'success',
-        ]);
-    });
+    Route::get('/set-logs-permissions', FilePermissionsController::class)->name('set-logs-permissions');
 
     Route::get('complaint-index', [ComplaintController::class, 'index'])->name('complaint.index');
 
