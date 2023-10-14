@@ -2181,7 +2181,7 @@
                             let tooltipTitle = email;
                             tooltipTitle += '&#013;';
                             tooltipTitle += '&#013;' + 'Dane do wysylki:';
-                            $.each(row.addresses[0], function (index, value) {
+                            $.each(row.addresses.find((item) => item.type == 'DELIVERY_ADDRESS'), function (index, value) {
                                 if (index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
                                     if (value === null) {
                                         tooltipTitle += ' Brak';
@@ -2191,7 +2191,7 @@
                                 }
                             });
                             tooltipTitle += '&#013;' + 'Dane do faktury:';
-                            $.each(row.addresses[1], function (index, value) {
+                            $.each(row.addresses.find((item) => item.type == 'INVOICE_ADDRESS'), function (index, value) {
                                 if (index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
                                     if (value === null) {
                                         tooltipTitle += ' Brak,';
