@@ -6,7 +6,6 @@ use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Entities\ProductPacking;
 use App\Factory\OrderBuilderFactory;
-use App\Helpers\OrderBuilder;
 use Exception;
 
 class ProductPacketService
@@ -20,6 +19,7 @@ class ProductPacketService
         $orderProducts = $order->items->filter(function (OrderItem $product) {
             return in_array($product->product->symbol, ProductPacking::pluck('product_symbol')->all()->toArray());
         });
+        dd($orderProducts);
 
         $orderProducts->each(function (OrderItem $product) use (&$toAddArray) {
             $productPacking = ProductPacking::query()->where('product_symbol', $product->product->symbol)->first();
