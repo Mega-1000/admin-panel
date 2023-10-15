@@ -77,7 +77,6 @@
 
     @php
         $maxNumberOfSquares = ($productPositioningDTO->IKRPDOHNRWWRIZBRWWOG * $productPositioningDTO->IPHWOZPS + $productPositioningDTO->IOHWRRWROZWRWWOG);
-        $borderRadius = $maxNumberOfSquares == 0;
     @endphp
 
     <td>
@@ -98,12 +97,6 @@
                     @endfor
                 </tr>
             @endwhile
-
-            @if(!$borderRadius)
-                <tr>
-                    <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
-                </tr>
-            @endif
             </tbody>
         </table>
     </td>
