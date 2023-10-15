@@ -6,7 +6,6 @@ use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Entities\Product;
 use App\Entities\ProductPacket;
-use App\Entities\ProductPacking;
 use App\Factory\OrderBuilderFactory;
 use Exception;
 
@@ -52,7 +51,7 @@ class ProductPacketService
                 $productToAddArray['amount'] = 1;
 
                 // Assign the product to the order using OrderBuilderFactory
-                $orderBuilder->assignItemsToOrder($order, [ $productToAddArray ]);
+                $orderBuilder->assignItemsToOrder($order, [ $productToAddArray ], false);
             }
         }
     }
