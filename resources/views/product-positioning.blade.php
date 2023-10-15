@@ -34,7 +34,7 @@
     </tr>
     <tr>
         <td>p. rozp.</td>
-        <td>{{ $productPositioningDTO->IPJZNRWWOG }}</td>
+        <td>{{ $productPositioningDTO->IKOZWRRNRWWOG }}</td>
         <td>{{ $productPositioningDTO->IOHWRRWROZWRWWOG }}</td>
         <td>{{ $productPositioningDTO->IOHWROP1WRWWOG }}</td>
     </tr>
@@ -43,7 +43,7 @@
 
 <div style="display: flex; flex-direction: row;">
     @php
-        $maxNumberOfSquares = ($productPositioningDTO->IKWJZWOG + $productPositioningDTO->IPJZNRWWOG);
+        $maxNumberOfSquares = ($productPositioningDTO->IKROZPDWRWOG * $productPositioningDTO->IJZPSWOG + $productPositioningDTO->IKOZWRRNRWWOG);
         $borderRadius = $maxNumberOfSquares == 0;
     @endphp
 
@@ -53,7 +53,7 @@
             <tbody>
             @while($maxNumberOfSquares > 0)
                 <tr>
-                    @for ($j = 0; $j <= $productPositioningDTO->IJZPSWOG - 1; $j++)
+                    @for ($j = 0; $j <= $productPositioningDTO->IJZPSWOG -  1; $j++)
                         @if($maxNumberOfSquares <= 0)
                             <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
                             @php($borderRadius = true)
