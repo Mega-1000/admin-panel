@@ -40,17 +40,15 @@ class ProductPacketService
 
         // Create an instance of OrderBuilderFactory
         $orderBuilder = OrderBuilderFactory::create();
-        var_dump($toAddArray);
 
         foreach ($toAddArray as $productToAddSymbol) {
             // Find the product by symbol in the Product model
-            $productToAdd = Product::where('symbol', $productToAddSymbol)->first();
-            var_dump($productToAdd);
+            $productToAdd = Product::where('symbol', explode(' ', $productToAddSymbol)[0])->first();
 
             if ($productToAdd) {
                 // Convert the product to an array and add pricing information
                 $productToAddArray = $productToAdd->toArray();
-                $productToAddArray['gross_selling_price_commercial_unit'] = $productToAdd->price;
+                $productToAddArray['gross_selling_price_commercial_unit'] = explode(' ', $productToAddSymbol)[1];
                 $productToAddArray['amount'] = 1;
 
                 // Assign the product to the order using OrderBuilderFactory
