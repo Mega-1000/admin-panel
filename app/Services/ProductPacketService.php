@@ -16,30 +16,43 @@ class ProductPacketService
      */
     public static function executeForOrder(Order $order): void
     {
-        $toAddArray = collect();
-        $orderProducts = $order->items->filter(function (OrderItem $product) {
-            var_dump($product->product->symbol);
-            return ProductPacket::where('product_symbol', $product->product->symbol)->exists();
-        });
-        var_dump($orderProducts);
+        // Create an empty array for products to add
+        $toAddArray = [];
 
+        // Get the order items that match product symbols in the ProductPacking model
+        $orderProducts = $order->items->filter(function (OrderItem $product) {
+            return ProductPacking::where('product_symbol', $product->product->symbol)->exists();
+        });
+
+        // Loop through order products and populate $toAddArray
         $orderProducts->each(function (OrderItem $product) use (&$toAddArray) {
-            $productPacking = ProductPacket::query()->where('product_symbol', $product->product->symbol)->first();
-            $toAddArray->push(explode(' ', json_decode($productPacking->packet_products_symbols)));
+            $productPacking = ProductPacking::where('product_symbol', $product->product->symbol)->first();
+            $packetProductsSymbols = json_decode($productPacking->packet_products_symbols);
+            if (!empty($packetProductsSymbols)) {
+                $toAddArray = array_merge($toAddArray, $packetProductsSymbols);
+            }
             $product->delete();
         });
 
-        $toAddArray = $toAddArray->flatten()->unique();
+        // Use array_unique to remove duplicates from $toAddArray
+        $toAddArray = array_unique($toAddArray);
 
+        // Create an instance of OrderBuilderFactory
         $orderBuilder = OrderBuilderFactory::create();
 
         foreach ($toAddArray as $productToAddSymbol) {
-            $productToAdd = Product::query()->where('symbol', $productToAddSymbol[0])->first()->toArray();
+            // Find the product by symbol in the Product model
+            $productToAdd = Product::where('symbol', $productToAddSymbol)->first();
 
-            $productPrice = $productToAdd[1];
-            $productToAdd['gross_selling_price_commercial_unit'] = $productPrice;
+            if ($productToAdd) {
+                // Convert the product to an array and add pricing information
+                $productToAddArray = $productToAdd->toArray();
+                $productToAddArray['gross_selling_price_commercial_unit'] = $productToAdd->price;
 
-            $orderBuilder->assignItemsToOrder($order, $productToAdd);
+                // Assign the product to the order using OrderBuilderFactory
+                $orderBuilder->assignItemsToOrder($order, $productToAddArray);
+            }
         }
     }
+
 }
