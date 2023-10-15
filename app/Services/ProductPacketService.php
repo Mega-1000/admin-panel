@@ -21,12 +21,12 @@ class ProductPacketService
 
         // Get the order items that match product symbols in the ProductPacking model
         $orderProducts = $order->items->filter(function (OrderItem $product) {
-            return ProductPacking::where('product_symbol', $product->product->symbol)->exists();
+            return ProductPacket::where('product_symbol', $product->product->symbol)->exists();
         });
 
         // Loop through order products and populate $toAddArray
         $orderProducts->each(function (OrderItem $product) use (&$toAddArray) {
-            $productPacking = ProductPacking::where('product_symbol', $product->product->symbol)->first();
+            $productPacking = ProductPacket::where('product_symbol', $product->product->symbol)->first();
             $packetProductsSymbols = json_decode($productPacking->packet_products_symbols);
             if (!empty($packetProductsSymbols)) {
                 $toAddArray = array_merge($toAddArray, $packetProductsSymbols);
