@@ -7,6 +7,7 @@ use App\Entities\Status;
 use App\Facades\Mailer;
 use App\Helpers\OrderPackagesCalculator;
 use App\Jobs\DispatchLabelEventByNameJob;
+use App\Jobs\FireProductPacketJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\StatusRepository;
 use App\Services\Label\AddLabelService;
@@ -41,7 +42,7 @@ readonly class OrderObserver
 
         $this->lowOrderQuantityAlertService->dispatchAlertsForOrder($order);
 
-        ProductPacketService::executeForOrder($order);
+        dispatch(new FireProductPacketJob($order));
     }
 
     public function updating(Order $order): void
