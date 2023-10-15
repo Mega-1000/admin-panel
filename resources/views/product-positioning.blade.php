@@ -73,6 +73,7 @@
         </tbody>
     </table>
 
+    @include('product-positioning-zero', ['productPositioningDTO' => $productPositioningDTO])
 </div>
 
 IJHWOZ: {{ $productPositioningDTO->IJHWOZ }}<br>

@@ -1,47 +1,24 @@
+@php
+    $maxNumberOfSquares = ($productPositioningDTO->IKRPDOHNRWWRIZBRWWOG * $productPositioningDTO->IPHWOZPS + $productPositioningDTO->IOHWRRWROZWRWWOG);
+    $borderRadius = false;
+@endphp
 
-<div>
-    <table>
-        <tbody>
+<table style="align-self: flex-start;">
+    <thead></thead>
+    <tbody>
+    @while($maxNumberOfSquares > 0)
         <tr>
-            <td>
-                @if($productPositioningDTO->getQuantityOfCompleteLayersOfTradeItemsInLargestUnitInGlobalUnit() != 0)
-                    <div style="align-self: flex-start;">
-                        @for($i = $productPositioningDTO->getQuantityOfCompleteLayersOfGlobalUnitsInGlobalUnit() - 1; $i >= 0; $i--)
-                            <div style="font-weight: bold; font-size: larger">
-                                --
-                            </div>
-                            <br>
-                        @endfor
-                    </div>
-                @endif
+            @for ($j = 0; $j <= $productPositioningDTO->IPHWOZPS - 1; $j++)
+                @if($maxNumberOfSquares <= 0)
+                    <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
+                    @php($borderRadius = true)
+                        @break
+                        @endif
 
-                @php
-                    $maxNumberOfSquares =
-                        $productPositioningDTO
-                        ->getQuantityOfCompleteLayersOfTradeItemsInLargestUnitInGlobalUnit()
-                        +
-                        $productPositioningDTO
-                        ->getQuantityOfTradeItemsInStartedLayerInLargestUnit();
-                @endphp
-            </td>
-            <td>
-                <table style="align-self: flex-start;">
-                    <thead></thead>
-                    <tbody>
-                    @while($maxNumberOfSquares > 0)
-                        <tr>
-                            @for ($j = 0; $j <= $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width; $j++)
-                                <td style="padding: 10px; border: 1px black solid;"></td>
-                                @php
-                                    $maxNumberOfSquares--
-                                @endphp
-                            @endfor
-                        </tr>
-                    @endwhile
-                    </tbody>
-                </table>
-            </td>
+                        <td style="padding: 10px; border: 1px black solid;"></td>
+                        @php($maxNumberOfSquares--)
+                        @endfor
         </tr>
-        </tbody>
-    </table>
-</div>
+    @endwhile
+    </tbody>
+</table>
