@@ -2401,7 +2401,7 @@
                                 const parsedAmount = parseFloat(amount);
                                 const parsedDeclaredAmount = parseFloat(declared_sum);
 
-                                if (payment.operation_type === ''Wpłata/wypłata bankowa - związana z fakturą zakupową'' }} && row.login !== 'info@ephpolska.pl') {
+                                if (payment.operation_type === 'Wpłata/wypłata bankowa - związana z fakturą zakupową' && row.login !== 'info@ephpolska.pl') {
                                     return;
                                 }
 
