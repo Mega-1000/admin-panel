@@ -101,6 +101,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     ->setAdresGlowny($preAddress)
                     ->setChceFV('true');
 
+                $preDokument = new PreDokument();
                 $preDokument
                     ->setKlient($preKlient)
                     ->setUwagi($order->id . ((empty($order->allegro_payment_id)) ? '' : ' ' . $order->allegro_payment_id))
