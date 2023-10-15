@@ -58,7 +58,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $orders = $this->orderRepository->whereHas('labels', function ($query) {
             $query->where('label_id', Label::INVOICE_TO_ISSUE);
@@ -68,6 +68,8 @@ class GenerateXmlForNexoJob implements ShouldQueue
             $query->where('label_id', Label::XML_INVOICE_GENERATED);
         })->get();
         $fileNames = [];
+
+        dd($orders);
 
         $files = Storage::disk('xmlForNexoDisk')->files();
         foreach ($files as $file) {

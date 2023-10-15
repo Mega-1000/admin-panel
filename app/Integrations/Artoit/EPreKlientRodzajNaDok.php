@@ -2,7 +2,9 @@
 
 namespace App\Integrations\Artoit;
 
-class EPreKlientRodzajNaDok extends \MyCLabs\Enum\Enum
+use MyCLabs\Enum\Enum;
+
+class EPreKlientRodzajNaDok extends Enum
 {
     const NABYWCA = 'Nabywca';
     const ODBIORCA = 'Odbiorca';
