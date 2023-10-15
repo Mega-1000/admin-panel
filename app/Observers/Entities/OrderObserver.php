@@ -31,6 +31,9 @@ readonly class OrderObserver
         protected LowOrderQuantityAlertService $lowOrderQuantityAlertService
     ) {}
 
+    /**
+     * @throws Exception
+     */
     public function created(Order $order): void
     {
         dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
@@ -42,7 +45,8 @@ readonly class OrderObserver
 
         $this->lowOrderQuantityAlertService->dispatchAlertsForOrder($order);
 
-        dispatch(new FireProductPacketJob($order));
+        ProductPacketService::executeForOrder($this->order);
+//        dispatch(new FireProductPacketJob($order));
     }
 
     public function updating(Order $order): void

@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\Order;
 use App\Services\ProductPacketService;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,7 +28,7 @@ class FireProductPacketJob implements ShouldQueue
      * Execute the job.
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function handle(): void
     {
