@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entities\Order;
 use App\Entities\OrderItem;
+use App\Entities\Product;
 use App\Entities\ProductPacket;
 use App\Entities\ProductPacking;
 use App\Factory\OrderBuilderFactory;
