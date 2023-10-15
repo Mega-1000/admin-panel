@@ -53,7 +53,7 @@ class ProductPacketService
                 $productToAddArray['gross_selling_price_commercial_unit'] = $productToAdd->price;
 
                 // Assign the product to the order using OrderBuilderFactory
-                $orderBuilder->assignItemsToOrder($order, $productToAddArray);
+                $orderBuilder->assignItemsToOrder($order, [ $productToAddArray ]);
             }
         }
     }
