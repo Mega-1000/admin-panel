@@ -18,8 +18,8 @@ class ProductPacketService
     {
         $toAddArray = collect();
         $orderProducts = $order->items->filter(function (OrderItem $product) {
-            return ProductPacket::where('product_symbol', $product->product->symbol)->exists();
             var_dump($product->product->symbol);
+            return ProductPacket::where('product_symbol', $product->product->symbol)->exists();
         });
         var_dump($orderProducts);
 
