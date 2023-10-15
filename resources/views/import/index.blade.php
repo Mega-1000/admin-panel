@@ -36,6 +36,10 @@
         Kreator formularzy
     </a>
 
+    <a href="{{ route('product-packets.index') }}" class="btn btn-primary">
+        Kreator pakietów
+    </a>
+
     <div class="row">
         <div class="col-md-12">
             @if ($import->processing)
