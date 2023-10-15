@@ -51,6 +51,7 @@ class ProductPacketService
                 // Convert the product to an array and add pricing information
                 $productToAddArray = $productToAdd->toArray();
                 $productToAddArray['gross_selling_price_commercial_unit'] = $productToAdd->price;
+                $productToAddArray['amount'] = 1;
 
                 // Assign the product to the order using OrderBuilderFactory
                 $orderBuilder->assignItemsToOrder($order, [ $productToAddArray ]);
