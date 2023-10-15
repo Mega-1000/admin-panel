@@ -3,6 +3,7 @@
     $borderRadius = false;
 @endphp
 
+@if($maxNumberOfSquares > 0)
 <table style="align-self: flex-start;">
     <thead></thead>
     <tbody>
@@ -22,3 +23,4 @@
     @endwhile
     </tbody>
 </table>
+@endif
