@@ -75,98 +75,106 @@ class GenerateXmlForNexoJob implements ShouldQueue
         }
 
         foreach ($orders as $order) {
-            $preDokument = new PreDokument();
-            $address = $order->getInvoiceAddress();
-            $preAddress = new PreAdres();
-            $preAddress
-                ->setUlica($address->address . ' ' . $address->flat_number)
-                ->setMiasto($address->city)
-                ->setKod($address->postal_code)
-                ->setPanstwo('Polska');
+            try {
+                $address = $order->getInvoiceAddress();
+                $preAddress = new PreAdres();
+                $preAddress
+                    ->setUlica($address->address . ' ' . $address->flat_number)
+                    ->setMiasto($address->city)
+                    ->setKod($address->postal_code)
+                    ->setPanstwo('Polska');
 
-            $postalCodeWithOnlyNumbers = preg_replace("/[^0-9]/", "", $address->postal_code);
+                $postalCodeWithOnlyNumbers = preg_replace("/[^0-9]/", "", $address->postal_code);
 
-            $preKlient = new PreKlient();
-            $preKlient
-                ->setTyp((empty($address->nip)) ? EPreKlientTyp::OSOBA : EPreKlientTyp::FIRMA)
-                ->setSymbol((empty($address->nip)) ? strtoupper(PdfCharactersHelper::changePolishCharactersToNonAccented($address->lastname . $address->firstname . $postalCodeWithOnlyNumbers)) : $address->nip)
-                ->setNazwa((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
-                ->setNazwaPelna((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
-                ->setOsobaImie($address->firstname)
-                ->setOsobaNazwisko($address->lastname)
-                ->setNIP($address->nip)
-                ->setEmail($address->getAllegroEmailAddress())
-                ->setTelefon($address->phone)
-                ->setRodzajNaDok(EPreKlientRodzajNaDok::NABYWCA)
-                ->setAdresGlowny($preAddress)
-                ->setChceFV('true');
-
-            $preDokument
-                ->setKlient($preKlient)
-                ->setUwagi($order->id . ((empty($order->allegro_payment_id)) ? '' : ' ' . $order->allegro_payment_id))
-                ->setRodzajPlatnosci('Przelew')
-                ->setWaluta('PLN')
-                ->setTypDokumentu(ETypDokumentu_HandloMag::FS)
-                ->setKategoria('Sprzedaż')
-                ->setUslugaTransportuCenaBrutto(0)
-                ->setUslugaTransportuCenaNetto(0)
-                ->setDataDostawy($this->getOrderInvoiceDate($order))
-                ->setDataUtworzenia($this->getOrderInvoiceDate($order))
-                ->setTerminPlatnosci($this->getOrderInvoiceDate($order))
-                ->setWartoscPoRabacieNetto(0)
-                ->setWartoscPoRabacieBrutto(0)
-                ->setWartoscNetto(0)
-                ->setWartoscBrutto(0)
-                ->setWartoscWplacona(0)
-                ->setNumer(0)
-                ->setNumerPelny(0)
-                ->setMagazyn((isset($order->warehouse) && $order->warehouse->id === 16) ? 'STA' : 'MAG');
-
-            foreach ($order->items as $item) {
-                $towar = new PreTowar();
-                $towar
-                    ->setRodzaj(ERodzajTowaru::TOWAR)
-                    ->setSymbol($item->product->getSimpleSymbol())
-                    ->setCenaKartotekowaNetto(0)
-                    ->setCenaNetto($item->net_purchase_price_commercial_unit ?? 0)
-                    ->setJM($item->product->packing->unit_commercial)
-                    ->setVat($item->product->price->vat ?? 23)
-                    ->setWysokosc(0)
-                    ->setSzerokosc(0)
-                    ->setDlugosc(0)
-                    ->setWaga($item->product->weight_trade_unit ?? 0);
-                $prePozycja = new PrePozycja();
-                $prePozycja
-                    ->setTowar($towar)
-                    ->setIlosc($item->quantity)
-                    ->setRabatProcent(0)
-                    ->setVat($item->product->price->vat ?? 23)
-                    ->setCenaNettoPrzedRabatem(0)
-                    ->setCenaNettoPoRabacie(0)
-                    ->setCenaBruttoPrzedRabatem(0)
-                    ->setCenaBruttoPoRabacie($item->gross_selling_price_commercial_unit)
-                    ->setWartoscCalejPozycjiNetto(0)
-                    ->setWartoscCalejPozycjiBrutto(0)
-                    ->setWartoscCalejPozycjiNettoZRabatem(0)
-                    ->setWartoscCalejPozycjiBruttoZRabatem($item->gross_selling_price_commercial_unit * $item->quantity);
+                $preKlient = new PreKlient();
+                $preKlient
+                    ->setTyp((empty($address->nip)) ? EPreKlientTyp::OSOBA : EPreKlientTyp::FIRMA)
+                    ->setSymbol((empty($address->nip)) ? strtoupper(PdfCharactersHelper::changePolishCharactersToNonAccented($address->lastname . $address->firstname . $postalCodeWithOnlyNumbers)) : $address->nip)
+                    ->setNazwa((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
+                    ->setNazwaPelna((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
+                    ->setOsobaImie($address->firstname)
+                    ->setOsobaNazwisko($address->lastname)
+                    ->setNIP($address->nip)
+                    ->setEmail($address->getAllegroEmailAddress())
+                    ->setTelefon($address->phone)
+                    ->setRodzajNaDok(EPreKlientRodzajNaDok::NABYWCA)
+                    ->setAdresGlowny($preAddress)
+                    ->setChceFV('true');
 
                 $preDokument
-                    ->setProdukty(array_merge($preDokument->getProdukty(), [$prePozycja]));
+                    ->setKlient($preKlient)
+                    ->setUwagi($order->id . ((empty($order->allegro_payment_id)) ? '' : ' ' . $order->allegro_payment_id))
+                    ->setRodzajPlatnosci('Przelew')
+                    ->setWaluta('PLN')
+                    ->setTypDokumentu(ETypDokumentu_HandloMag::FS)
+                    ->setKategoria('Sprzedaż')
+                    ->setUslugaTransportuCenaBrutto(0)
+                    ->setUslugaTransportuCenaNetto(0)
+                    ->setDataDostawy($this->getOrderInvoiceDate($order))
+                    ->setDataUtworzenia($this->getOrderInvoiceDate($order))
+                    ->setTerminPlatnosci($this->getOrderInvoiceDate($order))
+                    ->setWartoscPoRabacieNetto(0)
+                    ->setWartoscPoRabacieBrutto(0)
+                    ->setWartoscNetto(0)
+                    ->setWartoscBrutto(0)
+                    ->setWartoscWplacona(0)
+                    ->setNumer(0)
+                    ->setNumerPelny(0)
+                    ->setMagazyn((isset($order->warehouse) && $order->warehouse->id === 16) ? 'STA' : 'MAG');
+
+                foreach ($order->items as $item) {
+                    $towar = new PreTowar();
+                    $towar
+                        ->setRodzaj(ERodzajTowaru::TOWAR)
+                        ->setSymbol($item->product->getSimpleSymbol())
+                        ->setCenaKartotekowaNetto(0)
+                        ->setCenaNetto($item->net_purchase_price_commercial_unit ?? 0)
+                        ->setJM($item->product->packing->unit_commercial)
+                        ->setVat($item->product->price->vat ?? 23)
+                        ->setWysokosc(0)
+                        ->setSzerokosc(0)
+                        ->setDlugosc(0)
+                        ->setWaga($item->product->weight_trade_unit ?? 0);
+                    $prePozycja = new PrePozycja();
+                    $prePozycja
+                        ->setTowar($towar)
+                        ->setIlosc($item->quantity)
+                        ->setRabatProcent(0)
+                        ->setVat($item->product->price->vat ?? 23)
+                        ->setCenaNettoPrzedRabatem(0)
+                        ->setCenaNettoPoRabacie(0)
+                        ->setCenaBruttoPrzedRabatem(0)
+                        ->setCenaBruttoPoRabacie($item->gross_selling_price_commercial_unit)
+                        ->setWartoscCalejPozycjiNetto(0)
+                        ->setWartoscCalejPozycjiBrutto(0)
+                        ->setWartoscCalejPozycjiNettoZRabatem(0)
+                        ->setWartoscCalejPozycjiBruttoZRabatem($item->gross_selling_price_commercial_unit * $item->quantity);
+
+                    $preDokument
+                        ->setProdukty(array_merge($preDokument->getProdukty(), [$prePozycja]));
+                }
+
+                $preDokument->setProdukty(array_filter(array_merge($preDokument->getProdukty(), [
+                    ($order->additional_service_cost > 0) ? $this->getDKOPosition($order) : null,
+                    ($order->additional_cash_on_delivery_cost > 0) ? $this->getDKPPosition($order) : null,
+                    ($order->shipment_price_for_client > 0) ? $this->getUTPosition($order) : null
+                ])));
+
+                $xml = self::generateValidXmlFromObj($preDokument);
+                Storage::disk('xmlForNexoDisk')->put($order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
+                $preventionArray = [];
+
+                $fileNames[] = $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml';
+
+                AddLabelService::addLabels($order, [Label::XML_INVOICE_GENERATED], $preventionArray, [], Auth::user()?->id);
+            } catch (Throwable $ex) {
+                Log::error($ex->getMessage(), [
+                    'productId' => (isset($item)) ? $item->product->id : null,
+                    'orderItemId' => (isset($item)) ? $item->id : null,
+                    'orderId' => $order->id,
+                ]);
+                continue;
             }
-
-            $preDokument->setProdukty(array_filter(array_merge($preDokument->getProdukty(), [
-                ($order->additional_service_cost > 0) ? $this->getDKOPosition($order) : null,
-                ($order->additional_cash_on_delivery_cost > 0) ? $this->getDKPPosition($order) : null,
-                ($order->shipment_price_for_client > 0) ? $this->getUTPosition($order) : null
-            ])));
-
-            $xml = self::generateValidXmlFromObj($preDokument);
-            Storage::disk('xmlForNexoDisk')->put($order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
-            $preventionArray = [];
-
-            $fileNames[] = $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml';
-
-            AddLabelService::addLabels($order, [Label::XML_INVOICE_GENERATED], $preventionArray, [], Auth::user()?->id);
         }
 
         if (count($fileNames) > 0) {

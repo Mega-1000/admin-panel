@@ -4,7 +4,7 @@ namespace App\Integrations\Artoit;
 
 use MyCLabs\Enum\Enum;
 
-final class ETypDokumentu_HandloMag extends Enum
+final class ETypDokumentu_HandloMag
 {
     const FS = 'FS';
     const PA = 'PA';

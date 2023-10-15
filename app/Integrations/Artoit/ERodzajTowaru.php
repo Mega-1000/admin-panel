@@ -4,7 +4,7 @@ namespace App\Integrations\Artoit;
 
 use MyCLabs\Enum\Enum;
 
-class ERodzajTowaru extends Enum
+class ERodzajTowaru
 {
     const TOWAR = 'Towar';
     const USLUGA = 'Usluga';
