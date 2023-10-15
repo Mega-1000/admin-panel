@@ -45,8 +45,7 @@ readonly class OrderObserver
 
         $this->lowOrderQuantityAlertService->dispatchAlertsForOrder($order);
 
-        ProductPacketService::executeForOrder($this->order);
-//        dispatch(new FireProductPacketJob($order));
+        dispatch(new FireProductPacketJob($order));
     }
 
     public function updating(Order $order): void
