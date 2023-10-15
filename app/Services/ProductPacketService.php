@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entities\Order;
 use App\Entities\OrderItem;
+use App\Entities\ProductPacket;
 use App\Entities\ProductPacking;
 use App\Factory\OrderBuilderFactory;
 use Exception;
@@ -17,13 +18,12 @@ class ProductPacketService
     {
         $toAddArray = collect();
         $orderProducts = $order->items->filter(function (OrderItem $product) {
-
-            return ProductPacking::where('product_symbol', $product->product->symbol)->exists();
+            return ProductPacket::where('product_symbol', $product->product->symbol)->exists();
         });
         var_dump($orderProducts);
 
         $orderProducts->each(function (OrderItem $product) use (&$toAddArray) {
-            $productPacking = ProductPacking::query()->where('product_symbol', $product->product->symbol)->first();
+            $productPacking = ProductPacket::query()->where('product_symbol', $product->product->symbol)->first();
             $toAddArray->push(explode(' ', json_decode($productPacking->packet_products_symbols)));
             $product->delete();
         });
