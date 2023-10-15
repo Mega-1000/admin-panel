@@ -36,6 +36,7 @@ class ProductPacketService
 
         // Use array_unique to remove duplicates from $toAddArray
         $toAddArray = array_unique($toAddArray);
+        $toAddArray = collect($toAddArray)->flatten()->toArray();
 
         // Create an instance of OrderBuilderFactory
         $orderBuilder = OrderBuilderFactory::create();
