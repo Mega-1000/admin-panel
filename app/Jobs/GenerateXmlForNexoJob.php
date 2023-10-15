@@ -69,8 +69,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
         })->get();
         $fileNames = [];
 
-        dd($orders);
-
         $files = Storage::disk('xmlForNexoDisk')->files();
         foreach ($files as $file) {
             Storage::disk('xmlForNexoDisk')->delete($file);
