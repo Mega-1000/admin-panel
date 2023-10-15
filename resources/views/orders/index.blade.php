@@ -2401,6 +2401,10 @@
                                 const parsedAmount = parseFloat(amount);
                                 const parsedDeclaredAmount = parseFloat(declared_sum);
 
+                                if (payment.operation_type == {{ OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE }} && row.login != 'info@ephpolska.pl') {
+                                    return;
+                                }
+
                                 if (payment.operation_type === "Zwrot towaru") {
                                     returnedValue += parsedAmount;
                                 }
