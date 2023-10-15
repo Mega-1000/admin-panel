@@ -69,8 +69,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
         })->get();
         $fileNames = [];
 
-        dd($orders);
-
         $files = Storage::disk('xmlForNexoDisk')->files();
         foreach ($files as $file) {
             Storage::disk('xmlForNexoDisk')->delete($file);
@@ -78,7 +76,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
         foreach ($orders as $order) {
             try {
-                $preDokument = new PreDokument();
                 $address = $order->getInvoiceAddress();
                 $preAddress = new PreAdres();
                 $preAddress

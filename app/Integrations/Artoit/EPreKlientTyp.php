@@ -2,9 +2,7 @@
 
 namespace App\Integrations\Artoit;
 
-use MyCLabs\Enum\Enum;
-
-class EPreKlientTyp extends Enum
+class EPreKlientTyp
 {
     const FIRMA = 'Firma';
     const OSOBA = 'Osoba';
