@@ -88,7 +88,10 @@ class Orders
         $orderPayments = [];
         foreach ($orders as $order) {
             foreach ($order->payments as $payment) {
-                if ($payment->status !== 'Rozliczona deklarowana') {
+                //              if (payment.operation_type === 'Wpłata/wypłata bankowa - związana z fakturą zakupową' && row.login !== 'info@ephpolska.pl') {
+                //                                    return;
+                //                                }
+                if ($payment->status !== 'Rozliczona deklarowana' && $payment->operation_type !== 'Wpłata/wypłata bankowa - związana z fakturą zakupową' || $order->login == 'info@ephpolska.pl') {
                     $orderPayments[] = $payment;
                 }
             }
