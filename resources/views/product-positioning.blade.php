@@ -52,7 +52,7 @@
         <tbody>
         @while($maxNumberOfSquares > 0)
             <tr>
-                @if($$productPositioningDTO->IJZPSWOG - 1 <= 0) @break @endif
+                @if($productPositioningDTO->IJZPSWOG - 1 <= 0) @break @endif
                 @for ($j = 0; $j <= $productPositioningDTO->IJZPSWOG - 1; $j++)
                     @if($maxNumberOfSquares <= 0)
                         <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
