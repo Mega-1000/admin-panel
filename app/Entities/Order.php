@@ -113,7 +113,7 @@ class Order extends Model implements Transformable
         'token',
         'preliminary_buying_document_number',
         'buying_document_number',
-        'is_hidden',
+
     ];
     /**
      * The attributes that are mass assignable.
@@ -175,6 +175,7 @@ class Order extends Model implements Transformable
         'preferred_invoice_date',
         'is_buying_admin_side',
         'packages_values',
+        'is_hidden',
     ];
 
     /**
