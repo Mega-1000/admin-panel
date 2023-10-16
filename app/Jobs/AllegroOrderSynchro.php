@@ -266,6 +266,13 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->warehouse()->associate($warehouse);
                 $order->setDefaultDates('allegro');
 
+                $order->orderDates()->create([
+                    'customer_shipment_date_from' => $allegroOrder['delivery']['time']['from'],
+                    'customer_shipment_date_to' => $allegroOrder['delivery']['time']['to'],
+                    'consultant_shipment_date_from' => $allegroOrder['delivery']['time']['from'],
+                    'consultant_shipment_date_to' => $allegroOrder['delivery']['time']['to'],
+                ]);
+
                 $order->saveQuietly();
                 $this->addLabels($order);
 
@@ -348,10 +355,12 @@ class AllegroOrderSynchro implements ShouldQueue
                 $customer->save();
             }
         }
+
         $customer->login = $buyerEmail;
         $customer->nick_allegro = $buyer['login'];
         $customer->password = $customer->generatePassword($customerPhone);
         $customer->save();
+
         return $customer;
     }
 
