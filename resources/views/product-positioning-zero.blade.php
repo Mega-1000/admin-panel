@@ -16,8 +16,6 @@
                     @php($borderRadius = true)
                         @break
                         @endif
-
-                        <td style="padding: 10px; border: 1px black solid;"></td>
                         @php($maxNumberOfSquares--)
                         @endfor
         </tr>
