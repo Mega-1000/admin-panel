@@ -624,6 +624,7 @@ class OrdersController extends Controller
             }])
             ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers')
             ->orderBy('id', 'desc')
+            ->where('is_hidden', false)
             ->get();
 
         foreach ($orders as $order) {
@@ -634,6 +635,7 @@ class OrdersController extends Controller
             $orderButtons = ChatHelper::createButtonsArrayForOrder($order, $userId, MessagesHelper::TYPE_CUSTOMER);
             $order->buttons = $orderButtons;
             $order->user_invoices = $order->subiektInvoices;
+
         }
 
         return $orders->toJson();
