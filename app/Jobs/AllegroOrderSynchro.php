@@ -273,7 +273,6 @@ class AllegroOrderSynchro implements ShouldQueue
                     'consultant_shipment_date_to' => Carbon::create($allegroOrder['delivery']['time']['to'])->subWeekday(),
                 ]);
 
-
                 $order->saveQuietly();
                 $this->addLabels($order);
 

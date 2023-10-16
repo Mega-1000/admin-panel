@@ -113,6 +113,7 @@ class Order extends Model implements Transformable
         'token',
         'preliminary_buying_document_number',
         'buying_document_number',
+        'is_hidden',
     ];
     /**
      * The attributes that are mass assignable.

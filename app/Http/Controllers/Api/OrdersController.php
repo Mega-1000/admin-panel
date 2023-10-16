@@ -263,7 +263,14 @@ class OrdersController extends Controller
             $order->updateQuietly(['shipment_price_for_client_automatic' => $fullCost]);
             $order->updateQuietly(['shipment_price_for_client' => $fullCost]);
 
-            $order->update(['status_id' => 3]);
+            if ($request->get('hide_from_customer')) {
+                $order->update([
+                    'is_hidden' => $request->get('hide_from_customer'),
+                    'status_id' => 1,
+                ]);
+            } else {
+                $order->update(['status_id' => 3]);
+            }
 
             dispatch_now(new OrderStatusChangedNotificationJob($order->id));
 
