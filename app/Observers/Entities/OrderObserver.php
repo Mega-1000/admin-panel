@@ -36,8 +36,6 @@ readonly class OrderObserver
      */
     public function created(Order $order): void
     {
-        dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
-
         $this->orderPaymentLabelsService->calculateLabels($order);
 
         $order->token = Str::random(32);

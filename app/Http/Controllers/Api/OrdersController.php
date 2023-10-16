@@ -34,6 +34,7 @@ use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Http\Requests\ScheduleOrderReminderRequest;
+use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\SendReminderAboutOfferJob;
 use App\Mail\SendOfferToCustomerMail;
@@ -270,6 +271,8 @@ class OrdersController extends Controller
                 'order_id' => $order->id,
                 'message' => Status::find(18)->message,
             ]);
+
+            dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
