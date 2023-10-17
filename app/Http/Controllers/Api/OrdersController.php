@@ -279,7 +279,9 @@ class OrdersController extends Controller
                 'message' => Status::find(18)->message,
             ]);
 
-            dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
+            if ($order->created_at->format('Y-m-d H:i:s') === $order->updated_at->format('Y-m-d H:i:s')) {
+                dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
+            }
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
