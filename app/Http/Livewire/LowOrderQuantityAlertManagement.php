@@ -51,7 +51,6 @@ class LowOrderQuantityAlertManagement extends Component
             'title' => 'required',
             'itemNames' => 'required',
             'minQuantity' => 'required|numeric',
-            'phpCode' => 'required',
         ]);
 
         $data = [

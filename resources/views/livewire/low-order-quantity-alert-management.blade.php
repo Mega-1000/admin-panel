@@ -1,4 +1,4 @@
-<!DOCTYP<div>
+<div>
     <form wire:submit.prevent="submitForm" method="post">
         @csrf
 
@@ -12,12 +12,12 @@
         <input type="text" name="item_names" placeholder="Nazwy produktów" class="form-control" wire:model="itemNames">
 
         <div>
-            ilosc sztuk zakupiona w calej ofercie produktow ktore maja znaczniki podane w polu 3
+            ilosc sztuk zakupiona w calej ofercie produktow ktore maja znaczniki podane w polu znaczniki z csv z kolumny 13 ktore bedą brane pod uwage do sumy ilości aczkolwiek kazdy nalezy oddzielic przcinkiem bez spacji
         </div>
         <input type="number" name="min_quantity" placeholder="Minimalna ilość" class="form-control" wire:model="minQuantity">
 
         <div>
-            Kod php do liczenia
+            Kod php do liczenia do specjlnego liczenia dla programisty
         </div>
         <textarea placeholder="Kod php" class="form-control" wire:model="phpCode"></textarea>
 
@@ -58,10 +58,10 @@
                 Treść wiadomości
                 <textarea class="form-control" wire:model="messages.{{ $k }}.message"></textarea>
 
-                Opóźnienie wysłania wiadomości
+                Opóźnienie wysłania wiadomości w godzinach (np. 1.5)
                 <input type="text" class="form-control" wire:model="messages.{{ $k }}.delay_time">
 
-                Nazwa pliku z załącznikiem
+                Nazwa pliku z załącznikiem (nie obligatoryjne)
                 <input type="text" class="form-control" wire:model="messages.{{ $k }}.attachment_name">
 
                 <button class="btn btn-danger" wire:click.prevent="deleteMessage({{ $k }})">
