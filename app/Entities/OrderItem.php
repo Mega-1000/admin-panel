@@ -16,6 +16,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property Product $product
  * @property int $quantity
  * @property ProductStockPacket $packet
+ * @property string $gross_selling_price_commercial_unit
  * @package namespace App\Entities;
  */
 class OrderItem extends Model implements Transformable

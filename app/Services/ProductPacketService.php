@@ -28,6 +28,7 @@ class ProductPacketService
         $orderProducts->each(function (OrderItem $product) use (&$toAddArray) {
             $productPacking = ProductPacket::where('product_symbol', $product->product->symbol)->first();
             $packetProductsSymbols = json_decode($productPacking->packet_products_symbols);
+            $packetProductsSymbols .=  ' ' . $product->quantity;
             $toAddArray = array_merge($toAddArray, $packetProductsSymbols);
             $product->delete();
         });
@@ -44,10 +45,23 @@ class ProductPacketService
             $productToAdd = Product::where('symbol', explode(' ', $productToAddSymbol)[0])->first();
 
             if ($productToAdd) {
-                // Convert the product to an array and add pricing information
+                $explodedArray = explode(' ', $productToAddSymbol);
+                $productToAddArray = [
+                    'symbol' => $explodedArray[0],
+                    'price' => $explodedArray[1],
+                    'quantity' => $explodedArray[2] ,
+                    'max_quantity_in_order' => $explodedArray[3],
+                    'quantity_of_packet_in_order' => $explodedArray[4],
+                ];
+
+                $productToAddArray['quantity'] = min(
+                    $productToAddArray['quantity'] * $productToAddArray['quantity_of_packet_in_order'],
+                    $productToAddArray['max_quantity_in_order']
+                );
+
                 $productToAddArray = $productToAdd->toArray();
-                $productToAddArray['gross_selling_price_commercial_unit'] = explode(' ', $productToAddSymbol)[1];
-                $productToAddArray['amount'] = 1;
+                $productToAddArray['gross_selling_price_commercial_unit'] = $productToAddArray['price'];
+                $productToAddArray['amount'] = $productToAddArray['quantity'];
 
                 // Assign the product to the order using OrderBuilderFactory
                 $orderBuilder->assignItemsToOrder($order, [ $productToAddArray ], false);
