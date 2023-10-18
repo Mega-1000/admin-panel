@@ -2738,7 +2738,9 @@ class OrdersController extends Controller
         [$collection, $countFiltered] = $this->orderDatatableService->prepareCollection($data);
         $collection = $this->prepareAdditionalOrderData($collection);
 
-        $collection = $collection->unique();
+
+        /** @var \Illuminate\Support\Collection $collection */
+        $collection = $collection->unique('id');
 
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltered])->skipPaging()->setTotalRecords($collection->count())->make(true);
     }
