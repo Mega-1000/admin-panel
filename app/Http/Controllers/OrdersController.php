@@ -2740,7 +2740,6 @@ class OrdersController extends Controller
 
 
         /** @var \Illuminate\Support\Collection $collection */
-        $collection = $collection->unique('id');
 
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltered])->skipPaging()->setTotalRecords($collection->count())->make(true);
     }
