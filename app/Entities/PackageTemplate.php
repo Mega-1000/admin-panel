@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class PackageTemplate extends Model
 {
+    protected $fillable = [
+        'allegro_delivery_method',
+    ];
 
     const STATUS_NEW = 'NEW';
     const WAITING_FOR_CANCELLED = 'WAITING_FOR_CANCELLED';
@@ -13,8 +16,8 @@ class PackageTemplate extends Model
     public const WAITING_FOR_SENDING = 'WAITING_FOR_SENDING';
     const DELIVERED = 'DELIVERED';
     const CANCELLED = 'CANCELLED';
-    
+
     public function scopeAllegroDeliveryMethod($query, $method) {
-        return $query->where('allegro_delivery_method', 'like', '%"'.$method.'"%');
+        return $query->where('allegro_delivery_method', 'like', '%"' . $method . '"%');
     }
 }
