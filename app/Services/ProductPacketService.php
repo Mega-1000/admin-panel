@@ -50,7 +50,7 @@ class ProductPacketService
 
             if ($productToAdd) {
                 $explodedArray = explode(' ', $productToAddSymbol);
-                $productToAddArray = [
+                $dataArray = [
                     'symbol' => $explodedArray[0],
                     'price' => $explodedArray[1],
                     'quantity' => $explodedArray[2] ,
@@ -58,14 +58,13 @@ class ProductPacketService
                     'quantity_of_packet_in_order' => $explodedArray[4],
                 ];
 
-                $productToAddArray['quantity'] = min(
-                    $productToAddArray['quantity'] * $productToAddArray['quantity_of_packet_in_order'],
-                    $productToAddArray['max_quantity_in_order']
-                );
-
                 $productToAddArray = $productToAdd->toArray();
-                $productToAddArray['gross_selling_price_commercial_unit'] = $productToAddArray['price'];
-                $productToAddArray['amount'] = $productToAddArray['quantity'];
+                $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
+
+                $productToAddArray['amount'] = min(
+                    $dataArray['quantity'] * $dataArray['quantity_of_packet_in_order'],
+                    $dataArray['max_quantity_in_order']
+                );
 
                 // Assign the product to the order using OrderBuilderFactory
                 $orderBuilder->assignItemsToOrder($order, [ $productToAddArray ], false);
