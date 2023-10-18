@@ -2743,7 +2743,7 @@ class OrdersController extends Controller
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltered])->skipPaging()->setTotalRecords($collection->count())->make(true);
     }
 
-    public function prepareAdditionalOrderData($collection): Collection
+    public function prepareAdditionalOrderData($collection)
     {
         foreach ($collection as $order) {
             $additional_service = $order->additional_service_cost ?? 0;
