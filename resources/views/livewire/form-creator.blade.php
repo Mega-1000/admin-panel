@@ -23,10 +23,6 @@
         </button>
     </form>
 
-    <button wire:click="createButton">
-        okej
-    </button>
-
     <h3>
         Elementy
     </h3>

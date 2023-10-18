@@ -94,6 +94,7 @@ use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -2737,10 +2738,12 @@ class OrdersController extends Controller
         [$collection, $countFiltered] = $this->orderDatatableService->prepareCollection($data);
         $collection = $this->prepareAdditionalOrderData($collection);
 
+        $collection = $collection->unique();
+
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltered])->skipPaging()->setTotalRecords($collection->count())->make(true);
     }
 
-    public function prepareAdditionalOrderData($collection)
+    public function prepareAdditionalOrderData($collection): Collection
     {
         foreach ($collection as $order) {
             $additional_service = $order->additional_service_cost ?? 0;
