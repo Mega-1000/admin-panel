@@ -28,7 +28,11 @@ class ProductPacketService
         $orderProducts->each(function (OrderItem $product) use (&$toAddArray) {
             $productPacking = ProductPacket::where('product_symbol', $product->product->symbol)->first();
             $packetProductsSymbols = json_decode($productPacking->packet_products_symbols);
-            $packetProductsSymbols .=  ' ' . $product->quantity;
+
+            foreach ($packetProductsSymbols as &$symbol) {
+                $symbol .=  ' ' . $product->quantity;
+            }
+
             $toAddArray = array_merge($toAddArray, $packetProductsSymbols);
             $product->delete();
         });
