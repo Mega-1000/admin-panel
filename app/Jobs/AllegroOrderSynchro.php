@@ -268,8 +268,8 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $order->orderDates()->create([
                     'customer_shipment_date_from' => now(),
-                    'customer_shipment_date_to' => now(),
-                    'consultant_shipment_date_from' => $allegroOrder['delivery']['time']['from'],
+                    'customer_shipment_date_to' => Carbon::create($allegroOrder['delivery']['time']['to'])->subWeekday(),
+                    'consultant_shipment_date_from' => now(),
                     'consultant_shipment_date_to' => Carbon::create($allegroOrder['delivery']['time']['to'])->subWeekday(),
                 ]);
 
