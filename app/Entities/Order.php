@@ -783,16 +783,16 @@ class Order extends Model implements Transformable
             $dateFrom = Carbon::createFromTimestamp($this->created_at->getTimestamp());
             $dateTo = (Carbon::createFromTimestamp($this->created_at->getTimestamp()))->addWeekdays(2);
         }
-
-        $this->dates()->updateOrCreate(['order_id' => $this->id], [
-            'customer_shipment_date_from' => $dateFrom,
-            'customer_shipment_date_to' => $dateTo,
-            'customer_acceptance' => true,
-            'consultant_shipment_date_from' => $dateFrom,
-            'consultant_shipment_date_to' => $dateTo,
-            'consultant_acceptance' => true,
-            'message' => 'Ustawiono domyślne daty dla zamówienia'
-        ]);
+//
+//        $this->dates()->updateOrCreate(['order_id' => $this->id], [
+//            'customer_shipment_date_from' => $dateFrom,
+//            'customer_shipment_date_to' => $dateTo,
+//            'customer_acceptance' => true,
+//            'consultant_shipment_date_from' => $dateFrom,
+//            'consultant_shipment_date_to' => $dateTo,
+//            'consultant_acceptance' => true,
+//            'message' => 'Ustawiono domyślne daty dla zamówienia'
+//        ]);
     }
 
     public function orderDates(): HasOne
