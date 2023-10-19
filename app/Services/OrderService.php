@@ -128,7 +128,7 @@ class OrderService
                 $quantity = $product['quantity'];
                 $product = [
                         'amount' => $quantity
-                    ] + Product::query()->findOrFail($product['id'])->toArray();
+                ] + Product::query()->findOrFail($product['id'])->toArray();
             }
 
             $orderBuilder = (new OrderBuilder())
