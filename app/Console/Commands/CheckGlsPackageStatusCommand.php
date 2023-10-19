@@ -7,7 +7,7 @@ use App\Helpers\GlsCourier;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Console\Command;
 
-class CheckGlsPackageStatusCommand9 extends Command
+class CheckGlsPackageStatusCommand extends Command
 {
     protected $signature = 'check:gls-package-status {letter-number}';
 
