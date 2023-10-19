@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('low_order_quantity_alerts', function (Blueprint $table) {
+        Schema::table('low_order_quantity_alerts', function (Blueprint $table) {
             $table->string('item_names')->change();
         });
     }
