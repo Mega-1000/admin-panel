@@ -19,6 +19,10 @@ class ProductPacketService
         // Create an empty array for products to add
         $toAddArray = [];
 
+        $oldOrderValue = $order->items->sum(function (OrderItem $item) {
+            return $item->quantity * $item->gross_selling_price_commercial_unit;
+        });
+
         // Get the order items that match product symbols in the ProductPacking model
         $orderProducts = $order->items->filter(function (OrderItem $product) {
             return ProductPacket::where('product_symbol', $product->product->symbol)->exists();
@@ -59,15 +63,30 @@ class ProductPacketService
                 ];
 
                 $productToAddArray = $productToAdd->toArray();
-                $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
+                if (!str_contains($dataArray['price'], 'CBS')) {
+                    $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
+                } else if (str_contains($dataArray['price'], '-')) {
+                    $productToAddArray['gross_selling_price_commercial_unit'] = (float)$productToAddArray['gross_selling_price_commercial_unit'] - explode('-', $dataArray['price'])[1];
+                } else if (str_contains($dataArray['price'], '+')) {
+                    $productToAddArray['gross_selling_price_commercial_unit'] = (float)$productToAddArray['gross_selling_price_commercial_unit'] + (float)explode('+', $dataArray['price'])[1];
+                }
 
                 $productToAddArray['amount'] = min(
                     $dataArray['quantity'] * $dataArray['quantity_of_packet_in_order'],
                     $dataArray['max_quantity_in_order']
                 );
 
-                // Assign the product to the order using OrderBuilderFactory
+
                 $orderBuilder->assignItemsToOrder($order, [ $productToAddArray ], false);
+
+
+                $itemsValue = $order->items->sum(function (OrderItem $item) {
+                    return $item->quantity * $item->gross_selling_price_commercial_unit;
+                });
+
+                $order->update([
+                    'additional_service_cost' => $oldOrderValue - $itemsValue,
+                ]);
             }
         }
     }
