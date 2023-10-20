@@ -21,12 +21,6 @@ class LowOrderQuantityAlertService
     public function dispatchAlertsForOrder(Order $order): void
     {
         LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order) {
-//            if ($alert->php_code != '.') {
-//                eval($alert->php_code);
-//
-//                return;
-//            }
-
             $finalQuantity = 0;
 
             $orderItems = OrderItems::getItemsWithProductsWithLowOrderQuantityAlertText($order->id);

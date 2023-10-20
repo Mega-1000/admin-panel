@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Entities\LowOrderQuantityAlert;
 use App\Entities\Order;
+use App\Enums\LowOrderQuantityAlertSpacesEnum;
 
 class LowOrderQuantityAlertsSpacesHelper
 {
