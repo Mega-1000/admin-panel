@@ -44,9 +44,6 @@ class LowOrderQuantityAlertService
                 }
             }
 
-            if ($finalQuantity !== 0) {
-                dd('sukces');
-            }
 
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
                 /** @var LowOrderQuantityAlertMessage $message */
