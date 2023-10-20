@@ -38,7 +38,7 @@ class LowOrderQuantityAlertService
                 if (
                     in_array(
                         $item->product->$columnName,
-                        explode($alert->item_names, ',')
+                        explode(',', $alert->item_names)
                     )
                 ) {
                     $finalQuantity += $item->quantity;
