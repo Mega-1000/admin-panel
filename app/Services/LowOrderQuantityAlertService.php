@@ -25,7 +25,6 @@ class LowOrderQuantityAlertService
 
             $orderItems = OrderItems::getItemsWithProductsWithLowOrderQuantityAlertText($order->id);
 
-            dd($finalQuantity, $orderItems);
             foreach ($orderItems as $item) {
                 /** @var Order $order */
                 $order = $item->order;
@@ -34,9 +33,10 @@ class LowOrderQuantityAlertService
                     continue;
                 }
 
+                $columnName = $alert->column_name;
                 if (
                     in_array(
-                        $item->product->$alert->column_name,
+                        $item->product->$columnName,
                         explode($alert->item_names, ',')
                     )
                 ) {
