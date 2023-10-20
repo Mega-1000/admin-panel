@@ -34,7 +34,6 @@ class LowOrderQuantityAlertService
 //                }
 
                 $columnName = $alert->column_name;
-                dd($item->product->$columnName, explode($alert->item_names, ','));
                 if (
                     in_array(
                         $item->product->$columnName,
