@@ -29,9 +29,9 @@ class LowOrderQuantityAlertService
                 /** @var Order $order */
                 $order = $item->order;
 
-                if (!LowOrderQuantityAlertsSpacesHelper::checkIfSpaceIsCorrect($alert, $order)) {
-                    continue;
-                }
+//                if (!LowOrderQuantityAlertsSpacesHelper::checkIfSpaceIsCorrect($alert, $order)) {
+//                    continue;
+//                }
 
                 $columnName = $alert->column_name;
                 dd($item->product->$columnName, explode($alert->item_names, ','));
