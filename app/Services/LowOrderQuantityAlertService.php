@@ -25,7 +25,7 @@ class LowOrderQuantityAlertService
 
             $orderItems = OrderItems::getItemsWithProductsWithLowOrderQuantityAlertText($order->id);
 
-            dd($finalQuantity);
+            dd($finalQuantity, $orderItems);
             foreach ($orderItems as $item) {
                 /** @var Order $order */
                 $order = $item->order;
