@@ -44,6 +44,7 @@ class LowOrderQuantityAlertService
                 }
             }
 
+            dd($finalQuantity);
 
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
                 /** @var LowOrderQuantityAlertMessage $message */
