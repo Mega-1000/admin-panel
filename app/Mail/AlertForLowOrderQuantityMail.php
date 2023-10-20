@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Entities\LowOrderQuantityAlert;
+use App\Entities\LowOrderQuantityAlertMessage;
 use App\Entities\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -20,7 +20,7 @@ class AlertForLowOrderQuantityMail extends Mailable
      * @return void
      */
     public function __construct(
-        public LowOrderQuantityAlert $alert,
+        public LowOrderQuantityAlertMessage $alert,
         public readonly Order                 $order,
     ) {}
 
