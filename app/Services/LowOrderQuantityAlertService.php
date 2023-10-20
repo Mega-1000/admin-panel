@@ -44,13 +44,10 @@ class LowOrderQuantityAlertService
                 }
             }
 
-            if ($finalQuantity !== 0) {
-            dd($finalQuantity);
-            }
-
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
                 /** @var LowOrderQuantityAlertMessage $message */
                 foreach ($alert->messages as $message) {
+                    dd('wysyłamy');
                     dispatch(new AlertForOrderLowQuantityJob($order, $message))
                         ->delay(now()->addHours($message->delay_time));
                 }
