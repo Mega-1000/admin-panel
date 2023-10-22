@@ -40,6 +40,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property string $consultant_notices
  * @property mixed $factoryDelivery
  * @property Collection $labels
+ * @property bool $send_auto_messages
  *
  * @property Collection<OrderPackage> $packages
  *

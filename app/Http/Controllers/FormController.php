@@ -20,7 +20,11 @@ class FormController extends Controller
 
     public function executeAction(string $actionName, Order $order): JsonResponse
     {
-        FormActionService::$actionName($order);
+        $actions = explode(',', $actionName);
+
+        foreach ($actions as $action) {
+            FormActionService::$action($order);
+        }
 
         return response()->json([
             'message' => 'success',

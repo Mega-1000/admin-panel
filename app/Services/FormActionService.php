@@ -66,10 +66,21 @@ class FormActionService
 
         $data = new AllegroReturnDTO(
             paymentId: $allegroPaymentId,
-            reason: $request->reason,
+            reason: request()->reason,
             lineItems: $lineItemsForPaymentRefund,
         );
 
         $allegroPaymentService->initiatePaymentRefund($data);
+    }
+
+
+    /**
+     * @param Order $order
+     * @return void
+     */
+    public function stopSendingAutomaticMessages(Order $order): void
+    {
+        $order->send_auto_messages = false;
+        $order->save();
     }
 }
