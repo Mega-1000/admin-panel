@@ -30,9 +30,11 @@ class OrderPayments
      *
      * @return void
      */
-    public static function updatePaymentsStatusWithDeclaredSumFromOrder(Order $order, BankPayInDTO $payIn): void
+    public static function updatePaymentsStatusWithDeclaredSumFromOrder(Order $order, mixed $payIn): void
     {
-        $order->payments()->where('declared_sum', $payIn->kwota)->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
+        $amount = $payIn->kwota ?? $payIn['kwota'];
+
+        $order->payments()->where('declared_sum', $amount)->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
     }
 
     /**
