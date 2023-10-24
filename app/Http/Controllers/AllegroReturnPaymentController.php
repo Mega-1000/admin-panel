@@ -24,8 +24,8 @@ class AllegroReturnPaymentController extends Controller
         private readonly AllegroPaymentsReturnService $allegroPaymentsReturnService,
         private readonly Orders $orderRepository,
     ) {}
-    
-    public function index(Order $order): RedirectResponse|View 
+
+    public function index(Order $order): RedirectResponse|View
     {
         if (empty($order->allegro_payment_id)) {
             return redirect()->route('orders.index')->with([
@@ -55,7 +55,7 @@ class AllegroReturnPaymentController extends Controller
     {
         $allegroPaymentId = $order->allegro_payment_id;
         $allegroOrder = $this->allegroOrderService->getOrderByPaymentId($allegroPaymentId);
-        
+
         $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, $request->returns);
 
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
@@ -84,7 +84,7 @@ class AllegroReturnPaymentController extends Controller
                 'return_payment_id' => $response['id'],
             ]);
         }
-        
+
         $this->allegroPaymentsReturnService->removeAndAddNeccessaryLabelsAfterAllegroReturn($order);
 
         if (!$this->orderRepository->orderIsConstructed($order)) {
@@ -108,7 +108,7 @@ class AllegroReturnPaymentController extends Controller
 
         if (count($unsuccessfulCommissionRefundsItemNames) > 0) {
             $message = "Zwrot płatności pomyślny! Nie udało się zwrócić prowizji dla następujących przedmiotów: " . implode(", ", $unsuccessfulCommissionRefundsItemNames);
-            return redirect()->route('allegro-return.index', ['order' => $order])->with([
+            return redirect()->back()->with([
                 'message' => $message
             ]);
         }
