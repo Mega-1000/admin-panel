@@ -29,10 +29,6 @@ class LowOrderQuantityAlertService
                 /** @var Order $order */
                 $order = $item->order;
 
-//                if (!LowOrderQuantityAlertsSpacesHelper::checkIfSpaceIsCorrect($alert, $order)) {
-//                    continue;
-//                }
-
                 $columnName = $alert->column_name;
                 if (
                     in_array(

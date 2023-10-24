@@ -69,6 +69,10 @@ class ProductPacketService
                     $productToAddArray['gross_selling_price_commercial_unit'] = (float)$productToAddArray['gross_selling_price_commercial_unit'] - explode('-', $dataArray['price'])[1];
                 } else if (str_contains($dataArray['price'], '+')) {
                     $productToAddArray['gross_selling_price_commercial_unit'] = (float)$productToAddArray['gross_selling_price_commercial_unit'] + (float)explode('+', $dataArray['price'])[1];
+                } else if (!is_numeric($dataArray['price'])) {
+                    $product = Product::find($dataArray['price']);
+
+                    $productToAddArray['gross_selling_price_commercial_unit'] = $product->gross_selling_price_commercial_unit;
                 }
 
                 $productToAddArray['amount'] = min(
