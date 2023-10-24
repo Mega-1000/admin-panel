@@ -63,16 +63,29 @@ class ProductPacketService
                 ];
 
                 $productToAddArray = $productToAdd->toArray();
-                if (!str_contains($dataArray['price'], 'CBS')) {
-                    $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
-                } else if (str_contains($dataArray['price'], '-')) {
-                    $productToAddArray['gross_selling_price_commercial_unit'] = (float)$productToAddArray['gross_selling_price_commercial_unit'] - explode('-', $dataArray['price'])[1];
-                } else if (str_contains($dataArray['price'], '+')) {
-                    $productToAddArray['gross_selling_price_commercial_unit'] = (float)$productToAddArray['gross_selling_price_commercial_unit'] + (float)explode('+', $dataArray['price'])[1];
-                } else if (!is_numeric($dataArray['price'])) {
-                    $product = Product::find($dataArray['price']);
 
-                    $productToAddArray['gross_selling_price_commercial_unit'] = $product->gross_selling_price_commercial_unit;
+                if (str_contains($dataArray['price'], 'CBS')) {
+                    // Handle the case when 'CBS' is in the price
+                    // Modify $productToAddArray accordingly
+                } elseif (str_contains($dataArray['price'], '-')) {
+                    // Handle the case when '-' is in the price
+                    $parts = explode('-', $dataArray['price']);
+                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
+                    $productToAddArray['gross_selling_price_commercial_unit'] -= $priceAdjustment;
+                } elseif (str_contains($dataArray['price'], '+')) {
+                    // Handle the case when '+' is in the price
+                    $parts = explode('+', $dataArray['price']);
+                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
+                    $productToAddArray['gross_selling_price_commercial_unit'] += $priceAdjustment;
+                } elseif (!is_numeric($dataArray['price'])) {
+                    // Handle the case when $dataArray['price'] is not numeric
+                    $product = Product::where('symbol', $dataArray['price'])->first();
+                    if ($product) {
+                        $productToAddArray['gross_selling_price_commercial_unit'] = $product->gross_selling_price_commercial_unit;
+                    } else {
+                        // Handle the case when the product is not found
+                        // You may want to add appropriate error handling here
+                    }
                 }
 
                 $productToAddArray['amount'] = min(
@@ -80,9 +93,7 @@ class ProductPacketService
                     $dataArray['max_quantity_in_order']
                 );
 
-
-                $orderBuilder->assignItemsToOrder($order, [ $productToAddArray ], false);
-
+                $orderBuilder->assignItemsToOrder($order, [$productToAddArray], false);
 
                 $itemsValue = $order->items->sum(function (OrderItem $item) {
                     return $item->quantity * $item->gross_selling_price_commercial_unit;
