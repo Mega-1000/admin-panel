@@ -663,10 +663,11 @@ class OrdersController extends Controller
         }
 
         $products = [];
-
-        foreach ($order->items as &$item) {
-            foreach ($item->product as $key => $value) {
-                $item->$key = $value;
+        foreach ($order->items as $item) {
+            // Iterate through the properties of $item->product
+            foreach (get_object_vars($item->product) as $property => $value) {
+                // Set the property in $item to the value from $item->product
+                $item->$property = $value;
             }
         }
 
