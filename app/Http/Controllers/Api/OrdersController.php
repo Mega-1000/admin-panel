@@ -626,7 +626,6 @@ class OrdersController extends Controller
             }])
             ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers')
             ->orderBy('id', 'desc')
-            ->where('is_hidden', false)
             ->get();
 
         foreach ($orders as $order) {
