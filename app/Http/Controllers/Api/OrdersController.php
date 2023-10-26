@@ -663,13 +663,7 @@ class OrdersController extends Controller
         }
 
         foreach ($order->items as $item) {
-            // Iterate through the properties of $item->product
-            foreach ($item->product as $key => $value) {
-                // If the property is null, set it to an empty string
-                if (is_null($value)) {
-                    $item->product->$key = '';
-                }
-            }
+            $item = $item->product;
         }
 
         return response()->json($order->items);
