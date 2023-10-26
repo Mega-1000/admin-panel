@@ -77,14 +77,16 @@ class ProductPacketService
                     $parts = explode('+', $dataArray['price']);
                     $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
                     $productToAddArray['gross_selling_price_commercial_unit'] += $priceAdjustment;
-                } elseif (!is_numeric($dataArray['price'])) {
-                    // Handle the case when $dataArray['price'] is not numeric
-                    $product = Product::where('symbol', $dataArray['price'])->first();
-                    if ($product) {
-                        $productToAddArray['gross_selling_price_commercial_unit'] = $product->gross_selling_price_commercial_unit;
+                } else {
+                    if (is_numeric($dataArray['price'])) {
+                        $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
                     } else {
-                        // Handle the case when the product is not found
-                        // You may want to add appropriate error handling here
+                        // Handle the case when $dataArray['price'] is not numeric
+                        $product = Product::where('symbol', $dataArray['price'])->first();
+                        if ($product) {
+                            $productToAddArray['gross_selling_price_commercial_unit'] = $product->gross_selling_price_commercial_unit;
+                        } else {
+                        }
                     }
                 }
 
