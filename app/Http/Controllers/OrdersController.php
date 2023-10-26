@@ -270,7 +270,7 @@ class OrdersController extends Controller
         $order = Order::with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
 
         $orderId = $id;
-        WorkingEventsService::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $order->id);
+//        WorkingEventsService::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $order->id);
 
         $customerInfo = $this->customerAddressRepository->findWhere([
             "customer_id" => $order->customer->id,
