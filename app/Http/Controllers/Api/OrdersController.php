@@ -649,19 +649,30 @@ class OrdersController extends Controller
             return response()->json("Missing token", 400);
         }
 
-        $order = Order::where('token', 'PX6qqEVKenWrAUml1LzSJGlDiB60SwWS')->with(['items' => function ($q) {$q->with('product');}])->first();
+        $order = Order::where('token', $token)->with(['items' => function ($q) {
+            $q->with('product');
+        }])->first();
 
         if (!$order) {
             return response()->json("Order doesn't exist", 400);
         }
 
+        // Create an array to hold the response items
+        $responseItems = [];
+
         foreach ($order->items as $item) {
-            $item->fill($item->product->toArray())->save();
+            // Copy the properties from the associated product
+            $responseItem = $item->product->toArray();
+
+            // You can also include the item-specific properties if needed
+            $responseItem['item_specific_property'] = $item->item_specific_property;
+
+            $responseItems[] = $responseItem;
         }
 
-
-        return response()->json($order->items);
+        return response()->json($responseItems);
     }
+
 
     public function getPaymentDetailsForOrder(Request $request, $token): JsonResponse|array
     {
