@@ -659,12 +659,8 @@ class OrdersController extends Controller
             return response()->json("Order doesn't exist", 400);
         }
 
-        foreach ($order->items as $item) {
-            // Iterate through the properties of $item->product
-            foreach (get_object_vars($item->product) as $property => $value) {
-                // Set the property in $item to the value from $item->product
-                $item->$property = $value;
-            }
+        foreach ($order->items as &$item) {
+            $item = $item->product;
         }
 
 
