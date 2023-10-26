@@ -646,7 +646,7 @@ class OrdersController extends Controller
     public function getByToken(Request $request, $token): JsonResponse
     {
         if (empty($token)) {
-            return response("Missing token", 400);
+            return response()->json("Missing token", 400);
         }
 
         $order = Order::where('token', $token)
@@ -664,41 +664,7 @@ class OrdersController extends Controller
 
         $products = [];
 
-        foreach ($order->items as $item) {
-            if ($item->product) {
-                foreach (OrderBuilder::getPriceColumns() as $column) {
-                    if (property_exists($item, $column) && property_exists($item->product, $column)) {
-                        $item->product->$column = $item->$column;
-                    }
-                }
-
-                $vat = 1 + $item->product->vat / 100;
-
-                foreach ([
-                             'selling_price_calculated_unit',
-                             'selling_price_basic_uni',
-                             'selling_price_aggregate_unit',
-                             'selling_price_the_largest_unit'
-                         ] as $column) {
-                    $kGross = "gross_$column";
-                    $kNet = "net_$column";
-                    if (property_exists($item, $kNet) && property_exists($item->product, $kGross)) {
-                        $item->product->$kGross = round($item->$kNet * $vat, 2);
-                    }
-                }
-
-                if (property_exists($item, 'gross_selling_price_commercial_unit') && property_exists($item, 'quantity')) {
-                    $item->product->gross_price_of_packing = $item->gross_selling_price_commercial_unit;
-                    $item->product->amount = $item->quantity;
-                }
-
-                $item->product->amount = $item->quantity;
-
-                $products[] = $item->product;
-            }
-        }
-
-        return response()->json($products);
+        return response()->json($order->items);
     }
 
     public function getPaymentDetailsForOrder(Request $request, $token): JsonResponse|array

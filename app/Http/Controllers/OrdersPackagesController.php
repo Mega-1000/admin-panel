@@ -803,7 +803,7 @@ class OrdersPackagesController extends Controller
         return [$itemMessage, $messages];
     }
 
-    public function preparePackageToSend($orderId, $packageId)
+    public function preparePackageToSend($orderId, $packageId): JsonResponse
     {
         $order = Order::findOrFail($orderId);
         $package = OrderPackage::findOrFail($packageId);
