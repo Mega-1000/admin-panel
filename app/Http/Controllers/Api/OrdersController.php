@@ -664,6 +664,12 @@ class OrdersController extends Controller
 
         $products = [];
 
+        foreach ($order->items as &$item) {
+            foreach ($item->product as $key => $value) {
+                $item->$key = $value;
+            }
+        }
+
         return response()->json($order->items);
     }
 
