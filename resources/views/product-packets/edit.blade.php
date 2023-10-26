@@ -31,7 +31,7 @@
         <div class="form-group">
             <label for="packet_products_symbols">Symbole produktów w paczce</label>
             <input
-                value="{{ implode(json_decode($packet->packet_products_symbols)) }}"
+                value="{{ implode(',', json_decode($packet->packet_products_symbols)) }}"
                 type="text"
                 class="form-control"
                 id="packet_products_symbols"
