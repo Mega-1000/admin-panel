@@ -662,7 +662,7 @@ class OrdersController extends Controller
             return response()->json("Order doesn't exist", 400);
         }
 
-        foreach ($order->items as $item) {
+        foreach ($order->items as &$item) {
             $item = $item->product;
         }
 
