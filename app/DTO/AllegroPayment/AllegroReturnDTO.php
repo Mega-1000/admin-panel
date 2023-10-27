@@ -27,7 +27,8 @@ class AllegroReturnDTO
             'reason' => $this->reason,
             'lineItems' => array_map(function (AllegroReturnItemDTO $item) {
                 return $item->toAllegroRefundArray();
-            }, $this->lineItems)
+            }, $this->lineItems),
+            'message' => 'zwrot'
         ];
     }
 }
