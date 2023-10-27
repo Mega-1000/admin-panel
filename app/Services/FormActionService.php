@@ -30,7 +30,8 @@ class FormActionService
         if (!$order->chat) {
             // create new chat
             $chat = $messageService->createNewChat();
-            $order->chat()->associate($chat);
+            $order->chat_id = $chat->id;
+            $order->save();
         }
 
         $messageService->addMessage('tniemy na 50cm i wysyłamy', 5, null, null, $order->chat);
