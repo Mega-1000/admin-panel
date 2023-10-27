@@ -218,7 +218,7 @@ class MessagesHelper
      *
      * @return ChatUser|null $chatUser
      */
-    public function createOrGetBlankUser(Chat $chat): ?ChatUser
+    public function createOrGetBlankUser(Chat $chat): mixed
     {
         $chatUser = $chat->chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
 
