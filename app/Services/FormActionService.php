@@ -26,6 +26,13 @@ class FormActionService
         $order->labels()->detach(152);
 
         $messageService = new MessagesHelper();
+
+        if (!$order->chat) {
+            // create new chat
+            $chat = $messageService->createNewChat();
+            $order->chat()->associate($chat);
+        }
+
         $messageService->addMessage('tniemy na 50cm i wysyłamy', 5, null, null, $order->chat);
     }
 
