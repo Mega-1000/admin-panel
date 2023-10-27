@@ -11,11 +11,11 @@ readonly class AllegroReturnDTO
      */
     public function __construct(
         public string $paymentId,
-        public string $reason,
+        public mixed $reason = '',
         public array $lineItems,
     ) {}
 
-    public function toAllegroRefundArray(): array 
+    public function toAllegroRefundArray(): array
     {
         return [
             'payment' => [
