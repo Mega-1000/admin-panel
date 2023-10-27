@@ -10,7 +10,7 @@ class AllegroPaymentService extends AllegroApiService {
 
     private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 
-    public function getPaymentsFromLastDay(): array 
+    public function getPaymentsFromLastDay(): array
     {
         $startDate = Carbon::yesterday()->startOfDay();
         $endDate = Carbon::yesterday()->endOfDay();
@@ -18,7 +18,7 @@ class AllegroPaymentService extends AllegroApiService {
         return $this->getPaymentsBetweenDates($startDate, $endDate);
     }
 
-    public function getPaymentsBetweenDates(Carbon $startDate, Carbon $endDate): array 
+    public function getPaymentsBetweenDates(Carbon $startDate, Carbon $endDate): array
     {
         $startDateString = $startDate->format('Y-m-d\TH:i:s\Z');
         $endDateString = $endDate->format('Y-m-d\TH:i:s\Z');
@@ -88,7 +88,7 @@ class AllegroPaymentService extends AllegroApiService {
         return $payments;
     }
 
-    public function getRefundsByPaymentId(string $paymentId): array 
+    public function getRefundsByPaymentId(string $paymentId): array
     {
         $url = $this->getRestUrl("/payments/refunds?payment.id=" . $paymentId);
 
@@ -117,6 +117,7 @@ class AllegroPaymentService extends AllegroApiService {
         if (!($response = $this->request('POST', $url, $data))) {
             return false;
         }
+        dd($response);
 
         return $response;
     }
@@ -127,7 +128,7 @@ class AllegroPaymentService extends AllegroApiService {
      * @param int $quantity
      * @return bool - czy udało się stworzyć zwrot prowizji
      */
-    public function createCommissionRefund(string $lineItemId, int $quantity): bool 
+    public function createCommissionRefund(string $lineItemId, int $quantity): bool
     {
         $data = [
             "lineItem" => [
