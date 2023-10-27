@@ -33,6 +33,7 @@ use App\Services\AllegroOrderService;
 use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
+use App\Services\LowOrderQuantityAlertService;
 use App\Services\OrderAddressService;
 use App\Services\ProductService;
 use App\User;
@@ -265,6 +266,8 @@ class AllegroOrderSynchro implements ShouldQueue
                 $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
                 $order->warehouse()->associate($warehouse);
                 $order->setDefaultDates('allegro');
+
+                (new LowOrderQuantityAlertService())->dispatchAlertsForOrder($order);
 
                 $order->orderDates()->create([
                     'customer_shipment_date_from' => now(),

@@ -28,7 +28,6 @@ readonly class OrderObserver
         protected OrderPaymentLabelsService    $orderPaymentLabelsService,
         protected OrderService                 $orderService,
         protected OrderPackagesCalculator      $orderPackagesCalculator,
-        protected LowOrderQuantityAlertService $lowOrderQuantityAlertService
     ) {}
 
     /**
@@ -40,8 +39,6 @@ readonly class OrderObserver
 
         $order->token = Str::random(32);
         $order->save();
-
-        $this->lowOrderQuantityAlertService->dispatchAlertsForOrder($order);
 
         dispatch(new FireProductPacketJob($order));
     }
