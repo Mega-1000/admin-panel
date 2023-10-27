@@ -71,14 +71,9 @@ class ProductPacketService
                     } else {
                         $dataArray['price'] = explode($dataArray['price'], '(')[0];
 
-                        $productToAddArray['gross_selling_price_commercial_unit'] = 0;
-
                         $product = Product::where('symbol', $dataArray['price'])->first();
 
-                        if ($product) {
-                            $productToAddArray['gross_selling_price_commercial_unit'] = $product->price->allegro_gross_selling_price_after_all_additional_costs;
-                        } else {
-                        }
+                        $productToAddArray['gross_selling_price_commercial_unit'] = $product?->price?->allegro_gross_selling_price_after_all_additional_costs ?? 0;
                     }
                 }
 
