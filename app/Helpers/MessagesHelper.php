@@ -214,11 +214,12 @@ class MessagesHelper
     /**
      * Get or if no exist create Blank user (user without any ids, for sending generic messages)
      *
-     * @param  Chat     $chat
+     * @param Chat $chat
      *
-     * @return ChatUser $chatUser
+     * @return ChatUser|null $chatUser
      */
-    public function createOrGetBlankUser(Chat $chat): ChatUser {
+    public function createOrGetBlankUser(Chat $chat): ?ChatUser
+    {
         $chatUser = $chat->chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
 
         if ($chatUser === null) {
