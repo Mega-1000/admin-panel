@@ -65,22 +65,11 @@ class ProductPacketService
                 $productToAddArray = $productToAdd->toArray();
 
                 if (str_contains($dataArray['price'], 'CBS')) {
-                    // Handle the case when 'CBS' is in the price
-                    // Modify $productToAddArray accordingly
-                } elseif (str_contains($dataArray['price'], '-')) {
-                    // Handle the case when '-' is in the price
-                    $parts = explode('-', $dataArray['price']);
-                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
-                    $productToAddArray['gross_selling_price_commercial_unit'] -= $priceAdjustment;
-                } elseif (str_contains($dataArray['price'], '+')) {
-                    // Handle the case when '+' is in the price
-                    $parts = explode('+', $dataArray['price']);
-                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
-                    $productToAddArray['gross_selling_price_commercial_unit'] += $priceAdjustment;
                 } else {
                     if (is_numeric($dataArray['price'])) {
                         $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
                     } else {
+                        $productToAddArray['gross_selling_price_commercial_unit'] = 0;
                         // Handle the case when $dataArray['price'] is not numeric
                         $product = Product::where('symbol', $dataArray['price'])->first();
                         if ($product) {
@@ -88,6 +77,18 @@ class ProductPacketService
                         } else {
                         }
                     }
+                }
+
+                if (str_contains($dataArray['price'], '-')) {
+                    $parts = explode('-', $dataArray['price']);
+                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
+                    $productToAddArray['gross_selling_price_commercial_unit'] -= $priceAdjustment;
+                }
+
+                if (str_contains($dataArray['price'], '+')) {
+                    $parts = explode('+', $dataArray['price']);
+                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
+                    $productToAddArray['gross_selling_price_commercial_unit'] += $priceAdjustment;
                 }
 
                 $productToAddArray['amount'] = min(
