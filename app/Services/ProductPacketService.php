@@ -71,7 +71,9 @@ class ProductPacketService
                     } else {
                         $productToAddArray['gross_selling_price_commercial_unit'] = 0;
                         // Handle the case when $dataArray['price'] is not numeric
+
                         $product = Product::where('symbol', $dataArray['price'])->first();
+
                         if ($product) {
                             $productToAddArray['gross_selling_price_commercial_unit'] = $product->gross_selling_price_commercial_unit;
                         } else {
