@@ -117,7 +117,8 @@ class AllegroPaymentService extends AllegroApiService {
         if (!($response = $this->request('POST', $url, $data))) {
             return false;
         }
-        dd($response);
+
+        dd('okej', $response);
 
         return $response;
     }
