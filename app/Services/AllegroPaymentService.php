@@ -114,11 +114,11 @@ class AllegroPaymentService extends AllegroApiService {
 
         $data = $allegroReturnDTO->toAllegroRefundArray();
 
-        if (!($response = $this->request('POST', $url, $data))) {
-            return false;
-        }
+//        if (!($response = $this->request('POST', $url, $data))) {
+//            return false;
+//        }
+        dd($this->request('POST', $url, $data));
 
-        dd('okej', $response);
 
         return $response;
     }
