@@ -24,7 +24,7 @@ class AllegroReturnDTO
             'payment' => [
                 'id' => $this->paymentId
             ],
-            'reason' => $this->reason,
+            'reason' => 'REFUND',
             'lineItems' => array_map(function (AllegroReturnItemDTO $item) {
                 return $item->toAllegroRefundArray();
             }, $this->lineItems),
