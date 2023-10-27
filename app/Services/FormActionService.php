@@ -28,7 +28,6 @@ class FormActionService
         $messageService = new MessagesHelper();
 
         if (!$order->chat) {
-            // create new chat
             $chat = $messageService->createNewChat();
             $chat->order_id = $order->id;
             $chat->save();

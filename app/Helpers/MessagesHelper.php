@@ -44,7 +44,7 @@ class MessagesHelper
     /**
      * User's or Customer's or Employee's id
      **/
-    public mixed $currentUserId;
+    public $currentUserId = null;
     private array $cache = [];
 
     const TYPE_CUSTOMER = 'c';
