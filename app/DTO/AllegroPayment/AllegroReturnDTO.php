@@ -2,7 +2,7 @@
 
 namespace App\DTO\AllegroPayment;
 
-readonly class AllegroReturnDTO
+class AllegroReturnDTO
 {
     /**
      * @param string $paymentId
@@ -11,12 +11,15 @@ readonly class AllegroReturnDTO
      */
     public function __construct(
         public string $paymentId,
-        public mixed $reason = '',
+        public mixed $reason = 'zwrot',
         public array $lineItems,
     ) {}
 
     public function toAllegroRefundArray(): array
     {
+        if ($this->reason === null) {
+            $this->reason = 'zwrot';
+        }
         return [
             'payment' => [
                 'id' => $this->paymentId
