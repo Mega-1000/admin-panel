@@ -17,7 +17,7 @@ class AllegroReturnDTO
 
     public function toAllegroRefundArray(): array
     {
-        if ($this->reason === null) {
+        if (empty($this->reason)) {
             $this->reason = 'zwrot';
         }
         return [
