@@ -9,6 +9,7 @@ use App\Entities\OrderItem;
 use App\Helpers\LowOrderQuantityAlertsSpacesHelper;
 use App\Jobs\AlertForOrderLowQuantityJob;
 use App\Repositories\OrderItems;
+use Carbon\Carbon;
 
 class LowOrderQuantityAlertService
 {
@@ -43,7 +44,7 @@ class LowOrderQuantityAlertService
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
                 /** @var LowOrderQuantityAlertMessage $message */
                 foreach ($alert->messages as $message) {
-                    dispatch(new AlertForOrderLowQuantityJob($order, $message))->delay(Carbon::now()->addHours($message->delay_time));
+                    dispatch(new AlertForOrderLowQuantityJob($order, $message))->delay(\Carbon\Carbon::now()->addHours($message->delay_time));
                 }
             }
         });
