@@ -73,7 +73,7 @@ class ProductPacketService
 
                         $product = Product::where('symbol', explode($dataArray['price'], '(')[0])->first();
 
-                        $productToAddArray['gross_selling_price_commercial_unit'] = $product->price->gross_selling_price_commercial_unit;
+                        $productToAddArray['gross_selling_price_commercial_unit'] = $product?->price?->gross_selling_price_commercial_unit ?? 0;
                     }
                 }
 
