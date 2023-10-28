@@ -73,7 +73,7 @@ class ProductPacketService
 
                     $product = Product::where('symbol', $dataArray['price'])->first();
 
-                    $productToAddArray['gross_selling_price_commercial_unit'] = $product?->price?->allegro_gross_selling_price_after_all_additional_costs ?? 0;
+                    $productToAddArray['gross_selling_price_commercial_unit'] = 11.22;
 //                }
 //                }
 
@@ -95,6 +95,7 @@ class ProductPacketService
                 );
 
                 $orderBuilder->assignItemsToOrder($order, [$productToAddArray], false);
+
 
                 $itemsValue = $order->items->sum(function (OrderItem $item) {
                     return $item->quantity * $item->gross_selling_price_commercial_unit;
