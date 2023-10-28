@@ -64,21 +64,20 @@ class ProductPacketService
 
                 $productToAddArray = $productToAdd->toArray();
 
-//                if (str_contains($dataArray['price'], 'CBS')) {
-//                } else {
-//                if (is_numeric($dataArray['price'])) {
-//                    $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
-//                } else {
-                    $productToAddArray['gross_selling_price_commercial_unit'] = 0;
-                    $dataArray['price'] = explode($dataArray['price'], '(')[0];
+                if (str_contains($dataArray['price'], 'CBS')) {
+                } else {
+                    if (is_numeric($dataArray['price'])) {
+                        $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
+                    } else {
+                        $productToAddArray['gross_selling_price_commercial_unit'] = 0;
 
-                    $product = Product::where('symbol', $dataArray['price'])->first();
+                        $product = Product::where('symbol', explode($dataArray['price'], '(')[0])->first();
 
-                    if ($product) {
-                        $productToAddArray['gross_selling_price_commercial_unit'] = $product->price->gross_selling_price_commercial_unit;
+                        if ($product) {
+                            $productToAddArray['gross_selling_price_commercial_unit'] = $product->price->gross_selling_price_commercial_unit;
+                        }
                     }
-//                }
-//                }
+                }
 
                 if (str_contains($dataArray['price'], '(-)')) {
                     $parts = explode('(-)', $dataArray['price']);
