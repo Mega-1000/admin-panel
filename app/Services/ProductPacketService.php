@@ -78,17 +78,17 @@ class ProductPacketService
 //                }
 //                }
 
-                if (str_contains($dataArray['price'], '(-)')) {
-                    $parts = explode('(-)', $dataArray['price']);
-                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
-                    $productToAddArray['gross_selling_price_commercial_unit'] -= $priceAdjustment;
-                }
-
-                if (str_contains($dataArray['price'], '(+)')) {
-                    $parts = explode('(+)', $dataArray['price']);
-                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
-                    $productToAddArray['gross_selling_price_commercial_unit'] += $priceAdjustment;
-                }
+//                if (str_contains($dataArray['price'], '(-)')) {
+//                    $parts = explode('(-)', $dataArray['price']);
+//                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
+//                    $productToAddArray['gross_selling_price_commercial_unit'] -= $priceAdjustment;
+//                }
+//
+//                if (str_contains($dataArray['price'], '(+)')) {
+//                    $parts = explode('(+)', $dataArray['price']);
+//                    $priceAdjustment = isset($parts[1]) ? (float)$parts[1] : 0;
+//                    $productToAddArray['gross_selling_price_commercial_unit'] += $priceAdjustment;
+//                }
 
                 $productToAddArray['amount'] = min(
                     $dataArray['quantity'] * $dataArray['quantity_of_packet_in_order'],
