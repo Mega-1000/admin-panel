@@ -34,6 +34,10 @@ class AlertForOrderLowQuantityJob implements ShouldQueue
      */
     public function handle(): void
     {
+        if ($this->order->send_auto_messages === false) {
+            return;
+        }
+
         Mailer::create()
             ->to($this->order->customer->login)
             ->send(new AlertForLowOrderQuantityMail(
