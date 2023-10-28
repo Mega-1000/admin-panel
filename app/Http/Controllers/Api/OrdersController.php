@@ -651,7 +651,8 @@ class OrdersController extends Controller
         $order = Order::where('token', $token)
             ->with(['items' => function ($q) {
                 $q->with(['product' => function ($q) {
-                    $q->with('price');
+                    $q->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+                        ->leftJoin('product_prices', 'product_packings.product_id', '=', 'product_prices.product_id');
                 }]);
             }])
             ->first();
@@ -698,7 +699,6 @@ class OrdersController extends Controller
 
         return response()->json($products);
     }
-
 
 
     public function getPaymentDetailsForOrder(Request $request, $token): JsonResponse|array
