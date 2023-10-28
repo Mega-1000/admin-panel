@@ -69,6 +69,7 @@ class ProductPacketService
 //                if (is_numeric($dataArray['price'])) {
 //                    $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
 //                } else {
+                    $productToAddArray['gross_selling_price_commercial_unit'] = 0;
                     $dataArray['price'] = explode($dataArray['price'], '(')[0];
 
                     $product = Product::where('symbol', $dataArray['price'])->first();
