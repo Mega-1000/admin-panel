@@ -103,7 +103,7 @@ class ProductPacketService
                 });
 
                 $order->update([
-                    'additional_service_cost' => $oldOrderValue - $itemsValue,
+                    'additional_service_cost' => 111,
                 ]);
             }
         }
