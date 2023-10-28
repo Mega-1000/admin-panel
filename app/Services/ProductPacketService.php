@@ -64,18 +64,18 @@ class ProductPacketService
 
                 $productToAddArray = $productToAdd->toArray();
 
-                if (str_contains($dataArray['price'], 'CBS')) {
-                } else {
-                    if (is_numeric($dataArray['price'])) {
-                        $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
-                    } else {
-                        $dataArray['price'] = explode($dataArray['price'], '(')[0];
+//                if (str_contains($dataArray['price'], 'CBS')) {
+//                } else {
+//                if (is_numeric($dataArray['price'])) {
+//                    $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
+//                } else {
+                    $dataArray['price'] = explode($dataArray['price'], '(')[0];
 
-                        $product = Product::where('symbol', $dataArray['price'])->first();
+                    $product = Product::where('symbol', $dataArray['price'])->first();
 
-                        $productToAddArray['gross_selling_price_commercial_unit'] = $product?->price?->allegro_gross_selling_price_after_all_additional_costs ?? 0;
-                    }
-                }
+                    $productToAddArray['gross_selling_price_commercial_unit'] = $product?->price?->allegro_gross_selling_price_after_all_additional_costs ?? 0;
+//                }
+//                }
 
                 if (str_contains($dataArray['price'], '(-)')) {
                     $parts = explode('(-)', $dataArray['price']);

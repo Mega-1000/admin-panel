@@ -59,7 +59,7 @@ final class AllegroReturnPaymentHelper
         return [$lineItemsForPaymentRefund, $lineItemsForCommissionRefund];
     }
 
-    public static function createReturnsByAllegroId(array $allegroOrder, array $returns)
+    public static function createReturnsByAllegroId(array $allegroOrder, array $returns): array
     {
         $symbolToAllegroIdPairings = AllegroOrderHelper::createSymbolToAllegroIdPairingsFromLineItems($allegroOrder['lineItems']);
 
