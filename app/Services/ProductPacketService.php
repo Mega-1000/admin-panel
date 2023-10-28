@@ -74,7 +74,9 @@ class ProductPacketService
 
                     $product = Product::where('symbol', $dataArray['price'])->first();
 
-                    $productToAddArray['gross_selling_price_commercial_unit'] = 11.22;
+                    if ($product) {
+                        $productToAddArray['gross_selling_price_commercial_unit'] = $product->gross_selling_price_commercial_unit;
+                    }
 //                }
 //                }
 
@@ -97,6 +99,7 @@ class ProductPacketService
 
                 $orderBuilder->assignItemsToOrder($order, [$productToAddArray], false);
 
+                $order->items()->first()->update(['gross_selling_price_commercial_unit' => $productToAddArray['gross_selling_price_commercial_unit']]);
 
                 $itemsValue = $order->items->sum(function (OrderItem $item) {
                     return $item->quantity * $item->gross_selling_price_commercial_unit;
