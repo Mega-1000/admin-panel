@@ -661,11 +661,7 @@ class OrdersController extends Controller
 
         foreach ($order->items as $item) {
             // Copy the properties from the associated product
-            $responseItem = $item->product->toArray();
-
-            // You can also include the item-specific properties if needed
-            $responseItem['item_specific_property'] = $item->item_specific_property;
-
+            $responseItem = $item->product->toArray() + $item->toArray();
             $responseItems[] = $responseItem;
         }
 
