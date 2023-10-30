@@ -306,6 +306,14 @@ class OrderBuilder
 
         foreach ($items as $item) {
             $product = Product::find($item['id']);
+            // check if order alrleady has this product
+            $orderItem = $order->items()->where('product_id', $product->id)->first();
+            if ($orderItem) {
+                $orderItem->quantity += $item['amount'];
+                $orderItem->save();
+                continue;
+            }
+
             if (empty($product)) {
                 throw new Exception('product_not_found');
             }
