@@ -8,6 +8,7 @@ use App\Entities\Product;
 use App\Entities\ProductPacket;
 use App\Factory\OrderBuilderFactory;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class ProductPacketService
 {
@@ -71,7 +72,7 @@ class ProductPacketService
                     } else {
                         $productToAddArray['gross_selling_price_commercial_unit'] = 0;
 
-                        var_dump($dataArray['price']);
+                        Log::notice($dataArray);
 
                         $product = Product::where('symbol', explode('(', $dataArray['price'])[0])->first();
 
