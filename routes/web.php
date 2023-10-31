@@ -20,6 +20,7 @@ use App\Http\Controllers\ImportAllegroBillingController;
 use App\Http\Controllers\LowOrderQuantityAlertController;
 use App\Http\Controllers\MailReportController;
 use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterMessageController;
 use App\Http\Controllers\OrderInvoiceDocumentsController;
 use App\Http\Controllers\OrdersMessagesController;
@@ -480,6 +481,8 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@preparePackageToSend')->name('orders.package.prepareToSend');
         Route::get('orders/package/{package_id}/sticker',
             'OrdersPackagesController@getSticker')->name('orders.package.getSticker');
+        Route::resource('newsletter', NewsletterController::class)->names('newsletter');
+        Route::post('newsletter/import', [NewsletterController::class, 'loadJson'])->name('newsletter.import');
 
         Route::get('orders/packages/{package}/sticker', [OrdersPackagesController::class, 'getStickerFile'])->name('orders.packages.getStickerFile');
 
@@ -752,3 +755,4 @@ Route::post('/product-stock-logs/{productStockLog}/edit', [ProductStockLogsContr
 
 Route::get('/form/{form:name}/{order}', [FormController::class, 'index'])->name('form');
 Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction'])->name('execute-form-action');
+Route::get('newsletter/generate/{category:name}', [NewsletterController::class, 'generate'])->name('newsletter.generate');
