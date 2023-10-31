@@ -96,6 +96,7 @@ class ProductPacketService
                     $dataArray['quantity'] * $dataArray['quantity_of_packet_in_order'],
                     $dataArray['max_quantity_in_order']
                 );
+                Log::notice($dataArray['gross_selling_price_commercial_unit']);
 
                 $orderBuilder->assignItemsToOrder($order, [$productToAddArray], false);
 
