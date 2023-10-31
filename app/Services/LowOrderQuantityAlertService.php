@@ -52,6 +52,21 @@ class LowOrderQuantityAlertService
 
     public static function parseToken(string $text, int $orderId): string
     {
+        $text = self::replaceForNewsletterLinks($text, $orderId);
+
         return str_replace('{idZamowienia}', $orderId, $text);
+    }
+
+    private static function replaceForNewsletterLinks(string $text, int $orderId): string
+    {
+        $order = Order::find($orderId);
+        $categories = $order->items->pluck('product.category')->unique();
+
+        $replaceText = '';
+        foreach ($categories as $category) {
+            $replaceText .= '<a href="' . route('newsletter.generate', $category->name) . '">' . $category->name . '</a><br>';
+        }
+
+        return str_replace('{linkiDoGazetki}', $replaceText, $text);
     }
 }

@@ -5,6 +5,8 @@
 @section('table')
     <div class="alert alert-success">
         Uwaga! możesz użyć tagu {idZamowienia} w wiadomości, który zostanie zastąpiony przez id zamówienia.
+        <br>
+        Oraz {linkiDoGazetki} aby wygenerować linki do gazetki.
     </div>
 
 
