@@ -99,8 +99,6 @@ class ProductPacketService
 
                 $orderBuilder->assignItemsToOrder($order, [$productToAddArray], false);
 
-                $order->items()->first()->update(['gross_selling_price_commercial_unit' => $productToAddArray['gross_selling_price_commercial_unit']]);
-
                 $itemsValue = $order->items->sum(function (OrderItem $item) {
                     return $item->quantity * $item->gross_selling_price_commercial_unit;
                 });
