@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('low_order_quantity_alerts', function (Blueprint $table) {
-            $table->string('item_names')->change();
+            $table->float('delay_time')->change();
         });
     }
 
@@ -23,8 +23,10 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
-        //
+        Schema::table('low_order_quantity_alerts', function (Blueprint $table) {
+            $table->integer('delay_time')->change();
+        });
     }
 };
