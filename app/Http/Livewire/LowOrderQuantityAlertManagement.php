@@ -105,20 +105,15 @@ class LowOrderQuantityAlertManagement extends Component
         ];
     }
 
-    public function updateMessage(int $key): void
+    public function updateMessage(int $key, $k): void
     {
         $message = LowOrderQuantityAlertMessage::find($key);
 
         $message->update([
-            'title' => $this->messages[$key]['title'],
-            'message' => $this->messages[$key]['message'],
-            'delay_time' => $this->messages[$key]['delay_time'],
-            'attachment_name' => $this->messages[$key]['attachment_name'],
+            'title' => $this->messages[$k]['title'],
+            'message' => $this->messages[$k]['message'],
+            'delay_time' => $this->messages[$k]['delay_time'],
+            'attachment_name' => $this->messages[$k]['attachment_name'],
         ]);
-
-        dd(LowOrderQuantityAlertMessage::where('title', $this->messages[$key]['title'])
-            ->orWhere('message', $this->messages[$key]['message'])
-            ->orWhere('delay_time', $this->messages[$key]['delay_time'])
-            ->first());
     }
 }
