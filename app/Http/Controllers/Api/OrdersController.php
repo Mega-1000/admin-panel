@@ -626,6 +626,7 @@ class OrdersController extends Controller
             }])
             ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers')
             ->orderBy('id', 'desc')
+            ->where('is_hidden', false)
             ->get();
 
         foreach ($orders as $order) {
@@ -656,7 +657,6 @@ class OrdersController extends Controller
                 }]);
             }])
             ->first();
-
 
         if (!$order) {
             return response()->json("Order doesn't exist", 400);
@@ -698,7 +698,7 @@ class OrdersController extends Controller
             }
         }
 
-        return response()->json($responseItems);
+        return response()->json($products, 200);
     }
 
 
