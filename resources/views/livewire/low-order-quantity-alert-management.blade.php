@@ -68,7 +68,7 @@
                     Usuń wiadomość
                 </button>
 
-                <button wire:click.prevent="updateMessage({{ $message['id'] }}, {{ $k }})" class="btn btn-primary">
+                <button wire:click.prevent="updateMessage({{ $message['id'] ?? $k }}, {{ $k }})" class="btn btn-primary">
                     Zapisz wiadomość
                 </button>
             </form>
