@@ -302,6 +302,8 @@ class ImportBankPayIn implements ShouldQueue
         $payment = OrderPayment::where('comments', $payIn->stringify())->first();
         $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
 
+        $order->preferred_invoice_date = $payIn->data_ksiegowania;
+
         $payment = !isset($payment)
             ? $order->payments()->create([
                 'amount' => $paymentAmount,
