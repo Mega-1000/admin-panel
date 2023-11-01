@@ -69,7 +69,7 @@
                 </button>
 
                 <button wire:click.prevent="updateMessage({{ $message['id'] }}, {{ $k }})" class="btn btn-primary">
-                    Edytuj wiadomość
+                    Zapisz wiadomość
                 </button>
             </form>
             <hr>
