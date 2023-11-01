@@ -2206,6 +2206,11 @@
                             if (data) {
                                 html += '<button class="btn btn-default btn-xs" onclick="filterByPhone(' + data + ')">F</button><button class="btn btn-default btn-xs" onclick="clearAndfilterByPhone(' + data + ')">OF</button>';
                             }
+
+                            if (data && data.startsWith('48')) {
+                                data = data.substr(2);
+                            }
+
                             html += "<a style='width:100%' target='_blank' href='/admin/orders?nof=" + data + "' class='btn btn-success'>NOF</a>";
 
                             html += '<p data-toggle="tooltip" data-html="true" title="' + tooltipTitle + '">' + phone + '</p>';
