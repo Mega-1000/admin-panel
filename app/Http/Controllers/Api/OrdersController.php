@@ -648,11 +648,14 @@ class OrdersController extends Controller
             return response("Missing token", 400);
         }
 
-        $order = Order::where('token', $token)->with('items')->first();
-
-        if ($order) {
-            $order->items->load('product.packing.price');
-        }
+        $order = Order::where('token', $token)
+            ->with(['items' => function ($q) {
+                $q->with(['product' => function ($q) {
+                    $q->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+                        ->leftJoin('product_prices', 'product_packings.product_id', '=', 'product_prices.product_id');
+                }]);
+            }])
+            ->first();
 
 
         if (!$order) {
