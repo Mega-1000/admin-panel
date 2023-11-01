@@ -119,6 +119,9 @@ class LowOrderQuantityAlertManagement extends Component
             'attachment_name' => $this->messages[$key]['attachment_name'],
         ]);
 
-        dd($this->messages[$key]['title']);
+        dd(LowOrderQuantityAlertMessage::where('title', $this->messages[$key]['title'])
+            ->orWhere('message', $this->messages[$key]['message'])
+            ->orWhere('delay_time', $this->messages[$key]['delay_time'])
+            ->first());
     }
 }
