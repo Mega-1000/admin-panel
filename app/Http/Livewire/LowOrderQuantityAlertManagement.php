@@ -112,8 +112,6 @@ class LowOrderQuantityAlertManagement extends Component
             ->orWhere('delay_time', $this->messages[$key]['delay_time'])
             ->first();
 
-
-        dd($message);
         $message->update([
             'title' => $this->messages[$key]['title'],
             'message' => $this->messages[$key]['message'],
@@ -121,5 +119,6 @@ class LowOrderQuantityAlertManagement extends Component
             'attachment_name' => $this->messages[$key]['attachment_name'],
         ]);
 
+        dd($message);
     }
 }
