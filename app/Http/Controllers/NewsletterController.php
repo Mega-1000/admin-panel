@@ -93,7 +93,6 @@ class NewsletterController extends Controller
             $file = $request->file('file');
             $json = json_decode(file_get_contents($file->getRealPath()), true);
 
-
             foreach ($json as $category => $products) {
                 foreach ($products as $product) {
                     Newsletter::create([

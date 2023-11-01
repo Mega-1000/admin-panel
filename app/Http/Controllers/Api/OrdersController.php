@@ -651,7 +651,7 @@ class OrdersController extends Controller
         $order = Order::where('token', $token)->with('items')->first();
 
         if ($order) {
-            $order->items->load('product.productPacking.productPrice');
+            $order->items->load('product.packing.price');
         }
 
 
