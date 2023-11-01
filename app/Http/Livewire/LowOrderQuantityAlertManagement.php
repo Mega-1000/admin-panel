@@ -119,6 +119,6 @@ class LowOrderQuantityAlertManagement extends Component
             'attachment_name' => $this->messages[$key]['attachment_name'],
         ]);
 
-        dd($message);
+        dd($this->messages[$key]['title']);
     }
 }
