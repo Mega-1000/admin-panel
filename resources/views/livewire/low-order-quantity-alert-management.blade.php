@@ -68,7 +68,7 @@
                     Usuń wiadomość
                 </button>
 
-                <button wire:click="updateMessage" class="btn btn-primary">
+                <button wire:click.prevent="updateMessage" class="btn btn-primary">
                     Edytuj wiadomość
                 </button>
             </form>
