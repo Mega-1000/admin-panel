@@ -70,7 +70,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
-use function Clue\StreamFilter\fun;
 
 /**
  * Class OrdersController
@@ -657,6 +656,7 @@ class OrdersController extends Controller
                 }]);
             }])
             ->first();
+        Log::notice($order->items);
 
         if (!$order) {
             return response()->json("Order doesn't exist", 400);
@@ -698,7 +698,7 @@ class OrdersController extends Controller
             }
         }
 
-        return response()->json($products);
+        return response()->json($responseItems);
     }
 
 
