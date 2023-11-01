@@ -650,13 +650,13 @@ class OrdersController extends Controller
         }
 
         $order = Order::where('token', $token)
-            ->with(['items.product' => function ($q) {
-                $q->join('packings', 'products.id', '=', 'packings.product_id')
-                    ->join('prices', 'products.id', '=', 'prices.product_id')
-                    ->select('products.*', 'packings.*', 'prices.*');
+            ->with(['items' => function ($q) {
+                $q->with(['product' => function ($q) {
+                    $q->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+                        ->leftJoin('product_prices', 'product_packings.product_id', '=', 'product_prices.product_id');
+                }]);
             }])
             ->first();
-
 
         if (!$order) {
             return response()->json("Order doesn't exist", 400);
@@ -666,9 +666,6 @@ class OrdersController extends Controller
 
         foreach ($order->items as $item) {
             if ($item->product) {
-
-
-
                 foreach (OrderBuilder::getPriceColumns() as $column) {
                     if (property_exists($item, $column) && property_exists($item->product, $column)) {
                         $item->product->$column = $item->$column;
