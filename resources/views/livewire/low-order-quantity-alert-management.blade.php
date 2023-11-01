@@ -67,6 +67,10 @@
                 <button class="btn btn-danger" wire:click.prevent="deleteMessage({{ $k }})">
                     Usuń wiadomość
                 </button>
+
+                <button wire:click="updateMessage" class="btn btn-primary">
+                    Edytuj wiadomość
+                </button>
             </form>
             <hr>
         @endforeach

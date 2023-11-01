@@ -104,4 +104,20 @@ class LowOrderQuantityAlertManagement extends Component
             'attachment_name' => '',
         ];
     }
+
+    public function updateMessage(int $key): void
+    {
+        $message = LowOrderQuantityAlertMessage::where('title', $this->messages[$key]['title'])
+            ->where('message', $this->messages[$key]['message'])
+            ->where('delay_time', $this->messages[$key]['delay_time'])
+            ->first();
+
+        $message->update([
+            'title' => $this->messages[$key]['title'],
+            'message' => $this->messages[$key]['message'],
+            'delay_time' => $this->messages[$key]['delay_time'],
+            'attachment_name' => $this->messages[$key]['attachment_name'],
+        ]);
+
+    }
 }
