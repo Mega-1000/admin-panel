@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('low_order_quantity_alerts', function (Blueprint $table) {
+        Schema::table('low_order_quantity_alert_messages', function (Blueprint $table) {
             $table->float('delay_time')->change();
         });
     }
