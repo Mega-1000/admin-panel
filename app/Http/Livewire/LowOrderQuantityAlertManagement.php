@@ -108,8 +108,8 @@ class LowOrderQuantityAlertManagement extends Component
     public function updateMessage(int $key): void
     {
         $message = LowOrderQuantityAlertMessage::where('title', $this->messages[$key]['title'])
-            ->where('message', $this->messages[$key]['message'])
-            ->where('delay_time', $this->messages[$key]['delay_time'])
+            ->orWhere('message', $this->messages[$key]['message'])
+            ->orWhere('delay_time', $this->messages[$key]['delay_time'])
             ->first();
 
         $message->update([
