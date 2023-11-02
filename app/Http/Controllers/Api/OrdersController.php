@@ -650,11 +650,13 @@ class OrdersController extends Controller
         }
 
         $order = Order::where('token', $token)
-            ->with(['items' => function ($q) {
-                $q->with(['product' => function ($q) {
-                }]);
+            ->with(['items.product' => function ($q) {
+                $q->join('packings', 'products.packing_id', '=', 'packings.id')
+                    ->join('prices', 'products.price_id', '=', 'prices.id')
+                    ->select('products.*', 'packings.name as packing_name', 'prices.amount as price_amount');
             }])
             ->first();
+
 
         if (!$order) {
             return response()->json("Order doesn't exist", 400);
