@@ -652,8 +652,8 @@ class OrdersController extends Controller
         $order = Order::where('token', $token)
             ->with(['items' => function ($q) {
                 $q->with(['product' => function ($q) {
-                    $q->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-                        ->leftJoin('product_prices', 'product_packings.product_id', '=', 'product_prices.product_id');
+                    $q->with('packing')
+                        ->with('price');
                 }]);
             }])
             ->first();
@@ -667,6 +667,14 @@ class OrdersController extends Controller
         $products = [];
 
         foreach ($order->items as $item) {
+            foreach ($item->product->packing->getAttributes() as $key => $value) {
+                $item->product->$key = $value;
+            }
+
+            foreach ($item->product->price->getAttributes() as $key => $value) {
+                $item->product->$key = $value;
+            }
+
             if ($item->product) {
                 foreach (OrderBuilder::getPriceColumns() as $column) {
                     if (property_exists($item, $column) && property_exists($item->product, $column)) {
