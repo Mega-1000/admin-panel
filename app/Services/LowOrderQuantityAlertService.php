@@ -22,7 +22,7 @@ class LowOrderQuantityAlertService
     public function dispatchAlertsForOrder(Order $order): void
     {
         LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order) {
-            if ($order->items->whereHas('product', fn ($q) => $q->where('symbol', 'SUP-900-0'))->exists()) {
+            if ($order->items()->whereHas('product', fn ($q) => $q->where('symbol', 'SUP-900-0'))->exists()) {
                 return;
             }
 
