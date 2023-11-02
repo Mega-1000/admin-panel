@@ -51,6 +51,10 @@ class AddNewProductStockPositionForm extends Component
             }])
             ->first();
 
+        if ($existingRecord->position_quantity != 0) {
+            return null;
+        }
+
         if (!empty($existingRecord) && !$this->isDeletionConfirmationModalOpen) {
             $this->isDeletionConfirmationModalOpen = true;
             return null;
