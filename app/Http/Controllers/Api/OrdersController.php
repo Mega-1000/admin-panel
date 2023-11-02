@@ -658,7 +658,6 @@ class OrdersController extends Controller
             }])
             ->first();
 
-        throw new Exception($order->items);
 
         if (!$order) {
             return response()->json("Order doesn't exist", 400);
