@@ -31,6 +31,12 @@
 
         <div class="btn btn-primary" wire:click="submitForm">@lang('voyager.generic.save')</div>
 
+        @if($this->couldNotDelete)
+            <div class="alert alert-danger">
+                Nie można usunąć pozycji, ponieważ jest powiązana z produktami.
+            </div>
+        @endif
+
         @include('livewire.partials.deletion-modal')
     </form>
 </div>

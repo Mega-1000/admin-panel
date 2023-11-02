@@ -17,6 +17,7 @@ class AddNewProductStockPositionForm extends Component
     public string $shelf;
     public string $position;
     public bool $isDeletionConfirmationModalOpen = false;
+    public bool $couldNotDelete = false;
 
 
     public function __construct($id = null)
@@ -52,6 +53,7 @@ class AddNewProductStockPositionForm extends Component
             ->first();
 
         if ($existingRecord->position_quantity != 0) {
+            $this->couldNotDelete = true;
             return null;
         }
 
