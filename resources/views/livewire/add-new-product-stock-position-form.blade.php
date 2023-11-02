@@ -33,7 +33,7 @@
 
         @if($this->couldNotDelete)
             <div class="alert alert-danger">
-                Nie można usunąć pozycji, ponieważ jest powiązana z produktami.
+                Nie można usunąć pozycji, ponieważ występuje na niej inny asortyment o stanie magazynowym innym niż 0.
             </div>
         @endif
 
