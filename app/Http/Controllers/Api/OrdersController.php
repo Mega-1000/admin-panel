@@ -655,7 +655,7 @@ class OrdersController extends Controller
                     ->join('prices', 'products.price_id', '=', 'prices.id')
                     ->select('products.*', 'packings.name as packing_name', 'prices.amount as price_amount');
             }])
-            ->toSql();
+            ->first();
 
         throw new Exception($order);
 
