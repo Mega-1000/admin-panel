@@ -308,8 +308,8 @@ class ImportBankPayIn implements ShouldQueue
             ? $order->payments()->create([
                 'amount' => $paymentAmount,
                 'type' => 'CLIENT',
-                'promise' => '',
                 'payer' => $payer,
+                'promise' => '',
                 'operation_date' => $payIn->data_ksiegowania,
                 'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
                 'comments' => implode(" ", $payIn->toArray()),
