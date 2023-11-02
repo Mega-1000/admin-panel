@@ -655,8 +655,9 @@ class OrdersController extends Controller
                     ->join('prices', 'products.price_id', '=', 'prices.id')
                     ->select('products.*', 'packings.name as packing_name', 'prices.amount as price_amount');
             }])
-            ->first();
+            ->toSql();
 
+        Log::notice($order);
 
         if (!$order) {
             return response()->json("Order doesn't exist", 400);
