@@ -657,7 +657,7 @@ class OrdersController extends Controller
             }])
             ->toSql();
 
-        Log::notice($order);
+        throw new Exception($order);
 
         if (!$order) {
             return response()->json("Order doesn't exist", 400);
