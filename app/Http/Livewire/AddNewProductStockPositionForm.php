@@ -52,7 +52,7 @@ class AddNewProductStockPositionForm extends Component
             }])
             ->first();
 
-        if ($existingRecord->position_quantity != 0) {
+        if ($existingRecord?->position_quantity != 0) {
             $this->couldNotDelete = true;
             return null;
         }

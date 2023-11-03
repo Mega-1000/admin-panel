@@ -137,7 +137,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
      *
      * @return void
      */
-    public function handle(OrderPackageRepository $orderPackageRepository)
+    public function handle(OrderPackageRepository $orderPackageRepository): void
     {
         $this->orderPackageRepository = $orderPackageRepository;
         if ($this->data['delivery_address']['email'] === null) {
@@ -169,11 +169,8 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 $result = $this->createPackageForDB();
                 break;
             default:
-                Log::notice(
-                    'Wrong courier',
-                    ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
-                );
-                die;
+                $result = $this->createAllegroPackage();
+                break;
         }
 
         if (!empty($result['is_error']) || $result === null) {
@@ -209,6 +206,94 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 }
             }
         }
+    }
+
+    public function createAllegroPackage()
+    {
+
+        //      {
+        //   "input":{
+        //      "deliveryMethodId":"c3066682-97a3-42fe-9eb5-3beeccab840c", - identyfikator usługi dostawy; pobierzesz go za pomocą GET /shipment-management/delivery-services
+        //      "credentialsId":"c9e6f40a-3d25-48fc-838c-055ceb1c5bc0", - identyfikator umowy własnej; wymagany, jeżeli nadajesz przesyłkę na umowie własnej,
+        //      "sender":{ - dane nadawcy
+        //         "name":"Jan Kowalski", - dane osobowe nadawcy
+        //         "company":"Allegro.pl sp. z o.o.", - nazwa firmy
+        //         "street":"Główna", - ulica
+        //         "streetNumber":"30", - numer budynku
+        //         "postalCode":"10-200", - kod pocztowy
+        //         "city":"Warszawa", - miasto
+        //         "countryCode":"PL", - kod kraju zgodny ze standardem ISO 3166-1 alpha-2
+        //         "email":"email@mail.com", - adres e-mail
+        //         "phone":"500600700", - numer telefonu nadawcy
+        //         "point":"A1234567" - wymagane, jeśli adresem nadawczym jest punkt odbioru
+        //      },
+        //      "receiver":{ - dane odbiorcy
+        //         "name":"Jan Kowalski", - dane osobowe odbiorcy
+        //         "company":"Allegro.pl sp. z o.o.", - nazwa firmy
+        //         "street":"Główna", - ulica
+        //         "streetNumber":"30", - numer budynku
+        //         "postalCode":"10-200", - kod pocztowy
+        //         "city":"Warszawa", - miasto
+        //         "countryCode":"PL", - kod kraju zgodny ze standardem ISO 3166-1 alpha-2
+        //         "email":"email@mail.com", - wymagany, adres e-mail. Musisz  przekazać prawidłowy maskowany adres e-mail wygenerowany przez Allegro, np.
+        //hamu7udk3p+17454c1b6@allegromail.pl
+        //         "phone":"500600700", - numer telefonu
+        //         "point":"A1234567" - wymagane, jeśli adresem odbiorczym jest punkt odbioru. ID punktu odbioru, pobierzesz z danych zamówienia za pomocą GET /order/checkout-forms
+        //      },
+        //      "pickup":{ - wymagane, dane nadawcy
+        //         "name":"Jan Kowalski", - dane osobowe nadawcy
+        //         "company":"Allegro.pl sp. z o.o.", - nazwa firmy
+        //         "street":"Główna", - ulica
+        //         "streetNumber":"30", - numer budynku
+        //         "postalCode":"10-200", - kod pocztowy
+        //         "city":"Warszawa", - miasto
+        //         "countryCode":"PL", - kod kraju zgodny ze standardem ISO 3166-1 alpha-2
+        //         "email":"email@mail.com", - adres e-mail
+        //         "phone":"500600700", - numer telefonu nadawcy
+        //         "point":"A1234567" - wymagane, jeśli adresem nadawczym jest punkt odbioru
+        //      },
+        //      "referenceNumber":"abcd1234", - zewnętrzny ID / sygnatura, który nadaje sprzedający, dzięki któremu rozpozna przesyłkę w swoim systemie (część przewoźników nie korzysta z tego pola, w związku z czym informacja nie będzie widoczna na etykiecie)
+        //      "description":"Car wheels", - opis zawartości paczki
+        //      "packages":[ - wymagane, informacje o paczkach. Maksymalna liczba przesyłek dla przewoźników to: 10. Maksymalna liczba paczek wchodzących w skład jednej przesyłki (dotyczy tylko DPD i WE|DO) to: 10.
+        //         {
+        //            "type":"OTHER", - wymagane (jeśli nie przekażesz pola “type” na głównym poziomie), typ przesyłki; dostępne wartości: PACKAGE (paczka), DOX (list), PALLET (przesyłka paletowa), OTHER (inna)
+        //            "length":{ - długość paczki
+        //               "value":12,
+        //               "unit":"CENTIMETER"
+        //            },
+        //            "width":{ - szerokość paczki
+        //               "value":12,
+        //               "unit":"CENTIMETER"
+        //            },
+        //            "height":{ - wysokość paczki
+        //               "value":12,
+        //               "unit":"CENTIMETER"
+        //            },
+        //            "weight":{ - waga paczki
+        //               "value":12.45,
+        //               "unit":"KILOGRAMS"
+        //            }
+        //         }
+        //      ],
+        //      "insurance":{ - ubezpieczenie
+        //         "amount":"23.47", - suma ubezpieczenia
+        //         "currency":"PLN" - waluta kwoty ubezpieczenia
+        //      },
+        //      "cashOnDelivery":{ - płatność przy odbiorze
+        //         "amount":"2.50", - suma płatności przy odbiorze
+        //         "currency":"PLN", - waluta
+        //         "ownerName":"Jan Kowalski", - dane adresata płatności; wymagane jeśli dla wybranej usługi dostawy wymagany numer IBAN ("forceRequireIban": true)
+        //         "iban":"PL48109024022441789739167589" - numer konta IBAN wskazany w przez sprzedawcę przy tworzeniu przesyłki; musi być taki sam, jak w ustawieniach wypłat Allegro; dotyczy tylko przesyłek na terenie PL; wymagany jeśli dla wybranej usługi dostawy wymagany numer IBAN ("forceRequireIban": true)
+        //      },
+        //      "labelFormat":"PDF", - format etykiety (nie można go zmienić w późniejszym etapie); dostępne wartości: PDF, ZPL, EPL
+        //      "additionalServices":[ - usługi dodatkowe. Dostępne są tylko te możliwości, które otrzymałeś w odpowiedzi dla GET /shipment-management/delivery-services dla danej usługi dostawy
+        //         "ADDITIONAL_HANDLING"
+        //      ],
+        //"additionalProperties": {}
+        //   }
+        //}
+
+
     }
 
     /**
