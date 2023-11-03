@@ -1395,6 +1395,13 @@
         $.fn.dataTable.ext.errMode = 'throw';
 
         function createSimilar(id, orderId) {
+            if (window.isCreatingSimilar) {
+                return;
+            }
+
+            window.isCreatingSimilar = true;
+
+            setTimeout(() => {window.isCreatingSimilar = false}, 1000);
             let action = "{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
             action = action.replace('%id', id)
             $('#createSimilarPackForm').attr('action', action)
