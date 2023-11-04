@@ -239,7 +239,6 @@ class AllegroApiService
                     'Content-type' => 'application/x-www-form-urlencoded'
                 ]
             ]);
-            dd($response);
         } catch (Exception) {
             return false;
         }
