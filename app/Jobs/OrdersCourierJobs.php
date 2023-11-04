@@ -144,6 +144,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         if ($this->data['delivery_address']['email'] === null) {
             $this->data['delivery_address']['email'] = $this->orderPackageRepository->order->customer->login;
         }
+        dd($this->courierName);
         switch ($this->courierName) {
             case CourierName::DPD:
                 $result = $this->createPackageForDpd();
