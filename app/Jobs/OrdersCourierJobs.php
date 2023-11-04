@@ -260,41 +260,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
 
         dd($result);
-
-
-        //      {
-        //   "input":{
-        //      "deliveryMethodId":"c3066682-97a3-42fe-9eb5-3beeccab840c", - identyfikator usługi dostawy; pobierzesz go za pomocą GET /shipment-management/delivery-services
-        //      "pickup":{ - wymagane, dane nadawcy
-        //         "name":"Jan Kowalski", - dane osobowe nadawcy
-        //         "company":"Allegro.pl sp. z o.o.", - nazwa firmy
-        //         "street":"Główna", - ulica
-        //         "streetNumber":"30", - numer budynku
-        //         "postalCode":"10-200", - kod pocztowy
-        //         "city":"Warszawa", - miasto
-        //         "countryCode":"PL", - kod kraju zgodny ze standardem ISO 3166-1 alpha-2
-        //         "email":"email@mail.com", - adres e-mail
-        //         "phone":"500600700", - numer telefonu nadawcy
-        //         "point":"A1234567" - wymagane, jeśli adresem nadawczym jest punkt odbioru
-        //      },
-        //      "referenceNumber":"abcd1234", - zewnętrzny ID / sygnatura, który nadaje sprzedający, dzięki któremu rozpozna przesyłkę w swoim systemie (część przewoźników nie korzysta z tego pola, w związku z czym informacja nie będzie widoczna na etykiecie)
-        //      "description":"Car wheels", - opis zawartości paczki
-        //
-        //      "cashOnDelivery":{ - płatność przy odbiorze
-        //         "amount":"2.50", - suma płatności przy odbiorze
-        //         "currency":"PLN", - waluta
-        //         "ownerName":"Jan Kowalski", - dane adresata płatności; wymagane jeśli dla wybranej usługi dostawy wymagany numer IBAN ("forceRequireIban": true)
-        //         "iban":"PL48109024022441789739167589" - numer konta IBAN wskazany w przez sprzedawcę przy tworzeniu przesyłki; musi być taki sam, jak w ustawieniach wypłat Allegro; dotyczy tylko przesyłek na terenie PL; wymagany jeśli dla wybranej usługi dostawy wymagany numer IBAN ("forceRequireIban": true)
-        //      },
-        //      "labelFormat":"PDF", - format etykiety (nie można go zmienić w późniejszym etapie); dostępne wartości: PDF, ZPL, EPL
-        //      "additionalServices":[ - usługi dodatkowe. Dostępne są tylko te możliwości, które otrzymałeś w odpowiedzi dla GET /shipment-management/delivery-services dla danej usługi dostawy
-        //         "ADDITIONAL_HANDLING"
-        //      ],
-        //"additionalProperties": {}
-        //   }
-        //}
-
-
     }
 
     /**

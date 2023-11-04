@@ -131,6 +131,8 @@ class AllegroApiService
                 'json' => $params
             ];
 
+            dd($headers);
+
             // save to link for files
             if ($attachment !== null) {
 
@@ -166,7 +168,6 @@ class AllegroApiService
             }
         }
 
-        dd($response);
         if ($response->getStatusCode() != 200 && $response->getStatusCode() != 201) {
             if ($response->getStatusCode() != 204) {
                 return $this->cantGetAlert();
