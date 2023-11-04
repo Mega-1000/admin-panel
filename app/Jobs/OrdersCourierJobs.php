@@ -27,6 +27,7 @@ use App\Integrations\Pocztex\getAddresLabelCompact;
 use App\Integrations\Pocztex\sendEnvelope;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use App\Repositories\OrderPackageRepository;
+use App\Services\AllegroApiService;
 use App\Services\SchenkerService;
 use Carbon\Carbon;
 use DOMDocument;
@@ -254,7 +255,11 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             ]
         ];
 
-        dd($data);
+        $allegroApiService = new AllegroApiService();
+        $result = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/shipments/create-commands',$data);
+
+
+        dd($result);
 
 
         //      {
