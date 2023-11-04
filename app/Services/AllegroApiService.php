@@ -120,7 +120,8 @@ class AllegroApiService
             Log::error('AllegroApiService: access token not found');
             return false;
         }
-dd($this->getAccessToken());
+
+
         try {
             $headers = [
                 'Authorization' => "Bearer " . $this->getAccessToken(),
