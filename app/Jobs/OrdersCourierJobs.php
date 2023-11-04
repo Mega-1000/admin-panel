@@ -210,7 +210,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     'street' => $this->data['pickup_address']['address'],
                     'streetNumber' => $this->data['pickup_address']['flat_number'],
                     'city' => $this->data['pickup_address']['city'],
-                    'postCode' => $this->data['pickup_address']['postal_code'],
+                    'postCode' => '66-400',
                     'countryCode' => $this->data['pickup_address']['country'],
                     'email' => $this->data['pickup_address']['email'],
                     'phone' => $this->data['pickup_address']['phone'],
