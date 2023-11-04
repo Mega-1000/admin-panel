@@ -33,7 +33,7 @@ class AllegroApiService
             ? 'https://allegro.pl/auth/oauth'
             : 'https://allegro.pl.allegrosandbox.pl/auth/oauth';
 
-        $this->authModel = Allegro_Auth::find($this->auth_record_id);
+        $this->authModel = Allegro_Auth::find($this->auth_record_id ?? 2);
 
         $this->client = new Client();
 
@@ -174,6 +174,7 @@ class AllegroApiService
         if (isset($params['sink'])) {
             return $response;
         }
+
         return json_decode((string)$response->getBody(), true);
     }
 
