@@ -204,55 +204,56 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $data = [
             'input' => [
                 'sender' => [
-                    'name' => $this->pickup_address['firstname'],
-                    'company' => $this->pickup_address['firmname'],
-                    'street' => $this->pickup_address['address'],
-                    'streetNumber' => $this->pickup_address['flat_number'],
-                    'city' => $this->pickup_address['city'],
-                    'postCode' => $this->pickup_address['postal_code'],
-                    'countryCode' => $this->pickup_address['country'],
-                    'email' => $this->pickup_address['email'],
-                    'phone' => $this->pickup_address['phone'],
+                    'name' => $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'],
+                    'company' => $this->data['pickup_address']['firmname'],
+                    'street' => $this->data['pickup_address']['address'],
+                    'streetNumber' => $this->data['pickup_address']['flat_number'],
+                    'city' => $this->data['pickup_address']['city'],
+                    'postCode' => $this->data['pickup_address']['postal_code'],
+                    'countryCode' => $this->data['pickup_address']['country'],
+                    'email' => $this->data['pickup_address']['email'],
+                    'phone' => $this->data['pickup_address']['phone'],
                 ],
                 'packages' => [
                     [
                         'type' => 'OTHER',
                         'length' => [
-                            'value' => $this->length,
-                            'unit' => 'CENTIMETER'
+                            'value' => (float)$this->data['length'],
+                            'unit' => 'CENTIMETER',
                         ],
                         'width' => [
-                            'value' => $this->width,
+                            'value' => (float)$this->data['width'],
                             'unit' => 'CENTIMETER',
                         ],
                         'height' => [
-                            'value' => $this->height,
-                            'unit' => 'CENTIMETER'
+                            'value' => (float)$this->data['height'],
+                            'unit' => 'CENTIMETER',
                         ],
                         'weight' => [
-                            'value' => $this->weight,
-                            'unit' => 'KILOGRAM'
+                            'value' => (float)$this->data['weight'],
+                            'unit' => 'KILOGRAM',
                         ]
                     ]
                 ],
                 'labelFormat' => 'PDF',
                 'receiver' => [
-                    'name' => $this->delivery_address['firstname'],
-                    'company' => $this->delivery_address['firmname'],
-                    'street' => $this->delivery_address['address'],
-                    'streetNumber' => $this->delivery_address['flat_number'],
-                    'postalCode' => $this->delivery_address['postal_code'],
-                    'city' => $this->delivery_address['city'],
-                    'countryCode' => $this->delivery_address['country'],
-                    'email' => $this->delivery_address['email'],
-                    'phone' => $this->delivery_address['phone'],
+                    'name' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'],
+                    'company' => $this->data['delivery_address']['firmname'],
+                    'street' => $this->data['delivery_address']['address'],
+                    'streetNumber' => $this->data['delivery_address']['flat_number'],
+                    'postalCode' => $this->data['delivery_address']['postal_code'],
+                    'city' => $this->data['delivery_address']['city'],
+                    'countryCode' => $this->data['delivery_address']['country'],
+                    'email' => $this->data['delivery_address']['email'],
+                    'phone' => $this->data['delivery_address']['phone'],
                 ],
                 'insurance' => [
-                    'amount' => $this->amount,
+                    'amount' => $this->data['amount'],
                     'currency' => 'PLN',
                 ],
             ]
         ];
+
         dd($data);
 
 
