@@ -65,25 +65,10 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         'PROBLEM_WITH_JAS_INTEGRATION' => 9
     ];
 
-    /**
-     * @var
-     */
-    protected $data;
-
-    /**
-     * @var Repository|mixed
-     */
-    protected $config;
-
-    /**
-     * @var
-     */
-    protected $courierName;
-
-    /**
-     * @var OrderPackageRepository
-     */
-    protected $orderPackageRepository;
+    protected mixed $data;
+    protected mixed $config;
+    protected mixed $courierName;
+    protected OrderPackageRepository $orderPackageRepository;
 
     /**
      * Create a new job instance.
@@ -144,7 +129,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         if ($this->data['delivery_address']['email'] === null) {
             $this->data['delivery_address']['email'] = $this->orderPackageRepository->order->customer->login;
         }
-        dd($this->courierName);
+        dd($this);
         switch ($this->courierName) {
             case CourierName::DPD:
                 $result = $this->createPackageForDpd();
