@@ -150,11 +150,12 @@ class AllegroApiService
                 $data['sink'] = $params['sink'];
             }
 
-            $response = $this->client->request(
+            $response =dd($this->client->request(
                 $method,
                 $url,
                 $data
-            );
+            ));
+
             dd($response);
         } catch (Exception $e) {
             if ($e->getCode() == 401 && $first === true) {
