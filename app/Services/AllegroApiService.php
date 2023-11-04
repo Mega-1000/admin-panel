@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class AllegroApiService
 {
-    protected $auth_record_id = 2;
+    protected $auth_record_id = 1;
     protected $sandbox = false;
     protected $api_url = '';
     protected $auth_url = '';
