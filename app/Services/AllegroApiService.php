@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class AllegroApiService
 {
-    protected $auth_record_id = null;
+    protected $auth_record_id = 2;
     protected $sandbox = false;
     protected $api_url = '';
     protected $auth_url = '';
@@ -33,7 +33,7 @@ class AllegroApiService
             ? 'https://allegro.pl/auth/oauth'
             : 'https://allegro.pl.allegrosandbox.pl/auth/oauth';
 
-        $this->authModel = Allegro_Auth::find($this->auth_record_id ?? 2);
+        $this->authModel = Allegro_Auth::find($this->auth_record_id);
 
         $this->client = new Client();
 
