@@ -131,7 +131,6 @@ class AllegroApiService
                 'json' => $params
             ];
 
-            dd($headers);
 
             // save to link for files
             if ($attachment !== null) {
