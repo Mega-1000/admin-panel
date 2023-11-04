@@ -164,6 +164,9 @@
                     <option {{ old('delivery_courier_name') == 'DB' ? 'selected="selected"' : '' }} value="DB">
                         DB SCHENKER
                     </option>
+                    <option value="inna">
+                        Inna
+                    </option>
                 </select>
             </div>
             <div class="form-group">
