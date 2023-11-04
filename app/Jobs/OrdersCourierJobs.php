@@ -130,36 +130,37 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             $this->data['delivery_address']['email'] = $this->orderPackageRepository->order->customer->login;
         }
 
-        dd($this->courierName);
-        switch ($this->courierName) {
-            case CourierName::DPD:
-                $result = $this->createPackageForDpd();
-                break;
-            case CourierName::INPOST:
-                $result = $this->createPackageForInpost();
-                break;
-            case CourierName::ALLEGRO_INPOST:
-                $result = $this->createPackageForInpost(1);
-                break;
-            case CourierName::APACZKA:
-                $result = $this->createPackageForApaczka();
-                break;
-            case CourierName::POCZTEX:
-                $result = $this->createPackageForPocztex();
-                break;
-            case CourierName::JAS:
-                $result = $this->createPackageForJas();
-                break;
-            case CourierName::GLS:
-                $result = $this->createPackageForGLS();
-                break;
-            case CourierName::DB_SCHENKER:
-                $result = $this->createPackageForDB();
-                break;
-            default:
-                $result = $this->createAllegroPackage();
-                break;
-        }
+        $this->createAllegroPackage();
+//        dd($this->courierName);
+//        switch ($this->courierName) {
+//            case CourierName::DPD:
+//                $result = $this->createPackageForDpd();
+//                break;
+//            case CourierName::INPOST:
+//                $result = $this->createPackageForInpost();
+//                break;
+//            case CourierName::ALLEGRO_INPOST:
+//                $result = $this->createPackageForInpost(1);
+//                break;
+//            case CourierName::APACZKA:
+//                $result = $this->createPackageForApaczka();
+//                break;
+//            case CourierName::POCZTEX:
+//                $result = $this->createPackageForPocztex();
+//                break;
+//            case CourierName::JAS:
+//                $result = $this->createPackageForJas();
+//                break;
+//            case CourierName::GLS:
+//                $result = $this->createPackageForGLS();
+//                break;
+//            case CourierName::DB_SCHENKER:
+//                $result = $this->createPackageForDB();
+//                break;
+//            default:
+//                $result = $this->createAllegroPackage();
+//                break;
+//        }
 
         if (!empty($result['is_error']) || $result === null) {
             return;
