@@ -34,7 +34,6 @@ class AllegroApiService
             : 'https://allegro.pl.allegrosandbox.pl/auth/oauth';
 
         $this->authModel = Allegro_Auth::find($this->auth_record_id ?? 2);
-        dd($this->auth_record_id, $this->authModel);
 
         $this->client = new Client();
 
