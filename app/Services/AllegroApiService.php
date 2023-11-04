@@ -155,6 +155,7 @@ class AllegroApiService
                 $url,
                 $data
             );
+            dd($response);
         } catch (Exception $e) {
             if ($e->getCode() == 401 && $first === true) {
                 if ($this->getRefreshToken()) {
@@ -164,7 +165,6 @@ class AllegroApiService
                 }
                 return $this->request($method, $url, $params, $attachment, false);
             } else {
-                dd($e->getMessage());
                 Log::error('AllegroApiService: request: ' . $e->getMessage());
                 return $this->cantGetAlert();
             }
