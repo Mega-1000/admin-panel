@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\DTO\Schenker\Request\GetOrderDocumentRequestDTO;
 use App\DTO\Schenker\Response\CreateOrderResponseDTO;
+use App\Entities\Firm;
 use App\Entities\OrderPackage;
 use App\Enums\CourierName;
 use App\Enums\PackageStatus;
@@ -210,36 +211,65 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
     public function createAllegroPackage()
     {
+        $warehouse = Firm::find(16);
+        dd($this->data);
+
+        $data = [
+            'input' => [
+                'sender' => [
+                    'name' => $warehouse->address->name,
+                    'company' => $warehouse->address->name,
+                    'street' => $warehouse->address->street,
+                    'streetNumber' => $warehouse->address->street_number,
+                    'city' => $warehouse->address->city,
+                    'postCode' => $warehouse->address->post_code,
+                    'countryCode' => $warehouse->address->country_code,
+                    'email' => $warehouse->address->email,
+                    'phone' => $warehouse->address->phone,
+                ],
+                'packages' => [
+                     [
+                        'type' => 'OTHER',
+                        'length' => [
+                           'value' => 12,
+                           'unit' => 'CENTIMETER'
+                        ],
+                        'width' => [
+                           'value' => 12,
+                           'unit' => 'CENTIMETER',
+                        ],
+                        'height' => [
+                           'value' => 12,
+                           'unit' => 'CENTIMETER'
+                        ],
+                        'weight' => [
+                           'value' => 12.45,
+                           'unit' => 'KILOGRAM'
+                        ]
+                     ]
+                ],
+                'labelFormat' => 'PDF',
+                'receiver' => [
+                    'name' => $this->data['additional_data']['receiver']['name'],
+                    'company' => $this->data['additional_data']['receiver']['company'],
+                    'street' => $this->data['additional_data']['receiver']['street'],
+                    'streetNumber' => $this->data['additional_data']['receiver']['street_number'],
+                    'postalCode' => $this->data['additional_data']['receiver']['postal_code'],
+                    'city' => $this->data['additional_data']['receiver']['city'],
+                    'countryCode' => $this->data['additional_data']['receiver']['country_code'],
+                    'email' => $this->data['additional_data']['receiver']['email'],
+                    'phone' => $this->data['additional_data']['receiver']['phone'],
+                ],
+                'insurance' => [
+                    'amount' => $this->data['additional_data']['insurance']['amount'],
+                    'currency' => $this->data['additional_data']['insurance']['currency'],
+                ],
+            ]
+        ];
 
         //      {
         //   "input":{
         //      "deliveryMethodId":"c3066682-97a3-42fe-9eb5-3beeccab840c", - identyfikator usługi dostawy; pobierzesz go za pomocą GET /shipment-management/delivery-services
-        //      "credentialsId":"c9e6f40a-3d25-48fc-838c-055ceb1c5bc0", - identyfikator umowy własnej; wymagany, jeżeli nadajesz przesyłkę na umowie własnej,
-        //      "sender":{ - dane nadawcy
-        //         "name":"Jan Kowalski", - dane osobowe nadawcy
-        //         "company":"Allegro.pl sp. z o.o.", - nazwa firmy
-        //         "street":"Główna", - ulica
-        //         "streetNumber":"30", - numer budynku
-        //         "postalCode":"10-200", - kod pocztowy
-        //         "city":"Warszawa", - miasto
-        //         "countryCode":"PL", - kod kraju zgodny ze standardem ISO 3166-1 alpha-2
-        //         "email":"email@mail.com", - adres e-mail
-        //         "phone":"500600700", - numer telefonu nadawcy
-        //         "point":"A1234567" - wymagane, jeśli adresem nadawczym jest punkt odbioru
-        //      },
-        //      "receiver":{ - dane odbiorcy
-        //         "name":"Jan Kowalski", - dane osobowe odbiorcy
-        //         "company":"Allegro.pl sp. z o.o.", - nazwa firmy
-        //         "street":"Główna", - ulica
-        //         "streetNumber":"30", - numer budynku
-        //         "postalCode":"10-200", - kod pocztowy
-        //         "city":"Warszawa", - miasto
-        //         "countryCode":"PL", - kod kraju zgodny ze standardem ISO 3166-1 alpha-2
-        //         "email":"email@mail.com", - wymagany, adres e-mail. Musisz  przekazać prawidłowy maskowany adres e-mail wygenerowany przez Allegro, np.
-        //hamu7udk3p+17454c1b6@allegromail.pl
-        //         "phone":"500600700", - numer telefonu
-        //         "point":"A1234567" - wymagane, jeśli adresem odbiorczym jest punkt odbioru. ID punktu odbioru, pobierzesz z danych zamówienia za pomocą GET /order/checkout-forms
-        //      },
         //      "pickup":{ - wymagane, dane nadawcy
         //         "name":"Jan Kowalski", - dane osobowe nadawcy
         //         "company":"Allegro.pl sp. z o.o.", - nazwa firmy
@@ -254,31 +284,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         //      },
         //      "referenceNumber":"abcd1234", - zewnętrzny ID / sygnatura, który nadaje sprzedający, dzięki któremu rozpozna przesyłkę w swoim systemie (część przewoźników nie korzysta z tego pola, w związku z czym informacja nie będzie widoczna na etykiecie)
         //      "description":"Car wheels", - opis zawartości paczki
-        //      "packages":[ - wymagane, informacje o paczkach. Maksymalna liczba przesyłek dla przewoźników to: 10. Maksymalna liczba paczek wchodzących w skład jednej przesyłki (dotyczy tylko DPD i WE|DO) to: 10.
-        //         {
-        //            "type":"OTHER", - wymagane (jeśli nie przekażesz pola “type” na głównym poziomie), typ przesyłki; dostępne wartości: PACKAGE (paczka), DOX (list), PALLET (przesyłka paletowa), OTHER (inna)
-        //            "length":{ - długość paczki
-        //               "value":12,
-        //               "unit":"CENTIMETER"
-        //            },
-        //            "width":{ - szerokość paczki
-        //               "value":12,
-        //               "unit":"CENTIMETER"
-        //            },
-        //            "height":{ - wysokość paczki
-        //               "value":12,
-        //               "unit":"CENTIMETER"
-        //            },
-        //            "weight":{ - waga paczki
-        //               "value":12.45,
-        //               "unit":"KILOGRAMS"
-        //            }
-        //         }
-        //      ],
-        //      "insurance":{ - ubezpieczenie
-        //         "amount":"23.47", - suma ubezpieczenia
-        //         "currency":"PLN" - waluta kwoty ubezpieczenia
-        //      },
+        //
         //      "cashOnDelivery":{ - płatność przy odbiorze
         //         "amount":"2.50", - suma płatności przy odbiorze
         //         "currency":"PLN", - waluta
