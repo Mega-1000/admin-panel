@@ -129,7 +129,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         if ($this->data['delivery_address']['email'] === null) {
             $this->data['delivery_address']['email'] = $this->orderPackageRepository->order->customer->login;
         }
-        dd($this);
         switch ($this->courierName) {
             case CourierName::DPD:
                 $result = $this->createPackageForDpd();
@@ -198,60 +197,60 @@ class OrdersCourierJobs extends Job implements ShouldQueue
     public function createAllegroPackage()
     {
         $warehouse = Firm::find(16);
-        dd($this->data);
 
         $data = [
             'input' => [
                 'sender' => [
-                    'name' => $warehouse->address->name,
-                    'company' => $warehouse->address->name,
-                    'street' => $warehouse->address->street,
-                    'streetNumber' => $warehouse->address->street_number,
-                    'city' => $warehouse->address->city,
-                    'postCode' => $warehouse->address->post_code,
-                    'countryCode' => $warehouse->address->country_code,
-                    'email' => $warehouse->address->email,
-                    'phone' => $warehouse->address->phone,
+                    'name' => $this->pickup_address['firstname'],
+                    'company' => $this->pickup_address['firmname'],
+                    'street' => $this->pickup_address['address'],
+                    'streetNumber' => $this->pickup_address['flat_number'],
+                    'city' => $this->pickup_address['city'],
+                    'postCode' => $this->pickup_address['postal_code'],
+                    'countryCode' => $this->pickup_address['country'],
+                    'email' => $this->pickup_address['email'],
+                    'phone' => $this->pickup_address['phone'],
                 ],
                 'packages' => [
-                     [
+                    [
                         'type' => 'OTHER',
                         'length' => [
-                           'value' => 12,
-                           'unit' => 'CENTIMETER'
+                            'value' => $this->length,
+                            'unit' => 'CENTIMETER'
                         ],
                         'width' => [
-                           'value' => 12,
-                           'unit' => 'CENTIMETER',
+                            'value' => $this->width,
+                            'unit' => 'CENTIMETER',
                         ],
                         'height' => [
-                           'value' => 12,
-                           'unit' => 'CENTIMETER'
+                            'value' => $this->height,
+                            'unit' => 'CENTIMETER'
                         ],
                         'weight' => [
-                           'value' => 12.45,
-                           'unit' => 'KILOGRAM'
+                            'value' => $this->weight,
+                            'unit' => 'KILOGRAM'
                         ]
-                     ]
+                    ]
                 ],
                 'labelFormat' => 'PDF',
                 'receiver' => [
-                    'name' => $this->data['additional_data']['receiver']['name'],
-                    'company' => $this->data['additional_data']['receiver']['company'],
-                    'street' => $this->data['additional_data']['receiver']['street'],
-                    'streetNumber' => $this->data['additional_data']['receiver']['street_number'],
-                    'postalCode' => $this->data['additional_data']['receiver']['postal_code'],
-                    'city' => $this->data['additional_data']['receiver']['city'],
-                    'countryCode' => $this->data['additional_data']['receiver']['country_code'],
-                    'email' => $this->data['additional_data']['receiver']['email'],
-                    'phone' => $this->data['additional_data']['receiver']['phone'],
+                    'name' => $this->delivery_address['firstname'],
+                    'company' => $this->delivery_address['firmname'],
+                    'street' => $this->delivery_address['address'],
+                    'streetNumber' => $this->delivery_address['flat_number'],
+                    'postalCode' => $this->delivery_address['postal_code'],
+                    'city' => $this->delivery_address['city'],
+                    'countryCode' => $this->delivery_address['country'],
+                    'email' => $this->delivery_address['email'],
+                    'phone' => $this->delivery_address['phone'],
                 ],
                 'insurance' => [
-                    'amount' => $this->data['additional_data']['insurance']['amount'],
-                    'currency' => $this->data['additional_data']['insurance']['currency'],
+                    'amount' => $this->amount,
+                    'currency' => 'PLN',
                 ],
             ]
         ];
+
 
         //      {
         //   "input":{
