@@ -165,6 +165,8 @@ class AllegroApiService
                 return $this->cantGetAlert();
             }
         }
+
+        dd($response);
         if ($response->getStatusCode() != 200 && $response->getStatusCode() != 201) {
             if ($response->getStatusCode() != 204) {
                 return $this->cantGetAlert();
