@@ -131,7 +131,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             $this->data['delivery_address']['email'] = $this->orderPackageRepository->order->customer->login;
         }
 
-        $this->createAllegroPackage();
+        $result = $this->createAllegroPackage();
 //        dd($this->courierName);
 //        switch ($this->courierName) {
 //            case CourierName::DPD:
@@ -258,7 +258,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $allegroApiService = new AllegroApiService();
         $result = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/shipments/create-commands',$data);
 
-
+dd($result);
     }
 
     /**
