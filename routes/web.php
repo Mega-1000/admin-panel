@@ -91,7 +91,7 @@ Route::group(['prefix' => 'admin'], function () {
                 $authorization = base64_encode(CLIENT_ID . ':' . CLIENT_SECRET);
                 $headers = array("Authorization: Basic {$authorization}", "Content-Type: application/x-www-form-urlencoded");
                 $content = "grant_type=client_credentials";
-                $url = "https://allegro.pl.allegrosandbox.pl/auth/oauth/token";
+                $url = "https://allegro.pl/auth/oauth/token";
                 $ch = getCurl($headers, $url, $content);
                 $tokenResult = curl_exec($ch);
                 $resultCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
