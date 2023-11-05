@@ -92,7 +92,7 @@ class AllegroApiService
             return false;
         }
 
-        return json_decode((string)$response->getBody(), true);
+        return var_dump(json_decode((string)$response->getBody(), true));
     }
 
     public function checkAuthorizationStatus(string $deviceId)
@@ -136,7 +136,6 @@ class AllegroApiService
 
             // save to link for files
             if ($attachment !== null) {
-
                 $headers['Accept'] = 'application/vnd.allegro.public.v1+json';
                 $headers['Content-Type'] = $attachment['mimeType'];
 
