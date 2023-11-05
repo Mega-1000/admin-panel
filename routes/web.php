@@ -66,8 +66,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/allegro-api/auth/oauth2', 'AllegroApiController@auth_oauth2');
 
         Route::get('test1', function () {
-            define('CLIENT_ID', 'eafb0e5171234b048f942aeb5d7894f8'); // wprowadź Client_ID aplikacji
-            define('CLIENT_SECRET', 'uq8b1iH2eHwtS1ZIMnhubIGOBMlXouy4SBmx0r8fW9J2cIBLVzTelIkfLSNW9CRz'); // wprowadź Client_Secret aplikacji
+            define('CLIENT_ID', '972fc1b48a054003a6c14575d73e2d8b'); // wprowadź Client_ID aplikacji
+            define('CLIENT_SECRET', 'cArroPf68VMQquvQk3x5z1SbGWaeZOxE7vB6FBb2HIM6JXZPoEvVYI4J66tCxRCO'); // wprowadź Client_Secret aplikacji
 
             function getCurl($headers, $url, $content = null)
             {
