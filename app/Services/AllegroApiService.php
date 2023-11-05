@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class AllegroApiService
 {
-    protected $auth_record_id;
+    protected $auth_record_id = 2;
     protected $sandbox = false;
     protected $api_url = '';
     protected $auth_url = '';
@@ -116,6 +116,7 @@ class AllegroApiService
 
     public function request(string $method, string $url, array $params, array $attachment = null, bool $first = true)
     {
+        var_dump($this->getAuthCodes());
         if (!$this->getAccessToken()) {
             Log::error('AllegroApiService: access token not found');
             return false;
