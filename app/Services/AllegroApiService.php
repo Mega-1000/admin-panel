@@ -253,3 +253,4 @@ class AllegroApiService
         return false;
     }
 }
+
