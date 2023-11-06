@@ -267,7 +267,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->warehouse()->associate($warehouse);
                 $order->setDefaultDates('allegro');
 
-                (new LowOrderQuantityAlertService())->dispatchAlertsForOrder($order);
+                dispatch(new LowOrderQuantityAlertJob($order))->delay(now()->addSeconds(200));
 
                 $order->orderDates()->create([
                     'customer_shipment_date_from' => now(),
