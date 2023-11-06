@@ -117,6 +117,8 @@ class AllegroApiService
     public function request(string $method, string $url, array $params, array $attachment = null, bool $first = true)
     {
         var_dump($this->getAuthCodes());
+        var_dump($this->fetchAccessToken());
+
         if (!$this->getAccessToken()) {
             Log::error('AllegroApiService: access token not found');
             return false;
