@@ -131,37 +131,19 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             $this->data['delivery_address']['email'] = $this->orderPackageRepository->order->customer->login;
         }
 
-        $result = $this->createAllegroPackage();
+//        $result = $this->createAllegroPackage();
 //        dd($this->courierName);
-//        switch ($this->courierName) {
-//            case CourierName::DPD:
-//                $result = $this->createPackageForDpd();
-//                break;
-//            case CourierName::INPOST:
-//                $result = $this->createPackageForInpost();
-//                break;
-//            case CourierName::ALLEGRO_INPOST:
-//                $result = $this->createPackageForInpost(1);
-//                break;
-//            case CourierName::APACZKA:
-//                $result = $this->createPackageForApaczka();
-//                break;
-//            case CourierName::POCZTEX:
-//                $result = $this->createPackageForPocztex();
-//                break;
-//            case CourierName::JAS:
-//                $result = $this->createPackageForJas();
-//                break;
-//            case CourierName::GLS:
-//                $result = $this->createPackageForGLS();
-//                break;
-//            case CourierName::DB_SCHENKER:
-//                $result = $this->createPackageForDB();
-//                break;
-//            default:
-//                $result = $this->createAllegroPackage();
-//                break;
-//        }
+        $result = match ($this->courierName) {
+            CourierName::DPD => $this->createPackageForDpd(),
+            CourierName::INPOST => $this->createPackageForInpost(),
+            CourierName::ALLEGRO_INPOST => $this->createPackageForInpost(1),
+            CourierName::APACZKA => $this->createPackageForApaczka(),
+            CourierName::POCZTEX => $this->createPackageForPocztex(),
+            CourierName::JAS => $this->createPackageForJas(),
+            CourierName::GLS => $this->createPackageForGLS(),
+            CourierName::DB_SCHENKER => $this->createPackageForDB(),
+            default => $this->createAllegroPackage(),
+        };
 
         if (!empty($result['is_error']) || $result === null) {
             return;
@@ -257,8 +239,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
         $allegroApiService = new AllegroApiService();
         $result = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/shipments/create-commands',$data);
-
-dd($result);
     }
 
     /**
