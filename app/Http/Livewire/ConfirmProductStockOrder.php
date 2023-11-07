@@ -61,7 +61,7 @@ class ConfirmProductStockOrder extends Component
             }])
             ->first();
 
-        if ($existingRecord?->position_quantity !== 0) {
+        if ($existingRecord?->position_quantity != 0) {
             dd('nie można usunąć pozycji, która ma już ilość');
         }
 
