@@ -269,11 +269,21 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 dispatch(new LowOrderQuantityAlertJob($order))->delay(now()->addSeconds(200));
 
+                $toDate = now();
+                if (!$toDate->isWeekday()) {
+                    $toDate = $toDate->addWeekday();
+                } else {
+                    if ($toDate->hour < 11 || ($toDate->hour === 11 && $toDate->minute <= 15)) {
+                    } else {
+                        $toDate = $toDate->addWeekday();
+                    }
+                }
+
                 $order->orderDates()->create([
                     'customer_shipment_date_from' => now(),
-                    'customer_shipment_date_to' => Carbon::create($allegroOrder['delivery']['time']['to'])->subWeekday(),
+                    'customer_shipment_date_to' => $toDate,
                     'consultant_shipment_date_from' => now(),
-                    'consultant_shipment_date_to' => Carbon::create($allegroOrder['delivery']['time']['to'])->subWeekday(),
+                    'consultant_shipment_date_to' => $toDate,
                 ]);
 
                 $order->saveQuietly();
