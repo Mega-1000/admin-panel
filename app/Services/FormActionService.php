@@ -85,7 +85,7 @@ class FormActionService
      * @param Order $order
      * @return void
      */
-    public function stopSendingAutomaticMessages(Order $order): void
+    public static function stopSendingAutomaticMessages(Order $order): void
     {
         $order->send_auto_messages = false;
         $order->save();
