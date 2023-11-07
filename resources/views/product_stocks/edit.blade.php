@@ -401,6 +401,7 @@
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
                         html += '</a>';
                         html += '<button type="button" data-quantity="' + row.position_quantity + '" id="moveButton-' + row.id + '" class="btn btn-sm btn-warning edit" onclick="moveData(' + row.id + ')">Przenieś towar stąd</button>';
+                        html += `<a class="btn btn-primary" href="/admin/products/stocks/${row.id}/damaged" target="_blank">Dodaj uszkodzone produkty</a>`
                         html += '<button type="button" id="moveButtonAjax-' + row.id + '" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax(' + row.id + ')">Przenieś towar tutaj</button>';
                         return html;
                     }

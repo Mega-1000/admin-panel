@@ -31,7 +31,8 @@ class ProductStockPosition extends Model implements Transformable
         'bookstand',
         'shelf',
         'position',
-        'position_quantity'
+        'position_quantity',
+        'damaged',
     ];
 
     /**

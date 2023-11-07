@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductStockPositionDamagedController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('products/stocks')->group(function () {
@@ -63,6 +64,7 @@ Route::prefix('products/stocks')->group(function () {
         ->name('product_stocks.createMultipleAdminOrders');
     Route::get('place-multiple-admin-orders/intervals/{data}', 'ProductStocksController@getProductStockIntervals')
         ->name('product_stocks.getProductStockIntervals');
+    Route::get('{id}/damaged', ProductStockPositionDamagedController::class)->name('product_stocks.position.damaged');
 });
 
 
