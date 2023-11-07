@@ -31,7 +31,7 @@
          @foreach ($packageTemplates as $packageTemplate)
         <tr>
             <td>{{$packageTemplate->id}}</td>
-            <td>@if($packageTemplate->list_order!=1000){{$packageTemplate->list_order}}@endif</td>
+            <td>@if($packageTemplate->list_order != 1000){{$packageTemplate->list_order}}@endif</td>
             <td>{{$packageTemplate->symbol}}</td>
             <td>{{$packageTemplate->sello_deliverer_id}}</td>
             <td>{{$packageTemplate->sello_delivery_id}}</td>
@@ -43,7 +43,7 @@
             <td>{{$packageTemplate->created_at}}</td>
             <td>
                 <div class="col-md-10">
-                    <a href="{{ url()->current() }}/{{$packageTemplate->id}}/edit" class="btn btn-sm btn-primary edit">
+                    <a href="{{ url()->current() }}/{{ $packageTemplate->id }}/edit" class="btn btn-sm btn-primary edit">
                         <i class="voyager-edit"></i>
                         <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
                     </a>

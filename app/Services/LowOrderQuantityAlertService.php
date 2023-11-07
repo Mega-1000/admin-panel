@@ -5,11 +5,8 @@ namespace App\Services;
 use App\Entities\LowOrderQuantityAlert;
 use App\Entities\LowOrderQuantityAlertMessage;
 use App\Entities\Order;
-use App\Entities\OrderItem;
-use App\Helpers\LowOrderQuantityAlertsSpacesHelper;
 use App\Jobs\AlertForOrderLowQuantityJob;
 use App\Repositories\OrderItems;
-use Carbon\Carbon;
 
 class LowOrderQuantityAlertService
 {
