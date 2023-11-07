@@ -18,7 +18,7 @@ class FormController extends Controller
         ]);
     }
 
-    public function executeAction(string $actionName, Order $order): JsonResponse
+    public function executeAction(string $actionName, Order $order): string
     {
         $actions = explode(',', $actionName);
 
@@ -26,8 +26,6 @@ class FormController extends Controller
             FormActionService::$action($order);
         }
 
-        return response()->json([
-            'message' => 'success',
-        ]);
+        return 'Akcja została przekazana do systemu';
     }
 }
