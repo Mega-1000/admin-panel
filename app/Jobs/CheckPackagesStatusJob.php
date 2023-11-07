@@ -61,21 +61,6 @@ class CheckPackagesStatusJob
                 ) {
                     RemoveLabelService::removeLabels($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, [], Auth::user()?->id);
                 }
-
-                $order
-                    ->packages()
-                    ->where('status', PackageStatus::SENDING)
-                    ->whereDate('shipment_date', '<', Carbon::today()->subDays(2)->toDateString())
-                    ->get()
-                    ->each(function ($package) use ($preventionArray) {
-                        AddLabelService::addLabels(
-                            $package->order,
-                            [Label::BLUE_BATTERY_LABEL_ID],
-                            $preventionArray,
-                            [],
-                            Auth::user()?->id
-                        );
-                    });
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage());
                 continue;
