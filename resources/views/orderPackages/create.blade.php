@@ -101,11 +101,11 @@
                     </option>
                     <option {{ old('service_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
                     </option>
-                    <option
-                            {{ old('service_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                    <option {{ old('service_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
                         APACZKA
                     </option>
-                    <option {{ old('service_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
+                    <option {{ old('service_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">
+                        JAS
                     </option>
                     <option {{ old('service_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
