@@ -3,6 +3,8 @@
 namespace App\Helpers;
 
 use App\DTO\AllegroPayment\AllegroReturnItemDTO;
+use App\Entities\Order;
+use App\Entities\OrderPayment;
 use App\Enums\AllegroReturnItemTypeEnum;
 
 final class AllegroReturnPaymentHelper
@@ -54,6 +56,15 @@ final class AllegroReturnPaymentHelper
                 type: AllegroReturnItemTypeEnum::QUANTITY(),
                 quantity: $quantityToReturn,
             );
+
+            $order = Order::where('allegro_payment_id', $allegroId)->first();
+
+            OrderPayment::create([
+                'order_id' => $order->id,
+                'declared_sum' => $quantityToReturn * $price * -1,
+                'type' => 'refund',
+                'status' => 'success',
+            ]);
         }
 
         return [$lineItemsForPaymentRefund, $lineItemsForCommissionRefund];
