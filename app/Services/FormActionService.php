@@ -64,12 +64,20 @@ class FormActionService
         $allegroOrderService = app(AllegroOrderService::class);
         $allegroPaymentService = app(AllegroPaymentService::class);
 
+        $products = $order->items;
+        $arr = [];
+
+        foreach ($products as $product) {
+            $arr[$product->product->symbol] = [
+                ...$product,
+            ];
+        }
+
         $allegroPaymentId = $order->allegro_payment_id;
         $allegroOrder = $allegroOrderService->getOrderByPaymentId($allegroPaymentId);
 
         $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, []);
 
-        dd($returnsByAllegroId, $allegroOrder, $allegroPaymentId);
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
 
         $data = new AllegroReturnDTO(
