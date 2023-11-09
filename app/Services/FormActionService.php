@@ -69,7 +69,14 @@ class FormActionService
 
         foreach ($products as $product) {
             $arr[$product->product->symbol] = [
-                ...$product->toArray(),
+                'quantityUndamaged' => $product->quantity,
+                'undamagedDeductionCheck' => false,
+                'undamagedDeduction' => 0.0,
+                'quantityDamaged' => 0,
+                'returnDamagedCheck' => false,
+                'damagedDeduction' => 0.0,
+                'totalDeduction' => 0.0,
+                'price' => $product->price,
             ];
         }
 
