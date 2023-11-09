@@ -69,7 +69,7 @@ class FormActionService
 
         foreach ($products as $product) {
             $arr[$product->product->symbol] = [
-                ...$product,
+                ...$product->toArray(),
             ];
         }
 
