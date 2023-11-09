@@ -86,7 +86,7 @@ class FormActionService
         $returnsByAllegroId = AllegroReturnPaymentHelper::createReturnsByAllegroId($allegroOrder, $arr);
 
         list($lineItemsForPaymentRefund, $lineItemsForCommissionRefund) = AllegroReturnPaymentHelper::createLineItemsFromReturnsByAllegroId($returnsByAllegroId);
-
+        dd($returnsByAllegroId);
         $data = new AllegroReturnDTO(
             paymentId: $allegroPaymentId,
             reason: request()->reason,
