@@ -138,27 +138,32 @@ class OrderService
             $orderBuilder->assignItemsToOrder($order, $products);
 
             OrderAddress::create([
-                'firstname' => 'Dimitr',
-                'lastname' => 'Bolbot',
-                'address' => ' ul lotnicza 9',
+                'firstname' => 'Dmitro',
+                'lastname' => 'Magazynier',
+                'address' => 'Lotnicza',
                 'postal_code' => '55-200',
                 'flat_number' => '9',
-                'city' => 'stanowice',
+                'city' => 'Stanowice',
                 'type' => 'DELIVERY_ADDRESS',
                 'order_id' => $order->id,
+                'email' => 'info@ephpolska.pl',
             ]);
 
             OrderAddress::create([
-                'firmname' => 'Elektroniczna Platforma handlowa Sp z o o',
-                'address' => 'ul.  Jaracza 22/12',
-                'postal_code' => '50-305 ',
+                'firmname' => 'Elektroniczna Platforma handlowa Sp. z o.o.',
+                'address' => 'Jaracz',
+                'postal_code' => '50-305',
                 'city' => 'Wrocław',
                 'nip' => '8982272269',
                 'type' => 'INVOICE_ADDRESS',
                 'order_id' => $order->id,
+                'email' => 'info@ephpolska.pl',
+                'phone' => '691801594',
+                'flat_number' => '22/12.',
             ]);
 
-            $order->employee()->associate(12);
+            $order->employee_id = 12;
+            $order->save();
         });
 
         return $order;
