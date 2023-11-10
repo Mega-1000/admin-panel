@@ -1669,8 +1669,6 @@ class OrdersController extends Controller
         foreach ($orders as $order) {
             $preventionArray = [];
             try {
-                $order->labels_log .= Order::formatMessage($user, "dodał etykietę: $label->name");
-                $order->save();
             } catch (Exception $exception) {
                 Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }

@@ -102,8 +102,6 @@ class OrderAddressObserver
                 __('customers.form.buttons.' . strtolower($orderAddress->type))
             );
 
-            $orderAddress->order->labels_log .= Order::formatMessage(null, $messageTitle . implode(', ', $changeLog));
-            $orderAddress->order->save();
         }
     }
 }

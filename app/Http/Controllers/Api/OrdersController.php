@@ -897,8 +897,6 @@ class OrdersController extends Controller
             return [];
         }
 
-        $order->labels_log .= Order::formatMessage(Auth::user(), $request->description);
-        $order->save();
         $prev = [];
         AddLabelService::addLabels($order, [Label::FINAL_CONFIRMATION_DECLINED, Label::MASTER_MARK], $prev, [], Auth::user()->id);
 

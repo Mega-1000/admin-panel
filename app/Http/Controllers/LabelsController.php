@@ -124,8 +124,6 @@ class LabelsController extends Controller
             $order->labels()->detach($request->label_id);
             $user = Auth::user();
             $label = Label::find($request->label_id);
-            $order->labels_log .= Order::formatMessage($user, "usunął etykietę: $label->name");
-            $order->save();
             return response()->json('success');
         } catch (Exception $exception) {
             Log::error('Nie udało się usunąć etykiety', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);

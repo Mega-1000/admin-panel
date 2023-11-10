@@ -238,15 +238,10 @@ class AllegroOrderSynchro implements ShouldQueue
                 $orderDeliveryAddressErrors = $orderAddressService->errors();
 
                 if ($orderDeliveryAddressErrors->any()) {
-                    $order->labels_log .= Order::formatMessage(null, implode(' ', $orderDeliveryAddressErrors->all(':message')));
-                    $order->saveQuietly();
 
                 }
 
                 if (!Helper::phoneIsCorrect($orderDeliveryAddress?->phone ?? '')) {
-                    $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
-                    $order->labels()->attach(176);
-                    $order->saveQuietly();
                 }
 
                 // order package

@@ -28,9 +28,6 @@ class OrderOfferController extends Controller
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
 
-        $order->labels_log .= 'Oferta została wyświetlona dnia ' . date('Y-m-d H:i:s') . ' przez ' . $order->customer()->first()->login . PHP_EOL;
-        $order->save();
-
         $name = 'Oferta dla: ' . $order->customer()->first()->login . '_' . $order->id . '_' . date('Y-m-d_H-i-s') . '.html';
         Storage::disk('local')->put('/archive-files/' . $name, $message);
 
