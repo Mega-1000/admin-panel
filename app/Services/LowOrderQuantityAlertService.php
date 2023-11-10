@@ -56,7 +56,7 @@ class LowOrderQuantityAlertService
         foreach ($alertsToSend as $alert) {
             /** @var LowOrderQuantityAlertMessage $message */
             foreach ($alert->messages as $message) {
-                dispatch(new AlertForOrderLowQuantityJob($order, $message))->delay(\Carbon\Carbon::now()->addHours($message->delay_time));
+                dispatch(new AlertForOrderLowQuantityJob($order, $message))->delay(\Carbon\Carbon::now()->addMinutes($message->delay_time));
             }
         }
     }
