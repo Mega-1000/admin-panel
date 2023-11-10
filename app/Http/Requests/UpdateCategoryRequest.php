@@ -32,4 +32,13 @@ class UpdateCategoryRequest extends FormRequest
             'save_image' => 'required|boolean',
         ];
     }
+
+    public function validated($key = null, $default = null): array
+    {
+        $validated = parent::validated($key, $default);
+
+        $validated['description'] = nl2br($validated['description']);
+
+        return $validated;
+    }
 }
