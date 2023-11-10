@@ -58,7 +58,7 @@
                 Treść wiadomości
                 <textarea class="form-control" wire:model="messages.{{ $k }}.message"></textarea>
 
-                Opóźnienie wysłania wiadomości w godzinach (np. 1.5)
+                Opóźnienie wysłania wiadomości w minutach (np. 1 lub 2)
                 <input type="text" class="form-control" wire:model="messages.{{ $k }}.delay_time">
 
                 Nazwa pliku z załącznikiem (nie obligatoryjne)
