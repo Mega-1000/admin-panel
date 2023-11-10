@@ -25,6 +25,7 @@ class ImportPayInFromAllegro extends Command
     /**
      * Execute the console command.
      *
+     * @param AllegroImportPayInService $payInService
      * @return int
      */
     public function handle(AllegroImportPayInService $payInService): int
