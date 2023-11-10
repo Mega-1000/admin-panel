@@ -48,6 +48,7 @@ class CategoriesController extends Controller
     public function updateCategory(UpdateCategoryRequest $request): JsonResponse
     {
         $data = $request->validated();
+        $data['description'] = nl2br($data['description']);
 
         $category = Category::findorfail($request->validated('category'));
         $category->update($data);

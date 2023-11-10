@@ -33,16 +33,4 @@ class UpdateCategoryRequest extends FormRequest
         ];
     }
 
-    public function validated($key = null, $default = null): array
-    {
-        $validated = parent::validated($key, $default);
-
-        // Check if 'description' key exists before accessing it
-        if (isset($validated['description'])) {
-            $validated['description'] = nl2br($validated['description']);
-        }
-
-        return $validated;
-    }
-
 }
