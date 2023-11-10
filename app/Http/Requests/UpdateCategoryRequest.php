@@ -37,8 +37,12 @@ class UpdateCategoryRequest extends FormRequest
     {
         $validated = parent::validated($key, $default);
 
-        $validated['description'] = nl2br($validated['description']);
+        // Check if 'description' key exists before accessing it
+        if (isset($validated['description'])) {
+            $validated['description'] = nl2br($validated['description']);
+        }
 
         return $validated;
     }
+
 }
