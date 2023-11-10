@@ -41,8 +41,8 @@ class WorkingEventsService
                     $message = $eventMap[$event]['message'];
                 }
 
-                $order->$logName .= PHP_EOL . $now->format('Y-m-d H:i:s') . ' - ' . Auth::user()?->name . ' - ' . $message;
-                $order->saveQuietly();
+//                $order->$logName .= PHP_EOL . $now->format('Y-m-d H:i:s') . ' - ' . Auth::user()?->name . ' - ' . $message;
+//                $order->saveQuietly();
             }
         }
 
