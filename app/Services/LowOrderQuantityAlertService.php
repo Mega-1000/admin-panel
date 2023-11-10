@@ -18,7 +18,9 @@ class LowOrderQuantityAlertService
      */
     public function dispatchAlertsForOrder(Order $order): void
     {
-        LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order) {
+        $alertsToSend = [];
+
+        LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order, &$alertsToSend) {
             if ($order->items()->whereHas('product', fn ($q) => $q->where('symbol', 'SUP-900-0'))->exists()) {
                 return;
             }
@@ -43,12 +45,20 @@ class LowOrderQuantityAlertService
             }
 
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
-                /** @var LowOrderQuantityAlertMessage $message */
-                foreach ($alert->messages as $message) {
-                    dispatch(new AlertForOrderLowQuantityJob($order, $message))->delay(\Carbon\Carbon::now()->addHours($message->delay_time));
+                $alertsToSend[] = $alert;
+            } else {
+                if (in_array($alert->id, [8, 9])) {
+                    array_filter($alertsToSend, fn ($a) => !in_array($a->id, [8, 9]));
                 }
             }
         });
+
+        foreach ($alertsToSend as $alert) {
+            /** @var LowOrderQuantityAlertMessage $message */
+            foreach ($alert->messages as $message) {
+                dispatch(new AlertForOrderLowQuantityJob($order, $message))->delay(\Carbon\Carbon::now()->addHours($message->delay_time));
+            }
+        }
     }
 
     public static function parseToken(string $text, int $orderId): string
