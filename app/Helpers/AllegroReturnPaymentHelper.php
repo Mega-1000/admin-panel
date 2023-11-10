@@ -57,8 +57,7 @@ final class AllegroReturnPaymentHelper
                 quantity: $quantityToReturn,
             );
 
-            dd($allegroId);
-            $order = Order::where('allegro_payment_id', $allegroId)->first();
+            $order = Order::where('allegro_transaction_id', $allegroId)->first();
 
             OrderPayment::create([
                 'order_id' => $order?->id,
