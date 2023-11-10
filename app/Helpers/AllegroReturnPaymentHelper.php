@@ -57,10 +57,11 @@ final class AllegroReturnPaymentHelper
                 quantity: $quantityToReturn,
             );
 
+            dd($allegroId);
             $order = Order::where('allegro_payment_id', $allegroId)->first();
 
             OrderPayment::create([
-                'order_id' => $order->id,
+                'order_id' => $order?->id,
                 'declared_sum' => $quantityToReturn * $price * -1,
                 'type' => 'refund',
                 'status' => 'success',
@@ -78,9 +79,10 @@ final class AllegroReturnPaymentHelper
 
         foreach ($returns as $symbol => $itemReturn) {
             $symbol = explode("-", $symbol)[0];
-            if (array_key_exists($symbol, $symbolToAllegroIdPairings)) {
-                $returnsByAllegroId[$symbolToAllegroIdPairings[$symbol]] = $itemReturn;
-            }
+
+            $returnsByAllegroId[
+                $symbolToAllegroIdPairings[$symbol]
+            ] = $itemReturn;
         }
 
         return $returnsByAllegroId;
