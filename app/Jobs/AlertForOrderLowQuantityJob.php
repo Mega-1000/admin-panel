@@ -34,7 +34,7 @@ class AlertForOrderLowQuantityJob implements ShouldQueue
      */
     public function handle(): void
     {
-        if ($this->order->send_auto_messages === false) {
+        if (!$this->order->send_auto_messages) {
             return;
         }
 
