@@ -78,7 +78,9 @@ final class AllegroReturnPaymentHelper
 
         foreach ($returns as $symbol => $itemReturn) {
             $symbol = explode("-", $symbol)[0];
-            $returnsByAllegroId[$symbolToAllegroIdPairings[$symbol]] = $itemReturn;
+            if (array_key_exists($symbol, $symbolToAllegroIdPairings)) {
+                $returnsByAllegroId[$symbolToAllegroIdPairings[$symbol]] = $itemReturn;
+            }
         }
 
         return $returnsByAllegroId;
