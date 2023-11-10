@@ -23,7 +23,7 @@ class AddLabelService
     {
         $now = Carbon::now();
 
-        $order->labels_log .= PHP_EOL . 'Dodano etykietę' . 'id: ' . implode(',', $labelIdsToAdd) . ' ' . $now->format('Y-m-d H:i:s') . ' przez użtkownika: ' . auth()->user()->name;
+        $order->labels_log .= PHP_EOL . 'Dodano etykietę' . 'id: ' . implode(',', $labelIdsToAdd) . ' ' . $now->format('Y-m-d H:i:s') . ' przez użtkownika: ' . auth()->user()?->name ?? 'system';
         $order->saveQuietly();
 
         $options = array_merge([
