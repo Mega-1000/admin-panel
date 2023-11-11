@@ -99,6 +99,15 @@
                     <hr />
                 @endif
                 @endforeach
+
+                <p>
+                    Transport klient brutto (ustawiany recznie): {{ $order->shipment_price_for_client }}
+                </p>
+                <br>
+                <p>
+                    Dodaj watrość dostawy <input type="checkbox" name="addDeliveryValue" id="addDeliveryValue">
+                </p>
+
                 <div style="display: flex; justify-content: space-between">
                     <p>
                         Wartość całego zwrotu:

@@ -15,6 +15,7 @@ class AllegroReturnDTO
         public string $paymentId,
         public mixed $reason = 'zwrot',
         public array $lineItems,
+        public bool $addShipmentPrice = false,
     ) {}
 
     public function toAllegroRefundArray(): array
@@ -36,7 +37,7 @@ class AllegroReturnDTO
             'message' => 'zwrot',
             'delivery' => [
                 'value' => [
-                    'amount' => $order->shipment_price_for_client,
+                    'amount' => $this->addShipmentPrice ? $order->shipment_price_for_client : 0,
                     'currency' => 'PLN'
                 ],
             ],
