@@ -105,7 +105,7 @@
                 </p>
                 <br>
                 <p>
-                    Dodaj watrość dostawy <input type="checkbox" name="addDeliveryValue" id="addDeliveryValue">
+                    Dodaj watrość dostawy <input type="checkbox" name="addDeliveryValue" id="addDeliveryValue" checked>
                 </p>
 
                 <div style="display: flex; justify-content: space-between">
