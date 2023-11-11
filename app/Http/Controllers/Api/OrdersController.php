@@ -670,7 +670,7 @@ class OrdersController extends Controller
                 $item->product->$key = $value;
             }
 
-            $item->id = $item->product_id;
+            $item->product->id = $item->product_id;
 
             if ($item->product) {
                 foreach (OrderBuilder::getPriceColumns() as $column) {
