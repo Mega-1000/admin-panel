@@ -162,7 +162,6 @@ class OrderBuilder
         }
         $chatUserToken = '';
 
-        var_dump($data['order_items']);
         $this->assignItemsToOrder($order, $data['order_items']);
 
         $deliveryEmail = isset($data['delivery_address']) ? $data['delivery_address']['email'] ?? '' : '';
