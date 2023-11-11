@@ -9,7 +9,8 @@ class AllegroReturnDTO
     /**
      * @param string $paymentId
      * @param string $reason
-     * @param AllegroReturnItemDTO[] $lineItems
+     * @param AllegroReturnItemDTO $lineItems
+     * @param bool $addShipmentPrice
      */
     public function __construct(
         public string $paymentId,
