@@ -66,6 +66,7 @@ class AllegroReturnPaymentController extends Controller
                 reason: $request->reason,
                 lineItems: $lineItemsForPaymentRefund,
                 addShipmentPrice: $request->addShipmentPrice ?? true,
+                order: $order,
             );
 
             $response = $this->allegroPaymentService->initiatePaymentRefund($data);

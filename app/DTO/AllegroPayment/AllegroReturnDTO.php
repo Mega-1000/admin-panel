@@ -9,14 +9,16 @@ class AllegroReturnDTO
     /**
      * @param string $paymentId
      * @param string $reason
-     * @param AllegroReturnItemDTO $lineItems
+     * @param array $lineItems
      * @param bool $addShipmentPrice
+     * @param Order $order
      */
     public function __construct(
         public string $paymentId,
         public mixed $reason = 'zwrot',
         public array $lineItems,
         public bool $addShipmentPrice = false,
+        public Order $order,
     ) {}
 
     public function toAllegroRefundArray(): array
@@ -25,7 +27,6 @@ class AllegroReturnDTO
             $this->reason = 'zwrot';
         }
 
-        $order = Order::where('allegro_form_id', $this->paymentId)->first();
 
         return [
             'payment' => [
@@ -38,7 +39,7 @@ class AllegroReturnDTO
             'message' => 'zwrot',
             'delivery' => [
                 'value' => [
-                    'amount' => $this->addShipmentPrice ? $order->shipment_price_for_client : 0,
+                    'amount' => $this->addShipmentPrice ? $this->order->shipment_price_for_client : 0,
                     'currency' => 'PLN'
                 ],
             ],
