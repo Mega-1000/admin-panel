@@ -201,19 +201,19 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     [
                         'type' => 'OTHER',
                         'length' => [
-                            'value' => (float)$this->data['length'],
+                            'value' => 12,
                             'unit' => 'CENTIMETER',
                         ],
                         'width' => [
-                            'value' => (float)$this->data['width'],
+                            'value' => 12,
                             'unit' => 'CENTIMETER',
                         ],
                         'height' => [
-                            'value' => (float)$this->data['height'],
+                            'value' => 12,
                             'unit' => 'CENTIMETER',
                         ],
                         'weight' => [
-                            'value' => (float)$this->data['weight'],
+                            'value' =>12.2,
                             'unit' => 'KILOGRAM',
                         ]
                     ]
