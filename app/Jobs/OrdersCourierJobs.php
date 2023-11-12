@@ -234,7 +234,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     'amount' => $this->data['amount'],
                     'currency' => 'PLN',
                 ],
-                'deliveryMethodId' => $this->data['delivery_method_id'],
+//                'deliveryMethodId' => $this->data['delivery_method_id'],
             ]
         ];
         dd($this->data);
