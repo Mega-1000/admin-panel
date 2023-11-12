@@ -46,10 +46,6 @@ class LowOrderQuantityAlertService
 
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
                 $alertsToSend[] = $alert;
-            } else {
-                if (in_array($alert->id, [8, 9])) {
-                    array_filter($alertsToSend, fn ($a) => !in_array($a->id, [8, 9]));
-                }
             }
         });
 
