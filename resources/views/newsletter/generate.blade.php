@@ -13,7 +13,7 @@
                 <br>
                 <br>
 
-                <div class="text-lg">
+                <div class="text-2xl">
                     Cena: {{ $product->price->allegro_gross_selling_price_after_all_additional_costs }} zł
                 </div>
 
