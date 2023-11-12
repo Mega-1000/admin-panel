@@ -153,7 +153,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             'sending_number' => $result['sending_number'],
             'letter_number' => $result['letter_number'],
             'status' => PackageStatus::WAITING_FOR_SENDING
-        ], $this->data['additional_data'][' ']);
+        ], $this->data['additional_data']['order_package_id']);
         $package = $this->orderPackageRepository->find($this->data['additional_data']['order_package_id']);
 
         if ($package->service_courier_name !== 'INPOST' && $package->service_courier_name !== 'ALLEGRO-INPOST') {
