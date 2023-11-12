@@ -17,6 +17,8 @@
 
                     <p class="text-gray-600">{{ $product?->symbol }}</p>
 
+                    <br>
+
                     <a href="{{ $newsletter->auction_url }}" target="_blank" class="px-4 py-2 bg-blue-500 rounded text-white mt-4">
                         Zobacz aukcję
                     </a>
