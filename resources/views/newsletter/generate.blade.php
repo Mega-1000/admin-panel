@@ -14,7 +14,7 @@
                 <br>
 
                 <div class="text-lg">
-                    Cena: {{ $product->allegro_gross_selling_price_after_all_additional_costs }} zł
+                    Cena: {{ $product->price->allegro_gross_selling_price_after_all_additional_costs }} zł
                 </div>
 
                 <button class="px-4 py-2 bg-blue-500 rounded text-white mt-4">
