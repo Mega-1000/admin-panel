@@ -75,7 +75,7 @@ class LowOrderQuantityAlertService
 
         $replaceText = '';
         foreach ($categories as $category) {
-            $replaceText .= '<a href="' . route('newsletter.generate', $category->name) . '">' . $category->name . '</a><br>';
+            $replaceText .= route('newsletter.generate', $category->name) . '">' . $category->name;
         }
 
         return str_replace('{linkiDoGazetki}', $replaceText, $text);
