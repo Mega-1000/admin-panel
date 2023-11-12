@@ -184,6 +184,8 @@ class OrdersCourierJobs extends Job implements ShouldQueue
     {
         $warehouse = Firm::find(16);
 
+        $amount = number_format((float)$this->data['amount'], 2, '.', '');
+
         $data = [
             'input' => [
                 'sender' => [
@@ -231,7 +233,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     'phone' => $this->data['delivery_address']['phone'],
                 ],
                 'insurance' => [
-                    'amount' => 10.92,
+                    'amount' => (float)$this->data['amount'],
                     'currency' => 'PLN',
                 ],
                 'deliveryMethodId' => $this->data['allegro_delivery_method_id'],
