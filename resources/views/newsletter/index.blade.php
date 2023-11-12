@@ -26,13 +26,13 @@
                     Symbol produktu
                 </th>
                 <th>
-                    Akcje
-                </th>
-                <th>
                     Url aukcji
                 </th>
                 <th>
                     Opis
+                </th>
+                <th>
+                    Akcje
                 </th>
             </tr>
         </thead>

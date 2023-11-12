@@ -20,7 +20,7 @@
         <br>
 
         Opis
-        <input type="text" class="form-control" name="description" value="{{ $newsletter->description }}">
+        <textarea type="text" class="form-control" name="description" value="{{ $newsletter->description }}"></textarea>
         <br>
 
         <button class="btn btn-primary">

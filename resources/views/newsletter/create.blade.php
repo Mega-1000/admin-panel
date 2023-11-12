@@ -19,7 +19,7 @@
         <br>
 
         Opis
-        <input type="text" class="form-control" name="description">
+        <textarea type="text" class="form-control" name="description"></textarea>
         <br>
 
         <button class="btn btn-primary">

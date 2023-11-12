@@ -42,7 +42,9 @@ class NewsletterController extends Controller
      */
     public function store(CreateNewsletterRequest $request): RedirectResponse
     {
-        Newsletter::create($request->validated());
+        $data = $request->validated();
+        $request['description'] = nl2br($data['description']);
+        Newsletter::create($data);
 
         return redirect()->route('newsletter.index');
     }
@@ -69,7 +71,9 @@ class NewsletterController extends Controller
      */
     public function update(CreateNewsletterRequest $request, Newsletter $newsletter): RedirectResponse
     {
-        $newsletter->update($request->validated());
+        $data = $request->validated();
+        $request['description'] = nl2br($data['description']);
+        $newsletter->update($data);
 
         return redirect()->route('newsletter.index');
     }
