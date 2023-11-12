@@ -241,7 +241,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     'email' => $this->data['delivery_address']['email'],
                     'phone' => $this->data['delivery_address']['phone'],
                 ],
-                'pi'
                 'deliveryMethodId' => json_decode($this->data['allegro_delivery_method_id'])[0],
             ]
         ];
