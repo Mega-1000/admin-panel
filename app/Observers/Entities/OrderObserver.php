@@ -6,7 +6,7 @@ use App\Entities\Order;
 use App\Entities\Status;
 use App\Facades\Mailer;
 use App\Helpers\OrderPackagesCalculator;
-use App\Jobs\CalculateLabelsForOrder;
+use App\Jobs\calculateLabelsForOrder;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\FireProductPacketJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
@@ -42,7 +42,7 @@ readonly class OrderObserver
         $order->save();
 
         dispatch(new FireProductPacketJob($order));
-        dispatch(new CalculateLabelsForOrder($order));
+        dispatch(new calculateLabelsForOrder($order));
     }
 
     public function updating(Order $order): void
