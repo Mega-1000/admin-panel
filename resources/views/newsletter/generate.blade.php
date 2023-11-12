@@ -3,6 +3,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
     @foreach($products as $product)
         @php($product = \App\Entities\Product::where('symbol', $product->product)->first())
+        @php($newsletter = \App\Entities\Newsletter::where('product', $product->symbol)->first())
         <div class="p-4 border rounded-lg shadow-lg">
             <img src="{{ $product?->url_for_website }}" class="w-full h-48 object-cover rounded-lg">
             <div class="mt-4">
