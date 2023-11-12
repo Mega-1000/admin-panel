@@ -11,7 +11,7 @@
                 </div>
                 <h3 class="text-lg sm:text-xl md:text-2xl font-semibold">{{ $product?->name }}</h3>
 
-                <p class="text-gray-600">{!! $newsletter?->description !!}</p>
+                <p class="text-gray-600">{!! nl2br($newsletter?->description) !!}</p>
 
                 <p class="text-gray-600">{{ $product?->symbol }}</p>
 
