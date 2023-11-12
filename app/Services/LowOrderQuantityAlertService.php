@@ -80,7 +80,7 @@ class LowOrderQuantityAlertService
 
         $replaceText = '';
         foreach ($categories as $category) {
-            $replaceText .= route('newsletter.generate', $category->name);
+            $replaceText .= route('newsletter.generate', $category);
         }
 
         return str_replace('{linkiDoGazetki}', $replaceText, $text);
