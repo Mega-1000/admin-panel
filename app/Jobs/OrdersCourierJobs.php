@@ -199,7 +199,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 ],
                 'packages' => [
                     [
-                        'type' => 'OTHER',
+                        'type' => 'OTHER', // Required
                         'length' => [
                             'value' => 12,
                             'unit' => 'CENTIMETER',
@@ -213,10 +213,11 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                             'unit' => 'CENTIMETER',
                         ],
                         'weight' => [
-                            'value' =>12.2,
-                            'unit' => 'KILOGRAM',
-                        ]
-                    ]
+                            'value' => 12.45,
+                            'unit' => 'KILOGRAMS',
+                        ],
+                    ],
+                    // Add more elements as needed
                 ],
                 'labelFormat' => 'PDF',
                 'receiver' => [
