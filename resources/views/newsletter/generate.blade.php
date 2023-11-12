@@ -6,7 +6,7 @@
         <div class="p-4 border rounded-lg shadow-lg">
             <img src="{{ $product?->url_for_website }}" class="w-full h-48 object-cover rounded-lg">
             <div class="mt-4">
-                <div class="text-2xl">
+                <div class="text-2xl font-semibold">
                     Cena: {{ $product->price->allegro_gross_selling_price_after_all_additional_costs }} zł
                 </div>
                 <h3 class="text-lg sm:text-xl md:text-2xl font-semibold">{{ $product?->name }}</h3>
