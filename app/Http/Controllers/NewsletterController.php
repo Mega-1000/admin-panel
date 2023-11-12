@@ -112,7 +112,7 @@ class NewsletterController extends Controller
 
     public function generate(string $category): View
     {
-        $products = collect(Newsletter::where('category', $category))->each(function (&$product) {
+        $products = Newsletter::where('category', $category)->get()->each(function (&$product) {
             $product = Product::where('name', $product->product)->first();
         });
 
