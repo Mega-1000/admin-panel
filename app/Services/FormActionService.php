@@ -36,6 +36,9 @@ class FormActionService
         $messageService->addMessage('tniemy na 50cm i wysyłamy', 5, null, null, $order->chat);
     }
 
+    /**
+     * @throws ChatException
+     */
     public static function agreeForAdditionalPay(Order $order): void
     {
         $arr = [];
@@ -55,6 +58,16 @@ class FormActionService
         $package = $order->packages()->first();
         $package->cash_on_delivery += 29.90;
         $package->save();
+
+        $messageService = new MessagesHelper();
+
+        if (!$order->chat) {
+            $chat = $messageService->createNewChat();
+            $chat->order_id = $order->id;
+            $chat->save();
+        }
+
+        $messageService->addMessage('Produkujemy i wysyłamy', 5, null, null, $order->chat);
     }
 
     public static function cancelOrder(Order $order): void
