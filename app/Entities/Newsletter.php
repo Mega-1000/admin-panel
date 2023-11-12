@@ -12,5 +12,7 @@ class Newsletter extends Model
     protected $fillable = [
         'category',
         'product',
+        'auction_url',
+        'description',
     ];
 }

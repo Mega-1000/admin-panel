@@ -28,6 +28,12 @@
                 <th>
                     Akcje
                 </th>
+                <th>
+                    Url aukcji
+                </th>
+                <th>
+                    Opis
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -38,6 +44,12 @@
                     </td>
                     <td>
                         {{ $newsletter->product }}
+                    </td>
+                    <td>
+                        {{ $newsletter->auction_url }}
+                    </td>
+                    <td>
+                        {{ $newsletter->description }}
                     </td>
                     <td>
                         <a href="{{ route('newsletter.edit', $newsletter->id) }}" class="btn btn-primary">

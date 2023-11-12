@@ -114,6 +114,7 @@ class NewsletterController extends Controller
 
         return view('newsletter.generate', [
             'products' => $products,
+            'newsletter' => Newsletter::where('category', $category->name)->first(),
         ]);
     }
 }

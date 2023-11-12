@@ -14,6 +14,14 @@
         Symbol produktu
         <input type="text" class="form-control" name="product">
 
+        Url aukcji
+        <input type="text" class="form-control" name="auction_url">
+        <br>
+
+        Opis
+        <input type="text" class="form-control" name="description">
+        <br>
+
         <button class="btn btn-primary">
             Zapisz
         </button>

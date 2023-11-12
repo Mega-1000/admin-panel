@@ -11,13 +11,13 @@
                 </div>
                 <h3 class="text-lg sm:text-xl md:text-2xl font-semibold">{{ $product?->name }}</h3>
 
-                <p class="text-gray-600">{{ $product?->description }}</p>
+                <p class="text-gray-600">{{ $newsletter?->description }}</p>
 
                 <p class="text-gray-600">{{ $product?->symbol }}</p>
 
-                <button class="px-4 py-2 bg-blue-500 rounded text-white mt-4">
+                <a href="{{ $newsletter->auction_url }}" target="_blank" class="px-4 py-2 bg-blue-500 rounded text-white mt-4">
                     Zobacz aukcję
-                </button>
+                </a>
             </div>
         </div>
     @endforeach
