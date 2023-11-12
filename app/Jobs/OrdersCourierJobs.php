@@ -234,10 +234,9 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     'amount' => $this->data['amount'],
                     'currency' => 'PLN',
                 ],
-//                'deliveryMethodId' => $this->data['delivery_method_id'],
+                'deliveryMethodId' => $this->data['allegro_delivery_method_id'],
             ]
         ];
-        dd($this);
 
         $allegroApiService = new AllegroApiService();
         $result = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/shipments/create-commands', $data);

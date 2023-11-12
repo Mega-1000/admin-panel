@@ -891,6 +891,8 @@ class OrdersPackagesController extends Controller
             $data['cash_on_delivery'] = false;
             unset($data['price_for_cash_on_delivery']);
         }
+        $template = PackageTemplate::where('name', $package->chosen_data_template)->first();
+        $data['allegro_delivery_method_id'] =  $template?->allegro_delivery_method ?? null;
 
         if ($validator === true) {
             dispatch_now(new OrdersCourierJobs($data));
