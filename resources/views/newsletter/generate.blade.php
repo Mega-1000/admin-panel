@@ -4,7 +4,7 @@
     @foreach($products as $product)
         @php($product = \App\Entities\Product::where('symbol', $product->product)->first())
         <div class="p-4 border rounded-lg shadow-lg">
-            <img src="{{ $product?->url }}" class="w-full h-48 object-cover rounded-lg">
+            <img src="{{ $product?->url_for_website }}" class="w-full h-48 object-cover rounded-lg">
             <div class="mt-4">
                 <h3 class="text-lg sm:text-xl md:text-2xl font-semibold">{{ $product?->name }}</h3>
                 <p class="text-gray-600">{{ $product?->description }}</p>
