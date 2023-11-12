@@ -111,7 +111,7 @@
                 <div style="display: flex; justify-content: space-between">
                     <p>
                         Wartość całego zwrotu:
-                        <span id="totalValue">{{ $order->items->sum(function($item) { return $item->gross_selling_price_commercial_unit * $item->orderReturn->quantity_undamaged; }) }}</span>
+                        <span id="totalValue">{{ $order->items->sum(function($item) { return $item->gross_selling_price_commercial_unit * $item->orderReturn?->quantity_undamaged ?? 0; }) }}</span>
                     </p>
                     <button type="submit" class="btn btn-primary">Zwróć</button>
                 </div>
