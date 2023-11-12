@@ -162,6 +162,7 @@ class AllegroApiService
                 }
                 return $this->request($method, $url, $params, $attachment, false);
             } else {
+                Log::error('AllegroApiService: request: ' . $e->getTraceAsString());
                 Log::error('AllegroApiService: request: ' . $e->getMessage());
                 return $this->cantGetAlert();
             }
