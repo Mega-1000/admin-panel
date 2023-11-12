@@ -674,6 +674,8 @@ class OrdersController extends Controller
                 $item->product->$key = $value;
             }
 
+            $item->product->id = $item->product_id;
+
             if ($item->product) {
                 foreach (OrderBuilder::getPriceColumns() as $column) {
                     if (property_exists($item, $column) && property_exists($item->product, $column)) {
