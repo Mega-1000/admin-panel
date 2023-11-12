@@ -132,7 +132,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         }
 
 //        $result = $this->createAllegroPackage();
-//        dd($this->courierName);
+        dd($this->courierName);
         $result = match ($this->courierName) {
             CourierName::DPD => $this->createPackageForDpd(),
             CourierName::INPOST => $this->createPackageForInpost(),
