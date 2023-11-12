@@ -185,6 +185,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $warehouse = Firm::find(16);
 
         $amount = number_format((float)$this->data['amount'], 2, '.', '');
+        dd($amount);
 
         $data = [
             'input' => [
