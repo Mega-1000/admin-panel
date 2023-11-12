@@ -71,7 +71,12 @@ class LowOrderQuantityAlertService
     private static function replaceForNewsletterLinks(string $text, int $orderId): string
     {
         $order = Order::find($orderId);
-        $categories = $order->items->pluck('product.category')->unique();
+        $products = $order->items->pluck('product')->unique();
+        $categories = collect();
+        $products->each(function ($product) use (&$categories) {
+            $categories->push(explode('-', $product->symbol)[1]);
+        });
+        $categories = $categories->unique();
 
         $replaceText = '';
         foreach ($categories as $category) {

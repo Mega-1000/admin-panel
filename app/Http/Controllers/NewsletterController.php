@@ -110,9 +110,9 @@ class NewsletterController extends Controller
         return redirect()->back();
     }
 
-    public function generate(Category $category): View
+    public function generate(string $category): View
     {
-        $products = Newsletter::where('category', $category->name)->get()->each(function (&$product) {
+        $products = Newsletter::where('category', $category)->get()->each(function (&$product) {
             $product = Product::where('name', $product->product)->first();
         });
 
