@@ -220,15 +220,15 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 ],
                 'labelFormat' => 'PDF',
                 'pickup' => [
-                    'fid' => $this->config['dpd']['fid'],
-                    'name' => $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'],
-                    'company' => $this->data['pickup_address']['firmname'],
-                    'address' => $this->data['pickup_address']['address'] . ' ' . $this->data['pickup_address']['flat_number'],
-                    'city' => $this->data['pickup_address']['city'],
-                    'postalCode' => str_replace('-', '', $this->data['pickup_address']['postal_code']),
+                    'name' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'],
+                    'company' => $this->data['delivery_address']['firmname'],
+                    'street' => $this->data['delivery_address']['address'],
+                    'streetNumber' => $this->data['delivery_address']['flat_number'],
+                    'postalCode' => $this->data['delivery_address']['postal_code'],
+                    'city' => $this->data['delivery_address']['city'],
                     'countryCode' => 'PL',
-                    'email' => $this->data['pickup_address']['email'],
-                    'phone' => $this->data['pickup_address']['phone']
+                    'email' => $this->data['delivery_address']['email'],
+                    'phone' => $this->data['delivery_address']['phone'],
                 ],
                 'receiver' => [
                     'name' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'],
