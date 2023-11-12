@@ -2,7 +2,6 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
     @foreach($products as $product)
-        @php($product = \App\Entities\Product::where('symbol', $product->product)->first())
         <div class="p-4 border rounded-lg shadow-lg">
             @php
                 $newsletter = \App\Entities\Newsletter::where('product', $product->symbol)->first();
