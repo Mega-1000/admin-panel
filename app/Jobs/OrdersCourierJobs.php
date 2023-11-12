@@ -153,7 +153,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             'sending_number' => $result['sending_number'],
             'letter_number' => $result['letter_number'],
             'status' => PackageStatus::WAITING_FOR_SENDING
-        ], $this->data['additional_data']['order_package_id']);
+        ], $this->data['additional_data'][' ']);
         $package = $this->orderPackageRepository->find($this->data['additional_data']['order_package_id']);
 
         if ($package->service_courier_name !== 'INPOST' && $package->service_courier_name !== 'ALLEGRO-INPOST') {
@@ -217,7 +217,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                             'unit' => 'KILOGRAMS',
                         ],
                     ],
-                    // Add more elements as needed
                 ],
                 'labelFormat' => 'PDF',
                 'receiver' => [
@@ -235,8 +234,10 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     'amount' => $this->data['amount'],
                     'currency' => 'PLN',
                 ],
+                'deliveryMethodId' => $this->data['delivery_method_id'],
             ]
         ];
+        dd($this->data);
 
         $allegroApiService = new AllegroApiService();
         $result = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/shipments/create-commands', $data);
