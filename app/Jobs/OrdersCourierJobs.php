@@ -219,17 +219,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     ],
                 ],
                 'labelFormat' => 'PDF',
-                'pickup' => [
-                    'name' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'],
-                    'company' => $this->data['delivery_address']['firmname'],
-                    'street' => $this->data['delivery_address']['address'],
-                    'streetNumber' => $this->data['delivery_address']['flat_number'],
-                    'postalCode' => $this->data['delivery_address']['postal_code'],
-                    'city' => $this->data['delivery_address']['city'],
-                    'countryCode' => 'PL',
-                    'email' => $this->data['delivery_address']['email'],
-                    'phone' => $this->data['delivery_address']['phone'],
-                ],
                 'receiver' => [
                     'name' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'],
                     'company' => $this->data['delivery_address']['firmname'],
@@ -240,10 +229,12 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     'countryCode' => 'PL',
                     'email' => $this->data['delivery_address']['email'],
                     'phone' => $this->data['delivery_address']['phone'],
+                    'point' => $this->data['delivery_address']['point'],
                 ],
                 'deliveryMethodId' => json_decode($this->data['allegro_delivery_method_id'])[0],
             ]
         ];
+        dd($this->data);
 
         $allegroApiService = new AllegroApiService();
         $result = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/shipments/create-commands', $data);
