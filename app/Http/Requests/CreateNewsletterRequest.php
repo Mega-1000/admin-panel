@@ -26,6 +26,8 @@ class CreateNewsletterRequest extends FormRequest
         return [
             'category' => 'required|string',
             'product' => 'required|string',
+            'auction_url' => 'required|url',
+            'description' => 'required|string',
         ];
     }
 }
