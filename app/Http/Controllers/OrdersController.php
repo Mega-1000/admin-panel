@@ -719,6 +719,7 @@ class OrdersController extends Controller
         }
         $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
+        return redirect('https://admin.mega1000.pl/storage/allsmallprints.pdf');
         if (!$user->can_decline) {
             $this->unlinkLockFile();
             return response($pdf, 200, [
@@ -830,7 +831,6 @@ class OrdersController extends Controller
         }
         $file = $merger->merge();
         file_put_contents(public_path("storage/$finalPdfFileName"), $file);
-        dd($views);
         while ($i >= 0) {
             File::delete(public_path("spec_usr_$i.pdf"));
             $i--;
