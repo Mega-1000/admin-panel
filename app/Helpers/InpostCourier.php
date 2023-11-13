@@ -31,6 +31,7 @@ class InpostCourier implements iCourier
         $response = $this->prepareConnectionForTrackingStatus($url, Request::METHOD_GET, $params);
         $result = json_decode((string)$response->getBody(), true);
 
+        dd($result);
         if (!isset($result['items'][0])) {
             Log::info('Something went wrong with package:', ['order_id' => $package->order_id, 'package_id' => $package->id]);
             return;
