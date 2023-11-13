@@ -829,8 +829,8 @@ class OrdersController extends Controller
             $i++;
         }
         $file = $merger->merge();
-        dd($file);
         file_put_contents(public_path("storage/$finalPdfFileName"), $file);
+        dd($views);
         while ($i >= 0) {
             File::delete(public_path("spec_usr_$i.pdf"));
             $i--;
