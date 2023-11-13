@@ -817,7 +817,6 @@ class OrdersController extends Controller
                 'showPosition' => true,
                 'notPrint' => true
             ]);
-            dd($view->render());
             $views .= $view;
             if (empty($view)) {
                 continue;
@@ -830,6 +829,7 @@ class OrdersController extends Controller
             $i++;
         }
         $file = $merger->merge();
+        dd($file);
         file_put_contents(public_path("storage/$finalPdfFileName"), $file);
         while ($i >= 0) {
             File::delete(public_path("spec_usr_$i.pdf"));
