@@ -807,7 +807,6 @@ class OrdersController extends Controller
         foreach ($allOrders as $ord) {
             $dompdf = new Dompdf(['enable_remote' => true]);
             $order = Order::find($ord);
-            dd($order);
             $tagHelper->setOrder($order);
             $similar = OrdersHelper::findSimilarOrders($order);
 
@@ -818,6 +817,7 @@ class OrdersController extends Controller
                 'showPosition' => true,
                 'notPrint' => true
             ]);
+            dd($view->render());
             $views .= $view;
             if (empty($view)) {
                 continue;
