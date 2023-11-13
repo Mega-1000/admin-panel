@@ -297,8 +297,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
             $result = $dpd->sendPackage($parcels, $receiver, 'SENDER', $services, $this->data['notices']);
 
-            dd($result);
-
             if (!$result->success) {
                 Session::put('message', $result);
                 Log::info(
