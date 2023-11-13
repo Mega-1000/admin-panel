@@ -5,6 +5,10 @@
     <a href="{{ route('low-quantity-alerts.create') }}" class="my-2 px-4 py-2 bg-blue-500 text-white rounded">
         Stwórz
     </a>
+    <br>
+    <a href="{{ route('newsletter-packets.index') }}" class="btn btn-primary">
+        Zarządzanie pakietami wiadomości
+    </a>
 
     <table class="table table-bordered">
         <tr>

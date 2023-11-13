@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Entities\LowOrderQuantityAlert;
 use App\Entities\LowOrderQuantityAlertMessage;
 use App\Entities\Order;
+use App\Entities\ProductPacket;
 use App\Jobs\AlertForOrderLowQuantityJob;
+use App\NewsletterPacket;
 use App\Repositories\OrderItems;
 
 class LowOrderQuantityAlertService
@@ -18,7 +20,7 @@ class LowOrderQuantityAlertService
      */
     public function dispatchAlertsForOrder(Order $order): void
     {
-        $alertsToSend = [];
+        $alertsToSend = collect();
 
         LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order, &$alertsToSend) {
             if ($order->items()->whereHas('product', fn ($q) => $q->where('symbol', 'SUP-900-0'))->exists()) {
@@ -45,13 +47,20 @@ class LowOrderQuantityAlertService
             }
 
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
-                $alertsToSend[] = $alert;
-            } else {
-                if (in_array($alert->id, [8, 9])) {
-                    array_filter($alertsToSend, fn ($a) => !in_array($a->id, [8, 9]));
-                }
+                $alertsToSend->push($alert);
             }
         });
+
+        foreach (NewsletterPacket::all() as $packet) {
+            $alertsToSendForPacket = collect();
+
+            $packetAlertSymbols = explode(',', $packet->packet_products_symbols);
+
+            // Check if all alert symbols are present in the $alertsToSend collection
+            if ($alertsToSend->pluck('symbol')->intersect($packetAlertSymbols)->count() === count($packetAlertSymbols)) {
+                $alertsToSendForPacket->push($packet);
+            }
+        }
 
         foreach ($alertsToSend as $alert) {
             /** @var LowOrderQuantityAlertMessage $message */

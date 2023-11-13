@@ -72,7 +72,6 @@ class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
                     $lastMsgLogin = $messagesList['messages'][0]['author']['login'];
 
                     if( $lastMsgLogin === config('app.allegro_login') ) continue;
-
                     $customer = AllegroChatUserManagmentService::createOrFindUserFromAllegro( $lastMsgLogin );
 
                     $emailSendingService->addAllegroMsg($thread['id'], $customer->login);

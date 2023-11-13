@@ -22,6 +22,7 @@ use App\Http\Controllers\MailReportController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterMessageController;
+use App\Http\Controllers\NewsletterPacketController;
 use App\Http\Controllers\OrderInvoiceDocumentsController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
@@ -752,6 +753,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('complaint-index', [ComplaintController::class, 'index'])->name('complaint.index');
 
     Route::resource('product-packets', ProductPacketController::class)->names('product-packets');
+
+    Route::resource('newsletter-packets', NewsletterPacketController::class)->names('newsletter-packets');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
