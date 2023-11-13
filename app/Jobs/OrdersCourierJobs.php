@@ -325,13 +325,12 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
             $speedlabel = $dpd->generateSpeedLabelsByPackageIds([$result->packageId], $pickupAddress);
 
-            dd($speedlabel);
-            Storage::disk('local')->put('public/dpd/stickers/sticker' . $result->parcels[0]->Waybill . '.pdf',
-                $speedlabel->filedata);
+// Save sticker PDF in the public directory
+            file_put_contents(public_path('dpd/stickers/sticker' . $result->parcels[0]->Waybill . '.pdf'), $speedlabel->filedata);
 
+// Generate and save protocol PDF in the public directory
             $protocol = $dpd->generateProtocolByPackageIds([$result->packageId], $pickupAddress);
-            Storage::disk('local')->put('public/dpd/protocols/protocol' . $result->parcels[0]->Waybill . '.pdf',
-                $protocol->filedata);
+            file_put_contents(public_path('dpd/protocols/protocol' . $result->parcels[0]->Waybill . '.pdf'), $protocol->filedata);
 
             $date = Carbon::parse($this->data['pickup_address']['parcel_date'])->format('Y-m-d');
             $pickupDate = $date;
