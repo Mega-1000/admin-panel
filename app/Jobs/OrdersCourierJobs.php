@@ -325,6 +325,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
             $speedlabel = $dpd->generateSpeedLabelsByPackageIds([$result->packageId], $pickupAddress);
 
+            dd($speedlabel);
             Storage::disk('local')->put('public/dpd/stickers/sticker' . $result->parcels[0]->Waybill . '.pdf',
                 $speedlabel->filedata);
 
