@@ -22,7 +22,19 @@ class DPDService extends SoapClient
     public function __construct($fid = null, $username = null, $password = null, $wsdl = null, $lang = null)
     {
         $config_file = __DIR__ . '/../config.php';
-        $this->config = (file_exists($config_file)) ? include $config_file : new StdClass();
+        $this->config = [
+            'fid' => '338556',
+            'username' => '33855601',
+            'password' => '7NxOOlh5LdNL6mez',
+            'wsdl' => 'https://dpdservices.dpd.com.pl/DPDPackageObjServicesService/DPDPackageObjServices?WSDL',
+            'lang_code' => 'PL',
+            'api_version' => 4,
+            'debug' => false,
+            'log_errors' => false,
+            'log_path' => 'logs',
+            'timezone' => 'Europe/Warsaw',
+            'tracking_url' => 'https://tracktrace.dpd.com.pl/findPackage'
+        ];
 
         // set default timezone
         date_default_timezone_set((isset($this->config->timezone) && $this->config->timezone != '' ? $this->config->timezone : 'Europe/Warsaw'));
