@@ -30,7 +30,8 @@ class Inpost
 
     /**
      * Inpost constructor.
-     * @param $data
+     * @param null $data
+     * @param null $allegro
      */
     public function __construct($data = null, $allegro = null)
     {
@@ -214,20 +215,12 @@ class Inpost
     protected function prepareTemplateForLocker(): string
     {
         $symbol = explode('_', $this->data['symbol']);
-        switch (strtolower($symbol[1])) {
-            case 'pa':
-                $template = "small";
-                break;
-            case 'pb' :
-                $template = "medium";
-                break;
-            case 'pc':
-                $template = "large";
-                break;
-            default:
-                $template = false;
-        }
-        return $template;
+        return match (strtolower($symbol[1])) {
+            'pa' => "small",
+            'pb' => "medium",
+            'pc' => "large",
+            default => false,
+        };
     }
 
     public function createSimplePackage($json)
@@ -250,7 +243,6 @@ class Inpost
             curl_setopt($ch, CURLOPT_PROXYPORT, $PROXY_PORT);
         }
         $output = curl_exec($ch);
-dd($output);
         $curl_error = curl_error($ch);
         if ($curl_error) {
             Log::notice(
