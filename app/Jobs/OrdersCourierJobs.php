@@ -414,7 +414,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         // Operacje poprzedzające sleepa po stronie Inpostu trwają poniżej 3 sekund,
         // po natychmiastowym wywołaniu kolejnych metod nie ma jeszcze odpowiedniego wpisu w zwrotce ich API (numer przewozowy)
         sleep(3);
-        $href = $integration->hrefExecute($simplePackage->href);
+        $href = $integration->hrefExecute($simplePackage?->href);
         $package->letter_number = $href->tracking_number;
         $package->save();
         if ($href->status !== 'confirmed') {

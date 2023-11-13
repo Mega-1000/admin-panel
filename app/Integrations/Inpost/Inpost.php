@@ -250,7 +250,7 @@ class Inpost
             curl_setopt($ch, CURLOPT_PROXYPORT, $PROXY_PORT);
         }
         $output = curl_exec($ch);
-
+dd($output);
         $curl_error = curl_error($ch);
         if ($curl_error) {
             Log::notice(
