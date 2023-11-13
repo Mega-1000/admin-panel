@@ -807,6 +807,7 @@ class OrdersController extends Controller
         foreach ($allOrders as $ord) {
             $dompdf = new Dompdf(['enable_remote' => true]);
             $order = Order::find($ord);
+            dd($order);
             $tagHelper->setOrder($order);
             $similar = OrdersHelper::findSimilarOrders($order);
 
