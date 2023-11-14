@@ -702,7 +702,6 @@ class OrdersController extends Controller
             ]);
         }
 
-        $finalPdfFileName = $task->order->id . $task->order->created_at . '.pdf';
 
         if ($task === null) {
             $this->unlinkLockFile();
