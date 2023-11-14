@@ -711,7 +711,7 @@ class OrdersController extends Controller
                 'alert-type' => 'error',
             ]);
         }
-        $finalPdfFileName = $task->order->id . $task->order->created_at . '.pdf';
+        $finalPdfFileName = $task->order->id . '_' . $task->order->created_at . '.pdf';
 
         $user = User::find($data['user_id']);
         $ordersSimilar = OrdersHelper::findSimilarOrders($task->order);
