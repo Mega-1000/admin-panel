@@ -722,6 +722,7 @@ class OrdersController extends Controller
         $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
         return redirect('https://admin.mega1000.pl/storage/' . $finalPdfFileName);
+
         if (!$user->can_decline) {
             $this->unlinkLockFile();
             return response($pdf, 200, [

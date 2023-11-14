@@ -131,9 +131,9 @@ readonly final class FaqController
         $response = [];
 
         try {
-            $result = Faq::update([
+            $result = Faq::find($id)->update([
                 'questions' => $request->get('questions'),
-            ], $id);
+            ]);
             if ($result) {
                 $response['status'] = 200;
             }
