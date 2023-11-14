@@ -125,8 +125,8 @@ class OrderPackage extends Model implements Transformable
     public function getPathToSticker(): string
     {
         $paths = [
-            'INPOST' => "/storage/inpost/stickers/sticker$this->letter_number.pdf",
-            'ALLEGRO-INPOST' => "/storage/inpost/stickers/sticker$this->letter_number.pdf",
+            'INPOST' => "/inpost/stickers/sticker$this->letter_number.pdf",
+            'ALLEGRO-INPOST' => "/inpost/stickers/sticker$this->letter_number.pdf",
             'DPD' => "/dpd/stickers/sticker$this->letter_number.pdf",
             'POCZTEX' => "/storage/pocztex/protocols/protocol$this->sending_number.pdf",
             'JAS' => [

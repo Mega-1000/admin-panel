@@ -277,7 +277,9 @@ class Inpost
         }
         curl_close($ch);
 
-        return Storage::disk('local')->put('public/inpost/stickers/sticker' . $trackingNumber . '.pdf', $output);
+        $filePath = 'inpost/stickers/sticker' . $trackingNumber . '.pdf';
+
+        return Storage::disk('public')->put($filePath, $output);
     }
 
     public function hrefExecute($href)
