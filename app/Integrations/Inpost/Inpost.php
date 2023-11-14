@@ -257,7 +257,7 @@ class Inpost
         return $result;
     }
 
-    public function getLabel($id, $trackingNumber)
+    public function getLabel($id, $trackingNumber): bool
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/' . $this->org_id . '/shipments/labels');
