@@ -711,6 +711,7 @@ class OrdersController extends Controller
                 'alert-type' => 'error',
             ]);
         }
+        $finalPdfFileName = $task->order->id . $task->order->created_at . '.pdf';
 
         $user = User::find($data['user_id']);
         $ordersSimilar = OrdersHelper::findSimilarOrders($task->order);
@@ -720,7 +721,7 @@ class OrdersController extends Controller
         }
         $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
-        return redirect('https://admin.mega1000.pl/storage/allsmallprints.pdf');
+        return redirect('https://admin.mega1000.pl/storage/' . $finalPdfFileName);
         if (!$user->can_decline) {
             $this->unlinkLockFile();
             return response($pdf, 200, [
