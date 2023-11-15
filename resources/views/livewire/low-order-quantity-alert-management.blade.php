@@ -61,6 +61,9 @@
                 Opóźnienie wysłania wiadomości w minutach (np. 1 lub 2)
                 <input type="text" class="form-control" wire:model="messages.{{ $k }}.delay_time">
 
+                Id etykiedy dodawanej przy wysyłaniu wiadomości
+                <input type="text" class="form-control" wire:model="messages.{{ $k }}.label_id">
+
                 Nazwa pliku z załącznikiem (nie obligatoryjne)
                 <input type="text" class="form-control" wire:model="messages.{{ $k }}.attachment_name">
 

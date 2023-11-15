@@ -23,6 +23,7 @@ class LowOrderQuantityAlertManagement extends Component
             'message' => '',
             'delay_time' => 0,
             'attachment_name' => '',
+            'label_id' => '',
         ],
     ];
     public bool $beenRendered = false;
@@ -102,6 +103,7 @@ class LowOrderQuantityAlertManagement extends Component
             'message' => '',
             'delay_time' => 0,
             'attachment_name' => '',
+            'label_id' => '',
         ];
     }
 
@@ -114,6 +116,7 @@ class LowOrderQuantityAlertManagement extends Component
             'message' => $this->messages[$k]['message'],
             'delay_time' => $this->messages[$k]['delay_time'],
             'attachment_name' => $this->messages[$k]['attachment_name'],
+            'label_id' => $this->messages[$k]['label_id'] ?? '',
         ]);
     }
 }
