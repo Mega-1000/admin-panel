@@ -76,6 +76,7 @@ class LowOrderQuantityAlertManagement extends Component
                 'message' => $message['message'],
                 'delay_time' => $message['delay_time'],
                 'attachment_name' => $message['attachment_name'],
+                'label_id' => $message['label_id'] ?? '',
             ]);
         }
 
