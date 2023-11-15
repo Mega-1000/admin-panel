@@ -25,7 +25,7 @@ class LowOrderQuantityAlertMessage extends Model
         'message',
         'delay_time',
         'low_order_quantity_alert_id',
-        'label_id'
+        'label_id',
     ];
 
     public function alert(): BelongsTo

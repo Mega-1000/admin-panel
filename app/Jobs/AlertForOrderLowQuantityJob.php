@@ -7,6 +7,7 @@ use App\Entities\LowOrderQuantityAlertMessage;
 use App\Entities\Order;
 use App\Facades\Mailer;
 use App\Mail\AlertForLowOrderQuantityMail;
+use App\Services\Label\AddLabelService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -38,6 +39,14 @@ class AlertForOrderLowQuantityJob implements ShouldQueue
             return;
         }
 
+        $arr = [];
+
+        AddLabelService::addLabels(
+            $this->order,
+            [$this->alert->label_id],
+            $arr,
+            [],
+        );
         Mailer::create()
             ->to($this->order->customer->login)
             ->send(new AlertForLowOrderQuantityMail(
