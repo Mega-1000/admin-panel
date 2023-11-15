@@ -115,6 +115,7 @@ class OrdersPackagesController extends Controller
         } else {
             $orderPackage = OrderPackage::find($id);
         }
+
         $orderPackage->size_a = $data['size_a'];
         $orderPackage->size_b = $data['size_b'];
         $orderPackage->size_c = $data['size_c'];

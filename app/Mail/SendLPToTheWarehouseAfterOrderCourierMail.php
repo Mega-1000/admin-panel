@@ -39,7 +39,7 @@ class SendLPToTheWarehouseAfterOrderCourierMail extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromPath($this->path),
+//            Attachment::fromPath($this->path),
         ];
     }
 }
