@@ -211,7 +211,7 @@ class OrdersController extends Controller
         }
 
         if (!$customer) {
-            $customer = auth()->user();
+            $customer = auth()->guard('api')->user();
         }
 
         if ($customer === null && array_key_exists('customer_login', $data)) {
