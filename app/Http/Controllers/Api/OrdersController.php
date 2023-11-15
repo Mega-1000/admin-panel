@@ -201,11 +201,18 @@ class OrdersController extends Controller
         $data = $request->all();
 
         $customer = Customer::where('login', $data['customer_login'])->first();
-        $customer = $customer ?? Customer::create([
-            'login' => $data['customer_login'],
-            'status' => 'ACTIVE',
-            'password' => Hash::make($data['phone']),
-        ]);
+
+        if (!$customer && array_key_exists('customer_login', $data) && array_key_exists('phone', $data)) {
+            $customer = Customer::create([
+                'login' => $data['customer_login'],
+                'status' => 'ACTIVE',
+                'password' => Hash::make($data['phone']),
+            ]);
+        }
+
+        if (!$customer) {
+            $customer = auth()->user();
+        }
 
         if ($customer === null && array_key_exists('customer_login', $data)) {
             if (!array_key_exists('phone', $data)) {
