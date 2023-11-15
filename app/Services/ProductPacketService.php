@@ -60,7 +60,8 @@ class ProductPacketService
                     'price' => $explodedArray[1],
                     'quantity' => $explodedArray[2] ,
                     'max_quantity_in_order' => $explodedArray[3],
-                    'quantity_of_packet_in_order' => $explodedArray[4],
+                    'min_quantity_in_order' => $explodedArray[4],
+                    'quantity_of_packet_in_order' => $explodedArray[5],
                 ];
 
                 $productToAddArray = $productToAdd->toArray();
@@ -97,6 +98,10 @@ class ProductPacketService
                     $dataArray['max_quantity_in_order']
                 );
                 Log::notice($productToAddArray['gross_selling_price_commercial_unit']);
+
+                if ($productToAddArray['amount'] <= $dataArray['min_quantity_in_order']) {
+                    return;
+                }
 
                 $orderBuilder->assignItemsToOrder($order, [$productToAddArray], false);
 
