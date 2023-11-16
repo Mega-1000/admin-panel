@@ -9,6 +9,7 @@ use App\Entities\ProductPacket;
 use App\Jobs\AlertForOrderLowQuantityJob;
 use App\NewsletterPacket;
 use App\Repositories\OrderItems;
+use Carbon\Carbon;
 
 class LowOrderQuantityAlertService
 {
@@ -51,21 +52,21 @@ class LowOrderQuantityAlertService
             }
         });
 
-        foreach (NewsletterPacket::all() as $packet) {
-            $alertsToSendForPacket = collect();
-
-            $packetAlertSymbols = explode(',', $packet->packet_products_symbols);
-
-            // Check if all alert symbols are present in the $alertsToSend collection
-            if ($alertsToSend->pluck('symbol')->intersect($packetAlertSymbols)->count() === count($packetAlertSymbols)) {
-                $alertsToSendForPacket->push($packet);
-            }
-        }
+//        foreach (NewsletterPacket::all() as $packet) {
+//            $alertsToSendForPacket = collect();
+//
+//            $packetAlertSymbols = explode(',', $packet->packet_products_symbols);
+//
+//            // Check if all alert symbols are present in the $alertsToSend collection
+//            if ($alertsToSend->pluck('symbol')->intersect($packetAlertSymbols)->count() === count($packetAlertSymbols)) {
+//                $alertsToSendForPacket->push($packet);
+//            }
+//        }
 
         foreach ($alertsToSend as $alert) {
             /** @var LowOrderQuantityAlertMessage $message */
             foreach ($alert->messages as $message) {
-                dispatch(new AlertForOrderLowQuantityJob($order, $message))->delay(\Carbon\Carbon::now()->addMinutes($message->delay_time));
+                dispatch(new AlertForOrderLowQuantityJob($order, $message))->delay(Carbon::now()->addMinutes($message->delay_time));
             }
         }
     }
