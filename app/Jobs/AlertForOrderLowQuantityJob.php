@@ -41,12 +41,15 @@ class AlertForOrderLowQuantityJob implements ShouldQueue
 
         $arr = [];
 
-        AddLabelService::addLabels(
-            $this->order,
-            [$this->alert->label_id],
-            $arr,
-            [],
-        );
+        if ($this->alert->label_id) {
+            AddLabelService::addLabels(
+                $this->order,
+                [$this->alert->label_id],
+                $arr,
+                [],
+            );
+        }
+
         Mailer::create()
             ->to($this->order->customer->login)
             ->send(new AlertForLowOrderQuantityMail(

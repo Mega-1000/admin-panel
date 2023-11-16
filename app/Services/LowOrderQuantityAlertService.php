@@ -52,16 +52,16 @@ class LowOrderQuantityAlertService
             }
         });
 
-//        foreach (NewsletterPacket::all() as $packet) {
-//            $alertsToSendForPacket = collect();
-//
-//            $packetAlertSymbols = explode(',', $packet->packet_products_symbols);
-//
-//            // Check if all alert symbols are present in the $alertsToSend collection
-//            if ($alertsToSend->pluck('symbol')->intersect($packetAlertSymbols)->count() === count($packetAlertSymbols)) {
-//                $alertsToSendForPacket->push($packet);
-//            }
-//        }
+        foreach (NewsletterPacket::all() as $packet) {
+            $alertsToSendForPacket = collect();
+
+            $packetAlertSymbols = explode(',', $packet->packet_products_symbols);
+
+            // Check if all alert symbols are present in the $alertsToSend collection
+            if ($alertsToSend->pluck('symbol')->intersect($packetAlertSymbols)->count() === count($packetAlertSymbols)) {
+                $alertsToSendForPacket->push($packet);
+            }
+        }
 
         foreach ($alertsToSend as $alert) {
             /** @var LowOrderQuantityAlertMessage $message */
