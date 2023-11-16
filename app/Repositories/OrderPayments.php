@@ -19,7 +19,11 @@ class OrderPayments
      */
    public static function getCountOfPaymentsWithDeclaredSumFromOrder(Order $order, mixed $payIn): int
    {
-       $amount = $payIn->kwota;
+         if (is_array($payIn)) {
+             $amount = $payIn['kwota'];
+         } else {
+             $amount = $payIn->kwota;
+         }
 
        return $order->payments()->where('declared_sum', $amount)->whereNull('deleted_at')->count();
    }
