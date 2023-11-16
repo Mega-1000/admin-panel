@@ -15,7 +15,7 @@ class OrderLabelsObserver
      */
     public function created(OrderLabel $orderLabel): void
     {
-        if ($orderLabel->id = 50) {
+        if ($orderLabel->id === 50) {
             EmailSetting::find(36)->sendEmail($orderLabel->order->customer->login, $orderLabel->order);
         }
     }
