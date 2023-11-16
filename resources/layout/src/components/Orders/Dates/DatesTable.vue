@@ -68,7 +68,7 @@
         <div class="row text-center">
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-sm btn-primary" :class="{ disabled: userType!=='consultant'}"
-                    :disabled="userType!=='consultant'"
+                    :disabled="userType !== 'consultant'"
                     @click="$emit('modify','consultant')">Modyfikuj
             </button>
             <button type="button" class="btn btn-sm btn-success" :class="{ disabled: !canAccept('consultant') }"
