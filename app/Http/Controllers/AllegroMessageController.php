@@ -13,13 +13,14 @@ class AllegroMessageController extends Controller
 {
     public function __invoke(CreateAllegroMessageRequest $request): JsonResponse
     {
-        Mailer::create()
-            ->to('ksiegowosc@ephpolska.pl')
-            ->send(new AllegroMessageInformationMail(
-                $request->validated('message'),
-                FaqHelper::stringifyQuestionThree($request->validated('questionsTree')),
-                auth()->user(),
-            ));
+        $mail = new AllegroMessageInformationMail(
+            $request->validated('message'),
+            FaqHelper::stringifyQuestionThree($request->validated('questionsTree')),
+            auth()->user(),
+        );
+
+        Mailer::create()->to('ksiegowosc@ephpolska.pl')->send($mail);
+        Mailer::create()->to(auth()->user()->login)->send($mail);
 
         return response()->json([
             'message' => 'OK',

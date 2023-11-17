@@ -75,8 +75,9 @@ class AllegroChatService extends AllegroApiService {
 
         return $this->request('PUT', $url, [], $attachment, true);
     }
-    public function areNewMessages(string $chatLastCheck): bool {
 
+    public function areNewMessages(string $chatLastCheck): bool
+    {
         $user = auth()->user();
 
         $pendingMsg = AllegroChatThread::where([
@@ -86,6 +87,7 @@ class AllegroChatService extends AllegroApiService {
 
         return !$pendingMsg->isEmpty();
     }
+
     public function getCurrentThread(array $unreadedThreads): array {
 
         $user = auth()->user();

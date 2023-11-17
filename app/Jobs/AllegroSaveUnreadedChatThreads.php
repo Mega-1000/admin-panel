@@ -45,7 +45,7 @@ class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
             'group' => 'AllegroChat',
         ]);
 
-        Log::channel('allegro_chat')->info("Unreaded Threads: ".json_encode($this->unreadedThreads));
+        Log::channel('allegro_chat')->info("Unreaded Threads: " . json_encode($this->unreadedThreads));
     }
 
     private function getThreads($offset): bool
@@ -71,7 +71,7 @@ class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
                     $messagesList = $allegroChatService->listMessages($thread['id']);
                     $lastMsgLogin = $messagesList['messages'][0]['author']['login'];
 
-                    if( $lastMsgLogin === config('app.allegro_login') ) continue;
+                    if ($lastMsgLogin === config('app.allegro_login')) continue;
                     $customer = AllegroChatUserManagmentService::createOrFindUserFromAllegro( $lastMsgLogin );
 
                     $emailSendingService->addAllegroMsg($thread['id'], $customer->login);
