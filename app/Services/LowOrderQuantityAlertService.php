@@ -61,7 +61,7 @@ class LowOrderQuantityAlertService
     public function filterFromGroups(Collection $alertsToSend): Collection
     {
         foreach (NewsletterPacket::all() as $packet) {
-            $packetAlertSymbols = explode(',', $packet->packet_products_symbols);
+            $packetAlertSymbols = explode(',', $packet->newsletter_entries_ids);
             $found = collect();
 
             foreach ($packetAlertSymbols as $packetAlertSymbol) {
@@ -72,7 +72,7 @@ class LowOrderQuantityAlertService
                 }
             }
 
-            $alertsToSend->filter(fn ($alert) => !in_array($alert->id, $packetAlertSymbols));
+            $alertsToSend->filter(fn ($alert) => in_array($alert->id, $packetAlertSymbols));
 
             if ($found->count() == count($packetAlertSymbols)) {
                 $alertsToSend->push($found);
