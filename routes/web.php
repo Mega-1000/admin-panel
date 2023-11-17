@@ -34,6 +34,7 @@ use App\Http\Controllers\ProductStocksController;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
+use App\NewsletterPacket;
 use Barryvdh\DomPDF\PDF;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Artisan;
@@ -54,7 +55,6 @@ use TCG\Voyager\Facades\Voyager;
 Route::redirect('/', '/admin');
 
 Route::group(['prefix' => 'admin'], function () {
-
     Voyager::routes();
     Route::prefix('jobs')->group(function () {
         Route::queueMonitor();
