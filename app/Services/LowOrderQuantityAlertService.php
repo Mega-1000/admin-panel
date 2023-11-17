@@ -72,12 +72,13 @@ class LowOrderQuantityAlertService
                 }
             }
 
-            $alertsToSend->filter(fn ($alert) => in_array($alert->id, $packetAlertSymbols));
+            $alertsToSend = $alertsToSend->filter(fn ($alert) => !in_array($alert->id, $packetAlertSymbols));
 
             if ($found->count() == count($packetAlertSymbols)) {
-                $alertsToSend->push($found);
+                $alertsToSend->push($found->first());
             }
         }
+
 
         return $alertsToSend;
     }
