@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Entities\LowOrderQuantityAlert;
 use App\Entities\LowOrderQuantityAlertMessage;
 use App\Entities\Order;
-use App\Entities\ProductPacket;
 use App\Jobs\AlertForOrderLowQuantityJob;
 use App\NewsletterPacket;
 use App\Repositories\OrderItems;
@@ -23,6 +22,7 @@ class LowOrderQuantityAlertService
     public function dispatchAlertsForOrder(Order $order): void
     {
         $alertsToSend = collect();
+        $checkPackets = true;
 
         LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order, &$alertsToSend) {
             if ($order->items()->whereHas('product', fn ($q) => $q->where('symbol', 'SUP-900-0'))->exists()) {
@@ -46,6 +46,10 @@ class LowOrderQuantityAlertService
                 ) {
                     $finalQuantity += $item->quantity;
                 }
+
+                if ($item->product->automatic_email_messages_14_column === 'zawsze') {
+                    $checkPackets = false;
+                }
             }
 
             if ($finalQuantity !== 0 && $finalQuantity < $alert->min_quantity) {
@@ -53,7 +57,10 @@ class LowOrderQuantityAlertService
             }
         });
 
-        $alertsToSend = $this->filterFromGroups($alertsToSend);
+        if ($checkPackets) {
+
+            $alertsToSend = $this->filterFromGroups($alertsToSend);
+        }
 
         $this->dispatchMessages($alertsToSend, $order);
     }
