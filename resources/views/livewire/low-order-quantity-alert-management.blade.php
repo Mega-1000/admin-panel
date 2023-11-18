@@ -12,7 +12,7 @@
         <input type="text" name="item_names" placeholder="Nazwy produktów" class="form-control" wire:model="itemNames">
 
         <div>
-            ilosc sztuk zakupiona w calej ofercie produktow ktore maja znaczniki podane w polu znaczniki z csv z kolumny 13 ktore bedą brane pod uwage do sumy ilości aczkolwiek kazdy nalezy oddzielic przcinkiem bez spacji
+            Ilosc do której moduł będzie wykonywał wysyłkę wiadomości poniżej w przypadku gdy sumaryczna ilość w ofercie asortymentu ze znacznikiem w kolumnie powyżej będzie mniejsza od wskazanej. W przypadku połączenia akcji aby wiadomość była wysłana muszą byćspełnione oba warunki.
         </div>
         <input type="number" name="min_quantity" placeholder="Minimalna ilość" class="form-control" wire:model="minQuantity">
 
