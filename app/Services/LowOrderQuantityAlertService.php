@@ -24,7 +24,7 @@ class LowOrderQuantityAlertService
         $alertsToSend = collect();
         $checkPackets = true;
 
-        LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order, &$alertsToSend) {
+        LowOrderQuantityAlert::all()->each(function (LowOrderQuantityAlert $alert) use (&$order, &$alertsToSend, &$checkPackets) {
             if ($order->items()->whereHas('product', fn ($q) => $q->where('symbol', 'SUP-900-0'))->exists()) {
                 return;
             }
@@ -58,7 +58,6 @@ class LowOrderQuantityAlertService
         });
 
         if ($checkPackets) {
-
             $alertsToSend = $this->filterFromGroups($alertsToSend);
         }
 
