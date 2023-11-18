@@ -1,8 +1,9 @@
-<?php 
+<?php
 
 namespace App\DTO\ImportPayIn;
 
-final class AllegroPayInDTO {
+final class AllegroPayInDTO
+{
     public function __construct(
         public readonly string $date,
         public readonly string $operation,
@@ -16,7 +17,7 @@ final class AllegroPayInDTO {
         public readonly string $accountedDate = '',
     ) {}
 
-    public static $headers = [
+    public static array $headers = [
         'data',
         'data_zaksiegowania',
         'identyfikator',

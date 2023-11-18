@@ -34,15 +34,10 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFifteenMinutes()->between('16:01', '12:59');
         $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFiveMinutes()->between('13:00', '16:00');
 
-//        $schedule->job(Jobs\ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
-        //$schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");
         $schedule->job(Jobs\SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");
         $schedule->job(Jobs\CheckPriceChangesInProductsJob::class)->dailyAt("04:00");
         $schedule->job(Jobs\CheckDateOfProductNewPriceJob::class)->dailyAt("04:30");
-        // $schedule->job(Jobs\CustomerOrderDataReminder::class)->dailyAt("09:00");
         $schedule->job(Jobs\Orders\TriggerOrderLabelSchedulersJob::class)->everyFiveMinutes();
-//        $schedule->job(Jobs\AddNewWorkHourForUsers::class)->dailyAt("00:01");
-//        $schedule->job(Jobs\CheckTasksFromYesterdayJob::class)->dailyAt("00:01");
         $schedule->job(Jobs\WarehouseDispatchPendingReminderJob::class)->everyThirtyMinutes()->between('9:00', '17:00');
 
         // monday to saturday between 7 - 19
@@ -58,21 +53,12 @@ class Kernel extends ConsoleKernel
         // i am changing it from everyMinute to everyThirtyMinutes as rewriting would take some time, this should solve
         // queue overload issues
         $schedule->job(Jobs\ValidateSubiekt::class)->everyFiveMinutes();
-        // $schedule->job(Jobs\ChangeOrderInvoiceData::class)->dailyAt("07:00");
-        // $schedule->job(Jobs\JpgGeneratorJob::class)->dailyAt("01:00");
         $schedule->job(Jobs\ImportCsvFileJob::class)->everyFiveMinutes();
-//        $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->cron('0 6,11,17,22 * * *');
         $schedule->job(Jobs\UpdatePackageRealCostJob::class)->dailyAt("00:30");
-        // $schedule->job(Jobs\CheckIfInvoicesExistInOrders::class)->dailyAt("07:00");
-        // $schedule->job(Jobs\UrgentInvoiceRequest::class)->everyFifteenMinutes()->between('9:00', '17:00');
         $schedule->job(Jobs\CheckForHangedChats::class)->cron('0,15,30,45 7-17 * * 1-5');
         $schedule->job(Jobs\ConfirmSentPackagesJob::class)->dailyAt("23:34");
         $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->everyFifteenMinutes();
-//        $schedule->job(Jobs\ChangeDdpShipmentDatePackagesJob::class)->dailyAt("12:01");
 
-        //$schedule->job(Jobs\SendMessagesOnNewAllegroOrders::class)->everyFifteenMinutes();
-
-        // $schedule->job(Jobs\Cron\SendOrderInvoiceMsgMailsJob::class)->dailyAt("09:00");
         $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
         $schedule->command('import:allegro')->everyTwoMinutes()->between('8:00', '18:00');
         $schedule->command('import:allegro')->everyTenMinutes()->between('18:00', '8:00');

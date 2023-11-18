@@ -7,13 +7,14 @@ use Carbon\Carbon;
 
 class AllegroPayInDTOFactory
 {
-    private static $paymentTypesMap = [
+    private static array $paymentTypesMap = [
         "CONTRIBUTION" => "wpłata",
         "REFUND_CHARGE" => "zwrot",
         "SURCHARGE" => "dopłata"
     ];
 
-    public static function fromAllegroCsvData(array $data): AllegroPayInDTO {
+    public static function fromAllegroCsvData(array $data): AllegroPayInDTO
+    {
         return new AllegroPayInDTO(
             $data['data'],
             $data['operacja'],
@@ -28,7 +29,8 @@ class AllegroPayInDTOFactory
         );
     }
 
-    public static function fromAllegroApiData(array $data): AllegroPayInDTO {
+    public static function fromAllegroApiData(array $data): AllegroPayInDTO
+    {
         $allegroIdentifier = "";
         if (array_key_exists('payment', $data)) {
             $allegroIdentifier = $data['payment']['id'];
