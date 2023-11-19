@@ -58,7 +58,7 @@ class LowOrderQuantityAlertService
         });
 
         if ($checkPackets) {
-            $alertsToSend = $this->filterFromGroups($alertsToSend);
+//            $alertsToSend = $this->filterFromGroups($alertsToSend);
         }
 
         $this->dispatchMessages($alertsToSend, $order);
