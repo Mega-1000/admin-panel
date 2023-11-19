@@ -243,6 +243,12 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         }
         sleep(5);
         $package = $allegroApiService->request('GET', 'https://api.allegro.pl/shipment-management/shipments/create-commands/' . $result['commandId'], []);
+        $dateProposals = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/shipment-management/pickup-proposals', [
+            "shipmentIds" => [
+                $result['commandId']
+            ],
+            "readyDate" => now()->format('Y-m-d'),
+        ]);
         dd($allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/pickups/create-commands', [
             "commandId"=> "14e142cf-e8e0-48cc-bcf6-399b5fd90b32",
             "input" => [
@@ -250,7 +256,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                    $result['commandId']
                 ],
             ],
-            "pickupDateProposalId" => "2023071210001300",
+            "pickupDateProposalId" => $dateProposals['proposalItems'][0]['id'],
         ]));
 
         $label = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/label', [
