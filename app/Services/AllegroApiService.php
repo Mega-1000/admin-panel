@@ -122,7 +122,7 @@ class AllegroApiService
         }
 
         try {
-            $headers = $fileResponse ? [
+            $headers = !$fileResponse ? [
                 'Authorization' => "Bearer {$this->getAccessToken()}",
                 'Content-Type' => 'application/vnd.allegro.public.v1+json',
             ]
