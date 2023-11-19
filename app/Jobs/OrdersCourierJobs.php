@@ -249,7 +249,8 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 "shipmentIds" => [
                    $result['commandId']
                 ],
-            ]
+            ],
+            "pickupDateProposalId" => "ANY",
         ]));
 
         $label = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/label', [
