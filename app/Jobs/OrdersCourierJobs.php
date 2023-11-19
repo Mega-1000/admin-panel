@@ -241,7 +241,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         if (!empty($result['is_error']) || $result === null) {
             return;
         }
-        sleep(5);
+        sleep(6);
         $package = $allegroApiService->request('GET', 'https://api.allegro.pl/shipment-management/shipments/create-commands/' . $result['commandId'], []);
         $dateProposals = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/pickup-proposals', [
             "shipmentIds" => [
@@ -257,7 +257,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 ],
             ],
             "pickupDateProposalId" => $dateProposals['proposalItems'][0]['id'],
-        ]));
+        ]), $package);
 
         $label = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/label', [
             "shipmentIds" => [
