@@ -250,7 +250,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             "readyDate" => now()->format('Y-m-d'),
         ]);
         dd($allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/pickups/create-commands', [
-            "commandId"=> "14e142cf-e8e0-48cc-bcf6-399b5fd90b32",
+            "commandId"=> $package['shipmentId'],
             "input" => [
                 "shipmentIds" => [
                    $package['shipmentId']
