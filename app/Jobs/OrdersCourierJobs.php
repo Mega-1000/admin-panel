@@ -237,7 +237,13 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
         $allegroApiService = new AllegroApiService();
         $result = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/shipments/create-commands', $data);
-        dd($result);
+
+        if (!empty($result['is_error']) || $result === null) {
+            return;
+        }
+
+        $package = $allegroApiService->request('GET', 'https://api.allegro.pl/shipment-management/shipments/create-commands/' . $result['commandId'], []);
+dd($package);
     }
 
     /**
