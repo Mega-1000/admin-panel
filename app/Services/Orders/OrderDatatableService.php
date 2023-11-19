@@ -7,6 +7,7 @@ use App\Entities\OrderFiles;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPackageRealCostForCompany;
 use App\Entities\OrderPayment;
+use App\Helpers\OrderBilansCalculator;
 use App\Repositories\OrderPackageRealCostsForCompany;
 use App\Repositories\SpeditionExchangeRepository;
 use Carbon\Carbon;
@@ -384,6 +385,14 @@ readonly class OrderDatatableService
                 ->all();
             $row->files = OrderFiles::where('order_id', $row->orderId)->get();
             $row->additional_cash_on_delivery_cost = Order::find($row->orderId)->additional_cash_on_delivery_cost;
+
+            if (array_key_exists('selectOnlyNonZeroCBOOrders', $data) && $data['selectOnlyNonZeroCBOOrders'] === 'true') {
+                if (!OrderBilansCalculator::calculateCBO(Order::find($orderId))) {
+                    $collection = $collection->reject(function ($item) use ($orderId) {
+                        return $item->orderId === $orderId;
+                    });
+                }
+            }
         }
 
         foreach ($collection as $item) {

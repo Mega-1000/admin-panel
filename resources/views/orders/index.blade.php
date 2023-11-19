@@ -902,6 +902,8 @@
 
     <button name="selectOnlyWrongInvoiceBilansOrders" id="selectOnlyWrongInvoiceBilansOrders"
             class="btn btn-primary"></button>
+    <button name="selectOnlyNonZeroCBOOrders" id="selectOnlyNonZeroCBOOrders" class="btn btn-primary"></button>
+
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
         <tr>
@@ -1555,6 +1557,7 @@
                         }
                         d.customerId = customerId;
                         d.selectOnlyWrongInvoiceBilansOrders = localStorage.getItem('selectOnlyWrongInvoiceBilansOrders');
+                        d.selectOnlyNonZeroCBOOrders = localStorage.getItem('selectOnlyNonZeroCBOOrders');
                         let differenceMode = localStorage.getItem('differenceMode');
                         if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
                     },
@@ -4505,6 +4508,17 @@
             table.ajax.reload();
         });
 
+        const selectOnlyNonZeroCBOOrders = () => {
+            $('#selectOnlyNonZeroCBOOrders').text(localStorage.getItem('selectOnlyNonZeroCBOOrders') === 'true' ? 'Wybierz wszystkie' : 'Wybierz tylko z bilansem CBO > 0');
+        }
+
+        document.querySelector('#selectOnlyNonZeroCBOOrders').addEventListener('click', () => {
+            localStorage.setItem('selectOnlyNonZeroCBOOrders', localStorage.getItem('selectOnlyNonZeroCBOOrders') === 'true' ? 'false' : 'true');
+            selectOnlyNonZeroCBOOrders();
+            table.ajax.reload();
+        });
+
+
         setDeleteEventListeners();
     </script>
 
@@ -4523,6 +4537,7 @@
             dateTo.value = today;
 
             selectOnlyWrongInvoiceBilansOrders();
+            selectOnlyNonZeroCBOOrders();
         });
     </script>
 

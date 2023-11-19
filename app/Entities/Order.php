@@ -41,6 +41,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property mixed $factoryDelivery
  * @property Collection $labels
  * @property bool $send_auto_messages
+ * @property Collection $payments
  *
  * @property Collection<OrderPackage> $packages
  *
