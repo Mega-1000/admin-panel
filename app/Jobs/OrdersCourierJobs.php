@@ -265,7 +265,10 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 ],
                 "pageSize" => "A4",
                 "cutLine" => true
-            ]
+            ],
+            null,
+            true,
+            true
         );
 
         dd($label);

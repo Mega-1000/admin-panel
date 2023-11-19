@@ -114,7 +114,7 @@ class AllegroApiService
         return $this->api_url . $resource;
     }
 
-    public function request(string $method, string $url, array $params, array $attachment = null, bool $first = true)
+    public function request(string $method, string $url, array $params, array $attachment = null, bool $first = true, $fileResponse = false)
     {
         if (!$this->getAccessToken()) {
             Log::error('AllegroApiService: access token not found');
@@ -122,10 +122,17 @@ class AllegroApiService
         }
 
         try {
-            $headers = [
+            $headers = $fileResponse ? [
                 'Authorization' => "Bearer {$this->getAccessToken()}",
                 'Content-Type' => 'application/vnd.allegro.public.v1+json',
+            ]
+            : [
+                'accept' => 'application/octet-stream',
+                'Content-Type' => 'application/vnd.allegro.public.v1+json',
+                'Authorization' => "Bearer {$this->getAccessToken()}",
             ];
+
+
             $data = [
                 'headers' => $headers,
                 'json' => $params
