@@ -261,7 +261,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
         $label = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/label', [
             "shipmentIds" => [
-                    $result['commandId']
+                    $package['shipmentId']
                 ],
                 "pageSize" => "A4",
                 "cutLine" => true
