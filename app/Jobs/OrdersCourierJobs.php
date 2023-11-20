@@ -131,20 +131,20 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             $this->data['delivery_address']['email'] = $this->orderPackageRepository->order->customer->login;
         }
 
-        $result = $this->createAllegroPackage();
-        dd($this->courierName);
-//        $result = match ($this->courierName) {
-//            CourierName::DPD => $this->createPackageForDpd(),
-//            CourierName::INPOST => $this->createPackageForInpost(),
-//            CourierName::ALLEGRO_INPOST => $this->createPackageForInpost(1),
-//            CourierName::APACZKA => $this->createPackageForApaczka(),
-//            CourierName::POCZTEX => $this->createPackageForPocztex(),
-//            CourierName::JAS => $this->createPackageForJas(),
-//            CourierName::GLS => $this->createPackageForGLS(),
-//            CourierName::DB_SCHENKER => $this->createPackageForDB(),
-//            default => $this->createAllegroPackage(),
-//        };
-
+//        $result = $this->createAllegroPackage();
+//        dd($this->courierName);
+        $result = match ($this->courierName) {
+            CourierName::DPD => $this->createPackageForDpd(),
+            CourierName::INPOST => $this->createPackageForInpost(),
+            CourierName::ALLEGRO_INPOST => $this->createPackageForInpost(1),
+            CourierName::APACZKA => $this->createPackageForApaczka(),
+            CourierName::POCZTEX => $this->createPackageForPocztex(),
+            CourierName::JAS => $this->createPackageForJas(),
+            CourierName::GLS => $this->createPackageForGLS(),
+            CourierName::DB_SCHENKER => $this->createPackageForDB(),
+            default => $this->createAllegroPackage(),
+        };
+//
         if (!empty($result['is_error']) || $result === null) {
             return;
         }
@@ -260,7 +260,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         ]);
 
         $label = $allegroApiService->request('POST', 'https://api.allegro.pl/shipment-management/label', [
-            "shipmentIds" => [
+                "shipmentIds" => [
                     $package['shipmentId']
                 ],
                 "pageSize" => "A4",
