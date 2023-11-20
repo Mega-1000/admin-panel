@@ -282,14 +282,34 @@ readonly class OrderDatatableService
 
         $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
 
-        if ($withoutPagination || !empty($shipmentCostFilter->to) || array_key_exists('selectOnlyNonZeroCBOOrders', $data)) {
+        if ($withoutPagination || !empty($shipmentCostFilter->to)) {
             $collection = $query
                 ->get();
+        } else if (array_key_exists('selectOnlyNonZeroCBOOrders', $data) && $data['selectOnlyNonZeroCBOOrders'] === 'true') {
+            $collection = $query
+                ->get();
+
+            $collection->each(function ($row) use (&$collection) {
+                if (!OrderBilansCalculator::calculateCBO(Order::find($row->orderId))) {
+                    $collection = $collection->reject(function ($item) use ($row) {
+                        return $item->orderId === $row->orderId;
+                    });
+                }
+            });
+
+            $length = isset($data['length']) ? (int)$data['length'] : null;
+            $start = isset($data['start']) ? (int)$data['start'] : 0;
+
+            if ($length !== null) {
+                $collection = $collection->slice($start, $length);
+            }
+
         } else {
             $collection = $query
                 ->limit($data['length'])->offset($data['start'])
                 ->get();
         }
+
 
         foreach ($collection as $row) {
             $orderId = $row->orderId;
