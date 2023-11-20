@@ -38,10 +38,9 @@ readonly class OrderDatatableService
     protected array $dtColumns;
 
     /**
-     * @param null $selectAllDates
      * @return Builder
      */
-    private function getQueryForDataTables($selectAllDates = null): Builder
+    private function getQueryForDataTables(): Builder
     {
 
         $query = DB::table('orders')
@@ -283,7 +282,7 @@ readonly class OrderDatatableService
 
         $shipmentCostFilter = json_decode(Cookie::get('shipment_cost_filter'));
 
-        if ($withoutPagination || !empty($shipmentCostFilter->to)) {
+        if ($withoutPagination || !empty($shipmentCostFilter->to) || array_key_exists('selectOnlyNonZeroCBOOrders', $data)) {
             $collection = $query
                 ->get();
         } else {
