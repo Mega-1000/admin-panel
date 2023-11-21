@@ -268,6 +268,14 @@ readonly class OrderDatatableService
             $query->where('orders.customer_id', $data['customerId']);
         }
 
+        if (array_key_exists('selectOnlyProduced', $data) && $data['selectOnlyProduced'] === 'true') {
+            $query->whereExists(function ($innerQuery) {
+                $innerQuery->select("*")
+                    ->from('order_labels')
+                    ->whereRaw("order_labels.order_id = orders.id and order_labels.label_id = 50");
+            });
+        }
+
         if (array_key_exists('selectOnlyWrongInvoiceBilansOrders', $data) && $data['selectOnlyWrongInvoiceBilansOrders'] === 'true') {
             $query->whereRaw('orders.invoice_bilans = 0');
         }
