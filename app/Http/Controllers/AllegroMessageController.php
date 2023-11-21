@@ -28,14 +28,15 @@ class AllegroMessageController extends Controller
 
              $allegroChat = array_filter($apiResponse['threads'], function ($thread) use ($allegroCustomerName) {
                 return $thread['interlocutor']['login'] === $allegroCustomerName;
-            })[0];
+            });
 
-            if (array_key_exists('id', $allegroChat)) {
-                $allegroChatId = $allegroChat['id'];
-                break;
-            } else {
-                $offset += 20;
-            }
+             if (count($allegroChat) === 0) {
+                 $offset += 20;
+                 continue;
+             }
+
+            $allegroChatId = $allegroChat['id'];
+            break;
         }
 
         if ($allegroChatId) {
