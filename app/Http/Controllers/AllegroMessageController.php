@@ -10,6 +10,7 @@ use App\Mail\AllegroMessageInformationMail;
 use App\Services\AllegroApiService;
 use App\Services\Label\AddLabelService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class AllegroMessageController extends Controller
 {
@@ -25,6 +26,8 @@ class AllegroMessageController extends Controller
             $apiResponse = $allegroApiService->request('GET', 'https://api.allegro.pl/messaging/threads', [
                 'offset' => $offset,
             ]);
+
+            Log::notice($apiResponse);
 
              $allegroChat = array_filter($apiResponse['threads'], function ($thread) use ($allegroCustomerName) {
                 return $thread['interlocutor']['login'] === $allegroCustomerName;
