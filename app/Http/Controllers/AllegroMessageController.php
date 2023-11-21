@@ -30,16 +30,16 @@ class AllegroMessageController extends Controller
 
                 Log::notice($apiResponse);
 
-                $allegroChat = array_filter($apiResponse['threads'], function ($thread) use ($allegroCustomerName) {
+                $allegroChat = collect(array_filter($apiResponse['threads'], function ($thread) use ($allegroCustomerName) {
                     return $thread['interlocutor']['login'] === $allegroCustomerName;
-                });
+                }));
 
-                if (count($allegroChat) === 0) {
+                if ($allegroChat->count() === 0) {
                     $offset += 20;
                     continue;
                 }
-                Log::notice($allegroChat);
-                $allegroChatId = $allegroChat['id'];
+
+                $allegroChatId = $allegroChat->first()['id'];
                 break;
             }
 
