@@ -903,6 +903,7 @@
     <button name="selectOnlyWrongInvoiceBilansOrders" id="selectOnlyWrongInvoiceBilansOrders"
             class="btn btn-primary"></button>
     <button name="selectOnlyNonZeroCBOOrders" id="selectOnlyNonZeroCBOOrders" class="btn btn-primary"></button>
+    <button name="selectOnlyProduced" id="selectOnlyProduced" class="btn btn-primary"></button>
 
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
@@ -1558,6 +1559,7 @@
                         d.customerId = customerId;
                         d.selectOnlyWrongInvoiceBilansOrders = localStorage.getItem('selectOnlyWrongInvoiceBilansOrders');
                         d.selectOnlyNonZeroCBOOrders = localStorage.getItem('selectOnlyNonZeroCBOOrders');
+                        d.selectOnlyProduced = localStorage.getItem('selectOnlyProduced');
                         let differenceMode = localStorage.getItem('differenceMode');
                         if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
                     },
@@ -4518,6 +4520,17 @@
             table.ajax.reload();
         });
 
+        const selectOnlyProduced = () => {
+            $('#selectOnlyProduced').text(localStorage.getItem('selectOnlyProduced') === 'true' ? 'Wybierz wszystkie' : 'Wybierz tylko z etykietą wyprodukowano');
+        }
+
+        document.querySelector('#selectOnlyProduced').addEventListener('click', () => {
+            localStorage.setItem('selectOnlyProduced', localStorage.getItem('selectOnlyProduced') === 'true' ? 'false' : 'true');
+            selectOnlyProduced();
+            table.ajax.reload();
+        });
+
+
 
         setDeleteEventListeners();
     </script>
@@ -4538,6 +4551,7 @@
 
             selectOnlyWrongInvoiceBilansOrders();
             selectOnlyNonZeroCBOOrders();
+            selectOnlyProduced();
         });
     </script>
 
