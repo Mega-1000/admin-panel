@@ -17,7 +17,6 @@ readonly class MessageService
         public MessagesHelper $messagesHelper
     ) {}
 
-
     /**
      * @param $chat
      * @param Request $request

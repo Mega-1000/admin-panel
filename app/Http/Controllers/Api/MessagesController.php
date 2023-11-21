@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTO\Messages\CreateMessageDTO;
-use App\Entities\Chat;
 use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\Employee;
