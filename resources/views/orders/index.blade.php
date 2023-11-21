@@ -3339,7 +3339,7 @@
         }
 
         function printAll() {
-            $.post("{{route('orders.printAll')}}", table.ajax.params())
+            $.post("{{ route('orders.printAll') }}", table.ajax.params())
                 .done((data) => {
                     if (!data.error) {
                         window.open(data);
