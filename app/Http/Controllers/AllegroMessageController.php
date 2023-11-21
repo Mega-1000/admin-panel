@@ -17,7 +17,7 @@ class AllegroMessageController extends Controller
     public function __invoke(CreateAllegroMessageRequest $request, AllegroApiService $allegroApiService): JsonResponse
     {
         $user = Customer::find(auth()->id());
-        $numberOfPagesWitchWeSearchFor = 5;
+        $numberOfPagesWitchWeSearchFor = 50;
         $allegroChatId = null;
         $offset = 0;
         $allegroCustomerName = $user->nick_allegro;
