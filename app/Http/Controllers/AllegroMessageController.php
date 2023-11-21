@@ -22,30 +22,32 @@ class AllegroMessageController extends Controller
         $offset = 0;
         $allegroCustomerName = $user->nick_allegro;
 
-        for ($i = 0; $i <= $numberOfPagesWitchWeSearchFor; $i++) {
-            $apiResponse = $allegroApiService->request('GET', 'https://api.allegro.pl/messaging/threads', [
-                'offset' => $offset,
-            ]);
+        if ($user->nick_allegro) {
+            for ($i = 0; $i <= $numberOfPagesWitchWeSearchFor; $i++) {
+                $apiResponse = $allegroApiService->request('GET', 'https://api.allegro.pl/messaging/threads', [
+                    'offset' => $offset,
+                ]);
 
-            Log::notice($apiResponse);
+                Log::notice($apiResponse);
 
-             $allegroChat = array_filter($apiResponse['threads'], function ($thread) use ($allegroCustomerName) {
-                return $thread['interlocutor']['login'] === $allegroCustomerName;
-            });
+                $allegroChat = array_filter($apiResponse['threads'], function ($thread) use ($allegroCustomerName) {
+                    return $thread['interlocutor']['login'] === $allegroCustomerName;
+                });
 
-             if (count($allegroChat) === 0) {
-                 $offset += 20;
-                 continue;
-             }
+                if (count($allegroChat) === 0) {
+                    $offset += 20;
+                    continue;
+                }
 
-            $allegroChatId = $allegroChat['id'];
-            break;
-        }
+                $allegroChatId = $allegroChat['id'];
+                break;
+            }
 
-        if ($allegroChatId) {
-            $allegroApiService->request('PUT', 'https://api.allegro.pl/messaging/threads/' . $allegroChatId . '/read', [
-                'read' => false,
-            ]);
+            if ($allegroChatId) {
+                $allegroApiService->request('PUT', 'https://api.allegro.pl/messaging/threads/' . $allegroChatId . '/read', [
+                    'read' => false,
+                ]);
+            }
         }
 
 
