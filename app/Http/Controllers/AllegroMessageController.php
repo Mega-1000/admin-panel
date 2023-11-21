@@ -10,12 +10,13 @@ use App\Mail\AllegroMessageInformationMail;
 use App\Services\AllegroApiService;
 use App\Services\Label\AddLabelService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class AllegroMessageController extends Controller
 {
     public function __invoke(CreateAllegroMessageRequest $request, AllegroApiService $allegroApiService): JsonResponse
     {
-        dd($allegroApiService->request('POST', 'https://api.allegro.pl/messaging/threads', []));
+        Log::notice($allegroApiService->request('POST', 'https://api.allegro.pl/messaging/threads', [])));
 
         $user = Customer::find(auth()->id());
 
