@@ -10,20 +10,40 @@ use App\Mail\AllegroMessageInformationMail;
 use App\Services\AllegroApiService;
 use App\Services\Label\AddLabelService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 class AllegroMessageController extends Controller
 {
     public function __invoke(CreateAllegroMessageRequest $request, AllegroApiService $allegroApiService): JsonResponse
     {
-        $apiResponse = $allegroApiService->request('GET', 'https://api.allegro.pl/messaging/threads', []);
-        $allegroChatId = $apiResponse['threads'][0]['id'];
-
-        $allegroApiService->request('PUT', 'https://api.allegro.pl/messaging/threads/' . $allegroChatId . '/read', [
-            'read' => false,
-        ]);
-
         $user = Customer::find(auth()->id());
+        $numberOfPagesWitchWeSearchFor = 5;
+        $allegroChatId = null;
+        $offset = 0;
+        $allegroCustomerName = $user->nick_allegro;
+
+        for ($i = 0; $i <= $numberOfPagesWitchWeSearchFor; $i++) {
+            $apiResponse = $allegroApiService->request('GET', 'https://api.allegro.pl/messaging/threads', [
+                'offset' => $offset,
+            ]);
+
+             $allegroChat = array_filter($apiResponse['threads'], function ($thread) use ($allegroCustomerName) {
+                return $thread['interlocutor']['login'] === $allegroCustomerName;
+            })[0];
+
+            if (array_key_exists('id', $allegroChat)) {
+                $allegroChatId = $allegroChat['id'];
+                break;
+            } else {
+                $offset += 20;
+            }
+        }
+
+        if ($allegroChatId) {
+            $allegroApiService->request('PUT', 'https://api.allegro.pl/messaging/threads/' . $allegroChatId . '/read', [
+                'read' => false,
+            ]);
+        }
+
 
         $mail = new AllegroMessageInformationMail(
             $request->validated('message'),
