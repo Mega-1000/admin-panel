@@ -16,7 +16,12 @@ class AllegroMessageController extends Controller
 {
     public function __invoke(CreateAllegroMessageRequest $request, AllegroApiService $allegroApiService): JsonResponse
     {
-        Log::notice($allegroApiService->request('GET', 'https://api.allegro.pl/messaging/threads', []));
+        $apiResponse = $allegroApiService->request('GET', 'https://api.allegro.pl/messaging/threads', []);
+        $allegroChatId = $apiResponse['threads'][0]['id'];
+
+        $allegroApiService->request('PUT', 'https://api.allegro.pl/messaging/threads/' . $allegroChatId . '/read', [
+            'read' => false,
+        ]);
 
         $user = Customer::find(auth()->id());
 
