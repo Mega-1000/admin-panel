@@ -38,7 +38,7 @@ class AllegroMessageController extends Controller
                     $offset += 20;
                     continue;
                 }
-
+                Log::notice($allegroChat);
                 $allegroChatId = $allegroChat['id'];
                 break;
             }
