@@ -73,7 +73,7 @@ class AddLabelService
             $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
             if ($label->id === 50) {
-//                EmailSetting::find(36)?->sendEmail($order->customer->login, $order);
+                EmailSetting::find(36)?->sendEmail($order->customer->login, $order);
             }
 
             if ($time === null) {
@@ -127,8 +127,6 @@ class AddLabelService
                     $emailSendingService = new EmailSendingService();
                     $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP);
                     $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP_2);
-                    $emailSendingService->addNewScheduledEmail($order, EmailSetting::PRODUCED);
-
 
                     $order->preferred_invoice_date = $now;
                     $tasks = Task::query()->where('order_id', '=', $order->id)->get();
