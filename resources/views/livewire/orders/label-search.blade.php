@@ -12,7 +12,7 @@
                 @foreach($this->labels as $label)
                     <span
                           class="order-label filter-by-labels-in-group-input-change"
-                          wire:click="selectCurrent({{ $label['id'] }})"
+                          wire:click="selectCurrent({{ $label->id }})"
                     >
                        {{ $label->name }}
                     </span>
