@@ -57,6 +57,7 @@ class LabelSearch extends Component
 
     public function clearSelected()
     {
+        $this->toggleContainer();
         $this->emit('labelDeselected');
     }
 }

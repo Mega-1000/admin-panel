@@ -19,7 +19,7 @@
                     @endforeach
             </div>
 
-            <div class="filter-by-labels-in-group__clear">
+            <div>
                 <button class="btn btn-warning" wire:click="clearSelected">wyczyść</button>
             </div>
         </div>
