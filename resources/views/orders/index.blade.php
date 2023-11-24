@@ -4557,12 +4557,12 @@
         });
 
         Livewire.on('labelSelected', (labelId) => {
-            LocalStorage.setItem('labelId', labelId);
+            window.localStorage.setItem('labelId', labelId);
             table.ajax.reload();
         });
 
         Livewire.on('labelDeselected', () => {
-            LocalStorage.removeItem('labelId');
+            window.localStorage.removeItem('labelId');
             table.ajax.reload();
         });
     </script>
