@@ -4559,7 +4559,7 @@
         document.addEventListener('livewire:load', () => {
             const localStorageData = localStorage.getItem('labelId');
 
-            Livewire.emit('localStorageDataUpdated', localStorageData);
+            Livewire.emit('localStorageDataUpdated', localStorageData ?? '');
         });
 
 
@@ -4583,7 +4583,7 @@
                 window.localStorage.setItem('labelId', labelId);
             }
 
-            Livewire.emit('localStorageDataUpdated', localStorage.getItem('labelId'));
+            Livewire.emit('localStorageDataUpdated', localStorage.getItem('labelId') ?? '');
 
             table.ajax.reload();
         });
