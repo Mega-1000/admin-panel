@@ -276,7 +276,7 @@ readonly class OrderDatatableService
             });
         }
 
-        if (array_key_exists('labelId', $data)) {
+        if (array_key_exists('labelId', $data) && !empty($data['labelId'])) {
             $query->whereExists(function ($innerQuery) use ($data) {
                 $innerQuery->select("*")
                     ->from('order_labels')
