@@ -15,10 +15,9 @@ class LabelSearch extends Component
     protected $listeners = ['localStorageDataUpdated'];
     public ?array $localStorageData;
 
-    public function localStorageDataUpdated($data)
+    public function localStorageDataUpdated(string $data): void
     {
         $this->localStorageData = explode($data);
-        dd('okejk');
     }
 
     public function render(): View
