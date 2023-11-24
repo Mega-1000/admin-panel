@@ -9,6 +9,7 @@
         <i class="voyager-window-list"></i> @lang('orders.title')
     </h1>
     <link rel="stylesheet" href="{{ URL::asset('css/views/orders/index.css') }}">
+    @livewireStyles
 @endsection
 
 @section('table')
@@ -951,9 +952,7 @@
                 <th>
                     <div><span>@lang('orders.table.label_' . str_replace(" ", "_", $key))</span></div>
                     <div class="input_div input_div__label-search">
-                        <filter-by-labels-in-group
-                            group-name="{{ $key }}"
-                        />
+                        <livewire:orders.label-search :groupName="$key"/>
                     </div>
                 </th>
             @endforeach
@@ -1560,6 +1559,8 @@
                         d.selectOnlyWrongInvoiceBilansOrders = localStorage.getItem('selectOnlyWrongInvoiceBilansOrders');
                         d.selectOnlyNonZeroCBOOrders = localStorage.getItem('selectOnlyNonZeroCBOOrders');
                         d.selectOnlyProduced = localStorage.getItem('selectOnlyProduced');
+
+                        d.labelId = localStorage.getItem('labelId');
                         let differenceMode = localStorage.getItem('differenceMode');
                         if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
                     },
@@ -4535,6 +4536,7 @@
         setDeleteEventListeners();
     </script>
 
+    @livewireScripts
     <script>
         $(document).ready(function () {
             const now = new Date();
@@ -4553,6 +4555,15 @@
             selectOnlyNonZeroCBOOrders();
             selectOnlyProduced();
         });
-    </script>
 
+        Livewire.on('labelSelected', (labelId) => {
+            LocalStorage.setItem('labelId', labelId);
+            table.ajax.reload();
+        });
+
+        Livewire.on('labelDeselected', () => {
+            LocalStorage.removeItem('labelId');
+            table.ajax.reload();
+        });
+    </script>
 @endsection
