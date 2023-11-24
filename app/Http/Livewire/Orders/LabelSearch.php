@@ -17,7 +17,7 @@ class LabelSearch extends Component
 
     public function localStorageDataUpdated(string $data): void
     {
-        $this->localStorageData = explode($data);
+        $this->localStorageData = explode(',', $data);
     }
 
     public function render(): View
