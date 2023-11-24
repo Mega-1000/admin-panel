@@ -4556,6 +4556,13 @@
             selectOnlyProduced();
         });
 
+        document.addEventListener('livewire:load', () => {
+            const localStorageData = localStorage.getItem('labelId');
+
+            Livewire.emit('localStorageDataUpdated', localStorageData);
+        });
+
+
         Livewire.on('labelSelected', (labelId) => {
             const labelCurrent = window.localStorage.getItem('labelId');
             // if label is already selected then deselect it firstly explode string to array

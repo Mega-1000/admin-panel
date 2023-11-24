@@ -12,11 +12,20 @@ class LabelSearch extends Component
     public string $groupName;
     public array $labels = [];
     public bool $showContainer = false;
+    protected $listeners = ['localStorageDataUpdated'];
+    public ?array $localStorageData;
+
+    public function localStorageDataUpdated($data)
+    {
+        $this->localStorageData = $data;
+        dd('okejk');
+    }
 
     public function render(): View
     {
         return view('livewire.orders.label-search');
     }
+
 
     public function toggleContainer()
     {
