@@ -14,7 +14,7 @@
                         style="cursor: pointer"
                         wire:click="selectCurrent({{ $label->id }})"
                     >
-                        <i class="{{ $label->icon_name }}" style="font-size: 24px; background-color: {{ $label->color }}; border: {{ in_array($label->id, $this->localStorageData) ? '1px solid black' : ''}}; padding: 5px"></i>
+                        <i class="{{ $label->icon_name }}" style="font-size: 24px; background-color: {{ $label->color }}; border: {{ in_array($label->id, $this->localStorageData) ? '2px solid black' : ''}}; padding: 5px"></i>
                     </span>
                     @endforeach
             </div>

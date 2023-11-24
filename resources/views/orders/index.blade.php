@@ -4590,7 +4590,7 @@
 
         Livewire.on('labelDeselected', () => {
             window.localStorage.removeItem('labelId');
-            Livewire.emit('localStorageDataUpdated', localStorage.getItem('labelId'));
+            Livewire.emit('localStorageDataUpdated', '');
             table.ajax.reload();
         });
     </script>
