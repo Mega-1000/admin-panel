@@ -44,7 +44,7 @@ class LabelSearch extends Component
     public function selectCurrent($id)
     {
         $this->toggleContainer();
-        $this->emit('labelSelected');
+        $this->emit('labelSelected', $id);
     }
 
     public function clearSelected()
