@@ -4557,8 +4557,25 @@
         });
 
         Livewire.on('labelSelected', (labelId) => {
-            window.cu
-            window.localStorage.setItem('labelId', labelId);
+            const labelCurrent = window.localStorage.getItem('labelId');
+            // if label is already selected then deselect it firstly explode string to array
+            if (labelCurrent) {
+                const labelCurrentArray = labelCurrent.split(',');
+
+                if (labelCurrentArray.includes(labelId)) {
+                    const labelCurrentArrayFiltered = labelCurrentArray.filter(item => item !== labelId);
+                    window.localStorage.setItem('labelId', labelCurrentArrayFiltered.join(','));
+                    table.ajax.reload();
+                    return;
+                }
+            }
+
+            if (labelCurrent) {
+                window.localStorage.setItem('labelId', labelCurrent + ',' + labelId);
+            } else {
+                window.localStorage.setItem('labelId', labelId);
+            }
+
             table.ajax.reload();
         });
 

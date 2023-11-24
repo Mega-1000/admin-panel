@@ -277,10 +277,12 @@ readonly class OrderDatatableService
         }
 
         if (array_key_exists('labelId', $data) && !empty($data['labelId'])) {
+            $arrayIdLabelsIds = explode(',', $data['labelId']);
+
             $query->whereExists(function ($innerQuery) use ($data) {
                 $innerQuery->select("*")
                     ->from('order_labels')
-                    ->whereRaw("order_labels.order_id = orders.id and order_labels.label_id = {$data['labelId']}");
+                    ->whereRaw("order_labels.order_id = orders.id and order_labels.label_id IN (" . implode(',', $data['labelId']) . ")");
             });
         }
 
