@@ -14,7 +14,7 @@
                         style="cursor: pointer"
                         wire:click="selectCurrent({{ $label->id }})"
                     >
-                        <i class="{{ $label->icon_name }}" style="font-size: 24px;"></i>
+                        <i class="{{ $label->icon_name }}" style="font-size: 24px; background-color: {{ $label->color }}; padding: 5px"></i>
                     </span>
                     @endforeach
             </div>
