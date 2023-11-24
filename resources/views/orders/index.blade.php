@@ -4583,6 +4583,8 @@
                 window.localStorage.setItem('labelId', labelId);
             }
 
+            Livewire.emit('localStorageDataUpdated', localStorage.getItem('labelId'));
+
             table.ajax.reload();
         });
 
