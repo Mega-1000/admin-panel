@@ -4557,6 +4557,7 @@
         });
 
         Livewire.on('labelSelected', (labelId) => {
+            window.cu
             window.localStorage.setItem('labelId', labelId);
             table.ajax.reload();
         });

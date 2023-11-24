@@ -8,16 +8,18 @@
 
     @if($this->showContainer)
         <div style="background-color: white">
-            <div style="display: flex;">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
                 @foreach($this->labels as $label)
                     <span
-                          class="order-label filter-by-labels-in-group-input-change"
-                          wire:click="selectCurrent({{ $label->id }})"
+                        style="cursor: pointer"
+                        wire:click="selectCurrent({{ $label->id }})"
                     >
-                       {{ $label->name }}
+                        <i class="{{ $label->icon_name }}" style="font-size: 24px;"></i>
                     </span>
-                @endforeach
+                    @endforeach
             </div>
+
+
 
             <div class="filter-by-labels-in-group__clear">
                 <button class="btn btn-warning" wire:click="clearSelected">wyczyść</button>
