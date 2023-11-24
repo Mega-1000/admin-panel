@@ -17,7 +17,7 @@ class LabelSearch extends Component
 
     public function localStorageDataUpdated($data)
     {
-        $this->localStorageData = $data;
+        $this->localStorageData = explode($data);
         dd('okejk');
     }
 
