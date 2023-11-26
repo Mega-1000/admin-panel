@@ -7,12 +7,12 @@ trait Paginatable
     /**
      * @var int
      */
-    protected $perPageMax = 25;
+    protected int $perPageMax = 25;
 
     /**
      * @var int
      */
-    protected $perPage = 1;
+    protected int $perPage = 1;
 
     /**
      * Get the number of models to return per page.

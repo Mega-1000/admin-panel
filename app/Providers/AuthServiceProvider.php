@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\OrderDatatableColumns;
+use App\Policies\OrderDatatableColumnsPolicy;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -15,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
+        OrderDatatableColumns::class => OrderDatatableColumnsPolicy::class,
     ];
 
     /**
@@ -30,9 +32,6 @@ class AuthServiceProvider extends ServiceProvider
             return in_array($user->role_id, [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN]);
         });
 
-//        Route::group(['middleware' => Cors::class], function () {
-//            //Passport::routes();
-//        });
         Passport::tokensExpireIn(now()->addDays(30));
         Passport::refreshTokensExpireIn(now()->addDays(180));
 
