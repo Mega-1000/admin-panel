@@ -1,6 +1,29 @@
 @extends('layouts.datatable')
 
 @section('app-header')
+    <style>
+        th {
+            position: relative;
+        }
+
+        th::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 8px;
+            cursor: ew-resize;
+        }
+
+        body.resizing th::after {
+            display: none;
+        }
+
+        .resizing {
+            pointer-events: none;
+        }
+    </style>
     @livewireStyles
 @endsection
 

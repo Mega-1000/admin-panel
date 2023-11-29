@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\OrderDatatableColumns;
+use App\OrderDatatableColumn;
 use App\Policies\OrderDatatableColumnsPolicy;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -17,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        OrderDatatableColumns::class => OrderDatatableColumnsPolicy::class,
+        OrderDatatableColumn::class => OrderDatatableColumnsPolicy::class,
     ];
 
     /**

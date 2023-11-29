@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property User $user
  */
-class OrderDatatableColumns extends Model
+class OrderDatatableColumn extends Model
 {
     use HasFactory;
 

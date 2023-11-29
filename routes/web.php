@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\OrderDatatableColumnsManagementController;
 use App\Entities\OrderPackage;
 use App\Http\Controllers\AddLabelsCSVController;
 use App\Http\Controllers\AllegroBillingController;
 use App\Http\Controllers\AllegroReturnPaymentController;
-use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\ConfirmProductStockOrderController;
 use App\Http\Controllers\ControllSubjectInvoiceController;
@@ -35,10 +35,6 @@ use App\Http\Controllers\ProductStocksController;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
-use App\NewsletterPacket;
-use Barryvdh\DomPDF\PDF;
-use Dompdf\Dompdf;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
@@ -758,6 +754,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::resource('newsletter-packets', NewsletterPacketController::class)->names('newsletter-packets');
 
     Route::get('orderDatatable', OrderDatatableController::class)->name('orderDatatable');
+    Route::get('orderDatatableColumnsFiltering', [OrderDatatableColumnsManagementController::class, 'index'])->name('orderDatatableColumnsFiltering');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

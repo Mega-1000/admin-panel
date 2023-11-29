@@ -3,15 +3,32 @@
 namespace App\Services\OrderDatatable;
 
 use App\Entities\Order;
-use App\OrderDatatableColumns as OrderDatatableColumnsModel;
-use Illuminate\Pagination\LengthAwarePaginator;
-
+use App\Enums\OrderDatatableColumnsEnum;
+use App\OrderDatatableColumn;
+use App\Repositories\OrderDatatableColumns;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class OrderDatatableRetrievingService
 {
+    /**
+     * Get orders for datatable for current user
+     *
+     * @return array
+     */
     public function getOrders(): array
     {
-        return Order::paginate(10)->toArray();
+        $q = Order::query();
+
+        foreach (OrderDatatableColumn::where('filter', '!=', '')->get() as $column) {
+            $q->where($column->label, 'like', '%' . $column->filter . '%');
+        }
+
+        try {
+            return $q->paginate(session()->get('pageLength', 10))->toArray();
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            return $q->paginate(10)->toArray();
+        }
     }
 
     /**
@@ -21,13 +38,12 @@ class OrderDatatableRetrievingService
      */
     public static function getColumnNames(): array
     {
-        $dtColumns = OrderDatatableColumnsModel::where('hidden', false)->get()->toArray();
+        $dtColumns = OrderDatatableColumn::where('hidden', false)->get()->toArray();
 
         if (count($dtColumns) === 0) {
-            $dtColumns = [
-                ['name' => 'ID', 'order' => 1, 'size' => 100, 'label' => 'id'],
-                ['name' => 'created_at', 'order' => 2, 'size' => 150, 'label' => 'created_at'],
-            ];
+            $dtColumns = OrderDatatableColumnsEnum::DEFAULT_COLUMNS;
+
+            OrderDatatableColumns::reCreateForUser($dtColumns, auth()->id());
         }
 
         return $dtColumns;
