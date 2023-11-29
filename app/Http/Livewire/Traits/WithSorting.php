@@ -11,16 +11,6 @@ trait WithSorting
     public array $filters = [];
 
     /**
-     * WithSorting extends Livewire component and adds sorting functionality to it
-     * @param null $id
-     */
-    public function initializeWithSorting($id = null): void
-    {
-        $this->columns = OrderDatatableRetrievingService::getColumnNames();
-        $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
-    }
-
-    /**
      * Re render filters uses class state to re render filters
      */
     public function reRenderFilters(): void

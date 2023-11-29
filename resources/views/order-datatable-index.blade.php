@@ -32,4 +32,5 @@
 
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
+    <script src="{{ asset('js/datatable/labels-filter.js') }}"></script>
 @endsection

@@ -4,8 +4,6 @@ namespace App\Http\Livewire\OrderDatatable;
 
 use Illuminate\View\View;
 use Livewire\Component;
-use App\OrderDatatableColumn;
-use Livewire\Redirector;
 
 class OrderDatatableColumns extends Component
 {

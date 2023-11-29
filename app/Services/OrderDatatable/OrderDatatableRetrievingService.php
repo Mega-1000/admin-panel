@@ -4,6 +4,7 @@ namespace App\Services\OrderDatatable;
 
 use App\Entities\Order;
 use App\Enums\OrderDatatableColumnsEnum;
+use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
 use App\OrderDatatableColumn;
 use App\Repositories\OrderDatatableColumns;
 use Psr\Container\ContainerExceptionInterface;
@@ -22,6 +23,12 @@ class OrderDatatableRetrievingService
 
         foreach (OrderDatatableColumn::where('filter', '!=', '')->get() as $column) {
             $q->where($column->label, 'like', '%' . $column->filter . '%');
+        }
+
+        foreach (OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES as $columnName => $nonStandardColumnFilterClass) {
+            /** @var AbstractNonStandardColumnFilter $nonStandardColumnFilterClass */
+            $nonStandardColumnFilterClass = new $nonStandardColumnFilterClass();
+            $q = $nonStandardColumnFilterClass->applyFilter($q, $columnName);
         }
 
         try {

@@ -11,10 +11,14 @@ trait WithNonstandardColumns
      *
      * @return void
      */
-    public function withNonstandardColumnsInit(): void
+    public function initWithNonstandardColumns(): void
     {
         $this->addNonstandardColumn('akcje', function (array $order) {
             return view('livewire.order-datatable.nonstandard-columns.actions', compact('order'))->render();
+        });
+
+        $this->addNonstandardColumn('labels', function (array $order) {
+            return 'okej';
         });
     }
 
@@ -29,7 +33,7 @@ trait WithNonstandardColumns
     public function addNonstandardColumn(string $columnName, Closure $callback): void
     {
         foreach($this->orders['data'] as &$order) {
-            $order['akcje'] = $callback($order);
+            $order[$columnName] = $callback($order);
         }
     }
 

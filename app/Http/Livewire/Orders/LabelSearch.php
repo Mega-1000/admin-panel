@@ -14,6 +14,7 @@ class LabelSearch extends Component
     public bool $showContainer = false;
     protected $listeners = ['localStorageDataUpdated'];
     public ?array $localStorageData;
+    public string $sessionName = '';
 
     public function localStorageDataUpdated(string $data): void
     {
@@ -53,11 +54,15 @@ class LabelSearch extends Component
     {
         $this->toggleContainer();
         $this->emit('labelSelected', $id);
+
+        session()->put($this->sessionName, $id);
     }
 
     public function clearSelected()
     {
         $this->toggleContainer();
         $this->emit('labelDeselected');
+
+        session()->forget($this->sessionName);
     }
 }

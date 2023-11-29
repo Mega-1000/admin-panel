@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\OrderDatatable;
 
+use App\Http\Livewire\Traits\WithNonStandardColumnsSorting;
 use App\Http\Livewire\Traits\WithSorting;
 use App\Http\Livewire\Traits\WithNonstandardColumns;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
@@ -11,21 +12,23 @@ use Livewire\Component;
 
 class OrderDatatableIndex extends Component
 {
-    use WithSorting, WithNonstandardColumns, WithPageLengthManagement, WithColumnsDragAndDrop;
+    use WithSorting, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting;
 
     public array $orders;
     public $listeners = ['updateColumnOrderBackend'];
 
-
+    /**
+     * OrderDatatableIndex extends Livewire component and adds datatable functionality to it
+     *
+     * @return View
+     */
     public function render(): View
     {
         $this->orders = app(OrderDatatableRetrievingService::class)->getOrders();
 
         $this->reRenderFilters();
-        $this->withNonstandardColumnsInit();
-        $this->initializeWithPageLengthManagement();
-        $this->initializeWithSorting();
-        $this->initializeWithColumnsDragAndDrop();
+        $this->initWithNonstandardColumns();
+        $this->initWithNonStandardColumnsSorting();
 
         return view('livewire.order-datatable.order-datatable-index');
     }
