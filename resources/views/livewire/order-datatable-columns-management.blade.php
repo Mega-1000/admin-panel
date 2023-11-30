@@ -6,7 +6,11 @@
             </div>
 
             <div>
+                Wyświetlaj
                 <input type="checkbox" wire:model="columns.{{ $k }}.hidden" class="form-checkbox h-5 w-5 text-indigo-600">
+
+                Szerokość
+                <input type="number" wire:model="columns.{{ $k }}.size" class="form-input w-16 text-indigo-600">
             </div>
         </label>
         <hr class="my-2">

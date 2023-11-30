@@ -13,7 +13,7 @@
     <table class="table table-bordered">
         <colgroup>
             @foreach($columns as $column)
-                <col style="width: 150px;"> <!-- Set an initial width for each column -->
+                <col style="width: {{ $column['size'] }}px;"> <!-- Set an initial width for each column -->
             @endforeach
         </colgroup>
 

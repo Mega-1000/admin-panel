@@ -1,1 +1,1 @@
-<livewire:orders.label-search groupName="fakury zakupu" sessionName="sessionName" />
+<livewire:orders.label-search groupName="{{ $data['labelGroupName'] }}" sessionName="{{ $sessionName }}" />

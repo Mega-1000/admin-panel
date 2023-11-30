@@ -5,6 +5,7 @@ namespace App\Services\OrderDatatable;
 use App\Entities\Order;
 use App\Enums\OrderDatatableColumnsEnum;
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
+use App\Helpers\OrderDatatableNonstandardFiltersHelper;
 use App\OrderDatatableColumn;
 use App\Repositories\OrderDatatableColumns;
 use Psr\Container\ContainerExceptionInterface;
@@ -20,14 +21,18 @@ class OrderDatatableRetrievingService
     public function getOrders(): array
     {
         $q = Order::query();
+        $q->with(['labels', 'labels.labelGroup']);
 
-        foreach (OrderDatatableColumn::where('filter', '!=', '')->get() as $column) {
+        $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
+        $columns = $columns->filter(function ($column) {
+            return !in_array($column->label, array_keys(OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES));
+        });
+
+        foreach ($columns as $column) {
             $q->where($column->label, 'like', '%' . $column->filter . '%');
         }
 
-        foreach (OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES as $columnName => $nonStandardColumnFilterClass) {
-            /** @var AbstractNonStandardColumnFilter $nonStandardColumnFilterClass */
-            $nonStandardColumnFilterClass = new $nonStandardColumnFilterClass();
+        foreach (OrderDatatableNonstandardFiltersHelper::composeClasses() as $columnName => $nonStandardColumnFilterClass) {
             $q = $nonStandardColumnFilterClass->applyFilter($q, $columnName);
         }
 

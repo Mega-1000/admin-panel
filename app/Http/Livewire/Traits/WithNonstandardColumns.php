@@ -17,9 +17,20 @@ trait WithNonstandardColumns
             return view('livewire.order-datatable.nonstandard-columns.actions', compact('order'))->render();
         });
 
-        $this->addNonstandardColumn('labels', function (array $order) {
-            return 'okej';
-        });
+        $labelGroupNames = [
+            'platnosci' => 'Płatności',
+            'produkcja' => 'Produkcja',
+            'transport' => 'Transport',
+            'info dodatkowe' => 'Info dodatkowe',
+            'fakury zakupu' => 'Faktury zakupu',
+        ];
+
+        foreach ($labelGroupNames as $labelGroupName => $labelGroupDisplayName) {
+            $this->addNonstandardColumn('labels-' . $labelGroupName, function (array $order) use ($labelGroupName, $labelGroupDisplayName) {
+                return view('livewire.order-datatable.nonstandard-columns.labels', compact('order', 'labelGroupName', 'labelGroupDisplayName'))->render();
+            });
+        }
+
     }
 
 

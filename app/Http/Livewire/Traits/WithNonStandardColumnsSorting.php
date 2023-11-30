@@ -4,10 +4,22 @@ namespace App\Http\Livewire\Traits;
 
 use App\Enums\OrderDatatableColumnsEnum;
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
+use App\Helpers\OrderDatatableNonstandardFiltersHelper;
+use App\OrderDatatableColumn;
 
+/**
+ * Add extra functionality to Livewire component using its state and methods It depents on OrderDatatableColumnsEnum class
+ *
+ * @see OrderDatatableColumnsEnum
+ *
+ * All classes for non standard columns sorting must extends AbstractNonStandardColumnFilter
+ *
+ * @see AbstractNonStandardColumnFilter
+ *
+ * @category Trait
+ */
 trait WithNonStandardColumnsSorting
 {
-
     /**
      * WithNonStandardColumnsSorting extends Livewire component and adds nonstandard columns sorting functionality to it
      *
@@ -15,8 +27,8 @@ trait WithNonStandardColumnsSorting
      */
     public function initWithNonStandardColumnsSorting(): void
     {
-        foreach (OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES as $columnName => $nonStandardColumnFilterClass) {
-            $this->addNonStandardFilter($columnName, new $nonStandardColumnFilterClass());
+        foreach (OrderDatatableNonstandardFiltersHelper::composeClasses() as $columnName => $nonStandardColumnFilterClass) {
+            $this->addNonStandardFilter($columnName, $nonStandardColumnFilterClass);
         }
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Orders;
 
 use App\Entities\LabelGroup;
+use App\OrderDatatableColumn;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -38,7 +39,7 @@ class LabelSearch extends Component
 
     public function getAssociatedLabelsToOrderFromGroup(): array
     {
-        $groupId = LabelGroup::where('name', $this->groupName)->first()->id;
+        $groupId = LabelGroup::where('name', str_replace('labels-', '', $this->groupName))->first()->id;
 
         $labels = DB::table('labels')
             ->distinct()
@@ -52,17 +53,19 @@ class LabelSearch extends Component
 
     public function selectCurrent($id)
     {
-        $this->toggleContainer();
-        $this->emit('labelSelected', $id);
+        OrderDatatableColumn::where('label', $this->groupName)->update(['filter' => $id]);
 
-        session()->put($this->sessionName, $id);
+        $this->toggleContainer();
+
+        $this->emit('reloadDatatable');
     }
 
     public function clearSelected()
     {
-        $this->toggleContainer();
-        $this->emit('labelDeselected');
+        OrderDatatableColumn::where('label', $this->sessionName)->update(['filter' => '']);
 
-        session()->forget($this->sessionName);
+        $this->emit('reloadDatatable');
+
+        $this->toggleContainer();
     }
 }

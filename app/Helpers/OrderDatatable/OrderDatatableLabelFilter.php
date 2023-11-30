@@ -8,9 +8,19 @@ use Psr\Container\NotFoundExceptionInterface;
 
 final class OrderDatatableLabelFilter extends AbstractNonStandardColumnFilter
 {
-    public string $sessionName = 'labels';
+    public string $sessionName = '';
+
+    public function __construct(array $data)
+    {
+        $this->data = $data;
+        $this->sessionName = $data['labelGroupName'];
+
+        parent::__construct($data);
+    }
 
     /**
+     * Apply filter to query
+     *
      * @param mixed $query
      * @param string $columnName
      * @return mixed
@@ -19,18 +29,20 @@ final class OrderDatatableLabelFilter extends AbstractNonStandardColumnFilter
      */
     public function applyFilter(mixed $query, string $columnName): mixed
     {
-        return $query->whereHas('labels', function ($query) {
-            $query->find(session()->get($this->sessionName));
-        });
+        $filterValue = $this->getFilterValue();
+
+        return $filterValue ? $query->whereHas('labels', function ($query) use ($filterValue) {
+            $query->where('labels.id', $filterValue);
+        }) : $query;
     }
 
-    public function updateFilter(array $data): void
-    {
-        // TODO: Implement updateFilter() method.
-    }
-
+    /**
+     * Render filter component
+     *
+     * @return string
+     */
     public function renderFilter(): string
     {
-        return view('livewire.order-datatable.nonstandard-columns.filters.labels', ['sessionName' => $this->sessionName])->render();
+        return view('livewire.order-datatable.nonstandard-columns.filters.labels', ['sessionName' => $this->sessionName, 'data' => $this->data])->render();
     }
 }
