@@ -5,7 +5,6 @@ namespace App\Http\Livewire\OrderDatatable;
 use App\Http\Livewire\Traits\WithNonStandardColumnsSorting;
 use App\Http\Livewire\Traits\WithSorting;
 use App\Http\Livewire\Traits\WithNonstandardColumns;
-use App\OrderDatatableColumn;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use App\Livewire\Traits\OrderDatatable\WithPageLengthManagement;
 use Illuminate\View\View;

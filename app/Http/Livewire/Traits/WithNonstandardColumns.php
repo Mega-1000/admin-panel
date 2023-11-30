@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\Traits;
 
+use App\Entities\Order;
+use App\Services\Label\RemoveLabelService;
 use Closure;
 
 trait WithNonstandardColumns
@@ -46,6 +48,20 @@ trait WithNonstandardColumns
         foreach($this->orders['data'] as &$order) {
             $order[$columnName] = $callback($order);
         }
+    }
+
+    /**
+     * @param $labelId
+     * @param $orderId
+     * @return void
+     */
+    public function removeLabel($labelId, $orderId): void
+    {
+        $arr = [];
+        RemoveLabelService::removeLabels(Order::find($orderId), [$labelId], $arr, [], null);
+
+        $this->render();
+        $this->reloadDatatable();
     }
 
 }
