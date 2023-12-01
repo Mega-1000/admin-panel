@@ -19,6 +19,27 @@ trait WithNonstandardColumns
             return view('livewire.order-datatable.nonstandard-columns.actions', compact('order'))->render();
         });
 
+        $this->addNonstandardColumn('wyjechalo', function (array $order) {
+            return 'okej';
+        });
+
+        $this->addNonstandardColumn('nie-wyjechalo', function (array $order) {
+            return 'okej1';
+        });
+
+        $this->addNonstandardColumn('pozostalo-do-zaplaty', function (array $order) {
+
+            return view('livewire.order-datatable.nonstandard-columns.invoice-values', compact('order'))->render();
+        });
+
+        $this->addNonstandardColumn('bilans-oferty', function (array $order) {
+            return 'okej3';
+        });
+
+        $this->addNonstandardColumn('zaliczka-wplacona', function (array $order) {
+            return 'okej4';
+        });
+
         $labelGroupNames = [
             'platnosci' => 'Płatności',
             'produkcja' => 'Produkcja',

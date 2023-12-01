@@ -20,7 +20,7 @@ class OrderDatatableRetrievingService
     public function getOrders(): array
     {
         $q = Order::query();
-        $q->with(['labels', 'labels.labelGroup']);
+        $q->with(['labels', 'labels.labelGroup', 'invoices']);
 
         $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
         $columns = $columns->filter(function ($column) {

@@ -4,6 +4,7 @@ namespace App\Enums;
 
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
 use App\Helpers\OrderDatatable\OrderDatatableLabelFilter;
+use App\Helpers\OrderDatatable\OrderDatatableShipmentFilter;
 
 enum OrderDatatableColumnsEnum
 {
@@ -13,12 +14,17 @@ enum OrderDatatableColumnsEnum
     const DEFAULT_COLUMNS = [
         ['filter' => '', 'order' => 1, 'size' => 100, 'label' => 'id'],
         ['filter' => '', 'order' => 2, 'size' => 150, 'label' => 'created_at'],
-        ['filter' => '', 'order' => 3, 'size' => 100, 'label' => 'akcje'],
-        ['filter' => '', 'order' => 3, 'size' => 100, 'label' => 'labels-platnosci'],
-        ['filter' => '', 'order' => 3, 'size' => 100, 'label' => 'labels-produkcja'],
-        ['filter' => '', 'order' => 3, 'size' => 100, 'label' => 'labels-transport'],
-        ['filter' => '', 'order' => 3, 'size' => 100, 'label' => 'labels-info dodatkowe'],
-        ['filter' => '', 'order' => 3, 'size' => 100, 'label' => 'labels-fakury zakupu'],
+        ['filter' => '', 'order' => 4, 'size' => 100, 'label' => 'akcje'],
+        ['filter' => '', 'order' => 5, 'size' => 100, 'label' => 'labels-platnosci'],
+        ['filter' => '', 'order' => 6, 'size' => 100, 'label' => 'labels-produkcja'],
+        ['filter' => '', 'order' => 7, 'size' => 100, 'label' => 'labels-transport'],
+        ['filter' => '', 'order' => 8, 'size' => 100, 'label' => 'labels-info dodatkowe'],
+        ['filter' => '', 'order' => 9, 'size' => 100, 'label' => 'labels-fakury zakupu'],
+        ['filter' => '', 'order' => 10, 'size' => 100, 'label' => 'wyjechalo'],
+        ['filter' => '', 'order' => 11, 'size' => 100, 'label' => 'nie-wyjechalo'],
+        ['filter' => '', 'order' => 12, 'size' => 100, 'label' => 'bilans-oferty'],
+        ['filter' => '', 'order' => 14, 'size' => 100, 'label' => 'zaliczka-wplacona'],
+        ['filter' => '', 'order' => 14, 'size' => 100, 'label' => 'pozostalo-do-zaplaty'],
     ];
 
     /**
@@ -46,6 +52,14 @@ enum OrderDatatableColumnsEnum
         'labels-fakury zakupu' => [
             'class' => OrderDatatableLabelFilter::class,
             'data' => ['labelGroupName' => 'labels-fakury zakupu']
+        ],
+        'wyjechalo' => [
+            'class' => OrderDatatableShipmentFilter::class,
+            'data' => ['labelGroupName' => 'wyjechalo']
+        ],
+        'nie-wyjechalo' => [
+            'class' => OrderDatatableShipmentFilter::class,
+            'data' => ['labelGroupName' => 'nie-wyjechalo']
         ],
     ];
 }
