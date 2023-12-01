@@ -37,7 +37,7 @@ trait WithNonstandardColumns
         });
 
         $this->addNonstandardColumn('zaliczka-wplacona', function (array $order) {
-            return 'okej4';
+            return view('livewire.order-datatable.nonstandard-columns.deposit-paid', compact('order'))->render();
         });
 
         $labelGroupNames = [
