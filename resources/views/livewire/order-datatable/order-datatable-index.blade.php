@@ -78,4 +78,3 @@
 </div>
 
 <script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>
-

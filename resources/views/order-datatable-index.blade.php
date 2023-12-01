@@ -32,5 +32,33 @@
 
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/datatable/labels-filter.js') }}"></script>
+    <script>
+        const setDeleteEventListeners = () => {
+            setTimeout(() => {
+                const deleteLinks = document.querySelectorAll('#delete');
+                console.log(deleteLinks);
+                deleteLinks.forEach(function (link) {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const href = this.getAttribute('href');
+
+                        swal.fire({
+                            title: 'Jesteś pewien usuwania?',
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonText: 'OK',
+                        }).then(function (result) {
+                            if (result.isConfirmed) {
+                                window.location.href = href;
+                            }
+                        });
+                    });
+                });
+            }, 1000);
+        }
+
+        setDeleteEventListeners();
+    </script>
 @endsection
