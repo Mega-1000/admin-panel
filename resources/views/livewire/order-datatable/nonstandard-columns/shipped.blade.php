@@ -127,4 +127,4 @@
     @endphp
 @endif
 
-{{ $html }}
+{!! $html !!}
