@@ -7,6 +7,7 @@ use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvoc
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActions;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableInvoiceValues;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableNonShipped;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableOfferBalance;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableShipped;
 use App\Helpers\OrderDatatable\OrderDatatableLabelFilter;
