@@ -4,7 +4,7 @@
     $cancelled = 0;
 @endphp
 @if(count($data) !== 0)
-    @if($order->otherPackages && $order->otherPackages->firstWhere('type', 'not_calculable'))
+    @if($order['packages'] && collect($order['packages'])->firstWhere('type', 'not_calculable'))
         @php
             $html = '<div style="border: solid blue 4px" >';
         @endphp
