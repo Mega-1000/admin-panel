@@ -12,12 +12,14 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class OrderDatatableRetrievingService
 {
+    public static array $orders = [];
+
     /**
-     * Get orders for datatable for current user
+     * Fetch orders for datatable for current user save it in $orders property witch is static
      *
      * @return array
      */
-    public function getOrders(): array
+    public function fetchOrders(): array
     {
         $q = Order::query();
         $q->with(['labels', 'labels.labelGroup', 'invoiceValues', 'payments', 'items', 'allegroGeneralExpenses']);
@@ -40,6 +42,16 @@ class OrderDatatableRetrievingService
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             return $q->paginate(10)->toArray();
         }
+    }
+
+    /**
+     * Get orders for datatable for current user
+     *
+     * @return array
+     */
+    public function getOrders(): array
+    {
+        return self::$orders;
     }
 
     /**
