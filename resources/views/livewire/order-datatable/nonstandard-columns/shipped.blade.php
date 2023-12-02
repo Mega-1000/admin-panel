@@ -38,7 +38,7 @@
     @if($value['status'] !== 'SENDING' && $value['status'] !== 'DELIVERED' && $value['status'] !== 'CANCELLED')
         <div style="display: flex; align-items: center; flex-direction: column;">
             <div style="display: flex; align-items: stretch;">
-                <p style="margin: 8px 0 0 0;">{{ $row['order_id'] . '/' . $value['number'] }}</p>
+                <p style="margin: 8px 0 0 0;">{{ $order['id'] . '/' . $value['number'] }}</p>
                 @php
                     $name = $value['container_type'];
                     if ($value['symbol']) {
