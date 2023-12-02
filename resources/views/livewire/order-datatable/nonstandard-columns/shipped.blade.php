@@ -5,7 +5,7 @@
 @endphp
 
 @if(count($data) !== 0)
-    @if($order['otherPackages'] && collect($order['otherPackages'])->firstWhere('type', 'not_calculable'))
+    @if($order['other_packages'] && collect($order['other_packages'])->firstWhere('type', 'not_calculable'))
         @php
             $html = '<div style="border: solid blue 4px" >';
         @endphp
@@ -38,7 +38,7 @@
     @if($value['status'] !== 'SENDING' && $value['status'] !== 'DELIVERED' && $value['status'] !== 'CANCELLED')
         <div style="display: flex; align-items: center; flex-direction: column;">
             <div style="display: flex; align-items: stretch;">
-                <p style="margin: 8px 0 0 0;">{{ $row['id'] . '/' . $value['number'] }}</p>
+                <p style="margin: 8px 0 0 0;">{{ $row['order_id'] . '/' . $value['number'] }}</p>
                 @php
                     $name = $value['container_type'];
                     if ($value['symbol']) {
@@ -122,7 +122,7 @@
 
 @if($cancelled > 0)
     @php
-        $url = route('orders.editPackages', ['id' => $order['orderId']]);
+        $url = route('orders.edit_packages', ['id' => $order['order_id']]);
         $html .= '<a target="_blank" href="' . $url . '">Anulowano: ' . $cancelled . '</a>';
     @endphp
 @endif
