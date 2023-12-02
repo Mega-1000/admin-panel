@@ -8,6 +8,7 @@ use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActi
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableInvoiceValues;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableOfferBalance;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableShipped;
 use App\Helpers\OrderDatatable\OrderDatatableLabelFilter;
 use App\Helpers\OrderDatatable\OrderDatatableShipmentFilter;
 
@@ -96,6 +97,10 @@ enum OrderDatatableColumnsEnum
         ],
         'zaliczka-wplacona' => [
             'class' => NonStandardColumnInvocableDepositPaid::class,
+            'data' => []
+        ],
+        'wyjechalo' => [
+            'class' => NonStandardColumnInvocableShipped::class,
             'data' => []
         ],
     ];

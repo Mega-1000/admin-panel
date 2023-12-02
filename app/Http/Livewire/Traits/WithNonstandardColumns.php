@@ -23,10 +23,6 @@ trait WithNonstandardColumns
             });
         }
 
-        $this->addNonstandardColumn('wyjechalo', function (array $order) {
-            return 'okej';
-        });
-
         $this->addNonstandardColumn('nie-wyjechalo', function (array $order) {
             return 'okej1';
         });

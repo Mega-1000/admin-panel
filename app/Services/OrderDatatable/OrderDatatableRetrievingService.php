@@ -17,12 +17,12 @@ class OrderDatatableRetrievingService
     /**
      * Fetch orders for datatable for current user save it in $orders property witch is static
      *
-     * @return array
+     * @return void
      */
     public function fetchOrders(): void
     {
         $q = Order::query();
-        $q->with(['labels', 'labels.labelGroup', 'invoiceValues', 'payments', 'items', 'allegroGeneralExpenses']);
+        $q->with(['labels', 'labels.labelGroup', 'invoiceValues', 'payments', 'items', 'allegroGeneralExpenses', 'packages']);
 
         $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
         $columns = $columns->filter(function ($column) {
