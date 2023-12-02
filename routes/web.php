@@ -759,34 +759,6 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('orderDatatableColumnsFiltering', [OrderDatatableColumnsManagementController::class, 'index'])->name('orderDatatableColumnsFiltering');
 });
 
-Route::get('convert', function () {
-    return view('convert');
-});
-Route::post('convert', function (\Illuminate\Http\Request $request) {
-    // Validate the incoming request
-    $request->validate([
-        'file' => 'required|mimes:xls,xlsx', // Ensure the file is an Excel file
-    ]);
-
-    // Get the uploaded Excel file from the request
-    $file = $request->file('file');
-
-    // Read the Excel file using a package like Maatwebsite/Laravel-Excel
-    // Install the package by running: composer require maatwebsite/excel
-    // Import the class at the top of your file: use Maatwebsite\Excel\Facades\Excel;
-    $data = Excel::toArray([], $file);
-
-    // Extract only the data from the first column
-    $firstColumnData = array_column($data[0], 0);
-
-    // Implode the array to get a string of comma-separated numbers
-    $result = implode(',', $firstColumnData);
-
-    // You can do further processing or return the result as needed
-    return response()->json($result);
-});
-
-
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
 
