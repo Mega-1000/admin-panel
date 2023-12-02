@@ -17,7 +17,7 @@ class OrderDatatableRetrievingService
     /**
      * Fetch orders for datatable for current user save it in $orders property witch is static
      *
-     * @return void
+     * @return array
      */
     public function fetchOrders(): void
     {
@@ -38,9 +38,9 @@ class OrderDatatableRetrievingService
         }
 
         try {
-            self::$orders = $q->paginate(10)->toArray();
+            self::$orders = $q->paginate(session()->get('pageLength', 10))->toArray();
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-            self::$orders = [];
+            self::$orders = $q->paginate(10)->toArray();
         }
     }
 
