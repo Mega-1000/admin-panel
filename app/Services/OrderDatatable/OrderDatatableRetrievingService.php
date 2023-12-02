@@ -38,9 +38,9 @@ class OrderDatatableRetrievingService
         }
 
         try {
-            return $q->paginate(session()->get('pageLength', 10))->toArray();
+            self::$orders = $q->paginate(10)->toArray();
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-            return $q->paginate(10)->toArray();
+            self::$orders = [];
         }
     }
 
@@ -51,6 +51,11 @@ class OrderDatatableRetrievingService
      */
     public function getOrders(): array
     {
+        if (empty(static::$orders)) {
+            $this->fetchOrders();
+        }
+
+
         return self::$orders;
     }
 

@@ -759,9 +759,6 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('orderDatatableColumnsFiltering', [OrderDatatableColumnsManagementController::class, 'index'])->name('orderDatatableColumnsFiltering');
 });
 
-
-
-
 Route::get('convert', function () {
     return view('convert');
 });
