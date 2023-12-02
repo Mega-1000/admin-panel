@@ -80,11 +80,11 @@ enum OrderDatatableColumnsEnum
             'data' => []
         ],
         'wyjechalo' => [
-            'class' => NonStandardColumnInvocableInvoiceValues::class,
+            'class' => NonStandardColumnInvocableShipped::class,
             'data' => []
         ],
         'nie-wyjechalo' => [
-            'class' => NonStandardColumnInvocableActions::class,
+            'class' => NonStandardColumnInvocableNonShipped::class,
             'data' => []
         ],
         'pozostalo-do-zaplaty' => [
@@ -97,10 +97,6 @@ enum OrderDatatableColumnsEnum
         ],
         'zaliczka-wplacona' => [
             'class' => NonStandardColumnInvocableDepositPaid::class,
-            'data' => []
-        ],
-        'wyjechalo' => [
-            'class' => NonStandardColumnInvocableShipped::class,
             'data' => []
         ],
     ];

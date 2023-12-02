@@ -23,10 +23,6 @@ trait WithNonstandardColumns
             });
         }
 
-        $this->addNonstandardColumn('nie-wyjechalo', function (array $order) {
-            return 'okej1';
-        });
-
         $labelGroupNames = [
             'platnosci' => 'Płatności',
             'produkcja' => 'Produkcja',
