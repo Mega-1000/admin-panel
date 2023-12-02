@@ -786,7 +786,7 @@ Route::post('convert', function (\Illuminate\Http\Request $request) {
     $result = implode(',', $firstColumnData);
 
     // You can do further processing or return the result as needed
-    return response()->json(['result' => $result]);
+    return response()->json($result);
 });
 
 
