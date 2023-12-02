@@ -286,7 +286,7 @@ class Order extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function paymentsWithTrash()
+    public function paymentsWithTrash(): HasMany
     {
         return $this->hasMany(OrderPayment::class)->withTrashed();
     }

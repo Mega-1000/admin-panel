@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Traits;
 
 use App\Entities\Order;
+use App\Enums\OrderDatatableColumnsEnum;
 use App\Services\Label\RemoveLabelService;
 use Closure;
 
@@ -15,9 +16,12 @@ trait WithNonstandardColumns
      */
     public function initWithNonstandardColumns(): void
     {
-        $this->addNonstandardColumn('akcje', function (array $order) {
-            return view('livewire.order-datatable.nonstandard-columns.actions', compact('order'))->render();
-        });
+        foreach (OrderDatatableColumnsEnum::NON_STANDARD_COLUMNS as $columnName => $columnDisplayName) {
+            $this->addNonstandardColumn($columnName, function (array $order) use ($columnDisplayName) {
+                $class = new $columnDisplayName['class']();
+                return $class($order);
+            });
+        }
 
         $this->addNonstandardColumn('wyjechalo', function (array $order) {
             return 'okej';
@@ -25,19 +29,6 @@ trait WithNonstandardColumns
 
         $this->addNonstandardColumn('nie-wyjechalo', function (array $order) {
             return 'okej1';
-        });
-
-        $this->addNonstandardColumn('pozostalo-do-zaplaty', function (array $order) {
-
-            return view('livewire.order-datatable.nonstandard-columns.invoice-values', compact('order'))->render();
-        });
-
-        $this->addNonstandardColumn('bilans-oferty', function (array $order) {
-            return 'okej3';
-        });
-
-        $this->addNonstandardColumn('zaliczka-wplacona', function (array $order) {
-            return view('livewire.order-datatable.nonstandard-columns.deposit-paid', compact('order'))->render();
         });
 
         $labelGroupNames = [

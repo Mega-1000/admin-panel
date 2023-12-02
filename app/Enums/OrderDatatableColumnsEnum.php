@@ -3,6 +3,11 @@
 namespace App\Enums;
 
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
+use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvocable;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActions;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableInvoiceValues;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableOfferBalance;
 use App\Helpers\OrderDatatable\OrderDatatableLabelFilter;
 use App\Helpers\OrderDatatable\OrderDatatableShipmentFilter;
 
@@ -60,6 +65,38 @@ enum OrderDatatableColumnsEnum
         'nie-wyjechalo' => [
             'class' => OrderDatatableShipmentFilter::class,
             'data' => ['labelGroupName' => 'nie-wyjechalo']
+        ],
+    ];
+
+    /**
+     * List of non standard columns classes
+     *
+     * @var array<AbstractNonStandardColumnInvocable>
+     */
+    const NON_STANDARD_COLUMNS = [
+        'akcje' => [
+            'class' => NonStandardColumnInvocableActions::class,
+            'data' => []
+        ],
+        'wyjechalo' => [
+            'class' => NonStandardColumnInvocableInvoiceValues::class,
+            'data' => []
+        ],
+        'nie-wyjechalo' => [
+            'class' => NonStandardColumnInvocableActions::class,
+            'data' => []
+        ],
+        'pozostalo-do-zaplaty' => [
+            'class' => NonStandardColumnInvocableInvoiceValues::class,
+            'data' => []
+        ],
+        'bilans-oferty' => [
+            'class' => NonStandardColumnInvocableOfferBalance::class,
+            'data' => []
+        ],
+        'zaliczka-wplacona' => [
+            'class' => NonStandardColumnInvocableDepositPaid::class,
+            'data' => []
         ],
     ];
 }
