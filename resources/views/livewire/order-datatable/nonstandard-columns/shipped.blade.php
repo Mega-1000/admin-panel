@@ -19,7 +19,6 @@
                 $name = $value['symbol'];
             }
             $html .= '<p style="margin: 8px 8px 0 8px;">' . $name . '</p> </div> ';
-//            $html .= $value['sumOfCosts'] ? $value['sumOfCosts']['sum'] . ' /zł' : '';
             if ($value['delivery_cost_balance'] !== 0) {
                 $color = '';
                 if ($value['delivery_cost_balance'] >= 0) {

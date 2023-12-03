@@ -7,6 +7,7 @@ use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvoc
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActions;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableInvoiceValues;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableLabels;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableNonShipped;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableOfferBalance;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableShipped;
@@ -99,6 +100,21 @@ enum OrderDatatableColumnsEnum
         'zaliczka-wplacona' => [
             'class' => NonStandardColumnInvocableDepositPaid::class,
             'data' => []
+        ],
+        'labels-{name}' => [
+            'class' => NonStandardColumnInvocableLabels::class,
+            'data' => [
+                'labelGroupName' => '{name}'
+            ],
+            'map' => [
+                'name' => [
+                    'platnosci',
+                    'produkcja',
+                    'transport',
+                    'info dodatkowe',
+                    'fakury zakupu',
+                ]
+            ],
         ],
     ];
 }

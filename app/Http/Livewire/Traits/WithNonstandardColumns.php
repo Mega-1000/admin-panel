@@ -17,26 +17,51 @@ trait WithNonstandardColumns
     public function initWithNonstandardColumns(): void
     {
         foreach (OrderDatatableColumnsEnum::NON_STANDARD_COLUMNS as $columnName => $columnDisplayName) {
-            $this->addNonstandardColumn($columnName, function (array $order) use ($columnDisplayName) {
-                $class = new $columnDisplayName['class']();
-                return $class($order);
-            });
+            $matches = [];
+
+            // Use a regular expression to find all placeholders in curly braces
+            preg_match_all('/{([^}]+)}/', $columnName, $matches);
+
+            if (!empty($matches[1])) {
+                // Iterate over each placeholder and generate combinations
+                $combinations = [[]];
+                foreach ($matches[1] as $placeholder) {
+                    $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
+                    $newCombinations = [];
+                    foreach ($combinations as $combination) {
+                        foreach ($values as $value) {
+                            $newCombination = $combination;
+                            $newCombination[$placeholder] = $value;
+                            $newCombinations[] = $newCombination;
+                        }
+                    }
+                    $combinations = $newCombinations;
+                }
+
+                // Generate column names with replaced values and add functionality
+                foreach ($combinations as $combination) {
+                    $columnNameWithValues = $columnName;
+                    foreach ($combination as $placeholder => $value) {
+                        $columnNameWithValues = str_replace("$placeholder", $value, $columnNameWithValues);
+                    }
+
+                    $columnNameWithValues = str_replace(['{', '}'], '', $columnNameWithValues);
+
+                    $this->addNonstandardColumn($columnNameWithValues, function (array $order) use ($columnDisplayName, $combination) {
+                        $columnDisplayName['data'] = array_merge($columnDisplayName['data'], $combination);
+                        $class = new $columnDisplayName['class'](['labelGroupName' => $columnDisplayName['data']['name']]);
+
+                        return $class($order, $columnDisplayName['data']);
+                    });
+                }
+            } else {
+                // If no placeholders, add functionality as usual
+                $this->addNonstandardColumn($columnName, function (array $order) use ($columnDisplayName) {
+                    $class = new $columnDisplayName['class']();
+                    return $class($order);
+                });
+            }
         }
-
-        $labelGroupNames = [
-            'platnosci' => 'Płatności',
-            'produkcja' => 'Produkcja',
-            'transport' => 'Transport',
-            'info dodatkowe' => 'Info dodatkowe',
-            'fakury zakupu' => 'Faktury zakupu',
-        ];
-
-        foreach ($labelGroupNames as $labelGroupName => $labelGroupDisplayName) {
-            $this->addNonstandardColumn('labels-' . $labelGroupName, function (array $order) use ($labelGroupName, $labelGroupDisplayName) {
-                return view('livewire.order-datatable.nonstandard-columns.labels', compact('order', 'labelGroupName', 'labelGroupDisplayName'))->render();
-            });
-        }
-
     }
 
 

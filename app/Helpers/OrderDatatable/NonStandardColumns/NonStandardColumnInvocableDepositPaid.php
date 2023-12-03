@@ -4,9 +4,10 @@ namespace App\Helpers\OrderDatatable\NonStandardColumns;
 
 class NonStandardColumnInvocableDepositPaid extends AbstractNonStandardColumnInvocable
 {
+    protected string $view = 'livewire.order-datatable.nonstandard-columns.deposit-paid';
 
-    public function __invoke(array $order): string
+    protected function getData(array $order): array
     {
-        return view('livewire.order-datatable.nonstandard-columns.deposit-paid', compact('order'))->render();
+        return [];
     }
 }

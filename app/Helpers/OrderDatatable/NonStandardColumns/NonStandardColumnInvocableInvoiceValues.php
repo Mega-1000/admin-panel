@@ -4,12 +4,10 @@ namespace App\Helpers\OrderDatatable\NonStandardColumns;
 
 class NonStandardColumnInvocableInvoiceValues extends AbstractNonStandardColumnInvocable
 {
-    /**
-     * @param array $order
-     * @return string
-     */
-    public function __invoke(array $order): string
+   protected string $view = 'livewire.order-datatable.nonstandard-columns.invoice-values';
+
+    protected function getData(array $order): array
     {
-        return view('livewire.order-datatable.nonstandard-columns.invoice-values', compact('order'))->render();
+         return [];
     }
 }
