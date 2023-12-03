@@ -38,7 +38,7 @@ class OrderDatatableRetrievingService
         }
 
         try {
-            self::$orders = $q->paginate(session()->get('pageLength', 10))->toArray();
+            self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             self::$orders = $q->paginate(10)->toArray();
         }
