@@ -18,9 +18,9 @@
         $parsedAmount = floatval($amount);
         $parsedDeclaredAmount = floatval($declared_sum);
 
-        if ($payment['operation_type'] === 'Wpłata/wypłata bankowa - związana z fakturą zakupową' && $row['login'] !== 'info@ephpolska.pl') {
-            continue;
-        }
+//        if ($payment['operation_type'] === 'Wpłata/wypłata bankowa - związana z fakturą zakupową' && $row['login'] !== 'info@ephpolska.pl') {
+//            continue;
+//        }
 
         if ($payment['operation_type'] === "Zwrot towaru") {
             $returnedValue += $parsedAmount;
