@@ -14,7 +14,7 @@ class OrderDatatableShippedFilter extends AbstractNonStandardColumnFilter
     public function applyFilter(mixed $query, string $columnName): mixed
     {
         return $this->getFilterValue() ? $query->whereHas('packages', function ($q) {
-            $q->where('delivery_courier_name', $this->getFilterValue());
+            $q->where('delivery_courier_name', $this->getFilterValue())->whereNotNull('delivery_date');
         }) : $query;
     }
 
