@@ -122,8 +122,7 @@
 
 @if($cancelled > 0)
     @php
-        $url = route('orders.edit_packages', ['id' => $order['id']]);
-        $html .= '<a target="_blank" href="' . $url . '">Anulowano: ' . $cancelled . '</a>';
+        $html .= '<a target="_blank" href="' . '">Anulowano: ' . $cancelled . '</a>';
     @endphp
 @endif
 
