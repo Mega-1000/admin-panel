@@ -55,7 +55,6 @@ trait WithNonstandardColumns
                     });
                 }
             } else {
-                // If no placeholders, add functionality as usual
                 $this->addNonstandardColumn($columnName, function (array $order) use ($columnDisplayName) {
                     $class = new $columnDisplayName['class']();
                     return $class($order);
