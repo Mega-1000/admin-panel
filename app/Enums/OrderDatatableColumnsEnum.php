@@ -12,7 +12,8 @@ use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableNonS
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableOfferBalance;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableShipped;
 use App\Helpers\OrderDatatable\OrderDatatableLabelFilter;
-use App\Helpers\OrderDatatable\OrderDatatableShipmentFilter;
+use App\Helpers\OrderDatatable\OrderDatatableNonShippedFilter;
+use App\Helpers\OrderDatatable\OrderDatatableShippedFilter;
 
 enum OrderDatatableColumnsEnum
 {
@@ -62,11 +63,11 @@ enum OrderDatatableColumnsEnum
             'data' => ['labelGroupName' => 'labels-fakury zakupu']
         ],
         'wyjechalo' => [
-            'class' => OrderDatatableShipmentFilter::class,
+            'class' => OrderDatatableShippedFilter::class,
             'data' => ['labelGroupName' => 'wyjechalo']
         ],
         'nie-wyjechalo' => [
-            'class' => OrderDatatableShipmentFilter::class,
+            'class' => OrderDatatableNonShippedFilter::class,
             'data' => ['labelGroupName' => 'nie-wyjechalo']
         ],
     ];

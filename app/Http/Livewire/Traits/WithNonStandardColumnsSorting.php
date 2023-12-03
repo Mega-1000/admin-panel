@@ -5,6 +5,8 @@ namespace App\Http\Livewire\Traits;
 use App\Enums\OrderDatatableColumnsEnum;
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
 use App\Helpers\OrderDatatableNonstandardFiltersHelper;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Livewire\Livewire;
 
 /**
  * Add extra functionality to Livewire component using its state and methods It depents on OrderDatatableColumnsEnum class
@@ -19,6 +21,8 @@ use App\Helpers\OrderDatatableNonstandardFiltersHelper;
  */
 trait WithNonStandardColumnsSorting
 {
+    public array $updateFilters = [];
+
     /**
      * WithNonStandardColumnsSorting extends Livewire component and adds nonstandard columns sorting functionality to it
      *
@@ -42,12 +46,27 @@ trait WithNonStandardColumnsSorting
     public function addNonStandardFilter(string $columnName, AbstractNonStandardColumnFilter $nonStandardColumnSorter): void
     {
         $this->columns = array_map(function ($column) use ($columnName, $nonStandardColumnSorter) {
+            $string = str_replace('\\', '-', $nonStandardColumnSorter::class);
+
+            $nonStandardColumnSorter->setUpdateFilterMethodNameOnComponent(
+                'callOtherClassMethod("' . $string . '" , "updateFilter", "' . $columnName . '")'
+            );
+
             if ($column['label'] === $columnName) {
                 $column['filterComponent'] = $nonStandardColumnSorter->renderFilter();
             }
 
+            $componentPropertyName = $columnName;
+            $this->updateFilters[$componentPropertyName] = $nonStandardColumnSorter->getFilterValue();
+
             return $column;
         }, $this->columns);
+    }
+
+    public function callOtherClassMethod(string $class, string $method, $columnName, array $params = []): mixed
+    {
+        $class = str_replace('-', '\\', $class);
+        return app()->make($class, ['sessionName' => $columnName, 'data' => []])->$method($this->updateFilters[$columnName]);
     }
 }
 

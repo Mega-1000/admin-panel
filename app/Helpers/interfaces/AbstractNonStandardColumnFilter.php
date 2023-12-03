@@ -3,8 +3,6 @@
 namespace App\Helpers\interfaces;
 
 use App\OrderDatatableColumn;
-use Illuminate\Contracts\Container\BindingResolutionException;
-
 
 /**
  * Abstract class for non standard column filters
@@ -13,10 +11,12 @@ use Illuminate\Contracts\Container\BindingResolutionException;
  */
 abstract class AbstractNonStandardColumnFilter
 {
-    public string $sessionName;
+    public string $sessionName = '';
+    public string $updateMethodNameOnComponent;
     public function __construct(
         public array $data,
     ) {}
+
 
     /**
      * Apply filter
@@ -30,14 +30,13 @@ abstract class AbstractNonStandardColumnFilter
     /**
      * Update filter
      *
-     * @param array $data
+     * @param string $data
      * @return void
-     * @throws BindingResolutionException
      */
-    public function updateFilter(array $data): void
+    public function updateFilter(string $data): void
     {
         OrderDatatableColumn::where('label', $this->sessionName)->update([
-            'filter' => $data['filter'],
+            'filter' => $data,
         ]);
     }
 
@@ -56,5 +55,24 @@ abstract class AbstractNonStandardColumnFilter
     public function getFilterValue(): string
     {
         return OrderDatatableColumn::where('label', $this->sessionName)->first()?->filter ?? '';
+    }
+
+    /**
+     * Get update filter method name
+     *
+     * @return string
+     */
+    public function getUpdateFilterMethodName(): string
+    {
+        return 'updateFilters.'. $this->sessionName;
+    }
+
+    /**
+     * @param string $updateMethodNameOnComponent
+     * @return void
+     */
+    public function setUpdateFilterMethodNameOnComponent(string $updateMethodNameOnComponent): void
+    {
+        $this->updateMethodNameOnComponent = $updateMethodNameOnComponent;
     }
 }

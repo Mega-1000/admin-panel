@@ -6,6 +6,9 @@ use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
+/**
+ * @inheritdoc
+ */
 final class OrderDatatableLabelFilter extends AbstractNonStandardColumnFilter
 {
     public string $sessionName = '';
@@ -43,6 +46,9 @@ final class OrderDatatableLabelFilter extends AbstractNonStandardColumnFilter
      */
     public function renderFilter(): string
     {
-        return view('livewire.order-datatable.nonstandard-columns.filters.labels', ['sessionName' => $this->sessionName, 'data' => $this->data])->render();
+        return view(
+            'livewire.order-datatable.nonstandard-columns.filters.labels',
+            ['sessionName' => $this->sessionName, 'data' => $this->data]
+        )->render();
     }
 }
