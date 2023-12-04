@@ -108,16 +108,10 @@ class OrderDatatableRetrievingService
      * @param mixed $column
      * @return Builder
      */
-    private function applyNestedFilter(Builder $q, mixed $column)
+    private function applyNestedFilter(Builder $q, mixed $column): Builder
     {
         $labelParts = explode('.', $column->label);
 
-        // labelParts can be like  0 => "customer"
-        //  1 => "addresses"
-        //  2 => "0"
-        //  3 => "phone"
-
-        // in that case we need to use whereHas method
         if (is_numeric($labelParts[2])) {
             $q->whereHas($labelParts[0], function ($q) use ($labelParts, $column) {
                 $q->whereHas($labelParts[1], function ($q) use ($labelParts, $column) {
@@ -129,7 +123,4 @@ class OrderDatatableRetrievingService
 
         return $q;
     }
-
-
-
 }

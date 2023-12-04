@@ -6,6 +6,11 @@
         </div>
     </form>
 
+    <div class="form-group">
+        <label for="fs_generator">Generator faktur sprzedaży </label>
+        <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
+    </div>
+
     <a href="{{ route('orderDatatableColumnsFiltering') }}" class="btn btn-primary">
         Zarządzaj kolumnami
     </a>
