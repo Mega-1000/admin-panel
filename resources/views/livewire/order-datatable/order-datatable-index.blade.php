@@ -15,7 +15,7 @@
         Zarządzaj kolumnami
     </a>
 
-    <table style="overflow-x: auto;">
+    <table class="table table-borderless" style="overflow-x: auto;">
         <colgroup>
             @foreach($columns as $column)
                 <col style="width: {{ $column['size'] }}px;"> <!-- Set an initial width for each column -->
