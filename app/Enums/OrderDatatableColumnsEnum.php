@@ -34,7 +34,7 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 12, 'size' => 100, 'label' => 'bilans-oferty'],
         ['filter' => '', 'order' => 13, 'size' => 100, 'label' => 'zaliczka-wplacona'],
         ['filter' => '', 'order' => 14, 'size' => 100, 'label' => 'pozostalo-do-zaplaty'],
-        ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'clientPhone'],
+        ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'customer.phone'],
     ];
 
     /**
