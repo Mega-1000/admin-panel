@@ -5,8 +5,6 @@ namespace App\Http\Livewire\Traits;
 use App\Enums\OrderDatatableColumnsEnum;
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
 use App\Helpers\OrderDatatableNonstandardFiltersHelper;
-use Illuminate\Contracts\Container\BindingResolutionException;
-use Livewire\Livewire;
 
 /**
  * Add extra functionality to Livewire component using its state and methods It depents on OrderDatatableColumnsEnum class

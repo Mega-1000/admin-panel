@@ -22,7 +22,18 @@ class OrderDatatableRetrievingService
     public function fetchOrders(): void
     {
         $q = Order::query();
-        $q->with(['labels', 'labels.labelGroup', 'invoiceValues', 'payments', 'items', 'allegroGeneralExpenses', 'packages', 'otherPackages']);
+        $q->with([
+            'labels',
+            'labels.labelGroup',
+            'invoiceValues',
+            'payments',
+            'items',
+            'allegroGeneralExpenses',
+            'packages',
+            'otherPackages',
+            'customer',
+            'customer.addresses',
+        ]);
 
         $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
         $columns = $columns->filter(function ($column) {
