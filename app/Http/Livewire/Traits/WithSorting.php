@@ -25,7 +25,30 @@ trait WithSorting
     public function updatedFilters(): void
     {
         foreach ($this->filters as $key => $filter) {
+            // Update the filter for the current key
             OrderDatatableColumn::where('label', $key)->update(['filter' => $filter]);
+
+            // Check if the filter has nested arrays and update them accordingly
+            if (is_array($filter)) {
+                $this->updateNestedFilters($key, $filter);
+            }
         }
     }
+
+    protected function updateNestedFilters($parentKey, $filters): void
+    {
+        foreach ($filters as $subKey => $subFilter) {
+            // Build the nested key using dot notation
+            $nestedKey = $parentKey . '.' . $subKey;
+
+            // Update the filter for the nested key
+            OrderDatatableColumn::where('label', $nestedKey)->update(['filter' => $subFilter]);
+
+            // Check if the nested filter has further nesting
+            if (is_array($subFilter)) {
+                $this->updateNestedFilters($nestedKey, $subFilter);
+            }
+        }
+    }
+
 }

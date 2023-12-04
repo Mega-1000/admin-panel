@@ -7,6 +7,7 @@ use App\Enums\OrderDatatableColumnsEnum;
 use App\Helpers\OrderDatatableNonstandardFiltersHelper;
 use App\OrderDatatableColumn;
 use App\Repositories\OrderDatatableColumns;
+use Illuminate\Database\Eloquent\Builder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -41,7 +42,12 @@ class OrderDatatableRetrievingService
         });
 
         foreach ($columns as $column) {
-            $q->where($column->label, 'like', '%' . $column->filter . '%');
+            if (!$this->isNestedFilter($column)) {
+                $q->where($column->label, 'like', '%' . $column->filter . '%');
+                continue;
+            }
+
+            $query = $this->applyNestedFilter($q, $column);
         }
 
         foreach (OrderDatatableNonstandardFiltersHelper::composeClasses() as $columnName => $nonStandardColumnFilterClass) {
@@ -87,4 +93,43 @@ class OrderDatatableRetrievingService
 
         return $dtColumns;
     }
+
+    /**
+     * @param mixed $column
+     * @return bool
+     */
+    private function isNestedFilter(mixed $column): bool
+    {
+        return str_contains($column->label, '.');
+    }
+
+    /**
+     * @param Builder $q
+     * @param mixed $column
+     * @return Builder
+     */
+    private function applyNestedFilter(Builder $q, mixed $column)
+    {
+        $labelParts = explode('.', $column->label);
+
+        // labelParts can be like  0 => "customer"
+        //  1 => "addresses"
+        //  2 => "0"
+        //  3 => "phone"
+
+        // in that case we need to use whereHas method
+        if (is_numeric($labelParts[2])) {
+            $q->whereHas($labelParts[0], function ($q) use ($labelParts, $column) {
+                $q->whereHas($labelParts[1], function ($q) use ($labelParts, $column) {
+                    $q->where($labelParts[3], 'like', '%' . $column->filter . '%');
+                });
+            });
+            return $q;
+        }
+
+        return $q;
+    }
+
+
+
 }

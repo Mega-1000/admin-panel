@@ -54,10 +54,10 @@
                 <tr>
                     @foreach($columns as $column)
                         @php
-                            $order[$column['label']] = data_get($order, $column['label']);
+                            $data = data_get($order, $column['label']);
                         @endphp
 
-                        <td>{!! $order[$column['label']] !!}</td>
+                        <td>{!! $data !!}</td>
                     @endforeach
                 </tr>
             @endforeach
