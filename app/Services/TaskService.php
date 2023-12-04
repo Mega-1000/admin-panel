@@ -92,7 +92,7 @@ class TaskService
         if (empty($courierArray)) {
             throw new Exception(__('order_packages.message.package_error'));
         }
-        
+
         return Tasks::getWarehouseUserWithBlueHammerLabelQuery($courierArray)->offset($skip)->first();
     }
 
