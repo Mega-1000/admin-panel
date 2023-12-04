@@ -1,4 +1,6 @@
 <div>
+    <div>
+
     <form @wire:submit.prevent="updatedPageLength">
         <div class="d-flex">
             Ilość zamówień na stronę:
@@ -72,6 +74,7 @@
         Zarządzaj kolumnami
     </a>
 
+    </div>
     <table class="table table-borderless" style="overflow-x: auto;">
         <colgroup>
             @foreach($columns as $column)
