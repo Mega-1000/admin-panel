@@ -22,7 +22,7 @@ enum OrderDatatableColumnsEnum
      * Default columns for datatable
      */
     const DEFAULT_COLUMNS = [
-        ['filter' => '', 'order' => 1, 'size' => 100, 'label' => 'id'],
+        ['filter' => '', 'order' => 1, 'size' => 100, 'label' => 'id', 'resetFilters' => true],
         ['filter' => '', 'order' => 2, 'size' => 150, 'label' => 'created_at'],
         ['filter' => '', 'order' => 4, 'size' => 100, 'label' => 'akcje'],
         ['filter' => '', 'order' => 5, 'size' => 100, 'label' => 'labels-platnosci'],
@@ -35,7 +35,7 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 12, 'size' => 100, 'label' => 'bilans-oferty'],
         ['filter' => '', 'order' => 13, 'size' => 100, 'label' => 'zaliczka-wplacona'],
         ['filter' => '', 'order' => 14, 'size' => 100, 'label' => 'pozostalo-do-zaplaty'],
-        ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'customer.addresses.0.phone'],
+        ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'customer.addresses.0.phone', 'resetFilters' => true],
         ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'wartosc brutto sprzedazy'],
     ];
 

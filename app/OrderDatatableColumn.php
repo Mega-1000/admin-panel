@@ -26,5 +26,6 @@ class OrderDatatableColumn extends Model
         'user_id',
         'label',
         'filter',
+        'resetFilters',
     ];
 }

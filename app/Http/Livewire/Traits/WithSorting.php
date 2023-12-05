@@ -26,7 +26,13 @@ trait WithSorting
     {
         foreach ($this->filters as $key => $filter) {
             // Update the filter for the current key
-            OrderDatatableColumn::where('label', $key)->update(['filter' => $filter]);
+            $column = OrderDatatableColumn::where('label', $key)->first();
+
+            if ($column->resetFilters) {
+                OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
+            }
+
+            $column->update(['filter' => $filter]);
 
             // Check if the filter has nested arrays and update them accordingly
             if (is_array($filter)) {

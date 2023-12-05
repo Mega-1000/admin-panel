@@ -7,6 +7,7 @@ use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvoc
 class NonStandardColumnInvocableBruttoValue extends AbstractNonStandardColumnInvocable
 {
     public string $view = 'livewire.order-datatable.nonstandard-columns.brutto-value';
+
     protected function getData(array $order): array
     {
         return [];
