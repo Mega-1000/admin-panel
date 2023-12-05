@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Traits;
 use App\Enums\OrderDatatableColumnsEnum;
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
 use App\Helpers\OrderDatatableNonstandardFiltersHelper;
+use Illuminate\Contracts\Container\BindingResolutionException;
 
 /**
  * Add extra functionality to Livewire component using its state and methods It depents on OrderDatatableColumnsEnum class
@@ -61,6 +62,14 @@ trait WithNonStandardColumnsSorting
         }, $this->columns);
     }
 
+    /**
+     * @param string $class
+     * @param string $method
+     * @param $columnName
+     * @param array $params
+     * @return mixed
+     * @throws BindingResolutionException
+     */
     public function callOtherClassMethod(string $class, string $method, $columnName, array $params = []): mixed
     {
         $class = str_replace('-', '\\', $class);

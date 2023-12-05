@@ -4,17 +4,15 @@ namespace App\DTO\Label;
 
 use App\Entities\Order;
 
-class LabelSessionRemoveLabelDTO
+readonly class LabelSessionRemoveLabelDTO
 {
 
     public function __construct(
-        private readonly Order $order,
-        private readonly array $labelIdsToRemove,
-        private readonly array $loopPreventionArray,
-        private readonly array $customLabelIdsToAddAfterRemoval,
-    )
-    {
-    }
+        private Order $order,
+        private array $labelIdsToRemove,
+        private array $loopPreventionArray,
+        private array $customLabelIdsToAddAfterRemoval,
+    ) {}
 
     public function getOrder(): Order
     {

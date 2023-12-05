@@ -16,6 +16,8 @@ trait WithNonstandardColumns
      */
     public function initWithNonstandardColumns(): void
     {
+        $this->listeners[] = 'removeLabel';
+
         foreach (OrderDatatableColumnsEnum::NON_STANDARD_COLUMNS as $columnName => $columnDisplayName) {
             $matches = [];
 
