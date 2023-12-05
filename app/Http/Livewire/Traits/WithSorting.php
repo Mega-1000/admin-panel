@@ -33,11 +33,12 @@ trait WithSorting
             $column = OrderDatatableColumn::where('label', $key)->first();
 
             if ($column->resetFilters && $filter !== $column->filter) {
-                dd('okej');
                 OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
+                $column->update(['filter' => $filter]);
+
+                break;
             }
 
-            $column->update(['filter' => $filter]);
 
             // Check if the filter has nested arrays and update them accordingly
             if (is_array($filter)) {
