@@ -56,6 +56,8 @@ class OrderDatatableRetrievingService
 
         try {
             self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
+
+            $this->prepareAdditionalDataForOrders();
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             self::$orders = $q->paginate(10)->toArray();
         }
@@ -122,5 +124,28 @@ class OrderDatatableRetrievingService
         }
 
         return $q;
+    }
+
+    /**
+     * @return void
+     */
+    private function prepareAdditionalDataForOrders(): void
+    {
+        foreach (self::$orders['data'] as &$order) {
+            $additional_service = $order['additional_service_cost'] ?? 0;
+            $additional_cod_cost = $order['additional_cash_on_delivery_cost'] ?? 0;
+            $shipment_price_client = $order['shipment_price_for_client'] ?? 0;
+            $totalProductPrice = 0;
+
+            $products_value_gross = round($totalProductPrice, 2);
+            $sum_of_gross_values = round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
+            $order['values_data'] = [
+                'sum_of_gross_values' => $sum_of_gross_values,
+                'products_value_gross' => $products_value_gross,
+                'shipment_price_for_client' => $order->shipment_price_for_client ?? 0,
+                'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost ?? 0,
+                'additional_service_cost' => $order->additional_service_cost ?? 0
+            ];
+        }
     }
 }

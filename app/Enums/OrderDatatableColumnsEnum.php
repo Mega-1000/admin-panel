@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
+use App\Helpers\OrderDatatable\NonStandardColumnInvocableBruttoValue;
 use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvocable;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActions;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
@@ -35,6 +36,7 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 13, 'size' => 100, 'label' => 'zaliczka-wplacona'],
         ['filter' => '', 'order' => 14, 'size' => 100, 'label' => 'pozostalo-do-zaplaty'],
         ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'customer.addresses.0.phone'],
+        ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'wartosc brutto sprzedazy'],
     ];
 
     /**
@@ -117,6 +119,9 @@ enum OrderDatatableColumnsEnum
                     'fakury zakupu',
                 ]
             ],
+        ],
+        'wartosc brutto sprzedazy' => [
+            'class' => NonStandardColumnInvocableBruttoValue::class,
         ],
     ];
 }
