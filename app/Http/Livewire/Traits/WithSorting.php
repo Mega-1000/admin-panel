@@ -28,7 +28,7 @@ trait WithSorting
             // Update the filter for the current key
             $column = OrderDatatableColumn::where('label', $key)->first();
 
-            if ($column->resetFilters) {
+            if ($column->resetFilters && $filter !== $column->filter) {
                 OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
             }
 
