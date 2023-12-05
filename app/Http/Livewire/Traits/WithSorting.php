@@ -12,6 +12,8 @@ trait WithSorting
 
     /**
      * Re render filters uses class state to re render filters
+     *
+     * @return void
      */
     public function reRenderFilters(): void
     {
@@ -21,6 +23,8 @@ trait WithSorting
 
     /**
      * Update column order backend
+     *
+     * @return void
      */
     public function updatedFilters(): void
     {
@@ -29,6 +33,7 @@ trait WithSorting
             $column = OrderDatatableColumn::where('label', $key)->first();
 
             if ($column->resetFilters && $filter !== $column->filter) {
+                dd('okej');
                 OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
             }
 
@@ -41,7 +46,14 @@ trait WithSorting
         }
     }
 
-    protected function updateNestedFilters($parentKey, $filters): void
+    /**
+     * Update nested filters
+     *
+     * @param string $parentKey
+     * @param array $filters
+     * @return void
+     */
+    protected function updateNestedFilters(string $parentKey, array $filters): void
     {
         foreach ($filters as $subKey => $subFilter) {
             // Build the nested key using dot notation
