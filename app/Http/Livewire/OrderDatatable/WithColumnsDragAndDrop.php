@@ -31,6 +31,7 @@ trait WithColumnsDragAndDrop
                 'size' => $column['size'],
                 'user_id' => auth()->user()->id,
                 'label' => $column['label'],
+                'resetFilters' => $column['resetFilters'],
             ]);
         }
 
