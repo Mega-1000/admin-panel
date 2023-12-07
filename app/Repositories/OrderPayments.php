@@ -39,7 +39,7 @@ class OrderPayments
         if (is_array($payIn)) {
             $amount = $payIn['kwota'];
         } else {
-            $amount = $payIn->amount;
+            $amount = $payIn->kwota;
         }
 
         $order->payments()->where('declared_sum', $amount)->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
