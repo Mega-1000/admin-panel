@@ -22,7 +22,7 @@ class OrderPayments
          if (is_array($payIn)) {
              $amount = $payIn['kwota'];
          } else {
-             $amount = $payIn->amount;
+             $amount = $payIn->kwota;
          }
 
        return $order->payments()->where('declared_sum', $amount)->whereNull('deleted_at')->count();
