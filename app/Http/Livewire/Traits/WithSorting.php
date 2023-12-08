@@ -94,6 +94,7 @@ trait WithSorting
             $key = str_replace('.', '_', $key);
 
             if (array_key_exists($key, $query)) {
+                dd($query[$key]);
                 OrderDatatableColumn::where('label', $key)->first()->update(['filter' => str_replace('_', '.', $query[$key])]);
                 dd($key, $query[$key]);
             }
