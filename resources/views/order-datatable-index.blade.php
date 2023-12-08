@@ -88,7 +88,7 @@
     <script src="{{ asset('js/datatable/package-managment.js') }}"></script>
     <script src="{{ asset('js/datatable/labels-deletion.js') }}"></script>
     <script>
-        const uploadFile = () => {
+        const uploadFile = (id) => {
             let url = "{{ route('orders.fileAdd', ['id' => '%%']) }}"
             $('#addNewFileToOrder').attr('action', url.replace('%%', id));
             $('#add-new-file').modal('show');
