@@ -1,4 +1,6 @@
-<?php namespace App\Services;
+<?php
+
+namespace App\Services;
 
 use App\Entities\Allegro_Auth;
 use Exception;
@@ -74,7 +76,7 @@ class AllegroApiService
         return 'Basic ' . base64_encode(config('allegro.client_id') . ':' . config('allegro.client_secret'));
     }
 
-    public function authToken($authorization_code)
+    public function authToken($authorization_code): ?false
     {
         try {
             $response = $this->client->post(
@@ -92,7 +94,7 @@ class AllegroApiService
             return false;
         }
 
-        return var_dump(json_decode((string)$response->getBody(), true));
+        return json_decode((string)$response->getBody(), true);
     }
 
     public function checkAuthorizationStatus(string $deviceId)
