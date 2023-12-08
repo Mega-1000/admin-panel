@@ -24,14 +24,17 @@ trait WithSorting
     /**
      * Re render filters uses class state to re render filters
      *
+     * @param bool $applyFiltersFromQuery
      * @return void
      */
-    public function reRenderFilters(): void
+    public function reRenderFilters(bool $applyFiltersFromQuery = true): void
     {
         $this->columns = OrderDatatableRetrievingService::getColumnNames();
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
-        $this->applyFiltersFromQuery();
+        if ($applyFiltersFromQuery) {
+            $this->applyFiltersFromQuery();
+        }
     }
 
     /**
@@ -95,6 +98,7 @@ trait WithSorting
 
             if (array_key_exists($key, $query)) {
                 OrderDatatableColumn::where('label', str_replace('_', '.', $key))->first()->update(['filter' => $query[$key]]);
+                $this->reRenderFilters(false);
             }
         }
     }
