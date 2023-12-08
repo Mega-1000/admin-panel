@@ -42,4 +42,18 @@ class OrderDatatableIndex extends Component
     {
         $this->render();
     }
+
+    /**
+     * @return void
+     */
+    public function applyFiltersFromQuery(): void
+    {
+        $query = request()->query();
+
+        foreach ($this->filters as $key => $filter) {
+            if (isset($query[$key])) {
+                $this->filters[$key] = $query[$key];
+            }
+        }
+    }
 }

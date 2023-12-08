@@ -124,4 +124,14 @@ enum OrderDatatableColumnsEnum
             'class' => NonStandardColumnInvocableBruttoValue::class,
         ],
     ];
+
+
+    /**
+     * List of additional views columns mapping
+     *
+     * @var array<string>
+     */
+    const ADDITIONAL_VIEWS_COLUMNS = [
+        'customer.addresses.0.phone' => 'livewire.order-datatable.nonstandard-columns.additionals.phone-nof-no',
+    ];
 }

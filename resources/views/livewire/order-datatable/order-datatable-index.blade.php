@@ -14,7 +14,8 @@
     </div>
 
     <form method="POST" action="{{ route('order_packages.closeGroup') }}">
-        {{csrf_field()}}
+        {{ csrf_field() }}
+
         <div class="form-group col-md-6" style="margin-bottom: 5px">
             <label for="shipment_group" class="col-md-5" style="margin-top: 10px; padding-left: 0">Wybierz Grupę
                 przesyłek do zamknięcia</label>
@@ -122,7 +123,13 @@
                             $data = data_get($order, $column['label']);
                         @endphp
 
-                        <td>{!! $data !!}</td>
+                        <td>
+                            @if(array_key_exists($column['label'], \App\Enums\OrderDatatableColumnsEnum::ADDITIONAL_VIEWS_COLUMNS) ?? false)
+                                    @include(\App\Enums\OrderDatatableColumnsEnum::ADDITIONAL_VIEWS_COLUMNS[$column['label']], ['column' => $column, 'data' => $data])
+
+                            @endif
+                            {!! $data !!}
+                        </td>
                     @endforeach
                 </tr>
             @endforeach

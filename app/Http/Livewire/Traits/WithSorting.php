@@ -7,7 +7,18 @@ use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 
 trait WithSorting
 {
+    /**
+     * Columns for datatable
+     *
+     * @var array
+     */
     public array $columns = [];
+
+    /**
+     * Filters for datatable aplied at the moment
+     *
+     * @var array
+     */
     public array $filters = [];
 
     /**
@@ -28,6 +39,8 @@ trait WithSorting
      */
     public function updatedFilters(): void
     {
+        $this->applyFiltersFromQuery();
+
         foreach ($this->filters as $key => $filter) {
             $column = OrderDatatableColumn::where('label', $key)->first();
 
