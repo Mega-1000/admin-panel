@@ -91,9 +91,10 @@ trait WithSorting
         $query = request()->query();
 
         foreach ($this->filters as $key => $filter) {
-            $key = str_replace('_', '.', $key);
+            $key = str_replace('.', '_', $key);
+
             if (array_key_exists($key, $query)) {
-                OrderDatatableColumn::where('label', $key)->first()->update(['filter' => $query[$key]]);
+                OrderDatatableColumn::where('label', $key)->first()->update(['filter' => str_replace('_', '.', $query[$key])]);
                 dd($key, $query[$key]);
             }
         }
