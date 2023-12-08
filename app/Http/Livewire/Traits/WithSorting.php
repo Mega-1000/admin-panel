@@ -44,8 +44,7 @@ trait WithSorting
         foreach ($this->filters as $key => $filter) {
             $column = OrderDatatableColumn::where('label', $key)->first();
 
-            dd($column, $key, $this->filters);
-            if ($column->resetFilters && $filter !== $column->filter) {
+            if ($column && $column->resetFilters && $filter !== $column->filter) {
                 OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
                 $column->update(['filter' => $filter]);
 
