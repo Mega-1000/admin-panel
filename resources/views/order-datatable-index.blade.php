@@ -53,6 +53,33 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" id="add-new-file" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Dodaj nową fakturę sprzedaży:</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="addNewFileToOrder"
+                          method="POST" enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        Plik:
+                        <br/>
+                        <input accept=".pdf,image/*" type="file" name="file"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="addNewFileToOrder" class="btn btn-success pull-right">Wyślij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -60,4 +87,9 @@
     <script src="{{ asset('js/datatable/set-delete-event-listeners.js') }}"></script>
     <script src="{{ asset('js/datatable/package-managment.js') }}"></script>
     <script src="{{ asset('js/datatable/labels-deletion.js') }}"></script>
+    <script>
+        const uploadFile = () => {
+            $('#add-new-file').modal('show');
+        }
+    </script>
 @endsection
