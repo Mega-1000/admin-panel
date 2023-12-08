@@ -54,7 +54,7 @@ trait WithSorting
                 return;
             }
 
-            $column->update(['filter' => $filter]);
+            $column?->update(['filter' => $filter]);
 
             // Check if the filter has nested arrays and update them accordingly
             if (is_array($filter)) {
