@@ -1,6 +1,6 @@
 <div>
     @if($labelGroupName === 'info dodatkowe')
-        <button onclick="uploadFile">
+        <button onclick="uploadFile()">
             Dodaj
         </button>
     @endif
