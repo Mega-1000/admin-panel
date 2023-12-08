@@ -6,7 +6,7 @@
 
         @foreach($order['files'] as $file)
             <a href="{{ route('orders.getFile', ['id' => $file['id'], 'file_id' => 'QQ']) }}" target="_blank">
-                {{ $file['name'] }}
+                {{ $file['file_name'] }}
             </a>
         @endforeach
     @endif
