@@ -33,10 +33,10 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 10, 'size' => 100, 'label' => 'wyjechalo'],
         ['filter' => '', 'order' => 11, 'size' => 100, 'label' => 'nie-wyjechalo'],
         ['filter' => '', 'order' => 12, 'size' => 100, 'label' => 'bilans-oferty'],
-        ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'wartosc brutto sprzedazy'],
-        ['filter' => '', 'order' => 13, 'size' => 100, 'label' => 'zaliczka-wplacona'],
-        ['filter' => '', 'order' => 14, 'size' => 100, 'label' => 'pozostalo-do-zaplaty'],
-        ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'customer.addresses.0.phone', 'resetFilters' => true],
+        ['filter' => '', 'order' => 13, 'size' => 100, 'label' => 'wartosc brutto sprzedazy'],
+        ['filter' => '', 'order' => 14, 'size' => 100, 'label' => 'zaliczka-wplacona'],
+        ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'pozostalo-do-zaplaty'],
+        ['filter' => '', 'order' => 16, 'size' => 100, 'label' => 'customer.addresses.0.phone', 'resetFilters' => true],
     ];
 
     /**
