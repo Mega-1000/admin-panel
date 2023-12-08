@@ -3,6 +3,12 @@
         <button onclick="uploadFile()">
             Dodaj
         </button>
+
+        @foreach($order['files'] as $file)
+            <a href="{{ route('orders.getFile', ['id' => $file['id'], 'file_id' => 'QQ']) }}" target="_blank">
+                {{ $file['name'] }}
+            </a>
+        @endforeach
     @endif
 
     @foreach(!empty($order['labels']) && count($order['labels']) > 0 ? array_filter($order['labels'], function ($label) use($labelGroupName) { return $label['label_group']['name'] === $labelGroupName; }) : [] as $label)

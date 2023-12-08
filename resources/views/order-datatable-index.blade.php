@@ -89,6 +89,8 @@
     <script src="{{ asset('js/datatable/labels-deletion.js') }}"></script>
     <script>
         const uploadFile = () => {
+            let url = "{{ route('orders.fileAdd', ['id' => '%%']) }}"
+            $('#addNewFileToOrder').attr('action', url.replace('%%', id));
             $('#add-new-file').modal('show');
         }
     </script>

@@ -34,6 +34,7 @@ class OrderDatatableRetrievingService
             'otherPackages',
             'customer',
             'customer.addresses',
+            'files',
         ]);
 
         $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
