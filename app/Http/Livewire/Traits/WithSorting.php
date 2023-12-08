@@ -30,6 +30,8 @@ trait WithSorting
     {
         $this->columns = OrderDatatableRetrievingService::getColumnNames();
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
+
+        $this->applyFiltersFromQuery();
     }
 
     /**
@@ -39,8 +41,6 @@ trait WithSorting
      */
     public function updatedFilters(): void
     {
-        $this->applyFiltersFromQuery();
-
         foreach ($this->filters as $key => $filter) {
             $column = OrderDatatableColumn::where('label', $key)->first();
 
@@ -78,6 +78,21 @@ trait WithSorting
             // Check if the nested filter has further nesting
             if (is_array($subFilter)) {
                 $this->updateNestedFilters($nestedKey, $subFilter);
+            }
+        }
+    }
+
+
+    /**
+     * @return void
+     */
+    public function applyFiltersFromQuery(): void
+    {
+        $query = request()->query();
+
+        foreach ($this->filters as $key => $filter) {
+            if (isset($query[$key])) {
+                OrderDatatableColumn::where('label', $key)->first()->update(['filter' => $query[$key]]);
             }
         }
     }
