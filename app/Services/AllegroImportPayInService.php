@@ -95,8 +95,8 @@ readonly class AllegroImportPayInService
         $payIn->amount = explode(" ", $payIn->amount)[0];
         Log::notice($payIn->amount);
 
-        $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
-        OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn->toArray());
+        $declaredSum =  $order->payments()->where('declared_sum', $payIn->amount)->whereNull('deleted_at')->count() >= 1;
+        $order->payments()->where('declared_sum', $payIn->amount)->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
 
         $existingPayment = $order->payments()
             ->where('amount', $payIn->amount)
