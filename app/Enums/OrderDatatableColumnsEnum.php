@@ -41,6 +41,8 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 18, 'size' => 100, 'label' => 'allegro_payment_id'],
     ];
 
+    
+
     /**
      * List of classes that extends AbstractNonStandardColumnFilter
      *
