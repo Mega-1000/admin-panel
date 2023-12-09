@@ -79,7 +79,7 @@
         wire:model.debounce.500ms="orderPackageFilterNumber"
         class="form-control"
         wire:input.debounce.500ms="updateOrderPackageFilterNumber"
-        placeholder="Filtruj po kolumnach"
+        placeholder="Filtruj po numerze paczki"
     >
 
     </div>
