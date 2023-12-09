@@ -30,6 +30,7 @@ readonly class AllegroImportPayInService
 
         $payments = $this->allegroPaymentService->getPaymentsFromLastDay();
 
+        dd($payments);
         $filename = "transactionWithoutOrder.csv";
         $file = fopen($filename, 'w');
 

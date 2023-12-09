@@ -537,7 +537,7 @@ class AllegroOrderSynchro implements ShouldQueue
      *
      * @return void
      */
-    private function savePayments(Order $order, array $allegroPayment)
+    private function savePayments(Order $order, array $allegroPayment): void
     {
         OrderPayment::create([
             'declared_sum' => $allegroPayment['paidAmount']['amount'] ?? 0,
@@ -549,6 +549,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'operation_type' => OrderPaymentsEnum::DECLARED_FROM_ALLEGRO,
             'operation_id' => $allegroPayment['id'],
         ]);
+
         $order->labels()->attach(Label::BOOKED_FIRST_PAYMENT);
     }
 

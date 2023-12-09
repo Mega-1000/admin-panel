@@ -8,7 +8,7 @@ use Carbon\Carbon;
 class AllegroPaymentService extends AllegroApiService {
     protected $auth_record_id = 2;
 
-    private $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
+    private array $acceptedPaymentTypes = ["CONTRIBUTION", "REFUND_CHARGE", "SURCHARGE"];
 
     public function getPaymentsFromLastDay(): array
     {
@@ -96,11 +96,9 @@ class AllegroPaymentService extends AllegroApiService {
             return [];
         }
 
-        $uncancelledRefunds = array_filter($response['refunds'], function ($refund) {
+        return array_filter($response['refunds'], function ($refund) {
             return $refund['status'] !== "CANCELED";
         });
-
-        return $uncancelledRefunds;
     }
 
     /**

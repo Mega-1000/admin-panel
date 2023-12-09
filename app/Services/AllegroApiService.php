@@ -127,8 +127,7 @@ class AllegroApiService
             $headers = !$fileResponse ? [
                 'Authorization' => "Bearer {$this->getAccessToken()}",
                 'Content-Type' => 'application/vnd.allegro.public.v1+json',
-            ]
-            : [
+            ] : [
                 'accept' => 'application/octet-stream',
                 'Content-Type' => 'application/vnd.allegro.public.v1+json',
                 'Authorization' => "Bearer {$this->getAccessToken()}",
