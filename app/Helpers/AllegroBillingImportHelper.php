@@ -19,10 +19,10 @@ class AllegroBillingImportHelper
     private string $numberPattern = '/Numer nadania: (\d+)/';
 
     /**
-     * @param string $details
+     * @param string|null $details
      * @return string|null
      */
-    public function extractTrackingNumber(string $details): ?string
+    public function extractTrackingNumber(?string $details): ?string
     {
         return preg_match($this->numberPattern, $details)
             ? explode(',', preg_replace($this->numberPattern, '$1', $details))[0]
