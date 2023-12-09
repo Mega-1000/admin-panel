@@ -108,3 +108,5 @@
     echo $html;
 @endphp
 
+{{ $order['packages'][0]['real_cost_for_company'] }}
+
