@@ -360,7 +360,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('products/analyzer', 'ProductAnalyzerController@index')->name('product_analyzer.index');
         Route::post('products/analyzer/datatable', 'ProductAnalyzerController@datatable')->name('product_analyzer.datatable');
 
-        Route::get('orders', 'OrdersController@index')->name('orders.index');
+        Route::get('orders', 'OrdersController@index');
         Route::post('orders/update-notices', 'OrdersController@updateNotices')->name('orders.updateNotice');
         Route::post('orders/returnItemsFromStock',
             'OrdersController@returnItemsFromStock')->name('orders.returnItemsFromStock');
@@ -755,7 +755,7 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::resource('newsletter-packets', NewsletterPacketController::class)->names('newsletter-packets');
 
-    Route::get('orderDatatable', OrderDatatableController::class)->name('orderDatatable');
+    Route::get('orderDatatable', OrderDatatableController::class)->name('orders.index');
     Route::get('orderDatatableColumnsFiltering', [OrderDatatableColumnsManagementController::class, 'index'])->name('orderDatatableColumnsFiltering');
 });
 
