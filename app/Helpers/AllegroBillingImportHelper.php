@@ -30,10 +30,10 @@ class AllegroBillingImportHelper
     }
 
     /**
-     * @param string $details
+     * @param string|null $details
      * @return string|null
      */
-    public function extractAllegroId(string $details): ?string
+    public function extractAllegroId(?string $details): ?string
     {
         return preg_match($this->allegroIdPattern, $details)
             ? explode(',', preg_replace($this->allegroIdPattern, '$1', $details))[0]
