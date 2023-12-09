@@ -104,6 +104,12 @@
         if ($isProblem) {
             $html .= '</div>';
         }
+
+        $html .= "
+            <div>
+                Bilans: {$value['real_cost_for_company_sum']}
+            </div>
+        ";
     }
     echo $html;
 @endphp
