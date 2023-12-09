@@ -37,6 +37,8 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 14, 'size' => 100, 'label' => 'zaliczka-wplacona'],
         ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'pozostalo-do-zaplaty'],
         ['filter' => '', 'order' => 16, 'size' => 100, 'label' => 'customer.addresses.0.phone', 'resetFilters' => true],
+        ['filter' => '', 'order' => 17, 'size' => 100, 'label' => 'allegro_form_id'],
+        ['filter' => '', 'order' => 18, 'size' => 100, 'label' => 'allegro_payment_id'],
     ];
 
     /**
