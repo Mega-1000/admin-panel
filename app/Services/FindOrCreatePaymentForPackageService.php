@@ -17,7 +17,6 @@ class FindOrCreatePaymentForPackageService
      */
     public function execute(?OrderPackage $orderPackage): ?OrderPayment
     {
-        dd($orderPackage);
         $payment = OrderPayment::where('order_package_id', $orderPackage?->id)->first();
 
         if ($orderPackage?->cash_on_delivery > 0 && empty($payment)) {
