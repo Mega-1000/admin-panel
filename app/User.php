@@ -59,6 +59,7 @@ class User extends \TCG\Voyager\Models\User
     const WAREHOUSE_ID = 'warehouse_id';
     const RATE_HOUR = 'rate_hour';
     const REMEMBER_TOKEN = 'remember_token';
+    const GRID_SETTINGS = 'grid_settings';
 
     /**
      * The attributes that are mass assignable.
@@ -77,7 +78,8 @@ class User extends \TCG\Voyager\Models\User
         self::PASSWORD,
         self::STATUS,
         self::WAREHOUSE_ID,
-        self::RATE_HOUR
+        self::RATE_HOUR,
+        self::GRID_SETTINGS,
     ];
 
     /**

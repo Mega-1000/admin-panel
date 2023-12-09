@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\OrderDatatable;
 
+use App\Http\Livewire\Traits\WithGeneralFilters;
 use App\Http\Livewire\Traits\WithNonStandardColumnsSorting;
 use App\Http\Livewire\Traits\WithSorting;
 use App\Http\Livewire\Traits\WithNonstandardColumns;
@@ -12,7 +13,7 @@ use Livewire\Component;
 
 class OrderDatatableIndex extends Component
 {
-    use WithSorting, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting;
+    use WithSorting, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting, WithGeneralFilters;
 
     public array $orders;
     public $listeners = ['updateColumnOrderBackend', 'reloadDatatable'];
@@ -29,6 +30,7 @@ class OrderDatatableIndex extends Component
         $this->reRenderFilters();
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
+        $this->initWithGeneralFilters();
 
         return view('livewire.order-datatable.order-datatable-index');
     }

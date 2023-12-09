@@ -75,7 +75,15 @@
         Zarządzaj kolumnami
     </a>
 
+    <input
+        wire:model.debounce.500ms="orderPackageFilterNumber"
+        class="form-control"
+        wire:input.debounce.500ms="updateOrderPackageFilterNumber"
+        placeholder="Filtruj po kolumnach"
+    >
+
     </div>
+
     <table class="table table-borderless" style="overflow-x: auto;">
         <colgroup>
             @foreach($columns as $column)
