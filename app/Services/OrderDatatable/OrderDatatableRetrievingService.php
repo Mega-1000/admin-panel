@@ -55,11 +55,11 @@ class OrderDatatableRetrievingService
             $q = $nonStandardColumnFilterClass->applyFilter($q, $columnName);
         }
 
-//        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data)) {
-//            $q->whereHas('packages', function (Builder $query) use ($data) {
-//                $query->where('letter_number', 'like', '%' . $data->order_package_filter_number. '%');
-//            });
-//        }
+        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && $data->order_package_filter_number) {
+            $q->whereHas('packages', function (Builder $query) use ($data) {
+                $query->where('letter_number', 'like', '%' . $data->order_package_filter_number. '%');
+            });
+        }
 
         try {
             self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
