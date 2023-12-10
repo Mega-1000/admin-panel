@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->json('grid_settings')->nullable();
         });
-    }
+}
 
     /**
      * Reverse the migrations.

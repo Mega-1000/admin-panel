@@ -8,7 +8,18 @@
         </div>
     </form>
 
-    <div class="form-group">
+    <a href="{{ route('orderDatatableColumnsFiltering') }}" class="btn btn-primary">
+        Zarządzaj kolumnami
+    </a>
+
+    <input
+        wire:model.debounce.500ms="orderPackageFilterNumber"
+        class="form-control"
+        wire:input.debounce.500ms="updateOrderPackageFilterNumber"
+        placeholder="Filtruj po numerze paczki"
+    >
+
+        <div class="form-group">
         <label for="fs_generator">Generator faktur sprzedaży </label>
         <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
     </div>
@@ -70,18 +81,6 @@
                 </div>
             @endif
         @endforeach
-
-    <a href="{{ route('orderDatatableColumnsFiltering') }}" class="btn btn-primary">
-        Zarządzaj kolumnami
-    </a>
-
-    <input
-        wire:model.debounce.500ms="orderPackageFilterNumber"
-        class="form-control"
-        wire:input.debounce.500ms="updateOrderPackageFilterNumber"
-        placeholder="Filtruj po numerze paczki"
-    >
-
     </div>
 
     <table class="table table-borderless" style="overflow-x: auto;">
