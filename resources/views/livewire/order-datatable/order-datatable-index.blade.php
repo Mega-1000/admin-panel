@@ -25,33 +25,35 @@
             </div>
         </div>
 
-        <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true"
-                id="choosen-label">
-            <option value="" selected="selected">@lang('orders.table.choose_label')</option>
-            @php
-                $labelsGroup = \App\Entities\Label::all()->groupBy('group');
-            @endphp
-            @foreach($labelsGroup as $groupName => $group)
-                <optgroup label="{{ $groupName }}">
-                    @foreach($group as $label)
-                        <option value="{{ $label->id }}"
-                                data-content="
-                                    <span class='order-label label__list' style='color: {{$label->font_color}}; background-color: {{$label->color}}'>
-                                        <i class='{{$label->icon_name}}'></i>
-                                    </span>
-                                    {{ $label->name }}
-                                    "
-                                data-timed="{{ $label->timed }}">
-                            {{ $label->name }}
-                        </option>
-                    @endforeach
-                </optgroup>
-            @endforeach
-        </select>
+        <div wire:ignore>
+            <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true"
+                    id="choosen-label">
+                <option value="" selected="selected">@lang('orders.table.choose_label')</option>
+                @php
+                    $labelsGroup = \App\Entities\Label::all()->groupBy('group');
+                @endphp
+                @foreach($labelsGroup as $groupName => $group)
+                    <optgroup label="{{ $groupName }}">
+                        @foreach($group as $label)
+                            <option value="{{ $label->id }}"
+                                    data-content="
+                                        <span class='order-label label__list' style='color: {{$label->font_color}}; background-color: {{$label->color}}'>
+                                            <i class='{{$label->icon_name}}'></i>
+                                        </span>
+                                        {{ $label->name }}
+                                        "
+                                    data-timed="{{ $label->timed }}">
+                                {{ $label->name }}
+                            </option>
+                        @endforeach
+                    </optgroup>
+                @endforeach
+            </select>
 
-        <button class="btn btn-primary" onclick="addLabelsForCheckedOrders()">
-            Dodaj etyiety do zaznaconych
-        </button>
+            <button class="btn btn-primary" onclick="addLabelsForCheckedOrders()">
+                Dodaj etyiety do zaznaconych
+            </button>
+        </div>
 
         <form method="POST" action="{{ route('order_packages.closeGroup') }}">
             {{ csrf_field() }}
