@@ -1,53 +1,54 @@
 <div>
     <div>
+        <div>
+            <form @wire:submit.prevent="updatedPageLength">
+                <div class="d-flex">
+                    Ilość zamówień na stronę:
+                    <input type="number" class="form-control" placeholder="Ilość zamówień na stronę" wire:model="pageLength">
+                </div>
+            </form>
 
-    <form @wire:submit.prevent="updatedPageLength">
-        <div class="d-flex">
-            Ilość zamówień na stronę:
-            <input type="number" class="form-control" placeholder="Ilość zamówień na stronę" wire:model="pageLength">
+            <a href="{{ route('orderDatatableColumnsFiltering') }}" class="btn btn-primary">
+                Zarządzaj kolumnami
+            </a>
+
+            <input
+                wire:model.debounce.500ms="orderPackageFilterNumber"
+                class="form-control"
+                wire:input.debounce.500ms="updateOrderPackageFilterNumber"
+                placeholder="Filtruj po numerze paczki"
+            >
+
+            <div class="form-group">
+                <label for="fs_generator">Generator faktur sprzedaży </label>
+                <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
+            </div>
         </div>
-    </form>
+        <form method="POST" action="{{ route('order_packages.closeGroup') }}">
+            {{ csrf_field() }}
 
-    <a href="{{ route('orderDatatableColumnsFiltering') }}" class="btn btn-primary">
-        Zarządzaj kolumnami
-    </a>
-
-    <input
-        wire:model.debounce.500ms="orderPackageFilterNumber"
-        class="form-control"
-        wire:input.debounce.500ms="updateOrderPackageFilterNumber"
-        placeholder="Filtruj po numerze paczki"
-    >
-
-        <div class="form-group">
-        <label for="fs_generator">Generator faktur sprzedaży </label>
-        <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
+            <div class="form-group col-md-6" style="margin-bottom: 5px">
+                <label for="shipment_group" class="col-md-5" style="margin-top: 10px; padding-left: 0">Wybierz Grupę
+                    przesyłek do zamknięcia</label>
+                <div class="col-md-4" style="margin-top: 5px">
+                    <select class="form-control" name="shipment_group" required>
+                        <option disabled selected value="">Grupa przesyłek</option>
+                        @foreach(\App\Entities\ShipmentGroup::getOpenGroups() as $group)
+                            <option
+                                value="{{ $group->id }}">{{ $group->getLabel()}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button name="close_shipment_group" class="btn btn-info" data-toggle="tooltip"
+                            data-placement="right"
+                            title="Spowoduje zamknięcie obecnej grupy przesyłek"
+                            id="close_shipment_group">Zamknij grupę
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
-
-    <form method="POST" action="{{ route('order_packages.closeGroup') }}">
-        {{ csrf_field() }}
-
-        <div class="form-group col-md-6" style="margin-bottom: 5px">
-            <label for="shipment_group" class="col-md-5" style="margin-top: 10px; padding-left: 0">Wybierz Grupę
-                przesyłek do zamknięcia</label>
-            <div class="col-md-4" style="margin-top: 5px">
-                <select class="form-control" name="shipment_group" required>
-                    <option disabled selected value="">Grupa przesyłek</option>
-                    @foreach(\App\Entities\ShipmentGroup::getOpenGroups() as $group)
-                        <option
-                            value="{{ $group->id }}">{{ $group->getLabel()}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button name="close_shipment_group" class="btn btn-info" data-toggle="tooltip"
-                        data-placement="right"
-                        title="Spowoduje zamknięcie obecnej grupy przesyłek"
-                        id="close_shipment_group">Zamknij grupę
-                </button>
-            </div>
-        </div>
-    </form>
 
     <div class="col-md-3">
         <h4>Drukuj paczki z grupy:</h4>
