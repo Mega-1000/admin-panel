@@ -95,6 +95,13 @@
         }
     </script>
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            Livewire.hook('component.initialized', (component) => {
+                $('.selectpicker').selectpicker();
+                $('.selectpicker').selectpicker('render');
+            })
+        });
+
         const addLabelsForCheckedOrders = async () => {
             const label = document.getElementById('choosen-label').value;
 
