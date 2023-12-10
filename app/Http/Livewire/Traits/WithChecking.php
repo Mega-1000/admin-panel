@@ -10,6 +10,11 @@ trait WithChecking
     public array $checked = [];
     public string $labelToAdd = '';
 
+    public function initWithChecking(): void
+    {
+        $this->listeners[] = 'addLabelsForCheckedOrders';
+    }
+
     /**
      * @param int $id
      */
@@ -28,15 +33,15 @@ trait WithChecking
         $this->checked = collect($this->orders['data'])->pluck('id')->toArray();
     }
 
-    public function addLabelsForCheckedOrders(): void
+    /**
+     * @param int $labelId
+     * @return void
+     */
+    public function addLabelsForCheckedOrders(int $labelId): void
     {
-        $this->validate([
-            'labelToAdd' => 'required|string|max:255',
-        ]);
-
         $arr = [];
         foreach ($this->checked as $id) {
-            AddLabelService::addLabels($id, [$this->labelToAdd], $arr, []);
+            AddLabelService::addLabels($id, [$labelId], $arr, []);
         }
 
         $this->emit('reloadDatatable');

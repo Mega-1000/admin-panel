@@ -32,6 +32,7 @@ class OrderDatatableIndex extends Component
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
         $this->initWithGeneralFilters();
+        $this->initWithChecking();
 
         return view('livewire.order-datatable.order-datatable-index');
     }

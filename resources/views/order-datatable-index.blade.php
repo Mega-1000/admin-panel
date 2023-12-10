@@ -94,4 +94,12 @@
             $('#add-new-file').modal('show');
         }
     </script>
+    <script>
+        const addLabelsForCheckedOrders = async () => {
+            const label = document.getElementById('choosen-label').value;
+
+            await Livewire.emit('addLabelsForCheckedOrders', label);
+            await Swal.fire('success', 'Etykiety zostały dodane', 'success');
+        }
+    </script>
 @endsection

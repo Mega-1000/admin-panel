@@ -26,7 +26,7 @@
         </div>
 
         <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true"
-                id="choosen-label" wire:model="labelToAdd">
+                id="choosen-label">
             <option value="" selected="selected">@lang('orders.table.choose_label')</option>
             @php
                 $labelsGroup = \App\Entities\Label::all()->groupBy('group');
@@ -49,7 +49,7 @@
             @endforeach
         </select>
 
-        <button class="btn btn-primary" wire:click="addLabelsForCheckedOrders">
+        <button class="btn btn-primary" onclick="addLabelsForCheckedOrders()">
             Dodaj etyiety do zaznaconych
         </button>
 
