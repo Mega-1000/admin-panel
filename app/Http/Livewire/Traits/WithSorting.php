@@ -29,6 +29,8 @@ trait WithSorting
      */
     public function reRenderFilters(bool $applyFiltersFromQuery = true): void
     {
+        $this->listeners[] = 'resetFilters';
+
         $this->columns = OrderDatatableRetrievingService::getColumnNames();
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
