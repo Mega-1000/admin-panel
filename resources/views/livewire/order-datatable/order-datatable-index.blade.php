@@ -140,14 +140,15 @@
                         <br>
 
                         @if(empty($column['filterComponent']))
-                            <input
-                                type="text"
-                                wire:model.debounce.500ms="filters.{{ $column['label'] }}"
-                                placeholder="Search {{ $column['label'] }}"
-                                class="w-full text-sm"
-                                id="filter"
-                                onclick="{{ $column['resetFilters'] ? 'resetFilters' : '' }}"
-                            >
+                            <div onclick="{{ $column['resetFilters'] ? 'resetFilters' : '' }}">
+                                <input
+                                    type="text"
+                                    wire:model.debounce.500ms="filters.{{ $column['label'] }}"
+                                    placeholder="Search {{ $column['label'] }}"
+                                    class="w-full text-sm"
+                                    id="filter"
+                                >
+                            </div>
                         @else
                             {!! $column['filterComponent'] !!}
                         @endif
