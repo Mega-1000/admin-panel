@@ -37,19 +37,19 @@ class OrderDatatableRetrievingService
             'packages.realCostsForCompany',
         ]);
 
-//        $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
-//        $columns = $columns->filter(function ($column) {
-//            return !in_array($column->label, array_keys(OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES));
-//        });
-//
-//        foreach ($columns as $column) {
-//            if (!$this->isNestedFilter($column)) {
-//                $q->where($column->label, 'like', '%' . $column->filter . '%');
-//                continue;
-//            }
-//
-//            $q = $this->applyNestedFilter($q, $column);
-//        }
+        $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
+        $columns = $columns->filter(function ($column) {
+            return !in_array($column->label, array_keys(OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES));
+        });
+
+        foreach ($columns as $column) {
+            if (!$this->isNestedFilter($column)) {
+                $q->where($column->label, 'like', '%' . $column->filter . '%');
+                continue;
+            }
+
+            $q = $this->applyNestedFilter($q, $column);
+        }
 
         foreach (OrderDatatableNonstandardFiltersHelper::composeClasses() as $columnName => $nonStandardColumnFilterClass) {
             $q = $nonStandardColumnFilterClass->applyFilter($q, $columnName);
