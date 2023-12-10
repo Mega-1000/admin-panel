@@ -24,6 +24,7 @@
                 <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
             </div>
         </div>
+
         <form method="POST" action="{{ route('order_packages.closeGroup') }}">
             {{ csrf_field() }}
 

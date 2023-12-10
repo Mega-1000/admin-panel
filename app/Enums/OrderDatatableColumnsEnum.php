@@ -4,6 +4,7 @@ namespace App\Enums;
 
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
 use App\Helpers\OrderDatatable\NonStandardColumnInvocableBruttoValue;
+use App\Helpers\OrderDatatable\NonStandardColumnInvocableCheckbox;
 use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvocable;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActions;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
@@ -22,8 +23,9 @@ enum OrderDatatableColumnsEnum
      * Default columns for datatable
      */
     const DEFAULT_COLUMNS = [
-        ['filter' => '', 'order' => 1, 'size' => 100, 'label' => 'id', 'resetFilters' => true],
-        ['filter' => '', 'order' => 2, 'size' => 150, 'label' => 'created_at'],
+        ['filter' => '', 'order' => 1, 'size' => 100, 'label' => 'checkbox'],
+        ['filter' => '', 'order' => 2, 'size' => 100, 'label' => 'id', 'resetFilters' => true],
+        ['filter' => '', 'order' => 3, 'size' => 150, 'label' => 'created_at'],
         ['filter' => '', 'order' => 4, 'size' => 100, 'label' => 'akcje'],
         ['filter' => '', 'order' => 5, 'size' => 100, 'label' => 'labels-platnosci'],
         ['filter' => '', 'order' => 6, 'size' => 100, 'label' => 'labels-produkcja'],
@@ -40,8 +42,6 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 17, 'size' => 100, 'label' => 'allegro_form_id'],
         ['filter' => '', 'order' => 18, 'size' => 100, 'label' => 'allegro_payment_id'],
     ];
-
-    
 
     /**
      * List of classes that extends AbstractNonStandardColumnFilter
@@ -126,6 +126,10 @@ enum OrderDatatableColumnsEnum
         ],
         'wartosc brutto sprzedazy' => [
             'class' => NonStandardColumnInvocableBruttoValue::class,
+        ],
+        'checkbox' => [
+            'class' => NonStandardColumnInvocableCheckbox::class,
+            'data' => [],
         ],
     ];
 
