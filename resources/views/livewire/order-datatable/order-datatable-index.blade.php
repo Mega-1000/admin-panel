@@ -145,6 +145,8 @@
                                 wire:model.debounce.500ms="filters.{{ $column['label'] }}"
                                 placeholder="Search {{ $column['label'] }}"
                                 class="w-full text-sm"
+                                id="filter"
+                                onclick="{{ $column['resetFilters'] ? 'resetFilters' : '' }}"
                             >
                         @else
                             {!! $column['filterComponent'] !!}

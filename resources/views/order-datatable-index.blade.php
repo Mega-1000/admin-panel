@@ -108,5 +108,13 @@
             await Livewire.emit('addLabelsForCheckedOrders', label);
             await Swal.fire('success', 'Etykiety zostały dodane', 'success');
         }
+
+        const resetFilters = () => {
+            const filterInputs = document.querySelectorAll('.filter');
+
+            filterInputs.forEach(input => {
+                input.value = '';
+            });
+        }
     </script>
 @endsection
