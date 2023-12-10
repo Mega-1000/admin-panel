@@ -110,8 +110,7 @@
         }
 
         const resetFilters = () => {
-            alert('reset');
-            const filterInputs = document.querySelectorAll('.filter');
+            const filterInputs = document.querySelectorAll('#filter');
 
             filterInputs.forEach(input => {
                 input.value = '';
