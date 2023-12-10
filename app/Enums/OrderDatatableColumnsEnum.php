@@ -5,6 +5,7 @@ namespace App\Enums;
 use App\Helpers\interfaces\AbstractNonStandardColumnFilter;
 use App\Helpers\OrderDatatable\NonStandardColumnInvocableBruttoValue;
 use App\Helpers\OrderDatatable\NonStandardColumnInvocableCheckbox;
+use App\Helpers\OrderDatatable\NonStandardColumnInvocableId;
 use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvocable;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActions;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
@@ -129,6 +130,10 @@ enum OrderDatatableColumnsEnum
         ],
         'checkbox' => [
             'class' => NonStandardColumnInvocableCheckbox::class,
+            'data' => [],
+        ],
+        'id' => [
+            'class' => NonStandardColumnInvocableId::class,
             'data' => [],
         ],
     ];
