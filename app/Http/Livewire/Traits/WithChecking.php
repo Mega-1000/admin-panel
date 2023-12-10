@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Traits;
 
+use App\Entities\Order;
 use App\Services\Label\AddLabelService;
 
 trait WithChecking
@@ -41,7 +42,7 @@ trait WithChecking
     {
         $arr = [];
         foreach ($this->checked as $id) {
-            AddLabelService::addLabels($id, [$labelId], $arr, []);
+            AddLabelService::addLabels(Order::find($id), [$labelId], $arr, []);
         }
 
         $this->emit('reloadDatatable');
