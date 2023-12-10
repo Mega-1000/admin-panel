@@ -59,7 +59,7 @@ class OrderDatatableRetrievingService
 //            $q->whereHas('packages', function (Builder $query) use ($data) {
 //                $query->where('letter_number', 'like', '%' . $data->order_package_filter_number. '%');
 //            });
-        }
+//        }
 
         try {
             self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
