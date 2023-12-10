@@ -26,9 +26,12 @@
         </div>
 
         <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true"
-                id="choosen-label">
+                id="choosen-label" wire:model="labelToAdd">
             <option value="" selected="selected">@lang('orders.table.choose_label')</option>
-            @foreach(\App\Entities\LabelGroup::all() as $groupName => $group)
+            @php
+                $labelsGroup = \App\Entities\Label::all()->groupBy('group');
+            @endphp
+            @foreach($labelsGroup as $groupName => $group)
                 <optgroup label="{{ $groupName }}">
                     @foreach($group as $label)
                         <option value="{{ $label->id }}"
@@ -45,6 +48,10 @@
                 </optgroup>
             @endforeach
         </select>
+
+        <button class="btn btn-primary" wire:click="addLabelsForCheckedOrders">
+            Dodaj etyiety do zaznaconych
+        </button>
 
         <form method="POST" action="{{ route('order_packages.closeGroup') }}">
             {{ csrf_field() }}
