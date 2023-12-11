@@ -140,7 +140,7 @@
                         <br>
 
                         @if(empty($column['filterComponent']))
-                            <div onclick="{{ $column['resetFilters'] ? 'resetFilters()' : '' }}">
+                            <div onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}">
                                 <input
                                     type="text"
                                     wire:model.debounce.500ms="filters.{{ $column['label'] }}"
