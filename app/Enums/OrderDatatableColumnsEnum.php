@@ -42,6 +42,9 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 16, 'size' => 100, 'label' => 'customer.addresses.0.phone', 'resetFilters' => true],
         ['filter' => '', 'order' => 17, 'size' => 100, 'label' => 'allegro_form_id'],
         ['filter' => '', 'order' => 18, 'size' => 100, 'label' => 'allegro_payment_id', 'resetFilters' => true],
+        ['filter' => '', 'order' => 19, 'size' => 100, 'label' => 'customer.nick_allegro'],
+        ['filter' => '', 'order' => 20, 'size' => 100, 'label' => 'customer.login'],
+        ['filter' => '', 'order' => 20, 'size' => 100, 'label' => 'warehouse'],
     ];
 
     /**
@@ -134,6 +137,10 @@ enum OrderDatatableColumnsEnum
         ],
         'id' => [
             'class' => NonStandardColumnInvocableId::class,
+            'data' => [],
+        ],
+        'warehouse' => [
+            'class' => NonStandardColumnInvocableWarehouse::class,
             'data' => [],
         ],
     ];

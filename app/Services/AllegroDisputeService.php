@@ -28,7 +28,7 @@ class AllegroDisputeService extends AllegroApiService
 
     public function lookForNewDisputes(): void
     {
-        $latest100disputes = $this->getDisputesList(0, 100); // 100 is vendor limit and should be fine here
+        $latest100disputes = $this->getDisputesList(); // 100 is vendor limit and should be fine here
 
         foreach ($latest100disputes as $dispute) {
             if (
