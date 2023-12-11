@@ -9,7 +9,7 @@ class NonStandardColumnInvocableConsultantNotices extends AbstractNonStandardCol
     protected function getData(array $order): array
     {
         return [
-            'data' => $order,
+            'data' => $order ?? [],
         ];
     }
 }
