@@ -9,7 +9,7 @@ class NonStandardColumnInvocableWarehouse extends AbstractNonStandardColumnInvoc
     protected function getData(array $order): array
     {
         return [
-            $this->data
+            'data' => $this->data
         ];
     }
 }
