@@ -8,6 +8,7 @@ use App\Helpers\OrderDatatable\NonStandardColumnInvocableCheckbox;
 use App\Helpers\OrderDatatable\NonStandardColumnInvocableId;
 use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvocable;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActions;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableConsultantNotices;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableInvoiceValues;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableLabels;
@@ -44,8 +45,10 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 17, 'size' => 100, 'label' => 'allegro_form_id'],
         ['filter' => '', 'order' => 18, 'size' => 100, 'label' => 'allegro_payment_id', 'resetFilters' => true],
         ['filter' => '', 'order' => 19, 'size' => 100, 'label' => 'customer.nick_allegro'],
-        ['filter' => '', 'order' => 20, 'size' => 100, 'label' => 'customer.login'],
-        ['filter' => '', 'order' => 20, 'size' => 100, 'label' => 'warehouse'],
+        ['filter' => '', 'order' => 21, 'size' => 100, 'label' => 'customer.login'],
+        ['filter' => '', 'order' => 22, 'size' => 100, 'label' => 'warehouse'],
+        ['filter' => '', 'order' => 23, 'size' => 100, 'label' => 'consultant-notices'],
+
     ];
 
     /**
@@ -142,6 +145,10 @@ enum OrderDatatableColumnsEnum
         ],
         'warehouse' => [
             'class' => NonStandardColumnInvocableWarehouse::class,
+            'data' => [],
+        ],
+        'consultant-notices' => [
+            'class' => NonStandardColumnInvocableConsultantNotices::class,
             'data' => [],
         ],
     ];
