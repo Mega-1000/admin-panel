@@ -14,6 +14,7 @@ use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableLabe
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableNonShipped;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableOfferBalance;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableShipped;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableWarehouse;
 use App\Helpers\OrderDatatable\OrderDatatableLabelFilter;
 use App\Helpers\OrderDatatable\OrderDatatableNonShippedFilter;
 use App\Helpers\OrderDatatable\OrderDatatableShippedFilter;
