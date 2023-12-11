@@ -14,11 +14,6 @@ class AllegroDisputeService extends AllegroApiService
     const STATUS_ONGOING = 'ONGOING';
     const STATUS_CLOSED = 'CLOSED';
     const TYPE_REGULAR = 'REGULAR';
-    const CONTENT_TYPES_EXT = [
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'application/pdf' => 'pdf',
-    ];
     protected $auth_record_id = 2;
 
     public function __construct()
