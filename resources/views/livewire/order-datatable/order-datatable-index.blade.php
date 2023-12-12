@@ -191,7 +191,11 @@
                         </div>
                         <div>
                             @foreach($orders['links'] as $link)
-                                <a href="{{ $link['url'] }}" class="btn">{!! $link['label'] !!}</a>
+                                @if ($link['active'])
+                                    <span>{{ $link['label'] }}</span>
+                                @else
+                                    <a href="{{ $link['url'] }}" class="btn">{!! $link['label'] !!}</a>
+                                @endif
                             @endforeach
                         </div>
                     </div>
