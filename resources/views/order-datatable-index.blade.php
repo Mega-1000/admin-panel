@@ -30,13 +30,13 @@
 @section('table')
     <livewire:order-datatable.order-datatable-index />
 
-    <div class="warehouse-symbol">
-        MEGA-OLAWA
-    </div>
-
     <div class="modal fade" tabindex="-1" id="manual_label_selection_to_add_modal" role="dialog">
         <div class="modal-dialog" style="width: 90%">
             <div class="modal-content">
+                <div class="warehouse-symbol">
+                    MEGA-OLAWA
+                </div>
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
