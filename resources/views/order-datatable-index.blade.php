@@ -135,7 +135,6 @@
             });
 
 
-            if (manualLabelSelectionToAdd) {
                 $.ajax({
                     url: "/admin/labels/" + labelId + "/associated-labels-to-add-after-removal"
                 }).done(async function (data) {
@@ -171,89 +170,6 @@
                         modal.modal('hide');
                     });
                 });
-            } else {
-                let payDateLabelId = 63;
-                if (labelId == payDateLabelId) {
-                    let modalSetTime = $('#set_time');
-                    modalSetTime.modal('show');
-                    $('#set_time').on('shown.bs.modal', function () {
-                        $('#invoice-month').focus()
-                    })
-                    modalSetTime.find("#remove-label-and-set-date").off().on('click', () => {
-                        if ($('#invoice-month').val() > 12 || $('#invoice-days').val() > 31) {
-                            $('#invoice-date-error').removeAttr('hidden')
-                            return
-                        }
-                        $.ajax({
-                            type: "POST",
-                            url: '/admin/orders/payment-deadline',
-                            data: {
-                                order_id: orderId,
-                                date: {
-                                    year: $('#invoice-years').val(),
-                                    month: $('#invoice-month').val(),
-                                    day: $('#invoice-days').val(),
-                                }
-                            },
-                        }).done(function (data) {
-                            removeLabelRequest();
-                            refreshDtOrReload()
-                            modalSetTime.modal('hide')
-                            $('#invoice-month').val('')
-                            $('#invoice-days').val('')
-                        }).fail(function (data) {
-                            $('#invoice-date-error').removeAttr('hidden')
-                            $('#invoice-date-error').text(data.responseText ? data.responseText : 'Nieznany błąd2')
-
-                        });
-                    });
-                    return;
-                } else if (addedType == "chat") {
-                    var url = '{{ route("chat.index", ["all" => 1, "id" => ":id"]) }}';
-                    url = url.replace(':id', orderId);
-                    window.location.href = url
-                    return
-                } else if (addedType == "bonus") {
-                    let url = '{{ route("bonus.order-chat", ['id' => ":id"]) }}';
-                    url = url.replace(':id', orderId);
-                    window.location.href = url
-                    return
-                } else if (addedType != "C") {
-                    let confirmed = confirm("Na pewno usunąć etykietę?");
-                    if (!confirmed) {
-                        return;
-                    }
-                    removeLabelRequest();
-                    refreshDtOrReload();
-                    return;
-                }
-
-                let modalTypeC = $('#added_label_is_type_c_modal');
-                modalTypeC.modal('show');
-                modalTypeC.find("#confirmed_to_remove_chosen_label").off().on('click', removeLabelRequest);
-
-                modalTypeC.find("#new_date_for_timed_label_type_c_ok").off().on('click', function () {
-                    let val = modalTypeC.find("#new_date_for_timed_label_type_c").val();
-                    let date = moment(val);
-                    if (!date.isValid()) {
-                        alert("Nieprawidłowa data");
-                        return;
-                    }
-
-                    $.ajax({
-                        url: "/api/scheduled-time-reset-type-c",
-                        method: "POST",
-                        data: {
-                            order_id: orderId,
-                            label_id_to_handle: labelId,
-                            trigger_time: val
-                        }
-                    }).done(function () {
-                        removeLabelRequest();
-                        refreshDtOrReload();
-                    });
-                });
-            }
         }
         const labelActionMapping = {
             45: showSelectWarehouseTemplate,
