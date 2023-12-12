@@ -118,5 +118,15 @@
 
             Livewire.emit('resetFilters');
         }
+
+        const selectAllOrders = () => {
+            const checkBoxes = document.querySelectorAll('inupt[type="checkbox"]');
+
+            checkBoxes.forEach(checkBox => {
+                checkBox.checked = true;
+            });
+
+            Livewire.emit('selectAllOrders');
+        }
     </script>
 @endsection

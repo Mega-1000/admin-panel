@@ -14,6 +14,7 @@ trait WithChecking
     public function initWithChecking(): void
     {
         $this->listeners[] = 'addLabelsForCheckedOrders';
+        $this->listeners[] = 'selectAllOrders';
     }
 
     /**
@@ -27,7 +28,7 @@ trait WithChecking
     /**
      * Check all orders on current page
      */
-    public function checkAll(): void
+    public function selectAllOrders(): void
     {
         $this->allChecked = true;
 
