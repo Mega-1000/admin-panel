@@ -48,7 +48,6 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
     $.ajax({
         url: "/admin/labels/45/associated-labels-to-add-after-removal"
     }).done(async function (data) {
-
         let modal = $('#manual_label_selection_to_add_modal');
         let input = modal.find("#labels_to_add_after_removal_modal");
         input.empty();
@@ -75,6 +74,7 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
                 return false;
             }
             delivery_warehouse = modal.find("#delivery_warehouse2").val();
+            removeMultiLabel(orderId, 45, ids, delivery_warehouse);
             modal.modal('hide');
         });
     });
@@ -100,4 +100,47 @@ const removeLabel = (labelId, orderId) => {
             Livewire.emit('removeLabel', labelId, orderId);
         }
     });
+}
+
+const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
+    $.ajax({
+        url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
+        method: "POST",
+        data: {
+            labelsToAddIds: ids,
+            manuallyChosen: true
+        }
+    }).done(function () {
+        if ($.inArray('47', ids) != -1) {
+            $('input[name="order_id"]').val(orderId);
+            $('#selectWarehouse').val(16);
+            $('#warehouseSelect').attr('selected', true);
+            $('#selectWarehouse').click();
+            addingTaskToPlanner(orderId, delivery_warehouse);
+            refreshDtOrReload();
+        }
+        refreshDtOrReload();
+    })
+        .fail((error) => {
+            if (error.responseText === 'warehouse not found') {
+                $('#set-magazine').modal()
+                let form = $('#addWarehouse')
+                form.submit((event) => {
+                    event.preventDefault()
+                    $.ajax({
+                        method: 'post',
+                        url: '/admin/orders/set-warehouse-and-remove-label',
+                        dataType: 'json',
+                        data: {
+                            order_id: orderId,
+                            warehouse_id: event.target.warehouse_id.value,
+                            label: labelId,
+                            labelsToAddIds: ids
+                        },
+                    })
+                    $('#set-magazine').modal('hide');
+                    refreshDtOrReload()
+                })
+            }
+        });
 }

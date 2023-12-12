@@ -51,11 +51,6 @@ class OrderDatatableRetrievingService
             if (!$this->isNestedFilter($column)) {
                 $filter = str_replace(' ', '', $column->label);
 
-//                if (array_key_exists($filter, $labelStringFilterMappingArray)) {
-//                    foreach ($labelStringFilterMappingArray[$filter] as $labelStringFilter) {
-//                        $filter = str_replace($labelStringFilter, '', $filter);
-//                    }
-//                }
 
                 $q->where($column->label, 'like', '%' . $filter . '%');
                 continue;
