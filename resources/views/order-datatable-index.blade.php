@@ -114,7 +114,6 @@
 
             modalBody.prepend(warehouseTemplate);
             $("#delivery_warehouse2").autocomplete({
-                source: available,
                 classes: {
                     'ui-autocomplete': 'z-index-max',
                 },
