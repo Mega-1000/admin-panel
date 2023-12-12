@@ -36,10 +36,10 @@ class AddLabelService
         }
 
         foreach ($labelIdsToAdd as $labelId) {
-            $arrayIntersect = array_intersect($order->labels()->pluck('labels.id')->toArray(), Label::NOT_ADD_LABEL_CHECK_CORRECT);
-            if ($labelId === 45 && count($arrayIntersect) > 0) {
-                continue;
-            }
+//            $arrayIntersect = array_intersect($order->labels()->pluck('labels.id')->toArray(), Label::NOT_ADD_LABEL_CHECK_CORRECT);
+//            if ($labelId === 45 && count($arrayIntersect) > 0) {
+//                continue;
+//            }
 
             if (array_key_exists('already-added', $loopPreventionArray)
                 && in_array($labelId, $loopPreventionArray['already-added'])) {
