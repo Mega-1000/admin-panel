@@ -116,10 +116,10 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
             $('#selectWarehouse').val(16);
             $('#warehouseSelect').attr('selected', true);
             $('#selectWarehouse').click();
-            addingTaskToPlanner(orderId, delivery_warehouse);
-            refreshDtOrReload();
+            Liwewire.emit('reloadDatatable');
+        } else {
+            Liwewire.emit('reloadDatatable');
         }
-        refreshDtOrReload();
     })
         .fail((error) => {
             if (error.responseText === 'warehouse not found') {
@@ -139,7 +139,8 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
                         },
                     })
                     $('#set-magazine').modal('hide');
-                    refreshDtOrReload()
+
+                    Liwewire.emit('reloadDatatable');
                 })
             }
         });
