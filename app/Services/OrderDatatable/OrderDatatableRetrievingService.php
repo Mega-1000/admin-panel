@@ -35,6 +35,7 @@ class OrderDatatableRetrievingService
             'packages.realCostsForCompany',
             'warehouse',
             'chat.messages',
+            'task.user'
         ]);
 
         $columns = OrderDatatableColumn::where('filter', '!=', '')->get();

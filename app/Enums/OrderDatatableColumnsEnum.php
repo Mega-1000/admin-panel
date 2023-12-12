@@ -14,6 +14,7 @@ use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableInvo
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableLabels;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableNonShipped;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableOfferBalance;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableProductionDate;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableShipped;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableWarehouse;
 use App\Helpers\OrderDatatable\OrderDatatableLabelFilter;
@@ -48,7 +49,7 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 21, 'size' => 100, 'label' => 'customer.login'],
         ['filter' => '', 'order' => 22, 'size' => 100, 'label' => 'warehouse'],
         ['filter' => '', 'order' => 23, 'size' => 100, 'label' => 'consultant-notices'],
-
+        ['filter' => '', 'order' => 24, 'size' => 100, 'label' => 'production-date'],
     ];
 
     /**
@@ -149,6 +150,10 @@ enum OrderDatatableColumnsEnum
         ],
         'consultant-notices' => [
             'class' => NonStandardColumnInvocableConsultantNotices::class,
+            'data' => [],
+        ],
+        'production-date' => [
+            'class' => NonStandardColumnInvocableProductionDate::class,
             'data' => [],
         ],
     ];
