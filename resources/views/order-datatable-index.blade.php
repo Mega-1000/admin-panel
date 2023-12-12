@@ -120,7 +120,7 @@
         }
 
         const selectAllOrders = () => {
-            const checkBoxes = document.querySelectorAll('inupt[type="checkbox"]');
+            const checkBoxes = document.querySelectorAll('input[type="checkbox"]')
 
             checkBoxes.forEach(checkBox => {
                 checkBox.checked = true;
