@@ -43,9 +43,20 @@ class OrderDatatableRetrievingService
             return !in_array($column->label, array_keys(OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES));
         });
 
+        $labelStringFilterMappingArray = [
+            'id' => ['-']
+        ];
+
         foreach ($columns as $column) {
             if (!$this->isNestedFilter($column)) {
                 $filter = str_replace(' ', '', $column->label);
+
+                if (array_key_exists($filter, $labelStringFilterMappingArray)) {
+                    foreach ($labelStringFilterMappingArray[$filter] as $labelStringFilter) {
+                        $filter = str_replace($labelStringFilter, '', $filter);
+                    }
+                }
+
                 $q->where($column->label, 'like', '%' . $filter . '%');
                 continue;
             }
