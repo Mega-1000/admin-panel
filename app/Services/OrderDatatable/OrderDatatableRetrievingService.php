@@ -33,7 +33,7 @@ class OrderDatatableRetrievingService
             'customer.addresses',
             'files',
             'packages.realCostsForCompany',
-//            'warehouse',
+            'warehouse',
             'chat.messages',
         ]);
 
