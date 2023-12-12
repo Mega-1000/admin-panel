@@ -150,7 +150,6 @@
                     });
                     $('#manual_label_selection_to_add_modal').modal('show');
 
-                    if (labelId == 45) showSelectWarehouseTemplate(modal, orderId);
 
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {
                         let ids = [];
