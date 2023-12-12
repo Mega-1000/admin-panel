@@ -1,6 +1,12 @@
 <div>
     <div>
         <div>
+            <div>
+                <button onclick="selectAllOrders()" class="btn btn-primary">
+                    Zaznacz wszystkie zamówienia
+                </button>
+            </div>
+
             <form @wire:submit.prevent="updatedPageLength">
                 <div class="d-flex">
                     Ilość zamówień na stronę:
@@ -113,12 +119,6 @@
                 </div>
             @endif
         @endforeach
-    </div>
-
-    <div>
-        <button onclick="selectAllOrders()" class="btn btn-primary">
-            Zaznacz wszystkie zamówienia
-        </button>
     </div>
 
     <table class="table table-borderless" style="overflow-x: auto;">
