@@ -21,8 +21,6 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
     const modalBody = modal.find('.modal-body');
     const modalOk = modal.find('#labels_to_add_after_removal_modal_ok');
 
-    if (!warehouse) modalOk.attr('disabled', 'disabled');
-
     modalBody.prepend(warehouseTemplate);
     $("#delivery_warehouse2").autocomplete({
         classes: {
@@ -116,10 +114,9 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
             $('#selectWarehouse').val(16);
             $('#warehouseSelect').attr('selected', true);
             $('#selectWarehouse').click();
-            Liwewire.emit('reloadDatatable');
-        } else {
-            Liwewire.emit('reloadDatatable');
         }
+
+        Liwewire.emit('reloadDatatable');
     })
         .fail((error) => {
             if (error.responseText === 'warehouse not found') {
