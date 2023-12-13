@@ -129,4 +129,16 @@
             Livewire.emit('selectAllOrders');
         }
     </script>
+    <script>
+        function showLabelName(element, labelName) {
+            const labelPopup = element.querySelector('.label-popup');
+            labelPopup.innerHTML = labelName;
+            labelPopup.style.display = 'block';
+        }
+
+        function hideLabelName(element) {
+            const labelPopup = element.querySelector('.label-popup');
+            labelPopup.style.display = 'none';
+        }
+    </script>
 @endsection

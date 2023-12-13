@@ -11,12 +11,41 @@
         @endforeach
     @endif
 
-    @foreach(!empty($order['labels']) && count($order['labels']) > 0 ? array_filter($order['labels'], function ($label) use($labelGroupName) { return $label['label_group']['name'] === $labelGroupName; }) : [] as $label)
-        <span
-            style="cursor: pointer"
-            onclick="removeLabel({{ $label['id'] }}, {{ $order['id'] }})"
-        >
-        <i class="{{ $label['icon_name'] }}" style="font-size: 24px; background-color: {{ $label['color'] }}; padding: 5px"></i>
-    </span>
-    @endforeach
+    <div class="label-container">
+        @foreach(!empty($order['labels']) && count($order['labels']) > 0 ? array_filter($order['labels'], function ($label) use($labelGroupName) { return $label['label_group']['name'] === $labelGroupName; }) : [] as $label)
+            <span class="label-wrapper" style="cursor: pointer" onmouseover="showLabelName(this, '{{ $label['label_name'] }}')" onmouseout="hideLabelName(this)">
+                <i class="{{ $label['icon_name'] }}" style="font-size: 24px; background-color: {{ $label['color'] }}; padding: 5px"></i>
+                <div class="label-popup">{{ $label['label_name'] }}</div>
+            </span>
+        @endforeach
+    </div>
 </div>
+
+<style>
+    .label-container {
+        display: flex;
+    }
+
+    .label-wrapper {
+        position: relative;
+        margin-right: 10px;
+    }
+
+    .label-popup {
+        display: none;
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 5px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+    }
+
+    .label-wrapper:hover .label-popup {
+        display: block;
+    }
+</style>
