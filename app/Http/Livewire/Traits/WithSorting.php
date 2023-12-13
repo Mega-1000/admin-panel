@@ -58,12 +58,12 @@ trait WithSorting
 
             $column?->update(['filter' => $filter]);
 
-            // Check if the filter has nested arrays and update them accordingly
+            dd($filter, $column->filter);
+//             Check if the filter has nested arrays and update them accordingly
             if (is_array($filter)) {
                 $this->updateNestedFilters($key, $filter);
             }
 
-            dd($this->filters, OrderDatatableColumn::all());
         }
     }
 
