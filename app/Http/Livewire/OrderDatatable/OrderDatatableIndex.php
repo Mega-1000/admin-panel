@@ -17,6 +17,7 @@ class OrderDatatableIndex extends Component
     use WithSorting, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting, WithGeneralFilters, WithChecking;
 
     public array $orders;
+    public bool $loading = false;
     public $listeners = ['updateColumnOrderBackend', 'reloadDatatable'];
 
     /**

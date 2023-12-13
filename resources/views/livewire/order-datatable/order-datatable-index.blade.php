@@ -1,3 +1,5 @@
+<div wire:loading class="loader">Loading...</div>
+
 <div>
     <div>
         <div>
