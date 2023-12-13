@@ -27,7 +27,27 @@
         .loading {
             position: fixed;
             z-index: 999;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
+
+        .loading::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 4px solid #3498db; /* Change the color as needed */
+            border-top: 4px solid transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
     </style>
     @livewireStyles
 @endsection
