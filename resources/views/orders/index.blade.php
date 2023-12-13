@@ -3193,6 +3193,7 @@
                 if (!warehouse) modalOk.attr('disabled', 'disabled');
 
                 modalBody.prepend(warehouseTemplate);
+
                 $("#delivery_warehouse2").autocomplete({
                     source: available,
                     classes: {
@@ -3220,7 +3221,6 @@
                 $.ajax({
                     url: "/admin/labels/" + labelId + "/associated-labels-to-add-after-removal"
                 }).done(async function (data) {
-
                     let modal = $('#manual_label_selection_to_add_modal');
                     let input = modal.find("#labels_to_add_after_removal_modal");
                     input.empty();

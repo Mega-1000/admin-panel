@@ -6,22 +6,24 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
     $('.warehouse-template').remove();
 
     let warehouseTemplate = `
-                <div class="error" style="display: none">
-                    <div class="alert alert-danger" role="alert">
-                    </div>
-                </div>
-                <div class="warehouse-template">
-                <p>Magazyn nie został przypisany, przypisz magazyn przed wysłaniem</p>
-                <div class="form-group" style="width: 15%; padding: 5px;">
-                    <label for="delivery_warehouse2">Magazyn obsługujący</label>
-                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}">
-                </div><br>
-                </div>`;
+        <div class="error" style="display: none">
+            <div class="alert alert-danger" role="alert"></div>
+        </div>
+        <div class="warehouse-template">
+            <p>Magazyn nie został przypisany, przypisz magazyn przed wysłaniem</p>
+            <div class="form-group" style="width: 15%; padding: 5px;">
+                <label for="delivery_warehouse2">Magazyn obsługujący</label>
+                <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}">
+            </div><br>
+        </div>
+    `;
 
     const modalBody = modal.find('.modal-body');
     const modalOk = modal.find('#labels_to_add_after_removal_modal_ok');
 
     modalBody.prepend(warehouseTemplate);
+    document.getElementById('delivery_warehouse2').autocomplete = 'on';
+
     $("#delivery_warehouse2").autocomplete({
         classes: {
             'ui-autocomplete': 'z-index-max',
