@@ -62,6 +62,8 @@ trait WithSorting
             if (is_array($filter)) {
                 $this->updateNestedFilters($key, $filter);
             }
+
+            dd($this->filters, OrderDatatableColumn::all());
         }
     }
 
