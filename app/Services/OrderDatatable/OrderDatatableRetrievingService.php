@@ -9,6 +9,7 @@ use App\OrderDatatableColumn;
 use App\Repositories\OrderDatatableColumns;
 use Error;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\QueryException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -71,10 +72,10 @@ class OrderDatatableRetrievingService
             self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
 
             $this->prepareAdditionalDataForOrders();
-        } catch (Error $e) {
+        } catch (QueryException $e) {
             try {
                 self::$orders = $q->paginate(10)->toArray();
-            } catch (\Error $e) {
+            } catch (QueryException $e) {
                 OrderDatatableColumn::all()->each(fn($column) => $column->delete());
                 self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
             }
