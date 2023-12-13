@@ -49,10 +49,8 @@ class OrderDatatableRetrievingService
 
         foreach ($columns as $column) {
             if (!$this->isNestedFilter($column)) {
-                $filter = str_replace(' ', '', $column->label);
-
-
-                $q->where($column->label, 'like', '%' . $filter . '%');
+//                $filter = str_replace(' ', '', $column->label);
+                $q->where($column->label, 'like', '%' . $column->filter . '%');
                 continue;
             }
 
