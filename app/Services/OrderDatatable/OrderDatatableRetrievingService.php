@@ -7,6 +7,7 @@ use App\Enums\OrderDatatableColumnsEnum;
 use App\Helpers\OrderDatatableNonstandardFiltersHelper;
 use App\OrderDatatableColumn;
 use App\Repositories\OrderDatatableColumns;
+use Error;
 use Illuminate\Database\Eloquent\Builder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -90,7 +91,6 @@ class OrderDatatableRetrievingService
         if (empty(static::$orders)) {
             $this->fetchOrders();
         }
-
 
         return self::$orders;
     }
