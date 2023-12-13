@@ -53,6 +53,7 @@ class OrderDatatableRetrievingService
                 continue;
             }
 
+            dd('okej');
             $q = $this->applyNestedFilter($q, $column);
         }
 
