@@ -1,4 +1,4 @@
-<div wire:loading class="loading">Ładowanie...</div>/
+{{--<div class="loading">Ładowanie...</div>--}}
 
 <div>
     <div>
