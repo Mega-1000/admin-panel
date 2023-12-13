@@ -23,6 +23,11 @@
         .resizing {
             pointer-events: none;
         }
+
+        .loading {
+            position: fixed;
+            z-index: 999;
+        }
     </style>
     @livewireStyles
 @endsection
