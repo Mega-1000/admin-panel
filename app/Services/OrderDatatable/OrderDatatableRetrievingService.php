@@ -124,7 +124,6 @@ class OrderDatatableRetrievingService
      */
     private function applyNestedFilter(Builder $q, mixed $column): Builder
     {
-        dd('applying nested filters');
         $labelParts = explode('.', $column->label);
 
         if (is_numeric($labelParts[2])) {
