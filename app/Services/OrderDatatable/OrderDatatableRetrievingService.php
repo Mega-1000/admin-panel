@@ -70,7 +70,7 @@ class OrderDatatableRetrievingService
             self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
 
             $this->prepareAdditionalDataForOrders();
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+        } catch (Error $e) {
             try {
                 self::$orders = $q->paginate(10)->toArray();
             } catch (\Error $e) {
