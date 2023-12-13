@@ -49,17 +49,14 @@ trait WithSorting
         foreach ($this->filters as $key => $filter) {
             $column = OrderDatatableColumn::where('label', $key)->first();
 
-            if ($column && $column->resetFilters && $filter !== $column->filter) {
-                OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
-                $column->update(['filter' => $filter]);
-
-                return;
-            }
+//            if ($column && $column->resetFilters && $filter !== $column->filter) {
+//                OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
+//                $column->update(['filter' => $filter]);
+//
+//                return;
+//            }
 
             $column?->update(['filter' => $filter]);
-
-            dd($filter, $column->filter);
-//             Check if the filter has nested arrays and update them accordingly
             if (is_array($filter)) {
                 $this->updateNestedFilters($key, $filter);
             }
