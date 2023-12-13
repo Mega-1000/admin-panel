@@ -49,7 +49,6 @@ class OrderDatatableRetrievingService
 
         foreach ($columns as $column) {
             if (!$this->isNestedFilter($column)) {
-//                $filter = str_replace(' ', '', $column->label);
                 $q->where($column->label, 'like', '%' . $column->filter . '%');
                 continue;
             }
@@ -125,6 +124,7 @@ class OrderDatatableRetrievingService
      */
     private function applyNestedFilter(Builder $q, mixed $column): Builder
     {
+        dd('applying nested filters');
         $labelParts = explode('.', $column->label);
 
         if (is_numeric($labelParts[2])) {

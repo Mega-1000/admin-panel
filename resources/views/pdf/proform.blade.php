@@ -54,8 +54,8 @@
 
 	                    {{ $firm->name }}<br/>
                         @if ($firm->address)
-                        {{$firm->address->address}} {{$firm->address->flat_number}}<br/>
-                        {{$firm->address->postal_code}} {{$firm->address->city}}<br/>
+                            {{$firm->address->address}} {{$firm->address->flat_number}}<br/>
+                            {{$firm->address->postal_code}} {{$firm->address->city}}<br/>
                         @endif
                         NIP: {{$firm->nip}}<br/>
                         Nr konta: {{$firm->account_number}}<br/>
