@@ -63,12 +63,14 @@
                         E-mail ogólny : {{$firm->email}} <br/>
                         @else
 
-                        !!!!!!!!!!  ZMIANA NUMERU KONTA OD 2022-03-20 !!!!!!!!!!!!!<br/>
-                        ELETKRONICZNA PLATFORMA HANDLOWA SPOLKA Z O O <br/>
-                        JARACZA 22/12 <br/>
-                        50-305 WROCŁAW <br/>
-                        NIP 8982272269 <br/>
-                        numer konta 28 1140 2004 0000 3802 8205 1023 mBank S A<br/><br/>
+                        <div class="h3">
+                            !!!!!!!!!!  ZMIANA NUMERU KONTA OD 2023-13-13 !!!!!!!!!!!!!<br/>
+                            ELETKRONICZNA PLATFORMA HANDLOWA POLSKA SPOLKA Z O O <br/>
+                        </div>
+                        PIŁSUCKIEGO 74/320 <br/>
+                        50-020 WROCŁAW <br/>
+                        NIP 8971930266 <br/>
+                        numer konta 80 1140 2004 0000 3602 8433 3856 mBank S A<br/><br/>
                         Telefony: www.ephpolska.pl w zakładce <b>kontakt</b><br/>
                         E-mail ogólny: info@ephpolska.pl<br/>
                         Sklep: www.ephpolska.pl<br/>
@@ -92,7 +94,7 @@
         </tbody>
     </table>
     <div class="h3">
-        UWAGA przy dokonwyaniu przelewu bankowego tej oferty trzeba koniecznie wpisać ciąg znaków QQ{{ $order->id }}QQ 
+        UWAGA przy dokonwyaniu przelewu bankowego tej oferty trzeba koniecznie wpisać ciąg znaków QQ{{ $order->id }}QQ
     </div>
     Gdy chcesz realizować ofertę to koniecznie wejdź na naszą stronę <a href="https://www.ephpolska.pl"> www.ephpolska.pl </a> i sprawdź/skoryguj dane do dostawy.
     <table class="table table-striped" style="table-layout:fixed; width: 100%;">
