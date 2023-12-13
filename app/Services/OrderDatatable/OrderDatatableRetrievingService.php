@@ -52,7 +52,6 @@ class OrderDatatableRetrievingService
                 $q->where($column->label, 'like', '%' . $column->filter . '%');
                 continue;
             }
-            dd('nested filter');
 
             $q = $this->applyNestedFilter($q, $column);
         }
