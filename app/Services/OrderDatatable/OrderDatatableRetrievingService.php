@@ -126,13 +126,17 @@ class OrderDatatableRetrievingService
     {
         $labelParts = explode('.', $column->label);
 
-        if (is_numeric($labelParts[2])) {
+        if (array_key_exists(2, $labelParts) && is_numeric($labelParts[2])) {
             $q->whereHas($labelParts[0], function ($q) use ($labelParts, $column) {
                 $q->whereHas($labelParts[1], function ($q) use ($labelParts, $column) {
                     $q->where($labelParts[3], 'like', '%' . $column->filter . '%');
                 });
             });
             return $q;
+        } else {
+            $q->whereHas($labelParts[0], function ($q) use ($labelParts, $column) {
+                $q->where($labelParts[1], 'like', '%' . $column->filter . '%');
+            });
         }
 
         return $q;
