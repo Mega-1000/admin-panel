@@ -185,7 +185,7 @@ class RemoveLabelService
                     'action' => ProductStockLogActionEnum::DELETE,
                     'quantity' => $item->quantity,
                     'order_id' => $order->id,
-                    'user_id' => $userId,
+                    'user_id' => auth()->id(),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);

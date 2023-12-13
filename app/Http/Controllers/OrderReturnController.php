@@ -15,14 +15,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
-use App\Entities\ProductStockLog;
 
 class OrderReturnController extends Controller
 {
     public function __construct(
         protected readonly OrderReturnService $orderReturnService
-    ) {
-    }
+    ) {}
 
     /**
      * Show the return form of a specific resource.
