@@ -48,7 +48,7 @@ class OrderDatatableRetrievingService
         ];
 
         foreach ($columns as $column) {
-            dd($columns);
+            dd($column, $this->isNestedFilter($column));
             if (!$this->isNestedFilter($column)) {
                 $q->where($column->label, 'like', '%' . $column->filter . '%');
                 continue;
