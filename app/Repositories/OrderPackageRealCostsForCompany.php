@@ -6,7 +6,7 @@ use App\Entities\Order;
 use Ramsey\Collection\Collection;
 
 class OrderPackageRealCostsForCompany {
-    public static function getAllByOrderId(int $orderId): float
+    public static function getAllByOrderId(int|string $orderId): float
     {
         $order = Order::find($orderId);
 
