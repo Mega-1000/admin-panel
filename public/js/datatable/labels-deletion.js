@@ -1,13 +1,10 @@
 const getAvailableWarehousesString = (warehouses) => {
-    return $.ajax({
-        url: "/admin/get-available-warehouses-string",
-        dataType: "json",
-    }).done(function (data) {
-        window.allWarehousesString = data;
-    });
+    return fetch('/admin/get-available-warehouses-string')
+        .then(res => res.json())
+        .then(data => {
+            window.allWarehousesString = data;
+        });
 }
-
-getAvailableWarehousesString();
 
 const showSelectWarehouseTemplate = (modal, orderId) => {
     const row = $('#id-' + orderId);
