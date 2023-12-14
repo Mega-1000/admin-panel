@@ -8,7 +8,9 @@ use Ramsey\Collection\Collection;
 class OrderPackageRealCostsForCompany {
     public static function getAllByOrderId(int|string $orderId): float
     {
-        dd($orderId);
+        if (is_string($orderId)) {
+            dd($orderId);
+        }
         $order = Order::find($orderId);
 
         $realCosts = $order->packages->map(function ($orderPackage) {
