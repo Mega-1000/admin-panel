@@ -28,6 +28,12 @@ class OrderDatatableIndex extends Component
     public function boot(): void
     {
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
+
+        $this->reRenderFilters();
+        $this->initWithNonstandardColumns();
+        $this->initWithNonStandardColumnsSorting();
+        $this->initWithGeneralFilters();
+        $this->initWithChecking();
     }
 
     /**
@@ -37,17 +43,6 @@ class OrderDatatableIndex extends Component
      */
     public function render(): View
     {
-        if (empty($this->orders)) {
-
-        $this->orders = (new OrderDatatableRetrievingService())->getOrders();
-        }
-
-        $this->reRenderFilters();
-        $this->initWithNonstandardColumns();
-        $this->initWithNonStandardColumnsSorting();
-        $this->initWithGeneralFilters();
-        $this->initWithChecking();
-
         return view('livewire.order-datatable.order-datatable-index');
     }
 
