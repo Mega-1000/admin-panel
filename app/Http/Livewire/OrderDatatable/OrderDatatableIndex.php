@@ -45,6 +45,6 @@ class OrderDatatableIndex extends Component
      */
     public function reloadDatatable(): void
     {
-        $this->boot();
+        redirect()->route('order-datatable.index');
     }
 }
