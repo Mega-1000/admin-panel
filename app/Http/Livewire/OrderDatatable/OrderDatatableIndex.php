@@ -37,7 +37,10 @@ class OrderDatatableIndex extends Component
      */
     public function render(): View
     {
+        if (empty($this->orders)) {
+
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
+        }
 
         $this->reRenderFilters();
         $this->initWithNonstandardColumns();
