@@ -31,6 +31,7 @@ class OrderDatatableIndex extends Component
         if (empty($orders)) {
             $this->orders = $this->ordersRawFromDB = (new OrderDatatableRetrievingService())->getOrders();
         } else {
+            dd('okej');
             $this->orders = $this->ordersRawFromDB;
         }
 
