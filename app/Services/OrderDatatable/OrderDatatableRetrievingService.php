@@ -22,7 +22,7 @@ class OrderDatatableRetrievingService
      *
      * @return void
      */
-    public function fetchOrders(): void
+    public function fetchOrders(): array
     {
         $q = Order::query();
         $q->with([
@@ -72,6 +72,8 @@ class OrderDatatableRetrievingService
             self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
 
             $this->prepareAdditionalDataForOrders();
+
+            return self::$orders;
         } catch (QueryException $e) {
             try {
                 self::$orders = $q->paginate(10)->toArray();
