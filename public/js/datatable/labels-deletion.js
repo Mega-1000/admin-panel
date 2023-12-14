@@ -127,6 +127,7 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
             $('#selectWarehouse').val(16);
             $('#warehouseSelect').attr('selected', true);
             $('#selectWarehouse').click();
+            addingTaskToPlanner(orderId, delivery_warehouse);
         }
 
         Liwewire.emit('reloadDatatable');
@@ -154,4 +155,48 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
                 })
             }
         });
+    function addingTaskToPlanner(orderId, delivery_warehouse) {
+        $.ajax({
+            method: 'post',
+            url: '/admin/planning/tasks/adding-task-to-planner',
+            dataType: 'json',
+            data: {
+                order_id: orderId,
+                delivery_warehouse: delivery_warehouse
+            },
+        }).done(function (data) {
+            if (data.status === 'ERROR') {
+                let modal = $('#add-withdraw-task');
+                let input_delivery_warehouse = modal.find("#add-withdraw-task-delivery_warehouse");
+                let input_order_id = modal.find("#add-withdraw-task-order_id");
+                input_delivery_warehouse.val(data.delivery_warehouse);
+                input_order_id.val(data.id);
+                let order_ids = [data.id];
+                let clickCount = 0;
+                modal.modal();
+                $('#withdrawTaskButton').on('click', () => {
+                    if (clickCount > 0) {
+                        return false;
+                    } else {
+                        $.ajax({
+                            url: "/admin/orders/label-addition/45",
+                            method: "POST",
+                            data: {
+                                orderIds: order_ids
+                            }
+                        }).done(function () {
+                            modal.modal('hide');
+                            table.ajax.reload(null, false);
+                            return false;
+                        });
+
+                        clickCount++;
+                    }
+                })
+            } else {
+                window.open('/admin/planning/timetable', '_blank');
+            }
+        });
+    }
 }
+
