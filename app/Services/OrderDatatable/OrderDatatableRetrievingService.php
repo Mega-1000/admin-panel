@@ -39,6 +39,8 @@ class OrderDatatableRetrievingService
             'chat.messages',
             'task.user'
         ]);
+        var_dump(request());
+
 
         $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
         $columns = $columns->filter(function ($column) {

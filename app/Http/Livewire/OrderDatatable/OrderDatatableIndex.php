@@ -17,23 +17,8 @@ class OrderDatatableIndex extends Component
     use WithSorting, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting, WithGeneralFilters, WithChecking;
 
     public array $orders;
-    public array $ordersRawFromDB = [];
     public bool $loading = false;
     public $listeners = ['updateColumnOrderBackend', 'reloadDatatable'];
-
-    /**
-     * Mount component
-     *
-     * @return void
-     */
-    public function boot(?array $ordersRawFromDB): void
-    {
-        $this->reRenderFilters();
-        $this->initWithNonstandardColumns();
-        $this->initWithNonStandardColumnsSorting();
-        $this->initWithGeneralFilters();
-        $this->initWithChecking();
-    }
 
     /**
      * OrderDatatableIndex extends Livewire component and adds datatable functionality to it
@@ -42,6 +27,14 @@ class OrderDatatableIndex extends Component
      */
     public function render(): View
     {
+        $this->orders = (new OrderDatatableRetrievingService())->getOrders();
+
+        $this->reRenderFilters();
+        $this->initWithNonstandardColumns();
+        $this->initWithNonStandardColumnsSorting();
+        $this->initWithGeneralFilters();
+        $this->initWithChecking();
+
         return view('livewire.order-datatable.order-datatable-index');
     }
 
@@ -52,6 +45,6 @@ class OrderDatatableIndex extends Component
      */
     public function reloadDatatable(): void
     {
-        $this->orders = (new OrderDatatableRetrievingService())->fetchOrders();
+        $this->boot();
     }
 }
