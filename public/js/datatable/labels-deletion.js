@@ -22,7 +22,7 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
     const modalOk = modal.find('#labels_to_add_after_removal_modal_ok');
 
     modalBody.prepend(warehouseTemplate);
-    document.getElementById('delivery_warehouse2').autocomplete = 'on';
+    // document.getElementById('delivery_warehouse2').autocomplete = 'on';
 
     $("#delivery_warehouse2").autocomplete({
         classes: {
