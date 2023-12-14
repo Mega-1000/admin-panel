@@ -2,7 +2,7 @@ const getAvailableWarehousesString = (warehouses) => {
     fetch('/admin/get-available-warehouses-string')
         .then(res => res.json())
         .then(data => {
-            window.allWarehousesString = data.split(',');
+            window.allWarehousesString = data.replaceAll('"', '').split(',');
         });
 }
 
