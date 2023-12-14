@@ -17,7 +17,7 @@ class OrderDatatableIndex extends Component
     use WithSorting, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting, WithGeneralFilters, WithChecking;
 
     public array $orders;
-    public array $ordersRawFromDB;
+    public array $ordersRawFromDB = [];
     public bool $loading = false;
     public $listeners = ['updateColumnOrderBackend', 'reloadDatatable'];
 
@@ -28,7 +28,7 @@ class OrderDatatableIndex extends Component
      */
     public function boot(?array $ordersRawFromDB = null): void
     {
-        if ($ordersRawFromDB) {
+        if (!empty($ordersRawFromDB)) {
             $this->orders = $this->ordersRawFromDB = (new OrderDatatableRetrievingService())->getOrders();
         } else {
             $this->orders = $ordersRawFromDB;
