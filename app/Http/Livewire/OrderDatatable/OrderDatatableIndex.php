@@ -21,14 +21,22 @@ class OrderDatatableIndex extends Component
     public $listeners = ['updateColumnOrderBackend', 'reloadDatatable'];
 
     /**
+     * Mount component
+     *
+     * @return void
+     */
+    public function boot(): void
+    {
+        $this->orders = app(OrderDatatableRetrievingService::class)->getOrders();
+    }
+
+    /**
      * OrderDatatableIndex extends Livewire component and adds datatable functionality to it
      *
      * @return View
      */
     public function render(): View
     {
-        $this->orders = app(OrderDatatableRetrievingService::class)->getOrders();
-
         $this->reRenderFilters();
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
@@ -45,6 +53,6 @@ class OrderDatatableIndex extends Component
      */
     public function reloadDatatable(): void
     {
-        $this->render();
+        $this->boot();
     }
 }
