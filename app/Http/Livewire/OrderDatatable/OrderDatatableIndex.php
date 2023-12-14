@@ -37,6 +37,8 @@ class OrderDatatableIndex extends Component
      */
     public function render(): View
     {
+        $this->orders = $this->orders;
+
         $this->reRenderFilters();
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
