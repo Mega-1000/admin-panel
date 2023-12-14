@@ -3,7 +3,7 @@ const getAvailableWarehousesString = (warehouses) => {
         url: "/admin/get-available-warehouses-string",
         dataType: "json",
     }).done(function (data) {
-        return this.allWarehousesString = data;
+        window.allWarehousesString = data;
     });
 }
 
@@ -36,7 +36,7 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
     // document.getElementById('delivery_warehouse2').autocomplete = 'on';
 
     $("#delivery_warehouse2").autocomplete({
-        source: this.allWarehousesString,
+        source: window.allWarehousesString,
         classes: {
             'ui-autocomplete': 'z-index-max',
         },
