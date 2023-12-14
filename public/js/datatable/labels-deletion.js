@@ -1,10 +1,12 @@
 const getAvailableWarehousesString = (warehouses) => {
-    return fetch('/admin/get-available-warehouses-string')
+    fetch('/admin/get-available-warehouses-string')
         .then(res => res.json())
         .then(data => {
             window.allWarehousesString = data;
         });
 }
+
+getAvailableWarehousesString();
 
 const showSelectWarehouseTemplate = (modal, orderId) => {
     const row = $('#id-' + orderId);
