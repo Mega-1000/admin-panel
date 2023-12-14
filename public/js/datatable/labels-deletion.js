@@ -1,3 +1,14 @@
+const getAvailableWarehousesString = (warehouses) => {
+    return $.ajax({
+        url: "/admin/get-available-warehouses-string",
+        dataType: "json",
+    }).done(function (data) {
+        return this.allWarehousesString = data;
+    });
+}
+
+getAvailableWarehousesString();
+
 const showSelectWarehouseTemplate = (modal, orderId) => {
     const row = $('#id-' + orderId);
     const warehouseEl = row.find('.warehouse-symbol');
@@ -25,6 +36,7 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
     // document.getElementById('delivery_warehouse2').autocomplete = 'on';
 
     $("#delivery_warehouse2").autocomplete({
+        source: this.allWarehousesString,
         classes: {
             'ui-autocomplete': 'z-index-max',
         },

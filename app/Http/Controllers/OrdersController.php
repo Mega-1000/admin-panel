@@ -3050,4 +3050,18 @@ class OrdersController extends Controller
 
         return true;
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getAvailableWarehousesString(): JsonResponse
+    {
+        $allWarehouses = Warehouse::all();
+        $allWarehousesString = '';
+        foreach ($allWarehouses as $warehouse) {
+            $allWarehousesString .= '"' . $warehouse->symbol . '",';
+        }
+
+        return response()->json($allWarehousesString);
+    }
 }

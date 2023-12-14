@@ -25,6 +25,7 @@ use App\Http\Controllers\NewsletterMessageController;
 use App\Http\Controllers\NewsletterPacketController;
 use App\Http\Controllers\OrderDatatableController;
 use App\Http\Controllers\OrderInvoiceDocumentsController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
 use App\Http\Controllers\OrderWithDeclaredPaymentsListingController;
@@ -516,6 +517,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
         Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
+
+        Route::get('get-available-warehouses-string', [OrdersController::class, 'getAvailableWarehousesString'])->name('get-available-warehouses-string');
 
         Route::post('orders/set-warehouse/{orderId}', 'OrdersController@setWarehouse')->name('orders.setWarehouse');
 
