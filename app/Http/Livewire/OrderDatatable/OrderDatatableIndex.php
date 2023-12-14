@@ -27,7 +27,7 @@ class OrderDatatableIndex extends Component
      */
     public function boot(): void
     {
-        $this->orders = app(OrderDatatableRetrievingService::class)->getOrders();
+        $this->orders = (new OrderDatatableRetrievingService())->getOrders();
     }
 
     /**
@@ -37,7 +37,7 @@ class OrderDatatableIndex extends Component
      */
     public function render(): View
     {
-        $this->orders = $this->orders;
+        $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
         $this->reRenderFilters();
         $this->initWithNonstandardColumns();
