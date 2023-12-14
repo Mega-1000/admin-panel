@@ -29,6 +29,9 @@ class OrderDatatableIndex extends Component
     public function boot(?array $ordersRawFromDB = null): void
     {
         $this->orders = $ordersRawFromDB ?? (new OrderDatatableRetrievingService())->getOrders();
+        if (!empty($ordersRawFromDB)) {
+        dd($ordersRawFromDB);
+        }
 
         $this->reRenderFilters();
         $this->initWithNonstandardColumns();
