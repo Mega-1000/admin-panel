@@ -91,11 +91,8 @@ class OrderDatatableRetrievingService
     {
         if (empty(static::$orders)) {
             $this->fetchOrders();
-        } else {
-
-
-        dd(self::$orders['data']);
         }
+
         return self::$orders;
     }
 
