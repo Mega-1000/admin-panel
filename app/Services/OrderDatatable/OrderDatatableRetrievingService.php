@@ -93,6 +93,7 @@ class OrderDatatableRetrievingService
             $this->fetchOrders();
         }
 
+        dd(self::$orders['data']);
         return self::$orders;
     }
 
