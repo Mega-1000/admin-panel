@@ -26,13 +26,12 @@ class OrderDatatableIndex extends Component
      *
      * @return void
      */
-    public function boot(): void
+    public function boot(?array $ordersRawFromDB = null): void
     {
-        if (empty($orders)) {
+        if ($ordersRawFromDB) {
             $this->orders = $this->ordersRawFromDB = (new OrderDatatableRetrievingService())->getOrders();
         } else {
-            dd('okej');
-            $this->orders = $this->ordersRawFromDB;
+            $this->orders = $ordersRawFromDB;
         }
 
         $this->reRenderFilters();
@@ -59,6 +58,6 @@ class OrderDatatableIndex extends Component
      */
     public function reloadDatatable(): void
     {
-        $this->boot();
+        $this->boot($this->ordersRawFromDB);
     }
 }
