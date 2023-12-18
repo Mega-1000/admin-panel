@@ -103,7 +103,7 @@ trait WithSorting
             }
         }
 
-        $this->semiReloadDatatable();
+        $this->semiReloadDatatable(['reloadFilters' => false]);
     }
 
     public function resetFilters(): void

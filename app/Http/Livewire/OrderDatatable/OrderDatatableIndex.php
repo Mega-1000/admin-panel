@@ -25,11 +25,13 @@ class OrderDatatableIndex extends Component
      *
      * @return View
      */
-    public function render(): View
+    public function render(array $options = []): View
     {
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
-        $this->reRenderFilters();
+        if ($options['reloadFilters']) {
+            $this->reRenderFilters();
+        }
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
         $this->initWithGeneralFilters();
@@ -48,8 +50,8 @@ class OrderDatatableIndex extends Component
         redirect()->route('orders.index');
     }
 
-    public function semiReloadDatatable(): void
+    public function semiReloadDatatable(array $options = []): void
     {
-        $this->render();
+        $this->render($options);
     }
 }
