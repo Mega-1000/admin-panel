@@ -30,9 +30,7 @@ class OrderDatatableIndex extends Component
     {
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
-        if (array_key_exists('applyFiltersFromQuery', $options)) {
-            $this->reRenderFilters();
-        }
+        $this->reRenderFilters(array_key_exists('applyFiltersFromQuery', $options));
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
         $this->initWithGeneralFilters();
