@@ -23,13 +23,14 @@ class OrderDatatableIndex extends Component
     /**
      * OrderDatatableIndex extends Livewire component and adds datatable functionality to it
      *
+     * @param array $options
      * @return View
      */
     public function render(array $options = []): View
     {
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
-        if ($options['reloadFilters']) {
+        if (array_key_exists('applyFiltersFromQuery', $options)) {
             $this->reRenderFilters();
         }
         $this->initWithNonstandardColumns();
