@@ -107,7 +107,7 @@ trait WithSorting
     public function resetFilters(): void
     {
         OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
-        $this->reloadDatatable();
+        $this->semiReloadDatatable();
     }
 
 }

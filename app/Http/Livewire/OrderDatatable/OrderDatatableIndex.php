@@ -47,4 +47,9 @@ class OrderDatatableIndex extends Component
     {
         redirect()->route('orders.index');
     }
+
+    public function semiReloadDatatable(): void
+    {
+        $this->render();
+    }
 }
