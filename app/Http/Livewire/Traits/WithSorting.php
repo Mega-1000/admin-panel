@@ -102,6 +102,8 @@ trait WithSorting
                 $this->reRenderFilters(false);
             }
         }
+
+        $this->semiReloadDatatable();
     }
 
     public function resetFilters(): void
