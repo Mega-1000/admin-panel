@@ -50,19 +50,7 @@
             $tooltip_title .= '&#013;';
             $html = '';
 
-            if ($data) {
-                $html .= '<button class="btn btn-default btn-xs" onclick="filterByPhone(\'' . $data . '\')">F</button>';
-                $html .= '<button class="btn btn-default btn-xs" onclick="clearAndfilterByPhone(\'' . $data . '\')">OF</button>';
-            }
-
-            if ($data && strpos($data, '48') === 0) {
-                $data = substr($data, 2);
-            }
-
-            $html .= "<a style='width:100%' target='_blank' href='/admin/orders?nof=" . $data . "' class='btn btn-success'>NOF</a>";
-            $html .= '<p data-toggle="tooltip" data-html="true" title="' . $tooltip_title . '">' . $phone . '</p>';
-
-            echo $html;
+            echo $tooltip_title;
         @endphp
     </div>
 </div>
