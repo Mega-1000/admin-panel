@@ -38,7 +38,7 @@
                     id="choosen-label">
                 <option value="" selected="selected">@lang('orders.table.choose_label')</option>
                 @php
-                    $labelGroups = \App\Entities\LabelGroup::with('activeLabels')->all();
+                    $labelGroups = \App\Entities\LabelGroup::with('activeLabels')->get();
                     $groupedLabels = [];
 
                     foreach ($labelGroups as $labelGroup) {
