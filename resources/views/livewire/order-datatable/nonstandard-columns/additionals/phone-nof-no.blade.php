@@ -14,7 +14,7 @@
 
     <br>
 
-    <div id="tooltip-phone-info-{{ $column['id'] }}">
+    <div id="tooltip-phone-info-{{ $column['id'] }}" style="display: none">
         okej test
     </div>
 </div>

@@ -204,5 +204,10 @@
             const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
             phoneInformations.style.display = 'block';
         }
+
+        const hidePhoneInformations = (id) => {
+            const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
+            phoneInformations.style.display = 'none';
+        }
     </script>
 @endsection
