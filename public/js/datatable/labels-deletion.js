@@ -377,24 +377,24 @@ const labelActionMapping = {
     45: showSelectWarehouseTemplate,
 }
 
-const removeLabel = (labelId, orderId, labelId) => {
-    const action = labelActionMapping[labelId];
-    if (action) {
-        action($('#manual_label_selection_to_add_modal').modal('show'), orderId, labelId);
-        return;
-    }
-
-    swal.fire({
-        title: 'Jesteś pewien usuwania?',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: 'OK',
-    }).then(function (result) {
-        if (result.isConfirmed) {
-            Livewire.emit('removeLabel', labelId, orderId);
-        }
-    });
-}
+// const removeLabel = (labelId, orderId, labelId) => {
+//     const action = labelActionMapping[labelId];
+//     if (action) {
+//         action($('#manual_label_selection_to_add_modal').modal('show'), orderId, labelId);
+//         return;
+//     }
+//
+//     swal.fire({
+//         title: 'Jesteś pewien usuwania?',
+//         icon: 'info',
+//         showCancelButton: true,
+//         confirmButtonText: 'OK',
+//     }).then(function (result) {
+//         if (result.isConfirmed) {
+//             Livewire.emit('removeLabel', labelId, orderId);
+//         }
+//     });
+// }
 
 const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
     $.ajax({
