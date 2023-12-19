@@ -1,4 +1,4 @@
-function createSimilar(id, orderId) {
+const createSimilar = (id, orderId) => {
     if (window.isCreatingSimilar) {
         return;
     }
@@ -43,7 +43,7 @@ function createSimilar(id, orderId) {
 
 }
 
-function cancelPackage(id, orderId) {
+const cancelPackage = (id, orderId) => {
     if (confirm('Potwierdź anulację paczki')) {
         const url = `orderPackages/${id}/sendRequestForCancelled`;
         $.ajax({
@@ -56,7 +56,7 @@ function cancelPackage(id, orderId) {
     }
 }
 
-function deletePackage(id, orderId) {
+const deletePackage = (id, orderId) => {
     if (confirm('Potwierdź usunięcię paczki')) {
         const url = `/admin/orderPackages/${id}/`;
         $.ajax({
@@ -75,7 +75,7 @@ function deletePackage(id, orderId) {
     }
 }
 
-function sendPackage(id, orderId) {
+const sendPackage = (id, orderId) => {
     $('#package-' + id).attr("disabled", true);
     $('#order_courier > div > div > div.modal-header > h4 > span').remove();
     $('#order_courier > div > div > div.modal-header > span').remove();
