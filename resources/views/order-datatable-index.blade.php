@@ -49,7 +49,7 @@
         }
 
         #bs-select-1 {
-            width: 1000px !important;
+            width: 80vw !important;
         }
     </style>
     @livewireStyles
