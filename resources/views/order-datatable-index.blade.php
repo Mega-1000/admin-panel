@@ -48,6 +48,9 @@
             100% { transform: rotate(360deg); }
         }
 
+        #bs-select-1 {
+            width: 1000px !important;
+        }
     </style>
     @livewireStyles
 @endsection
