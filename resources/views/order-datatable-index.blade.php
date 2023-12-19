@@ -199,4 +199,10 @@
             labelPopup.style.display = 'none';
         }
     </script>
+    <script>
+        const showPhoneInformations = (id) => {
+            const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
+            phoneInformations.style.display = 'block';
+        }
+    </script>
 @endsection
