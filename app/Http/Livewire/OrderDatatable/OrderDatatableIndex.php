@@ -29,7 +29,7 @@ class OrderDatatableIndex extends Component
     public function render(array $options = []): View
     {
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
-
+dd($this->orders);
         $this->reRenderFilters(array_key_exists('applyFiltersFromQuery', $options));
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
