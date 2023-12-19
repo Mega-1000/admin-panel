@@ -35,6 +35,7 @@ class OrderDatatableIndex extends Component
                 $order['realId'] = $order['id'];
             }
         }
+        dd($this->orders);
 
         $this->reRenderFilters(array_key_exists('applyFiltersFromQuery', $options));
         $this->initWithNonstandardColumns();
