@@ -45,7 +45,7 @@
                         $groupedLabels[$labelGroup->name] = $labelGroup->activeLabels;
                     }
                 @endphp
-                @foreach($labelGroups as $groupName => $group)
+                @foreach($groupedLabels as $groupName => $group)
                     <optgroup label="{{ $groupName }}">
                         @foreach($group as $label)
                             <option value="{{ $label->id }}"
