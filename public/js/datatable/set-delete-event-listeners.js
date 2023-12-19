@@ -7,16 +7,16 @@ const setDeleteEventListeners = () => {
                 e.preventDefault();
                 const href = this.getAttribute('href');
 
-                // swal.fire({
-                //     title: 'Jesteś pewien usuwania?',
-                //     icon: 'info',
-                //     showCancelButton: true,
-                //     confirmButtonText: 'OK',
-                // }).then(function (result) {
-                //     if (result.isConfirmed) {
-                //         window.location.href = href;
-                //     }
-                // });
+                swal.fire({
+                    title: 'Jesteś pewien usuwania?',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'OK',
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        window.location.href = href;
+                    }
+                });
             });
         });
     }, 1000);
