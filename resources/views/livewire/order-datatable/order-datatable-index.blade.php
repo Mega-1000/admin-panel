@@ -37,10 +37,7 @@
             <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true"
                     id="choosen-label">
                 <option value="" selected="selected">@lang('orders.table.choose_label')</option>
-                @php
-                    $labelsGroup = \App\Entities\Label::all()->groupBy('group');
-                @endphp
-                @foreach($labelsGroup as $groupName => $group)
+                @foreach($labelGroups as $groupName => $group)
                     <optgroup label="{{ $groupName }}">
                         @foreach($group as $label)
                             <option value="{{ $label->id }}"
