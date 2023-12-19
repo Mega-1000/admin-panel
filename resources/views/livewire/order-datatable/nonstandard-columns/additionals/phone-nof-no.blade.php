@@ -2,7 +2,7 @@
     @php
     @endphp
     onmouseover="showPhoneInformations({{ $column['id'] }})"
-    onmouseout="hidePhoneInformations()"
+    onmouseout="hidePhoneInformations({{ $column['id'] }}"
 >
     <a class="btn btn-primary" href="?{{ $column['label'] }}={{ $data }}">
         NO
