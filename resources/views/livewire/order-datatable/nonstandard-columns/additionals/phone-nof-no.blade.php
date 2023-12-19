@@ -1,8 +1,8 @@
 <div
     @php
     @endphp
-    onmouseover="showPhoneInformations({{ $data['id'] }})"
-    onmouseout="hidePhoneInformations({{ $data['id'] }})"
+    onmouseover="showPhoneInformations({{ $wholeOrder['id'] }})"
+    onmouseout="hidePhoneInformations({{ $wholeOrder['id'] }})"
 >
     <a class="btn btn-primary" href="?{{ $column['label'] }}={{ $data }}">
         NO
@@ -14,7 +14,7 @@
 
     <br>
 
-    <div id="tooltip-phone-info-{{ $column['id'] }}" style="display: none">
+    <div id="tooltip-phone-info-{{ $wholeOrder['id'] }}" style="display: none">
         okej test
     </div>
 </div>
