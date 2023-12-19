@@ -36,6 +36,8 @@ class OrderDatatableIndex extends Component
             return $order;
         }, $this->orders);
 
+        dd($this->orders);
+
         $this->reRenderFilters(array_key_exists('applyFiltersFromQuery', $options));
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
