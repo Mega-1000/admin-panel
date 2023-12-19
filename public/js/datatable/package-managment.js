@@ -5,18 +5,18 @@ function createSimilar(id, orderId) {
 
     window.isCreatingSimilar = true;
 
-    setTimeout(() => {window.isCreatingSimilar = false}, 1000);
-    let action = "{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
+    setTimeout(() => {window.isCreatingSimilar = false}, 1000)
+    let action = `/admin/orderPackages/duplicate/${id}`
     action = action.replace('%id', id)
     $('#createSimilarPackForm').attr('action', action)
     $('#createSimilarPackForm').submit(function (e) {
         e.preventDefault();
 
         // Disable the submit button to prevent multiple submissions
-        var submitButton = $(this).find('button[type="submit"]');
+        const submitButton = $(this).find('button[type="submit"]');
         submitButton.prop('disabled', true);
 
-        var form = $(this);
+        const form = $(this);
 
         $.ajax({
             url: form.attr('action'),
@@ -45,9 +45,9 @@ function createSimilar(id, orderId) {
 
 function cancelPackage(id, orderId) {
     if (confirm('Potwierdź anulację paczki')) {
-        url = '{{route('order_packages.sendRequestForCancelled', ['orderPackage' => '%id'])}}';
+        const url = `orderPackages/${id}/sendRequestForCancelled`;
         $.ajax({
-            url: url.replace('%id', id),
+            url: url,
         }).done(function (data) {
             table.ajax.reload(null, false);
         }).fail(function () {
@@ -58,7 +58,7 @@ function cancelPackage(id, orderId) {
 
 function deletePackage(id, orderId) {
     if (confirm('Potwierdź usunięcię paczki')) {
-        url = '{{route('order_packages.destroy', ['id' => '%id'])}}';
+        const url = `/admin/orderPackages/${id}/`;
         $.ajax({
             url: url.replace('%id', id),
             type: 'delete',
