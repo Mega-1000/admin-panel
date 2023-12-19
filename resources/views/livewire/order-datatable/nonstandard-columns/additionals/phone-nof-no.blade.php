@@ -1,8 +1,8 @@
 <div
     @php
     @endphp
-    onmouseover="showPhoneInformations(this, '{{ $column['id'] }}')"
-    onmouseout="hidePhoneInformations(this)"
+    onmouseover="showPhoneInformations({{ $column['id'] }})"
+    onmouseout="hidePhoneInformations()"
 >
     <a class="btn btn-primary" href="?{{ $column['label'] }}={{ $data }}">
         NO
