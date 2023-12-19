@@ -31,7 +31,9 @@ class OrderDatatableIndex extends Component
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
         foreach ($this->orders as $order) {
-            $order['realId'] = $order['id'];
+            if (array_key_exists('id', $order)) {
+                $order['realId'] = $order['id'];
+            }
         }
 
         $this->reRenderFilters(array_key_exists('applyFiltersFromQuery', $options));
