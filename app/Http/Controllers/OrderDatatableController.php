@@ -23,7 +23,6 @@ class OrderDatatableController extends Controller
     public function __invoke(): View
     {
         $templateData = $this->orderPackagesDataHelper->getData();
-
         $labelGroups = $this->labelGroupRepository->get()->sortBy('order');
 
         return view('order-datatable-index', compact('templateData', 'labelGroups'));
