@@ -56,7 +56,7 @@
 @endsection
 
 @section('table')
-    <livewire:order-datatable.order-datatable-index :labelGroups="$labelGroups" />
+    <livewire:order-datatable.order-datatable-index />
 
     <div class="modal fade" tabindex="-1" id="manual_label_selection_to_add_modal" role="dialog">
         <div class="modal-dialog" style="width: 90%">
