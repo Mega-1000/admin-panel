@@ -230,7 +230,7 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
         modalBody.prepend(warehouseTemplate);
 
         $("#delivery_warehouse2").autocomplete({
-            source: available,
+            source: window.allWarehousesString,
             classes: {
                 'ui-autocomplete': 'z-index-max',
             },
