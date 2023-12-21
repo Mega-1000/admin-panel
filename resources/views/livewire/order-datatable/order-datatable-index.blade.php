@@ -201,7 +201,14 @@
                                 @if ($link['active'])
                                     <span>{{ $link['label'] }}</span>
                                 @else
-                                    <a href="{{ $link['url'] }}" class="btn">{!! $link['label'] !!}</a>
+                                    @php
+                                        dd($orders['links']);
+                                    @endphp
+                                    @php
+                                        $url =
+                                    @endphp
+
+                                    <a href="{{ $url }}" class="btn">{!! $link['label'] !!}</a>
                                 @endif
                             @endforeach
                         </div>

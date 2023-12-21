@@ -5,7 +5,7 @@
 <form action="/admin/orders/{{$order['id']}}" method="POST">
     @method('delete')
     @csrf
-    <button class="btn btn-danger btn-sm edit" id="delete">Usuń</button>
+    <button class="btn btn-danger btn-sm edit" id="O">Usuń</button>
 </form>
 
 <a href="/admin/orderReturn/' + {{ $order['id'] }} + '" class="btn btn-sm btn-danger edit">
