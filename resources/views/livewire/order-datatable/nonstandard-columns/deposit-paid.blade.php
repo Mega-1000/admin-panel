@@ -53,7 +53,7 @@
     }
 
     $bilans = $totalOfPayments - $totalOfReturns + $totalOfDeclaredPayments;
-    \App\Helpers\OrderBilansCalculator::calculateCBO(Order::find($order['id']));
+    $offerFinanceBilans = \App\Helpers\OrderBilansCalculator::calculateCBO(App\Entities\Order::find($order['id']));
 @endphp
 
 <p> Z: {{ round($totalOfPayments, 2) }} </p>
