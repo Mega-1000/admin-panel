@@ -34,9 +34,9 @@ trait WithSorting
         $this->columns = OrderDatatableRetrievingService::getColumnNames();
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
-        if ($applyFiltersFromQuery) {
-            $this->applyFiltersFromQuery();
-        }
+//        if ($applyFiltersFromQuery) {
+//            $this->applyFiltersFromQuery();
+//        }
     }
 
     /**
