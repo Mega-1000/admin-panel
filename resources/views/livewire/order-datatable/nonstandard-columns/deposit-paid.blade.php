@@ -53,7 +53,7 @@
     }
 
     $bilans = $totalOfPayments - $totalOfReturns + $totalOfDeclaredPayments;
-//    $offerFinanceBilans = $row['values_data']['sum_of_gross_values'] - $bilans + $returnedValue - $WPFZ - $kwonPayments;
+    \App\Helpers\OrderBilansCalculator::calculateCBO(Order::find($order['id']));
 @endphp
 
 <p> Z: {{ round($totalOfPayments, 2) }} </p>
@@ -62,7 +62,7 @@
 <p> ZT: {{ round($returnedValue, 2) }} </p>
 <p> WTON: {{ round($kwonPayments, 2) }} </p>
 <p> BIF: {{ round($bilans, 2) }} </p>
-{{--<p> CBO: {{ round($offerFinanceBilans, 2) }} </p>--}}
+<p> CBO: {{ round($offerFinanceBilans, 2) }} </p>
 <p> WPFZ: {{ round($WPFZ, 2) }} </p>
 
 @foreach ($settledDeclared as $amount)

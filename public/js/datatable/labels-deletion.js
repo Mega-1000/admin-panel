@@ -70,7 +70,7 @@ function removeTimedLabel(orderId, labelId) {
 
 
 function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, timed = null, skipTimed = true) {
-    if (timed == '1' && skipTimed) {
+    if (timed === '1' && skipTimed) {
         $('#timed_label_removal').modal('show');
         $('#time_label_removal_ok').on('click', () => {
             removeTimedLabel(orderId, labelId)
