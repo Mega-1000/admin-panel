@@ -2,7 +2,7 @@
     Edytuj
 </a>
 
-<form action="{{ route('orders.destroy', $order['id']) }}" method="POST">
+<form action="/admin/orders/{{$order['id']}}" method="POST">
     @method('delete')
     @csrf
     <button class="btn btn-danger btn-sm edit" id="delete">Usuń</button>
