@@ -4302,6 +4302,10 @@
                         showCancelButton: true,
                         confirmButtonText: 'OK',
                     }).then(function (result) {
+                        if (link.closest('form')) {
+                            link.closest('form').submit();
+                        }
+
                         if (result.isConfirmed) {
                             window.location.href = href;
                         }
