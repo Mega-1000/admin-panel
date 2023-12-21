@@ -202,9 +202,14 @@
                                     <span>{{ $link['label'] }}</span>
                                 @else
                                     @php
-                                        dd($orders['links']);
-                                    @endphp
-                                    @php
+                                        $url = '?page=' . $link['label'] . '&';
+                                        if ($link['label'] === 'Next &raquo;') {
+                                            $url = '?page=' . ($orders['current_page'] + 1) . '&';
+                                        }
+
+                                        if ($link['label'] === '&laquo; Previous') {
+                                            $url = '?page=' . ($orders['current_page'] - 1) . '&';
+                                        }
                                     @endphp
 
                                     <a href="{{ $url }}" class="btn">{!! $link['label'] !!}</a>
