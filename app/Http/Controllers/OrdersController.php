@@ -1572,6 +1572,9 @@ class OrdersController extends Controller
         if ($roleId != 1 && $roleId != 2) {
             abort(403, 'Nieautoryzowana akcja');
         }
+
+        dd('destroy handler');
+
         $order = $this->orderRepository->find($id);
         foreach ($order->packages as $package) {
             $package->delete();
