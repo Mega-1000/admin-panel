@@ -44,6 +44,7 @@ trait WithSorting
     /**
      * Update column order backend
      *
+     * @param bool $applyFromQuery
      * @return void
      */
     public function updatedFilters(bool $applyFromQuery = true): void
@@ -59,9 +60,9 @@ trait WithSorting
             }
 
             $column?->update(['filter' => $filter]);
-            if (is_array($filter) && $applyFromQuery) {
-                $this->updateNestedFilters($key, $filter);
-            }
+//            if (is_array($filter) && $applyFromQuery) {
+//                $this->updateNestedFilters($key, $filter);
+//            }
 
         }
     }
