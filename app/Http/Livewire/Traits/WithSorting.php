@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Traits;
 
 use App\OrderDatatableColumn;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
+use Livewire\Redirector;
 
 trait WithSorting
 {
@@ -34,9 +35,9 @@ trait WithSorting
         $this->columns = OrderDatatableRetrievingService::getColumnNames();
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
-//        if ($applyFiltersFromQuery) {
-//            $this->applyFiltersFromQuery();
-//        }
+        if (request()->query('applyFiltersFromQuery') === 'true') {
+            $this->applyFiltersFromQuery();
+        }
     }
 
     /**
@@ -90,7 +91,7 @@ trait WithSorting
     /**
      * @return void
      */
-    public function applyFiltersFromQuery(): void
+    public function applyFiltersFromQuery(): Redirector
     {
         $query = request()->query();
 
@@ -103,7 +104,7 @@ trait WithSorting
             }
         }
 
-        $this->semiReloadDatatable(['reloadFilters' => false]);
+        return redirect(request()->url() . '?applyFiltersFromQuery=true');
     }
 
     public function resetFilters(): void
