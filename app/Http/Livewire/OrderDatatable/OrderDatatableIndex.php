@@ -46,7 +46,7 @@ class OrderDatatableIndex extends Component
      */
     public function reloadDatatable(): void
     {
-        redirect()->route('orders.index');
+        redirect()->route('orders.index', ['applyFiltersFromQuery' => true]);
     }
 
     public function semiReloadDatatable(array $options = []): void

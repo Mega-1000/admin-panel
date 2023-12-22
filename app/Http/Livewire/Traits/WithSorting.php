@@ -92,7 +92,7 @@ trait WithSorting
     /**
      * @return Redirector
      */
-    public function applyFiltersFromQuery(): Redirector
+    public function applyFiltersFromQuery(): void
     {
         $query = request()->query();
 
@@ -105,7 +105,7 @@ trait WithSorting
             }
         }
 
-        return redirect(request()->url() . '?applyFiltersFromQuery=true');
+        $this->reloadDatatable();
     }
 
     public function resetFilters(): void
