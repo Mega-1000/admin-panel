@@ -35,7 +35,8 @@ trait WithSorting
         $this->columns = OrderDatatableRetrievingService::getColumnNames();
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
-        if (request()->query('applyFiltersFromQuery') === 'true') {
+
+        if (request()->query('applyFiltersFromQuery') != 'true') {
             $this->applyFiltersFromQuery();
         }
     }
@@ -89,7 +90,7 @@ trait WithSorting
 
 
     /**
-     * @return void
+     * @return Redirector
      */
     public function applyFiltersFromQuery(): Redirector
     {
