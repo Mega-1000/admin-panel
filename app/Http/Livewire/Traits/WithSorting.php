@@ -36,9 +36,9 @@ trait WithSorting
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
 
-//        if (request()->query('applyFiltersFromQuery') != 'true') {
-//            $this->applyFiltersFromQuery();
-//        }
+        if (request()->query('applyFiltersFromQuery') != 'true') {
+            $this->applyFiltersFromQuery();
+        }
     }
 
     /**
