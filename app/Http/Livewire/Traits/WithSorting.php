@@ -105,7 +105,7 @@ trait WithSorting
             }
         }
 
-        return dd(redirect(request()->url() . '?applyFiltersFromQuery=true'));
+        return redirect(request()->url() . '?applyFiltersFromQuery=true');
     }
 
     public function resetFilters(): void
