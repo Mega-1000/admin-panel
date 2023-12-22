@@ -46,7 +46,7 @@ trait WithSorting
      *
      * @return void
      */
-    public function updatedFilters(): void
+    public function updatedFilters(bool $applyFromQuery = true): void
     {
         foreach ($this->filters as $key => $filter) {
             $column = OrderDatatableColumn::where('label', $key)->first();
@@ -59,7 +59,7 @@ trait WithSorting
             }
 
             $column?->update(['filter' => $filter]);
-            if (is_array($filter)) {
+            if (is_array($filter) && $applyFromQuery) {
                 $this->updateNestedFilters($key, $filter);
             }
 
