@@ -94,7 +94,6 @@ trait WithSorting
      */
     public function applyFiltersFromQuery(): Redirector
     {
-        dd('applyFiltersFromQuery');
         $query = request()->query();
 
         foreach ($this->filters as $key => $filter) {
@@ -106,7 +105,7 @@ trait WithSorting
             }
         }
 
-        return redirect(request()->url() . '?applyFiltersFromQuery=true');
+        return dd(redirect(request()->url() . '?applyFiltersFromQuery=true'));
     }
 
     public function resetFilters(): void
