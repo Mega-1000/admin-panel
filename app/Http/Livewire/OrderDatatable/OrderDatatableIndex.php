@@ -18,7 +18,7 @@ class OrderDatatableIndex extends Component
 
     public array $orders;
     public bool $loading = false;
-    public $listeners = ['updateColumnOrderBackend', 'reloadDatatable'];
+    public $listeners = ['updateColumnOrderBackend', 'reloadDatatable', 'semiReloadDatatable'];
 
     /**
      * OrderDatatableIndex extends Livewire component and adds datatable functionality to it
