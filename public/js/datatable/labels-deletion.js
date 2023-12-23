@@ -59,7 +59,13 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
 }
 
 function removeTimedLabel(orderId, labelId) {
-    Livewire.emit('semiReloadDataTable');
+    $.ajax({
+        url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
+        method: "POST",
+        data: {time: $('#time_label_removal').val()}
+    }).done(function (res) {
+        Livewire.emit('semiReloadDataTable');
+    });
 }
 
 
