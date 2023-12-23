@@ -3,15 +3,19 @@
 namespace App\Services;
 
 use App\Entities\Order;
+use App\Helpers\OrderBilansCalculator;
+use App\Helpers\OrderDepositPaidCalculator;
 use App\Repositories\Orders;
 use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use Illuminate\Support\Facades\Auth;
 
-class OrderPaymentLabelsService
+readonly class OrderPaymentLabelsService
 {
     public function __construct(
-        protected Orders       $orderRepository,
-        protected LabelService $labelService,
+        protected Orders                     $orderRepository,
+        protected LabelService               $labelService,
+        protected OrderDepositPaidCalculator $orderDepositPaidCalculator,
     ) {}
 
     /**
@@ -61,6 +65,23 @@ class OrderPaymentLabelsService
             AddLabelService::addLabels($order, [
                 45, 68
             ], $arr, [], Auth::user()?->id);
+        }
+
+        $additional_service = $order->additional_service_cost ?? 0;
+        $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
+        $shipment_price_client = $order->shipment_price_for_client ?? 0;
+        $totalProductPrice = 0;
+
+        foreach ($order->items as $item) {
+            $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
+            $quantity = $item->quantity ?? 0;
+            $totalProductPrice += $price * $quantity;
+        }
+
+        $sumOfGrossValues = round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client);
+
+        if (round($this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order)['balance']) !== $sumOfGrossValues) {
+            RemoveLabelService::removeLabels($order, [39], $arr, [], Auth::user()?->id);
         }
     }
 }

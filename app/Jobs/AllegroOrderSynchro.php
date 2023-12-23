@@ -237,12 +237,12 @@ class AllegroOrderSynchro implements ShouldQueue
                 $orderAddressService->addressIsValid($orderDeliveryAddress);
                 $orderDeliveryAddressErrors = $orderAddressService->errors();
 
-                if ($orderDeliveryAddressErrors->any()) {
-
-                }
-
-                if (!Helper::phoneIsCorrect($orderDeliveryAddress?->phone ?? '')) {
-                }
+//                if ($orderDeliveryAddressErrors->any()) {
+//
+//                }
+//
+//                if (!Helper::phoneIsCorrect($orderDeliveryAddress?->phone ?? '')) {
+//                }
 
                 // order package
                 $this->addOrderPackage($order, $allegroOrder['delivery']);
@@ -318,6 +318,7 @@ class AllegroOrderSynchro implements ShouldQueue
         if (array_key_exists('delivery', $allegroOrder) && array_key_exists('address', $allegroOrder['delivery'] ?? []) && count($allegroOrder['delivery']['address'] ?? []) > 0) {
             return true;
         }
+
         return false;
     }
 
