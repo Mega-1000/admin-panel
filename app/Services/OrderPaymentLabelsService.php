@@ -80,6 +80,7 @@ readonly class OrderPaymentLabelsService
 
         $sumOfGrossValues = round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client);
 
+        dd(round($this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order)['balance']), $sumOfGrossValues, $order->payments->count());
         if (
             round($this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order)['balance']) == $sumOfGrossValues &&
             $order->payments->count() > 0
