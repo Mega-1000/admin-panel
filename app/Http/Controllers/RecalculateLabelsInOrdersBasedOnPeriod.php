@@ -16,7 +16,7 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
 
     public function __invoke(RecalculateLabelsInOrdersBasedOnPeriodRequest $request): RedirectResponse
     {
-        $orders = Order::query()->whereBetween('created_at', [Carbon::create($request->get('date-from')), Cabon::create($request->get('date-to'))])->get();
+        $orders = Order::query()->whereBetween('created_at', [Carbon::create($request->get('date-from')), Carbon::create($request->get('date-to'))])->get();
 dd($orders);
         foreach ($orders as $order) {
             $this->orderPaymentLabelsService->calculateLabels($order);
