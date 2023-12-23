@@ -24,8 +24,8 @@ class RecalculateLabelsInOrdersBasedOnPeriodRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date-from' => 'required|date',
-            'date-to' => 'required|date',
+            'time-from' => 'required|date',
+            'time-to' => 'required|date',
         ];
     }
 }

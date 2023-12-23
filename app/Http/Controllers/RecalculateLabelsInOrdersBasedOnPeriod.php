@@ -6,7 +6,6 @@ use App\Entities\Order;
 use App\Http\Requests\RecalculateLabelsInOrdersBasedOnPeriodRequest;
 use App\Services\OrderPaymentLabelsService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
 {
@@ -18,7 +17,6 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
     {
         $orders = Order::query()->whereBetween('created_at', [$request->get('date-from'), $request->get('date-to')])->get();
 
-        dd($orders);
         foreach ($orders as $order) {
             $this->orderPaymentLabelsService->calculateLabels($order);
         }
