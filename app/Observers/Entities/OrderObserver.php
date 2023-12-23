@@ -87,7 +87,6 @@ readonly class OrderObserver
 
     public function updated(Order $order): void
     {
-
         if (count($order->payments)) {
             if ($order->isPaymentRegulated()) {
                 dispatch(new DispatchLabelEventByNameJob($order, "payment-equal-to-order-value"));
