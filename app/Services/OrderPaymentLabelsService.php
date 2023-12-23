@@ -31,6 +31,8 @@ readonly class OrderPaymentLabelsService
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
         $orderReturnGoods = round($this->orderRepository->getOrderReturnGoods($order), 2);
 
+        $arr = [];
+
         if ($calculateRelated) {
             foreach ($this->orderRepository->getAllRelatedOrders($order) as $relatedOrder) {
                 $this->calculateLabels($relatedOrder, false);
@@ -59,7 +61,6 @@ readonly class OrderPaymentLabelsService
         }
 
         $relatedPaymentsValue -= $orderReturnGoods;
-        $arr = [];
 
         if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
             $this->labelService->removeLabel($order->id, [134]);
