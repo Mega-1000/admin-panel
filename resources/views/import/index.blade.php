@@ -233,7 +233,9 @@
                 <div class="panel-body">
                     <form action="{{ route('recalculate-labels-in-orders-based-on-period') }}" method="post">
                         @csrf
+                        Data od
                         <input type="date" class="form-control" name="time-from">
+                        Data do
                         <input type="date" class="form-control" name="time-to">
 
                         <button type="submit" class="btn btn-primary">
