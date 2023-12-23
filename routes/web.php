@@ -33,6 +33,7 @@ use App\Http\Controllers\PackageProductOrderController;
 use App\Http\Controllers\ProductPacketController;
 use App\Http\Controllers\ProductStockLogsController;
 use App\Http\Controllers\ProductStocksController;
+use App\Http\Controllers\RecalculateLabelsInOrdersBasedOnPeriod;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
@@ -760,6 +761,8 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::get('orderDatatable', OrderDatatableController::class)->name('orders.index');
     Route::get('orderDatatableColumnsFiltering', [OrderDatatableColumnsManagementController::class, 'index'])->name('orderDatatableColumnsFiltering');
+
+    Route::post('recalculate-labels-in-orders-based-on-period', RecalculateLabelsInOrdersBasedOnPeriod::class)->name('recalculate-labels-in-orders-based-on-period');
 });
 
 
