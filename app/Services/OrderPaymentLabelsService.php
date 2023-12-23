@@ -37,35 +37,6 @@ readonly class OrderPaymentLabelsService
             }
         }
 
-        $relatedPaymentsValue -= $orderReturnGoods;
-        $arr = [];
-
-//        if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
-//            $this->labelService->removeLabel($order->id, [134]);
-//            return;
-//        }
-//
-//        if (round($relatedOrdersValue, 2) == round($relatedPaymentsValue, 2)) {
-//            $this->labelService->removeLabel($order->id, [134]);
-//            AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
-//
-//            return;
-//        }
-        $this->labelService->removeLabel($order->id, [133]);
-        AddLabelService::addLabels($order, [134], $arr, [], Auth::user()?->id);
-
-
-        $labels = $order->labels()->get()->pluck('id')->toArray();
-
-        $labelsToCheck = [52, 53, 54, 114, 47, 48, 96, 149, 49, 50, 195, 121];
-
-        $labelsToCheck = array_diff($labelsToCheck, $labels);
-
-        if (count($labelsToCheck) === 12) {
-            AddLabelService::addLabels($order, [
-                45, 68
-            ], $arr, [], Auth::user()?->id);
-        }
 
         $additional_service = $order->additional_service_cost ?? 0;
         $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
@@ -80,12 +51,41 @@ readonly class OrderPaymentLabelsService
 
         $sumOfGrossValues = round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client);
 
-        dd(round($this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order)['balance']), $sumOfGrossValues, $order->payments->count());
         if (
             round($this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order)['balance']) == $sumOfGrossValues &&
             $order->payments->count() > 0
         ) {
             RemoveLabelService::removeLabels($order, [39], $arr, [], Auth::user()?->id);
+        }
+
+        $relatedPaymentsValue -= $orderReturnGoods;
+        $arr = [];
+
+        if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
+            $this->labelService->removeLabel($order->id, [134]);
+            return;
+        }
+
+        if (round($relatedOrdersValue, 2) == round($relatedPaymentsValue, 2)) {
+            $this->labelService->removeLabel($order->id, [134]);
+            AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
+
+            return;
+        }
+        $this->labelService->removeLabel($order->id, [133]);
+        AddLabelService::addLabels($order, [134], $arr, [], Auth::user()?->id);
+
+
+        $labels = $order->labels()->get()->pluck('id')->toArray();
+
+        $labelsToCheck = [52, 53, 54, 114, 47, 48, 96, 149, 49, 50, 195, 121];
+
+        $labelsToCheck = array_diff($labelsToCheck, $labels);
+
+        if (count($labelsToCheck) === 12) {
+            AddLabelService::addLabels($order, [
+                45, 68
+            ], $arr, [], Auth::user()?->id);
         }
     }
 }
