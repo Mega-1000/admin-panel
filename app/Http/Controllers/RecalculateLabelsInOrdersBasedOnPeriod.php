@@ -18,6 +18,7 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
     {
         $orders = Order::query()->whereBetween('created_at', [$request->get('date-from'), $request->get('date-to')])->get();
 
+        dd($orders);
         foreach ($orders as $order) {
             $this->orderPaymentLabelsService->calculateLabels($order);
         }
