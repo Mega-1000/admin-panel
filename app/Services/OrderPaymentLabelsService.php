@@ -40,17 +40,17 @@ readonly class OrderPaymentLabelsService
         $relatedPaymentsValue -= $orderReturnGoods;
         $arr = [];
 
-        if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
-            $this->labelService->removeLabel($order->id, [134]);
-            return;
-        }
-
-        if (round($relatedOrdersValue, 2) == round($relatedPaymentsValue, 2)) {
-            $this->labelService->removeLabel($order->id, [134]);
-            AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
-
-            return;
-        }
+//        if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
+//            $this->labelService->removeLabel($order->id, [134]);
+//            return;
+//        }
+//
+//        if (round($relatedOrdersValue, 2) == round($relatedPaymentsValue, 2)) {
+//            $this->labelService->removeLabel($order->id, [134]);
+//            AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
+//
+//            return;
+//        }
         $this->labelService->removeLabel($order->id, [133]);
         AddLabelService::addLabels($order, [134], $arr, [], Auth::user()?->id);
 
