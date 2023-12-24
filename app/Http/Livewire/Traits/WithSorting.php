@@ -113,5 +113,4 @@ trait WithSorting
         OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
         $this->semiReloadDatatable();
     }
-
 }
