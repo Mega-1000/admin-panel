@@ -20,7 +20,9 @@ class OrderDatatableRetrievingService
     /**
      * Fetch orders for datatable for current user save it in $orders property witch is static
      *
-     * @return void
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function fetchOrders(): array
     {
@@ -37,7 +39,8 @@ class OrderDatatableRetrievingService
             'packages.realCostsForCompany',
             'warehouse',
             'chat.messages',
-            'task.user'
+            'task.user',
+            'task.taskTime'
         ]);
 
 

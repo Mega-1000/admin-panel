@@ -55,42 +55,42 @@ class Task extends Model implements Transformable
         });
     }
 
-    public function warehouse() :BelongsTo
+    public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
     }
 
-    public function user() :BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function order() :BelongsTo
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function taskSalaryDetail() :HasOne
+    public function taskSalaryDetail(): HasOne
     {
         return $this->hasOne(TaskSalaryDetails::class);
     }
 
-    public function taskTime() :HasOne
+    public function taskTime(): HasOne
     {
         return $this->hasOne(TaskTime::class);
     }
 
-    public function reportProperty() :HasMany
+    public function reportProperty(): HasMany
     {
         return $this->hasMany(ReportProperty::class);
     }
 
-    public function childs() :HasMany
+    public function childs(): HasMany
     {
         return $this->hasMany(Task::class, 'parent_id', 'id');
     }
 
-    public function parent() :HasMany
+    public function parent(): HasMany
     {
         return $this->hasMany(Task::class, 'id', 'parent_id');
     }
