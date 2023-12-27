@@ -23,7 +23,6 @@ trait WithGeneralFilters
      */
     public function initWithGeneralFilters(): void
     {
-        $this->listeners[] = 'updateOrderPackageFilterNumber';
         $this->orderPackageFilterNumber = json_decode(auth()->user()->grid_settings)->order_package_filter_number ?? '';
     }
 
