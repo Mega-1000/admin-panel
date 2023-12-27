@@ -156,6 +156,7 @@
                             <div onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}">
                                 <input
                                     type="text"
+                                    wire:change="updateFilters"
                                     wire:model.debounce.500ms="filters.{{ $column['label'] }}"
                                     placeholder="Search {{ $column['label'] }}"
                                     class="w-full text-sm"

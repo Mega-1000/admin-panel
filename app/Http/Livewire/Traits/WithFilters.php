@@ -47,7 +47,7 @@ trait WithFilters
      * @param bool $applyFromQuery
      * @return void
      */
-    public function updatedFilters(bool $applyFromQuery = true): void
+    public function updateFilters(bool $applyFromQuery = true): void
     {
         dd('filters updated');
         foreach ($this->filters as $key => $filter) {
