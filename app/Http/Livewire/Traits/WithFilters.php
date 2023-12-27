@@ -41,6 +41,11 @@ trait WithFilters
         }
     }
 
+    public function updatedFilters(): void
+    {
+        $this->skipRender();
+    }
+
     /**
      * Update column order backend
      *
@@ -49,7 +54,6 @@ trait WithFilters
      */
     public function updateFilters(bool $applyFromQuery = true): void
     {
-        dd('filters updated');
         foreach ($this->filters as $key => $filter) {
             $column = OrderDatatableColumn::where('label', $key)->first();
 
