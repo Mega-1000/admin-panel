@@ -43,6 +43,8 @@ trait WithChecking
      */
     public function addLabelsForCheckedOrders(int $labelId): void
     {
+
+        dd($labelId, $this->checked);
         $arr = [];
         foreach ($this->checked as $id) {
             AddLabelService::addLabels(Order::find($id), [$labelId], $arr, []);
