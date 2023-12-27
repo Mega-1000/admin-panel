@@ -1,1 +1,5 @@
-{{ $order['task']['production_date'] ?? '' }} {{ $order['task']['user']['firstname'] ?? '' }} {{ $order['task']['user']['lastname'] ?? '' }}
+{{ $order['production_date'] ?? '' }}
+
+{{ $order['task']['user']['firstname'] ?? '' }}
+
+{{ $order['task']['user']['lastname'] ?? '' }}
