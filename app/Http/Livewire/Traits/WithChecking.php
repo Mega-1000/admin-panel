@@ -35,6 +35,8 @@ trait WithChecking
         $this->allChecked = true;
 
         $this->checked = collect($this->orders['data'])->pluck('id')->toArray();
+
+        dd($this->checked);
     }
 
     /**
