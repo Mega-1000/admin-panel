@@ -34,9 +34,17 @@ trait WithChecking
     {
         $this->allChecked = true;
 
-        $this->checked = collect($this->orders['data'])->pluck('id')->toArray();
+        $ids = collect($this->orders['data'])->pluck('id')->toArray();
 
-        dd($this->checked);
+        foreach ($ids as &$id) {
+            $pattern = '/taskOrder-(\d+)/';
+
+            if (preg_match($pattern, $id, $matches)) {
+                $id = $matches[1];
+            }
+        }
+
+        $this->checked = $ids;
     }
 
     /**
