@@ -23,6 +23,8 @@ trait WithChecking
     public function checkOrder(int $id): void
     {
         $this->checked[] = $id;
+
+        $this->skipRender();
     }
 
     /**
