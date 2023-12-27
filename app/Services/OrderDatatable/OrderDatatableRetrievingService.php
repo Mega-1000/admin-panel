@@ -40,7 +40,7 @@ class OrderDatatableRetrievingService
             'warehouse',
             'chat.messages',
             'task.user',
-            'task.taskTime'
+            'task.taskTime',
         ]);
 
 
