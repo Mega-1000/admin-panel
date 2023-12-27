@@ -21,7 +21,6 @@
             </a>
 
             <input
-                wire:change="updateOrderPackageFilterNumber"
                 wire:model.debounce.500ms="orderPackageFilterNumber"
                 class="form-control"
                 placeholder="Filtruj po numerze paczki"
