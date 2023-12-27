@@ -5,7 +5,7 @@ namespace App\Http\Livewire\OrderDatatable;
 use App\Http\Livewire\Traits\WithChecking;
 use App\Http\Livewire\Traits\WithGeneralFilters;
 use App\Http\Livewire\Traits\WithNonStandardColumnsSorting;
-use App\Http\Livewire\Traits\WithSorting;
+use App\Http\Livewire\Traits\WithFilters;
 use App\Http\Livewire\Traits\WithNonstandardColumns;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use App\Livewire\Traits\OrderDatatable\WithPageLengthManagement;
@@ -14,7 +14,7 @@ use Livewire\Component;
 
 class OrderDatatableIndex extends Component
 {
-    use WithSorting, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting, WithGeneralFilters, WithChecking;
+    use WithFilters, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting, WithGeneralFilters, WithChecking;
 
     public array $orders;
     public bool $loading = false;

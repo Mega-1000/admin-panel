@@ -6,7 +6,7 @@ use App\OrderDatatableColumn;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use Livewire\Redirector;
 
-trait WithSorting
+trait WithFilters
 {
     /**
      * Columns for datatable
@@ -49,6 +49,7 @@ trait WithSorting
      */
     public function updatedFilters(bool $applyFromQuery = true): void
     {
+        dd('filters updated');
         foreach ($this->filters as $key => $filter) {
             $column = OrderDatatableColumn::where('label', $key)->first();
 

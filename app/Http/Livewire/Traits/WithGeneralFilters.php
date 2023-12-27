@@ -31,7 +31,7 @@ trait WithGeneralFilters
      *
      * @return void
      */
-    public function updateeeOrderPackageFilterNumber(): void
+    public function updateOrderPackageFilterNumber(): void
     {
         auth()->user()->update(
             ['grid_settings' => json_encode([
