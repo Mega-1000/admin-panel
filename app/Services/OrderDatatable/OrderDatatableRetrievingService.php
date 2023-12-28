@@ -62,7 +62,7 @@ class OrderDatatableRetrievingService
             $q = $nonStandardColumnFilterClass->applyFilter($q, $columnName);
         }
 
-        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && $data->order_package_filter_number ?? 10) {
+        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && property_exists($data, 'order_package_filter_number') && $data->order_package_filter_number) {
             $q->whereHas('packages', function (Builder $query) use ($data) {
                 $query->where('letter_number', 'like', '%' . $data->order_package_filter_number. '%');
             });
