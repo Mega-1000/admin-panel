@@ -19,6 +19,7 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
         $period = Carbon::parse($request->get('time-from'))->toPeriod(Carbon::parse($request->get('time-to')));
 
         $orders = Order::query()->whereBetween('created_at', $period)->get();
+        dd($orders);
         foreach ($orders as $order) {
             $this->orderPaymentLabelsService->calculateLabels($order);
         }
