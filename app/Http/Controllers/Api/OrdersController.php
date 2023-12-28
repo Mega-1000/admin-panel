@@ -938,7 +938,6 @@ class OrdersController extends Controller
 
         $labelId = match ($request->invoice_day) {
             'standard' => Label::ORDER_RECEIVED_INVOICE_STANDARD,
-            'today' => Label::ORDER_RECEIVED_INVOICE_TODAY,
             default => 0,
         };
         if ($labelId > 0) {
