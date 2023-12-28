@@ -45,6 +45,8 @@ trait WithChecking
         }
 
         $this->checked = $ids;
+
+        $this->skipRender();
     }
 
     /**
