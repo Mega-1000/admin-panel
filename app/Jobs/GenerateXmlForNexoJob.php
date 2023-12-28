@@ -205,7 +205,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
      */
     private function getOrderInvoiceDate(Order $order): string
     {
-        $now = Carbon::now();
         $preferredInvoiceDate = new Carbon($order->preferred_invoice_date);
 
         return $preferredInvoiceDate->toDateTimeLocalString();
