@@ -64,7 +64,7 @@ trait WithGeneralFilters
         auth()->user()->update(
             ['grid_settings' => json_encode([
                 $key => $value,
-            ])]
+            ] + json_decode(auth()->user()->grid_settings, true))]
         );
     }
 }
