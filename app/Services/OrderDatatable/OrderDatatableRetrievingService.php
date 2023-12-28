@@ -49,10 +49,6 @@ class OrderDatatableRetrievingService
             return !in_array($column->label, array_keys(OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES));
         });
 
-        $labelStringFilterMappingArray = [
-            'id' => ['-']
-        ];
-
         foreach ($columns as $column) {
             if (!$this->isNestedFilter($column)) {
                 $q->where($column->label, 'like', '%' . $column->filter . '%');
@@ -65,7 +61,7 @@ class OrderDatatableRetrievingService
         foreach (OrderDatatableNonstandardFiltersHelper::composeClasses() as $columnName => $nonStandardColumnFilterClass) {
             $q = $nonStandardColumnFilterClass->applyFilter($q, $columnName);
         }
-
+        dd(json_decode(auth()->user()->grid_settings));
         if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && $data->order_package_filter_number) {
             $q->whereHas('packages', function (Builder $query) use ($data) {
                 $query->where('letter_number', 'like', '%' . $data->order_package_filter_number. '%');
