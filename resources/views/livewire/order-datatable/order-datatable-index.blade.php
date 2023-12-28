@@ -27,6 +27,10 @@
                 placeholder="Filtruj po numerze paczki"
             >
 
+            <button class="btn btn-primary" wire:click="updateIsSortingByPreferredInvoiceDate">
+                Filtruj po preferowanych datach wystawienia faktury
+            </button>
+
             <div class="form-group">
                 <label for="fs_generator">Generator faktur sprzedaży </label>
                 <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>

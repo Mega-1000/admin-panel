@@ -15,6 +15,7 @@ use Livewire\Component;
 trait WithGeneralFilters
 {
     public string $orderPackageFilterNumber = '';
+    public bool $isSortingByPreferredInvoiceDate = false;
 
     /**
      * Initialize general filters trait for Livewire component
@@ -24,6 +25,7 @@ trait WithGeneralFilters
     public function initWithGeneralFilters(): void
     {
         $this->orderPackageFilterNumber = json_decode(auth()->user()->grid_settings)->order_package_filter_number ?? '';
+        $this->isSortingByPreferredInvoiceDate = json_decode(auth()->user()->grid_settings)->is_sorting_by_preferred_invoice_date ?? false;
     }
 
     /**
@@ -33,13 +35,36 @@ trait WithGeneralFilters
      */
     public function updateOrderPackageFilterNumber(): void
     {
-        auth()->user()->update(
-            ['grid_settings' => json_encode([
-                'order_package_filter_number' => $this->orderPackageFilterNumber,
-            ])]
-        );
+        $this->updateGridSettings('order_package_filter_number', $this->orderPackageFilterNumber);
 
         $this->reloadDatatable();
+    }
 
+    /**
+     * Update is sorting by preferred invoice date
+     *
+     * @return void
+     */
+    public function updateIsSortingByPreferredInvoiceDate(): void
+    {
+        $this->updateGridSettings('is_sorting_by_preferred_invoice_date', !$this->isSortingByPreferredInvoiceDate);
+
+        $this->reloadDatatable();
+    }
+
+    /**
+     * Update grid settings in user model based on authenticated user
+     *
+     * @param string $key
+     * @param string $value
+     * @return void
+     */
+    private function updateGridSettings(string $key, string $value): void
+    {
+        auth()->user()->update(
+            ['grid_settings' => json_encode([
+                $key => $value,
+            ])]
+        );
     }
 }
