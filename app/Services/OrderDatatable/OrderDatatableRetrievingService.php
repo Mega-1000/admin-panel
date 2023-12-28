@@ -51,6 +51,11 @@ class OrderDatatableRetrievingService
 
         foreach ($columns as $column) {
             if (!$this->isNestedFilter($column)) {
+                if ($column->label === 'customer.addresses.0.phone') {
+                    $column->filter = str_replace(' ', '', $column->filter);
+                    $column->filter = str_replace('-', '', $column->filter);
+                }
+
                 $q->where($column->label, 'like', '%' . $column->filter . '%');
                 continue;
             }
@@ -82,6 +87,8 @@ class OrderDatatableRetrievingService
         } catch (QueryException $e) {
             try {
                 self::$orders = $q->paginate(10)->toArray();
+
+                return self::$orders;
             } catch (QueryException $e) {
                 OrderDatatableColumn::all()->each(fn($column) => $column->delete());
                 self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
@@ -93,6 +100,8 @@ class OrderDatatableRetrievingService
      * Get orders for datatable for current user
      *
      * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function getOrders(): array
     {
