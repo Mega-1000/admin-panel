@@ -25,9 +25,9 @@ class AddLabelService
      */
     public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId = null, ?Carbon $time = null): void
     {
-        if (in_array(195, $labelIdsToAdd)) {
-            throw new Exception('Label 195 is deprecated');
-        }
+//        if (in_array(195, $labelIdsToAdd)) {
+//            throw new Exception('Label 195 is deprecated');
+//        }
 
         $now = Carbon::now();
 
