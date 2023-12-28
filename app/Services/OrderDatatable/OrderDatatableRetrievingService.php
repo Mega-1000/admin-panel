@@ -68,6 +68,11 @@ class OrderDatatableRetrievingService
             });
         }
 
+        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && property_exists($data, 'is_sorting_by_preferred_invoice_date') && $data->is_sorting_by_preferred_invoice_date) {
+            $q->where('preferred_invoice_date', '!=', null);
+            $q->orderBy('preferred_invoice_date', 'desc');
+        }
+
         try {
             self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
 
