@@ -12,6 +12,7 @@ use App\Entities\WorkingEvents;
 use App\Services\AllegroPaymentsReturnService;
 use App\Services\WorkingEventsService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\TimedLabelJob;
 use App\Services\EmailSendingService;
@@ -19,10 +20,13 @@ use App\Entities\EmailSetting;
 
 class AddLabelService
 {
+    /**
+     * @throws Exception
+     */
     public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId = null, ?Carbon $time = null): void
     {
         if (in_array(195, $labelIdsToAdd)) {
-            throw new \Exception('Label 195 is deprecated');
+            throw new Exception('Label 195 is deprecated');
         }
 
         $now = Carbon::now();
