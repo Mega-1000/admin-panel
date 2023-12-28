@@ -207,11 +207,8 @@ class GenerateXmlForNexoJob implements ShouldQueue
     {
         $now = Carbon::now();
         $preferredInvoiceDate = new Carbon($order->preferred_invoice_date);
-        if ($now->isSameMonth($preferredInvoiceDate)) {
-            return $now->toDateString();
-        } else {
-            return $preferredInvoiceDate->lastOfMonth()->toDateTimeLocalString();
-        }
+
+        return $preferredInvoiceDate->toDateTimeLocalString();
     }
 
     /**
