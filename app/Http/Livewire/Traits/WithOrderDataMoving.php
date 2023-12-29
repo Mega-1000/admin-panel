@@ -14,6 +14,8 @@ trait WithOrderDataMoving
     public function setOrderToMove(int $id): void
     {
         $this->idOfOrderToMove = $id;
+
+        $this->skipRender();
     }
 
     /**
