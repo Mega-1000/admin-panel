@@ -8,13 +8,13 @@
     <button class="btn btn-danger btn-sm edit" id="O">Usuń</button>
 </form>
 
-<a href="/admin/orderReturn/' + {{ $order['id'] }} + '" class="btn btn-sm btn-danger edit">
+<a href="/admin/orderReturn/{{ $order['id'] }}" class="btn btn-sm btn-danger edit">
     <i class="glyphicon glyphicon-share-alt"></i>
     <span class="hidden-xs hidden-sm">Zwrot</span>
 </a>
 
 
-<a href="/admin/allegro/return-payment/' + {{ $order['id'] }} + '" class="btn btn-sm btn-danger edit">
+<a href="/admin/allegro/return-payment/{{ $order['id'] }}" class="btn btn-sm btn-danger edit">
     <i class="glyphicon glyphicon-share-alt"></i>
     <span class="hidden-xs hidden-sm">Zwrot Allegro</span>
 </a>
@@ -29,6 +29,6 @@
 <a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>
 
 @if ($order['is_buying_admin_side'])
-    <a class="btn btn-primary" href="/admin/accept-products/${id}" target="__blank">Przyjmij na stany magazynowe</a>
+    <a class="btn btn-primary" href="/admin/accept-products/{{ $order['id'] }}" target="__blank">Przyjmij na stany magazynowe</a>
 @endif
 
