@@ -210,11 +210,5 @@
             phoneInformations.style.display = 'none';
         }
     </script>
-
-    @if($this->shouldReload)
-        <script>
-            alert('Zamówienie zostało zaktualizowane');
-            window.location.reload();
-        </script>
-    @endif
 @endsection
+<script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>

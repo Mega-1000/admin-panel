@@ -227,4 +227,10 @@
     </table>
 </div>
 
-<script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>
+@if($this->shouldReload)
+    <script>
+        alert('Zamówienie zostało zaktualizowane');
+        window.location.reload();
+    </script>
+@endif
+
