@@ -11,6 +11,7 @@ use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use App\Livewire\Traits\OrderDatatable\WithPageLengthManagement;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\Redirector;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -45,12 +46,11 @@ class OrderDatatableIndex extends Component
     /**
      * Listener for event from frontend or child components
      *
-     * @return void
+     * @return mixed
      */
-    public function reloadDatatable(): void
+    public function reloadDatatable(): mixed
     {
-        dd('reloadDatatyable');
-        redirect()->route('orders.index', ['applyFiltersFromQuery' => true]);
+        return redirect()->route('orders.index', ['applyFiltersFromQuery' => true]);
     }
 
     public function semiReloadDatatable(array $options = []): void

@@ -26,9 +26,9 @@ trait WithFilters
      * Re render filters uses class state to re render filters
      *
      * @param bool $applyFiltersFromQuery
-     * @return void
+     * @return void|Redirector
      */
-    public function reRenderFilters(bool $applyFiltersFromQuery = true): void
+    public function reRenderFilters(bool $applyFiltersFromQuery = true): mixed
     {
         $this->listeners[] = 'resetFilters';
 
@@ -37,7 +37,7 @@ trait WithFilters
 
 
         if (request()->query('applyFiltersFromQuery') != 'true' && $applyFiltersFromQuery) {
-            $this->applyFiltersFromQuery();
+            return $this->applyFiltersFromQuery();
         }
     }
 
@@ -95,9 +95,9 @@ trait WithFilters
 
 
     /**
-     * @return void
+     * @return Redirector
      */
-    public function applyFiltersFromQuery(): void
+    public function applyFiltersFromQuery(): mixed
     {
         $query = request()->query();
 
@@ -110,7 +110,7 @@ trait WithFilters
             }
         }
 
-        $this->reloadDatatable();
+        return $this->reloadDatatable();
     }
 
     public function resetFilters(): void
