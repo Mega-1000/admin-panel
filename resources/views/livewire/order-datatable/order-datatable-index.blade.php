@@ -227,7 +227,7 @@
     </table>
 </div>
 
-@if($this->shouldReload)
+@if($this->shouldRedirect)
     <script>
         alert('Zamówienie zostało zaktualizowane');
         window.location.reload();
