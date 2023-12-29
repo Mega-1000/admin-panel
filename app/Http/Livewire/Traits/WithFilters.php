@@ -4,6 +4,8 @@ namespace App\Http\Livewire\Traits;
 
 use App\OrderDatatableColumn;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Livewire\Redirector;
 
 trait WithFilters
@@ -97,7 +99,7 @@ trait WithFilters
 
 
     /**
-     * @return void
+     * @return Application|RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function applyFiltersFromQuery()
     {
@@ -114,7 +116,7 @@ trait WithFilters
 
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
-        return $this->redirect(route('orders.index', ['applyFiltersFromQuery' => false]));
+        return redirect(route('orders.index', ['applyFiltersFromQuery' => false]));
     }
 
     public function resetFilters(): void
