@@ -39,6 +39,8 @@ trait WithFilters
         if (request()->query('applyFiltersFromQuery') != 'true' && $applyFiltersFromQuery) {
             return $this->applyFiltersFromQuery();
         }
+
+        return null;
     }
 
     public function updatedFilters(): void
