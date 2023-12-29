@@ -38,6 +38,7 @@ class OrderDatatableIndex extends Component
         $redirectInstance = $this->reRenderFilters();
         if (!is_null($redirectInstance)) {
             return $redirectInstance;
+            dd('oikej');
         }
 
 

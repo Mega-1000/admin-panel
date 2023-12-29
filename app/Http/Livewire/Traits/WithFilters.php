@@ -114,7 +114,6 @@ trait WithFilters
 
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
-        return null;
         return $this->redirect(route('orders.index', ['applyFiltersFromQuery' => false]));
     }
 
