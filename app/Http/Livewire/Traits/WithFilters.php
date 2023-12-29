@@ -111,6 +111,10 @@ trait WithFilters
         }
 
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
+
+        sleep(2);
+
+        $this->redirect(route('orders.index', ['applyFiltersFromQuery' => false]));
     }
 
     public function resetFilters(): void
