@@ -110,7 +110,7 @@ trait WithFilters
             }
         }
 
-        $this->emit('reloadDatatable');
+        $this->orders = (new OrderDatatableRetrievingService())->getOrders();
     }
 
     public function resetFilters(): void
