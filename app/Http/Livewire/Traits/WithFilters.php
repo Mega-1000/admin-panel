@@ -114,8 +114,6 @@ trait WithFilters
             }
         }
 
-        $this->orders = (new OrderDatatableRetrievingService())->getOrders();
-
         return 'okej';
     }
 
