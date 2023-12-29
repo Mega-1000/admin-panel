@@ -211,7 +211,7 @@
         }
     </script>
 
-    @if($shouldReload)
+    @if($this->shouldReload)
         <script>
             alert('Zamówienie zostało zaktualizowane');
             window.location.reload();
