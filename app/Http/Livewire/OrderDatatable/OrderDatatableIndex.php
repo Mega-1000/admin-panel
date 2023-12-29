@@ -22,6 +22,7 @@ class OrderDatatableIndex extends Component
     public array $orders;
     public bool $loading = false;
     public $listeners = ['updateColumnOrderBackend', 'reloadDatatable', 'semiReloadDatatable'];
+    public bool $shouldRedirect = false;
 
     /**
      * OrderDatatableIndex extends Livewire component and adds datatable functionality to it
@@ -35,13 +36,16 @@ class OrderDatatableIndex extends Component
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
         $redirectInstance = $this->reRenderFilters();
+        if (!is_null($redirectInstance)) {
+            $this->shouldRedirect = true;
+        }
 
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
         $this->initWithGeneralFilters();
         $this->initWithChecking();
 
-        return view('livewire.order-datatable.order-datatable-index', ['shouldReload' => !is_null($redirectInstance)]);
+        return view('livewire.order-datatable.order-datatable-index');
     }
 
     /**
