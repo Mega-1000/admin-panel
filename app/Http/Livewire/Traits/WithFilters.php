@@ -110,7 +110,7 @@ trait WithFilters
             }
         }
 
-//        $this->reloadDatatable();
+        $this->reloadDatatable();
     }
 
     public function resetFilters(): void

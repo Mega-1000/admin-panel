@@ -25,7 +25,6 @@ class OrderDatatableIndex extends Component
     /**
      * OrderDatatableIndex extends Livewire component and adds datatable functionality to it
      *
-     * @param array $options
      * @return View
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
