@@ -110,8 +110,7 @@ trait WithFilters
             }
         }
 
-        $query['applyFiltersFromQuery'] = true;
-        $this->redirect(route('orders.index', $query));
+        $this->emit('reloadDatatable');
     }
 
     public function resetFilters(): void
