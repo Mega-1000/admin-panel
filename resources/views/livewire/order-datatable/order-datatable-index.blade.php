@@ -229,6 +229,7 @@
 
 @if($this->shouldRedirect)
     <script>
+        alert('Zmieniono grupę przesyłek');
         window.location.href = {{ route('orders.index', ['applyFiltersFromQuery' => true]) }};
     </script>
 @endif
