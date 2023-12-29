@@ -229,8 +229,7 @@
 
 @if($this->shouldRedirect)
     <script>
-        alert('Zamówienie zostało zaktualizowane');
-        window.location.reload();
+        window.location.href = {{ route('orders.index', ['applyFiltersFromQuery' => true]) }};
     </script>
 @endif
 
