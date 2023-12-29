@@ -53,8 +53,8 @@ class OrderDatatableIndex extends Component
         return redirect()->route('orders.index', ['applyFiltersFromQuery' => true]);
     }
 
-    public function semiReloadDatatable(array $options = []): void
+    public function semiReloadDatatable(): void
     {
-        $this->render($options);
+        $this->render();
     }
 }
