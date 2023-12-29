@@ -2,7 +2,7 @@
     Rozpocznij przenoszenie
 </button>
 
-<button wire:click="moveDataToOrder({{ $order['id'] }})" class="btn btn-primary w-100 edit">
+<button wire:click="moveDataToOrder({{ $order['id'] }})" class="btn btn-primary w-100 edit" id="finalize-order-moving">
     Zakończ przenoszenie
 </button>
 

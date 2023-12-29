@@ -155,7 +155,17 @@
     <script>
         Livewire.on('orderMoved', () => {
             Swal.fire('success', 'Zamówienie zostało przeniesione', 'success');
+        });
+
+        document.querySelectorAll('#finalize-order-moving').forEach((item) => {
+            item.style.display = 'none';
         })
+
+        Livewire.on('orderToMoveSet', () => {
+            document.querySelectorAll('#finalize-order-moving').forEach((item) => {
+                item.style.display = 'block';
+            })
+        });
 
         document.addEventListener("DOMContentLoaded", () => {
             Livewire.hook('component.initialized', (component) => {

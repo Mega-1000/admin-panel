@@ -4,7 +4,6 @@ namespace App\Http\Livewire\Traits;
 
 use App\Entities\Order;
 use App\Entities\OrderAddress;
-use App\Helpers\BackPackPackageDivider;
 use Exception;
 
 trait WithOrderDataMoving
@@ -15,6 +14,7 @@ trait WithOrderDataMoving
     {
         $this->idOfOrderToMove = $id;
 
+        $this->emit('orderToMoveSet');
         $this->skipRender();
     }
 
