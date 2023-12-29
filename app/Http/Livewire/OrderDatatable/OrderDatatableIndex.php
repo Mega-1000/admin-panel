@@ -7,17 +7,25 @@ use App\Http\Livewire\Traits\WithGeneralFilters;
 use App\Http\Livewire\Traits\WithNonStandardColumnsSorting;
 use App\Http\Livewire\Traits\WithFilters;
 use App\Http\Livewire\Traits\WithNonstandardColumns;
+use App\Http\Livewire\Traits\WithOrderDataMoving;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use App\Livewire\Traits\OrderDatatable\WithPageLengthManagement;
 use Illuminate\View\View;
 use Livewire\Component;
-use Livewire\Redirector;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 class OrderDatatableIndex extends Component
 {
-    use WithFilters, WithPageLengthManagement, WithColumnsDragAndDrop, WithNonstandardColumns, WithNonStandardColumnsSorting, WithGeneralFilters, WithChecking;
+    use
+        WithFilters,
+        WithPageLengthManagement,
+        WithColumnsDragAndDrop,
+        WithNonstandardColumns,
+        WithNonStandardColumnsSorting,
+        WithGeneralFilters,
+        WithChecking,
+        WithOrderDataMoving;
 
     public array $orders;
     public bool $loading = false;

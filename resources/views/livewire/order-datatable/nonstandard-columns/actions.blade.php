@@ -1,3 +1,11 @@
+<button wire:click="setOrderToMove({{ $order['id'] }})" class="btn btn-secondary w-100 edit">
+    Rozpocznij przenoszenie
+</button>
+
+<button wire:click="moveDataToOrder({{ $order['id'] }})" class="btn btn-primary w-100 edit">
+    Zakończ przenoszenie
+</button>
+
 <a class="btn btn-sm btn-primary w-100 edit" href="{{ route('orders.edit', $order['id']) }}">
     Edytuj
 </a>
@@ -12,7 +20,6 @@
     <i class="glyphicon glyphicon-share-alt"></i>
     <span class="hidden-xs hidden-sm">Zwrot</span>
 </a>
-
 
 <a href="/admin/allegro/return-payment/{{ $order['id'] }}" class="btn btn-sm btn-danger edit">
     <i class="glyphicon glyphicon-share-alt"></i>

@@ -1689,9 +1689,8 @@ class OrdersController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
-    public function splitOrders(Request $request)
+    public function splitOrders(Request $request): RedirectResponse
     {
-
         $order = $this->orderRepository->find($request->input('orderId'));
         $order->clearPackages();
 
