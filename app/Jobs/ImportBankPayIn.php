@@ -320,6 +320,10 @@ class ImportBankPayIn implements ShouldQueue
 
         if ($order->preferred_invoice_date) {
             $order->preferred_invoice_date = $payIn->data_ksiegowania;
+            $order->save();
+
+            $arr = [];
+            AddLabelService::addLabels($order, [195, 41], $arr, [], Auth::user()?->id);
         }
 
         if ($order->payments()->count() === 1) {
