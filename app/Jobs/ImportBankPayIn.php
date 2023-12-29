@@ -229,6 +229,7 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param Order $order Order object.
      * @param BankPayInDTO $payIn Pay in row.
+     * @throws Exception
      */
     private function settlePromisePayments(Order $order, BankPayInDTO $payIn): void
     {
@@ -316,6 +317,10 @@ class ImportBankPayIn implements ShouldQueue
                 'operation_type' => $operationType,
                 'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]) : $payment;
+
+        if ($order->preferred_invoice_date) {
+            $order->preferred_invoice_date = $payIn->data_ksiegowania;
+        }
 
         if ($order->payments()->count() === 1) {
             $order->labels()->attach(45);
