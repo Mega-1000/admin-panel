@@ -153,6 +153,10 @@
         }
     </script>
     <script>
+        Livewire.on('orderMoved', () => {
+            Swal.fire('success', 'Zamówienie zostało przeniesione', 'success');
+        })
+
         document.addEventListener("DOMContentLoaded", () => {
             Livewire.hook('component.initialized', (component) => {
                 $('.selectpicker').selectpicker();

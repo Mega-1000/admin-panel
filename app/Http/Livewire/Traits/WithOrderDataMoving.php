@@ -74,5 +74,6 @@ trait WithOrderDataMoving
             }
         }
 
+        $this->emit('orderMoved');
     }
 }
