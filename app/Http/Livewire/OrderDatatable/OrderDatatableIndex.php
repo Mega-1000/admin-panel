@@ -34,12 +34,10 @@ class OrderDatatableIndex extends Component
     {
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
-
         $redirectInstance = $this->reRenderFilters();
         if (!is_null($redirectInstance)) {
-            return $redirectInstance;
+            return view('redirect-view');
         }
-
 
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
