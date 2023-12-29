@@ -30,11 +30,17 @@ class OrderDatatableIndex extends Component
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function render(): View
+    public function render()
     {
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
-        $this->reRenderFilters();
+
+        $redirectInstance = $this->reRenderFilters();
+        if (!is_null($redirectInstance)) {
+            return $redirectInstance;
+        }
+
+
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
         $this->initWithGeneralFilters();

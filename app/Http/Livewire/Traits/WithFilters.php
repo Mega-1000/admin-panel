@@ -28,7 +28,7 @@ trait WithFilters
      * @param bool $applyFiltersFromQuery
      * @return void
      */
-    public function reRenderFilters(bool $applyFiltersFromQuery = true): void
+    public function reRenderFilters(bool $applyFiltersFromQuery = true)
     {
         $this->listeners[] = 'resetFilters';
 
@@ -37,8 +37,10 @@ trait WithFilters
 
 
         if (request()->query('applyFiltersFromQuery') != 'true' && $applyFiltersFromQuery) {
-            $this->applyFiltersFromQuery();
+            return $this->applyFiltersFromQuery();
         }
+
+        return null;
     }
 
     public function updatedFilters(): void
@@ -97,7 +99,7 @@ trait WithFilters
     /**
      * @return void
      */
-    public function applyFiltersFromQuery(): void
+    public function applyFiltersFromQuery()
     {
         $query = request()->query();
 
@@ -114,7 +116,7 @@ trait WithFilters
 
         sleep(2);
 
-        $this->redirect(route('orders.index', ['applyFiltersFromQuery' => false]));
+        return $this->redirect(route('orders.index', ['applyFiltersFromQuery' => false]));
     }
 
     public function resetFilters(): void
