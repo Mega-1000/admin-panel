@@ -199,6 +199,12 @@ class ProductsService
             ->paginate($this->getPerPage());
         $products->data = $products->items();
 
+        foreach ($products->data as $product) {
+            if ($product->children->count() > 0) {
+                $product->hasChildren = true;
+            }
+        }
+
         return $products;
     }
 
