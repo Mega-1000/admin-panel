@@ -111,6 +111,8 @@ trait WithFilters
         }
 
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
+
+        $this->semiReloadDatatable();
     }
 
     public function resetFilters(): void
