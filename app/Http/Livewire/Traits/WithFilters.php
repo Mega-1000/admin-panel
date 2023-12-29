@@ -36,7 +36,6 @@ trait WithFilters
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
 
-        dd(request()->query('applyFiltersFromQuery') != 'true', $applyFiltersFromQuery, request()->query('applyFiltersFromQuery'));
         if (request()->query('applyFiltersFromQuery') != 'true' && $applyFiltersFromQuery) {
             $this->applyFiltersFromQuery();
         }

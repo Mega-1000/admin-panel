@@ -11,6 +11,8 @@ use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use App\Livewire\Traits\OrderDatatable\WithPageLengthManagement;
 use Illuminate\View\View;
 use Livewire\Component;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class OrderDatatableIndex extends Component
 {
@@ -25,12 +27,14 @@ class OrderDatatableIndex extends Component
      *
      * @param array $options
      * @return View
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function render(array $options = []): View
+    public function render(): View
     {
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
-        $this->reRenderFilters(array_key_exists('applyFiltersFromQuery', $options));
+        $this->reRenderFilters();
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
         $this->initWithGeneralFilters();
