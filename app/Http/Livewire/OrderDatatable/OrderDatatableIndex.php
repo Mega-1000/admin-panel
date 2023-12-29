@@ -35,16 +35,13 @@ class OrderDatatableIndex extends Component
         $this->orders = (new OrderDatatableRetrievingService())->getOrders();
 
         $redirectInstance = $this->reRenderFilters();
-        if (!is_null($redirectInstance)) {
-            return view('redirect-view');
-        }
 
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
         $this->initWithGeneralFilters();
         $this->initWithChecking();
 
-        return view('livewire.order-datatable.order-datatable-index');
+        return view('livewire.order-datatable.order-datatable-index', ['shouldReload' => !is_null($redirectInstance)]);
     }
 
     /**

@@ -210,4 +210,11 @@
             phoneInformations.style.display = 'none';
         }
     </script>
+
+    @if($shouldReload)
+        <script>
+            alert('Zamówienie zostało zaktualizowane');
+            window.location.reload();
+        </script>
+    @endif
 @endsection
