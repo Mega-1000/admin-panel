@@ -101,6 +101,7 @@ trait WithFilters
     {
         $query = request()->query();
 
+        dd('applience filters from query');
         foreach ($this->filters as $key => $filter) {
             $key = str_replace('.', '_', $key);
 
