@@ -110,7 +110,9 @@ trait WithFilters
             }
         }
 
-        $this->semiReloadDatatable();
+        // add to query applyFiltersFromQuery to prevent infinite loop
+        $query['applyFiltersFromQuery'] = true;
+        $this->redirect(route('orders.index', $query));
     }
 
     public function resetFilters(): void
