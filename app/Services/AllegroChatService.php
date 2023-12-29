@@ -49,9 +49,8 @@ class AllegroChatService extends AllegroApiService {
     }
     public function newMessage(string $threadId, array $data) {
         $url = $this->getRestUrl("/messaging/threads/$threadId/messages");
-        $response = $this->request('POST', $url, $data);
 
-        return $response;
+        return $this->request('POST', $url, $data);
     }
     public function newAttachmentDeclaration(array $data) {
         $url = $this->getRestUrl("/messaging/message-attachments");
