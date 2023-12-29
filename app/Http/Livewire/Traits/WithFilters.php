@@ -110,8 +110,8 @@ trait WithFilters
             }
         }
 
-//        $query['applyFiltersFromQuery'] = true;
-//        $this->redirect(route('orders.index', $query));
+        $query['applyFiltersFromQuery'] = true;
+        $this->redirect(route('orders.index', $query));
     }
 
     public function resetFilters(): void
