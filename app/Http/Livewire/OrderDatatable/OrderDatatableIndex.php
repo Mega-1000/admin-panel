@@ -44,7 +44,6 @@ class OrderDatatableIndex extends Component
         $this->initWithGeneralFilters();
         $this->initWithChecking();
 
-        return view('livewire.order-datatable.order-datatable-index');
     }
 
     /**

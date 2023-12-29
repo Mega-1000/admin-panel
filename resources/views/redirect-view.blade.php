@@ -1,4 +1,4 @@
 <script>
     alert('okej');
-    widow.location.href = {{ route('orders.index', ['applyFiltersFromQuery' => true]) }}
+    window.location.href = {{ route('orders.index', ['applyFiltersFromQuery' => true]) }}
 </script>
