@@ -1,5 +1,3 @@
-{{--<div class="loading">Ładowanie...</div>--}}
-
 <div>
     <div>
         <div>

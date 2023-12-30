@@ -41,6 +41,7 @@ class OrderDatatableRetrievingService
             'chat.messages',
             'task.user',
             'task.taskTime',
+            'addresses'
         ]);
 
 

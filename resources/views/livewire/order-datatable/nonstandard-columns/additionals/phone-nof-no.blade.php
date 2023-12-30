@@ -25,7 +25,7 @@
             $tooltip_title .= '&#013;';
             $tooltip_title .= '&#013;' . 'Dane do wysylki:';
 
-            foreach ($wholeOrder['customer']['addresses'] as $item) {
+            foreach ($wholeOrder['addresses'] as $item) {
                 if ($item['type'] == 'DELIVERY_ADDRESS') {
                     foreach ($item as $index => $value) {
                         if (!in_array($index, ['type', 'created_at', 'updated_at'])) {
@@ -37,7 +37,7 @@
 
             $tooltip_title .= '&#013;' . 'Dane do faktury:';
 
-            foreach ($wholeOrder['customer']['addresses'] as $item) {
+            foreach ($wholeOrder['addresses'] as $item) {
                 if ($item['type'] == 'INVOICE_ADDRESS') {
                     foreach ($item as $index => $value) {
                         if (!in_array($index, ['type', 'created_at', 'updated_at'])) {
