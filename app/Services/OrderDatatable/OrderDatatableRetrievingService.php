@@ -19,11 +19,13 @@ class OrderDatatableRetrievingService
     /**
      * Fetch orders for datatable for current user save it in $orders property witch is static
      *
-     * @return array
+     * @param int $sessionPageLength
+     * @param string $authenticatedUserGridSettings
+     * @return void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function fetchOrders(): array
+    private function fetchOrders(int $sessionPageLength, string $authenticatedUserGridSettings): void
     {
         $q = OrderDatatableRetrievingHelper::getOrderQueryWithRelations();
         $columns = OrderDatatableColumns::getAllStandardColumns();
@@ -31,22 +33,24 @@ class OrderDatatableRetrievingService
         $q = OrderDatatableRetrievingHelper::applyNestedFilters($columns, $q);
 
         $q = OrderDatatableNonstandardFiltersHelper::applyNonstandardFilters($q);
-        $q = OrderDatatableRetrievingHelper::applyGeneralFilters($q);
+        $q = OrderDatatableRetrievingHelper::applyGeneralFilters($q, $authenticatedUserGridSettings);
 
-        return $this->assignOrdersToClassProperty($q);
+        $this->assignOrdersToClassProperty($q, $sessionPageLength);
     }
 
     /**
      * Get orders for datatable for current user
      *
+     * @param int $sessionPageLength
+     * @param string $authenticatedUserGridSettings
      * @return array
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function getOrders(): array
+    public function getOrders(int $sessionPageLength, string $authenticatedUserGridSettings): array
     {
         if (empty(static::$orders)) {
-            $this->fetchOrders();
+            $this->fetchOrders($sessionPageLength, $authenticatedUserGridSettings);
         }
 
         return self::$orders;
@@ -57,14 +61,14 @@ class OrderDatatableRetrievingService
      *
      * @return array[]
      */
-    public static function getColumnNames(): array
+    public static function getColumnNames(int $authUserId): array
     {
         $dtColumns = OrderDatatableColumn::where('hidden', false)->get()->toArray();
 
         if (count($dtColumns) === 0) {
             $dtColumns = OrderDatatableColumnsEnum::DEFAULT_COLUMNS;
 
-            OrderDatatableColumns::reCreateForUser($dtColumns, auth()->id());
+            OrderDatatableColumns::reCreateForUser($dtColumns, $authUserId);
         }
 
         return $dtColumns;
@@ -104,25 +108,20 @@ class OrderDatatableRetrievingService
      * Execute database query and assign orders to class property
      *
      * @param Builder $q
-     * @return array
+     * @param int $sessionPageLength
+     * @return void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    private function assignOrdersToClassProperty(Builder $q): array
+    private function assignOrdersToClassProperty(Builder $q, int $sessionPageLength): void
     {
         try {
-            self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
+            self::$orders = $q->orderBy('created_at', 'desc')->paginate($sessionPageLength)->toArray();
 
             $this->prepareAdditionalDataForOrders();
         } catch (QueryException $e) {
-            try {
-                self::$orders = $q->paginate(10)->toArray();
-            } catch (QueryException $e) {
-                OrderDatatableColumn::all()->each(fn($column) => $column->delete());
-                self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
-            }
+            OrderDatatableColumn::all()->each(fn($column) => $column->delete());
+            self::$orders = $q->orderBy('created_at', 'desc')->paginate($sessionPageLength)->toArray();
         }
-
-        return self::$orders;
     }
 }

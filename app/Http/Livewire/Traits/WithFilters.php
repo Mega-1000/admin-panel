@@ -34,7 +34,7 @@ trait WithFilters
     {
         $this->listeners[] = 'resetFilters';
 
-        $this->columns = OrderDatatableRetrievingService::getColumnNames();
+        $this->columns = OrderDatatableRetrievingService::getColumnNames(auth()->id());
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
 

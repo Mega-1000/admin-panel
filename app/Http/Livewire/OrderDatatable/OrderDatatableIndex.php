@@ -41,7 +41,7 @@ class OrderDatatableIndex extends Component
      */
     public function render()
     {
-        $this->orders = (new OrderDatatableRetrievingService())->getOrders();
+        $this->orders = (new OrderDatatableRetrievingService())->getOrders(session()->get('pageLength', 10), auth()->user()->grid_settings);
 
         $redirectInstance = $this->reRenderFilters();
         if (!is_null($redirectInstance)) {

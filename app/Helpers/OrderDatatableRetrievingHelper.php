@@ -47,15 +47,17 @@ class OrderDatatableRetrievingHelper
         ]);
     }
 
-    public static function applyGeneralFilters(Builder $q): Builder
+    public static function applyGeneralFilters(Builder $q, string $authenticatedUserGridSettings): Builder
     {
-        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && property_exists($data, 'order_package_filter_number') && $data->order_package_filter_number) {
+        $decodedGridSettings = json_decode($authenticatedUserGridSettings);
+        $data = $decodedGridSettings;
+        if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'order_package_filter_number') && $data->order_package_filter_number) {
             $q->whereHas('packages', function (Builder $query) use ($data) {
                 $query->where('letter_number', 'like', '%' . $data->order_package_filter_number. '%');
             });
         }
 
-        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && property_exists($data, 'is_sorting_by_preferred_invoice_date') && $data->is_sorting_by_preferred_invoice_date) {
+        if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'is_sorting_by_preferred_invoice_date') && $data->is_sorting_by_preferred_invoice_date) {
             $q->where('preferred_invoice_date', '!=', null);
             $q->orderBy('preferred_invoice_date', 'desc');
         }
