@@ -2,12 +2,11 @@
 
 namespace App\Services\OrderDatatable;
 
-use App\Entities\Order;
 use App\Enums\OrderDatatableColumnsEnum;
 use App\Helpers\OrderDatatableNonstandardFiltersHelper;
+use App\Helpers\OrderDatatableRetrievingHelper;
 use App\OrderDatatableColumn;
 use App\Repositories\OrderDatatableColumns;
-use Error;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Psr\Container\ContainerExceptionInterface;
@@ -26,75 +25,15 @@ class OrderDatatableRetrievingService
      */
     public function fetchOrders(): array
     {
-        $q = Order::query();
-        $q->with([
-            'labels.labelGroup',
-            'invoiceValues',
-            'payments',
-            'items',
-            'allegroGeneralExpenses',
-            'otherPackages',
-            'customer.addresses',
-            'files',
-            'packages.realCostsForCompany',
-            'warehouse',
-            'chat.messages',
-            'task.user',
-            'task.taskTime',
-            'addresses',
-        ]);
+        $q = OrderDatatableRetrievingHelper::getOrderQueryWithRelations();
+        $columns = OrderDatatableColumns::getAllStandardColumns();
 
+        $q = OrderDatatableRetrievingHelper::applyNestedFilters($columns, $q);
 
-        $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
-        $columns = $columns->filter(function ($column) {
-            return !in_array($column->label, array_keys(OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES));
-        });
+        $q = OrderDatatableNonstandardFiltersHelper::applyNonstandardFilters($q);
+        $q = OrderDatatableRetrievingHelper::applyGeneralFilters($q);
 
-        foreach ($columns as $column) {
-            if (!$this->isNestedFilter($column)) {
-                if ($column->label === 'customer.addresses.0.phone') {
-                    $column->filter = str_replace(' ', '', $column->filter);
-                    $column->filter = str_replace('-', '', $column->filter);
-                }
-
-                $q->where($column->label, 'like', '%' . $column->filter . '%');
-                continue;
-            }
-
-            $q = $this->applyNestedFilter($q, $column);
-        }
-
-        foreach (OrderDatatableNonstandardFiltersHelper::composeClasses() as $columnName => $nonStandardColumnFilterClass) {
-            $q = $nonStandardColumnFilterClass->applyFilter($q, $columnName);
-        }
-
-        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && property_exists($data, 'order_package_filter_number') && $data->order_package_filter_number) {
-            $q->whereHas('packages', function (Builder $query) use ($data) {
-                $query->where('letter_number', 'like', '%' . $data->order_package_filter_number. '%');
-            });
-        }
-
-        if (($data = json_decode(auth()->user()->grid_settings)) !== null && is_object($data) && property_exists($data, 'is_sorting_by_preferred_invoice_date') && $data->is_sorting_by_preferred_invoice_date) {
-            $q->where('preferred_invoice_date', '!=', null);
-            $q->orderBy('preferred_invoice_date', 'desc');
-        }
-
-        try {
-            self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
-
-            $this->prepareAdditionalDataForOrders();
-
-            return self::$orders;
-        } catch (QueryException $e) {
-            try {
-                self::$orders = $q->paginate(10)->toArray();
-
-                return self::$orders;
-            } catch (QueryException $e) {
-                OrderDatatableColumn::all()->each(fn($column) => $column->delete());
-                self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
-            }
-        }
+        return $this->assignOrdersToClassProperty($q);
     }
 
     /**
@@ -132,40 +71,6 @@ class OrderDatatableRetrievingService
     }
 
     /**
-     * @param mixed $column
-     * @return bool
-     */
-    private function isNestedFilter(mixed $column): bool
-    {
-        return str_contains($column->label, '.');
-    }
-
-    /**
-     * @param Builder $q
-     * @param mixed $column
-     * @return Builder
-     */
-    private function applyNestedFilter(Builder $q, mixed $column): Builder
-    {
-        $labelParts = explode('.', $column->label);
-
-        if (array_key_exists(2, $labelParts) && is_numeric($labelParts[2])) {
-            $q->whereHas($labelParts[0], function ($q) use ($labelParts, $column) {
-                $q->whereHas($labelParts[1], function ($q) use ($labelParts, $column) {
-                    $q->where($labelParts[3], 'like', '%' . $column->filter . '%');
-                });
-            });
-            return $q;
-        } else {
-            $q->whereHas($labelParts[0], function ($q) use ($labelParts, $column) {
-                $q->where($labelParts[1], 'like', '%' . $column->filter . '%');
-            });
-        }
-
-        return $q;
-    }
-
-    /**
      * @return void
      */
     private function prepareAdditionalDataForOrders(): void
@@ -185,13 +90,39 @@ class OrderDatatableRetrievingService
             $products_value_gross = round($totalProductPrice, 2);
             $sum_of_gross_values = round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
 
-            $order['values_data'] = array(
+            $order['values_data'] = [
                 'sum_of_gross_values' => $sum_of_gross_values,
                 'products_value_gross' => $products_value_gross,
                 'shipment_price_for_client' => $order['shipment_price_for_client'] ?? 0,
                 'additional_cash_on_delivery_cost' => $order['additional_cash_on_delivery_cost'] ?? 0,
                 'additional_service_cost' => $order['additional_service_cost'] ?? 0
-            );
+            ];
         }
+    }
+
+    /**
+     * Execute database query and assign orders to class property
+     *
+     * @param Builder $q
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function assignOrdersToClassProperty(Builder $q): array
+    {
+        try {
+            self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
+
+            $this->prepareAdditionalDataForOrders();
+        } catch (QueryException $e) {
+            try {
+                self::$orders = $q->paginate(10)->toArray();
+            } catch (QueryException $e) {
+                OrderDatatableColumn::all()->each(fn($column) => $column->delete());
+                self::$orders = $q->orderBy('created_at', 'desc')->paginate(session()->get('pageLength', 10))->toArray();
+            }
+        }
+
+        return self::$orders;
     }
 }

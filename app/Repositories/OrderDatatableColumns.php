@@ -2,7 +2,9 @@
 
 namespace App\Repositories;
 
+use App\Enums\OrderDatatableColumnsEnum;
 use App\OrderDatatableColumn;
+use Illuminate\Support\Collection;
 
 class OrderDatatableColumns
 {
@@ -22,5 +24,14 @@ class OrderDatatableColumns
         foreach ($dtColumns as $column) {
             OrderDatatableColumn::create($column + ['user_id' => $userId]);
         }
+    }
+
+    public static function getAllStandardColumns(): Collection
+    {
+        $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
+
+        return $columns->filter(function ($column) {
+            return !in_array($column->label, array_keys(OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES));
+        });
     }
 }
