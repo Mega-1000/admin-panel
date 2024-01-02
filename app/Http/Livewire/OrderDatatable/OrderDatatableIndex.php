@@ -83,4 +83,23 @@ class OrderDatatableIndex extends Component
     {
         $this->render();
     }
+
+    protected function generateCombinations(array $match): array
+    {
+        $combinations = [[]];
+        foreach ($match as $placeholder) {
+            $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
+            $newCombinations = [];
+            foreach ($combinations as $combination) {
+                foreach ($values as $value) {
+                    $newCombination = $combination;
+                    $newCombination[$placeholder] = $value;
+                    $newCombinations[] = $newCombination;
+                }
+            }
+            $combinations = $newCombinations;
+        }
+
+        return $combinations;
+    }
 }
