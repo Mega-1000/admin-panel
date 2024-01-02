@@ -4,12 +4,12 @@ namespace App\Http\Livewire\Traits;
 
 use App\Entities\Order;
 use App\Services\Label\AddLabelService;
+use Exception;
 
 trait WithChecking
 {
     public bool $allChecked = false;
     public array $checked = [];
-    public string $labelToAdd = '';
 
     public function initWithChecking(): void
     {
@@ -18,40 +18,39 @@ trait WithChecking
     }
 
     /**
+     * Add or remove an order ID from the checked array.
+     *
      * @param int $id
      */
     public function checkOrder(int $id): void
     {
-        $this->checked[] = $id;
+        if (!in_array($id, $this->checked)) {
+            $this->checked[] = $id;
+        } else {
+            $this->checked = array_diff($this->checked, [$id]);
+        }
 
         $this->skipRender();
     }
 
     /**
-     * Check all orders on current page
+     * Check all orders on the current page.
      */
     public function selectAllOrders(): void
     {
         $this->allChecked = true;
-
-        $ids = collect($this->orders['data'])->pluck('id')->toArray();
-
-        foreach ($ids as &$id) {
-            $pattern = '/taskOrder-(\d+)/';
-
-            if (preg_match($pattern, $id, $matches)) {
-                $id = $matches[1];
-            }
-        }
-
-        $this->checked = $ids;
+        $this->checked = collect($this->orders['data'])
+            ->pluck('id')
+            ->toArray();
 
         $this->skipRender();
     }
 
     /**
+     * Add labels to checked orders.
+     *
      * @param int $labelId
-     * @return void
+     * @throws Exception
      */
     public function addLabelsForCheckedOrders(int $labelId): void
     {

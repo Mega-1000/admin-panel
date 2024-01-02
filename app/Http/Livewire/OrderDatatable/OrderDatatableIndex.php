@@ -10,8 +10,10 @@ use App\Http\Livewire\Traits\WithNonstandardColumns;
 use App\Http\Livewire\Traits\WithOrderDataMoving;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use App\Livewire\Traits\OrderDatatable\WithPageLengthManagement;
+use App\User;
 use Illuminate\View\View;
 use Livewire\Component;
+use Livewire\Redirector;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -31,6 +33,7 @@ class OrderDatatableIndex extends Component
     public bool $loading = false;
     public $listeners = ['updateColumnOrderBackend', 'reloadDatatable', 'semiReloadDatatable'];
     public bool $shouldRedirect = false;
+    public User $user;
 
     /**
      * OrderDatatableIndex extends Livewire component and adds datatable functionality to it
@@ -39,9 +42,14 @@ class OrderDatatableIndex extends Component
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function render()
+    public function render(): View
     {
-        $this->orders = (new OrderDatatableRetrievingService())->getOrders(session()->get('pageLength', 10), auth()->user()->grid_settings);
+        /** @var User $user */
+        $this->user = User::find(auth()->id());
+
+        $this->orders = (new OrderDatatableRetrievingService())->getOrders(
+            session()->get('pageLength', 10), $this->user->grid_settings ?? '[]'
+        );
 
         $redirectInstance = $this->reRenderFilters();
         if (!is_null($redirectInstance)) {
@@ -59,13 +67,18 @@ class OrderDatatableIndex extends Component
     /**
      * Listener for event from frontend or child components
      *
-     * @return mixed
+     * @return Redirector
      */
-    public function reloadDatatable(): mixed
+    public function reloadDatatable(): Redirector
     {
         return redirect()->route('orders.index', ['applyFiltersFromQuery' => true]);
     }
 
+    /**
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function semiReloadDatatable(): void
     {
         $this->render();

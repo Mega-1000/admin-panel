@@ -27,15 +27,15 @@ class OrderDatatableRetrievingService
      */
     private function fetchOrders(int $sessionPageLength, string $authenticatedUserGridSettings): void
     {
-        $q = OrderDatatableRetrievingHelper::getOrderQueryWithRelations();
+        $query = OrderDatatableRetrievingHelper::getOrderQueryWithRelations();
         $columns = OrderDatatableColumns::getAllStandardColumns();
 
-        $q = OrderDatatableRetrievingHelper::applyNestedFilters($columns, $q);
+        $query = OrderDatatableRetrievingHelper::applyNestedFilters($columns, $query);
 
-        $q = OrderDatatableNonstandardFiltersHelper::applyNonstandardFilters($q);
-        $q = OrderDatatableRetrievingHelper::applyGeneralFilters($q, $authenticatedUserGridSettings);
+        $query = OrderDatatableNonstandardFiltersHelper::applyNonstandardFilters($query);
+        $query = OrderDatatableRetrievingHelper::applyGeneralFilters($query, $authenticatedUserGridSettings);
 
-        $this->assignOrdersToClassProperty($q, $sessionPageLength);
+        $this->assignOrdersToClassProperty($query, $sessionPageLength);
     }
 
     /**

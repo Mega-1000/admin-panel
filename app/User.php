@@ -22,8 +22,8 @@ use Laravel\Passport\HasApiTokens;
  * Class User
  * @package App
  *
+ * @property string $grid_settings
  * @property int $id
- *
  */
 class User extends \TCG\Voyager\Models\User
 {

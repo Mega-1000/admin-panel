@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Traits;
 
+use App\User;
 use Livewire\Component;
 
 /**
@@ -24,8 +25,8 @@ trait WithGeneralFilters
      */
     public function initWithGeneralFilters(): void
     {
-        $this->orderPackageFilterNumber = json_decode(auth()->user()->grid_settings)->order_package_filter_number ?? '';
-        $this->isSortingByPreferredInvoiceDate = json_decode(auth()->user()->grid_settings)->is_sorting_by_preferred_invoice_date ?? false;
+        $this->orderPackageFilterNumber = json_decode($this->user->grid_settings)->order_package_filter_number ?? '';
+        $this->isSortingByPreferredInvoiceDate = json_decode($this->user->grid_settings)->is_sorting_by_preferred_invoice_date ?? false;
     }
 
     /**

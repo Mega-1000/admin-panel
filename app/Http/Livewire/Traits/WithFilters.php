@@ -28,13 +28,13 @@ trait WithFilters
      * Re render filters uses class state to re render filters
      *
      * @param bool $applyFiltersFromQuery
-     * @return void
+     * @return string|null
      */
-    public function reRenderFilters(bool $applyFiltersFromQuery = true)
+    public function reRenderFilters(bool $applyFiltersFromQuery = true): string|null
     {
         $this->listeners[] = 'resetFilters';
 
-        $this->columns = OrderDatatableRetrievingService::getColumnNames(auth()->id());
+        $this->columns = OrderDatatableRetrievingService::getColumnNames($this->user->id);
         $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
 
 
