@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Traits;
 
 use App\Entities\Order;
 use App\Enums\OrderDatatableColumnsEnum;
+use App\Services\Label\RemoveLabelService;
 use Closure;
 
 trait WithNonstandardColumns
@@ -59,6 +60,7 @@ trait WithNonstandardColumns
         foreach ($combination as $placeholder => $value) {
             $columnNameWithValues = str_replace('{' . $placeholder . '}', $value, $columnNameWithValues);
         }
+
         return $columnNameWithValues;
     }
 
@@ -69,10 +71,7 @@ trait WithNonstandardColumns
             $data = array_merge($columnDisplayName['data'], $combination);
             $class = new $columnDisplayName['class']();
 
-            // Assuming the class has a method that can be called to process the order
-            // and the additional data. The method name is hypothetical and should
-            // be replaced with the actual method name.
-            return $class->processOrder($order, $data);
+            return $class($order, $data);
         };
     }
 
@@ -86,7 +85,7 @@ trait WithNonstandardColumns
     public function removeLabel(int $labelId, int $orderId): void
     {
         $arr = [];
-        $this->labelRemoverService->removeLabels(Order::find($orderId), [$labelId], $arr, [], $this->user->id);
+        RemoveLabelService::removeLabels(Order::find($orderId), [$labelId], $arr, [], $this->user->id);
         $this->reloadDatatable();
     }
 }
