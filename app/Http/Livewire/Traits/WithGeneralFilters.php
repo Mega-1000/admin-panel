@@ -62,10 +62,10 @@ trait WithGeneralFilters
      */
     private function updateGridSettings(string $key, string $value): void
     {
-        auth()->user()->update(
+        $this->user->update(
             ['grid_settings' => json_encode([
                 $key => $value,
-            ] + json_decode(auth()->user()->grid_settings, true))]
+            ] + json_decode($this->user->grid_settings, true))]
         );
     }
 }

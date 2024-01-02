@@ -4,45 +4,38 @@ namespace App\Http\Livewire\Traits;
 
 use App\OrderDatatableColumn;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Http\RedirectResponse;
-use Livewire\Redirector;
+use Illuminate\Support\Facades\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 trait WithFilters
 {
-    /**
-     * Columns for datatable
-     *
-     * @var array
-     */
     public array $columns = [];
-
-    /**
-     * Filters for datatable aplied at the moment
-     *
-     * @var array
-     */
     public array $filters = [];
 
-    /**
-     * Re render filters uses class state to re render filters
-     *
-     * @param bool $applyFiltersFromQuery
-     * @return string|null
-     */
-    public function reRenderFilters(bool $applyFiltersFromQuery = true): string|null
+    public function mountWithFilters(): void
     {
         $this->listeners[] = 'resetFilters';
+    }
 
-        $this->columns = OrderDatatableRetrievingService::getColumnNames($this->user->id);
-        $this->filters = array_combine(array_column($this->columns, 'label'), array_column($this->columns, 'filter'));
+    public function reRenderFilters(bool $applyFiltersFromQuery = true): ?string
+    {
+        $this->initializeColumnsAndFilters();
 
-
-        if (request()->query('applyFiltersFromQuery') != 'true' && $applyFiltersFromQuery) {
+        if (Request::query('applyFiltersFromQuery') !== 'true' && $applyFiltersFromQuery) {
             return $this->applyFiltersFromQuery();
         }
 
         return null;
+    }
+
+    protected function initializeColumnsAndFilters(): void
+    {
+        $this->columns = OrderDatatableRetrievingService::getColumnNames($this->user->id);
+        $this->filters = array_combine(
+            array_column($this->columns, 'label'),
+            array_column($this->columns, 'filter')
+        );
     }
 
     public function updatedFilters(): void
@@ -50,76 +43,64 @@ trait WithFilters
         $this->skipRender();
     }
 
-    /**
-     * Update column order backend
-     *
-     * @param bool $applyFromQuery
-     * @return void
-     */
     public function updateFilters(bool $applyFromQuery = true): void
     {
         foreach ($this->filters as $key => $filter) {
-            $column = OrderDatatableColumn::where('label', $key)->first();
-
-            if ($column && $column->resetFilters && $filter !== $column->filter) {
-                OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
-                $column->update(['filter' => $filter]);
-
-                return;
-            }
-
-            $column?->update(['filter' => $filter]);
-            if (is_array($filter) && $applyFromQuery) {
-                $this->updateNestedFilters($key, $filter);
-            }
+            $this->updateColumnFilter($key, $filter, $applyFromQuery);
         }
     }
 
-    /**
-     * Update nested filters
-     *
-     * @param string $parentKey
-     * @param array $filters
-     * @return void
-     */
+    protected function updateColumnFilter(string $key, $filter, bool $applyFromQuery): void
+    {
+        $column = OrderDatatableColumn::where('label', $key)->first();
+
+        if ($column && $column->resetFilters && $filter !== $column->filter) {
+            OrderDatatableColumn::query()->update(['filter' => '']);
+            $column->update(['filter' => $filter]);
+            return;
+        }
+
+        $column?->update(['filter' => $filter]);
+
+        if (is_array($filter) && $applyFromQuery) {
+            $this->updateNestedFilters($key, $filter);
+        }
+    }
+
     protected function updateNestedFilters(string $parentKey, array $filters): void
     {
         foreach ($filters as $subKey => $subFilter) {
-            // Build the nested key using dot notation
             $nestedKey = $parentKey . '.' . $subKey;
-
             OrderDatatableColumn::where('label', $nestedKey)->update(['filter' => $subFilter]);
 
-            // Check if the nested filter has further nesting
             if (is_array($subFilter)) {
                 $this->updateNestedFilters($nestedKey, $subFilter);
             }
         }
     }
 
-
-    /**
-     * @return Application|RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function applyFiltersFromQuery()
+    public function applyFiltersFromQuery(): string
     {
-        $query = request()->query();
+        foreach (Request::query() as $key => $value) {
+            $key = str_replace('_', '.', $key);
 
-        foreach ($this->filters as $key => $filter) {
-            $key = str_replace('.', '_', $key);
-
-            if (array_key_exists($key, $query)) {
-                OrderDatatableColumn::where('label', str_replace('_', '.', $key))->first()->update(['filter' => $query[$key]]);
-                $this->reRenderFilters(false);
+            if (isset($this->filters[$key])) {
+                OrderDatatableColumn::where('label', $key)->first()->update(['filter' => $value]);
             }
         }
+
+        $this->reRenderFilters(false);
 
         return 'okej';
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function resetFilters(): void
     {
-        OrderDatatableColumn::all()->each(fn ($column) => $column->update(['filter' => '']));
+        OrderDatatableColumn::query()->update(['filter' => '']);
         $this->semiReloadDatatable();
     }
 }
