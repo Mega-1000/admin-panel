@@ -17,105 +17,54 @@ trait WithNonstandardColumns
     public function initWithNonstandardColumns(): void
     {
         $this->listeners[] = 'removeLabel';
-        $this->generateNonstandardColumns();
-    }
 
-    /**
-     * Generate nonstandard columns based on configurations
-     *
-     * @return void
-     */
-    private function generateNonstandardColumns(): void
-    {
         foreach (OrderDatatableColumnsEnum::NON_STANDARD_COLUMNS as $columnName => $columnDisplayName) {
+            $matches = [];
+
+            // Use a regular expression to find all placeholders in curly braces
             preg_match_all('/{([^}]+)}/', $columnName, $matches);
-            $placeholders = $matches[1] ?? [];
 
-            if ($placeholders) {
-                $this->processPlaceholders($columnName, $placeholders, $columnDisplayName);
-            } else {
-                $this->addNonstandardColumn($columnName, $this->createColumnCallback($columnDisplayName));
-            }
-        }
-    }
-
-    /**
-     * Process column name placeholders
-     *
-     * @param string $columnName
-     * @param array $placeholders
-     * @param array $columnDisplayName
-     * @return void
-     */
-    private function processPlaceholders(string $columnName, array $placeholders, array $columnDisplayName): void
-    {
-        $combinations = $this->generatePlaceholderCombinations($placeholders, $columnDisplayName);
-
-        foreach ($combinations as $combination) {
-            $modifiedColumnName = $this->replacePlaceholdersInColumnName($columnName, $combination);
-            $callback = $this->createColumnCallback($columnDisplayName, $combination);
-            $this->addNonstandardColumn($modifiedColumnName, $callback);
-        }
-    }
-
-    /**
-     * Generate combinations of placeholders
-     *
-     * @param array $placeholders
-     * @param array $columnDisplayName
-     * @return array
-     */
-    private function generatePlaceholderCombinations(array $placeholders, array $columnDisplayName): array
-    {
-        $combinations = [[]];
-        foreach ($placeholders as $placeholder) {
-            $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
-            $newCombinations = [];
-
-            foreach ($combinations as $combination) {
-                foreach ($values as $value) {
-                    $newCombinations[] = array_merge($combination, [$placeholder => $value]);
+            if (!empty($matches[1])) {
+                // Iterate over each placeholder and generate combinations
+                $combinations = [[]];
+                foreach ($matches[1] as $placeholder) {
+                    $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
+                    $newCombinations = [];
+                    foreach ($combinations as $combination) {
+                        foreach ($values as $value) {
+                            $newCombination = $combination;
+                            $newCombination[$placeholder] = $value;
+                            $newCombinations[] = $newCombination;
+                        }
+                    }
+                    $combinations = $newCombinations;
                 }
+
+                // Generate column names with replaced values and add functionality
+                foreach ($combinations as $combination) {
+                    $columnNameWithValues = $columnName;
+                    foreach ($combination as $placeholder => $value) {
+                        $columnNameWithValues = str_replace("$placeholder", $value, $columnNameWithValues);
+                    }
+
+                    $columnNameWithValues = str_replace(['{', '}'], '', $columnNameWithValues);
+
+                    $this->addNonstandardColumn($columnNameWithValues, function (array $order) use ($columnDisplayName, $combination) {
+                        $columnDisplayName['data'] = array_merge($columnDisplayName['data'], $combination);
+                        $class = new $columnDisplayName['class'](['labelGroupName' => $columnDisplayName['data']['name']]);
+
+                        return $class($order, $columnDisplayName['data']);
+                    });
+                }
+            } else {
+                $this->addNonstandardColumn($columnName, function (array $order) use ($columnDisplayName) {
+                    $class = new $columnDisplayName['class']();
+                    return $class($order);
+                });
             }
-
-            $combinations = $newCombinations;
         }
-
-        return $combinations;
     }
 
-    /**
-     * Replace placeholders in the column name
-     *
-     * @param string $columnName
-     * @param array $combination
-     * @return string
-     */
-    private function replacePlaceholdersInColumnName(string $columnName, array $combination): string
-    {
-        foreach ($combination as $placeholder => $value) {
-            $columnName = str_replace("{{$placeholder}}", $value, $columnName);
-        }
-
-        return $columnName;
-    }
-
-    /**
-     * Create a callback function for a column
-     *
-     * @param array $columnDisplayName
-     * @param array $combination
-     * @return Closure
-     */
-    private function createColumnCallback(array $columnDisplayName, array $combination = []): Closure
-    {
-        return function (array $order) use ($columnDisplayName, $combination) {
-            $data = array_merge($columnDisplayName['data'], $combination);
-            $class = new $columnDisplayName['class'](['labelGroupName' => $data['name'] ?? null]);
-
-            return $class($order, $data);
-        };
-    }
 
     /**
      * Add nonstandard column to datatable
@@ -126,21 +75,22 @@ trait WithNonstandardColumns
      */
     public function addNonstandardColumn(string $columnName, Closure $callback): void
     {
-        foreach ($this->orders['data'] as &$order) {
+        foreach($this->orders['data'] as &$order) {
             $order[$columnName] = $callback($order);
         }
     }
 
     /**
-     * Remove label from an order
-     *
      * @param $labelId
      * @param $orderId
      * @return void
      */
     public function removeLabel($labelId, $orderId): void
     {
-        RemoveLabelService::removeLabels(Order::find($orderId), [$labelId], [], [], null);
+        $arr = [];
+        RemoveLabelService::removeLabels(Order::find($orderId), [$labelId], $arr, [], null);
+
         $this->reloadDatatable();
     }
+
 }
