@@ -4,75 +4,78 @@ namespace App\Http\Livewire\Traits;
 
 use App\Entities\Order;
 use App\Enums\OrderDatatableColumnsEnum;
-use App\Services\Label\RemoveLabelService;
 use Closure;
 
 trait WithNonstandardColumns
 {
-    /**
-     * WithNonstandardColumns extends Livewire component and adds nonstandard columns functionality to it
-     *
-     * @return void
-     */
-    public function initWithNonstandardColumns(): void
+    protected function initListeners(): void
     {
         $this->listeners[] = 'removeLabel';
+    }
+
+    public function initWithNonstandardColumns(): void
+    {
+        $this->initListeners();
 
         foreach (OrderDatatableColumnsEnum::NON_STANDARD_COLUMNS as $columnName => $columnDisplayName) {
-            $matches = [];
+            $combinations = $this->generateCombinations($columnName, $columnDisplayName);
 
-            // Use a regular expression to find all placeholders in curly braces
-            preg_match_all('/{([^}]+)}/', $columnName, $matches);
-
-            if (!empty($matches[1])) {
-                // Iterate over each placeholder and generate combinations
-                $combinations = [[]];
-                foreach ($matches[1] as $placeholder) {
-                    $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
-                    $newCombinations = [];
-                    foreach ($combinations as $combination) {
-                        foreach ($values as $value) {
-                            $newCombination = $combination;
-                            $newCombination[$placeholder] = $value;
-                            $newCombinations[] = $newCombination;
-                        }
-                    }
-                    $combinations = $newCombinations;
-                }
-
-                // Generate column names with replaced values and add functionality
-                foreach ($combinations as $combination) {
-                    $columnNameWithValues = $columnName;
-                    foreach ($combination as $placeholder => $value) {
-                        $columnNameWithValues = str_replace("$placeholder", $value, $columnNameWithValues);
-                    }
-
-                    $columnNameWithValues = str_replace(['{', '}'], '', $columnNameWithValues);
-
-                    $this->addNonstandardColumn($columnNameWithValues, function (array $order) use ($columnDisplayName, $combination) {
-                        $columnDisplayName['data'] = array_merge($columnDisplayName['data'], $combination);
-                        $class = new $columnDisplayName['class'](['labelGroupName' => $columnDisplayName['data']['name']]);
-
-                        return $class($order, $columnDisplayName['data']);
-                    });
-                }
-            } else {
-                $this->addNonstandardColumn($columnName, function (array $order) use ($columnDisplayName) {
-                    $class = new $columnDisplayName['class']();
-                    return $class($order);
-                });
+            foreach ($combinations as $combination) {
+                $columnNameWithValues = $this->replacePlaceholders($columnName, $combination);
+                $this->addNonstandardColumn($columnNameWithValues, $this->getColumnCallback($columnDisplayName, $combination));
             }
         }
     }
 
+    protected function generateCombinations(string $columnName, array $columnDisplayName): array
+    {
+        $matches = [];
+        preg_match_all('/{([^}]+)}/', $columnName, $matches);
 
-    /**
-     * Add nonstandard column to datatable
-     *
-     * @param string $columnName
-     * @param Closure $callback
-     * @return void
-     */
+        if (empty($matches[1])) {
+            return [[]];
+        }
+
+        $combinations = [[]];
+        foreach ($matches[1] as $placeholder) {
+            $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
+            $newCombinations = [];
+            foreach ($combinations as $combination) {
+                foreach ($values as $value) {
+                    $newCombination = $combination;
+                    $newCombination[$placeholder] = $value;
+                    $newCombinations[] = $newCombination;
+                }
+            }
+            $combinations = $newCombinations;
+        }
+
+        return $combinations;
+    }
+
+    protected function replacePlaceholders(string $columnName, array $combination): string
+    {
+        $columnNameWithValues = $columnName;
+        foreach ($combination as $placeholder => $value) {
+            $columnNameWithValues = str_replace('{' . $placeholder . '}', $value, $columnNameWithValues);
+        }
+        return $columnNameWithValues;
+    }
+
+
+    protected function getColumnCallback(array $columnDisplayName, array $combination): Closure
+    {
+        return function (array $order) use ($columnDisplayName, $combination) {
+            $data = array_merge($columnDisplayName['data'], $combination);
+            $class = new $columnDisplayName['class']();
+
+            // Assuming the class has a method that can be called to process the order
+            // and the additional data. The method name is hypothetical and should
+            // be replaced with the actual method name.
+            return $class->processOrder($order, $data);
+        };
+    }
+
     public function addNonstandardColumn(string $columnName, Closure $callback): void
     {
         foreach($this->orders['data'] as &$order) {
@@ -80,17 +83,10 @@ trait WithNonstandardColumns
         }
     }
 
-    /**
-     * @param $labelId
-     * @param $orderId
-     * @return void
-     */
-    public function removeLabel($labelId, $orderId): void
+    public function removeLabel(int $labelId, int $orderId): void
     {
         $arr = [];
-        RemoveLabelService::removeLabels(Order::find($orderId), [$labelId], $arr, [], null);
-
+        $this->labelRemoverService->removeLabels(Order::find($orderId), [$labelId], $arr, [], $this->user->id);
         $this->reloadDatatable();
     }
-
 }
