@@ -183,12 +183,10 @@
 
         const resetFilters = () => {
             const filterInputs = document.querySelectorAll('#filter');
-
+            // do not trigger event of "input"
             filterInputs.forEach(input => {
                 input.value = '';
             });
-
-            Livewire.emit('resetFilters');
         }
 
         const selectAllOrders = () => {
