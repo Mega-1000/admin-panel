@@ -55,6 +55,10 @@ trait WithFilters
         $column = OrderDatatableColumn::where('label', $key)->first();
 
         if ($column && $column->resetFilters && $filter !== $column->filter) {
+            if ($column->label === 'customer.addresses.0.phone') {
+                $filter = str_replace($filter, [' ', '-', '(', ')'], '');
+            }
+
             OrderDatatableColumn::query()->update(['filter' => '']);
             $column->update(['filter' => $filter]);
             return;
