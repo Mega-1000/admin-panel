@@ -97,5 +97,7 @@ trait WithFilters
     public function resetFilters(): void
     {
         OrderDatatableColumn::query()->update(['filter' => '']);
+
+        $this->skipRender();
     }
 }
