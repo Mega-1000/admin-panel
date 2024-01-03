@@ -98,6 +98,6 @@ trait WithFilters
     {
         OrderDatatableColumn::query()->update(['filter' => '']);
 
-        $this->skipRender();
+        $this->reloadDatatable();
     }
 }
