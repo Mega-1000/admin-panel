@@ -9,11 +9,6 @@ use Closure;
 
 trait WithNonstandardColumns
 {
-    protected function setListeners(): void
-    {
-        $this->listeners[] = 'removeLabel';
-    }
-
     /**
      * WithNonstandardColumns extends Livewire component and adds nonstandard columns functionality to it
      *
@@ -21,7 +16,7 @@ trait WithNonstandardColumns
      */
     public function initWithNonstandardColumns(): void
     {
-        $this->setListeners();
+        $this->listeners[] = 'removeLabel';
 
         foreach (OrderDatatableColumnsEnum::NON_STANDARD_COLUMNS as $columnName => $columnDisplayName) {
             $matches = [];
@@ -31,7 +26,19 @@ trait WithNonstandardColumns
 
             if (!empty($matches[1])) {
                 // Iterate over each placeholder and generate combinations
-                $combinations = $this->generateCombinations($matches[1]);
+                $combinations = [[]];
+                foreach ($matches[1] as $placeholder) {
+                    $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
+                    $newCombinations = [];
+                    foreach ($combinations as $combination) {
+                        foreach ($values as $value) {
+                            $newCombination = $combination;
+                            $newCombination[$placeholder] = $value;
+                            $newCombinations[] = $newCombination;
+                        }
+                    }
+                    $combinations = $newCombinations;
+                }
 
                 // Generate column names with replaced values and add functionality
                 foreach ($combinations as $combination) {
@@ -42,7 +49,12 @@ trait WithNonstandardColumns
 
                     $columnNameWithValues = str_replace(['{', '}'], '', $columnNameWithValues);
 
-                    $this->settleNonStandardColumns($columnNameWithValues, $columnDisplayName, $combination);
+                    $this->addNonstandardColumn($columnNameWithValues, function (array $order) use ($columnDisplayName, $combination) {
+                        $columnDisplayName['data'] = array_merge($columnDisplayName['data'], $combination);
+                        $class = new $columnDisplayName['class'](['labelGroupName' => $columnDisplayName['data']['name']]);
+
+                        return $class($order, $columnDisplayName['data']);
+                    });
                 }
             } else {
                 $this->addNonstandardColumn($columnName, function (array $order) use ($columnDisplayName) {
@@ -78,17 +90,8 @@ trait WithNonstandardColumns
         $arr = [];
         RemoveLabelService::removeLabels(Order::find($orderId), [$labelId], $arr, [], null);
 
+        $this->render();
         $this->reloadDatatable();
-    }
-
-    protected function settleNonStandardColumns(string $columnNameWithValues, array $columnDisplayName, array $combination): void
-    {
-        $this->addNonstandardColumn($columnNameWithValues, function (array $order) use ($columnDisplayName, $combination) {
-            $columnDisplayName['data'] = array_merge($columnDisplayName['data'], $combination);
-            $class = new $columnDisplayName['class'](['labelGroupName' => $columnDisplayName['data']['name']]);
-
-            return $class($order, $columnDisplayName['data']);
-        });
     }
 
 }
