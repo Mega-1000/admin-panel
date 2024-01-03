@@ -96,6 +96,19 @@ trait WithFilters
 
     public function resetFilters(): void
     {
+        $willAnyFilterBeReset = false;
+        foreach (OrderDatatableColumn::all() as $column) {
+            if ($column->filter !== '') {
+                $willAnyFilterBeReset = true;
+                break;
+            }
+        }
+
+        if (!$willAnyFilterBeReset) {
+            $this->skipRender();
+            return;
+        }
+
         OrderDatatableColumn::query()->update(['filter' => '']);
 
         $this->reloadDatatable();
