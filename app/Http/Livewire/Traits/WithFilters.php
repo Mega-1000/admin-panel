@@ -46,6 +46,7 @@ trait WithFilters
     public function updateFilters(bool $applyFromQuery = true): void
     {
         foreach ($this->filters as $key => $filter) {
+            dd($this->filters);
             $this->updateColumnFilter($key, $filter, $applyFromQuery);
         }
     }
