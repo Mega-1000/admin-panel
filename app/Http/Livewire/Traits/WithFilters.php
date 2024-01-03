@@ -63,6 +63,7 @@ trait WithFilters
         $column?->update(['filter' => $filter]);
 
         if (is_array($filter) && $applyFromQuery) {
+            dd($this->filters);
             $filter = str_replace(' ', '', $filter);
 
             $this->updateNestedFilters($key, $filter);
