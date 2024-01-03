@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\Traits;
 
-use App\User;
 use Livewire\Component;
 
 /**

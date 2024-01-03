@@ -94,13 +94,9 @@ trait WithFilters
         return 'okej';
     }
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
     public function resetFilters(): void
     {
         OrderDatatableColumn::query()->update(['filter' => '']);
-        $this->semiReloadDatatable();
+        $this->skipRender();
     }
 }
