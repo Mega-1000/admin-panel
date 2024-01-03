@@ -187,6 +187,8 @@
             filterInputs.forEach(input => {
                 input.value = '';
             });
+
+            Livewire.emit('resetFilters');
         }
 
         const selectAllOrders = () => {
