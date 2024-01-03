@@ -383,6 +383,51 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
 
 }
 
+function checkOrderQuantityInStock(orderId) {
+    let html = '';
+    let status = 0;
+    $.ajax({
+        type: 'GET',
+        url: `/admin/planning/tasks/${orderId}/checkOrderQuantityInStock`,
+        async: false
+    }).done(function (data) {
+        if (data.status !== 200) {
+            return 1;
+        }
+        if (Object.keys(data.data).length > 0) {
+            status = 1;
+        }
+        $.each(data.data, function (index, value) {
+            html += `
+                    <h3>oferta ${index}</h3>
+                    <table class="table">
+                            <tr class="appendRow">
+                            <td style="width: 200px;">Nazwa</td>
+                            <td style="width: 100px;">Symbol</td>
+                            <td style="width: 50px;">Ilość potrzebna</td>
+                            <td style="width: 50px;">Na magazynie/Ilość na pozycji</td>
+                            <td>#</td>
+                        </tr>`;
+            $.each(value, function (index, value) {
+                html += `
+                        <tr class="appendRow">
+                            <td>${value.product_name}</td>
+                            <td>${value.product_symbol}</td>
+                            <td>${value.quantity}</td>
+                            <td>${value.stock_quantity}/${value.first_position_quantity}</td>
+                            <td><a href="/admin/products/stocks/${value.product_stock_id}/edit" target="_blank">Przenieś</a></td>
+                        </tr>`;
+            });
+            html += '</table>';
+        });
+        $('#quantity-in-stock-list .error-finish-task-form').html(html);
+    }).fail(function () {
+        status = 1;
+    });
+
+    return status;
+}
+
 const labelActionMapping = {
     45: showSelectWarehouseTemplate,
 }
