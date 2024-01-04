@@ -1,3 +1,29 @@
+@php
+    $sumOfPurchase = 0;
+    $items = $order['items'];
+
+    foreach ($items as $item) {
+        $pricePurchase = $item['net_purchase_price_commercial_unit_after_discounts'] ?? 0;
+        $quantity = $item['quantity'] ?? 0;
+        $sumOfPurchase += floatval($pricePurchase) * intval($quantity);
+    }
+
+    $totalItemsCost = $sumOfPurchase * 1.23;
+    $transportCost = 0;
+@endphp
+
+wartość towaru: <br />
+{{ number_format($totalItemsCost, 2) }}<br/>
+
+@if ($order['shipment_price_for_us'])
+    Koszt tran.: <br/>
+    {{ $order['shipment_price_for_us'] }}<br />
+    @php $transportCost = floatval($order['shipment_price_for_us']); @endphp
+@endif
+
+@php $totalCost = $totalItemsCost + $transportCost; @endphp
+Suma: <br /><b>{{ number_format($totalCost, 2) }}</b>
+
 @if (isset($order['invoices']))
     @foreach ($order['invoices'] as $invoice)
         @if ($invoice['invoice_type'] === 'buy')
