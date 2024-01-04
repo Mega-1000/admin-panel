@@ -39,10 +39,18 @@ trait WithChecking
     public function selectAllOrders(): void
     {
         $this->allChecked = true;
-        $this->checked = collect($this->orders['data'])
+        $ids = [];
+        $array = collect($this->orders['data'])
             ->pluck('id')
             ->toArray();
-        dd($this->checked);
+
+        foreach ($array as $htmlString) {
+            if (preg_match('/taskOrder-(\d+)/', $htmlString, $matches)) {
+                $ids[] = $matches[1];
+            }
+        }
+
+        $this->checked = $ids;
 
         $this->skipRender();
     }
