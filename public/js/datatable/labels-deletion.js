@@ -160,11 +160,7 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
         $.ajax({
             url: '/api/get-labels-scheduler-await/{{ \Illuminate\Support\Facades\Auth::user()->id }}'
         }).done(function (res) {
-            if (res.length) {
-                location.reload();
-            } else {
-                table.ajax.reload(null, false);
-            }
+            Livewire.emit('reloadDatatable');
         });
     };
 
