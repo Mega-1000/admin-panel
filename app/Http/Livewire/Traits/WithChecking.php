@@ -50,6 +50,7 @@ trait WithChecking
             }
         }
 
+        dd($ids);
         $this->checked = $ids;
 
         $this->skipRender();
