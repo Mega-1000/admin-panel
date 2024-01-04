@@ -50,7 +50,6 @@ trait WithChecking
             }
         }
 
-        dd($ids);
         $this->checked = $ids;
 
         $this->skipRender();
@@ -64,12 +63,6 @@ trait WithChecking
      */
     public function addLabelsForCheckedOrders(int $labelId): void
     {
-        if ($this->allChecked) {
-            $this->checked = collect($this->orders['data'])
-                ->pluck('id')
-                ->toArray();
-        }
-
         foreach ($this->checked as $id) {
             $arr = [];
             AddLabelService::addLabels(Order::find($id), [$labelId], $arr, []);
