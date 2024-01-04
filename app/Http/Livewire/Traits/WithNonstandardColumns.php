@@ -4,7 +4,6 @@ namespace App\Http\Livewire\Traits;
 
 use App\Entities\Order;
 use App\Enums\OrderDatatableColumnsEnum;
-use App\Helpers\CombinationGeneratorHelper;
 use App\Services\Label\RemoveLabelService;
 use Closure;
 
@@ -29,10 +28,16 @@ trait WithNonstandardColumns
                 // Iterate over each placeholder and generate combinations
                 $combinations = [[]];
                 foreach ($matches[1] as $placeholder) {
-                    $combinations = CombinationGeneratorHelper::generateCombination(
-                        $combinations,
-                        $placeholder
-                    );
+                    $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
+                    $newCombinations = [];
+                    foreach ($combinations as $combination) {
+                        foreach ($values as $value) {
+                            $newCombination = $combination;
+                            $newCombination[$placeholder] = $value;
+                            $newCombinations[] = $newCombination;
+                        }
+                    }
+                    $combinations = $newCombinations;
                 }
 
                 // Generate column names with replaced values and add functionality
