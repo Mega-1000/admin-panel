@@ -72,6 +72,7 @@ class OrderDatatableIndex extends Component
      */
     public function reloadDatatable(): mixed
     {
+        dd(request()->query() + ['applyFiltersFromQuery' => true], request()->query());
         return redirect()->route('orders.index', request()->query() + ['applyFiltersFromQuery' => true]);
     }
 
