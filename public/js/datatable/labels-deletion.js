@@ -64,7 +64,6 @@ function removeTimedLabel(orderId, labelId) {
         method: "POST",
         data: {time: $('#time_label_removal').val()}
     }).done(function (res) {
-        alert('okej');
         Livewire.emit('reloadDatatable');
     });
 }
