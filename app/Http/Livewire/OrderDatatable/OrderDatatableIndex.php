@@ -49,7 +49,7 @@ class OrderDatatableIndex extends Component
         $this->user = User::find(auth()->id());
 
         $this->orders = (new OrderDatatableRetrievingService())->getOrders(
-            session()->get('pageLength', 10), $this->user->grid_settings ?? '[]'
+            $this->getPageLengthProperty(), $this->user->grid_settings ?? '[]'
         );
 
         $redirectInstance = $this->reRenderFilters();
@@ -72,8 +72,13 @@ class OrderDatatableIndex extends Component
      */
     public function reloadDatatable(): mixed
     {
-        dd(request()->query() + ['applyFiltersFromQuery' => true], request()->query());
-        return redirect()->route('orders.index', request()->query() + ['applyFiltersFromQuery' => true]);
+        return redirect()->route(
+            'orders.index',
+            [
+                'page' => $this->getPageLengthProperty(),
+                'applyFiltersFromQuery' => true
+            ]
+        );
     }
 
     /**
@@ -81,7 +86,7 @@ class OrderDatatableIndex extends Component
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function semiReloadDatatable(): void
+    private function semiReloadDatatable(): void
     {
         $this->render();
     }
@@ -97,5 +102,10 @@ class OrderDatatableIndex extends Component
         }
 
         return $combinations;
+    }
+
+    private function getPageLengthProperty(): int
+    {
+        return session()->get('pageLength', 10);
     }
 }
