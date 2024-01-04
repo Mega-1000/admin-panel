@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\OrderDatatable;
 
+use App\Helpers\CombinationGeneratorHelper;
 use App\Http\Livewire\Traits\WithChecking;
 use App\Http\Livewire\Traits\WithGeneralFilters;
 use App\Http\Livewire\Traits\WithNonStandardColumnsSorting;
@@ -69,9 +70,9 @@ class OrderDatatableIndex extends Component
      *
      * @return Redirector
      */
-    public function reloadDatatable(): Redirector
+    public function reloadDatatable(): mixed
     {
-        return redirect()->route('orders.index', ['applyFiltersFromQuery' => true]);
+        return redirect()->route('orders.index', ['applyFiltersFromQuery' => true, ...request()->query()]);
     }
 
     /**
@@ -88,16 +89,10 @@ class OrderDatatableIndex extends Component
     {
         $combinations = [[]];
         foreach ($match as $placeholder) {
-            $values = $columnDisplayName['map'][$placeholder] ?? [$placeholder];
-            $newCombinations = [];
-            foreach ($combinations as $combination) {
-                foreach ($values as $value) {
-                    $newCombination = $combination;
-                    $newCombination[$placeholder] = $value;
-                    $newCombinations[] = $newCombination;
-                }
-            }
-            $combinations = $newCombinations;
+            CombinationGeneratorHelper::generateCombination(
+                $combinations,
+                $placeholder
+            );
         }
 
         return $combinations;

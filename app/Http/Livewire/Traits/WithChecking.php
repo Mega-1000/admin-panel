@@ -59,6 +59,6 @@ trait WithChecking
             AddLabelService::addLabels(Order::find($id), [$labelId], $arr, []);
         }
 
-        $this->emit('reloadDatatable');
+        $this->reloadDatatable();
     }
 }
