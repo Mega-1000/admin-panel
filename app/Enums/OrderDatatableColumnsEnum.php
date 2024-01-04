@@ -10,6 +10,7 @@ use App\Helpers\OrderDatatable\NonStandardColumns\AbstractNonStandardColumnInvoc
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableActions;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableConsultantNotices;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableDepositPaid;
+use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableInvoicesColumn;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableInvoiceValues;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableLabels;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableNonShipped;
@@ -50,7 +51,8 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 21, 'size' => 100, 'label' => 'allegro_payment_id', 'resetFilters' => true],
         ['filter' => '', 'order' => 22, 'size' => 100, 'label' => 'customer.nick_allegro'],
         ['filter' => '', 'order' => 23, 'size' => 100, 'label' => 'customer.login'],
-        ['filter' => '', 'order' => 23, 'size' => 100, 'label' => 'preferred_invoice_date'],
+        ['filter' => '', 'order' => 24, 'size' => 100, 'label' => 'preferred_invoice_date'],
+        ['filter' => '', 'order' => 25, 'size' => 100, 'label' => 'invoices_column'],
     ];
 
     /**
@@ -155,6 +157,10 @@ enum OrderDatatableColumnsEnum
         ],
         'production-date' => [
             'class' => NonStandardColumnInvocableProductionDate::class,
+            'data' => [],
+        ],
+        'invoices_column' => [
+            'class' => NonStandardColumnInvocableInvoicesColumn::class,
             'data' => [],
         ],
     ];
