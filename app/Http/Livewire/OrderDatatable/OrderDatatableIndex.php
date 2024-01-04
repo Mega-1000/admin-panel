@@ -16,6 +16,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\Redirector;
+use Livewire\WithPagination;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -29,7 +30,8 @@ class OrderDatatableIndex extends Component
         WithNonStandardColumnsSorting,
         WithGeneralFilters,
         WithChecking,
-        WithOrderDataMoving;
+        WithOrderDataMoving,
+        WithPagination;
 
     public array $orders;
     public bool $loading = false;
@@ -76,7 +78,7 @@ class OrderDatatableIndex extends Component
         return redirect()->route(
             'orders.index',
             [
-                'page' => Paginator::resolveCurrentPage(),
+                'page' => $this->page,
                 'applyFiltersFromQuery' => true
             ]
         );
