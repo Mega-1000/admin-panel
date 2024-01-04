@@ -82,7 +82,7 @@ class OrderDatatableRetrievingHelper
             $q = self::applyNestedFilter($q, $column);
         }
 
-        return $q;w
+        return $q;
     }
 
     /**
