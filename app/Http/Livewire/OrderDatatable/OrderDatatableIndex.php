@@ -12,6 +12,7 @@ use App\Http\Livewire\Traits\WithOrderDataMoving;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use App\Livewire\Traits\OrderDatatable\WithPageLengthManagement;
 use App\User;
+use Illuminate\Pagination\Paginator;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\Redirector;
@@ -75,7 +76,7 @@ class OrderDatatableIndex extends Component
         return redirect()->route(
             'orders.index',
             [
-                'page' => $this->getPageLengthProperty(),
+                'page' => Paginator::resolveCurrentPage(),
                 'applyFiltersFromQuery' => true
             ]
         );
