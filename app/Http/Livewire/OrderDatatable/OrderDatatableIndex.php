@@ -49,6 +49,10 @@ class OrderDatatableIndex extends Component
     public function mount(): void
     {
         $this->user = User::find(auth()->id());
+        $this->orders = (new OrderDatatableRetrievingService())->getOrders(
+            $this->getPageLengthProperty(), $this->user->grid_settings ?? '[]'
+        );
+
 
         $this->initWithNonstandardColumns();
         $this->initWithNonStandardColumnsSorting();
