@@ -46,24 +46,11 @@ class OrderDatatableIndex extends Component
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function mount(): void
-    {
-        $this->user = User::find(auth()->id());
-        $this->orders = (new OrderDatatableRetrievingService())->getOrders(
-            $this->getPageLengthProperty(), $this->user->grid_settings ?? '[]'
-        );
-
-
-        $this->initWithNonstandardColumns();
-        $this->initWithNonStandardColumnsSorting();
-        $this->initWithGeneralFilters();
-        $this->initWithChecking();
-
-        // Any other initialization that can be done upfront
-    }
-
     public function render(): View
     {
+        /** @var User $user */
+        $this->user = User::find(auth()->id());
+
         $this->orders = (new OrderDatatableRetrievingService())->getOrders(
             $this->getPageLengthProperty(), $this->user->grid_settings ?? '[]'
         );
@@ -72,6 +59,11 @@ class OrderDatatableIndex extends Component
         if (!is_null($redirectInstance)) {
             $this->shouldRedirect = true;
         }
+
+        $this->initWithNonstandardColumns();
+        $this->initWithNonStandardColumnsSorting();
+        $this->initWithGeneralFilters();
+        $this->initWithChecking();
 
         return view('livewire.order-datatable.order-datatable-index');
     }
