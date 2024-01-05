@@ -113,6 +113,6 @@ trait WithFilters
 
         OrderDatatableColumn::query()->update(['filter' => '']);
 
-        $this->reloadDatatable();
+        $this->semiReloadDatatable();
     }
 }
