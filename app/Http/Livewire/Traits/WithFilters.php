@@ -98,7 +98,6 @@ trait WithFilters
 
     public function resetFilters(): void
     {
-
         $willAnyFilterBeReset = false;
         foreach (OrderDatatableColumn::all() as $column) {
             if ($column->filter !== '') {
@@ -113,7 +112,5 @@ trait WithFilters
         }
 
         OrderDatatableColumn::query()->update(['filter' => '']);
-
-        $this->skipRender();
     }
 }
