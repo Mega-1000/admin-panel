@@ -32,6 +32,7 @@
 
         if ($payment['operation_type'] === 'wartość towaru oferty niewyjechanej') {
             $kwonPayments += $parsedAmount;
+            return;
         }
 
         if ($payment['operation_type'] === 'Wartość pobrania przez firmę zewnętrzną') {
