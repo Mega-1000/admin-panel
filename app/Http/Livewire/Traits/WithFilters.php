@@ -98,6 +98,8 @@ trait WithFilters
 
     public function resetFilters(): void
     {
+        $this->user->update(['grid_settings' => json_decode($this->user->grid_settings) + ['filtersReseting' => true]]);
+
         $willAnyFilterBeReset = false;
         foreach (OrderDatatableColumn::all() as $column) {
             if ($column->filter !== '') {
@@ -113,6 +115,6 @@ trait WithFilters
 
         OrderDatatableColumn::query()->update(['filter' => '']);
 
-        $this->semiReloadDatatable();
+        $this->user->update(['grid_settings' => json_decode($this->user->grid_settings) + ['filtersReseting' => false]]);
     }
 }
