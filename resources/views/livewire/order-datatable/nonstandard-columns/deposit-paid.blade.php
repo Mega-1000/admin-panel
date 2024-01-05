@@ -30,7 +30,7 @@
             continue;
         }
 
-        if ($payment['operation_type'] === '') {
+        if ($payment['operation_type'] === 'wartość towaru oferty niewyjechanej') {
             $kwonPayments += $parsedAmount;
         }
 
