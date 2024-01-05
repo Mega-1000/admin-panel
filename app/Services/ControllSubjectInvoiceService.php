@@ -27,7 +27,6 @@ class ControllSubjectInvoiceService
      */
     public function handle(array $data): array
     {
-        dd($data, $this->orders);
         foreach ($data as $dto) {
             $this->handleSingle($dto);
         }
