@@ -60,7 +60,7 @@ class OrderDatatableRetrievingHelper
 
         if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'is_sorting_by_preferred_invoice_date') && $data->is_sorting_by_preferred_invoice_date) {
             $q->where('preferred_invoice_date', '!=', null);
-            $q->orderBy('preferred_invoice_date', 'desc');
+            $q->orderByRaw('DATE(preferred_invoice_date) DESC');
         }
 
         return $q;
