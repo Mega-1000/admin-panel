@@ -8,6 +8,7 @@ use App\Helpers\OrderDepositPaidCalculator;
 use App\Repositories\Orders;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 readonly class OrderPaymentLabelsService
@@ -24,6 +25,7 @@ readonly class OrderPaymentLabelsService
      * @return void
      * @oaram bool|null $calculateRelated
      *
+     * @throws Exception
      */
     public function calculateLabels(Order $order, ?bool $calculateRelated = null): void
     {
@@ -67,6 +69,7 @@ readonly class OrderPaymentLabelsService
             return;
         }
 
+        dd($relatedOrdersValue, $relatedPaymentsValue);
         if (round($relatedOrdersValue, 2) == round($relatedPaymentsValue, 2)) {
             $this->labelService->removeLabel($order->id, [134]);
             AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
