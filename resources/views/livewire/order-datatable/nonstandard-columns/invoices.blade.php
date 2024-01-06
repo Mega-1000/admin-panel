@@ -42,4 +42,10 @@ Suma: <br /><b>{{ number_format($totalCost, 2) }}</b>
     <a href="#" class="remove__invoices" onclick="getInvoicesList({{ $order['id'] }})">Usuń</a>
 @endif
 
-<a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $order['id'] }}/wyslij-fakture">Dodaj</a>
+@php
+    if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
+          $id = $matches[1];
+      }
+@endphp
+
+<a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $id }}/wyslij-fakture">Dodaj</a>
