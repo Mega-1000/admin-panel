@@ -8,7 +8,6 @@ readonly final class ControllSubjectInvoiceDTO
     public string $deliveryEndDate;
     public string $warehouseDate;
     public string $issueDate;
-    public int $commentsCount;
     public string $number;
     public string $value;
     public string $flag;
@@ -40,7 +39,6 @@ readonly final class ControllSubjectInvoiceDTO
         $this->deliveryEndDate = $data['deliveryEndDate'];
         $this->warehouseDate = $data['warehouseDate'];
         $this->issueDate = $data['issueDate'];
-        $this->commentsCount = $data['commentsCount'];
         $this->number = $data['number'];
         $this->value = str_replace(' ', '', $data['value']);
         $this->flag = $data['flag'];

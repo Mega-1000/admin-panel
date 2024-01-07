@@ -12,7 +12,6 @@ class ControllSubjectInvoiceDTOFactory
         'Data zakończenia dostawy' => 'deliveryEndDate',
         'Data magazynowa' => 'warehouseDate',
         'Data wystawienia' => 'issueDate',
-        'Liczba komentarzy' => 'commentsCount',
         'Numer' => 'number',
         'Wartość' => 'value',
         'Flaga' => 'flag',
