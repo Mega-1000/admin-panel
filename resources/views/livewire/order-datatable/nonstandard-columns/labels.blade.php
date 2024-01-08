@@ -21,7 +21,7 @@
                 onmouseover="showLabelName(this, '{{ $label['name'] }}')"
                 onmouseout="hideLabelName(this)"
             >
-                <i class="{{ $label['icon_name'] }}" style="font-size: 30px; background-color: {{ $label['color'] }}; padding: 10px"></i>
+                <i class="{{ $label['icon_name'] }}" style="font-size: 30px; background-color: {{ $label['color'] }}; color: #ffffff; padding: 10px"></i>
                 <div class="label-popup">{{ $label['name'] }}</div>
             </span>
         @endforeach
@@ -36,11 +36,6 @@
         max-width: 100%;
         gap: 10px;
         padding: 10px;
-    }
-
-    .label-container > i {
-        margin: 0;
-        color: #ffffff;
     }
 
     .label-wrapper {
