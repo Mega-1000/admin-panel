@@ -34,7 +34,9 @@
         flex-direction: column;
         flex-wrap: wrap;
         max-width: 100%;
-        gap: 5px
+        gap: 10px;
+        padding: 10px;
+        color: #ffffff;
     }
 
     .label-wrapper {
