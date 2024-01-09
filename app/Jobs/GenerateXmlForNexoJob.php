@@ -179,10 +179,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
             }
         }
 
-        usort($fileNames, function ($a, $b) {
-            return strcmp($a, $b);
-        });
-
         if (count($fileNames) > 0) {
             $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
             $zip = new ZipArchive();
