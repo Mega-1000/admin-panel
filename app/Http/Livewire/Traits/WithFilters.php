@@ -95,8 +95,6 @@ trait WithFilters
             }
         }
 
-        $this->semiReloadDatatable();
-
         return 'okej';
     }
 
