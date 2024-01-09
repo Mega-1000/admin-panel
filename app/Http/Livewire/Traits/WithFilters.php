@@ -27,7 +27,7 @@ trait WithFilters
             $this->applyFiltersFromQuery();
         }
 
-        return $this->anyFiltersApplied ? redirect()->route('orders.index') : null;
+        return $this->anyFiltersApplied ? dd('shouldReload') : null;
     }
 
     protected function initializeColumnsAndFilters(): void
