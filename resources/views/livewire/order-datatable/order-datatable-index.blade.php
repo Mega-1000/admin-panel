@@ -229,6 +229,11 @@
     </table>
 </div>
 
+
+@if($this->anyFiltersApplied)
+    okrokrok
+@endif
+
 @if($this->shouldRedirect)
     <script>
         alert('Zmieniono grupę przesyłek');

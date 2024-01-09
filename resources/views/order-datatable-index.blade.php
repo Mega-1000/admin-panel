@@ -223,10 +223,6 @@
             const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
             phoneInformations.style.display = 'none';
         }
-
-        Livewire.on('filtersUpdated', () => {
-            alert('nof')
-        })
     </script>
 @endsection
 <script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>

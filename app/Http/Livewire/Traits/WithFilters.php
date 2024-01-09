@@ -97,9 +97,6 @@ trait WithFilters
                 $this->anyFiltersApplied = true;
             }
         }
-        if ($this->anyFiltersApplied) {
-            $this->emit('reloadDatatable');
-        }
     }
 
     public function resetFilters(): void
