@@ -27,7 +27,6 @@ trait WithFilters
             $this->applyFiltersFromQuery();
         }
 
-        $this->emit('filtersUpdated');
         return null;
     }
 
@@ -87,18 +86,20 @@ trait WithFilters
         $this->reloadDatatable();
     }
 
-    public function applyFiltersFromQuery(): string
+    public function applyFiltersFromQuery(): void
     {
         foreach (Request::query() as $key => $value) {
             $key = str_replace('_', '.', $key);
+
 
             if (isset($this->filters[$key])) {
                 OrderDatatableColumn::where('label', $key)->first()->update(['filter' => $value]);
                 $this->anyFiltersApplied = true;
             }
         }
-
-        return 'okej';
+        if ($this->anyFiltersApplied) {
+         dd('NOFD');
+        }
     }
 
     public function resetFilters(): void
