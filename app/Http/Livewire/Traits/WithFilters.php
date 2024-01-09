@@ -98,7 +98,7 @@ trait WithFilters
             }
         }
         if ($this->anyFiltersApplied) {
-         dd('NOFD');
+            $this->emit('reloadDatatable');
         }
     }
 
