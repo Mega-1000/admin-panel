@@ -223,6 +223,13 @@
             const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
             phoneInformations.style.display = 'none';
         }
+
+        // if there is query param of customer_addresses_0_phone
+        if (window.location.href.includes('customer_addresses_0_phone')) {
+            setTimeout(() => {
+                alert('okej')
+            }, 1000);
+        }
     </script>
 @endsection
 <script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>
