@@ -27,7 +27,8 @@ trait WithFilters
             $this->applyFiltersFromQuery();
         }
 
-        return  null;
+        $this->emit('filtersUpdated');
+        return null;
     }
 
     protected function initializeColumnsAndFilters(): void
