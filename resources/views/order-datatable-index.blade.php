@@ -227,7 +227,8 @@
         // if there is query param of customer_addresses_0_phone
         if (window.location.href.includes('customer_addresses_0_phone')) {
             setTimeout(() => {
-                alert('okej')
+                // redirect to this url without query params
+                window.location = window.location.href.split('?')[0];
             }, 1000);
         }
     </script>
