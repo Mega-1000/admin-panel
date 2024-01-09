@@ -165,7 +165,7 @@
                                     id="filter"
                                 >
                                 @if($column['label'] === 'id')
-                                    @include('orders.datatables.filters.additional.id')
+                                    {!! view('livewire.orders.datatables.filters.additional.id')->render() !!}
                                 @endif
                             </div>
                         @else
