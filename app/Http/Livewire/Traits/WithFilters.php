@@ -63,7 +63,6 @@ trait WithFilters
         $column?->update(['filter' => $filter]);
 
         if (is_array($filter) && $applyFromQuery && array_key_exists('addresses', $filter)) {
-dd('appliwnce of NOF');
             $this->resetFilters();
 
             $filter['addresses'][0]['phone'] = str_replace(' ', '', $filter['addresses'][0]['phone']);
@@ -96,7 +95,7 @@ dd('appliwnce of NOF');
             }
         }
 
-        $this->reRenderFilters(false);
+        $this->reloadDatatable();
 
         return 'okej';
     }
