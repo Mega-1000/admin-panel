@@ -27,7 +27,7 @@ trait WithFilters
             $this->applyFiltersFromQuery();
         }
 
-        $this->reloadDatatable();
+        $this->emit('reloadDatatable');
         return  null;
     }
 
