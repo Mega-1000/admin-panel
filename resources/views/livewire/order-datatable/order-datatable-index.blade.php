@@ -34,7 +34,7 @@
                 <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
             </div>
 
-            <button class="btn btn-primary" onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}">
+            <button class="btn btn-primary" onclick="resetFilters()">
                 Resetuj filtry
             </button>
         </div>
@@ -163,6 +163,7 @@
                             <div>
                                 <input
                                     type="text"
+                                    onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}"
                                     wire:change="updateFilters"
                                     wire:model.debounce.500ms="filters.{{ $column['label'] }}"
                                     placeholder="Search {{ $column['label'] }}"
