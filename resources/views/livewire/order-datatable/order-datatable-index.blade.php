@@ -50,7 +50,7 @@
                     foreach ($labelGroups as $labelGroup) {
                         $groupedLabels[$labelGroup->name] = $labelGroup->activeLabels;
                     }
-                @endphp
+//                @endphp
                 @foreach($groupedLabels as $groupName => $group)
                     <optgroup label="{{ $groupName }}">
                         @foreach($group as $label)
@@ -163,7 +163,6 @@
                             <div>
                                 <input
                                     type="text"
-                                    onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}"
                                     wire:change="updateFilters"
                                     wire:model.debounce.500ms="filters.{{ $column['label'] }}"
                                     placeholder="Search {{ $column['label'] }}"
