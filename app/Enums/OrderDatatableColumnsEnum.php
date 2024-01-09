@@ -18,6 +18,7 @@ use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableOffe
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableProductionDate;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableShipped;
 use App\Helpers\OrderDatatable\NonStandardColumns\NonStandardColumnInvocableWarehouse;
+use App\Helpers\OrderDatatable\OrderDatatableIdFilter;
 use App\Helpers\OrderDatatable\OrderDatatableLabelFilter;
 use App\Helpers\OrderDatatable\OrderDatatableNonShippedFilter;
 use App\Helpers\OrderDatatable\OrderDatatableShippedFilter;
@@ -89,6 +90,10 @@ enum OrderDatatableColumnsEnum
             'class' => OrderDatatableNonShippedFilter::class,
             'data' => ['labelGroupName' => 'nie-wyjechalo']
         ],
+    ];
+
+    const FILTERS_ADDITIONAL_VIEW = [
+        'id' => 'orders.datatables.filters.additional.id',
     ];
 
     /**

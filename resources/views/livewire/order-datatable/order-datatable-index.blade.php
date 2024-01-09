@@ -33,10 +33,6 @@
                 <label for="fs_generator">Generator faktur sprzedaży </label>
                 <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
             </div>
-
-            <button class="btn btn-primary" onclick="resetFilters()">
-                Resetuj filtry
-            </button>
         </div>
 
         <div wire:ignore>
@@ -159,7 +155,6 @@
                         <br>
 
                         @if(empty($column['filterComponent']))
-                            <!-- onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}" -->
                             <div>
                                 <input
                                     type="text"
@@ -169,6 +164,10 @@
                                     class="w-full text-sm"
                                     id="filter"
                                 >
+
+                                @if(array_key_exists($column['label'], \App\Enums\OrderDatatableColumnsEnum::FILTERS_ADDITIONAL_VIEW) ?? false)
+                                    @include(\App\Enums\OrderDatatableColumnsEnum::FILTERS_ADDITIONAL_VIEW[$column['label']], ['column' => $column])
+                                @endif
                             </div>
                         @else
                             {!! $column['filterComponent'] !!}
