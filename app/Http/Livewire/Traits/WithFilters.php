@@ -27,7 +27,7 @@ trait WithFilters
             $this->applyFiltersFromQuery();
         }
 
-        return $this->anyFiltersApplied ? dd('shouldReload') : null;
+        return  null;
     }
 
     protected function initializeColumnsAndFilters(): void
