@@ -164,6 +164,7 @@
                                     class="w-full text-sm"
                                     id="filter"
                                 >
+                                {{array_key_exists($column['label'], \App\Enums\OrderDatatableColumnsEnum::FILTERS_ADDITIONAL_VIEW) ?? false}}
 
                                 @if(array_key_exists($column['label'], \App\Enums\OrderDatatableColumnsEnum::FILTERS_ADDITIONAL_VIEW) ?? false)
                                     @include(\App\Enums\OrderDatatableColumnsEnum::FILTERS_ADDITIONAL_VIEW[$column['label']], ['column' => $column])
