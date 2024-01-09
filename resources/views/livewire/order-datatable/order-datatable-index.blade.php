@@ -159,7 +159,7 @@
                                 <input
                                     type="text"
                                     wire:change="updateFilters"
-                                    wire:model.debounce.500ms="filters.{{ $column['label'] }}"
+                                    wire:model="filters.{{ $column['label'] }}"
                                     placeholder="Search {{ $column['label'] }}"
                                     class="w-full text-sm"
                                     id="filter"
