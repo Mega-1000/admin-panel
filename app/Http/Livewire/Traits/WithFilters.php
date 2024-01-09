@@ -12,21 +12,22 @@ trait WithFilters
 {
     public array $columns = [];
     public array $filters = [];
+    public bool $anyFiltersApplied = false;
 
     public function mountWithFilters(): void
     {
         $this->listeners[] = 'resetFilters';
     }
 
-    public function reRenderFilters(bool $applyFiltersFromQuery = true): ?string
+    public function reRenderFilters(): mixed
     {
         $this->initializeColumnsAndFilters();
 
-        if (Request::query('applyFiltersFromQuery') !== 'true' && $applyFiltersFromQuery) {
-            return $this->applyFiltersFromQuery();
+        if (Request::query('applyFiltersFromQuery') !== 'true') {
+            $this->applyFiltersFromQuery();
         }
 
-        return null;
+        return $this->anyFiltersApplied ? $this->reloadDatatable() : null;
     }
 
     protected function initializeColumnsAndFilters(): void
@@ -92,6 +93,7 @@ trait WithFilters
 
             if (isset($this->filters[$key])) {
                 OrderDatatableColumn::where('label', $key)->first()->update(['filter' => $value]);
+                $this->anyFiltersApplied = true;
             }
         }
 
