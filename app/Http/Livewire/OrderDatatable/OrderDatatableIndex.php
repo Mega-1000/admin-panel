@@ -77,10 +77,10 @@ class OrderDatatableIndex extends Component
     {
         return redirect()->route(
             'orders.index',
-//            [
-//                'page' => $this->page,
-//                'applyFiltersFromQuery' => true
-//            ]
+            [
+                'page' => $this->page,
+                'applyFiltersFromQuery' => true
+            ]
         );
     }
 

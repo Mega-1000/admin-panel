@@ -27,7 +27,7 @@ trait WithFilters
             $this->applyFiltersFromQuery();
         }
 
-        return $this->anyFiltersApplied ? $this->reloadDatatable() : null;
+        return $this->anyFiltersApplied ? redirect()->route('orders.index') : null;
     }
 
     protected function initializeColumnsAndFilters(): void
