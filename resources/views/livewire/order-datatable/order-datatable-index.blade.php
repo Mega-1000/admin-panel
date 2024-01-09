@@ -33,6 +33,10 @@
                 <label for="fs_generator">Generator faktur sprzedaży </label>
                 <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
             </div>
+
+            <button class="btn btn-primary" onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}">
+                Resetuj filtry
+            </button>
         </div>
 
         <div wire:ignore>
@@ -155,7 +159,8 @@
                         <br>
 
                         @if(empty($column['filterComponent']))
-                            <div onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}">
+                            <!-- onclick="{{ $column['resetFilters'] ?? false ? 'resetFilters()' : '' }}" -->
+                            <div>
                                 <input
                                     type="text"
                                     wire:change="updateFilters"
