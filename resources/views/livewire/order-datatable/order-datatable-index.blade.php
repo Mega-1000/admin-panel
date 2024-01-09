@@ -164,6 +164,7 @@
                                     class="w-full text-sm"
                                     id="filter"
                                 >
+
                                 @if($column['label'] === 'id')
                                     {!! view('livewire.order-datatable.nonstandard-columns.filters.additional.id')->render() !!}
                                 @endif

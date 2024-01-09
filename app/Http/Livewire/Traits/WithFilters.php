@@ -52,6 +52,8 @@ trait WithFilters
 
     protected function updateColumnFilter(string $key, $filter, bool $applyFromQuery): void
     {
+        $this->resetFilters();
+
         $column = OrderDatatableColumn::where('label', $key)->first();
 
         if ($column && $column->resetFilters && $filter !== $column->filter) {
