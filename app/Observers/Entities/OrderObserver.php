@@ -48,6 +48,7 @@ readonly class OrderObserver
         if (!$order->isDirty()) {
             return;
         }
+
         if (!empty($order->getDirty()['status_id'])) {
             $statusId = $order->getDirty()['status_id'];
             /** @var Status $status */

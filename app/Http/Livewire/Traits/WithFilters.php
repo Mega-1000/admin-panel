@@ -52,8 +52,6 @@ trait WithFilters
 
     protected function updateColumnFilter(string $key, $filter, bool $applyFromQuery): void
     {
-        $this->resetFilters();
-
         $column = OrderDatatableColumn::where('label', $key)->first();
 
         if ($column && $column->resetFilters && $filter !== $column->filter) {
@@ -64,8 +62,9 @@ trait WithFilters
 
         $column?->update(['filter' => $filter]);
 
-        if (is_array($filter) && $applyFromQuery) {
-            dd($filter);
+        if (is_array($filter) && $applyFromQuery && array_key_exists('addresses', $filter)) {
+            $this->resetFilters();
+
             $filter['addresses'][0]['phone'] = str_replace(' ', '', $filter['addresses'][0]['phone']);
 
             $this->updateNestedFilters($key, $filter);
@@ -82,6 +81,8 @@ trait WithFilters
                 $this->updateNestedFilters($nestedKey, $subFilter);
             }
         }
+
+        $this->reloadDatatable();
     }
 
     public function applyFiltersFromQuery(): string
