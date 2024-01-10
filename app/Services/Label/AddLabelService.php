@@ -48,6 +48,10 @@ class AddLabelService
 //                continue;
 //            }
 
+            if ($labelId === 66 && $order->preferred_invoice_date === null) {
+                $order->preferred_invoice_date = Carbon::now();
+            }
+
             if (array_key_exists('already-added', $loopPreventionArray)
                 && in_array($labelId, $loopPreventionArray['already-added'])) {
                 continue;
