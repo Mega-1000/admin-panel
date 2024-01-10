@@ -55,6 +55,8 @@ trait WithFilters
     {
         $column = OrderDatatableColumn::where('label', $key)->first();
 
+        dd($column);
+
         if ($column && $column->resetFilters && $filter !== $column->filter) {
             OrderDatatableColumn::query()->update(['filter' => '']);
             $column->update(['filter' => $filter]);
@@ -74,9 +76,6 @@ trait WithFilters
 
     protected function updateNestedFilters(string $parentKey, array $filters): void
     {
-
-        dd($this->filters);
-
         foreach ($filters as $subKey => $subFilter) {
             $nestedKey = $parentKey . '.' . $subKey;
             OrderDatatableColumn::where('label', $nestedKey)->update(['filter' => $subFilter]);
