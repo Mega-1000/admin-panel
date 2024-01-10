@@ -95,6 +95,7 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
             url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
             method: "POST"
         }).done(function (res) {
+            refreshDtOrReload();
             $('#position__errors').empty();
             $('#quantity__errors').empty();
             $('#exists__errors').empty();
@@ -345,7 +346,6 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
                 return;
             }
             removeLabelRequest();
-            refreshDtOrReload();
             return;
         }
 
