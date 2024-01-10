@@ -85,7 +85,7 @@ trait WithFilters
             }
         }
 
-        $this->reloadDatatable();
+        $this->semiReloadDatatable();
     }
 
     public function applyFiltersFromQuery(): void
