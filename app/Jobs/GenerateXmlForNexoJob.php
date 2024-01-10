@@ -163,10 +163,12 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 ])));
 
                 $xml = self::generateValidXmlFromObj($preDokument);
-                Storage::disk('xmlForNexoDisk')->put($order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
+                $xmlFileName = Carbon::create($order->preferred_invoice_date)->format('Y-m-d') . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml';
+
+                Storage::disk('xmlForNexoDisk')->put($xmlFileName, mb_convert_encoding($xml, "UTF-8", "auto"));
                 $preventionArray = [];
 
-                $fileNames[] = $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml';
+                $fileNames[] = $xmlFileName;
 
                 AddLabelService::addLabels($order, [Label::XML_INVOICE_GENERATED], $preventionArray, [], Auth::user()?->id);
             } catch (Throwable $ex) {
@@ -356,7 +358,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
      *
      * @return string
      */
-    private static function generateXmlFromArray($array, $node_name)
+    private static function generateXmlFromArray($array, $node_name): string
     {
         $xml = '';
 
