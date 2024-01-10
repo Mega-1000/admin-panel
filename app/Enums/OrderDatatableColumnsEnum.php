@@ -147,7 +147,7 @@ enum OrderDatatableColumnsEnum
             'class' => NonStandardColumnInvocableId::class,
             'data' => [],
         ],
-        'warehouse' => [
+        'warehouse.symbol' => [
             'class' => NonStandardColumnInvocableWarehouse::class,
             'data' => [],
         ],
