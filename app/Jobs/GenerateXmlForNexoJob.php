@@ -163,7 +163,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 ])));
 
                 $xml = self::generateValidXmlFromObj($preDokument);
-                $xmlFileName = Carbon::create($order->preferred_invoice_date)->format('Y-m-d') . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml';
+                $xmlFileName = Carbon::create($order->preferred_invoice_date)->format('Y-m-d') . '-' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml';
 
                 Storage::disk('xmlForNexoDisk')->put($xmlFileName, mb_convert_encoding($xml, "UTF-8", "auto"));
                 $preventionArray = [];
