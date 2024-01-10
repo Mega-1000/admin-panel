@@ -60,7 +60,6 @@ trait WithFilters
             $column->update(['filter' => $filter]);
             return;
         }
-        dd($this->filters);
 
         $column?->update(['filter' => $filter]);
 
