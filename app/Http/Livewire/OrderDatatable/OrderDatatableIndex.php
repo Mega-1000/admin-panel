@@ -12,7 +12,6 @@ use App\Http\Livewire\Traits\WithOrderDataMoving;
 use App\Services\OrderDatatable\OrderDatatableRetrievingService;
 use App\Livewire\Traits\OrderDatatable\WithPageLengthManagement;
 use App\User;
-use Illuminate\Pagination\Paginator;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\Redirector;
