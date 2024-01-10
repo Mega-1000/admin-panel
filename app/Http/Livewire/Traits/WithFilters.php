@@ -63,10 +63,12 @@ trait WithFilters
 
         $column?->update(['filter' => $filter]);
 
-        if (is_array($filter) && $applyFromQuery && array_key_exists('addresses', $filter)) {
+        if (is_array($filter)) {
             $this->resetFilters();
 
-            $filter['addresses'][0]['phone'] = str_replace(' ', '', $filter['addresses'][0]['phone']);
+            if (array_key_exists('addresses', $filter)) {
+                $filter['addresses'][0]['phone'] = str_replace(' ', '', $filter['addresses'][0]['phone']);
+            }
 
             $this->updateNestedFilters($key, $filter);
         }
