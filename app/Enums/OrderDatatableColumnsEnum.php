@@ -45,7 +45,7 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 15, 'size' => 100, 'label' => 'wartosc brutto sprzedazy'],
         ['filter' => '', 'order' => 16, 'size' => 100, 'label' => 'zaliczka-wplacona'],
         ['filter' => '', 'order' => 17, 'size' => 100, 'label' => 'pozostalo-do-zaplaty'],
-        ['filter' => '', 'order' => 18, 'size' => 100, 'label' => 'warehouse'],
+        ['filter' => '', 'order' => 18, 'size' => 100, 'label' => 'warehouse.symbol'],
         ['filter' => '', 'order' => 19, 'size' => 100, 'label' => 'customer.addresses.0.phone', 'resetFilters' => true],
         ['filter' => '', 'order' => 20, 'size' => 100, 'label' => 'allegro_form_id'],
         ['filter' => '', 'order' => 21, 'size' => 100, 'label' => 'allegro_payment_id', 'resetFilters' => true],
