@@ -55,14 +55,13 @@ trait WithFilters
     {
         $column = OrderDatatableColumn::where('label', $key)->first();
 
-        dd($column);
-
         if ($column && $column->resetFilters && $filter !== $column->filter) {
             OrderDatatableColumn::query()->update(['filter' => '']);
             $column->update(['filter' => $filter]);
             return;
         }
 
+        dd($filter);
         $column?->update(['filter' => $filter]);
 
         if (is_array($filter) && $applyFromQuery && array_key_exists('addresses', $filter)) {
