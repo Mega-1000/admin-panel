@@ -4,7 +4,6 @@
     $value = collect($data)->firstWhere('status', 'SENDING');
 @endphp
 @php
-dd($value['letter_number']);
     $html = '';
     foreach ($data as $key => $value) {
         $isProblem = abs(($value['real_cost_for_company'] ?? 0) - ($value['cost_for_company'] ?? 0)) > 2;
