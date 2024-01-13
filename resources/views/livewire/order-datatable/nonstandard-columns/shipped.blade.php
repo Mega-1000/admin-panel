@@ -81,7 +81,7 @@
                     $html .= "<a target=\"_blank\" href=\"/admin/orders/packages/{$value['id']}/sticker\"><p>{$value['letter_number']}</p></a>";
                 } else if ($value['delivery_courier_name'] === 'GLS') {
                     $html .= "<a target=\"_blank\" href=\"/admin/orders/packages/{$value['id']}/sticker\"><p>{$value['letter_number']}";
-                    $html .= $value['letter_number'] ? $value['letter_number'] : 'wygeneruj naklejkę';
+                    $html .= $value['letter_number'] ? '' : 'wygeneruj naklejkę';
                     $html .= '<div>';
                     if ($value['cash_on_delivery'] !== null && $value['cash_on_delivery'] > 0) {
                         $html .= '<span>' . $value['cash_on_delivery'] . ' zł</span>';
