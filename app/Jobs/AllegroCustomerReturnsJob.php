@@ -139,7 +139,10 @@ class AllegroCustomerReturnsJob implements ShouldQueue
                     $order->to_refund = $this->countRefund($return['items']);
                     $order->save();
                     $prev = [];
-                    AddLabelService::addLabels($order, [Label::RETURN_ALLEGRO_ITEMS], $prev, [], Auth::user()?->id);
+
+                    if (!$order->labels->where('id', Label::RETURN_ALLEGRO_ITEMS)->isEmpty()) {
+                        AddLabelService::addLabels($order, [Label::RETURN_ALLEGRO_ITEMS], $prev, [], Auth::user()?->id);
+                    }
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
