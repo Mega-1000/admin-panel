@@ -39,6 +39,8 @@
         if (
             $payment['operation_type'] === 'Wpłata/wypłata bankowa - związana z fakturą zakupową' &&
             $order['customer']['login'] !== 'info@ephpolska.pl' &&
+            array_key_exists('warehouse', $order) &&
+            array_key_exists('symbol', $order['warehouse']) &&
             $order['warehouse']['symbol'] === 'MEGA-OLAWA'
         ) {
             continue;
