@@ -270,6 +270,21 @@
                 })
             })
         }
+
+        $('#remove-selected-file').on('click', () => {
+            let fileId = $('#files__list option:selected').val();
+            let url = "<?php echo e(route('orders.fileDelete', ['file_id' => '%%'])); ?>"
+            $.ajax({
+                url: url.replace('%%', fileId)
+            }).done(function (data) {
+                $('#invoice_delete_success').modal('show');
+
+                $('#invoice-delete-ok').on('click', function () {
+                    location.reload();
+                });
+            })
+        })
+
     </script>
 @endsection
 <script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>
