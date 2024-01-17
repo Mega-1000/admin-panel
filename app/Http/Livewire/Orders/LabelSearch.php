@@ -49,15 +49,17 @@ class LabelSearch extends Component
             ->where(['labels.label_group_id' => $groupId])
             ->get();
 
+        $labels = $labels->toArray();
+
         foreach ($labels as $label) {
             if (empty(Order::whereHas('labels', function ($query) use ($label) {
                 $query->where('label_id', $label->id);
             })->first())) {
-                $labels->forget($label->id);
+                unset($labels[array_search($label, $labels)]);
             }
         }
 
-        return $this->labels = $labels->toArray();
+        return $this->labels = $labels;
     }
 
     public function selectCurrent($id)
