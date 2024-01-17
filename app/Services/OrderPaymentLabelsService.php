@@ -58,7 +58,8 @@ readonly class OrderPaymentLabelsService
             round($this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order)['balance']) === $sumOfGrossValues &&
             $order->payments->count() > 0
         ) {
-            RemoveLabelService::removeLabels($order, [39], $arr, [], Auth::user()?->id);
+            $arr = [];
+            RemoveLabelService::removeLabels($order, [39], $arr, [], null);
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         }
