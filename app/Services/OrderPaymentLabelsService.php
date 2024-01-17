@@ -53,10 +53,11 @@ readonly class OrderPaymentLabelsService
             $totalProductPrice += $price * $quantity;
         }
 
+        $depositPaidData = $this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order);
+
         $sumOfGrossValues = round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client);
-        dd(round($this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order)['balance']), $sumOfGrossValues, $order->payments->count() > 0);
         if (
-            round($this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order)['balance']) === $sumOfGrossValues &&
+            $sumOfGrossValues + round($depositPaidData['returnedValue']) - round($depositPaidData['balance']) == 0 &&
             $order->payments->count() > 0
         ) {
             $arr = [];
