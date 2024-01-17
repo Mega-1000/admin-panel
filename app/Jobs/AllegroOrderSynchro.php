@@ -289,13 +289,7 @@ class AllegroOrderSynchro implements ShouldQueue
                     $orderAddressService = new OrderAddressService();
 
                     $orderAddressService->addressIsValid($orderInvoiceAddress);
-                    $orderInvoiceAddressErrors = $orderAddressService->errors();
-
                     $orderAddressService->addressIsValid($orderDeliveryAddress);
-                    $orderDeliveryAddressErrors = $orderAddressService->errors();
-                    if (!$orderInvoiceAddressErrors->any() && !$orderDeliveryAddressErrors->any()) {
-                        $order->labels()->attach(39);
-                    }
                 }
                 $prev = [];
                 AddLabelService::addLabels($order, [177], $prev, [], Auth::user()?->id);
