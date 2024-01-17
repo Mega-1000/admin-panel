@@ -23,6 +23,10 @@ class OrderDepositPaidCalculator
         $settledDeclaredAmounts = [];
 
         foreach ($order->payments as $payment) {
+            if ($payment['operation_type'] === 'Wpłata/wypłata bankowa - związana z fakturą zakupową' && $order['customer']['login'] !== 'info@ephpolska.pl') {
+                continue;
+            }
+
             if ($payment->deleted_at !== null) {
                 continue;
             }
