@@ -53,7 +53,6 @@ class LabelSearch extends Component
             if (empty(Order::whereHas('labels', function ($query) use ($label) {
                 $query->where('label_id', $label->id);
             })->first())) {
-                dd('forget label' . $label->id);
                 $labels->forget($label->id);
             }
         }
