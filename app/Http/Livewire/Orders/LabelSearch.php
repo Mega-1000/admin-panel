@@ -50,10 +50,10 @@ class LabelSearch extends Component
             ->get();
 
         foreach ($labels as $label) {
-            dd('okok');
             if (empty(Order::whereHas('labels', function ($query) use ($label) {
-                $query->where('label_id', 45);
+                $query->where('label_id', $label->id);
             })->first())) {
+                dd('forget label' . $label->id);
                 $labels->forget($label->id);
             }
         }
