@@ -8,6 +8,10 @@
             <a href="{{ route('orders.getFile', ['id' => $order['id'], 'file_id' => $file['hash']]) }}" target="_blank">
                 {{ $file['file_name'] }}
             </a>
+
+            <button onclick="getFilesList({{ $order['id'] }})">
+                Usuń
+            </button>
         @endforeach
     @endif
 

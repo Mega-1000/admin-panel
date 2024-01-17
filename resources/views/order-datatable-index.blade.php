@@ -138,6 +138,22 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" id="order_files_delete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" id="files__container">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Wybierz plik do usunięcia</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="remove-selected-file" data-dismiss="modal">Usuń wybrany plik</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -230,6 +246,29 @@
                 // redirect to this url without query params
                 window.location = window.location.href.split('?')[0];
             }, 1000);
+        }
+
+        const getFilesList = (id) => {
+            let url = "{{ route('orders.getFiles', ['id' => '%%']) }}"
+            $.ajax({
+                url: url.replace('%%', id)
+            }).done(function (data) {
+                $('#order_files_delete').modal('show');
+                if (data === null) {
+                    return;
+                }
+                $('#files__list').remove();
+                let parent = document.getElementById("files__container");
+                let filesSelect = document.createElement("SELECT");
+                filesSelect.id = "files__list";
+                parent.appendChild(filesSelect);
+                data.forEach((file) => {
+                    let option = document.createElement("option");
+                    option.value = file.id;
+                    option.text = file.file_name;
+                    filesSelect.appendChild(option);
+                })
+            })
         }
     </script>
 @endsection
