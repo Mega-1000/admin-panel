@@ -53,10 +53,10 @@ trait WithFilters
 
     protected function updateColumnFilter(string $key, $filter, bool $applyFromQuery): void
     {
-        $column = OrderDatatableColumn::where('label', $key)->first();
+        $column = auth()->user()->orderDatatableColumn()->where('label', $key)->first();
 
         if ($column && $column->resetFilters && $filter !== $column->filter) {
-            OrderDatatableColumn::query()->update(['filter' => '']);
+            auth()->user()->orderDatatableColumn()->update(['filter' => '']);
             $column->update(['filter' => $filter]);
             return;
         }

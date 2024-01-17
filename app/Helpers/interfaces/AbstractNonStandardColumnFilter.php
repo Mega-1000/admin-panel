@@ -35,7 +35,7 @@ abstract class AbstractNonStandardColumnFilter
      */
     public function updateFilter(string $data): void
     {
-        OrderDatatableColumn::where('label', $this->sessionName)->update([
+        auth()->user()->orderDatatableColumn()->where('label', $this->sessionName)->update([
             'filter' => $data,
         ]);
     }
@@ -54,7 +54,7 @@ abstract class AbstractNonStandardColumnFilter
      */
     public function getFilterValue(): string
     {
-        return OrderDatatableColumn::where('label', $this->sessionName)->first()?->filter ?? '';
+        return auth()->user()->orderDatatableColumn()->where('label', $this->sessionName)->first()?->filter ?? '';
     }
 
     /**

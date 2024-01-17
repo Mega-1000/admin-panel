@@ -12,7 +12,7 @@ class OrderDatatableColumnsManagement extends Component
 
     public function render(): View
     {
-        $this->columns = OrderDatatableColumn::all()->toArray();
+        $this->columns = auth()->user()->orderDatatableColumn->toArray();
         $this->columns = array_map(function ($column) {
             $column['hidden'] = !$column['hidden'];
             $column['size'] = $column['size'] ?? 100;

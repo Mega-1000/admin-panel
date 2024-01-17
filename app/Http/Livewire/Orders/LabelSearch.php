@@ -64,7 +64,7 @@ class LabelSearch extends Component
 
     public function selectCurrent($id)
     {
-        OrderDatatableColumn::where('label', $this->groupName)->update(['filter' => $id]);
+        auth()->user()->orderDatatableColumn()->where('label', $this->groupName)->update(['filter' => $id]);
 
         $this->toggleContainer();
 
@@ -73,7 +73,7 @@ class LabelSearch extends Component
 
     public function clearSelected()
     {
-        OrderDatatableColumn::where('label', $this->sessionName)->update(['filter' => '']);
+        auth()->user()->orderDatatableColumn()->where('label', $this->sessionName)->update(['filter' => '']);
 
         $this->emit('reloadDatatable');
 

@@ -23,7 +23,7 @@ trait WithColumnsDragAndDrop
         $this->columns = array_combine(array_column($this->columns, 'order'), $this->columns);
         $this->columns = collect($this->columns)->sortBy('order')->toArray();
 
-        OrderDatatableColumn::all()->each(fn ($column) => $column->delete());
+        $this->user->orderDatatableColumns()->each(fn ($column) => $column->delete());
         foreach ($this->columns as $column) {
             OrderDatatableColumn::create([
                 'order' => $column['order'],
@@ -40,7 +40,7 @@ trait WithColumnsDragAndDrop
 
     public function hideColumn($name): Redirector
     {
-        OrderDatatableColumn::where('label', $name)->update(['hidden' => true]);
+        $this->user->orderDatatableColumns()->where('label', $name)->update(['hidden' => true]);
 
         return redirect(route('orderDatatable'));
     }

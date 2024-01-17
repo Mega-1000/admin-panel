@@ -166,4 +166,9 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasMany(Order::class, 'employee_id');
     }
 
+    public function orderDatatableColumns(): HasMany
+    {
+        return $this->hasMany(OrderDatatableColumn::class);
+    }
+
 }
