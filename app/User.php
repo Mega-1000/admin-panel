@@ -161,7 +161,7 @@ class User extends \TCG\Voyager\Models\User
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
 
-    public function orders()
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'employee_id');
     }

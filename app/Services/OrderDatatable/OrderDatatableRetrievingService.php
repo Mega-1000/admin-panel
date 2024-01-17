@@ -63,7 +63,7 @@ class OrderDatatableRetrievingService
      */
     public static function getColumnNames(int $authUserId): array
     {
-        $dtColumns = OrderDatatableColumn::where('hidden', false)->get()->toArray();
+        $dtColumns = auth()->user()->orderDatatableColumns()->where('hidden', false)->get()->toArray();
 
         if (count($dtColumns) === 0) {
             $dtColumns = OrderDatatableColumnsEnum::DEFAULT_COLUMNS;
