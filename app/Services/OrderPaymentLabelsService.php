@@ -60,7 +60,6 @@ readonly class OrderPaymentLabelsService
             $sumOfGrossValues + round($depositPaidData['returnedValue']) - round($depositPaidData['balance']) == 0 &&
             $order->payments->count() > 0
         ) {
-            dd('test');
             $order->labels()->detach(39);
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
