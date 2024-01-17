@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Orders;
 
 use App\Entities\LabelGroup;
+use App\Entities\Order;
 use App\OrderDatatableColumn;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -47,6 +48,14 @@ class LabelSearch extends Component
             ->rightJoin('order_labels', 'order_labels.label_id', '=', 'labels.id')
             ->where(['labels.label_group_id' => $groupId])
             ->get();
+
+        foreach ($labels as $label) {
+            if (!Order::whereHas('labels', function ($query) use ($label) {
+                $query->where('label_id', $label->id);
+            })->exists()) {
+                $labels->forget($label->id);
+            }
+        }
 
         return $this->labels = $labels->toArray();
     }
