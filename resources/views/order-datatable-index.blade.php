@@ -154,6 +154,24 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" id="quantity-in-stock-list" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.task_realized')</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="error-finish-task-form"></div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
