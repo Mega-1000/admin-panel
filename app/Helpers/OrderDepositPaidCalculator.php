@@ -21,10 +21,15 @@ class OrderDepositPaidCalculator
         $knownPayments = 0.0;
         $externalFirmValue = 0.0;
         $settledDeclaredAmounts = [];
+        $wtonValue = 0.0;
 
         foreach ($order->payments as $payment) {
             if ($payment['operation_type'] === 'Wpłata/wypłata bankowa - związana z fakturą zakupową' && $order['customer']['login'] !== 'info@ephpolska.pl') {
                 continue;
+            }
+
+            if ($payment['operation_type'] === 'wartość towaru oferty niewyjechanej') {
+                $wtonValue += $payment['amount'];
             }
 
             if ($payment->deleted_at !== null) {
@@ -48,6 +53,7 @@ class OrderDepositPaidCalculator
             'knownPayments' => $knownPayments,
             'externalFirmValue' => $externalFirmValue,
             'offerFinanceBalance' => $offerFinanceBalance,
+            'wtonValue' => $wtonValue,
         ];
     }
 
