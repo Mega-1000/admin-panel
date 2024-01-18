@@ -56,8 +56,9 @@ readonly class OrderPaymentLabelsService
         $depositPaidData = $this->orderDepositPaidCalculator->calculateDepositPaidOrderData($order);
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
+        dd($sumOfGrossValues, $depositPaidData);
         if (
-            $sumOfGrossValues + $depositPaidData['returnedValue'] - $depositPaidData['balance'] == 0 &&
+            $sumOfGrossValues + $depositPaidData['returnedValue'] - $depositPaidData['balance']) == 0 &&
             $order->payments->count() > 0
         ) {
             $order->labels()->detach(39);
