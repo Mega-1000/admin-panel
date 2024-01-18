@@ -59,7 +59,7 @@ readonly class OrderPaymentLabelsService
 
         dd($sumOfGrossValues, $depositPaidData, $sumOfGrossValues + $depositPaidData['returnedValue'] - $depositPaidData['balance'] - $depositPaidData['wtonValue'] == 0);
         if (
-            $sumOfGrossValues + $depositPaidData['returnedValue'] - $depositPaidData['balance'] - $depositPaidData['wtonValue'] == 0 &&
+            $sumOfGrossValues + $depositPaidData['returnedValue'] - $depositPaidData['offerFinanceBalance'] - $depositPaidData['wtonValue'] == 0 &&
             $order->payments->count() > 0
         ) {
             $order->labels()->detach(39);
