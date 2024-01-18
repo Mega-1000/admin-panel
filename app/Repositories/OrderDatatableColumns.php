@@ -28,7 +28,7 @@ class OrderDatatableColumns
 
     public static function getAllStandardColumns(): Collection
     {
-        $columns = OrderDatatableColumn::where('filter', '!=', '')->get();
+        $columns = auth()->user()->orderDatatableColumns()->where('filter', '!=', '')->get();
 
         return $columns->filter(function ($column) {
             return !in_array($column->label, array_keys(OrderDatatableColumnsEnum::NON_STANDARD_FILTERS_CLASSES));

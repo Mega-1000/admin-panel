@@ -120,7 +120,7 @@ class OrderDatatableRetrievingService
 
             $this->prepareAdditionalDataForOrders();
         } catch (QueryException $e) {
-            OrderDatatableColumn::all()->each(fn($column) => $column->delete());
+            auth()->user()->orderDatatableColumns->each(fn($column) => $column->delete());
             self::$orders = $q->orderBy('created_at', 'desc')->paginate($sessionPageLength)->toArray();
         }
     }
