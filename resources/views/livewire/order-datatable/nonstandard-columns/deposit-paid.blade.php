@@ -54,7 +54,7 @@
             $totalOfReturns -= $parsedAmount ?? $parsedDeclaredAmount;
         } elseif ($parsedAmount && $parsedAmount > 0 && $payment['operation_type'] !== '') {
             $totalOfPayments += $parsedAmount;
-        } elseif (!$parsedAmount && $parsedDeclaredAmount > 0) {
+        } elseif (!$parsedAmount && $parsedDeclaredAmount != 0) {
             $totalOfDeclaredPayments += $status === 'Rozliczona deklarowana' ? 0 : $parsedDeclaredAmount;
 
             if ($status === 'Rozliczona deklarowana') {
