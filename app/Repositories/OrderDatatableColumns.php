@@ -14,7 +14,7 @@ class OrderDatatableColumns
      */
     public static function deleteAllRecords(int $userId): void
     {
-        OrderDatatableColumn::all()->each(fn($column) => $column->delete());
+        auth()->user()->orderDatatableColumns->each(fn($column) => $column->delete());
     }
 
     public static function reCreateForUser(array $dtColumns, int $userId): void
