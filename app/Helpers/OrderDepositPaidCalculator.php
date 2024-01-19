@@ -31,6 +31,7 @@ class OrderDepositPaidCalculator
 
             if ($payment['operation_type'] === 'Wartość pobrania przez firmę zewnętrzną') {
                 $wpfzValue += $payment['amount'];
+                dd($wpfzValue);
                 continue;
             }
 
