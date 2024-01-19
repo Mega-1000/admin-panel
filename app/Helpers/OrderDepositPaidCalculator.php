@@ -40,7 +40,6 @@ class OrderDepositPaidCalculator
             $this->processPayment($payment, $totalPayments, $totalDeclaredPayments, $totalReturns, $returnedValue, $knownPayments, $externalFirmValue, $settledDeclaredAmounts);
         }
 
-        dd($totalPayments, $totalReturns, $totalDeclaredPayments);
         $balance = $totalPayments - $totalReturns + $totalDeclaredPayments;
         $offerFinanceBalance = OrderBilansCalculator::calculateCBO(Order::find($order['id']));
 
