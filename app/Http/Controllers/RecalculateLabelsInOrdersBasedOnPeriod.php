@@ -26,17 +26,14 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
                 ]
             );
 
-        if ($request->get('calculate-only-with-39')) {
-            // join on labels have to have 39 in id using pivot table label_order
-            $query->join('order_labels', 'orders.id', '=', 'order_labels.order_id')
-                ->join('labels', 'order_labels.label_id', '=', 'labels.id')
-                ->where('labels.id', 'like', '%39%');
-        }
 
         $orders = $query->get();
 
-        dd($orders);
         foreach ($orders as $order) {
+            if ($request->get('calculate-only-with-39') && DB::table('order_labels')->where('order_id', $order->id)->where('label_id', 39)->count() == 0) {
+                continue;
+            }
+
             $this->orderPaymentLabelsService->calculateLabels($order);
 
             $additional_service = $order->additional_service_cost ?? 0;
