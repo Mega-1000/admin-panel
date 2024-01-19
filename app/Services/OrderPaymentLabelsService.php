@@ -62,7 +62,6 @@ readonly class OrderPaymentLabelsService
             round($sumOfGrossValues) + round($depositPaidData['returnedValue']) - round($depositPaidData['offerFinanceBalance']) - round($depositPaidData['wtonValue']) == 0.0 &&
             $order->payments->count() > 0
         ) {
-            dd('oko');
             $order->labels()->detach(39);
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
