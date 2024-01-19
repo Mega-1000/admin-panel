@@ -237,6 +237,8 @@
                         <input type="date" class="form-control" name="time-from">
                         Data do
                         <input type="date" class="form-control" name="time-to">
+                        <br>
+                        Licz jedynie zamówienia z etykietą niebieski dolar <input name="calculate-only-with-39" type="checkbox">
 
                         <button type="submit" class="btn btn-primary">
                             Przelicz
