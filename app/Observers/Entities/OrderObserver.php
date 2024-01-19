@@ -13,6 +13,7 @@ use App\Jobs\FireProductPacketJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\StatusRepository;
 use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\OrderPaymentLabelsService;
 use App\Services\OrderService;
 use Carbon\Carbon;
@@ -130,7 +131,7 @@ readonly class OrderObserver
         ) {
             $order = Order::find($order->id);
             $LpArray = [];
-//            RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
+            RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         }
