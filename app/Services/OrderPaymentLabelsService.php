@@ -57,7 +57,8 @@ readonly class OrderPaymentLabelsService
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
-        dd(round($sumOfGrossValues) + round($depositPaidData['returnedValue']) - round($depositPaidData['balance']) - round($depositPaidData['wtonValue']));
+        dd(            round($sumOfGrossValues) + round($depositPaidData['returnedValue']) - round($depositPaidData['balance']) - round($depositPaidData['wtonValue']) == 0.0 &&
+            $order->payments->count() > 0);
         if (
             round($sumOfGrossValues) + round($depositPaidData['returnedValue']) - round($depositPaidData['balance']) - round($depositPaidData['wtonValue']) == 0.0 &&
             $order->payments->count() > 0
