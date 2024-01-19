@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
+use App\Helpers\OrderDepositPaidCalculator;
 use App\Http\Requests\RecalculateLabelsInOrdersBasedOnPeriodRequest;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
@@ -15,7 +16,8 @@ use Illuminate\Support\Facades\DB;
 class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
 {
     public function __construct(
-        protected readonly OrderPaymentLabelsService $orderPaymentLabelsService
+        protected readonly OrderPaymentLabelsService $orderPaymentLabelsService,
+        protected readonly OrderDepositPaidCalculator $orderDepositPaidCalculator,
     ) {}
 
     public function __invoke(RecalculateLabelsInOrdersBasedOnPeriodRequest $request): RedirectResponse
