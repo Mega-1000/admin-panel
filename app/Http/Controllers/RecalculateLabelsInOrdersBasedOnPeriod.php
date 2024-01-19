@@ -36,6 +36,7 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
             if ($request->get('calculate-only-with-39') && DB::table('order_labels')->where('order_id', $order->id)->where('label_id', 39)->count() == 0) {
                 continue;
             }
+            $arr = [];
 
             $this->orderPaymentLabelsService->calculateLabels($order);
 
