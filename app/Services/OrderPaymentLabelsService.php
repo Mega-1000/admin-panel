@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Helpers\OrderBilansCalculator;
 use App\Helpers\OrderDepositPaidCalculator;
@@ -62,8 +63,8 @@ readonly class OrderPaymentLabelsService
             $order->payments->count() > 0
         ) {
             $order = Order::find($order->id);
-            $order->labels()->detach(39);
-            dd($order->labels()->detach(39));
+            $LpArray = [];
+            RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         }
