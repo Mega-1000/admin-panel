@@ -125,7 +125,6 @@ readonly class OrderObserver
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
-        dd(round($depositPaidData['externalFirmValue']));
         if (
             round($sumOfGrossValues) + round($depositPaidData['returnedValue']) - round($depositPaidData['balance']) - round($depositPaidData['wtonValue']) - round($depositPaidData['wpfzValue']) == 0.0 &&
             $order->payments->count() > 0
