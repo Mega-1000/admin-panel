@@ -5,6 +5,7 @@ namespace App\Observers\Entities;
 use App\Entities\Order;
 use App\Entities\Status;
 use App\Facades\Mailer;
+use App\Helpers\OrderDepositPaidCalculator;
 use App\Helpers\OrderPackagesCalculator;
 use App\Jobs\calculateLabelsForOrder;
 use App\Jobs\DispatchLabelEventByNameJob;
@@ -27,6 +28,7 @@ readonly class OrderObserver
         protected OrderPaymentLabelsService    $orderPaymentLabelsService,
         protected OrderService                 $orderService,
         protected OrderPackagesCalculator      $orderPackagesCalculator,
+        protected OrderDepositPaidCalculator   $orderDepositPaidCalculator,
     ) {}
 
     /**
