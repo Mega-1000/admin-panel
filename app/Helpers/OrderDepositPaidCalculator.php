@@ -29,11 +29,6 @@ class OrderDepositPaidCalculator
                 continue;
             }
 
-            if ($payment['operation_type'] == 'Wartość pobrania przez firmę zewnętrzną') {
-                $wpfzValue += $payment['amount'];
-                continue;
-            }
-
             if ($payment['operation_type'] === 'wartość towaru oferty niewyjechanej') {
                 $wtonValue += $payment['amount'];
                 continue;
