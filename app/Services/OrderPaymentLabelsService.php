@@ -63,6 +63,7 @@ readonly class OrderPaymentLabelsService
             $order->payments->count() > 0
         ) {
             $order->labels()->detach(39);
+            dd('label detached', $order, $order->labels()->detach(39));
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         }
