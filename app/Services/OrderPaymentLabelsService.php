@@ -64,7 +64,7 @@ readonly class OrderPaymentLabelsService
         ) {
             $order = Order::find($order->id);
             $LpArray = [];
-            RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
+//            RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         }
@@ -97,5 +97,7 @@ readonly class OrderPaymentLabelsService
                 45, 68
             ], $arr, [], Auth::user()?->id);
         }
+
+        RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
     }
 }
