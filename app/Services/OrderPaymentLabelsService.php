@@ -2,13 +2,10 @@
 
 namespace App\Services;
 
-use App\Entities\Label;
 use App\Entities\Order;
-use App\Helpers\OrderBilansCalculator;
 use App\Helpers\OrderDepositPaidCalculator;
 use App\Repositories\Orders;
 use App\Services\Label\AddLabelService;
-use App\Services\Label\RemoveLabelService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -97,8 +94,5 @@ readonly class OrderPaymentLabelsService
                 45, 68
             ], $arr, [], Auth::user()?->id);
         }
-
-        $order->labels()->detach(39);
-        RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
     }
 }

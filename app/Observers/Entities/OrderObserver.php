@@ -105,6 +105,7 @@ readonly class OrderObserver
         }
 
         $this->orderPaymentLabelsService->calculateLabels($order);
+        $order->labels()->detach(39);
     }
 
     public function labelsAttached(Order $order): void
