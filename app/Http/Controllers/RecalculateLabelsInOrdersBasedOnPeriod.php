@@ -27,9 +27,10 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
             );
 
         if ($request->get('calculate-only-with-39')) {
-            $query->join('label_order', 'orders.id', '=', 'label_order.order_id')
-                ->join('labels', 'label_order.label_id', '=', 'labels.id')
-                ->where('labels.id', '39');
+            // join on labels have to have 39 in id using pivot table label_order
+            $query->join('order_labels', 'orders.id', '=', 'order_labels.order_id')
+                ->join('labels', 'order_labels.label_id', '=', 'labels.id')
+                ->where('labels.id', 'like', '%39%');
         }
 
         $orders = $query->get();
