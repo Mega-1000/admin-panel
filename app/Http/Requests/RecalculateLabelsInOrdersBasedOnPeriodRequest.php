@@ -26,7 +26,7 @@ class RecalculateLabelsInOrdersBasedOnPeriodRequest extends FormRequest
         return [
             'time-from' => 'required|date',
             'time-to' => 'required|date',
-            'calculate-only-with-39' => 'nullable|boolean',
+            'calculate-only-with-39' => 'nullable',
         ];
     }
 }

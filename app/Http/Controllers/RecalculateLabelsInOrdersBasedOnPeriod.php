@@ -32,8 +32,6 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
 
         $orders = $query->get();
 
-        dd($orders);
-
         foreach ($orders as $order) {
             $this->orderPaymentLabelsService->calculateLabels($order);
 
