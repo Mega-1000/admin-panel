@@ -98,6 +98,7 @@ readonly class OrderPaymentLabelsService
             ], $arr, [], Auth::user()?->id);
         }
 
+        $order->labels()->detach(39);
         RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
     }
 }
