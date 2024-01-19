@@ -27,7 +27,9 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
             );
 
         if ($request->get('calculate-only-with-39')) {
-            $query->whereHas('labels', fn ($q) => $q->where('id', 39));
+            $query->join('label_order', 'orders.id', '=', 'label_order.order_id')
+                ->join('labels', 'label_order.label_id', '=', 'labels.id')
+                ->where('labels.id', '39');
         }
 
         $orders = $query->get();
