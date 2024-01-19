@@ -57,13 +57,11 @@ readonly class OrderPaymentLabelsService
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
-//        dd(round($sumOfGrossValues) + round($depositPaidData['returnedValue']) - round($depositPaidData['offerFinanceBalance']) - round($depositPaidData['wtonValue']));
         if (
             round($sumOfGrossValues) + round($depositPaidData['returnedValue']) - round($depositPaidData['offerFinanceBalance']) - round($depositPaidData['wtonValue']) == 0.0 &&
             $order->payments->count() > 0
         ) {
             $order->labels()->detach(39);
-            dd('label detached', $order, $order->labels()->detach(39));
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         }
