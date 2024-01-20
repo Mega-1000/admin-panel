@@ -56,7 +56,7 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
             $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
             if (
-                round($sumOfGrossValues) + round($depositPaidData['returnedValue']) - round($depositPaidData['balance']) - round($depositPaidData['wtonValue']) == 0.0 &&
+                round(round($sumOfGrossValues, 2) + round($depositPaidData['returnedValue'], 2) - round($depositPaidData['balance'], 2) - round($depositPaidData['wtonValue'], 2) - round($depositPaidData['externalFirmValue'], 2)) == 0.0 &&
                 $order->payments->count() > 0
             ) {
                 $order = Order::find($order->id);
@@ -65,6 +65,7 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
             } else {
                 AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
             }
+
         }
 
         return redirect()->back();

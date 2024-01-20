@@ -135,7 +135,6 @@ readonly class OrderObserver
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         }
-
     }
 
     public function labelsAttached(Order $order): void
