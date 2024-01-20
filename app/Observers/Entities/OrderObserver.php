@@ -125,10 +125,10 @@ readonly class OrderObserver
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
-        dd(round($depositPaidData['wpfzValue'], 2));
-        dd(round($sumOfGrossValues, 2), round($depositPaidData['returnedValue'], 2), round($depositPaidData['balance'], 2), round($depositPaidData['wtonValue'], 2), round($depositPaidData['wpfzValue'], 2));
+        dd(round($depositPaidData['externalFirmValue'], 2));
+        dd(round($sumOfGrossValues, 2), round($depositPaidData['returnedValue'], 2), round($depositPaidData['balance'], 2), round($depositPaidData['wtonValue'], 2), round($depositPaidData['externalFirmValue'], 2));
         if (
-            round($sumOfGrossValues, 2) + round($depositPaidData['returnedValue'], 2) - round($depositPaidData['balance'], 2) - round($depositPaidData['wtonValue'], 2) - round($depositPaidData['wpfzValue'], 2) == 0.0 &&
+            round($sumOfGrossValues, 2) + round($depositPaidData['returnedValue'], 2) - round($depositPaidData['balance'], 2) - round($depositPaidData['wtonValue'], 2) - round($depositPaidData['externalFirmValue'], 2) == 0.0 &&
             $order->payments->count() > 0
         ) {
             $order = Order::find($order->id);
