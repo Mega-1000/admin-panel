@@ -20,7 +20,7 @@
             @foreach(
                 !empty($order['labels']) &&
                 count($order['labels']) > 0
-                    ? array_filter($order['labels'], function ($label) use($labelGroupName) { return $label['label_group']['name'] === $labelGroupName; })
+                    ? array_filter($order['labels'], function ($label) use($labelGroupName) { return !empty($label['label_group']) ? $label['label_group']['name'] === $labelGroupName : null; })
                     : [] as $label
             )
                 <span
