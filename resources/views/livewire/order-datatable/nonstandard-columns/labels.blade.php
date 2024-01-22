@@ -17,6 +17,7 @@
 
     <div class="label-container">
         @if(!empty($order))
+            {{ dd($order) }}
             @foreach(!empty($order['labels']) && count($order['labels']) > 0 ? array_filter($order['labels'], function ($label) use($labelGroupName) { return $label['label_group']['name'] === $labelGroupName; }) : [] as $label)
                 <span
                     onclick="
