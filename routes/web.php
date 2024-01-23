@@ -37,6 +37,7 @@ use App\Http\Controllers\RecalculateLabelsInOrdersBasedOnPeriod;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
+use App\Http\Middleware\FilterOrderInvoiceValue;
 use http\Client\Request;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -542,7 +543,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('import/store', 'ImportController@store')->name('import.store');
         Route::post('import/store-nexo-controller', 'ImportController@storeNexoController')->name('import.storeNexoController');
         Route::get('store/import/{id}/{amount}', 'OrdersPaymentsController@storeFromImport');
-        Route::post('/controll-subject-invoice', ControllSubjectInvoiceController::class)->name('controll-subject-invoices');
+        Route::post('/controll-subject-invoice', ControllSubjectInvoiceController::class)->name('controll-subject-invoices')->middleware(FilterOrderInvoiceValue::class);
 
         Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 

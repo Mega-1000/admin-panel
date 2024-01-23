@@ -185,10 +185,15 @@
             <div class="panel panel-bordered">
                 <div class="panel-heading">
                     <div class="panel-title">
-                        MODUŁ ZACZYTYWANIA FAKTUR Z SUBIEKTA  ( modul ten dokonuje wpisu wszystkich fakur zaczytywanych z pliku csv na gridzie do kolumny bilans faktur subiekt, plik csv powstaje przez skopiowanie z subiekta spisu wszystkich faktur i wklejenie go do exela i nastepnie przetworzenie go do csv )
+                        MODUŁ ZACZYTYWANIA FAKTUR Z SUBIEKTA ( modul ten dokonuje wpisu wszystkich fakur zaczytywanych z pliku csv na gridzie do kolumny bilans faktur subiekt, plik csv powstaje przez skopiowanie z subiekta spisu wszystkich faktur i wklejenie go do exela i nastepnie przetworzenie go do csv )
                     </div>
                 </div>
                 <div class="panel-body">
+                    <select name="invoice-kind">
+                        <option>faktury sprzedazy</option>
+                        <option>faktury zakupu</option>
+                    </select>
+
                     <form method="post" action="{{ route('controll-subject-invoices') }}" enctype="multipart/form-data">
                         @csrf
                         <input type="file" name="file">

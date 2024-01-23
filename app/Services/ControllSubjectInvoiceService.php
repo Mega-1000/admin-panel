@@ -4,10 +4,6 @@ namespace App\Services;
 
 use App\DTO\ControllSubjectInvoice\ControllSubjectInvoiceDTO;
 use App\Entities\Order;
-use App\Entities\OrderInvoiceValue;
-use App\Repositories\OrderInvoiceValues;
-use App\Repositories\Orders;
-use App\Services\Label\AddLabelService;
 
 class ControllSubjectInvoiceService
 {
@@ -25,7 +21,7 @@ class ControllSubjectInvoiceService
      * @param array<ControllSubjectInvoiceDTO> $data
      * @return array
      */
-    public function handle(array $data): array
+    public function handle(array $data, ): array
     {
         foreach ($data as $dto) {
             $this->handleSingle($dto);

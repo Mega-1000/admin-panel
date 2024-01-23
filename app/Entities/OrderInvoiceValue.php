@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $order_id
+ * @property float $value
+ * @property string $invoice_number
+ * @property string $issue_date
+ * @property string $type
+ */
 class OrderInvoiceValue extends Model
 {
     use HasFactory;
@@ -15,6 +22,7 @@ class OrderInvoiceValue extends Model
         'value',
         'invoice_number',
         'issue_date',
+        'type',
     ];
 
     public function order(): BelongsTo

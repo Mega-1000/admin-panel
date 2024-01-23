@@ -20,6 +20,7 @@ final class OrderInvoiceValueService
             'value' => $dto->value,
             'invoice_number' => $dto->number,
             'issue_date' => $dto->issueDate,
+            'type' => request()->get('invoice-kind') === 'faktury sprzedazy' ? 'selling' : 'buying',
         ]);
     }
 
