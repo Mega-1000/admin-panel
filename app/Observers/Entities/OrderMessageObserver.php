@@ -24,12 +24,12 @@ class OrderMessageObserver
                     dispatch(new DispatchLabelEventByNameJob($orderMessage->order,
                         "new-mail-from-shipping-company"));
                 } else {
-                    $this->dispatchLabels(
-                        $orderMessage,
-                        "chatting-started-transport",
-                        "chatting-client-sent-message-to-us-transport",
-                        "chatting-sent-message-to-client-transport"
-                    );
+//                    $this->dispatchLabels(
+//                        $orderMessage,
+//                        "chatting-started-transport",
+//                        "chatting-client-sent-message-to-us-transport",
+//                        "chatting-sent-message-to-client-transport"
+//                    );
                 }
                 break;
             case 'WAREHOUSE':
