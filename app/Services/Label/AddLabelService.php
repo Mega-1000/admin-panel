@@ -51,13 +51,12 @@ class AddLabelService
             if ($labelId === 66 && $order->preferred_invoice_date === null) {
                 $order->preferred_invoice_date = Carbon::now();
                 $order->save();
-                dd('adding 66');
+            }
 
-                // check if order has label 42
-                if (!$order->labels()->where('label_id', 42)->exists()) {
-                    !$order->labels()->where('label_id', 41)->exists() ? $order->labels()->attach(41) : null;
-                    !$order->labels()->where('label_id', 195)->exists() ? $order->labels()->attach(195) : null;
-                }
+
+            if (!$order->labels()->where('label_id', 42)->exists()) {
+                !$order->labels()->where('label_id', 41)->exists() ? $order->labels()->attach(41) : null;
+                !$order->labels()->where('label_id', 195)->exists() ? $order->labels()->attach(195) : null;
             }
 
             if (array_key_exists('already-added', $loopPreventionArray)
