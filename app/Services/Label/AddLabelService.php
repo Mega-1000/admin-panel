@@ -43,16 +43,10 @@ class AddLabelService
         }
 
         foreach ($labelIdsToAdd as $labelId) {
-//            $arrayIntersect = array_intersect($order->labels()->pluck('labels.id')->toArray(), Label::NOT_ADD_LABEL_CHECK_CORRECT);
-//            if ($labelId === 45 && count($arrayIntersect) > 0) {
-//                continue;
-//            }
-
             if ($labelId === 66 && $order->preferred_invoice_date === null) {
                 $order->preferred_invoice_date = Carbon::now();
                 $order->save();
             }
-
 
             if (!$order->labels()->where('label_id', 42)->exists()) {
                 !$order->labels()->where('label_id', 41)->exists() ? $order->labels()->attach(41) : null;

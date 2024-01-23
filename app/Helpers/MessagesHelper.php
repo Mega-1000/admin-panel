@@ -283,10 +283,9 @@ class MessagesHelper
 
         $blankChatUser = $this->createOrGetBlankUser($chat);
 
-        $chatStatus = ChatStatus::first();
-        $content = $chatStatus->is_active ? $chatStatus->message : "Witamy!
-                        W czym możemy pomóc?";
-        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+//        $chatStatus = ChatStatus::first();
+//        $content = $chatStatus->is_active ? $chatStatus->message : "Witamy! W czym możemy pomóc?";
+//        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
 
         $this->cache['chat'] = $chat;
         $this->chatId = $chat->id;
