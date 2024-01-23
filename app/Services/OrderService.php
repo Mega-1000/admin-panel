@@ -318,11 +318,11 @@ class OrderService
         }
 
         $arr = [];
-        if (self::calculateTotalCost($order) !== $sumOfReturns) {
-            AddLabelService::addLabels($order, [235], $arr, [], Auth::user()?->id);
-
-            return;
-        }
+//        if (self::calculateTotalCost($order) !== $sumOfReturns) {
+//            AddLabelService::addLabels($order, [235], $arr, [], Auth::user()?->id);
+//
+//            return;
+//        }
 
         AddLabelService::addLabels($order, [236], $arr, [], Auth::user()?->id);
     }
