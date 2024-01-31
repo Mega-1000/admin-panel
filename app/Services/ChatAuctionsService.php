@@ -79,7 +79,7 @@ readonly class ChatAuctionsService
             }
         }
 
-        dd($employees, $firms);
+        dd($employees, $firms, $variations, $order);
         foreach ($employees as $employee) {
             Mailer::create()
                 ->to($employee->email)
