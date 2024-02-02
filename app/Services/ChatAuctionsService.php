@@ -70,7 +70,8 @@ readonly class ChatAuctionsService
         $order = $auction->chat->order;
         $variations = $this->productService->getVariations($order);
 
-        $firms = $this->getFirms($variations);
+        $firms = array_unique($this->getFirms($variations));
+        dd($firms);
 
         $employees = [];
         foreach ($firms as $firm) {
