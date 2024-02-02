@@ -131,7 +131,7 @@ readonly class OrderObserver
         ) {
             $order = Order::find($order->id);
             $LpArray = [];
-            RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
+            RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()?->id);
         } else {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         }
