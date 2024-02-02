@@ -72,6 +72,7 @@ readonly class ChatAuctionsService
 
         $firms = array_unique($this->getFirms($variations));
 
+        dd($firms);
         $employees = [];
         foreach ($firms as $firm) {
             foreach ($this->employeesRepository->getEmployeesForAuctionOrderByFirm($firm) as $employee) {
