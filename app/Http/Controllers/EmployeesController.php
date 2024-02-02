@@ -12,6 +12,7 @@ use App\Repositories\EmployeeRepository;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -192,7 +193,9 @@ class EmployeesController extends Controller
 
     public function destroy($id)
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         $this->repository->delete($id);
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         return redirect()->back()->with([
             'message' => __('employees.message.delete'),
