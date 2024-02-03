@@ -18,7 +18,6 @@ class ChatAuctionFirm extends Model
      * @property ChatAuction $chatAuction
      * @property string $token
      */
-
     protected $fillable = [
         'chat_auction_id',
         'firm_id',

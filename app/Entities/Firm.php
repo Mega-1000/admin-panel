@@ -12,6 +12,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * Class Firm.
  * @property string $email
  * @property int $id
+ * @property string $access_token
  * @package namespace App\Entities;
  */
 class Firm extends Model implements Transformable
