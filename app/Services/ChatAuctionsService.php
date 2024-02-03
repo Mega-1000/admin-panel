@@ -14,6 +14,7 @@ use App\Repositories\Employees;
 use App\Repositories\Firms;
 use App\Services\Label\AddLabelService;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 readonly class ChatAuctionsService
@@ -122,5 +123,18 @@ readonly class ChatAuctionsService
         foreach ($orders as $order) {
             $this->auctionOffersCreatorService->createOrder($order, $user);
         }
+    }
+
+    /**
+     * Get auctions
+     *
+     * @param Firm $firm
+     * @return Collection
+     */
+    public function getAuctions(Firm $firm): Collection
+    {
+        return ChatAuction::whereHas('firms', function ($query) use ($firm) {
+            $query->where('firm_id', $firm->id);
+        })->get();
     }
 }

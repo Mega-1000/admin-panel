@@ -7,6 +7,7 @@ use App\DTO\ChatAuctions\CreateChatAuctionOfferDTO;
 use App\Entities\Chat;
 use App\Entities\ChatAuction;
 use App\Entities\ChatAuctionFirm;
+use App\Entities\Firm;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Helpers\Exceptions\ChatException;
 use App\Http\Requests\CreateAuctionRequest;
@@ -19,6 +20,7 @@ use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -166,5 +168,16 @@ class AuctionsController extends Controller
         );
 
         return redirect()->back();
+    }
+
+    public function getAuctions(string $token): JsonResponse
+    {
+        $auctions = $this->chatAuctionsService->getAuctions(
+            Firm::where('access_token', $token)->firstOrFail(),
+        );
+
+        return response()->json(
+            $auctions
+        );
     }
 }

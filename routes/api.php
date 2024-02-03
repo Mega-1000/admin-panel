@@ -5,6 +5,7 @@ use App\Http\Controllers\AllegroMessageController;
 use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\OrderPackageController;
 use App\Http\Controllers\Api\ProductsController;
+use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ShipmentPayInReportByInvoiceNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/create-message', AllegroMessageController::class);
 });
+Route::get('get-auctions/{firmToken}', [AuctionsController::class, 'getAuctions'])->name('api.auctions.get-auctions');
 
 Route::get('order/invoice/{order}', 'Api\InvoiceController@getInvoicesForOrder')->name('api.orders.invoice');
 
