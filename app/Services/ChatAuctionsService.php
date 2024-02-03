@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTO\ChatAuctions\CreateChatAuctionDTO;
 use App\Entities\ChatAuction;
+use App\Entities\ChatAuctionFirm;
 use App\Entities\Firm;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
@@ -136,7 +137,13 @@ readonly class ChatAuctionsService
         return ChatAuction::whereHas('firms', function ($query) use ($firm) {
             $query->where('firm_id', $firm->id);
         })
-            ->with(['offers', 'offers.firm'])
-            ->get();
+        ->with(['offers', 'offers.firm'])
+        ->get()
+        ->each(function (ChatAuction $auction) {
+            $auction->editPricesLink = ChatAuctionFirm::where('chat_auction_id', $auction->id)
+                ->where('firm_id', $auction->firms->first()->id)
+                ->first()
+                ->token;
+        });
     }
 }
