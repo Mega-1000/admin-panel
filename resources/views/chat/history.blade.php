@@ -9,8 +9,7 @@
 @endforeach
 <h5>Pracownicy:</h5>
 @foreach ($usersHistory['employees'] as $user)
-    {{ dd($user) }}
-    <label>{{ $user->employee->email }}
+    <label>{{ \App\Entities\Employee::find($user->employee_id)->email }}
         <input type="checkbox" checked class="filter-users-history" value="{{ $user->id }}" />
     </label>
 @endforeach
