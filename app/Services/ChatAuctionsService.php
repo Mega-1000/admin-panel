@@ -139,9 +139,9 @@ readonly class ChatAuctionsService
         })
         ->with(['offers', 'offers.firm'])
         ->get()
-        ->each(function (ChatAuction $auction) {
+        ->each(function (ChatAuction $auction) use ($firm) {
             $auction->editPricesLink = ChatAuctionFirm::where('chat_auction_id', $auction->id)
-                ->where('firm_id', $auction->firms->first()->id)
+                ->where('firm_id', $firm->id)
                 ->first()
                 ->token;
         });
