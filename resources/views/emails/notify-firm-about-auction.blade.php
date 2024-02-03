@@ -18,6 +18,9 @@ Ze względu na fakt
 najniższe możliwe ceny aby zwiększyć prawdopodobieństwo wyboru waszej oferty.
 <br>
 <br>
+Chcielibyśmy również zaznaczyć, że klient nie musi zdecydować się na najtańszą ofertę więc prosimy o podanie najniższej ceny która jest dla Was akceptowalna.
+<br>
+<br>
 Nie
 <br>
 będzie widoczne kto dokonuje propozycji ofertowej tylko jedynie najniższa cena
