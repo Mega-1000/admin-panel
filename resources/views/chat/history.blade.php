@@ -9,9 +9,11 @@
 @endforeach
 <h5>Pracownicy:</h5>
 @foreach ($usersHistory['employees'] as $user)
-    <label>{{ \App\Entities\Employee::find($user->employee_id)->email }}
-        <input type="checkbox" checked class="filter-users-history" value="{{ $user->id }}" />
-    </label>
+    @if ($user?->employee?->email)
+        <label>{{ $user->employee->email }}
+            <input type="checkbox" checked class="filter-users-history" value="{{ $user->id }}" />
+        </label>
+    @endif
 @endforeach
 <h5>Konsultanci:</h5>
 @foreach ($usersHistory['consultants'] as $user)
