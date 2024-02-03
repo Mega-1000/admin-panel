@@ -140,7 +140,7 @@ readonly class ChatAuctionsService
         ->with(['offers', 'offers.firm'])
         ->get()
         ->each(function (ChatAuction $auction) use ($firm) {
-            $auction->editPricesLink = route('createOffer', ['token' => ChatAuctionFirm::where('chat_auction_id', $auction->id)
+            $auction->editPricesLink = route('auctions.offer.create', ['token' => ChatAuctionFirm::where('chat_auction_id', $auction->id)
                 ->where('firm_id', $firm->id)
                 ->first()
                 ->token
