@@ -136,7 +136,7 @@ readonly class ChatAuctionsService
         return ChatAuction::whereHas('firms', function ($query) use ($firm) {
             $query->where('firm_id', $firm->id);
         })
-            ->with('offers')
+            ->with(['offers', 'offers.firm'])
             ->get();
     }
 }
