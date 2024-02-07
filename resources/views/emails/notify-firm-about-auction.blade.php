@@ -6,25 +6,28 @@ Prosimy kliknąć poniższy link który przeniesie Was do
 modułu na którym prowadzony jest przetarg.
 <br>
 <br>
-<a href="{{ route('auctions.offer.create', ['token' => $token]) }}">{{ route('auctions.offer.create', ['token' => $token]) }}</a>
-<br>
-<br>
+
 Podane tam będą wszystkie parametry oraz asortyment dotyczący przetargu oraz
 możliwość wprowadzenie swoich cen w m3 lub w opakowaniach.
+<br>
+<br>
+
+<a href="{{ route('auctions.offer.create', ['token' => $token]) }}">{{ route('auctions.offer.create', ['token' => $token]) }}</a>
+
 <br>
 <br>
 Ze względu na fakt
 że do przetargu jest zaproszonych wielu sprzedawców i producentów prosimy podać
 najniższe możliwe ceny aby zwiększyć prawdopodobieństwo wyboru waszej oferty.
+
 <br>
 <br>
-Chcielibyśmy również zaznaczyć, że klient nie musi zdecydować się na najtańszą ofertę więc prosimy o podanie najniższej ceny która jest dla Was akceptowalna.
+Chcielibyśmy również zaznaczyć, że klient nie musi zdecydować się na ofertę najtańszego styropianu więc prosimy o podanie najniższej ceny która jest dla Was akceptowalna.
+
 <br>
 <br>
-Nie
-<br>
-będzie widoczne kto dokonuje propozycji ofertowej tylko jedynie najniższa cena
-zaproponowana przez któregoś z oferentów.
+Podane przez państwa ceny nie są widoczne dla innych oferentów jedynie dla klienta. Widoczna dla oferenów jest jedynie najniższa cena dla danego rodzaju styropianu zaproponowana przez jednego z uczestników.
+
 <br>
 <br>
 Ostatecznie sprzedaż klientowi może
@@ -35,7 +38,8 @@ najniższą cenę.
 <br>
 <br>
 
-Panel firmy z wszystkimi przetargami możesz znaleść pod następującym adresem: https://mega1000.pl/firms/przetargi?firmToken= {{ $firm->access_token }}
+Panel firmy z wszystkimi przetargami możesz znaleść pod następującym adresem:
+    <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
 <br>
 <br>
 A więc kliknij i dołącz do przetargu.
