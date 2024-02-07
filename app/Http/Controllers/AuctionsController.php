@@ -179,8 +179,10 @@ class AuctionsController extends Controller
         );
 
         return response()->json(
-            $firm,
-            $auctions
+            [
+                $firm,
+                $auctions,
+            ]
         );
     }
 }
