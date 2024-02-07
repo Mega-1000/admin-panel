@@ -31,6 +31,11 @@ Ostatecznie sprzedaż klientowi może
 się odbyć przez was bezpośrednio lub przez naszą firmę lub ewentualnie przez
 inna firmę którą możecie wskazać jeżeli sprzedaż przez nich gwarantuje
 najniższą cenę.
+
+<br>
+<br>
+
+Panel firmy z wszystkimi przetargami możesz znaleść pod następującym adresem: https://mega1000.pl/firms/przetargi?firmToken= {{ $firm->access_token }}
 <br>
 <br>
 A więc kliknij i dołącz do przetargu.
