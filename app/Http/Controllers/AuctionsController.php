@@ -172,11 +172,14 @@ class AuctionsController extends Controller
 
     public function getAuctions(string $token): JsonResponse
     {
+        $firm = Firm::where('access_token', $token)->firstOrFail();
+
         $auctions = $this->chatAuctionsService->getAuctions(
-            Firm::where('access_token', $token)->firstOrFail(),
+            $firm,
         );
 
         return response()->json(
+            $firm,
             $auctions
         );
     }
