@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class SendNotificationsForAuctionOfferForFirmsJob implements ShouldQueue
 {
@@ -35,7 +36,6 @@ class SendNotificationsForAuctionOfferForFirmsJob implements ShouldQueue
     {
         $firms = $chatAuctionOfferRepository->getFirmsForAuctionOfferForEmailRemider($this->chatAuctionOffer);
 
-        dd($firms);
         foreach ($firms as $firm) {
             $this->sendMailToFirm($firm->email);
         }
@@ -49,6 +49,7 @@ class SendNotificationsForAuctionOfferForFirmsJob implements ShouldQueue
      */
     private function sendMailToFirm(string $email): void
     {
+        Log::info('Message about new lower price offer was sent');
         Mailer::create()
             ->to($email)
             ->send(new NotificationsForAuctionOfferForFirmsMail($this->chatAuctionOffer, $email));
