@@ -35,6 +35,7 @@ class SendNotificationsForAuctionOfferForFirmsJob implements ShouldQueue
     {
         $firms = $chatAuctionOfferRepository->getFirmsForAuctionOfferForEmailRemider($this->chatAuctionOffer);
 
+        dd($firms);
         foreach ($firms as $firm) {
             $this->sendMailToFirm($firm->email);
         }
