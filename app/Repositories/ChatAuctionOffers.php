@@ -51,7 +51,7 @@ class ChatAuctionOffers
             ->where('order_item_id', $chatAuctionOffer->order_item_id)
             ->select('chat_auction_offers.*', 'firms.email') // adjust the select based on your needs
             ->groupBy('firms.email')
-            ->where('commercial_price_net', '>', $chatAuctionOffer->commercial_price_net)
+//            ->where('commercial_price_net', '>', $chatAuctionOffer->commercial_price_net)
             ->get();
     }
 
