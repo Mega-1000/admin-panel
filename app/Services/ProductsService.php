@@ -232,6 +232,8 @@ class ProductsService
                     } else {
                         $product->blured = false;
                     }
+                } else {
+                    $product->blured = true;
                 }
             }
         }
