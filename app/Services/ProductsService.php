@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Entities\Category;
 use App\Entities\ChimneyAttribute;
 use App\Entities\PostalCodeLatLon;
+use App\Entities\Warehouse;
 use App\Helpers\MessagesHelper;
 use App\Repositories\Categories;
 use App\Repositories\ProductStockLogs;
@@ -222,7 +223,10 @@ class ProductsService
                     ]
                 );
 
-                if (!empty($query)) {
+                $radius = $query->distance;
+                $warehouse = Warehouse::find($query->id);
+
+                if ($radius > $warehouse->radius) {
                     $product->blured = true;
                 } else {
                     $product->blured = false;

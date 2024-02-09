@@ -224,7 +224,7 @@ class ProductsController extends Controller
     {
         $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get()->toArray();
         $tree = $this->parseTree($allCategories);
-
+    
         return response(json_encode($tree));
     }
 
