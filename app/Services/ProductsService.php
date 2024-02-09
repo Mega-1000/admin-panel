@@ -195,14 +195,13 @@ class ProductsService
         return Category::findOrFail((int)$request['category_id']);
     }
 
-    public function getProducts($category, ?string $zipCode = null)
+    public function getProducts($category, ?string $zipCode = null): LengthAwarePaginator
     {
         $products = Categories::getProductsForCategory($category)
             ->paginate($this->getPerPage());
         $products->data = $products->items();
 
         foreach($products->data as &$product) {
-            return $zipCode;
             $zipCodeData = PostalCodeLatLon::where('postal_code', $zipCode)->first();
 
             if ($zipCodeData) {
