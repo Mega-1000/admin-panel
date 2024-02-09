@@ -211,7 +211,7 @@ class ProductsController extends Controller
     public function getProductsByCategory(Request $request): JsonResponse
     {
         $category = $this->productsService->getCategory($request->all());
-        $products = $this->productsService->getProducts($category);
+        $products = $this->productsService->getProducts($category, $request->get('zipCode'));
         $this->productsService->prepareProductData($products);
 
         return response()->json($products);

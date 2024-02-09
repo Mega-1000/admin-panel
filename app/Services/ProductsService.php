@@ -4,12 +4,14 @@ namespace App\Services;
 
 use App\Entities\Category;
 use App\Entities\ChimneyAttribute;
+use App\Entities\PostalCodeLatLon;
 use App\Helpers\MessagesHelper;
 use App\Repositories\Categories;
 use App\Repositories\ProductStockLogs;
 use App\Traits\Paginatable;
 use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use ParseError;
 
@@ -193,11 +195,38 @@ class ProductsService
         return Category::findOrFail((int)$request['category_id']);
     }
 
-    public function getProducts($category): LengthAwarePaginator
+    public function getProducts($category, ?string $zipCode = null): LengthAwarePaginator
     {
         $products = Categories::getProductsForCategory($category)
             ->paginate($this->getPerPage());
         $products->data = $products->items();
+
+        foreach($products->data as &$product) {
+            $zipCodeData = PostalCodeLatLon::where('postal_code', $zipCode)->first();
+
+            $query = DB::selectOne(
+                'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                        FROM postal_code_lat_lon pc
+                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                             JOIN warehouses w on wa.warehouse_id = w.id
+                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                        ORDER BY distance
+                    limit 1',
+                [
+                    'latitude' => $zipCodeData->latitude,
+                    'longitude' => $zipCodeData->longitude,
+                    'firmId' => $product->firm
+                ]
+            );
+
+            if (!empty($query)) {
+                $product->blured = true;
+            } else {
+                $product->blured = false;
+            }
+        }
 
         foreach ($products->data as $product) {
             if ($product->children->count() > 0) {
