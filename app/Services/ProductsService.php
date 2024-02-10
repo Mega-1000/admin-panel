@@ -232,7 +232,7 @@ class ProductsService
                     } else {
                         $product->blured = false;
                     }
-                } else {
+                } else if ($product?->variation_group === 'styropiany') {
                     $product->blured = true;
                 }
             }
