@@ -227,7 +227,7 @@ class ProductsService
                     $radius = $query->distance;
                     $warehouse = Warehouse::find($query->id);
 
-                    if ($radius > $warehouse->radius && $product?->variation_group === 'styropiany') {
+                    if ($radius > $warehouse->radius) {
                         $product->blured = true;
                     } else {
                         $product->blured = false;
