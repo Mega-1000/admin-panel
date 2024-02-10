@@ -219,7 +219,7 @@ class ProductsService
                     [
                         'latitude' => $zipCodeData->latitude,
                         'longitude' => $zipCodeData->longitude,
-                        'firmId' => $product->firm->id
+                        'firmId' => $product?->firm?->id
                     ]
                 );
 
