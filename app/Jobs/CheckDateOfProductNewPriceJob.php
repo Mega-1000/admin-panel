@@ -53,14 +53,14 @@ class CheckDateOfProductNewPriceJob implements ShouldQueue
                 $groupExp = $exp[1];
             }
             $pattern = $this->setPatternKey($product);
+
+            if ($product->symbol === 'ST042F') {
+                dd($pattern);
+            }
+
             switch ($groupExp) {
                 case 'UB':
                     $price['net_purchase_price_basic_unit'] = $pattern;
-
-                    if ($product->symbol === 'ST042F') {
-                        dd($price['net_purchase_price_basic_unit']);
-                    }
-
                     $price['net_purchase_price_commercial_unit'] = (float)$price['net_purchase_price_basic_unit'] * $product->packing->numbers_of_basic_commercial_units_in_pack;
                     $price['net_purchase_price_calculated_unit'] = (float)$price['net_purchase_price_basic_unit'] * $product->packing->unit_consumption;
                     $price['net_purchase_price_aggregate_unit'] = ((float)$price['net_purchase_price_basic_unit'] * $product->packing->numbers_of_basic_commercial_units_in_pack) * $product->packing->number_of_sale_units_in_the_pack;
