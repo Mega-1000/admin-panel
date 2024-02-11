@@ -80,7 +80,6 @@ readonly class ChatAuctionsService
                 $employees[] = $employee;
             }
         }
-        dd($employees);
 
         $employees = array_unique($employees);
         foreach ($employees as $employee) {
