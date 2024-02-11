@@ -54,9 +54,9 @@ class CheckDateOfProductNewPriceJob implements ShouldQueue
             }
             $pattern = $this->setPatternKey($product);
 
-//            if ($product->symbol === 'ST042F') {
+            if ($product->symbol === 'ST042F') {
                 dd($pattern);
-//            }
+            }
 
             switch ($groupExp) {
                 case 'UB':
