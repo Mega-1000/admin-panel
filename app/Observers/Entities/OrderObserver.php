@@ -37,6 +37,8 @@ readonly class OrderObserver
      */
     public function created(Order $order): void
     {
+        $order->employee()->attach(12);
+
         $this->orderPaymentLabelsService->calculateLabels($order);
 
         $order->token = Str::random(32);
