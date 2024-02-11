@@ -25,9 +25,6 @@ class AddLabelService
      */
     public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId = null, ?Carbon $time = null): void
     {
-//        if (in_array(195, $labelIdsToAdd)) {
-//            throw new Exception('Label 195 is deprecated');
-//        }
         $now = Carbon::now();
 
         $order->labels_log .= PHP_EOL . 'Dodano etykietę' . 'id: ' . implode(',', $labelIdsToAdd) . ' ' . $now->format('Y-m-d H:i:s') . ' przez użtkownika: ' . auth()->user()?->name ?? 'system';
@@ -43,6 +40,10 @@ class AddLabelService
         }
 
         foreach ($labelIdsToAdd as $labelId) {
+            if ($labelId === 39 && $order->payments->count() === 0) {
+                return;
+            }
+
             if ($labelId === 66) {
                 if ($order->preferred_invoice_date === null) {
                     $order->preferred_invoice_date = Carbon::now();
