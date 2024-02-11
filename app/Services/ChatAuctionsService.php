@@ -82,6 +82,19 @@ readonly class ChatAuctionsService
         }
 
         $employees = array_unique($employees);
+
+        foreach ($employees as $employee) {
+            $firmAssociatedWithEmployee = Firm::where('email', $employee->email)->first();
+
+            if ($firmAssociatedWithEmployee) {
+                foreach ($firmAssociatedWithEmployee->employees as $employee) {
+                    $employees[] = $employee;
+                }
+            }
+        }
+
+        $employees = array_unique($employees);
+
         foreach ($employees as $employee) {
             Mailer::create()
                 ->to($employee->email)
