@@ -21,7 +21,8 @@ class ChatAuctionFirm extends Model
     protected $fillable = [
         'chat_auction_id',
         'firm_id',
-        'token'
+        'token',
+        'email_of_employee',
     ];
 
     public function chatAuction(): BelongsTo

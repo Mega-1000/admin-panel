@@ -56,9 +56,10 @@ class ChatAuctionFirms
      *
      * @param $auction
      * @param $firm
+     * @param $emailOfEmplotee
      * @return string
      */
-    public function createWithToken($auction, $firm): string
+    public function createWithToken($auction, $firm, $emailOfEmplotee): string
     {
         $token = Str::random(60);
 
@@ -66,6 +67,7 @@ class ChatAuctionFirms
             'chat_auction_id' => $auction->id,
             'firm_id' => $firm->id,
             'token' => $token,
+            'email_of_employee' => $emailOfEmplotee,
         ]);
 
         return $token;

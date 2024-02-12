@@ -98,7 +98,7 @@ readonly class ChatAuctionsService
         foreach ($employees as $employee) {
             Mailer::create()
                 ->to($employee->email)
-                ->send(new NotifyFirmAboutAuction($auction, $employee->firm, $this->generateLinkForAuction($auction, $employee->firm)));
+                ->send(new NotifyFirmAboutAuction($auction, $employee->firm, $this->generateLinkForAuction($auction, $employee->firm, $employee->email)));
         }
 
         $auction->update([
@@ -120,11 +120,12 @@ readonly class ChatAuctionsService
      *
      * @param ChatAuction $auction
      * @param Firm $firm
+     * @param string $emailOfEmployee
      * @return string
      */
-    public function generateLinkForAuction(ChatAuction $auction, Firm $firm): string
+    public function generateLinkForAuction(ChatAuction $auction, Firm $firm, string $emailOfEmployee): string
     {
-        return $this->chatAuctionFirmsRepository->createWithToken($auction, $firm);
+        return $this->chatAuctionFirmsRepository->createWithToken($auction, $firm, $emailOfEmployee);
     }
 
     /**
