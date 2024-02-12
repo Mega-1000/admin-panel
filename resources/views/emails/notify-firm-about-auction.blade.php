@@ -38,7 +38,9 @@ najniższą cenę.
 <br>
 <br>
 
-Panel twojej firmy gdzie znajdziesz wszystkie swoje przetargi w naszym systemie możesz znaleść pod następującym adresem:
+W linku poniżej znajdziesz: <br>
+- Dostęp do wszystkich przetargów w których wasza firma zosatła zaproszona do udziału <br>
+- Dokonać zmiany cen tabelarycznych
     <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
 <br>
 <br>
