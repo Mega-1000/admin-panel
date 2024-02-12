@@ -119,7 +119,7 @@ class AuctionsController extends Controller
         $firm = ChatAuctionFirm::query()->where('token', $token)->firstorfail();
 
         $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($request->validated() + [
-            'firm_id' => $firm->id,
+            'firm_id' => $firm->firm_id,
             'chat_auction_id' => $firm->chat_auction_id
         ]));
 

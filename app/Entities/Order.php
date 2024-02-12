@@ -502,7 +502,6 @@ class Order extends Model implements Transformable
         return $this->belongsTo(User::class);
     }
 
-
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
