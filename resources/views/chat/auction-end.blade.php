@@ -160,6 +160,15 @@
 
     <body>
     <div>
+        <div class="alert-success alert">
+            Poleć naszą platformę znajomym, a my zaoferujemy Ci 20zł zniżki za każdego nowego użytkownika!
+
+            <br>
+            <br>
+
+            Twój link to <span style="font: bold">https://mega1000.pl/rejestracja?ref={{ auth()->user()->id }}</span> - skopiuj go i udostępnij znajomym!
+        </div>
+
         <div class="container" id="flex-container">
             <div id="chat-container">
                 <table>
@@ -251,15 +260,6 @@
 
                 </tbody>
             </table>
-
-            <div class="alert-success alert">
-                Poleć naszą platformę znajomym, a my zaoferujemy Ci 20zł zniżki za każdego nowego użytkownika!
-
-                <br>
-                <br>
-
-                Twój link to <bold>https://mega1000.pl/rejestracja?ref={{ auth()->user()->id }}</bold> - skopiuj go i udostępnij znajomym!
-            </div>
         </div>
     </div>
     </body>
