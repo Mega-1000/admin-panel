@@ -168,7 +168,7 @@
                     <br>
                     <br>
 
-                    Twój link to <span style="font-weight: bold">https://mega1000.pl/rejestracja?ref={{ auth()->user()->id }}</span> - skopiuj go i udostępnij znajomym!
+                    Twój link to <span style="font-weight: bold">https://mega1000.pl/sklep?ref={{ base64_decode($auction->chat->order->customer->id) }}</span> - skopiuj go i udostępnij znajomym!
                 </div>
 
                 <table>
