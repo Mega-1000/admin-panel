@@ -170,7 +170,7 @@
 
                     Twój link to
                     <span style="font-weight: bold">
-                        https://mega1000.pl/sklep?ref={{ $auction->chat->order->customer->id}}
+                        https://mega1000.pl/sklep?ref={{ base64_encode($auction->chat->order->customer->id) }}
                     </span>
                     - skopiuj go i udostępnij znajomym!
                 </div>
