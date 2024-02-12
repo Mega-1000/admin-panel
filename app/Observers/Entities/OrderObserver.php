@@ -37,7 +37,8 @@ readonly class OrderObserver
      */
     public function created(Order $order): void
     {
-        $order->employee()->attach(12);
+        $order->employee_id = 12;
+        $order->save();
 
         $this->orderPaymentLabelsService->calculateLabels($order);
 
