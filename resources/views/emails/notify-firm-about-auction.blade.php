@@ -40,7 +40,7 @@ najniższą cenę.
 
 W linku poniżej znajdziesz: <br>
 - Dostęp do wszystkich przetargów w których wasza firma zosatła zaproszona do udziału <br>
-- Dokonać zmiany cen tabelarycznych
+- Dokonać zmiany cen tabelarycznych <br>
     <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
 <br>
 <br>
