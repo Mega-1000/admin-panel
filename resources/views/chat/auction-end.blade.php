@@ -228,7 +228,7 @@
             </thead>
             <tbody>
 
-            @foreach($firms->unique() as $firm)
+            @foreach($firms->unique('firm.symbol') as $firm)
                 @if($auction->offers->where('firm_id', $firm->id)->count() === 0)
                     <tr>
                         <td>
