@@ -256,7 +256,7 @@
 
                                 foreach ($items as $item) {
                                     $variation = App\Entities\Product::where('product_group', $item->product_group)->where('firm_id', $firm->id);
-                                    $prices[] = $variation->price;
+                                    $prices[] = $variation->basic_price_gross;
                                 }
                                 @endphp
 
