@@ -217,7 +217,7 @@
                                 $displayedFirmSymbols[] = $firm->firm->symbol; // Add the symbol to the tracked array
                             @endphp
 
-                            {{ dd($product) }}
+                            {{ dd($products) }}
                             @foreach($products as $product)
                                 <td>
                                     @php
