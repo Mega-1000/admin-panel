@@ -217,7 +217,6 @@
                                 $displayedFirmSymbols[] = $firm->firm->symbol; // Add the symbol to the tracked array
                             @endphp
 
-                            {{ dd($products) }}
                             @foreach($products as $product)
                                 <td>
                                     @php
@@ -233,6 +232,9 @@
                                     @endif
                                 </td>
                             @endforeach
+
+                            <!-- ceny firm które nie złożyły oferty -->
+
                         </tr>
                     @endforeach
 
