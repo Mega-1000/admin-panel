@@ -183,43 +183,47 @@
                                 Ceny za m3
                             </h5>
                         </th> <!-- Empty cell for the top-left corner -->
-                        @php
-                            $displayedNames = [];
-                        @endphp
                         @foreach($products as $product)
-                            @php
-                                $originalName = $product->product->name;
-                                $words = explode(' ', $originalName);
-                                array_shift($words); // Remove the first word
-                                $modifiedName = implode(' ', $words); // Reconstruct the name without the first word
-                            @endphp
-
-                            @if(!in_array($modifiedName, $displayedNames))
-                                <th>
-                                    {{ $modifiedName }}
-                                    <button class="btn btn-primary">
-                                        Sortuj
-                                    </button>
-                                </th>
+                            <th>
                                 @php
-                                    $displayedNames[] = $modifiedName; // Add the modified name to the array to avoid duplicates
+                                    $name = $product->product->name;
+                                    $words = explode(' ', $name);
+                                    array_shift($words);
+                                    $name = implode(' ', $words);
                                 @endphp
-                            @endif
+                                {{ $name }}
+                                <button class="btn btn-primary">
+                                    Sortuj
+                                </button>
+                            </th>
                         @endforeach
                     </tr>
                     </thead>
                     <tbody>
+                    @php
+                        $displayedFirmSymbols = [];
+                    @endphp
+
                     @foreach($firms as $firm)
-                        @if($auction->offers->where('firm_id', $firm->id)->count() === 0)
+                        @if($auction->offers->where('firm_id', $firm->id)->count() === 0 || in_array($firm->firm->symbol, $displayedFirmSymbols))
                             @continue
                         @endif
+
                         <tr>
                             <td>
                                 {{ $firm->firm->symbol }}
-                            </td> <!-- Modify this according to your firm object -->
+                            </td> <!-- Display the firm symbol -->
+                            @php
+                                $displayedFirmSymbols[] = $firm->firm->symbol; // Add the symbol to the tracked array
+                            @endphp
+
                             @foreach($products as $product)
                                 <td>
-                                    @if($offer = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->first())
+                                    @php
+                                        $offer = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->first();
+                                    @endphp
+
+                                    @if($offer)
                                         {{ $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_net') }} Zł
 
                                         <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-firm="{{ $firm->firm->name }}" data-product="{{ $product->product->name }}">
@@ -230,6 +234,7 @@
                             @endforeach
                         </tr>
                     @endforeach
+
                     </tbody>
                 </table>
 
