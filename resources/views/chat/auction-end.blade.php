@@ -232,10 +232,28 @@
                                     @endif
                                 </td>
                             @endforeach
-
-                            <!-- ceny firm które nie złożyły oferty -->
-
                         </tr>
+                    @endforeach
+
+                    @php
+                        $displayedSymbols = [];
+                    @endphp
+
+                    @foreach($firms as $firm)
+                        @php
+                            $symbol = $firm->firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
+                        @endphp
+
+                        @if($auction->offers->where('firm_id', $firm->id)->count() === 0 && !in_array($symbol, $displayedSymbols))
+                            <tr>
+                                <td>
+                                    {{ $symbol }}
+                                </td>
+                            </tr>
+                            @php
+                                $displayedSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
+                            @endphp
+                        @endif
                     @endforeach
 
                     </tbody>
