@@ -182,7 +182,7 @@
                             <h5 style="text-align: right">
                                 Ceny za m3
                             </h5>
-                        </th> <!-- Empty cell for the top-left corner -->
+                        </th>
                         @foreach($products as $product)
                             <th>
                                 @php
@@ -224,7 +224,7 @@
                                     @endphp
 
                                     @if($offer)
-                                        {{ $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_net') }} Zł
+                                        {{ $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }} Zł
 
                                         <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-firm="{{ $firm->firm->name }}" data-product="{{ $product->product->name }}">
                                     @else
