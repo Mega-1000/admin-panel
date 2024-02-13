@@ -255,8 +255,8 @@
                                 $items = $auction->chat->order->items->pluck('product');
 
                                 foreach ($items as $item) {
-                                    $variation = $item->product-> // find vatiariation of product
-                                    $prices[] = $variation->price; // add price to array
+                                    $variation = App\Entities\Product::where('product_group', $item->product_group)->where('firm_id', $firm->id);
+                                    $prices[] = $variation->price;
                                 }
                                 @endphp
 
