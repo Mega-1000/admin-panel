@@ -160,7 +160,7 @@ class OrderBuilder
                 $this->attachFileToOrder($file, $order);
             }
         }
-        $chatUserToken = '';
+        $chatUserToken = $order->chat->users()->where('user_id', $customer->id)->first()->pivot->token;
 
         $this->assignItemsToOrder($order, $data['order_items']);
 

@@ -249,6 +249,22 @@
                                 <td>
                                     {{ $symbol }}
                                 </td>
+
+                                @php
+                                $prices = [];
+                                $items = $auction->chat->order->items->pluck('product');
+
+                                foreach ($items as $item) {
+                                    $variation = $item->product-> // find vatiariation of product
+                                    $prices[] = $variation->price; // add price to array
+                                }
+                                @endphp
+
+                                @foreach($prices as $price)
+                                    <td>
+                                        {{ $price }} Zł
+                                    </td>
+                                @endforeach
                             </tr>
                             @php
                                 $displayedSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
