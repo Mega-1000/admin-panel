@@ -183,19 +183,28 @@
                                 Ceny za m3
                             </h5>
                         </th> <!-- Empty cell for the top-left corner -->
+                        @php
+                            $displayedNames = [];
+                        @endphp
                         @foreach($products as $product)
-                            <th>
+                            @php
+                                $originalName = $product->product->name;
+                                $words = explode(' ', $originalName);
+                                array_shift($words); // Remove the first word
+                                $modifiedName = implode(' ', $words); // Reconstruct the name without the first word
+                            @endphp
+
+                            @if(!in_array($modifiedName, $displayedNames))
+                                <th>
+                                    {{ $modifiedName }}
+                                    <button class="btn btn-primary">
+                                        Sortuj
+                                    </button>
+                                </th>
                                 @php
-                                    $name = $product->product->name;
-                                    $words = explode(' ', $name);
-                                    array_shift($words);
-                                    $name = implode(' ', $words);
+                                    $displayedNames[] = $modifiedName; // Add the modified name to the array to avoid duplicates
                                 @endphp
-                                {{ $name }}
-                                <button class="btn btn-primary">
-                                    Sortuj
-                                </button>
-                            </th>
+                            @endif
                         @endforeach
                     </tr>
                     </thead>
