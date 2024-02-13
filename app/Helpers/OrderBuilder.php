@@ -160,6 +160,13 @@ class OrderBuilder
                 $this->attachFileToOrder($file, $order);
             }
         }
+
+        if (!$order->chat) {
+            $helper = new MessagesHelper();
+            $helper->orderId = $order->id;
+            $helper->createNewChat();
+        }
+
         $chatUserToken = $order->chat->users()->where('user_id', $customer->id)->first()->pivot->token;
 
         $this->assignItemsToOrder($order, $data['order_items']);
