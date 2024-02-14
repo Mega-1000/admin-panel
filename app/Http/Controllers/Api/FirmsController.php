@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Firm;
 use App\Http\Requests\Api\Firms\FirmUpdateRequest;
 use App\Repositories\FirmRepository;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 class FirmsController
@@ -49,6 +51,11 @@ class FirmsController
             );
             die();
         }
+    }
+
+    public function getFirmBySymbol(Firm $firm): JsonResponse
+    {
+        return response()->json($firm);
     }
 
 }

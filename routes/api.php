@@ -3,6 +3,7 @@
 use App\Entities\ShippingPayInReport;
 use App\Http\Controllers\AllegroMessageController;
 use App\Http\Controllers\Api\DiscountController;
+use App\Http\Controllers\Api\FirmsController;
 use App\Http\Controllers\Api\OrderPackageController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\AuctionsController;
@@ -139,6 +140,7 @@ Route::get('products/{id}', 'Api\ProductsController@getProduct')->name('api.get-
 Route::get('products/', 'Api\ProductsController@getProducts')->name('api.get-products');
 
 Route::post('firms/updateData/{firm_id}', 'Api\FirmsController@updateData')->name('api.update-data');
+Route::get('firm/{firm:symbol}', [FirmsController::class, 'getFirmBySymbol']);
 
 Route::post('spedition-exchange/generate-link', 'Api\SpeditionExchangeController@generateLink')->name('api.spedition-exchange.generate-link');
 Route::get('spedition-exchange/get-details/{hash}', 'Api\SpeditionExchangeController@getDetails')->name('api.spedition-exchange.get-details');
