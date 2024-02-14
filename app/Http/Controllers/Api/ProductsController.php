@@ -44,14 +44,14 @@ class ProductsController extends Controller
      * @param $id
      * @return array
      */
-    public function getProductsForPriceUpdates($id): array
+    public function getProductsForPriceUpdates($id)
     {
         $warehouse = Warehouse::findOrFail($id);
 
         $products = $this->repository->findWhere([
             ['product_name_supplier', '=', $warehouse->symbol]
         ]);
-        dd($products);
+        return $products;
         $productsReturnArray = [];
 
         foreach ($products as $product) {
