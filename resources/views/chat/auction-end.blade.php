@@ -260,7 +260,7 @@
                                 }
                                 @endphp
 
-                                {{ dd($prices;) }}
+                                {{ dd($prices); }}
 
                                 @foreach($prices as $price)
                                     <td>
