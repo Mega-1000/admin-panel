@@ -260,6 +260,8 @@
                                 }
                                 @endphp
 
+                                {{ $prices }}
+
                                 @foreach($prices as $price)
                                     <td>
                                         {{ $price }} Zł
