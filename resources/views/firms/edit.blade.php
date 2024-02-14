@@ -43,7 +43,7 @@
         </a>
     </div>
 
-    <form method="post" action="{{ route('') }}" class="btn btn-primary" >
+    <form method="post" action="{{ route('auction.notification-firm-panel', $firm->id) }}" class="btn btn-primary" >
         @csrf
         <button class="btn btn-primary">
             Wyślij powiadomienie na temat dostępności panelu przetargów
