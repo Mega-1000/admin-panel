@@ -35,7 +35,7 @@ class NotificationAboutFirmPanelMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Panel firmy w naszym systemie przetargów',
+            subject: 'Dostęp do przetargów i zarządzanie ofertami w naszym systemie',
         );
     }
 
