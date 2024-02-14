@@ -50,7 +50,7 @@ class ProductsController extends Controller
         $warehouse = Firm::findOrFail($id);
 
         $products = $this->repository->findWhere([
-            ['product_name_supplier', '=', $firm->symbol]
+            ['product_name_supplier', '=', $warehouse->symbol]
         ]);
 
         $productsReturnArray = [];
