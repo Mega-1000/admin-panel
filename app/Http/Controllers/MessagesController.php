@@ -279,7 +279,9 @@ class MessagesController extends Controller
         $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
         $userToken = $helper->encrypt();
 
-        return redirect()->route('chat.show', ['token' => $userToken]);
+        $showAuctionInstructions = request()->query('showAuctionInstructions');
+
+        return redirect()->route('chat.show', ['token' => $userToken, 'showAuctionInstrictions' => $showAuctionInstructions]);
     }
 
     /**
