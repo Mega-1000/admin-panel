@@ -57,7 +57,7 @@ class ProductsController extends Controller
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
             if ($group == null) {
-                continue;
+//                continue;
             }
             $exp = explode('-', $group);
             $groupExp = $exp[1];
@@ -224,7 +224,7 @@ class ProductsController extends Controller
     {
         $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get()->toArray();
         $tree = $this->parseTree($allCategories);
-    
+
         return response(json_encode($tree));
     }
 
