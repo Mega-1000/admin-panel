@@ -42,6 +42,14 @@
             <i class="voyager-plus"></i> <span>@lang('employees.create')</span>
         </a>
     </div>
+
+    <form method="post" action="{{ route('') }}" class="btn btn-primary" >
+        @csrf
+        <button class="btn btn-primary">
+            Wyślij powiadomienie na temat dostępności panelu przetargów
+        </button>
+    </form>
+
     <form id="firms" action="{{ action('FirmsController@update', ['id' => $firm->id])}}"
           method="POST">
         {{ csrf_field() }}

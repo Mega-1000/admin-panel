@@ -9,10 +9,12 @@ use App\Entities\ChatAuction;
 use App\Entities\ChatAuctionFirm;
 use App\Entities\Firm;
 use App\Exceptions\DeliverAddressNotFoundException;
+use App\Facades\Mailer;
 use App\Helpers\Exceptions\ChatException;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Http\Requests\UpdateChatAuctionRequest;
+use App\Mail\NotificationAboutFirmPanelMail;
 use App\Repositories\ChatAuctionFirms;
 use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
@@ -184,5 +186,19 @@ class AuctionsController extends Controller
                 $auctions,
             ]
         );
+    }
+
+    public function sendNotificationAboutFirmPanel(Firm $firm): RedirectResponse
+    {
+        Mailer::create()
+            ->to($firm->email)
+            ->send(new NotificationAboutFirmPanelMail(
+                $firm,
+            ));
+
+        return redirect()->back()->with([
+            'message' => 'Pomyślnie wysłano wiadomość e-mail',
+            'alert-type' => 'success'
+        ]);
     }
 }
