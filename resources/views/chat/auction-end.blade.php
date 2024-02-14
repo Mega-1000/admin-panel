@@ -281,7 +281,7 @@
                     <tr>
                         <th>
                             <h5 style="text-align: right">
-                                Firmy, które nie złożyły oferty
+                                Firmy, które nie złożyły spersonalizowanej wyceny dla tego zlecenia
                             </h5>
                         </th>
                     </tr>
