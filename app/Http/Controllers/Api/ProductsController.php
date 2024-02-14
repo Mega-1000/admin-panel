@@ -55,9 +55,10 @@ class ProductsController extends Controller
         $productsReturnArray = [];
 
         foreach ($products as $product) {
+            dd($products);
             $group = $product->product_group_for_change_price;
             if ($group == null) {
-//                continue;
+                continue;
             }
             $exp = explode('-', $group);
             $groupExp = $exp[1];
