@@ -255,8 +255,7 @@
                                 $items = $auction->chat->order->items->pluck('product');
 
                                 foreach ($items as $item) {
-                                    {{ dd($item, $firm); }}
-                                    $variation = App\Entities\Product::where('product_group', $item->product_group)->where('product_name_supplier', $firm->symbol)->first();
+                                    $variation = App\Entities\Product::where('product_group', $item->product_group)->where('product_name_supplier', $firm->firm->symbol)->first();
                                     $prices[] = $variation?->basic_price_gross;
                                 }
                                 @endphp
