@@ -571,7 +571,7 @@ class OrdersController extends Controller
                         ->with('price');
                 }]);
             }])
-            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers')
+            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers', 'chat.auctions')
             ->orderBy('id', 'desc')
             ->where('is_hidden', false)
             ->get();
@@ -584,7 +584,6 @@ class OrdersController extends Controller
             $orderButtons = ChatHelper::createButtonsArrayForOrder($order, $userId, MessagesHelper::TYPE_CUSTOMER);
             $order->buttons = $orderButtons;
             $order->user_invoices = $order->subiektInvoices;
-
         }
 
         return $orders->toJson();
