@@ -208,7 +208,7 @@ class OrderBuilder
         }
         $order->save();
         $this->postOrderActions?->run($order);
-        return ['id' => $order->id, 'canPay' => $canPay ?? false, 'chatUserToken' => $chatUserToken];
+        return ['id' => $order->id, 'canPay' => $canPay ?? false, 'customerId' => $order->customer->id ,'chatUserToken' => $chatUserToken];
     }
 
     /**
