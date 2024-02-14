@@ -235,6 +235,8 @@
                         </tr>
                     @endforeach
 
+                    {{ dd($displayedFirmSymbols); }}
+
                     @foreach($firms as $firm)
                         @php
                             $symbol = $firm->firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
