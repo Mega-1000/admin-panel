@@ -30,6 +30,22 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
     />
+    <style>
+        .darken-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1; /* Ensure this is below your button and instruction z-index */
+        }
+
+        .highlight-element {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
     <!-- Select2 JS -->
 </head>
 
@@ -58,6 +74,9 @@
                             <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
                                 Rozpocznij przetarg
                             </a>
+                            <div id="auction-instructions" style="display: none;">
+                                <p>You can click this button to start the auction.</p>
+                            </div>
                         @else
                             <!-- if auction->end_of_auction is in past show message  -->
                             <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}">
@@ -587,6 +606,27 @@
                     }
                 })
             })
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            const params = new URLSearchParams(window.location.search);
+            const showAuctionInstructions = params.get('showAuctionInstructions') === 'true';
+
+            if (showAuctionInstructions) {
+                // Show the instructions
+                $('#auction-instructions').show();
+
+                // Highlight the start auction button
+                $('#start-auction').addClass('highlight-element');
+
+                // Darken the rest of the page
+                $('body').append('<div class="darken-page"></div>');
+
+                // Ensure the button and instructions are above the darkened background
+                $('#auction-instructions, #start-auction').addClass('highlight-element');
+            }
         });
     </script>
 </body>
