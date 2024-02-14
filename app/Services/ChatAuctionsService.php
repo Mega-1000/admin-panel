@@ -152,6 +152,7 @@ readonly class ChatAuctionsService
             $query->where('firm_id', $firm->id);
         })
         ->with(['offers', 'offers.firm', 'chat.order.customer.addresses', 'chat.order.items.product.packing'])
+        ->orderBy('updated_at', 'desc')
         ->get()
         ->each(function (ChatAuction $auction) use ($firm) {
             $auction->editPricesLink = route('auctions.offer.create', ['token' => ChatAuctionFirm::where('chat_auction_id', $auction->id)
