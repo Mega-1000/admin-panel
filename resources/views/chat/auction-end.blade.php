@@ -259,7 +259,7 @@
 
                                 @foreach($prices as $price)
                                     <td>
-                                        {{ $price }} Zł
+                                        {{ $price }} zł
                                     </td>
                                 @endforeach
                             </tr>
