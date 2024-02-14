@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\Category;
+use App\Entities\Firm;
 use App\Entities\Product;
 use App\Entities\Warehouse;
 use App\Http\Controllers\Controller;
@@ -46,16 +47,15 @@ class ProductsController extends Controller
      */
     public function getProductsForPriceUpdates($id)
     {
-        $warehouse = Warehouse::findOrFail($id);
+        $warehouse = Firm::findOrFail($id);
 
         $products = $this->repository->findWhere([
-            ['product_name_supplier', '=', $warehouse->symbol]
+            ['product_name_supplier', '=', $firm->symbol]
         ]);
-        return $products;
+
         $productsReturnArray = [];
 
         foreach ($products as $product) {
-            dd($products);
             $group = $product->product_group_for_change_price;
             if ($group == null) {
                 continue;
