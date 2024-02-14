@@ -51,7 +51,7 @@ class ProductsController extends Controller
         $products = $this->repository->findWhere([
             ['product_name_supplier', '=', $warehouse->symbol]
         ]);
-
+        dd($products);
         $productsReturnArray = [];
 
         foreach ($products as $product) {
