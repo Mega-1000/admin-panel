@@ -74,8 +74,10 @@
                             <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
                                 Rozpocznij przetarg
                             </a>
-                            <div id="auction-instructions" style="display: none;">
+                            <div id="auction-instructions" style="display: none; color: white; font-weight: bold; font-size: large">
                                 <p>You can click this button to start the auction.</p>
+                                <br>
+                                <button class="btn btn-primary" id="dimiss-info">Ok</button>
                             </div>
                         @else
                             <!-- if auction->end_of_auction is in past show message  -->
@@ -626,6 +628,11 @@
 
                 // Ensure the button and instructions are above the darkened background
                 $('#auction-instructions, #start-auction').addClass('highlight-element');
+
+                $('#dimiss-info').on('click', function() {
+                    $('#auction-instructions').hide();
+                    $('.darken-page').remove();
+                });
             }
         });
     </script>
