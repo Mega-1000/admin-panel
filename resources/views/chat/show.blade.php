@@ -75,8 +75,7 @@
                                 Rozpocznij przetarg
                             </a>
                             <div id="auction-instructions" style="display: none; color: white; font-weight: bold; font-size: large">
-                                <p>You can click this button to start the auction.</p>
-                                <br>
+                            <p>Możesz rozpocząć aukcję klikając w ten przycisk. Poprosimy firmy o indywidualną wycenę twojego zamówienia.</p>
                                 <button class="btn btn-primary" id="dimiss-info">Ok</button>
                             </div>
                         @else
