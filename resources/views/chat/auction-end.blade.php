@@ -263,7 +263,7 @@
                                 @endforeach
                             </tr>
                             @php
-                                $displayedSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
+                               $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
                             @endphp
                         @endif
                     @endforeach
