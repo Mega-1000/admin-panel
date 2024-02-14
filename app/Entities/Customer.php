@@ -37,7 +37,7 @@ class Customer extends Authenticatable implements Transformable
      * @var array
      */
     protected $fillable = [
-        'id_from_old_db', 'login', 'password', 'nick_allegro', 'status',
+        'id_from_old_db', 'login', 'password', 'nick_allegro', 'status', 'id_of_parrent_referral', 'balance_of_addictional_discount_account'
     ];
 
     protected $hidden = ['password', 'remember_token'];

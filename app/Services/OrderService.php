@@ -7,6 +7,7 @@ use App\DTO\orderPayments\OrderPaymentDTO;
 use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
+use App\Entities\Customer;
 use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderPayment;
@@ -318,12 +319,13 @@ class OrderService
         }
 
         $arr = [];
-//        if (self::calculateTotalCost($order) !== $sumOfReturns) {
-//            AddLabelService::addLabels($order, [235], $arr, [], Auth::user()?->id);
-//
-//            return;
-//        }
 
         AddLabelService::addLabels($order, [236], $arr, [], Auth::user()?->id);
+    }
+
+    public function handleReferral(int $idOfParrentUser, string $newCustomerWitchWasRefferedLogin): void
+    {
+        $referredCustomer = Customer::where('login', $newCustomerWitchWasRefferedLogin)->first();
+        $referredCustomer->update(['id_of_parrent_referral' => $idOfParrentUser]);
     }
 }

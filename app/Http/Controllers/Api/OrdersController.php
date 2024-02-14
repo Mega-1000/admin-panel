@@ -53,6 +53,7 @@ use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
 use App\Services\OrderAddressesService;
 use App\Services\OrderPackageService;
+use App\Services\OrderService;
 use App\Services\ProductService;
 use App\Services\WorkingEventsService;
 use Carbon\Carbon;
@@ -80,36 +81,6 @@ class OrdersController extends Controller
 {
     use ApiResponsesTrait;
 
-    /** @var OrderRepository */
-    protected $orderRepository;
-
-    /** @var CustomerRepository */
-    protected $customerRepository;
-
-    /** @var OrderItemRepository */
-    protected $orderItemRepository;
-
-    /** @var ProductRepository */
-    protected $productRepository;
-
-    /** @var OrderAddressRepository */
-    protected $orderAddressRepository;
-
-    /** @var OrderMessageRepository */
-    protected $orderMessageRepository;
-
-    /** @var CustomerAddressRepository */
-    protected $customerAddressRepository;
-
-    /** @var ProductPriceRepository */
-    protected $productPriceRepository;
-
-    /** @var OrderMessageAttachmentRepository */
-    protected $orderMessageAttachmentRepository;
-
-    /** @var OrderPackageRepository */
-    protected $orderPackageRepository;
-
     private $error_code = null;
 
     private $errors = [
@@ -125,60 +96,21 @@ class OrdersController extends Controller
 
     private $defaultError = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
 
-    /**
-     * @var ProductService
-     */
-    private $productService;
-
-    /**
-     * @var ProductPackingRepository
-     */
-    private $productPackingRepository;
-
-    /**
-     * OrdersController constructor.
-     *
-     * @param OrderRepository $orderRepository
-     * @param CustomerRepository $customerRepository
-     * @param OrderItemRepository $orderItemRepository
-     * @param ProductRepository $productRepository
-     * @param OrderAddressRepository $orderAddressRepository
-     * @param OrderMessageRepository $orderMessageRepository
-     * @param CustomerAddressRepository $customerAddressRepository
-     * @param ProductPriceRepository $productPriceRepository
-     * @param OrderMessageAttachmentRepository $orderMessageAttachmentRepository
-     * @param OrderPackageRepository $orderPackageRepository
-     * @param ProductService $productService
-     * @param ProductPackingRepository $productPackingRepository
-     */
     public function __construct(
-        OrderRepository                  $orderRepository,
-        CustomerRepository               $customerRepository,
-        OrderItemRepository              $orderItemRepository,
-        ProductRepository                $productRepository,
-        OrderAddressRepository           $orderAddressRepository,
-        OrderMessageRepository           $orderMessageRepository,
-        CustomerAddressRepository        $customerAddressRepository,
-        ProductPriceRepository           $productPriceRepository,
-        OrderMessageAttachmentRepository $orderMessageAttachmentRepository,
-        OrderPackageRepository           $orderPackageRepository,
-        ProductService                   $productService,
-        ProductPackingRepository         $productPackingRepository
-    )
-    {
-        $this->orderRepository = $orderRepository;
-        $this->customerRepository = $customerRepository;
-        $this->orderItemRepository = $orderItemRepository;
-        $this->productRepository = $productRepository;
-        $this->orderAddressRepository = $orderAddressRepository;
-        $this->orderMessageRepository = $orderMessageRepository;
-        $this->customerAddressRepository = $customerAddressRepository;
-        $this->productPriceRepository = $productPriceRepository;
-        $this->orderMessageAttachmentRepository = $orderMessageAttachmentRepository;
-        $this->orderPackageRepository = $orderPackageRepository;
-        $this->productService = $productService;
-        $this->productPackingRepository = $productPackingRepository;
-    }
+        private OrderRepository $orderRepository,
+        private CustomerRepository $customerRepository,
+        private OrderItemRepository $orderItemRepository,
+        private ProductRepository $productRepository,
+        private OrderAddressRepository $orderAddressRepository,
+        private OrderMessageRepository $orderMessageRepository,
+        private CustomerAddressRepository $customerAddressRepository,
+        private ProductPriceRepository $productPriceRepository,
+        private OrderMessageAttachmentRepository $orderMessageAttachmentRepository,
+        private OrderPackageRepository $orderPackageRepository,
+        private ProductService $productService,
+        private ProductPackingRepository $productPackingRepository,
+        private OrderService $orderService,
+    ) {}
 
     /**
      * @throws Exception
@@ -208,6 +140,8 @@ class OrdersController extends Controller
                 'status' => 'ACTIVE',
                 'password' => Hash::make($data['phone']),
             ]);
+
+            $this->orderService->handleReferral($request->validated('register_reffered_user_id'), $data['customer_login']);
         }
 
         if (!$customer) {
