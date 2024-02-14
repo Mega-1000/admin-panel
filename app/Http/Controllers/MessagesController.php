@@ -281,7 +281,7 @@ class MessagesController extends Controller
 
         $showAuctionInstructions = request()->query('showAuctionInstructions');
 
-        return redirect()->route('chat.show', ['token' => $userToken, 'showAuctionInstrictions' => $showAuctionInstructions]);
+        return redirect()->route('chat.show', ['token' => $userToken, 'showAuctionInstructions' => $showAuctionInstructions]);
     }
 
     /**
