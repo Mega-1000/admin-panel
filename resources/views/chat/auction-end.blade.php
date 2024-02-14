@@ -252,6 +252,10 @@
 
                                 foreach ($items as $item) {
                                     $variation = App\Entities\Product::where('product_group', $item->product_group)->where('product_name_supplier', $firm->firm->symbol)->first();
+
+                                    if ($firm->firm->symbol === 'BESSER-TRZEBINIA') {
+                                        dd($variation);
+                                    }
                                     $prices[] = $variation?->price->net_purchase_price_basic_unit_after_discounts;
                                 }
                                 @endphp
