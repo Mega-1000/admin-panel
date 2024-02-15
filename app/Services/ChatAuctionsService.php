@@ -70,30 +70,7 @@ readonly class ChatAuctionsService
     public function confirmAuction(ChatAuction $auction): void
     {
         $order = $auction->chat->order;
-        $variations = $this->productService->getVariations($order);
-
-        $firms = array_unique($this->getFirms($variations));
-
-        $employees = [];
-        foreach ($firms as $firm) {
-            foreach ($this->employeesRepository->getEmployeesForAuctionOrderByFirm($firm) as $employee) {
-                $employees[] = $employee;
-            }
-        }
-
-        $employees = array_unique($employees);
-
-        foreach ($employees as $employee) {
-            $firmAssociatedWithEmployee = Firm::where('email', $employee->email)->first();
-
-            if ($firmAssociatedWithEmployee) {
-                foreach ($firmAssociatedWithEmployee->employees as $employee) {
-                    $employees[] = $employee;
-                }
-            }
-        }
-
-        $employees = array_unique($employees);
+        $employees = Employees::getEmployeesForAuction($order);
 
         foreach ($employees as $employee) {
             Mailer::create()

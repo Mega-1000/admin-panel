@@ -16,8 +16,10 @@ use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Http\Requests\UpdateChatAuctionRequest;
 use App\Mail\NotificationAboutFirmPanelMail;
 use App\Repositories\ChatAuctionFirms;
+use App\Repositories\Employees;
 use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
+use App\Services\ProductService;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -199,6 +201,18 @@ class AuctionsController extends Controller
         return redirect()->back()->with([
             'message' => 'Pomyślnie wysłano wiadomość e-mail',
             'alert-type' => 'success'
+        ]);
+    }
+
+    public function displayPreDataPricesTable(Chat $chat): View
+    {
+        $variations = app(ProductService::class)->getVariations($chat->order);
+
+        $firms = array_unique(app(ChatAuctionsService::class)->getFirms($variations));
+
+        return view('auctions.pre-data-prices-table', [
+            'order' => $chat->order,
+            'firms' => $firms
         ]);
     }
 }

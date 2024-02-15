@@ -32,7 +32,7 @@ Podane przez państwa ceny nie są widoczne dla innych oferentów jedynie dla kl
 <br>
 Ostatecznie sprzedaż klientowi może
 się odbyć przez was bezpośrednio lub przez naszą firmę lub ewentualnie przez
-inna firmę którą możecie wskazać jeżeli sprzedaż przez nich gwarantujex
+inna firmę którą możecie wskazać jeżeli sprzedaż przez nich gwarantuje
 najniższą cenę.
 
 <br>

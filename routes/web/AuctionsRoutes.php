@@ -20,4 +20,5 @@ Route::prefix('auctions/{auction}')->name('auctions.')->group(function () {
 Route::get('auctions/offer/create/{token}', [AuctionsController::class, 'createOffer'])->name('auctions.offer.create');
 Route::post('auctions/offer/store/{token}', [AuctionsController::class, 'storeOffer'])->name('auctions.offer.store');
 Route::post('auctions/send-notification-about-firm-panel/{firm}', [AuctionsController::class, 'sendNotificationAboutFirmPanel'])->name('auction.notification-firm-panel');
+Route::get('auctions/display-pre-data-table/{chat}', [AuctionsController::class, 'displayPreDataPricesTable'])->name('displayPreDataPricesTable');
 
