@@ -10,7 +10,7 @@
         @foreach($order->items->pluck('product') as $product)
             <th>
                 @php
-                    $name = $product->product->name;
+                    $name = $product->name;
                     $words = explode(' ', $name);
                     array_shift($words);
                     $name = implode(' ', $words);
