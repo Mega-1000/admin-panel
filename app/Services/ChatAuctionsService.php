@@ -36,7 +36,7 @@ readonly class ChatAuctionsService
      * @param array $variations
      * @return array
      */
-    private function getFirms(array $variations): array
+    public function getFirms(array $variations): array
     {
         $firms = [];
         foreach ($variations as $variation) {
