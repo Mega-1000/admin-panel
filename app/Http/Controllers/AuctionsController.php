@@ -194,7 +194,7 @@ class AuctionsController extends Controller
 
     public function sendNotificationAboutFirmPanel(Firm $firm): RedirectResponse
     {
-        $employees = $firm->employees()->whereHas('roles', function (Blueprint $q) {
+        $employees = $firm->employees()->whereHas('employeeRoles', function (Blueprint $q) {
             $q->where('name', 'zmiana cen');
         })->get();
 
