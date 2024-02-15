@@ -24,9 +24,11 @@ use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Matrix\Builder;
 
 class AuctionsController extends Controller
 {
@@ -192,11 +194,18 @@ class AuctionsController extends Controller
 
     public function sendNotificationAboutFirmPanel(Firm $firm): RedirectResponse
     {
-        Mailer::create()
-            ->to($firm->email)
-            ->send(new NotificationAboutFirmPanelMail(
-                $firm,
-            ));
+        $employees = $firm->employees()->whereHas('role', function (Blueprint $q) {
+            $q->where('name', 'zmiana cen');
+        })->get();
+
+        foreach ($employees as $employee) {
+
+            Mailer::create()
+                ->to($employee->email)
+                ->send(new NotificationAboutFirmPanelMail(
+                    $firm,
+                ));
+        }
 
         return redirect()->back()->with([
             'message' => 'Pomyślnie wysłano wiadomość e-mail',
