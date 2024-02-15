@@ -41,10 +41,10 @@
 
             @php
                 $prices = [];
-                $items = $order->items->pluck('product');
+                $items = $order->items->pluck('product')->toArray();
 
                 foreach ($items as $item) {
-                    dd($items);
+                    dd($item);
                     $variation = App\Entities\Product::where('product_group', $item->product_group)->where('product_name_supplier', $firm->firm->symbol)->first();
 
                     $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
