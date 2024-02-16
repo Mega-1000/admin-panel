@@ -250,7 +250,6 @@ class AuctionsController extends Controller
 
             $productGroups[] = $group;
         }
-        dd($productGroups);
 
         dd($products);
 
