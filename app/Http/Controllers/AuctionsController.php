@@ -8,9 +8,11 @@ use App\Entities\Chat;
 use App\Entities\ChatAuction;
 use App\Entities\ChatAuctionFirm;
 use App\Entities\Firm;
+use App\Entities\Order;
 use App\Entities\Product;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
+use App\Helpers\AuctionsHelper;
 use App\Helpers\Exceptions\ChatException;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
@@ -237,9 +239,7 @@ class AuctionsController extends Controller
         $filteredProducts = collect(); // Initialize an empty collection for filtered products
 
         foreach ($products as $product) {
-            $trimmedString = ltrim($product->product_group, '|');
-            preg_match('/^(\w+)\s+(\w+)/', $trimmedString, $matches);
-            $group = $matches ? $matches[0] : '';
+            $group = AuctionsHelper::getTrimmedProductGroupName($product);
 
             if (!in_array($group, $productGroups)) {
                 $productGroups[] = $group;
@@ -253,9 +253,26 @@ class AuctionsController extends Controller
 
         return view('auctions.pre-data-prices-table', [
             'products' => $filteredProducts,
-            'firms' => $firms
+            'firms' => $firms,
         ]);
     }
 
+    public function getStyrofoamTypes(): JsonResponse
+    {
+        $styrofoamTypes = Product::where('variation_group', 'styropiany')
+            ->pluck('product_group')
+            ->unique()
+            ->all();
 
+        return response()->json($styrofoamTypes);
+    }
+
+    public function getQuotesByStyrofoamType(string $type): JsonResponse
+    {
+        $products = Product::where('product_group', 'like', '%' .  $type . '%')
+            ->select('firm_id')
+            ->distinct()
+            ->get();
+
+    }
 }

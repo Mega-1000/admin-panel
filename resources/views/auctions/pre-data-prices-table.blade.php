@@ -64,6 +64,7 @@
         }
     </style>
 </head>
+
 <table>
     <thead>
     <tr>
