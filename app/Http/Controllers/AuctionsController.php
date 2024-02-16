@@ -8,6 +8,7 @@ use App\Entities\Chat;
 use App\Entities\ChatAuction;
 use App\Entities\ChatAuctionFirm;
 use App\Entities\Firm;
+use App\Entities\Product;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
 use App\Helpers\Exceptions\ChatException;
@@ -224,4 +225,40 @@ class AuctionsController extends Controller
             'firms' => $firms
         ]);
     }
+
+    public function displayPricesTable(Chat $chat): View
+    {
+        $products = Product::where('variation_group', 'styropiany')
+            ->select('product_group')
+            ->distinct()
+            ->get();
+
+        $productGroups = [];
+
+        foreach ($products as $product) {
+            // Remove the first | character
+            $trimmedString = ltrim($product->product_group, '|');
+            // Use preg_match to extract the first two words
+            preg_match('/^(\w+)\s+(\w+)/', $trimmedString, $matches);
+            // Return the matched group or an empty string if no match is found
+            $group = $matches ? $matches[0] : '';
+
+            if (in_array($group, $productGroups)) {
+                $product->forget($product);
+            }
+
+            $productGroups[] = $group;
+        }
+
+        $firms = Firm::whereHas('products', function ($q) {
+            $q->where('variation_group', 'styropiany');
+        })->get();
+
+        return view('auctions.pre-data-prices-table', [
+            'products' => $products,
+            'firms' => $firms
+        ]);
+    }
+
+
 }
