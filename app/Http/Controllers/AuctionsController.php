@@ -276,7 +276,7 @@ class AuctionsController extends Controller
             $productGroups[] = $group;
         }
 
-        return response()->json($styrofoamTypes);
+        return response()->json($productGroups);
     }
 
     public function getQuotesByStyrofoamType(string $type): JsonResponse
