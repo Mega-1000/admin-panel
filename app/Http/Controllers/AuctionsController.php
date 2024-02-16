@@ -271,7 +271,7 @@ class AuctionsController extends Controller
     {
         $products = Product::where('product_group', 'like', '%' .  $type . '%')
             ->select('product_name_supplier')
-            ->with('prices')
+            ->with('price')
             ->distinct()
             ->get();
 
