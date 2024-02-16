@@ -261,7 +261,7 @@ class OrderService
                     'amount' => 1,
                     'gross_selling_price_commercial_unit' => $data->getPurchaseValue(),
                     'recalculate' => true,
-                ] + $product->toArray()
+                ] + $product?->toArray() ?? []
             ]);
 
             $item = $order->items()->first();
