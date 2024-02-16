@@ -125,7 +125,12 @@
 
             @foreach($prices as $price)
                 <td>
-                    {{ $price }} zł
+                    @if($price)
+                        {{ $price }} zł
+                    @elseif
+                        Brak oferty
+                    @endif
+
                 </td>
             @endforeach
         </tr>
