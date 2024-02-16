@@ -282,6 +282,7 @@ class AuctionsController extends Controller
             if (!in_array($group, $productGroups)) {
                 continue;
             }
+
             $productGroups[] = $group;
         }
 
