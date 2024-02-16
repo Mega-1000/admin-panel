@@ -73,7 +73,7 @@
             </h5>
         </th>
         @php
-            $items = $order ? $order->items->pluck('product') : $products;
+            $items = isset($order) ? $order->items->pluck('product') : $products;
         @endphp
 
         @foreach($items as $product)
