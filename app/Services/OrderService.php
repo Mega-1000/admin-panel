@@ -256,7 +256,7 @@ class OrderService
                 ->setPriceCalculator(new OrderPriceCalculator())
                 ->setProductService($productService);
             $product = Product::query()->where('symbol', 'TWSU')->first();
-            $productArray = $product->toArray() ?? [];
+            $productArray = $product?->toArray() ?? [];
             $orderBuilder->assignItemsToOrder($order, [
                 [
                     'amount' => 1,
