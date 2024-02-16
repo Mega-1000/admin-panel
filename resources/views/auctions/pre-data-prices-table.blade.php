@@ -127,7 +127,7 @@
                 <td>
                     @if($price)
                         {{ $price }} zł
-                    @elseif
+                    @else
                         Brak oferty
                     @endif
 
