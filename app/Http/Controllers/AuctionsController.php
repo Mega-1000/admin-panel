@@ -231,7 +231,8 @@ class AuctionsController extends Controller
         $products = Product::where('variation_group', 'styropiany')
             ->select('product_group')
             ->distinct()
-            ->get();
+            ->get()
+            ->pluck('product_group');
 
         $productGroups = [];
 
