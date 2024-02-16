@@ -234,6 +234,7 @@ class AuctionsController extends Controller
             ->get()
             ->pluck('product_group');
 
+        dd($products);
         $productGroups = [];
 
         foreach ($products as $product) {
