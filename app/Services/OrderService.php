@@ -256,12 +256,13 @@ class OrderService
                 ->setPriceCalculator(new OrderPriceCalculator())
                 ->setProductService($productService);
             $product = Product::query()->where('symbol', 'TWSU')->first();
+            $productArray = $product->toArray() ?? [];
             $orderBuilder->assignItemsToOrder($order, [
                 [
                     'amount' => 1,
                     'gross_selling_price_commercial_unit' => $data->getPurchaseValue(),
                     'recalculate' => true,
-                ] + $product?->toArray() ?? []
+                ] + $productArray
             ]);
 
             $item = $order->items()->first();
