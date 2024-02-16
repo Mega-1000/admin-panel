@@ -274,5 +274,6 @@ class AuctionsController extends Controller
             ->distinct()
             ->get();
 
+        return response()->json($products);
     }
 }
