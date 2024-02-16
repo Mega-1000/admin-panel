@@ -22,5 +22,5 @@ Route::post('auctions/offer/store/{token}', [AuctionsController::class, 'storeOf
 Route::post('auctions/send-notification-about-firm-panel/{firm}', [AuctionsController::class, 'sendNotificationAboutFirmPanel'])->name('auction.notification-firm-panel');
 Route::get('auctions/display-pre-data-table/{chat}', [AuctionsController::class, 'displayPreDataPricesTable'])->name('displayPreDataPricesTable');
 Route::get('auctions/display-prices-table',  [AuctionsController::class, 'displayPricesTable'])->name('displayPreDataPricesTable');
-Route::get('auctions/get-styrofoarm-types', [AuctionsController::class, 'getStyrofoamTypes']);
+Route::get('auctions/get-styrofoam-types', [AuctionsController::class, 'getStyrofoamTypes']);
 Route::get('auctions/get-quotes-by-styrofoarm-type/{type}', [AuctionsController::class, 'getQuotesByStyrofoamType']);
