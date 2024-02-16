@@ -251,6 +251,8 @@ class AuctionsController extends Controller
             $q->where('variation_group', 'styropiany');
         })->get();
 
+        dd($firms);
+
         return view('auctions.pre-data-prices-table', [
             'products' => $products,
             'firms' => $firms
