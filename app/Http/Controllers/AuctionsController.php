@@ -234,23 +234,18 @@ class AuctionsController extends Controller
             ->get();
 
         $productGroups = [];
+        $filteredProducts = collect(); // Initialize an empty collection for filtered products
 
         foreach ($products as $product) {
-            // Remove the first | character
             $trimmedString = ltrim($product->product_group, '|');
-            // Use preg_match to extract the first two words
             preg_match('/^(\w+)\s+(\w+)/', $trimmedString, $matches);
-            // Return the matched group or an empty string if no match is found
             $group = $matches ? $matches[0] : '';
 
-            if (in_array($group, $productGroups)) {
-                $products->forget($product->id);
-                continue;
+            if (!in_array($group, $productGroups)) {
+                $productGroups[] = $group;
+                $filteredProducts->push($product); // Add product to the filtered collection
             }
-
-            $productGroups[] = $group;
         }
-
         dd($products);
 
         $firms = Firm::whereHas('products', function ($q) {
