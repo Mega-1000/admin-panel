@@ -264,6 +264,18 @@ class AuctionsController extends Controller
             ->unique()
             ->all();
 
+        $productGroups = [];
+
+        foreach ($styrofoamTypes as $product) {
+            $group = AuctionsHelper::getTrimmedProductGroupName($product);
+
+            if (!in_array($group, $productGroups)) {
+                continue;
+            }
+
+            $productGroups[] = $group;
+        }
+
         return response()->json($styrofoamTypes);
     }
 
@@ -273,18 +285,6 @@ class AuctionsController extends Controller
             ->with('price')
             ->get()
             ->unique('product_name_supplier');
-
-        $productGroups = [];
-
-        foreach ($products as $product) {
-            $group = 'pl';
-
-            if (!in_array($group, $productGroups)) {
-                continue;
-            }
-
-            $productGroups[] = $group;
-        }
 
 
         return response()->json($productGroups);
