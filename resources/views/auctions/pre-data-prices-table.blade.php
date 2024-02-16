@@ -84,7 +84,9 @@
                     array_shift($words);
                     $name = implode(' ', $words);
                     if (empty($name)) {
-                        $name = $product->tableDisplayName;
+                        $trimmedString = ltrim($product->product_group, '|');
+                        preg_match('/^(\w+)\s+(\w+)/', $trimmedString, $matches);
+                        $name = $matches ? $matches[0] : '';
                     }
                 @endphp
                 {{ $name }}

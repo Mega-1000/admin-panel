@@ -240,7 +240,6 @@ class AuctionsController extends Controller
             $trimmedString = ltrim($product->product_group, '|');
             preg_match('/^(\w+)\s+(\w+)/', $trimmedString, $matches);
             $group = $matches ? $matches[0] : '';
-            $product->tableDisplayName = $product;
 
             if (!in_array($group, $productGroups)) {
                 $productGroups[] = $group;
