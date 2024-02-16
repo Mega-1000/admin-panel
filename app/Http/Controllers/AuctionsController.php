@@ -246,7 +246,7 @@ class AuctionsController extends Controller
                 $filteredProducts->push($product); // Add product to the filtered collection
             }
         }
-        dd($products);
+        dd($filteredProducts);
 
         $firms = Firm::whereHas('products', function ($q) {
             $q->where('variation_group', 'styropiany');
