@@ -244,7 +244,7 @@ class AuctionsController extends Controller
             $group = $matches ? $matches[0] : '';
 
             if (in_array($group, $productGroups)) {
-                $product->forget($product);
+                $products->forget($product);
             }
 
             $productGroups[] = $group;
