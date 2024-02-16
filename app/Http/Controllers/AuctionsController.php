@@ -277,7 +277,7 @@ class AuctionsController extends Controller
         $productGroups = [];
 
         foreach ($products as $product) {
-            $group = AuctionsHelper::getTrimmedProductGroupName($product);
+            $group = 'pl';
 
             if (!in_array($group, $productGroups)) {
                 continue;
