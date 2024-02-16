@@ -274,6 +274,17 @@ class AuctionsController extends Controller
             ->get()
             ->unique('product_name_supplier');
 
-        return response()->json($products);
+        $productGroups = [];
+
+        foreach ($products as $product) {
+            $group = AuctionsHelper::getTrimmedProductGroupName($product);
+
+            if (!in_array($group, $productGroups)) {
+                $productGroups[] = $group;
+            }
+        }
+
+
+        return response()->json($productGroups);
     }
 }
