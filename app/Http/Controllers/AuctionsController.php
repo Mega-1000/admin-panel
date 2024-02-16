@@ -250,7 +250,7 @@ class AuctionsController extends Controller
             $productGroups[] = $group;
         }
 
-        dd($product);
+        dd($products);
 
         $firms = Firm::whereHas('products', function ($q) {
             $q->where('variation_group', 'styropiany');
