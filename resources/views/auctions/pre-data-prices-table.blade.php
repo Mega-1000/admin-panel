@@ -72,7 +72,11 @@
                 Ceny za m3
             </h5>
         </th>
-        @foreach($order->items->pluck('product') as $product)
+        @php
+            $items = $order ? $order->items->pluck('product') : $products;
+        @endphp
+
+        @foreach($items as $product)
             <th>
                 @php
                     $name = $product->name;
