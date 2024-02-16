@@ -245,6 +245,7 @@ class AuctionsController extends Controller
 
             if (in_array($group, $productGroups)) {
                 $products->forget($product->id);
+                continue;
             }
 
             $productGroups[] = $group;
