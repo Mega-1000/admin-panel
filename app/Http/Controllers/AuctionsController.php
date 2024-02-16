@@ -270,9 +270,7 @@ class AuctionsController extends Controller
     public function getQuotesByStyrofoamType(string $type): JsonResponse
     {
         $products = Product::where('product_group', 'like', '%' .  $type . '%')
-            ->select('product_name_supplier')
-            ->with('price')
-            ->distinct()
+            ->unique('product_name_supplier')
             ->get();
 
         return response()->json($products);
