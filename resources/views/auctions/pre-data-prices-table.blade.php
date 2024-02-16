@@ -107,7 +107,7 @@
 
             @php
                 $prices = [];
-                $items = $order->items->pluck('product')->toArray();
+                $items = $items->toArray();
 
                 foreach ($items as $item) {
                     $variation = App\Entities\Product::where('product_group', $item['product_group'])->where('product_name_supplier', $firm->symbol)->first();
