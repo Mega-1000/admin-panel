@@ -268,9 +268,8 @@ class OrderService
 
             if (!empty($productArray)) {
                 $dataForBuilder[0] += $productArray;
+                $orderBuilder->assignItemsToOrder($order, $dataForBuilder);
             }
-
-            $orderBuilder->assignItemsToOrder($order, $dataForBuilder);
 
             $item = $order->items()->first();
             $item->save();
