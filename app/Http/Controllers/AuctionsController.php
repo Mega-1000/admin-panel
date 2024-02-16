@@ -270,10 +270,9 @@ class AuctionsController extends Controller
             $group = AuctionsHelper::getTrimmedProductGroupName($product);
 
             if (!in_array($group, $productGroups)) {
+                $productGroups[] = $group;
                 continue;
             }
-
-            $productGroups[] = $group;
         }
 
         return response()->json($productGroups);
