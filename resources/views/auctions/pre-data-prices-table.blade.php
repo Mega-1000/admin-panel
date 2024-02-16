@@ -83,6 +83,9 @@
                     $words = explode(' ', $name);
                     array_shift($words);
                     $name = implode(' ', $words);
+                    if (empty($name)) {
+                        $name = $product->tableDisplayName;
+                    }
                 @endphp
                 {{ $name }}
             </th>
