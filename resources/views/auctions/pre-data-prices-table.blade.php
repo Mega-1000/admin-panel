@@ -90,7 +90,7 @@
                         $name = $matches ? $matches[0] : '';
                     }
                 @endphp
-                <a href="https://mega1000.pl/{{ $name }}/{{ \App\Entities\Category::where('symbol', $name)->first()->id }}">
+                <a href="https://mega1000.pl/{{ $name }}/{{ \App\Entities\Category::where('name', $name)->first()->id }}">
                     {{ $name }}
                 </a>
             </th>
