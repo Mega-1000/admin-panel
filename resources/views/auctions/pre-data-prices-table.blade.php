@@ -90,9 +90,7 @@
                         $name = $matches ? $matches[0] : '';
                     }
                 @endphp
-                <a href="https://mega1000.pl/{{ $name }}/{{ \App\Entities\Category::where('name', $name)->first()?->id }}">
-                    {{ $name }}
-                </a>
+                {{ $name }}
             </th>
         @endforeach
     </tr>
@@ -110,7 +108,9 @@
 
         <tr>
             <td>
-                {{ $symbol }}
+                <a href="https://mega1000.pl/{{ $name }}/{{ \App\Entities\Category::where('name', $name)->first()?->id }}">
+                    {{ $symbol }}
+                </a>
             </td>
 
             @php
