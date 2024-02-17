@@ -173,27 +173,6 @@ class ProductsController extends Controller
             ->find((int)$request->product)
             ->children;
 
-        $products = Product::where('variation_group', 'styropiany')->get();
-        foreach ($products as $product) {
-            $children = Product
-                ::with(['children' => function ($q) {
-                    $q->select('product_prices.*', 'product_packings.*', 'products.*');
-                    $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
-                    $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
-                    $q->orderBy('priority');
-                    $q->orderBy('name');
-                }])
-                ->find((int)$product->id)
-                ->children;
-
-            if ($children) {
-                foreach ($children as $child) {
-                    $child->url_for_website = $product->url_for_website;
-                    $child->save();
-                }
-            }
-        }
-
         return response()->json($products);
     }
 
