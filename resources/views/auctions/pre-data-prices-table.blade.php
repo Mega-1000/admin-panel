@@ -108,7 +108,7 @@
 
         <tr>
             <td>
-                <a href="https://mega1000.pl/{{ $name }}/{{ \App\Entities\Category::where('name', $name)->first()?->id }}">
+                <a href="https://mega1000.pl/{{ $symbol }}/{{ \App\Entities\Category::where('name', $symbol)->first()?->id }}">
                     {{ $symbol }}
                 </a>
             </td>
