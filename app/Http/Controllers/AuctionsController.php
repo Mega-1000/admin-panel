@@ -286,6 +286,6 @@ class AuctionsController extends Controller
             ->unique('product_name_supplier');
 
 
-        return response()->json($productGroups);
+        return response()->json($products);
     }
 }
