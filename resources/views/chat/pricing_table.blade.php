@@ -12,28 +12,28 @@
         <td>
             <div class="flex">
                 <input class="price net_purchase_price_commercial_unit" name="commercial_price_net"
-                       value="{{ $product->net_purchase_price_commercial_unit_after_discounts }}"/>
+                       value="{{ $productPrices['commercial_price_net'] ?? $product->net_purchase_price_commercial_unit_after_discounts }}"/>
                 <p>PLN</p>
             </div>
         </td>
         <td>
             <div class="flex">
                 <input class="price net_purchase_price_basic_unit" name="basic_price_net"
-                       value="{{ $productPrice ?? $product->net_purchase_price_basic_unit_after_discounts }}"/>
+                       value="{{ $productPrices['basic_price_net'] ?? $product->net_purchase_price_basic_unit_after_discounts }}"/>
                 <p>PLN</p>
             </div>
         </td>
         <td>
             <div class="flex">
                 <input class="price net_purchase_price_calculated_unit" name="calculated_price_net"
-                       value="{{ $product->net_purchase_price_calculated_unit_after_discounts }}"/>
+                       value="{{ $productPrices['calculated_price_net'] ?? $product->net_purchase_price_calculated_unit_after_discounts }}"/>
                 <p>PLN</p>
             </div>
         </td>
         <td>
             <div class="flex">
                 <input class="price net_purchase_price_aggregate_unit" name="aggregate_price_net"
-                       value="{{ $product->net_purchase_price_aggregate_unit_after_discounts }}"/>
+                       value="{{ $productPrices['aggregate_price_net'] ??$product->net_purchase_price_aggregate_unit_after_discounts }}"/>
                 <p>PLN</p>
             </div>
         </td>
@@ -45,28 +45,28 @@
         <td>
             <div class="flex">
                 <input class="price gross_purchase_price_commercial_unit" name="commercial_price_gross"
-                       value="{{number_format($product->net_purchase_price_commercial_unit_after_discounts * 1.23, 2)}}"/>
+                       value="{{$productPrices['commercial_price_gross'] ?? number_format($product->net_purchase_price_commercial_unit_after_discounts * 1.23, 2)}}"/>
                 <p>PLN</p>
             </div>
         </td>
         <td>
             <div class="flex">
                 <input class="price gross_purchase_price_basic_unit" name="basic_price_gross"
-                       value="{{number_format($product->net_purchase_price_basic_unit_after_discounts * 1.23, 2)}}"/>
+                       value="{{ $productPrices['basic_price_gross'] ?? number_format($product->net_purchase_price_basic_unit_after_discounts * 1.23, 2)}}"/>
                 <p>PLN</p>
             </div>
         </td>
         <td>
             <div class="flex">
                 <input class="price gross_purchase_price_calculated_unit" name="calculated_price_gross"
-                       value="{{number_format($product->net_purchase_price_calculated_unit_after_discounts * 1.23, 2)}}"/>
+                       value="{{ $productPrices['calculated_price_gross'] ?? number_format($product->net_purchase_price_calculated_unit_after_discounts * 1.23, 2)}}"/>
                 <p>PLN</p>
             </div>
         </td>
         <td>
             <div class="flex">
                 <input class="price gross_purchase_price_aggregate_unit" name="aggregate_price_gross"
-                       value="{{number_format($product->net_purchase_price_aggregate_unit_after_discounts * 1.23, 2)}}"/>
+                       value="{{ $productPrices['aggregate_price_gross'] ?? number_format($product->net_purchase_price_aggregate_unit_after_discounts * 1.23, 2)}}"/>
                 <p>PLN</p>
             </div>
         </td>
