@@ -96,6 +96,12 @@
                     </p>
                 </div>
                 <form style="display: flex; flex-direction: column" action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST">
+                    @php
+                        $productPrice = \App\Entities\ChatAuctionOffer::where('order_item_id', $product->id)
+                            ->where('firm_id', $chat_auction_firm->firm_id)
+                            ->min('commercial_price_net');
+                    @endphp
+
                     @csrf
                     <input type="hidden" class="unit_consumption"
                            value="{{ $product->product->packing->unit_consumption }}">
@@ -144,13 +150,6 @@
     <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
     <script>
         @php
-            foreach ($products as $product) {
-                $productPrice = \App\Entities\ChatAuctionOffer::where('order_item_id', $product->id)
-                ->where('firm_id', $chat_auction_firm->firm_id)
-                ->min('commercial_price_net');
-
-                dd($productPrice);
-            }
         @endphp
     </script>
 </body>

@@ -19,7 +19,7 @@
         <td>
             <div class="flex">
                 <input class="price net_purchase_price_basic_unit" name="basic_price_net"
-                       value="{{ $product->net_purchase_price_basic_unit_after_discounts }}"/>
+                       value="{{ $productPrice ?? $product->net_purchase_price_basic_unit_after_discounts }}"/>
                 <p>PLN</p>
             </div>
         </td>
