@@ -205,7 +205,7 @@
                     @endphp
 
                     @foreach($firms as $firm)
-                        @if($auction->offers->where('firm_id', $firm->id)->count() === 0 || in_array($firm->firm->symbol, $displayedFirmSymbols))
+                        @if($auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm->firm->symbol, $displayedFirmSymbols))
                             @continue
                         @endif
 
@@ -220,11 +220,11 @@
                             @foreach($products as $product)
                                 <td>
                                     @php
-                                        $offer = $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->first();
+                                        $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->first();
                                     @endphp
 
                                     @if($offer)
-                                        {{ $auction->offers->where('firm_id', $firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }} Zł
+                                        {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }} Zł
 
 {{--                                        <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-firm="{{ $firm->firm->name }}" data-product="{{ $product->product->name }}">--}}
                                     @else
@@ -240,7 +240,7 @@
                             $symbol = $firm->firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
                         @endphp
 
-                        @if($auction->offers->where('firm_id', $firm->id)->count() === 0 && !in_array($symbol, $displayedFirmSymbols))
+                        @if($auction->offers->where('firm_id', $firm->firm->id)->count() === 0 && !in_array($symbol, $displayedFirmSymbols))
                             <tr>
                                 <td>
                                     {{ $symbol }}
@@ -297,9 +297,8 @@
                     @php
                         $symbol = $firm->firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
                     @endphp
-                    {{ $auction->offers }} {{ $firm->firm->id }}
 
-                    @if($auction->offers->where('firm_id', $firm->id)->count() === 0 && !in_array($symbol, $displayedSymbols))
+                    @if($auction->offers->where('firm_id', $firm->firm->id)->count() === 0 && !in_array($symbol, $displayedSymbols))
                         <tr>
                             <td>
                                 {{ $symbol }}
