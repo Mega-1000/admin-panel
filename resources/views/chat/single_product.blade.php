@@ -32,7 +32,7 @@
                        value="{{ $product->product->packing->numbers_of_basic_commercial_units_in_pack }}">
                 <input type="hidden" name="item_id" value="{{ $product->id }}">
                 @include('chat/pricing_table')
-                <input type="submit" value="aktualizuj">
+                <input type="submit" value="Aktualizuj proponowane przez ciebie ceny">
             </form>
         @endif
     </div>
