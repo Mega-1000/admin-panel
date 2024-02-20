@@ -115,7 +115,7 @@
                         <input type="checkbox" name="send_notification" value="true" {{ $product->current_firm_offers?->send_notification ? 'checked' : '' }}>
                     </div>
 
-                    <button type="submit">aktualizuj</button>
+                    <button type="submit">Aktualizuj proponowane przez twoją firmę ceny</button>
                 </form>
             </div>
         @else
@@ -128,8 +128,6 @@
                 </div>
             @endif
         @endif
-
-
     @endforeach
 
     <script src="{{ asset('js/app.js') }}"></script>
@@ -144,4 +142,15 @@
     <script src="{{ asset('js/vue-scripts.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/libs/blink-title.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
+    <script>
+        @php
+            foreach ($products as $product) {
+                $productPrice = \App\Entities\ChatAuctionOffer::where('product_id', $product->id)
+                ->where('firm_id', $chat_auction_firm->firm_id)
+                ->min('commercial_price_net');
+
+                dd($productPrice);
+            }
+        @endphp
+    </script>
 </body>
