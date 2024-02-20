@@ -1,4 +1,5 @@
 setTimeout(() => {
+    alert('okej')
     const priceInputs = document.getElementsByName('basic_price_net');
     priceInputs.forEach((priceInput) => {
         // Create a new 'change' event
