@@ -1,15 +1,14 @@
 setTimeout(() => {
-    alert('okej')
     const priceInputs = document.getElementsByName('basic_price_net');
     priceInputs.forEach((priceInput) => {
         // Create a new 'change' event
         const event = new Event('change');
         // Dispatch it on the priceInput
         priceInput.dispatchEvent(event);
-        alert('okej');
     });
 }, 1000);
 $(document).on('change', '.price', function (event) {
+    alert('eee')
         var parent = $(event.target).closest('form')
         var net_purchase_price_commercial_unit = parent.find('.net_purchase_price_commercial_unit');
         var net_purchase_price_basic_unit = parent.find('.net_purchase_price_basic_unit');
