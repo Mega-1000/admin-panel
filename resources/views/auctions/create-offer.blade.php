@@ -99,7 +99,7 @@
                     @php
                         $productPrice = \App\Entities\ChatAuctionOffer::where('order_item_id', $product->id)
                             ->where('firm_id', $chat_auction_firm->firm_id)
-                            ->min('commercial_price_net');
+                            ->min('basic_price_net');
                     @endphp
 
                     @csrf
@@ -149,7 +149,5 @@
     <script type="text/javascript" src="{{ asset('js/libs/blink-title.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
     <script>
-        @php
-        @endphp
     </script>
 </body>
