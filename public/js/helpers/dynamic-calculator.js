@@ -1,12 +1,13 @@
-const priceInputs = document.getElementsByName('basic_price_net');
-priceInputs.forEach((priceInput) => {
-    // Create a new 'change' event
-    const event = new Event('change');
-    // Dispatch it on the priceInput
-    priceInput.dispatchEvent(event);
-    alert('okej');
-});
-
+setTimeout(() => {
+    const priceInputs = document.getElementsByName('basic_price_net');
+    priceInputs.forEach((priceInput) => {
+        // Create a new 'change' event
+        const event = new Event('change');
+        // Dispatch it on the priceInput
+        priceInput.dispatchEvent(event);
+        alert('okej');
+    });
+}, 1000);
 $(document).on('change', '.price', function (event) {
         var parent = $(event.target).closest('form')
         var net_purchase_price_commercial_unit = parent.find('.net_purchase_price_commercial_unit');
