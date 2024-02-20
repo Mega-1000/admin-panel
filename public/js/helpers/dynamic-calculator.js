@@ -4,6 +4,7 @@ priceInputs.forEach((priceInput) => {
     const event = new Event('change');
     // Dispatch it on the priceInput
     priceInput.dispatchEvent(event);
+    alert('okej');
 });
 
 $(document).on('change', '.price', function (event) {
