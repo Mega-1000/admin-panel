@@ -149,5 +149,11 @@
     <script type="text/javascript" src="{{ asset('js/libs/blink-title.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
     <script>
+        setTimeout(() => {
+            const priceInputs = document.getElementsByName('basic_price_net');
+            priceInputs.forEach((priceInput) => {
+                onPriceChange(priceInput)
+            });
+        }, 1000);
     </script>
 </body>

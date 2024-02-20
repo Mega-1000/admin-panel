@@ -1,9 +1,3 @@
-setTimeout(() => {
-    const priceInputs = document.getElementsByName('basic_price_net');
-    priceInputs.forEach((priceInput) => {
-        onPriceChange(priceInput)
-    });
-}, 1000);
 $(document).on('change', '.price', function (event) {
     onPriceChange(event)
 });
