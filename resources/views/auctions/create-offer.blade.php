@@ -145,7 +145,7 @@
     <script>
         @php
             foreach ($products as $product) {
-                $productPrice = \App\Entities\ChatAuctionOffer::where('product_id', $product->id)
+                $productPrice = \App\Entities\ChatAuctionOffer::where('order_item_id', $product->id)
                 ->where('firm_id', $chat_auction_firm->firm_id)
                 ->min('commercial_price_net');
 
