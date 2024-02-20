@@ -152,6 +152,7 @@
         setTimeout(() => {
             const priceInputs = document.getElementsByName('basic_price_net');
             priceInputs.forEach((priceInput) => {
+                alert('okej')
                 onPriceChange(priceInput)
             });
         }, 1000);
