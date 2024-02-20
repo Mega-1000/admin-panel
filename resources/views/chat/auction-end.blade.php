@@ -217,7 +217,6 @@
                                 $displayedFirmSymbols[] = $firm->firm->symbol; // Add the symbol to the tracked array
                             @endphp
 
-                            {{ $firm->firm->symbol }}
                             @foreach($products as $product)
                                 <td>
                                     @php
@@ -298,6 +297,7 @@
                     @php
                         $symbol = $firm->firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
                     @endphp
+                    {{ $auction->offers }} {{ $firm->id }}
 
                     @if($auction->offers->where('firm_id', $firm->id)->count() === 0 && !in_array($symbol, $displayedSymbols))
                         <tr>
