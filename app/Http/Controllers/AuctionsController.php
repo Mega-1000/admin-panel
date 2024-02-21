@@ -231,7 +231,8 @@ class AuctionsController extends Controller
     public function displayPricesTable(Chat $chat): View
     {
         $products = Product::where('variation_group', 'styropiany')
-            ->select('product_group')
+            ->whereHas('children')
+            ->select('name')
             ->distinct()
             ->get();
 
@@ -239,7 +240,7 @@ class AuctionsController extends Controller
         $filteredProducts = collect(); // Initialize an empty collection for filtered products
 
         foreach ($products as $product) {
-            $group = AuctionsHelper::getTrimmedProductGroupName($product);
+            $group = strstr($product->name," ");
 
             if (!in_array($group, $productGroups)) {
                 $productGroups[] = $group;
