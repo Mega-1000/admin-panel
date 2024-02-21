@@ -136,7 +136,7 @@
                             ->where('name', 'like', '%' . $item['name'] . '%')
                             ->first();
 
-                        if ($item['name'] === 'fasada 031 ETIXX')
+                        if ($item['name'] === 'fasada 031 ETIXX' && $variation)
                         {
                             dd($variation, $item['name']);
                         }
