@@ -44,17 +44,8 @@
             background-color: #4CAF50;
             color: white;
             position: sticky;
-            z-index: 2; /* Ensures the header is above other content */
-        }
-
-        /* First row of header */
-        thead th:nth-child(1) {
-            top: 0; /* Stick to the top */
-        }
-
-        /* Second row of headers */
-        thead th:not(:nth-child(1)) {
-            top: 33px; /* Adjust this value based on the actual height of your first header row */
+            top: 0; /* Adjust if you have a specific offset */
+            z-index: 1; /* Ensures the header is above other content */
         }
 
         tr:nth-child(even) {
