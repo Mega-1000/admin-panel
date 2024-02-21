@@ -233,6 +233,7 @@ class AuctionsController extends Controller
         $products = Product::where('variation_group', 'styropiany')
             ->whereHas('children')
             ->get();
+        dd($products);
 
         $productGroups = [];
         $filteredProducts = collect(); // Initialize an empty collection for filtered products
@@ -250,6 +251,7 @@ class AuctionsController extends Controller
             $q->where('variation_group', 'styropiany');
         })->get();
 
+        dd($filteredProducts);
 
         return view('auctions.pre-data-prices-table', [
             'products' => $filteredProducts,
