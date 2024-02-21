@@ -136,8 +136,12 @@
                             ->where('name', 'like', '%' . $item['name'] . '%')
                             ->first();
 
+                        if ($item->name === 'fasada 031 ETIXX')
+                            {
                         dd($variation, $item['name']);
                         $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
+                            }
+
                     }
                 @endphp
 
