@@ -130,7 +130,7 @@
 
                         $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
                     }
-                    dd($prices);
+                    dd($items);
                 @endphp
 
                 @foreach($prices as $price)
