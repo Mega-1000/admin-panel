@@ -271,6 +271,7 @@ class AuctionsController extends Controller
                 continue;
             }
         }
+        dd($productGroups);
 
         return response()->json($productGroups);
     }
