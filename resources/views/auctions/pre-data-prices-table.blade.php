@@ -19,7 +19,6 @@
         }
 
         .container {
-            width: 40%;
             margin: auto;
             overflow-y: auto; /* Make sure the container allows for scrolling */
             max-height: 90vh; /* Adjust based on your needs */
