@@ -72,6 +72,10 @@
         <tr>
             <th>Ceny za m3</th>
             @php
+                $items = isset($order) ? $order->items->pluck('product') : $products;
+            @endphp
+
+            @php
                 $groupedItems = [];
                 foreach ($items as $product) {
                     // Assuming $product->name or similar property exists
@@ -98,52 +102,52 @@
         </thead>
         <tbody>
 
-    @php
-        $displayedFirmSymbols = [];
-    @endphp
-
-    @foreach($firms as $firm)
         @php
-            $symbol = $firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
+            $displayedFirmSymbols = [];
         @endphp
 
-        <tr>
-            <td>
-                <a href="https://mega1000.pl/{{ $symbol }}/{{ \App\Entities\Category::where('name', $symbol)->first()?->id }}/no-layout">
-                    {{ $symbol }}
-                </a>
-            </td>
-
+        @foreach($firms as $firm)
             @php
-                $prices = [];
-                if (!is_array($items)) {
-                    $items = $items->toArray();
-                }
-
-                foreach ($items as $item) {
-                    $variation = App\Entities\Product::where('product_group', $item['product_group'])->where('product_name_supplier', $firm->symbol)->first();
-
-                    $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
-                }
+                $symbol = $firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
             @endphp
 
-            @foreach($prices as $price)
+            <tr>
                 <td>
-                    @if($price)
-                        {{ $price }} zł
-                    @else
-                        Brak oferty
-                    @endif
-
+                    <a href="https://mega1000.pl/{{ $symbol }}/{{ \App\Entities\Category::where('name', $symbol)->first()?->id }}/no-layout">
+                        {{ $symbol }}
+                    </a>
                 </td>
-            @endforeach
-        </tr>
-        @php
-            $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
-        @endphp
-    @endforeach
 
-    </tbody>
-</table>
+                @php
+                    $prices = [];
+                    if (!is_array($items)) {
+                        $items = $items->toArray();
+                    }
+
+                    foreach ($items as $item) {
+                        $variation = App\Entities\Product::where('product_group', $item['product_group'])->where('product_name_supplier', $firm->symbol)->first();
+
+                        $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
+                    }
+                @endphp
+
+                @foreach($prices as $price)
+                    <td>
+                        @if($price)
+                            {{ $price }} zł
+                        @else
+                            Brak oferty
+                        @endif
+
+                    </td>
+                @endforeach
+            </tr>
+            @php
+                $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
+            @endphp
+        @endforeach
+
+        </tbody>
+    </table>
 </div>
 </body>
