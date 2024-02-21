@@ -126,7 +126,9 @@
                     }
 
                     foreach ($items as $item) {
-                        $variation = App\Entities\Product::where('product_group', $item['product_group'])->where('product_name_supplier', $firm->symbol)->first();
+                        $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
+                        ->where('name', 'like', '%' . $item->name)
+                        ->first();
 
                         $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
                     }
