@@ -79,7 +79,6 @@
                 $groupedItems = [];
                 foreach ($items as $product) {
                     $product->name = \App\Helpers\AuctionsHelper::getTrimmedProductGroupName($product);
-                    $product->name = str_split($product->name, 0)[1];
                     // Assuming $product->name or similar property exists
                     // Split name to identify the prefix (e.g., "fasada") and the suffix (e.g., "045")
                     list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
