@@ -249,7 +249,6 @@ class AuctionsController extends Controller
         $firms = Firm::whereHas('products', function ($q) {
             $q->where('variation_group', 'styropiany');
         })->get();
-        dd($filteredProducts);
 
         return view('auctions.pre-data-prices-table', [
             'products' => $filteredProducts,
