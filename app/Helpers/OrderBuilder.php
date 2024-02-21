@@ -167,7 +167,7 @@ class OrderBuilder
             $helper->createNewChat();
         }
 
-        $chatUserToken = $order->chat?->users()->where('user_id', $customer->id)->first()->pivot->token;
+        $chatUserToken = $order->chat?->users()->where('user_id', $customer->id)->first()?->pivot?->token;
 
         $this->assignItemsToOrder($order, $data['order_items']);
 
