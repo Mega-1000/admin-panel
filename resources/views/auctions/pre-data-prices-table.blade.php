@@ -137,7 +137,7 @@
                 @foreach($prices as $price)
                     <td>
                         @if($price)
-                            {{ $price }} zł
+                            {{ $price }}
                         @else
                             Brak oferty
                         @endif
