@@ -260,8 +260,7 @@ class AuctionsController extends Controller
     {
         $styrofoamTypes = Product::where('variation_group', 'styropiany')
             ->whereHas('children')
-            ->unique()
-            ->all();
+            ->get();
 
         $productGroups = [];
 
