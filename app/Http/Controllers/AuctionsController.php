@@ -231,8 +231,7 @@ class AuctionsController extends Controller
     public function displayPricesTable(Chat $chat): View
     {
         $products = Product::where('variation_group', 'styropiany')
-            ->select('product_group')
-            ->distinct()
+            ->whereHas('children')
             ->get();
 
         $productGroups = [];
@@ -250,6 +249,7 @@ class AuctionsController extends Controller
         $firms = Firm::whereHas('products', function ($q) {
             $q->where('variation_group', 'styropiany');
         })->get();
+        dd($filteredProducts);
 
         return view('auctions.pre-data-prices-table', [
             'products' => $filteredProducts,
@@ -271,7 +271,7 @@ class AuctionsController extends Controller
                 continue;
             }
         }
-        dd($productGroups);
+
 
         return response()->json($productGroups);
     }
