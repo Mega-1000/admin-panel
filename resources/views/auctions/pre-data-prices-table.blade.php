@@ -130,8 +130,9 @@
                         $items = $items->toArray();
                     }
 
-                    foreach ($items as $item) {
+                    dd($items);
 
+                    foreach ($items as $item) {
                         $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
                             ->where('name', 'like', '%' . $item['name'] . '%')
                             ->first();
