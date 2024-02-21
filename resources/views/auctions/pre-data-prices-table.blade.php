@@ -21,6 +21,8 @@
         .container {
             width: 40%;
             margin: auto;
+            overflow-y: auto; /* Make sure the container allows for scrolling */
+            max-height: 90vh; /* Adjust based on your needs */
         }
 
         @media screen and (max-width: 768px) {
@@ -31,6 +33,7 @@
 
         table {
             border-collapse: collapse;
+            width: 100%; /* Ensure table fills the container */
         }
 
         th, td {
@@ -41,6 +44,9 @@
         th {
             background-color: #4CAF50;
             color: white;
+            position: sticky;
+            top: 0; /* Adjust if you have a specific offset */
+            z-index: 1; /* Ensures the header is above other content */
         }
 
         tr:nth-child(even) {
@@ -62,45 +68,11 @@
         th.desc::after {
             content: " ↑"; /* Change to arrow SVG or symbol as needed */
         }
-
-        .loader {
-         position: fixed;
-         z-index: 9999;
-         top: 0;
-         left: 0;
-         width: 100%;
-         height: 100%;
-         background: rgba(255, 255, 255, 0.9);
-         display: flex;
-         justify-content: center;
-         align-items: center;
-        }
-
-        .loader::after {
-        content: "";
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-        }
-
-        /* Hide the loader once the page is loaded */
-        .loaded .loader {
-        display: none;
-        }
     </style>
+
 </head>
 
 <body>
-<div id="loader" class="loader"></div>
-
 <div class="container">
     <table>
         <thead>
