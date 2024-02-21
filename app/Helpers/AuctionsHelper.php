@@ -13,15 +13,19 @@ class AuctionsHelper
     public static function getTrimmedProductGroupName(mixed $product): string
     {
         $position = strpos($product->name, ' '); // Find the position of the first space
-        $trimmedName = $position !== false ? substr($product->name, $position + 1) : $product->name;
+        if ($position !== false) {
+            // If a space is found, return the substring starting from the character after the space
+            $trimmedName = substr($product->name, $position + 1);
+        } else {
+            // If no space is found, return the original name
+            $trimmedName = $product->name;
+        }
 
-        // Check if the last character is a hyphen and remove it if true
-        if (substr($trimmedName, -1) === '-') {
-            $trimmedName = substr($trimmedName, 0, -1);
+        // Check if the last characters are " -" and remove them if present
+        if (substr($trimmedName, -2) === ' -') {
+            $trimmedName = substr($trimmedName, 0, -2);
         }
 
         return $trimmedName;
     }
-
-
 }
