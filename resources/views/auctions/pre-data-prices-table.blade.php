@@ -100,6 +100,10 @@
         <tr>
             <th></th> <!-- Placeholder for the "Ceny za m3" column -->
             @foreach($groupedItems as $prefix => $suffixes)
+                @php
+                    // Sort suffixes numerically
+                    natsort($suffixes);
+                @endphp
                 @foreach($suffixes as $suffix)
                     <th>{{ $suffix }}</th>
                 @endforeach
