@@ -136,7 +136,7 @@
                             ->where('name', 'like', '%' . $item['name'] . '%')
                             ->first();
 
-                        dd($variation);
+                        dd($variation, $item['name']);
                         $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
                     }
                 @endphp
