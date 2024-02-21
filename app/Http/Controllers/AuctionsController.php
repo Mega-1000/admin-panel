@@ -232,8 +232,6 @@ class AuctionsController extends Controller
     {
         $products = Product::where('variation_group', 'styropiany')
             ->whereHas('children')
-            ->select('name')
-            ->distinct()
             ->get();
 
         $productGroups = [];
@@ -252,7 +250,7 @@ class AuctionsController extends Controller
             $q->where('variation_group', 'styropiany');
         })->get();
 
-        dd($filteredProducts);
+
         return view('auctions.pre-data-prices-table', [
             'products' => $filteredProducts,
             'firms' => $firms,
