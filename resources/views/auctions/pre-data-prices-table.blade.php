@@ -83,6 +83,8 @@
                     // Split name to identify the prefix (e.g., "fasada") and the suffix (e.g., "045")
                     list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
                     $groupedItems[$prefix][] = $suffix;
+
+                    dd($product->name, $prefix, $suffix);
                 }
             @endphp
 
