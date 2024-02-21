@@ -113,55 +113,52 @@
         @endphp
 
         @foreach($firms as $firm)
-            @php
-                $symbol = $firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
-            @endphp
-
             <tr>
                 <td>
-                    <a href="https://mega1000.pl/{{ $symbol }}/{{ \App\Entities\Category::where('name', $symbol)->first()?->id }}/no-layout">
-                        {{ $symbol }}
+                    <a href="https://mega1000.pl/{{ $firm->symbol }}/{{ \App\Entities\Category::where('name', $firm->symbol)->first()?->id }}/no-layout">
+                        {{ $firm->symbol }}
                     </a>
                 </td>
 
                 @php
-                    $prices = [];
-                    if (!is_array($items)) {
-                        $items = $items->toArray();
-                    }
+                    // Initialize an array to store prices for each grouped item
+                    $groupedPrices = [];
 
-                    dd($items);
+                    // Loop through each group and its items
+                    foreach ($groupedItems as $prefix => $suffixes) {
+                        foreach ($suffixes as $suffix) {
+                            // Construct the name pattern to match for this product
+                            $namePattern = $prefix . ' ' . $suffix;
 
-                    foreach ($items as $item) {
-                        $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
-                            ->where('name', 'like', '%' . $item['name'] . '%')
-                            ->first();
+                            // Fetch the variation based on the firm's symbol and the name pattern
+                            $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
+                                ->where('name', 'like', '%' . $namePattern . '%')
+                                ->first();
 
-                        if ($item['name'] === 'fasada EPS70 040' && $variation)
-                        {
-                            dd($variation, $item['name']);
+                            // Store the price in the groupedPrices array, using the prefix and suffix as keys
+                            $groupedPrices[$prefix][$suffix] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
                         }
-                        $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
-
                     }
                 @endphp
 
-                @foreach($prices as $price)
-                    <td>
-                        @if($price)
-                            {{ $price }}
-                        @else
-                            Brak oferty
-                        @endif
+                @foreach($groupedItems as $prefix => $suffixes)
+                    @foreach($suffixes as $suffix)
+                        @php
+                            // Retrieve the price from the groupedPrices array
+                            $price = $groupedPrices[$prefix][$suffix] ?? null;
+                        @endphp
 
-                    </td>
+                        <td>
+                            @if($price)
+                                {{ $price }} zł
+                            @else
+                                Brak oferty
+                            @endif
+                        </td>
+                    @endforeach
                 @endforeach
             </tr>
-            @php
-                $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
-            @endphp
         @endforeach
-
         </tbody>
     </table>
 </div>
