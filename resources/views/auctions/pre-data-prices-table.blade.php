@@ -65,37 +65,38 @@
     </style>
 </head>
 
-<table>
-    <thead>
-    <tr>
-        <th>
-            <h5 style="text-align: right">
-                Ceny za m3
-            </h5>
-        </th>
-        @php
-            $items = isset($order) ? $order->items->pluck('product') : $products;
-        @endphp
+<body>
+<div class="container">
+    <table>
+        <thead>
+        <tr>
+            <th>Ceny za m3</th>
+            @php
+                $groupedItems = [];
+                foreach ($items as $product) {
+                    // Assuming $product->name or similar property exists
+                    // Split name to identify the prefix (e.g., "fasada") and the suffix (e.g., "045")
+                    list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
+                    $groupedItems[$prefix][] = $suffix;
+                }
+            @endphp
 
-        @foreach($items as $product)
-            <th>
-                @php
-                    $name = $product->name;
-                    $words = explode(' ', $name);
-                    array_shift($words);
-                    $name = implode(' ', $words);
-                    if (empty($name)) {
-                        $trimmedString = ltrim($product->product_group, '|');
-                        preg_match('/^(\w+)\s+(\w+)/', $trimmedString, $matches);
-                        $name = $matches ? $matches[0] : '';
-                    }
-                @endphp
-                {{ $name }}
-            </th>
-        @endforeach
-    </tr>
-    </thead>
-    <tbody>
+            @foreach($groupedItems as $prefix => $suffixes)
+                <th colspan="{{ count($suffixes) }}">
+                    {{ $prefix }}
+                </th>
+            @endforeach
+        </tr>
+        <tr>
+            <th></th> <!-- Placeholder for the "Ceny za m3" column -->
+            @foreach($groupedItems as $prefix => $suffixes)
+                @foreach($suffixes as $suffix)
+                    <th>{{ $suffix }}</th>
+                @endforeach
+            @endforeach
+        </tr>
+        </thead>
+        <tbody>
 
     @php
         $displayedFirmSymbols = [];
@@ -144,3 +145,5 @@
 
     </tbody>
 </table>
+</div>
+</body>
