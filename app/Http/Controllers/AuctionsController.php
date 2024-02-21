@@ -231,15 +231,15 @@ class AuctionsController extends Controller
     public function displayPricesTable(Chat $chat): View
     {
         $products = Product::where('variation_group', 'styropiany')
-            ->whereHas('children')
+            ->select('product_group')
+            ->distinct()
             ->get();
-        dd($products);
 
         $productGroups = [];
         $filteredProducts = collect(); // Initialize an empty collection for filtered products
 
         foreach ($products as $product) {
-            $group = strstr($product->name," ");
+            $group = AuctionsHelper::getTrimmedProductGroupName($product);
 
             if (!in_array($group, $productGroups)) {
                 $productGroups[] = $group;
@@ -251,8 +251,6 @@ class AuctionsController extends Controller
             $q->where('variation_group', 'styropiany');
         })->get();
 
-        dd($filteredProducts);
-
         return view('auctions.pre-data-prices-table', [
             'products' => $filteredProducts,
             'firms' => $firms,
@@ -261,10 +259,7 @@ class AuctionsController extends Controller
 
     public function getStyrofoamTypes(): JsonResponse
     {
-        $styrofoamTypes = Product::where('variation_group', 'styropiany')
-            ->pluck('product_group')
-            ->unique()
-            ->all();
+        $styrofoamTypes = Product::where('variation_group', 'styropiany')->whereHas('children')->unique()->all();
 
         $productGroups = [];
 
@@ -286,7 +281,6 @@ class AuctionsController extends Controller
             ->with('price')
             ->get()
             ->unique('product_name_supplier');
-
 
         return response()->json($products);
     }
