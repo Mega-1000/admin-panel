@@ -258,7 +258,10 @@ class AuctionsController extends Controller
 
     public function getStyrofoamTypes(): JsonResponse
     {
-        $styrofoamTypes = Product::where('variation_group', 'styropiany')->whereHas('children')->unique()->all();
+        $styrofoamTypes = Product::where('variation_group', 'styropiany')
+            ->pluck('product_group')
+            ->unique()
+            ->all();
 
         $productGroups = [];
 
