@@ -136,10 +136,10 @@
                             ->where('name', 'like', '%' . $item['name'] . '%')
                             ->first();
 
-//                        if ($item['name'] === 'fasada 031 ETIXX' && $variation)
-//                        {
+                        if ($item['name'] === 'fasada EPS70 040' && $variation)
+                        {
                             dd($variation, $item['name']);
-//                        }
+                        }
                         $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
 
                     }
