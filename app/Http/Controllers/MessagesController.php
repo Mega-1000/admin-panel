@@ -294,11 +294,10 @@ class MessagesController extends Controller
         foreach ($company->employees as $employee) {
             $chatHelper = new MessagesHelper($chat->token);
 
-            MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+            dd(MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee));
 
             ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
         }
-
 
         return redirect()->back();
     }
