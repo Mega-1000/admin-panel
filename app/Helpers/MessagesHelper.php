@@ -66,7 +66,7 @@ class MessagesHelper
         if ($token) {
             $this->decrypt($token);
             if (!$this->getChat() && !$this->getProduct() && !$this->getOrder()) {
-                throw new ChatException('Either chat, product or order must exist');
+                throw new Exception('Either chat, product or order must exist');
             }
         }
     }
