@@ -29,9 +29,6 @@ readonly class MessageService
         $chatUser->save();
 
         $chatUser->employee()->associate($user);
-
-
-        dd($chatUser->employee);
     }
 
     /**
