@@ -40,6 +40,7 @@ readonly class MessageService
     {
         $helper = new MessagesHelper($data->token);
         $chat = $helper->getChat();
+        dd($helper);
 
         if (!$chat) {
             $helper->createNewChat();
