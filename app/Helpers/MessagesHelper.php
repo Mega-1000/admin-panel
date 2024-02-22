@@ -676,7 +676,6 @@ class MessagesHelper
      */
     public function prepareEmployees(Collection $employeesIds, Collection $currentEmployeesOnChat): Collection
     {
-
         $employeesIdsFiltered = [];
         foreach ($employeesIds as $productEmployees) {
 
