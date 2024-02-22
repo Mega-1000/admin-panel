@@ -289,7 +289,7 @@ class MessagesController extends Controller
      */
     public function addUsersFromCompanyToChat(Chat $chat, Request $request): RedirectResponse
     {
-        $company = Firm::find($request->get('company_id'));
+        $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
 
         foreach ($company->employees as $employee) {
             $chatHelper = new MessagesHelper($chat->token);

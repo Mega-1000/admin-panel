@@ -236,18 +236,13 @@
                         @endif
 
                         <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST">
-                            @csrf <!-- Add this line if you're using CSRF protection -->
+                            @csrf
 
                             <h2>
                                 Dodaj firmę
                             </h2>
 
-                            <select class="select2" data-live-search="true" name="companyId" id="companyId">
-                                <option>Dodaj użytkownika</option>
-                                @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}">{{ $company->symbol }}</option>
-                                @endforeach
-                            </select>
+                            <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy">
 
                             <button type="submit" class="btn btn-primary"> <!-- Use type="submit" to submit the form -->
                                 Dodaj użytkowników
