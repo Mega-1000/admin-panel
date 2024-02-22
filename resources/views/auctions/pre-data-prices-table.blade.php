@@ -128,9 +128,10 @@
                         // Initialize an array to store prices for each grouped item
                         $groupedPrices = [];
 
-                        // Loop through each group and its items
+
                         foreach ($groupedItems as $prefix => $suffixes) {
-                            foreach (natsort($suffixes) as $suffix) {
+                            natsort($suffixes);
+                            foreach ($suffixes as $suffix) {
                                 // Construct the name pattern to match for this product
                                 $namePattern = $prefix . ' ' . $suffix;
 
