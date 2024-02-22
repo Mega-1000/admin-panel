@@ -167,8 +167,8 @@
     </table>
 </div>
 
-<th id="sortManufacturer">Manufacturer</th>
-<th id="sortPrice">Price</th>
+<div id="sortManufacturer">Manufacturer</div>
+<div id="sortPrice">Price</div>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
