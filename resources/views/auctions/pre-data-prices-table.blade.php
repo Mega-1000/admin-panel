@@ -203,6 +203,7 @@
             // Add click event to all column headers
             document.querySelectorAll(".container th").forEach(headerCell => {
                 headerCell.addEventListener("click", () => {
+                    alert('okej')
                     const tableElement = headerCell.parentElement.parentElement.parentElement;
                     const headerIndex = Array.prototype.indexOf.call(headerCell.parentNode.children, headerCell);
                     const currentIsAscending = headerCell.classList.contains("asc");
