@@ -130,6 +130,7 @@
 
 
                         foreach ($groupedItems as $prefix => $suffixes) {
+                            natsort($suffixes);
                             foreach ($suffixes as $suffix) {
                                 // Construct the name pattern to match for this product
                                 $namePattern = $prefix . ' ' . $suffix;
@@ -147,12 +148,7 @@
 
                     @foreach($groupedItems as $prefix => $suffixes)
                         @php
-                            // Assuming $groupedPrices[$prefix] contains all the price information for this prefix group
-                            // Sort $groupedPrices[$prefix] by price in ascending order
-                            $pricesArray = $groupedPrices[$prefix];
-                            usort($pricesArray, function($a, $b) {
-                                return $a - $b; // Simple comparison based on price values
-                            });
+
                         @endphp
 
                         @foreach($pricesArray as $suffix => $priceInfo)
