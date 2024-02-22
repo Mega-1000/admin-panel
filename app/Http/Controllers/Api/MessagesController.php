@@ -353,7 +353,7 @@ class MessagesController extends Controller
      * @param string $token
      *
      * @return void
-     * @throws ChatException
+     * @throws Exception
      */
     public function closeChat(string $token): void
     {
@@ -361,7 +361,7 @@ class MessagesController extends Controller
         $chat = $helper->getChat();
         $order = $helper->getOrder();
         if ($chat === null) {
-            throw new ChatException('Nieprawidłowy token chatu');
+            throw new Exception('Nieprawidłowy token chatu');
         }
         $user = $helper->getCurrentUser();
         $currentChatUser = $helper->getCurrentChatUser();
