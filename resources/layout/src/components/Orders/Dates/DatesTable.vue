@@ -125,7 +125,7 @@ export default class DatesTable extends Vue {
   }
 
   public get acceptance (): Acceptance {
-    return this.$store?.getters['OrdersService/acceptance']
+    return console.log(this.$store?.getters['OrdersService/acceptance'])
   }
 
   public getGlyphiconClass (accept: boolean): string {
