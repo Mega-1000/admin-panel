@@ -166,4 +166,33 @@
         </tbody>
     </table>
 </div>
+
+<!-- Sort and Filter Section -->
+<div class="sort-filter-controls">
+    <label for="sort-by">Sort by:</label>
+    <select id="sort-by">
+        <option value="factory">Factory Name</option>
+        <option value="price">Price</option>
+    </select>
+
+    <label for="filter-factory">Filter by Factory Name:</label>
+    <input type="text" id="filter-factory" placeholder="Enter factory name">
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#sort-by').change(function() {
+            // Implement sorting logic here based on selected option
+            // This is a placeholder to show where you would call your sorting function
+            console.log('Sort by:', $(this).val());
+        });
+
+        $('#filter-factory').on('input', function() {
+            // Implement filtering logic here
+            // This is a placeholder to show where you would call your filtering function
+            console.log('Filter by factory name:', $(this).val());
+        });});
+
+</script>
 </body>
