@@ -294,7 +294,11 @@ class MessagesController extends Controller
         foreach ($company->employees as $employee) {
             $chatHelper = new MessagesHelper($chat->token);
 
-            MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+            $chatHelper->chatId = $chat->id;
+            $chatHelper->currentUserType = 'e';
+
+            $userId = MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+            $chatHelper->currentUserId = $userId;
 
             ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
         }

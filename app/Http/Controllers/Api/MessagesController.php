@@ -73,15 +73,10 @@ class MessagesController extends Controller
                 return 'ok';
             }
 
-            $helper->chatId = $chat;
-            $helper->currentUserId = $chatUser->id;
-            $helper->currentUserType = 'e';
-
             MessageService::createNewCustomerOrEmployee($chat, $request, $user);
 
             if (is_a($user, Customer::class)) {
                 $email = $user->login;
-                dd($helper);
                 ChatNotificationJob::sendNewMessageEmail($email, $helper);
             }
 

@@ -22,13 +22,15 @@ readonly class MessageService
      * @param Request $request
      * @param $user
      */
-    public static function createNewCustomerOrEmployee($chat, Request $request, $user): void
+    public static function createNewCustomerOrEmployee($chat, Request $request, $user): int
     {
         $chatUser = new ChatUser();
         $chatUser->chat()->associate($chat);
         $chatUser->save();
 
         $chatUser->employee()->associate($user);
+
+        return $chatUser->id;
     }
 
     /**
