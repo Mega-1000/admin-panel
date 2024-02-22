@@ -167,32 +167,55 @@
     </table>
 </div>
 
-<!-- Sort and Filter Section -->
-<div class="sort-filter-controls">
-    <label for="sort-by">Sort by:</label>
-    <select id="sort-by">
-        <option value="factory">Factory Name</option>
-        <option value="price">Price</option>
-    </select>
+<th id="sortManufacturer">Manufacturer</th>
+<th id="sortPrice">Price</th>
 
-    <label for="filter-factory">Filter by Factory Name:</label>
-    <input type="text" id="filter-factory" placeholder="Enter factory name">
-</div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-    $(document).ready(function() {
-        $('#sort-by').change(function() {
-            // Implement sorting logic here based on selected option
-            // This is a placeholder to show where you would call your sorting function
-            console.log('Sort by:', $(this).val());
+    document.addEventListener("DOMContentLoaded", function() {
+        // Function to sort rows
+        function sortTableByColumn(table, column, asc = true) {
+            const dirModifier = asc ? 1 : -1;
+            const tBody = table.tBodies[0];
+            const rows = Array.from(tBody.querySelectorAll("tr"));
+
+            // Sort each row
+            const sortedRows = rows.sort((a, b) => {
+                const aColText = a.querySelector(`td:nth-child(${column})`).textContent.trim();
+                const bColText = b.querySelector(`td:nth-child(${column})`).textContent.trim();
+
+                return aColText > bColText ? (1 * dirModifier) : (-1 * dirModifier);
+            });
+
+            // Remove all existing TRs from the table
+            while (tBody.firstChild) {
+                tBody.removeChild(tBody.firstChild);
+            }
+
+            // Re-add the newly sorted rows
+            tBody.append(...sortedRows);
+
+            // Remember how the column is currently sorted
+            table.querySelectorAll("th").forEach(th => th.classList.remove("asc", "desc"));
+            table.querySelector(`th:nth-child(${column})`).classList.toggle("asc", asc);
+            table.querySelector(`th:nth-child(${column})`).classList.toggle("desc", !asc);
+        }
+
+        // Attach click event listeners for each header (adjust selector as needed)
+        document.querySelector("#sortManufacturer").addEventListener("click", function() {
+            const tableElement = this.closest("table");
+            const headerIndex = Array.prototype.indexOf.call(this.parentNode.children, this) + 1;
+            sortTableByColumn(tableElement, headerIndex);
         });
 
-        $('#filter-factory').on('input', function() {
-            // Implement filtering logic here
-            // This is a placeholder to show where you would call your filtering function
-            console.log('Filter by factory name:', $(this).val());
-        });});
+        document.querySelector("#sortPrice").addEventListener("click", function() {
+            const tableElement = this.closest("table");
+            const headerIndex = Array.prototype.indexOf.call(this.parentNode.children, this) + 1;
+            sortTableByColumn(tableElement, headerIndex, false); // Assuming prices are initially in descending order
+        });
+    });
 
 </script>
 </body>
