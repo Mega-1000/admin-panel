@@ -36,6 +36,7 @@ readonly class MessageService
         }
 
         $chatUser->save();
+        dd($chatUser);
     }
 
     /**
