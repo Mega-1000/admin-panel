@@ -38,37 +38,3 @@
         @endif
     </div>
 </div>
-
-<style>
-    .label-container {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        max-width: 100%;
-        gap: 10px;
-        padding: 10px;
-    }
-
-    .label-wrapper {
-        position: relative;
-        margin-right: 10px;
-    }
-
-    .label-popup {
-        display: none;
-        position: absolute;
-        bottom: 125%;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 5px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        z-index: 1;
-    }
-
-    .label-wrapper:hover .label-popup {
-        display: block;
-    }
-</style>
