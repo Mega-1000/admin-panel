@@ -130,7 +130,6 @@
 
 
                         foreach ($groupedItems as $prefix => $suffixes) {
-                            natsort($suffixes);
                             foreach ($suffixes as $suffix) {
                                 // Construct the name pattern to match for this product
                                 $namePattern = $prefix . ' ' . $suffix;
@@ -148,20 +147,24 @@
 
                     @foreach($groupedItems as $prefix => $suffixes)
                         @php
-
+                            natsort($suffixes)
                         @endphp
 
-                        @foreach($pricesArray as $suffix => $priceInfo)
+                        @foreach($suffixes as $suffix)
+                            @php
+                                // Retrieve the price from the groupedPrices array
+                                $price = $groupedPrices[$prefix][$suffix] ?? null;
+                            @endphp
+
                             <td>
-                                @if($priceInfo['price']) <!-- Assuming 'price' is the key where the price is stored -->
-                                {{ $priceInfo['price'] }} zł
+                                @if($price)
+                                    {{ $price }} zł
                                 @else
                                     Brak oferty
                                 @endif
                             </td>
                         @endforeach
                     @endforeach
-
                 </tr>
             @endforeach
             </tbody>
