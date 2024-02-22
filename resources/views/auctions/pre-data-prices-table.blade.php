@@ -206,6 +206,7 @@
         // Attach click event listeners for each header (adjust selector as needed)
         document.querySelector("#sortManufacturer").addEventListener("click", function() {
             const tableElement = this.closest("table");
+            console.log(tableElement)
             const headerIndex = Array.prototype.indexOf.call(this.parentNode.children, this) + 1;
             sortTableByColumn(tableElement, headerIndex);
         });
