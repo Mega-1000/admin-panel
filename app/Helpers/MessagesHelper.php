@@ -78,8 +78,8 @@ class MessagesHelper
      */
     public function encrypt(): string
     {
-        $this->setChatId();
-        $this->setUsers();
+        dd($this->chatId);
+
 
         if ($this->chatId) {
             return encrypt([
@@ -100,7 +100,6 @@ class MessagesHelper
         if($this->productId) {
             $dataToEncrypt['pId'] = $this->productId;
         }
-        dd($dataToEncrypt);
 
         return encrypt($dataToEncrypt);
     }
