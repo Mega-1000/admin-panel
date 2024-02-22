@@ -167,7 +167,7 @@
         </table>
     </div>
     <script>
-        $(document).ready(function(){
+        setTimeout(() => {
             // Function to sort table rows
             function sortTableByColumn(table, column, asc = true) {
                 const dirModifier = asc ? 1 : -1;
@@ -203,7 +203,6 @@
             // Add click event to all column headers
             document.querySelectorAll(".container th").forEach(headerCell => {
                 headerCell.addEventListener("click", () => {
-                    alert('okej')
                     const tableElement = headerCell.parentElement.parentElement.parentElement;
                     const headerIndex = Array.prototype.indexOf.call(headerCell.parentNode.children, headerCell);
                     const currentIsAscending = headerCell.classList.contains("asc");
@@ -211,7 +210,7 @@
                     sortTableByColumn(tableElement, headerIndex, !currentIsAscending);
                 });
             });
-        });
+        }, 1000);
     </script>
 
 </body>
