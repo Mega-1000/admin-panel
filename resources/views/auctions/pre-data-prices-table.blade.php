@@ -71,99 +71,146 @@
 </head>
 
 <body>
-<div class="container">
-    <table>
-        <thead>
-        <tr>
-            <th>Ceny za m3</th>
-            @php
-                $items = isset($order) ? $order->items->pluck('product') : $products;
-            @endphp
-
-            @php
-                $groupedItems = [];
-                foreach ($items as $product) {
-                    $product->name = \App\Helpers\AuctionsHelper::getTrimmedProductGroupName($product);
-                    // Assuming $product->name or similar property exists
-                    // Split name to identify the prefix (e.g., "fasada") and the suffix (e.g., "045")
-                    list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
-                    $groupedItems[$prefix][] = $suffix;
-                }
-            @endphp
-
-            @foreach($groupedItems as $prefix => $suffixes)
-                <th colspan="{{ count($suffixes) }}">
-                    {{ $prefix }}
-                </th>
-            @endforeach
-        </tr>
-        <tr>
-            <th></th> <!-- Placeholder for the "Ceny za m3" column -->
-            @foreach($groupedItems as $prefix => $suffixes)
-                @php
-                    // Sort suffixes numerically
-                    natsort($suffixes);
-                @endphp
-                @foreach($suffixes as $suffix)
-                    <th>{{ $suffix }}</th>
-                @endforeach
-            @endforeach
-        </tr>
-        </thead>
-        <tbody>
-
-        @php
-            $displayedFirmSymbols = [];
-        @endphp
-
-        @foreach($firms as $firm)
+    <div class="container">
+        <table>
+            <thead>
             <tr>
-                <td>
-                    <a href="https://mega1000.pl/{{ $firm->symbol }}/{{ \App\Entities\Category::where('name', $firm->symbol)->first()?->id }}/no-layout">
-                        {{ $firm->symbol }}
-                    </a>
-                </td>
+                <th>Ceny za m3</th>
+                @php
+                    $items = isset($order) ? $order->items->pluck('product') : $products;
+                @endphp
 
                 @php
-                    // Initialize an array to store prices for each grouped item
-                    $groupedPrices = [];
-
-                    // Loop through each group and its items
-                    foreach ($groupedItems as $prefix => $suffixes) {
-                        foreach ($suffixes as $suffix) {
-                            // Construct the name pattern to match for this product
-                            $namePattern = $prefix . ' ' . $suffix;
-
-                            // Fetch the variation based on the firm's symbol and the name pattern
-                            $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
-                                ->where('name', 'like', '%' . $namePattern . '%')
-                                ->first();
-
-                            // Store the price in the groupedPrices array, using the prefix and suffix as keys
-                            $groupedPrices[$prefix][$suffix] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
-                        }
+                    $groupedItems = [];
+                    foreach ($items as $product) {
+                        $product->name = \App\Helpers\AuctionsHelper::getTrimmedProductGroupName($product);
+                        // Assuming $product->name or similar property exists
+                        // Split name to identify the prefix (e.g., "fasada") and the suffix (e.g., "045")
+                        list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
+                        $groupedItems[$prefix][] = $suffix;
                     }
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
+                    <th colspan="{{ count($suffixes) }}">
+                        {{ $prefix }}
+                    </th>
+                @endforeach
+            </tr>
+            <tr>
+                <th></th> <!-- Placeholder for the "Ceny za m3" column -->
+                @foreach($groupedItems as $prefix => $suffixes)
+                    @php
+                        // Sort suffixes numerically
+                        natsort($suffixes);
+                    @endphp
                     @foreach($suffixes as $suffix)
-                        @php
-                            // Retrieve the price from the groupedPrices array
-                            $price = $groupedPrices[$prefix][$suffix] ?? null;
-                        @endphp
-
-                        <td>
-                            @if($price)
-                                {{ $price }} zł
-                            @else
-                                Brak oferty
-                            @endif
-                        </td>
+                        <th>{{ $suffix }}</th>
                     @endforeach
                 @endforeach
             </tr>
-        @endforeach
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+
+            @php
+                $displayedFirmSymbols = [];
+            @endphp
+
+            @foreach($firms as $firm)
+                <tr>
+                    <td>
+                        <a href="https://mega1000.pl/{{ $firm->symbol }}/{{ \App\Entities\Category::where('name', $firm->symbol)->first()?->id }}/no-layout">
+                            {{ $firm->symbol }}
+                        </a>
+                    </td>
+
+                    @php
+                        // Initialize an array to store prices for each grouped item
+                        $groupedPrices = [];
+
+                        // Loop through each group and its items
+                        foreach ($groupedItems as $prefix => $suffixes) {
+                            foreach ($suffixes as $suffix) {
+                                // Construct the name pattern to match for this product
+                                $namePattern = $prefix . ' ' . $suffix;
+
+                                // Fetch the variation based on the firm's symbol and the name pattern
+                                $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
+                                    ->where('name', 'like', '%' . $namePattern . '%')
+                                    ->first();
+
+                                // Store the price in the groupedPrices array, using the prefix and suffix as keys
+                                $groupedPrices[$prefix][$suffix] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
+                            }
+                        }
+                    @endphp
+
+                    @foreach($groupedItems as $prefix => $suffixes)
+                        @foreach($suffixes as $suffix)
+                            @php
+                                // Retrieve the price from the groupedPrices array
+                                $price = $groupedPrices[$prefix][$suffix] ?? null;
+                            @endphp
+
+                            <td>
+                                @if($price)
+                                    {{ $price }} zł
+                                @else
+                                    Brak oferty
+                                @endif
+                            </td>
+                        @endforeach
+                    @endforeach
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function(){
+            // Function to sort table rows
+            function sortTableByColumn(table, column, asc = true) {
+                const dirModifier = asc ? 1 : -1;
+                const tBody = table.tBodies[0];
+                const rows = Array.from(tBody.querySelectorAll("tr"));
+
+                // Sort each row
+                const sortedRows = rows.sort((a, b) => {
+                    const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+                    const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+
+                    // Attempt to convert cell text to float
+                    const aColValue = isNaN(parseFloat(aColText)) ? aColText : parseFloat(aColText);
+                    const bColValue = isNaN(parseFloat(bColText)) ? bColText : parseFloat(bColText);
+
+                    return aColValue > bColValue ? (1 * dirModifier) : (-1 * dirModifier);
+                });
+
+                // Remove all existing TRs from the table
+                while (tBody.firstChild) {
+                    tBody.removeChild(tBody.firstChild);
+                }
+
+                // Re-add the newly sorted rows
+                tBody.append(...sortedRows);
+
+                // Remember how the column is currently sorted
+                table.querySelectorAll("th").forEach(th => th.classList.remove("asc", "desc"));
+                table.querySelector(`th:nth-child(${column + 1})`).classList.toggle("asc", asc);
+                table.querySelector(`th:nth-child(${column + 1})`).classList.toggle("desc", !asc);
+            }
+
+            // Add click event to all column headers
+            document.querySelectorAll(".container th").forEach(headerCell => {
+                headerCell.addEventListener("click", () => {
+                    const tableElement = headerCell.parentElement.parentElement.parentElement;
+                    const headerIndex = Array.prototype.indexOf.call(headerCell.parentNode.children, headerCell);
+                    const currentIsAscending = headerCell.classList.contains("asc");
+
+                    sortTableByColumn(tableElement, headerIndex, !currentIsAscending);
+                });
+            });
+        });
+    </script>
+
 </body>
