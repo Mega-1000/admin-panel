@@ -300,7 +300,7 @@ class MessagesController extends Controller
             $userId = MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
             $chatHelper->currentUserId = $userId;
 
-            ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
+//            ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
         }
 
         return redirect()->back();
