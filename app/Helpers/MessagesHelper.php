@@ -100,6 +100,7 @@ class MessagesHelper
         if($this->productId) {
             $dataToEncrypt['pId'] = $this->productId;
         }
+        dd($dataToEncrypt);
 
         return encrypt($dataToEncrypt);
     }
