@@ -131,10 +131,10 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
 
 <p>
     Od<br>
-    ELEKTRONICZNA PLATFORMA HANDLOWA SP. Z O.O.<br/>
-    JARACZA 22/12<br/>
-    50-305 WROCAŁAW<br/>
-    NIP: 8982272269<br/>
+    ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
+    ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
+    50-020 Wrocław<br/>
+    NIP: 8971930266<br/>
 </p>
 <p>
     Dane do dostawy: <br/>
