@@ -176,14 +176,19 @@
 
                 // Sort each row
                 const sortedRows = rows.sort((a, b) => {
-                    const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
-                    const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+                    const aColText = a.querySelector(`td:nth-child(${column})`).textContent.trim();
+                    const bColText = b.querySelector(`td:nth-child(${column})`).textContent.trim();
 
-                    // Attempt to convert cell text to float
-                    const aColValue = isNaN(parseFloat(aColText)) ? aColText : parseFloat(aColText);
-                    const bColValue = isNaN(parseFloat(bColText)) ? bColText : parseFloat(bColText);
+                    // Check for no offer and sort those to the bottom
+                    const aValueIsNoOffer = aColText === "Brak oferty";
+                    const bValueIsNoOffer = bColText === "Brak oferty";
 
-                    return aColValue > bColValue ? (1 * dirModifier) : (-1 * dirModifier);
+                    if (aValueIsNoOffer && bValueIsNoOffer) return 0; // Both have no offer, keep order
+                    if (aValueIsNoOffer) return 1; // Only A has no offer, move A down
+                    if (bValueIsNoOffer) return -1; // Only B has no offer, move B down
+
+                    // If neither row has "Brak oferty", proceed with standard comparison
+                    return aColText.localeCompare(bColText, undefined, {numeric: true, sensitivity: 'base'}) * dirModifier;
                 });
 
                 // Remove all existing TRs from the table
@@ -194,10 +199,10 @@
                 // Re-add the newly sorted rows
                 tBody.append(...sortedRows);
 
-                // Remember how the column is currently sorted
+                // Update sort direction classes
                 table.querySelectorAll("th").forEach(th => th.classList.remove("asc", "desc"));
-                table.querySelector(`th:nth-child(${column + 1})`).classList.toggle("asc", asc);
-                table.querySelector(`th:nth-child(${column + 1})`).classList.toggle("desc", !asc);
+                table.querySelector(`th:nth-child(${column})`).classList.toggle("asc", asc);
+                table.querySelector(`th:nth-child(${column})`).classList.toggle("desc", !asc);
             }
 
             // Add click event to all column headers
