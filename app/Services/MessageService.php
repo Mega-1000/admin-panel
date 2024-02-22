@@ -26,9 +26,8 @@ readonly class MessageService
     {
         $chatUser = new ChatUser();
         $chatUser->chat()->associate($chat);
+        $chatUser->employee_id = $user->id;
         $chatUser->save();
-
-        $chatUser->employee()->associate($user);
 
         return $chatUser->id;
     }
@@ -40,7 +39,6 @@ readonly class MessageService
     {
         $helper = new MessagesHelper($data->token);
         $chat = $helper->getChat();
-        dd($helper);
 
         if (!$chat) {
             $helper->createNewChat();
