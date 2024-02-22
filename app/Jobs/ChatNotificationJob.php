@@ -62,7 +62,6 @@ class ChatNotificationJob implements ShouldQueue
         $helper->currentUserType = $chatUser->user ? MessagesHelper::TYPE_USER : ($chatUser->employee ? MessagesHelper::TYPE_EMPLOYEE : MessagesHelper::TYPE_CUSTOMER);
         $helper->currentUserId = $userObject->id;
 
-        dd($helper);
         try {
             $email = $userObject->email ?? $userObject->login;
 

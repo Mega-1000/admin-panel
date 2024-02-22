@@ -62,7 +62,6 @@ class MessagesController extends Controller
         try {
             $helper = new MessagesHelper($token);
             $chat = $helper->getChat();
-
             if (!$chat) {
                 $chat = $helper->createNewChat();
             }
@@ -73,6 +72,11 @@ class MessagesController extends Controller
                 $chatUser->restore();
                 return 'ok';
             }
+
+            $helper->chatId = $chat;
+            $helper->currentUserId = $chatUser->id;
+            $helper->currentUserType = 'e';
+
 
             MessageService::createNewCustomerOrEmployee($chat, $request, $user);
 
