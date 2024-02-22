@@ -202,6 +202,6 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
 <br>
 <p>
     Z pozdrowieniami
-    ZESPOL MEGA1000
+    Zespół Ephpolska
 </p>
 </body>

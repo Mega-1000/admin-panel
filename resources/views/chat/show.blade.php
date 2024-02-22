@@ -149,6 +149,9 @@
                     @endif
                 </div>
                 @if ($chat)
+                    <h2>
+                        Chat magazyn-konsultant-klient
+                    </h2>
                     @include('chat.chat_body')
                 @endif
                 <div id="new-message" class="loader-2" style="position: relative;">
