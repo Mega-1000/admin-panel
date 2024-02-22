@@ -574,6 +574,7 @@ class OrdersController extends Controller
             ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers', 'chat.auctions')
             ->orderBy('id', 'desc')
             ->where('is_hidden', false)
+            ->paginate(10)
             ->get();
 
         foreach ($orders as $order) {
