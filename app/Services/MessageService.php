@@ -26,16 +26,11 @@ readonly class MessageService
     {
         $chatUser = new ChatUser();
         $chatUser->chat()->associate($chat);
-
-        if ($request->type == Employee::class) {
-            $chatUser->employee()->associate($user);
-        }
-
-        if ($request->type == Customer::class) {
-            $chatUser->customer()->associate($user);
-        }
-
         $chatUser->save();
+
+        $chatUser->employee()->associate($user);
+
+
         dd($chatUser->employee);
     }
 
