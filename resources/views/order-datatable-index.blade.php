@@ -172,7 +172,9 @@
         </div>
     </div>
 
-    @section('scripts')
+@endsection
+
+@section('scripts')
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -305,6 +307,5 @@
         }
 
     </script>
-    @endsection
 @endsection
 <script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>
