@@ -4970,6 +4970,7 @@
                 type: 'GET',
                 credentials: 'same-origin',
                 success: function(data) {
+                    console.log(data)
                     if (data) {
                         populateDatesTable(data);
                     }
