@@ -4984,7 +4984,7 @@
             }
         };
         const updateDatesSend = (params) => {
-            return fetch(getFullUrl('api/orders/' + params.orderId + '/updateDates'), {
+            return fetch('/api/orders/' + params.orderId + '/updateDates', {
                 method: 'PUT',
                 credentials: 'same-origin',
                 headers: new Headers({
