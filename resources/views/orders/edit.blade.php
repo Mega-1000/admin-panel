@@ -666,7 +666,7 @@
                         <div class="panel-collapse collapse" id="collapseDates">
                             <div class="panel-body" style="padding:1em">
                                 <div class="col-sm-8">
-                                    @include('dates.blade.php')
+                                    @include('dates')
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="col-md-12">
