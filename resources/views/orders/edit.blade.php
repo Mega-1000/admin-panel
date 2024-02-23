@@ -666,9 +666,7 @@
                         <div class="panel-collapse collapse" id="collapseDates">
                             <div class="panel-body" style="padding:1em">
                                 <div class="col-sm-8">
-                                    <div class="vue-components">
-                                        <order-dates order-id="{{ $order->id }}"></order-dates>
-                                    </div>
+                                    @include('dates.blade.php')
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="col-md-12">

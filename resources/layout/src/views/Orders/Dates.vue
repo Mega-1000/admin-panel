@@ -46,7 +46,7 @@ export default class OrderDates extends Vue {
   public toggleShowModifyDatesModal (type: string): void {
     this.type = 'consultant'
 
-    console.log(this.showModal);
+    console.log(this.showModal)
     this.showModal = true
   }
 
