@@ -5011,6 +5011,7 @@
                     '<td><button class="btn btn-primary btn-sm" onclick="showModifyDateModal(' + date.orderId + ', \'' + date.type + '\', \'' + date.from + '\', \'' + date.to + '\')">Modify</button></td>' +
                     '</tr>';
             });
+            alert(html)
             $('#datesTable tbody').html(html);
         }
 
