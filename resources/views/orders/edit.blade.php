@@ -4966,7 +4966,7 @@
 
         function loadOrderDates() {
             $.ajax({
-                url: '/api/orders/dates', // Adjust this URL to your API endpoint
+                url: '/api/orders/{{ $order->id }}/getDates', // Adjust this URL to your API endpoint
                 type: 'GET',
                 credentials: 'same-origin',
                 success: function(data) {
