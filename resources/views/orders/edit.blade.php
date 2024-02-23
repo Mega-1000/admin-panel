@@ -92,7 +92,7 @@
         </a>
     </div>
     <form id="orders" action="{{ action('OrdersController@update', ['id' => $order->id])}}"
-          method="POST">
+          method="POST" >
         {{ csrf_field() }}
         {{ method_field('put') }}
         <div class="orders-general" id="general">
