@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order Dates Management</title>
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-</head>
-<body>
 <div class="container mt-5">
     <h2>Order Dates Management</h2>
     <div id="alerts"></div>
@@ -141,5 +132,3 @@
     });
 </script>
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
-</body>
-</html>
