@@ -5003,11 +5003,11 @@
 
         function populateDatesTable(dates) {
             let html = '';
-            dates.forEach(function(date) {
+            dates.forEach((v, k) => {
                 html += '<tr>' +
-                    '<td>' + date.type + '</td>' +
-                    '<td>' + date.from + '</td>' +
-                    '<td>' + date.to + '</td>' +
+                    '<td>' + k + '</td>' +
+                    '<td>' + date.delivery_date_from + '</td>' +
+                    '<td>' + date.delivery_date_to + '</td>' +
                     '<td><button class="btn btn-primary btn-sm" onclick="showModifyDateModal(' + date.orderId + ', \'' + date.type + '\', \'' + date.from + '\', \'' + date.to + '\')">Modify</button></td>' +
                     '</tr>';
             });
