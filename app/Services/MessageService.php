@@ -26,7 +26,14 @@ readonly class MessageService
     {
         $chatUser = new ChatUser();
         $chatUser->chat()->associate($chat);
-        $chatUser->employee_id = $user->id;
+        if ($user instanceof Customer) {
+            $chatUser->customer_id = $user->id;
+        }
+
+        if ($user instanceof Employee) {
+            $chatUser->employee_id = $user->id;
+        }
+
         $chatUser->save();
 
         return $chatUser->id;
