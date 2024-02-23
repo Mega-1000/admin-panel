@@ -4968,6 +4968,7 @@
             $.ajax({
                 url: '/api/orders/dates', // Adjust this URL to your API endpoint
                 type: 'GET',
+                credentials: 'same-origin',
                 success: function(data) {
                     if (data && data.dates) {
                         populateDatesTable(data.dates);
@@ -4983,6 +4984,7 @@
             $.ajax({
                 url: '/api/orders/' + orderId + '/dates/modify', // Adjust this URL to your API endpoint
                 type: 'POST',
+                credentials: 'same-origin',
                 data: {
                     dateType: dateType,
                     dateFrom: dateFrom,
