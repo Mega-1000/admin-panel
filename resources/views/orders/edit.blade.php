@@ -4970,7 +4970,6 @@
                 type: 'GET',
                 credentials: 'same-origin',
                 success: function(data) {
-                    console.log(data)
                     if (data) {
                         populateDatesTable(data);
                     }
@@ -5004,15 +5003,27 @@
 
         function populateDatesTable(dates) {
             let html = '';
-            dates.forEach((v, k) => {
-                html += '<tr>' +
-                    '<td>' + k + '</td>' +
-                    '<td>' + date.delivery_date_from + '</td>' +
-                    '<td>' + date.delivery_date_to + '</td>' +
-                    '<td><button class="btn btn-primary btn-sm" onclick="showModifyDateModal(' + date.orderId + ', \'' + date.type + '\', \'' + date.from + '\', \'' + date.to + '\')">Modify</button></td>' +
-                    '</tr>';
-            });
-            alert(html)
+            function populateDatesTable(dates) {
+                let html = '';
+                Object.keys(dates).forEach(function(key) {
+                    const date = dates[key]; // Get the date object for the current key
+                    // Assuming you want to display delivery and shipment dates for each key
+                    html += '<tr>' +
+                        '<td>Delivery Date From (' + key + ')</td>' +
+                        '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
+                        '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
+                        '<td><button class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\')">Modify</button></td>' +
+                        '</tr>';
+                    html += '<tr>' +
+                        '<td>Shipment Date From (' + key + ')</td>' +
+                        '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
+                        '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
+                        '<td><button class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\')">Modify</button></td>' +
+                        '</tr>';
+                });
+                $('#datesTable tbody').html(html);
+            }
+
             $('#datesTable tbody').html(html);
         }
 
