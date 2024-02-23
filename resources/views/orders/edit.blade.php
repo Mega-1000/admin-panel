@@ -4966,8 +4966,8 @@
             const deliveryDateTo = dateType === 'delivery' ? $('#dateTo').val() : null;
 
             try {
-                const result = await updateDates({
-                    orderId: orderId,
+                const result = await updateDatesSend({
+                    orderId: {{ $order->id }},
                     type: dateType,
                     shipmentDateFrom: dateFrom,
                     shipmentDateTo: dateTo,
@@ -4983,6 +4983,25 @@
                 showAlert('danger', 'Failed to modify the date.');
             }
         };
+        const updateDatesSend = (params) => {
+            return fetch(getFullUrl('api/orders/' + params.orderId + '/updateDates'), {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: new Headers({
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'X-Requested-Width': 'XMLHttpRequest'
+                }),
+                body: JSON.stringify({
+                    type: params.type,
+                    shipmentDateFrom: params.shipmentDateFrom,
+                    shipmentDateTo: params.shipmentDateTo,
+                    deliveryDateFrom: params.deliveryDateFrom,
+                    deliveryDateTo: params.deliveryDateTo
+                })
+            }).then((response) => {
+                return response.json()
+            })
+        }
 
         function showAlert(type, message) {
             const alertHtml = '<div class="alert alert-' + type + '">' + message + '</div>';
