@@ -201,6 +201,9 @@ class MessagesController extends Controller
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function getMessages(GetMessagesRequest $request, string $token): JsonResponse
     {
         try {
@@ -212,7 +215,7 @@ class MessagesController extends Controller
             $lastId = $data['lastId'] ?? 0;
 
             if (!$chat) {
-                throw new ChatException('Wrong chat token');
+                throw new Exception('Wrong chat token');
             }
 
             $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
