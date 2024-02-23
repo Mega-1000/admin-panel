@@ -55,7 +55,6 @@
 </div>
 
 <script>
-    $(document).ready(function() {
         loadOrderDates();
 
         $('#saveDateChanges').click(function() {
@@ -129,6 +128,5 @@
                 $('#alerts').html('');
             }, 3000);
         }
-    });
 </script>
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
