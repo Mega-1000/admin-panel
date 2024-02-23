@@ -402,12 +402,30 @@ class OrdersController extends Controller
             ];
         }
 
+        /** @var OrderDates $dates */
+        $dates = $order->dates;
+        if (empty($dates)) {
+            $order->dates()->create([
+                'message' => 'Proszę o uzupełnienie dat'
+            ]);
+            $order->refresh();
+            $dates = $order->dates;
+        }
+
+        $customerDates = [
+            'delivery_date_from' => $dates->getDateAttribute('customer_delivery_date_from'),
+            'delivery_date_to' => $dates->getDateAttribute('customer_delivery_date_to'),
+            'shipment_date_from' => $dates->getDateAttribute('customer_shipment_date_from'),
+            'shipment_date_to' => $dates->getDateAttribute('customer_shipment_date_to'),
+        ];
+
         return array_merge(
             [
                 "DELIVERY_ADDRESS" => $order->addresses()->with('country')->where('type', '=', 'DELIVERY_ADDRESS')->first(),
                 "INVOICE_ADDRESS" => $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first(),
                 "DELIVERY_LOCK" => $isDeliveryChangeLocked,
                 "INVOICE_LOCK" => $isInvoiceChangeLocked,
+                "CUSTOMER_DATES" => $customerDates,
             ],
             $orderDates ?? []
         );
