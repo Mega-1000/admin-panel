@@ -77,7 +77,7 @@
             </button>
           </div>
         </div>
-        <div class="row text-center mt-5" v-if="!acceptance.customer && canAcceptAsCustomer && !canAccept('warehouse')">
+        <div class="row text-center mt-5" v-if="!acceptance.customer && canAcceptAsCustomer">
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-sm btn-info"
                     @click="$emit('acceptAsCustomer')">Akceptuj w imieniu klienta
