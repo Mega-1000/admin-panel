@@ -4957,7 +4957,7 @@
         loadOrderDates();
 
 
-        $('#saveDateChanges').click(async function() {
+        const updateDates = async () => {
             const orderId = $('#orderId').val();
             const dateType = $('#dateType').val(); // 'shipment' or 'delivery'
             const dateFrom = dateType === 'shipment' ? $('#dateFrom').val() : null;
@@ -4982,7 +4982,7 @@
                 console.error('Failed to modify the date:', error);
                 showAlert('danger', 'Failed to modify the date.');
             }
-        });
+        };
 
         function showAlert(type, message) {
             const alertHtml = '<div class="alert alert-' + type + '">' + message + '</div>';
