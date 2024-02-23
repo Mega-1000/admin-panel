@@ -4956,13 +4956,41 @@
     <script>
         loadOrderDates();
 
-        $('#saveDateChanges').click(function() {
+
+        $('#saveDateChanges').click(async function() {
             const orderId = $('#orderId').val();
-            const dateType = $('#dateType').val();
-            const dateFrom = $('#dateFrom').val();
-            const dateTo = $('#dateTo').val();
-            modifyOrderDate(orderId, dateType, dateFrom, dateTo);
+            const dateType = $('#dateType').val(); // 'shipment' or 'delivery'
+            const dateFrom = dateType === 'shipment' ? $('#dateFrom').val() : null;
+            const dateTo = dateType === 'shipment' ? $('#dateTo').val() : null;
+            const deliveryDateFrom = dateType === 'delivery' ? $('#dateFrom').val() : null;
+            const deliveryDateTo = dateType === 'delivery' ? $('#dateTo').val() : null;
+
+            try {
+                const result = await updateDates({
+                    orderId: orderId,
+                    type: dateType,
+                    shipmentDateFrom: dateFrom,
+                    shipmentDateTo: dateTo,
+                    deliveryDateFrom: deliveryDateFrom,
+                    deliveryDateTo: deliveryDateTo,
+                });
+
+                $('#modifyDateModal').modal('hide');
+                showAlert('success', 'Date successfully modified.');
+                loadOrderDates(); // Refresh dates table
+            } catch (error) {
+                console.error('Failed to modify the date:', error);
+                showAlert('danger', 'Failed to modify the date.');
+            }
         });
+
+        function showAlert(type, message) {
+            const alertHtml = '<div class="alert alert-' + type + '">' + message + '</div>';
+            $('#alerts').html(alertHtml);
+            setTimeout(function() {
+                $('#alerts').html('');
+            }, 3000);
+        }
 
         function loadOrderDates() {
             $.ajax({
@@ -5007,13 +5035,13 @@
                 const date = dates[key]; // Get the date object for the current key
                 // Assuming you want to display delivery and shipment dates for each key
                 html += '<tr>' +
-                    '<td>Delivery Date From (' + key + ')</td>' +
+                    '<td>Delivery Date (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
                     '<td><button class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\')">Modify</button></td>' +
                     '</tr>';
                 html += '<tr>' +
-                    '<td>Shipment Date From (' + key + ')</td>' +
+                    '<td>Shipment Date (' + key + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                     '<td><button class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\')">Modify</button></td>' +
