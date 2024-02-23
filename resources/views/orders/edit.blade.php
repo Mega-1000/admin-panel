@@ -4970,8 +4970,8 @@
                 type: 'GET',
                 credentials: 'same-origin',
                 success: function(data) {
-                    if (data && data.dates) {
-                        populateDatesTable(data.dates);
+                    if (data) {
+                        populateDatesTable(data);
                     }
                 },
                 error: function(xhr, status, error) {
