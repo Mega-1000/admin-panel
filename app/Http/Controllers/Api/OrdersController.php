@@ -774,10 +774,10 @@ class OrdersController extends Controller
         if ($request->has('type')) {
             $order->dates->resetAcceptance();
             $result = $order->dates()->update([
-                $request->type . '_shipment_date_from' => $request->shipmentDateFrom,
-                $request->type . '_shipment_date_to' => $request->shipmentDateTo,
-                $request->type . '_delivery_date_from' => $request->deliveryDateFrom,
-                $request->type . '_delivery_date_to' => $request->deliveryDateTo,
+                $request->type . '_shipment_date_from' => $request->shipmentDateFrom ?? now(),
+                $request->type . '_shipment_date_to' => $request->shipmentDateTo ?? now(),
+                $request->type . '_delivery_date_from' => $request->deliveryDateFrom ?? now(),
+                $request->type . '_delivery_date_to' => $request->deliveryDateTo ?? now(),
                 $request->type . '_acceptance' => true,
                 'message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'
             ]);
