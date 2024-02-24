@@ -731,40 +731,37 @@
             let html = '';
             Object.keys(dates).forEach(function(key) {
                 const date = dates[key]; // Get the date object for the current key
-                // Assuming you want to display delivery and shipment dates for each key
+
+                // Skip if the key is 'acceptance'
                 if (key === 'acceptance') {
                     return;
                 }
 
+                // Determine user roles
                 const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
                 const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
                 const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}';
 
+                // Adjust IsModifyAble logic to allow warehouse to accept customer dates and vice versa
                 let IsModifyAble = false;
-
-                if (isCustomer && key === 'customer') {
+                if ((isCustomer && key === 'warehouse') || (isWarehouse && key === 'customer')) {
                     IsModifyAble = true;
                 }
 
-                if (isConsultant && key === 'consultant') {
-                    IsModifyAble = true;
-                }
-
-                if (isWarehouse && key === 'warehouse') {
-                    IsModifyAble = true;
-                }
-
+                // Delivery date row
                 html += '<tr>' +
-                    '<td>Propozycja data wysyłki (' + key + ')</td>' +
+                    '<td>Proposed delivery date (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
-                    (IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
+                    (IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'' + date.orderId + '\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
                     '</tr>';
+
+                // Shipment date row
                 html += '<tr>' +
-                    '<td>Propozycja data dostawy (' + key + ')</td>' +
+                    '<td>Proposed shipment date (' + key + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
-                    (IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
+                    (IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'' + date.orderId + '\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
                     '</tr>';
             });
             $('#datesTable tbody').html(html);

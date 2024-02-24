@@ -435,11 +435,11 @@ class MessagesHelper
      */
     private function sendWaitingMessage(Chat $chat): void
     {
-        $content = "Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
-                    Zajmuje to zwykle do kilku minut.";
-        $blankChatUser = $this->createOrGetBlankUser($chat);
-
-        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+//        $content = "Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
+//                    Zajmuje to zwykle do kilku minut.";
+//        $blankChatUser = $this->createOrGetBlankUser($chat);
+//
+//        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
 
     public function sendDateChangeMessage(Chat $chat, string $type): void
