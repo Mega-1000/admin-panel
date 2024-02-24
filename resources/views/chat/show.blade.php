@@ -736,23 +736,23 @@
                     return;
                 }
 
-                const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
-                const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
-                const isWarehouse = '{{ $chatBlankUser }}';
+                {{--const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';--}}
+                {{--const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';--}}
+                {{--const isWarehouse = '{{ $chatBlankUser }}';--}}
 
-                let IsModifyAble = false;
+                {{--let IsModifyAble = false;--}}
 
-                if (isCustomer && key === 'customer') {
-                    IsModifyAble = true;
-                }
+                {{--if (isCustomer && key === 'customer') {--}}
+                {{--    IsModifyAble = true;--}}
+                {{--}--}}
 
-                if (isConsultant && key === 'consultant') {
-                    IsModifyAble = true;
-                }
+                {{--if (isConsultant && key === 'consultant') {--}}
+                {{--    IsModifyAble = true;--}}
+                {{--}--}}
 
-                if (isWarehouse && key === 'warehouse') {
-                    IsModifyAble = true;
-                }
+                {{--if (isWarehouse && key === 'warehouse') {--}}
+                {{--    IsModifyAble = true;--}}
+                {{--}--}}
 
                 html += '<tr>' +
                     '<td>Prpoponowana data wysyłki (' + key + ')</td>' +
