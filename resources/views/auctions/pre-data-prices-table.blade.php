@@ -77,7 +77,6 @@
             <tr>
                 <th>Ceny za m3</th>
                 @php
-                dd($order);
                     $items = isset($order) ? $order->items->pluck('product') : $products;
                 @endphp
 
