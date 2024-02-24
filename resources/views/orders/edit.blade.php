@@ -5027,7 +5027,6 @@
         }
 
         function modifyOrderDate(orderId, dateType, dateFrom, dateTo, type) {
-            window.type11 = type;
             $.ajax({
                 url: '/api/orders/' + orderId + '/dates/modify', // Adjust this URL to your API endpoint
                 type: 'POST',
@@ -5074,6 +5073,7 @@
             $('#dateType').val(type);
             $('#dateFrom').val(from);
             $('#dateTo').val(to);
+            window.type11 = type;
             $('#modifyDateModal').modal('show');
         }
 
