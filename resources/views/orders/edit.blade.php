@@ -5068,12 +5068,12 @@
             $('#datesTable tbody').html(html);
         }
 
-        window.showModifyDateModal = function(orderId, type, from, to) {
+        window.showModifyDateModal = function(orderId, type, from, to, kolej, type11) {
             $('#orderId').val(orderId);
             $('#dateType').val(type);
             $('#dateFrom').val(from);
             $('#dateTo').val(to);
-            window.type11 = type;
+            window.type11 = type11;
             $('#modifyDateModal').modal('show');
         }
 
