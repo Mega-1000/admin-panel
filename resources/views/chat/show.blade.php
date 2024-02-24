@@ -77,11 +77,15 @@
                             <div id="auction-instructions" style="display: none; color: white; font-weight: bold; font-size: large; border-radius: 15px; padding: 20px; background-color: #0c0c0c">
                             <p>Poniżej tabela cen brutto produktów z tej oferty których istnieje możliwość dostarczenia na wskazany kod pocztowy.</p>
                                 <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="600px; width: 100%" width="600"></iframe>
-                            <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg. Jeśli chcesz wykonać inną interakcję naciśnij przycisk zamknij komunikat</p>
+                            <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg.
+                                <br>
+                                <br>
+                                <button class="btn btn-primary" id="dimiss-info">Zamknij ten komunikat</button>
+                                <br>
+                                Jeśli chcesz wykonać inną interakcję naciśnij przycisk zamknij komunikat</p>
                                 <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
                                     Rozpocznij przetarg
                                 </a>
-                                <button class="btn btn-primary" id="dimiss-info">Zamknij ten komunikat</button>
                             </div>
                         @else
                             <!-- if auction->end_of_auction is in past show message  -->
