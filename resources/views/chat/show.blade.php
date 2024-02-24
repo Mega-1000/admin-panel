@@ -80,9 +80,9 @@
                             <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg.
                                 <br>
                                 <br>
+                                Jeśli chcesz wykonać inną interakcję naciśnij przycisk zamknij komunikat</p>
                                 <button class="btn btn-primary" id="dimiss-info">Zamknij ten komunikat</button>
                                 <br>
-                                Jeśli chcesz wykonać inną interakcję naciśnij przycisk zamknij komunikat</p>
                                 <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
                                     Rozpocznij przetarg
                                 </a>
