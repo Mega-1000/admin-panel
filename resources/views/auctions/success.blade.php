@@ -10,6 +10,9 @@
 
 <body>
     <div class="container">
-        Akcja została wykonana pomyślnie. Możesz zamknąć stronę.
+        Akcja została wykonana pomyślnie, rozpoczęto proces przetargowy.
+        <br>
+        <br>
+        Możesz zamknąć okno.
     </div>
 </body>
