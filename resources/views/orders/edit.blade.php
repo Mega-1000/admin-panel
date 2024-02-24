@@ -4967,7 +4967,7 @@
             try {
                 const result = await updateDatesSend({
                     orderId: {{ $order->id }},
-                    type: window.dateType,
+                    type: window.type11,
                     shipmentDateFrom: dateFrom,
                     shipmentDateTo: dateTo,
                     deliveryDateFrom: deliveryDateFrom,
@@ -5027,7 +5027,7 @@
         }
 
         function modifyOrderDate(orderId, dateType, dateFrom, dateTo, type) {
-            window.dateType = type;
+            window.type11 = type;
             $.ajax({
                 url: '/api/orders/' + orderId + '/dates/modify', // Adjust this URL to your API endpoint
                 type: 'POST',
