@@ -727,7 +727,7 @@ class OrdersController extends Controller
         ];
     }
 
-    public function acceptDates(Order $order, Request $request)
+    public function acceptDates(Order $order, Request $request, MessagesHelper $messagesHelper)
     {
         $result = null;
         WorkingEventsService::createEvent(WorkingEvents::ACCEPT_DATES_EVENT, $order->id);
@@ -735,7 +735,7 @@ class OrdersController extends Controller
         $order->date_accepted = true;
         $order->save();
 
-
+        $messagesHelper->sendDateAcceptationMessage($order->chat);
     }
 
     public function updateDates(Order $order, Request $request, MessagesHelper $messagesHelper)

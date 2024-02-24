@@ -729,9 +729,6 @@
 
         function populateDatesTable(dates) {
             let html = '';
-            // Assuming window.dateAccepted is set to the $order->date_accepted status
-            const dateAccepted = window.dateAccepted; // This should be set appropriately
-
             Object.keys(dates).forEach(function(key) {
                 const date = dates[key]; // Get the date object for the current key
 
@@ -742,6 +739,7 @@
                 const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
                 const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
                 const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}';
+                const isAccepted = {{ $order->date_accepted}};
                 window.userType = '{{ $userType }}';
 
                 // get full name of userType
@@ -755,26 +753,28 @@
 
                 // Determine if the user can modify the date
                 let canModify = false;
-                if (!dateAccepted) { // Check if date has not been accepted yet
-                    if (isCustomer && key === 'customer') {
-                        canModify = true;
-                    }
+                if (isCustomer && key === 'customer') {
+                    canModify = true;
+                }
 
-                    if (isConsultant && key === 'consultant') {
-                        canModify = true;
-                    }
+                if (isConsultant && key === 'consultant') {
+                    canModify = true;
+                }
 
-                    if (isWarehouse && key === 'warehouse') {
-                        canModify = true;
-                    }
+                if (isWarehouse && key === 'warehouse') {
+                    canModify = true;
                 }
 
                 // Determine if the user can accept the date (new functionality)
                 let canAccept = false;
-                if (!dateAccepted) { // Check if date has not been accepted yet
-                    if ((isCustomer && key === 'warehouse') || (isWarehouse && key === 'customer')) {
-                        canAccept = true;
-                    }
+                if ((isCustomer && key === 'warehouse') || (isWarehouse && key === 'customer')) {
+                    canAccept = true;
+                }
+
+                if (isAccepted) {
+                    canAccept = false;
+                    canModify = false;
+                    $('#dates-table').before('<div class="alert alert-info">Daty zostały finalnie zatwierdzone i nie ma możliwości ich modyfikacji</div>');
                 }
 
                 // Delivery date row
@@ -783,7 +783,7 @@
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
-                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'delivery\', \'' + key + '\')">Accept</div></td>' : '') +
+                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'delivery\', \'' + key + '\')">Akceptuj</div></td>' : '') +
                     '</tr>';
 
                 // Shipment date row
@@ -792,12 +792,11 @@
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
-                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'shipment\', \'' + key + '\')">Accept</div></td>' : '') +
+                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'shipment\', \'' + key + '\')">Akceptuj</div></td>' : '') +
                     '</tr>';
             });
             $('#datesTable tbody').html(html);
         }
-
 
         // Add a new function for accepting dates
         window.acceptDate = function(dateType, key) {
