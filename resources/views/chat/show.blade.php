@@ -755,17 +755,17 @@
                 }
 
                 html += '<tr>' +
-                    '<td>Prpoponowana data wysyłki (' + key + ')</td>' +
+                    '<td>Propozycja data wysyłki (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
-                    IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
-                    '</tr>' : '';
+                    (IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
+                    '</tr>';
                 html += '<tr>' +
-                    '<td>Prpoponowana data dostawy (' + key + ')</td>' +
+                    '<td>Propozycja data dostawy (' + key + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
-                    IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
-                    '</tr>' : '';
+                    (IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
+                    '</tr>';
             });
             $('#datesTable tbody').html(html);
         }
