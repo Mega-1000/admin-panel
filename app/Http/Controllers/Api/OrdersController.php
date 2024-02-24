@@ -230,6 +230,8 @@ class OrdersController extends Controller
                 dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
             }
 
+            $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
+
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
             ]);

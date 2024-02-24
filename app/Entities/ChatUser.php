@@ -30,6 +30,7 @@ class ChatUser extends Model
 
     public $fillable = [
         'user_id',
+        'customer_id',
     ];
 
     public function user(): BelongsTo
