@@ -738,7 +738,7 @@
 
                 const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
                 const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
-                const isWarehouse = '{{ $userType == MessagesHelper::TYPE_WAREHOUSE }}';
+                const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}';
 
                 let IsModifyAble = false;
 
