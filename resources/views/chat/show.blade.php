@@ -793,7 +793,7 @@
 
         // Add a new function for accepting dates
         window.acceptDate = function(dateType, key) {
-            return fetch(getFullUrl('api/orders/' + {{ $order->id }} + '/acceptDates'), {
+            return fetch('/api/orders/' + {{ $order->id }} + '/acceptDates', {
                 method: 'PUT',
                 credentials: 'same-origin',
                 headers: new Headers({
