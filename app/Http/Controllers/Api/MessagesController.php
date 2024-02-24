@@ -220,6 +220,7 @@ class MessagesController extends Controller
 
             $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
             $assignedMessagesIds = array_flip($assignedMessagesIds);
+            dd($assignedMessagesIds);
             $out = '';
             foreach ($chat->messages as $message) {
                 if ($message->id <= $lastId || $area != $message->area) {
