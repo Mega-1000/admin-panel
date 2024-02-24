@@ -5074,6 +5074,7 @@
             $('#dateFrom').val(from);
             $('#dateTo').val(to);
             window.type11 = type11;
+            alert(window.type11)
             $('#modifyDateModal').modal('show');
         }
 
