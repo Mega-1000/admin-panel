@@ -812,7 +812,7 @@
                     userType: window.userType
                 })
             }).then((response) => {
-                return response.json()
+                window.location.reload();
             })
         }
 
