@@ -446,6 +446,7 @@ class MessagesHelper
     {
         $content = "Zmieniono daty dostawy, zmieniający: " . $type . ". Prosimy o zapoznanie się z nowymi terminami i zatwierdzenie.";
         $blankChatUser = $this->createOrGetBlankUser($chat);
+        $this->chatId = $chat->id;
 
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
