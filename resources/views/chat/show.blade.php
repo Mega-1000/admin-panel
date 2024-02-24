@@ -78,12 +78,9 @@
                             <p>Poniżej tabela cen brutto produktów z tej oferty których istnieje możliwość dostarczenia na wskazany kod pocztowy.</p>
                                 <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="600px; width: 100%" width="600"></iframe>
                             <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg.</p>
-                                <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
-                                    @csrf
-                                    <button class="btn btn-success">
-                                        Rozpocznij przetarg
-                                    </button>
-                                </form>
+                                <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
+                                    Rozpocznij przetarg
+                                </a>
                                 <button class="btn btn-primary" id="dimiss-info">Ok</button>
                             </div>
                         @else
