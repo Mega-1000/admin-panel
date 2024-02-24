@@ -731,40 +731,11 @@ class OrdersController extends Controller
     {
         $result = null;
         WorkingEventsService::createEvent(WorkingEvents::ACCEPT_DATES_EVENT, $order->id);
-        if ($request->has('type') && $request->has('userType')) {
-            /** @var OrderDates $dates */
-            $dates = $order->dates;
-            $result = $order->dates()->update([
-                $request->userType . '_delivery_date_from' => $dates->getDateAttribute($request->type . '_delivery_date_from'),
-                $request->userType . '_delivery_date_to' => $dates->getDateAttribute($request->type . '_delivery_date_to'),
-                $request->userType . '_shipment_date_from' => $dates->getDateAttribute($request->type . '_shipment_date_from'),
-                $request->userType . '_shipment_date_to' => $dates->getDateAttribute($request->type . '_shipment_date_to'),
-                $request->userType . '_acceptance' => true,
-                'message' => __('order_dates.' . $request->userType) . ' <strong>zaakceptował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'
 
-            ]);
-        }
-        if ($result) {
-            $order->dates->refresh();
-            return response(json_encode([
-                'acceptance' => [
-                    'customer' => $order->dates->customer_acceptance,
-                    'consultant' => $order->dates->consultant_acceptance,
-                    'warehouse' => $order->dates->warehouse_acceptance,
-                    'message' => $order->dates->message,
-                ],
-                $request->userType => [
-                    'delivery_date_from' => $dates->getDateAttribute($request->type . '_delivery_date_from'),
-                    'delivery_date_to' => $dates->getDateAttribute($request->type . '_delivery_date_to'),
-                    'shipment_date_from' => $dates->getDateAttribute($request->type . '_shipment_date_from'),
-                    'shipment_date_to' => $dates->getDateAttribute($request->type . '_shipment_date_to'),
-                ]
-            ]), 200);
-        }
-        return response(json_encode([
-            'error_code' => 500,
-            'error_message' => __('order_dates.messages.error')
-        ]), 500);
+        $order->date_accepted = true;
+        $order->save();
+
+
     }
 
     public function updateDates(Order $order, Request $request, MessagesHelper $messagesHelper)
