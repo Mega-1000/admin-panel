@@ -732,20 +732,32 @@
             Object.keys(dates).forEach(function(key) {
                 const date = dates[key]; // Get the date object for the current key
 
-                // Skip if the key is 'acceptance'
                 if (key === 'acceptance') {
                     return;
                 }
 
-                // Determine user roles
                 const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
                 const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
                 const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}';
 
-                // Adjust IsModifyAble logic to allow warehouse to accept customer dates and vice versa
-                let IsModifyAble = false;
+                // Determine if the user can modify the date
+                let canModify = false;
+                if (isCustomer && key === 'customer') {
+                    canModify = true;
+                }
+
+                if (isConsultant && key === 'consultant') {
+                    canModify = true;
+                }
+
+                if (isWarehouse && key === 'warehouse') {
+                    canModify = true;
+                }
+
+                // Determine if the user can accept the date (new functionality)
+                let canAccept = false;
                 if ((isCustomer && key === 'warehouse') || (isWarehouse && key === 'customer')) {
-                    IsModifyAble = true;
+                    canAccept = true;
                 }
 
                 // Delivery date row
@@ -753,7 +765,8 @@
                     '<td>Proposed delivery date (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
-                    (IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'' + date.orderId + '\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
+                    (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
+                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'delivery\', \'' + key + '\')">Accept</div></td>' : '') +
                     '</tr>';
 
                 // Shipment date row
@@ -761,11 +774,20 @@
                     '<td>Proposed shipment date (' + key + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
-                    (IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'' + date.orderId + '\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
+                    (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
+                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'shipment\', \'' + key + '\')">Accept</div></td>' : '') +
                     '</tr>';
             });
             $('#datesTable tbody').html(html);
         }
+
+        // Add a new function for accepting dates
+        window.acceptDate = function(dateType, key) {
+            console.log('Accepting ' + dateType + ' date for ' + key);
+            // Implement the logic to call the backend API for accepting the date here
+            // You might need to pass more parameters such as orderId, dateFrom, dateTo, etc., based on your backend requirements
+        }
+
 
         window.showModifyDateModal = function(orderId, type, from, to, type11) {
             $('#orderId').val(orderId);
