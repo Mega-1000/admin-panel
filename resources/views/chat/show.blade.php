@@ -772,9 +772,9 @@
                 }
 
                 if (isAccepted) {
-                    canAccept = false;
-                    canModify = false;
-                    $('#dates-table').before('<div class="alert alert-info">Daty zostały finalnie zatwierdzone i nie ma możliwości ich modyfikacji</div>');
+                    // canAccept = false;
+                    // canModify = false;
+                    // $('#dates-table').before('<div class="alert alert-info">Daty zostały finalnie zatwierdzone i nie ma możliwości ich modyfikacji</div>');
                 }
 
                 // Delivery date row
