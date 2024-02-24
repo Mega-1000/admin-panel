@@ -65,7 +65,7 @@ class AuctionsController extends Controller
     {
         $this->chatAuctionsService->createAuction(CreateChatAuctionDTO::fromRequest($chat, $request->validated()));
 
-        return redirect()->route('success');
+        return redirect($request->get('backUrl'));
     }
 
     /**

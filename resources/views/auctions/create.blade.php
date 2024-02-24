@@ -15,7 +15,7 @@
 </head>
 
 <body>
-    <form class="form-group-default m-6" action="{{ route('auctions.store', ['chat' => $chat->id]) }}" method="post">
+    <form class="form-group-default m-6" action="{{ route('auctions.store', ['chat' => $chat->id, 'backUrl' => URL::previous()]) }}" method="post">
         @csrf
 
         <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Data zakończenia przetargu</label>
