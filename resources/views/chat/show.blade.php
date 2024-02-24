@@ -364,6 +364,7 @@
             $('#new-message').removeClass('loader-2');
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
+
             const storagePath = '{{ asset("storage") }}';
             const documentTitle = document.title;
 
@@ -735,18 +736,36 @@
                     return;
                 }
 
+                const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
+                const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
+                const isWarehouse = '{{ $chatBlankUser }}';
+
+                let IsModifyAble = false;
+
+                if (isCustomer && key === 'customer') {
+                    IsModifyAble = true;
+                }
+
+                if (isConsultant && key === 'consultant') {
+                    IsModifyAble = true;
+                }
+
+                if (isWarehouse && key === 'warehouse') {
+                    IsModifyAble = true;
+                }
+
                 html += '<tr>' +
                     '<td>Prpoponowana data wysyłki (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
-                    '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
-                    '</tr>';
+                    IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
+                    '</tr>' : '';
                 html += '<tr>' +
                     '<td>Prpoponowana data dostawy (' + key + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
-                    '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
-                    '</tr>';
+                    IsModifyAble ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
+                    '</tr>' : '';
             });
             $('#datesTable tbody').html(html);
         }
