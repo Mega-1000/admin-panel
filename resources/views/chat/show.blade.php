@@ -739,6 +739,16 @@
                 const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
                 const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
                 const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}';
+                window.userType = '{{ $userType }}';
+
+                // get full name of userType
+                if (window.userType === 'c') {
+                    window.userType = 'customer';
+                } else if (window.userType === 'u') {
+                    window.userType = 'consultant';
+                } else if (window.userType === 'e') {
+                    window.userType = 'warehouse';
+                }
 
                 // Determine if the user can modify the date
                 let canModify = false;
@@ -766,7 +776,7 @@
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
-                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'delivery\', \'' + key + '\')">Accept</div></td>' : '') +
+                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'delivery\', \'' + key + '\')">Akceptuj</div></td>' : '') +
                     '</tr>';
 
                 // Shipment date row
@@ -775,7 +785,7 @@
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
-                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'shipment\', \'' + key + '\')">Accept</div></td>' : '') +
+                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'shipment\', \'' + key + '\')">Akceptuj</div></td>' : '') +
                     '</tr>';
             });
             $('#datesTable tbody').html(html);
@@ -783,9 +793,20 @@
 
         // Add a new function for accepting dates
         window.acceptDate = function(dateType, key) {
-            console.log('Accepting ' + dateType + ' date for ' + key);
-            // Implement the logic to call the backend API for accepting the date here
-            // You might need to pass more parameters such as orderId, dateFrom, dateTo, etc., based on your backend requirements
+            return fetch(getFullUrl('api/orders/' + {{ $order->id }} + '/acceptDates'), {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: new Headers({
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'X-Requested-Width': 'XMLHttpRequest'
+                }),
+                body: JSON.stringify({
+                    type: key,
+                    userType: window.userType
+                })
+            }).then((response) => {
+                return response.json()
+            })
         }
 
 
