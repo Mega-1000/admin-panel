@@ -1,13 +1,13 @@
 <div class="container mt-5" >
-    <h2>Order Dates Management</h2>
+    <h2>Zarządzanie datami do zamówienia</h2>
     <div id="alerts"></div>
     <table class="table" id="datesTable">
         <thead>
         <tr>
-            <th>Date Type</th>
-            <th>From</th>
-            <th>To</th>
-            <th>Action</th>
+            <th>Typ daty</th>
+            <th>Od</th>
+            <th>Do</th>
+            <th>Akcje</th>
         </tr>
         </thead>
         <tbody>
@@ -29,26 +29,26 @@
             <div class="modal-body">
                 <form id="modifyDateForm">
                     <div class="form-group">
-                        <label for="dateType">Date Type</label>
+                        <label for="dateType">Typ daty</label>
                         <select form="modifyDateForm" class="form-control" id="dateType">
-                            <option value="shipment">Shipment</option>
-                            <option value="delivery">Delivery</option>
+                            <option value="shipment">Wysyłka</option>
+                            <option value="delivery">Dostawa</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="dateFrom">From</label>
+                        <label for="dateFrom">Od</label>
                         <input form="modifyDateForm" type="date" class="form-control" id="dateFrom" required>
                     </div>
                     <div class="form-group">
-                        <label for="dateTo">To</label>
+                        <label for="dateTo">Do</label>
                         <input form="modifyDateForm" type="date" class="form-control" id="dateTo" required>
                     </div>
                     <input form="modifyDateForm" type="hidden" id="orderId" value="">
                 </form>
             </div>
             <div class="modal-footer">
-                <div type="button" class="btn btn-secondary" data-dismiss="modal">Close</div>
-                <div type="button" class="btn btn-primary" id="saveDateChanges" onclick="updateDates(); event.preventDefault();">Save changes</div>
+                <div type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</div>
+                <div type="button" class="btn btn-primary" id="saveDateChanges" onclick="updateDates(); event.preventDefault();">Zapisz zmiany</div>
             </div>
         </div>
     </div>
