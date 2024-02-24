@@ -75,7 +75,7 @@
                                 Rozpocznij przetarg
                             </a>
                             <div id="auction-instructions" style="display: none; color: white; font-weight: bold; font-size: large; border-radius: 15px; padding: 20px; background-color: #0c0c0c">
-                                <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="500px"></iframe>
+                                <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="700px; width: 100%"></iframe>
                             <p>Możesz rozpocząć przetarg klikając w ten przycisk. Poprosimy firmy o indywidualną wycenę twojego zamówienia.</p>
                                 <button class="btn btn-primary" id="dimiss-info">Ok</button>
                             </div>
