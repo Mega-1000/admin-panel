@@ -79,7 +79,7 @@
                                 <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="600px; width: 100%" width="600"></iframe>
                             <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg.
                                 <br>
-                                !!! Jeśli chcesz wykonać inną interakcję naciśnij przycisk zamknij tą tabelę</p>
+                                !!! Jeśli chcesz wykonać inną czynnoś naciśnij przycisk zamknij tą tabelę</p>
                                 <button class="btn btn-primary" id="dimiss-info">Zamknij tą tabelę</button>
                                 <br>
                                 <br>
