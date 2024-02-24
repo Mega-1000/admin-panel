@@ -143,10 +143,7 @@
                     </div>
                 @endif
                 <div class="vue-components">
-                    @if (!empty($order))
-                        <order-dates order-id="{{ $order->id }}" user-type="{{ $userType }}"
-                            chat-id="{{ empty($chat) ? null : $chat->id }}"></order-dates>
-                    @endif
+                    @include('dates')
                 </div>
                 @if ($chat)
                     <h2>
