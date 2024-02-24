@@ -31,6 +31,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Matrix\Builder;
 
 class AuctionsController extends Controller
@@ -59,9 +60,9 @@ class AuctionsController extends Controller
      *
      * @param Chat $chat
      * @param CreateAuctionRequest $request
-     * @return RedirectResponse
+     * @return Redirector
      */
-    public function store(Chat $chat, CreateAuctionRequest $request): RedirectResponse
+    public function store(Chat $chat, CreateAuctionRequest $request): Redirector
     {
         $this->chatAuctionsService->createAuction(CreateChatAuctionDTO::fromRequest($chat, $request->validated()));
 
