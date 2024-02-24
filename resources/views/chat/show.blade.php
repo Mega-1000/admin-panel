@@ -358,7 +358,7 @@
 
             $(document).ready(function() {
                 $(function () {
-                    console.log($("select").selectize());
+                    // console.log($("select").selectize());
                 });
 
             $('#new-message').removeClass('loader-2');
