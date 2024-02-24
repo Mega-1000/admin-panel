@@ -47,8 +47,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" form="none" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" form="none" class="btn btn-primary" id="saveDateChanges" onclick="updateDates()">Save changes</button>
+                <div type="button" class="btn btn-secondary" data-dismiss="modal">Close</div>
+                <div type="button" class="btn btn-primary" id="saveDateChanges" onclick="updateDates(); event.preventDefault();">Save changes</div>
             </div>
         </div>
     </div>
