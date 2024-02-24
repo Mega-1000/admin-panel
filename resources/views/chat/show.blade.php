@@ -787,7 +787,7 @@
                     '<td>Proponowana data wysyłki (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
-                    (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
+                    (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
                     (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'delivery\', \'' + key + '\')">Akceptuj</div></td>' : '') +
                     '</tr>';
 
@@ -796,7 +796,7 @@
                     '<td>Proponowana data dostawy (' + key + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
-                    (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
+                    (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
                     (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'shipment\', \'' + key + '\')">Akceptuj</div></td>' : '') +
                     '</tr>';
             });
