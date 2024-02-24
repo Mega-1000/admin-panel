@@ -143,7 +143,7 @@
                     </div>
                 @endif
                 <div class="vue-components">
-                    @php($order = $chat->orders->first())
+                    @php($order = $chat->order)
                     @include('dates')
                 </div>
                 @if ($chat)
