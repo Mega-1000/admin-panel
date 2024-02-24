@@ -220,17 +220,16 @@ class MessagesController extends Controller
 
             $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
             $assignedMessagesIds = array_flip($assignedMessagesIds);
-            dd($assignedMessagesIds);
             $out = '';
             foreach ($chat->messages as $message) {
                 if ($message->id <= $lastId || $area != $message->area) {
                     continue;
                 }
-                if ($helper->currentUserType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id])) {
+//                if ($helper->currentUserType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id])) {
                     $out .= view('chat/single_message')->with([
                         'message' => $message,
                     ])->render();
-                }
+//                }
             }
             $helper->setLastRead();
 
