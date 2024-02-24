@@ -5053,13 +5053,13 @@
                 const date = dates[key]; // Get the date object for the current key
                 // Assuming you want to display delivery and shipment dates for each key
                 html += '<tr>' +
-                    '<td>Delivery Date (' + key + ')</td>' +
+                    '<td>Prpoponowana data wysyłki (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
                     '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' +
                     '</tr>';
                 html += '<tr>' +
-                    '<td>Shipment Date (' + key + ')</td>' +
+                    '<td>Prpoponowana data dostawy (' + key + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                     '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' +
