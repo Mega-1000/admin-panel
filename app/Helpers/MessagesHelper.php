@@ -442,6 +442,14 @@ class MessagesHelper
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
 
+    public function sendDateChangeMessage(Chat $chat, string $type): void
+    {
+        $content = "Zmieniono daty dostawy, zmieniający: " . $type . ". Prosimy o zapoznanie się z nowymi terminami i zatwierdzenie.";
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+
+        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+    }
+
     private function getAdminChatUser($secondTry = false)
     {
         $chat = $this->getChat();

@@ -767,7 +767,7 @@ class OrdersController extends Controller
         ]), 500);
     }
 
-    public function updateDates(Order $order, Request $request)
+    public function updateDates(Order $order, Request $request, MessagesHelper $messagesHelper)
     {
         $result = null;
         WorkingEventsService::createEvent(WorkingEvents::UPDATE_DATES_EVENT, $order->id);
@@ -794,6 +794,8 @@ class OrdersController extends Controller
             $updateData[$request->type . '_acceptance'] = true;
 
             $result = $order->dates()->update($updateData);
+
+            $messagesHelper->sendDateChangeMessage($order->chat, $request->type);
         }
 
         if ($result) {
