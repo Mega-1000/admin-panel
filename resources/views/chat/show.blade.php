@@ -772,14 +772,14 @@
                 }
 
                 if (isAccepted) {
-                    // canAccept = false;
+                    canAccept = false;
                     // canModify = false;
                     // $('#dates-table').before('<div class="alert alert-info">Daty zostały finalnie zatwierdzone i nie ma możliwości ich modyfikacji</div>');
                 }
 
                 // Delivery date row
                 html += '<tr>' +
-                    '<td>Proposed delivery date (' + key + ')</td>' +
+                    '<td>Proponowana data wysyłki (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +
@@ -788,7 +788,7 @@
 
                 // Shipment date row
                 html += '<tr>' +
-                    '<td>Proposed shipment date (' + key + ')</td>' +
+                    '<td>Proponowana data dostawy (' + key + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modify</div></td>' : '') +

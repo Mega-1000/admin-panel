@@ -767,6 +767,7 @@ class OrdersController extends Controller
             $result = $order->dates()->update($updateData);
 
             $messagesHelper->sendDateChangeMessage($order->chat, $request->type);
+            $order->date_accepted = false;
         }
 
         if ($result) {
