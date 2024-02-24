@@ -771,6 +771,11 @@
                     canAccept = true;
                 }
 
+                // there have to be at least one date to accept
+                if (!date.delivery_date_from && !date.shipment_date_from && !date.delivery_date_to && !date.shipment_date_to) {
+                    canAccept = false;
+                }
+
                 if (isAccepted) {
                     canAccept = false;
                     // canModify = false;
