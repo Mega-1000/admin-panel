@@ -739,7 +739,7 @@
                 const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
                 const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
                 const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}';
-                const isAccepted = {{ $order->date_accepted ?? false }};
+                const isAccepted = {{ $order?->date_accepted ?? 'false' }};
                 window.userType = '{{ $userType }}';
 
                 // get full name of userType
