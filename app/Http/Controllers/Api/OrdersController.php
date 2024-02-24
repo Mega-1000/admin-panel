@@ -771,26 +771,39 @@ class OrdersController extends Controller
     {
         $result = null;
         WorkingEventsService::createEvent(WorkingEvents::UPDATE_DATES_EVENT, $order->id);
+
         if ($request->has('type')) {
             $order->dates->resetAcceptance();
-            $result = $order->dates()->update([
-                $request->type . '_shipment_date_from' => $request->shipmentDateFrom ?? now(),
-                $request->type . '_shipment_date_to' => $request->shipmentDateTo ?? now(),
-                $request->type . '_delivery_date_from' => $request->deliveryDateFrom ?? now(),
-                $request->type . '_delivery_date_to' => $request->deliveryDateTo ?? now(),
-                $request->type . '_acceptance' => true,
-                'message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'
-            ]);
+            $updateData = ['message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'];
+
+            // Only add fields to the update array if they are present in the request
+            if ($request->filled('shipmentDateFrom')) {
+                $updateData[$request->type . '_shipment_date_from'] = $request->shipmentDateFrom;
+            }
+            if ($request->filled('shipmentDateTo')) {
+                $updateData[$request->type . '_shipment_date_to'] = $request->shipmentDateTo;
+            }
+            if ($request->filled('deliveryDateFrom')) {
+                $updateData[$request->type . '_delivery_date_from'] = $request->deliveryDateFrom;
+            }
+            if ($request->filled('deliveryDateTo')) {
+                $updateData[$request->type . '_delivery_date_to'] = $request->deliveryDateTo;
+            }
+
+            // Always set acceptance to true
+            $updateData[$request->type . '_acceptance'] = true;
+
+            $result = $order->dates()->update($updateData);
         }
 
         if ($result) {
             $order->dates->refresh();
             return response(json_encode([
                 $request->type => [
-                    'shipment_date_from' => $request->shipmentDateFrom,
-                    'shipment_date_to' => $request->shipmentDateTo,
-                    'delivery_date_from' => $request->deliveryDateFrom,
-                    'delivery_date_to' => $request->deliveryDateTo,
+                    'shipment_date_from' => $request->shipmentDateFrom ?? $order->dates->{$request->type . '_shipment_date_from'},
+                    'shipment_date_to' => $request->shipmentDateTo ?? $order->dates->{$request->type . '_shipment_date_to'},
+                    'delivery_date_from' => $request->deliveryDateFrom ?? $order->dates->{$request->type . '_delivery_date_from'},
+                    'delivery_date_to' => $request->deliveryDateTo ?? $order->dates->{$request->type . '_delivery_date_to'},
                 ],
                 'acceptance' => [
                     $request->type => true,
