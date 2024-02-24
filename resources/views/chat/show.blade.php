@@ -632,6 +632,142 @@
             }
         });
     </script>
+    <script>
+        loadOrderDates();
+
+        const updateDates = async () => {
+            const orderId = $('#orderId').val();
+            const dateType = $('#dateType').val(); // 'shipment' or 'delivery'
+            const dateFrom = dateType === 'shipment' ? $('#dateFrom').val() : null;
+            const dateTo = dateType === 'shipment' ? $('#dateTo').val() : null;
+            const deliveryDateFrom = dateType === 'delivery' ? $('#dateFrom').val() : null;
+            const deliveryDateTo = dateType === 'delivery' ? $('#dateTo').val() : null;
+
+            try {
+                const result = await updateDatesSend({
+                    orderId: {{ $order->id }},
+                    type: window.type11,
+                    shipmentDateFrom: dateFrom,
+                    shipmentDateTo: dateTo,
+                    deliveryDateFrom: deliveryDateFrom,
+                    deliveryDateTo: deliveryDateTo,
+                });
+
+                $('#modifyDateModal').modal('hide');
+                showAlert('success', 'Date successfully modified.');
+                loadOrderDates(); // Refresh dates table
+            } catch (error) {
+                console.error('Failed to modify the date:', error);
+                showAlert('danger', 'Failed to modify the date.');
+            }
+        };
+        const updateDatesSend = (params) => {
+            return fetch('/api/orders/' + params.orderId + '/updateDates', {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: new Headers({
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'X-Requested-Width': 'XMLHttpRequest'
+                }),
+                body: JSON.stringify({
+                    type: params.type,
+                    shipmentDateFrom: params.shipmentDateFrom,
+                    shipmentDateTo: params.shipmentDateTo,
+                    deliveryDateFrom: params.deliveryDateFrom,
+                    deliveryDateTo: params.deliveryDateTo
+                })
+            }).then((response) => {
+                return response.json()
+            })
+        }
+
+        function showAlert(type, message) {
+            const alertHtml = '<div class="alert alert-' + type + '">' + message + '</div>';
+            $('#alerts').html(alertHtml);
+            setTimeout(function() {
+                $('#alerts').html('');
+            }, 3000);
+        }
+
+        function loadOrderDates() {
+            $.ajax({
+                url: '/api/orders/{{ $order->id }}/getDates', // Adjust this URL to your API endpoint
+                type: 'GET',
+                credentials: 'same-origin',
+                success: function(data) {
+                    if (data) {
+                        populateDatesTable(data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showAlert('danger', 'Failed to load order dates.');
+                }
+            });
+        }
+
+        function modifyOrderDate(orderId, dateType, dateFrom, dateTo, type) {
+            $.ajax({
+                url: '/api/orders/' + orderId + '/dates/modify', // Adjust this URL to your API endpoint
+                type: 'POST',
+                credentials: 'same-origin',
+                data: {
+                    dateType: dateType,
+                    dateFrom: dateFrom,
+                    dateTo: dateTo
+                },
+                success: function(data) {
+                    $('#modifyDateModal').modal('hide');
+                    showAlert('success', 'Date successfully modified.');
+                    loadOrderDates(); // Refresh dates table
+                },
+                error: function(xhr, status, error) {
+                    showAlert('danger', 'Failed to modify the date.');
+                }
+            });
+        }
+
+        function populateDatesTable(dates) {
+            let html = '';
+            Object.keys(dates).forEach(function(key) {
+                const date = dates[key]; // Get the date object for the current key
+                // Assuming you want to display delivery and shipment dates for each key
+                if (key === 'acceptance') {
+                    return;
+                }
+
+                html += '<tr>' +
+                    '<td>Prpoponowana data wysyłki (' + key + ')</td>' +
+                    '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
+                    '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
+                    '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
+                    '</tr>';
+                html += '<tr>' +
+                    '<td>Prpoponowana data dostawy (' + key + ')</td>' +
+                    '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
+                    '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
+                    '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
+                    '</tr>';
+            });
+            $('#datesTable tbody').html(html);
+        }
+
+        window.showModifyDateModal = function(orderId, type, from, to, type11) {
+            $('#orderId').val(orderId);
+            $('#dateType').val(type);
+            $('#dateFrom').val(from);
+            $('#dateTo').val(to);
+            window.type11 = type11;
+            $('#modifyDateModal').modal('show');
+        }
+
+        function showAlert(type, message) {
+            const alertHtml = '<div class="alert alert-' + type + '">' + message + '</div>';
+            $('#alerts').html(alertHtml);
+            setTimeout(function() {
+                $('#alerts').html('');
+            }, 3000);
+        }
+    </script>
 </body>
 
 </html>
