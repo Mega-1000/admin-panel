@@ -619,7 +619,7 @@
     <script>
         $(document).ready(function() {
             const params = new URLSearchParams(window.location.search);
-            const showAuctionInstructions = params.get('showAuctionInstructions') === 'true' && {{ $order->chat->auction()->first() ? 'true' : 'false' }};
+            const showAuctionInstructions = params.get('showAuctionInstructions') === 'true' && {{ $order->chat->auctions()->first() ? 'true' : 'false' }};
 
             if (showAuctionInstructions) {
                 // Show the instructions
