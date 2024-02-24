@@ -5052,6 +5052,10 @@
             Object.keys(dates).forEach(function(key) {
                 const date = dates[key]; // Get the date object for the current key
                 // Assuming you want to display delivery and shipment dates for each key
+                if (key === 'acceptance') {
+                    return;
+                }
+
                 html += '<tr>' +
                     '<td>Prpoponowana data wysyłki (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
