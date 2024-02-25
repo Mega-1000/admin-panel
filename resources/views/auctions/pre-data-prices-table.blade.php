@@ -96,6 +96,7 @@
                         {{ $prefix }}
                     </th>
                 @endforeach
+                {{ dd($groupedItems) }}
             </tr>
             <tr>
                 <th></th> <!-- Placeholder for the "Ceny za m3" column -->
