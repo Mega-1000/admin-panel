@@ -136,9 +136,8 @@
 
                                 $lastSpacePosition = strrpos($namePattern, ' ');
 
-                                $newString = substr($namePattern, 0, $lastSpacePosition);
+                                $namePattern = substr($namePattern, 0, $lastSpacePosition);
 
-                                echo $newString; // Outputs: "This is a sample"
 
                                 // Fetch the variation based on the firm's symbol and the name pattern
                                 $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
