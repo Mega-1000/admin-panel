@@ -134,6 +134,12 @@
                                 // Construct the name pattern to match for this product
                                 $namePattern = $prefix . ' ' . $suffix;
 
+                                $lastSpacePosition = strrpos($namePattern, ' ');
+
+                                $newString = substr($namePattern, 0, $lastSpacePosition);
+
+                                echo $newString; // Outputs: "This is a sample"
+
                                 // Fetch the variation based on the firm's symbol and the name pattern
                                 $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
                                     ->where('name', 'like', '%' . $namePattern . '%')
