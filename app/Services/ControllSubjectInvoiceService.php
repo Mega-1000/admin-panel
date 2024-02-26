@@ -45,8 +45,8 @@ class ControllSubjectInvoiceService
         $regex = '/^\d{5}/';
 
         if (preg_match($regex, $notes, $matches)) {
-            dd($matches);
              $order = Order::find($matches[0]);
+             dd($order);
 
             if (!$order) {
                 $this->addToReport($dto);
