@@ -61,7 +61,6 @@ class ControllSubjectInvoiceService
             return;
         }
 
-        dd($dto, $order);
         OrderInvoiceValueService::createFromDTO($dto, $order);
 
         $this->orders[] = $order->id;

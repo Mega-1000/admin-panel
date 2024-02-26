@@ -19,13 +19,13 @@ final class OrderInvoiceValueService
             return OrderInvoiceValue::where('invoice_number', $dto->number)->first();
         }
 
-        return OrderInvoiceValue::create([
+        return dd(OrderInvoiceValue::create([
             'order_id' => $order->id,
             'value' => $dto->value,
             'invoice_number' => $dto->number,
             'issue_date' => $dto->issueDate,
             'type' => request()->get('invoice-kind') === 'faktury sprzedazy' ? 'selling' : 'buying',
-        ]);
+        ]));
     }
 
     /**
