@@ -15,6 +15,7 @@ final class OrderInvoiceValueService
      */
     public static function createFromDTO(ControllSubjectInvoiceDTO $dto, Order $order): OrderInvoiceValue
     {
+        dd($dto->number);
         if (OrderInvoiceValue::where('invoice_number', $dto->number)->exists()) {
             return OrderInvoiceValue::where('invoice_number', $dto->number)->first();
         }
