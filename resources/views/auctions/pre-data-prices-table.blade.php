@@ -134,7 +134,7 @@
                                 // Construct the name pattern to match for this product
                                 $namePattern = $prefix . ' ' . $suffix;
 
-                                if($order) {
+                                if(isset($order)) {
                                     $lastSpacePosition = strrpos($namePattern, ' ');
 
                                     $namePattern = substr($namePattern, 0, $lastSpacePosition);
