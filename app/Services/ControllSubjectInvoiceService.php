@@ -46,7 +46,6 @@ class ControllSubjectInvoiceService
 
         if (preg_match($regex, $notes, $matches)) {
              $order = Order::find($matches[0]);
-             dd($order);
 
             if (!$order) {
                 $this->addToReport($dto);
@@ -62,6 +61,7 @@ class ControllSubjectInvoiceService
             return;
         }
 
+        dd($dto, $order);
         OrderInvoiceValueService::createFromDTO($dto, $order);
 
         $this->orders[] = $order->id;
