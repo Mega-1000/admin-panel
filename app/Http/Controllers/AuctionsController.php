@@ -250,7 +250,7 @@ class AuctionsController extends Controller
 
 
         $customersZipCode = request()->query('zip-code');
-        $cordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customersZipCode)->get()->first();
+        $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customersZipCode)->get()->first();
 
         $firms = Firm::whereHas('products', function ($q) {
             $q->where('variation_group', 'styropiany');
@@ -268,15 +268,15 @@ class AuctionsController extends Controller
                     ORDER BY distance
                 limit 1',
                 [
-                    'latitude' => $cordinatesOfUser->latitude,
-                    'longitude' => $cordinatesOfUser->longitude,
+                    'latitude' => $coordinatesOfUser->latitude,
+                    'longitude' => $coordinatesOfUser->longitude,
                     'firmId' => $firm->id
                 ]
             );
 
             $radius = $raw->distance;
 
-            if ($radius > $firm->warehousre->radius) {
+            if ($radius > $firm->warehouses()->first()->radius) {
                 $firms->forget($firm);
             }
         }
