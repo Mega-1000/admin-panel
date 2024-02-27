@@ -98,7 +98,7 @@
 
                 @foreach($groupedItems as $prefix => $suffixes)
                     <th  colspan="{{ count($suffixes) }}">
-                        {{ $prefix }} Sortuj
+                        {{ $prefix }}
                     </th>
                 @endforeach
             </tr>
@@ -110,7 +110,7 @@
                         natsort($suffixes);
                     @endphp
                     @foreach($suffixes as $suffix)
-                        <th>{{ $suffix }}</th>
+                        <th title="Kliknij aby sortować">{{ $suffix }}</th>
                     @endforeach
                 @endforeach
             </tr>
