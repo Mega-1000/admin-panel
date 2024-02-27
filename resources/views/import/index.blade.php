@@ -194,7 +194,7 @@
                         <option>faktury zakupu</option>
                     </select>
 
-                    <form method="post" action="{{ route('controll-subject-invoices') }}" enctype="multipart/form-data">
+                    <form method="post" action="{{ route('w') }}" enctype="multipart/form-data">
                         @csrf
                         <input type="file" name="file">
 

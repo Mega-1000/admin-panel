@@ -32,6 +32,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\DB;
 use Matrix\Builder;
 
 class AuctionsController extends Controller
@@ -229,7 +230,7 @@ class AuctionsController extends Controller
         ]);
     }
 
-    public function displayPricesTable(Chat $chat): View
+    public function displayPricesTable(): View
     {
         $products = Product::where('variation_group', 'styropiany')
             ->whereHas('children')
@@ -247,9 +248,39 @@ class AuctionsController extends Controller
             }
         }
 
+
+        $customersZipCode = request()->query('zip-code');
+        $cordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customersZipCode)->get()->first();
+
         $firms = Firm::whereHas('products', function ($q) {
             $q->where('variation_group', 'styropiany');
         })->get();
+
+        foreach ($firms as $firm) {
+            $raw = DB::selectOne(
+                'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                    POW(69.1 * (pc.latitude - :latitude), 2) +
+                    POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                    FROM postal_code_lat_lon pc
+                         JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                         JOIN warehouses w on wa.warehouse_id = w.id
+                    WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                    ORDER BY distance
+                limit 1',
+                [
+                    'latitude' => $cordinatesOfUser->latitude,
+                    'longitude' => $cordinatesOfUser->longitude,
+                    'firmId' => $firm->id
+                ]
+            );
+
+            $radius = $raw->distance;
+
+            if ($radius > $firm->warehousre->radius) {
+                $firms->forget($firm);
+            }
+        }
+
 
         return view('auctions.pre-data-prices-table', [
             'products' => $filteredProducts,
