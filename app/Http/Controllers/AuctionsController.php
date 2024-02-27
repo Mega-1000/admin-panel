@@ -256,7 +256,7 @@ class AuctionsController extends Controller
             $q->where('variation_group', 'styropiany');
         })->get();
 
-        foreach ($firms as $firm) {
+        foreach ($firms as $key => $firm) {
             $raw = DB::selectOne(
                 'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
                     POW(69.1 * (pc.latitude - :latitude), 2) +
@@ -277,7 +277,7 @@ class AuctionsController extends Controller
             $radius = $raw->distance;
 
             if ($radius > $firm->warehouses()->first()->radius) {
-                $firms->forget($firm->id);
+                $firms->forget($key);
             }
         }
 
