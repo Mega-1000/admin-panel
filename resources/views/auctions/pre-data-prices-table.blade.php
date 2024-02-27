@@ -98,7 +98,7 @@
 
                 @foreach($groupedItems as $prefix => $suffixes)
                     <th  colspan="{{ count($suffixes) }}">
-                        {{ $prefix }}
+                        {{ $prefix }} Sortuj
                     </th>
                 @endforeach
             </tr>
