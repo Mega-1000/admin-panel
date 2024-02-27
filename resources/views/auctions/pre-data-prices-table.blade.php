@@ -110,7 +110,7 @@
                         natsort($suffixes);
                     @endphp
                     @foreach($suffixes as $suffix)
-                        <th title="Kliknij aby sortować">{{ $suffix }}</th>
+                        <th title="Kliknij aby sortować">{{ $suffix }} <br> <br> Sortuj po cenie</th>
                     @endforeach
                 @endforeach
             </tr>
