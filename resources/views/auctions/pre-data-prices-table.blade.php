@@ -77,6 +77,9 @@
 
 <body>
     <div >
+        <h1>
+            Jeśli chcesz sortować po cenie za m3, kliknij na nagłówek kolumny.
+        </h1>
         <table>
             <thead>
             <tr>
@@ -110,7 +113,7 @@
                         natsort($suffixes);
                     @endphp
                     @foreach($suffixes as $suffix)
-                        <th title="Kliknij aby sortować">{{ $suffix }} <br> <br> Sortuj po cenie</th>
+                        <th title="Kliknij aby sortować">{{ $suffix }}</th>
                     @endforeach
                 @endforeach
             </tr>
