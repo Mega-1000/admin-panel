@@ -67,6 +67,11 @@
         th.desc::after {
             content: " ↑"; /* Change to arrow SVG or symbol as needed */
         }
+
+        th {
+            cursor: pointer;
+        }
+
     </style>
 </head>
 
@@ -92,7 +97,7 @@
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
-                    <th colspan="{{ count($suffixes) }}">
+                    <th  colspan="{{ count($suffixes) }}">
                         {{ $prefix }}
                     </th>
                 @endforeach
@@ -184,7 +189,15 @@
                 var table = $(this).parents('table').eq(0);
                 var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()));
                 this.asc = !this.asc;
-                if (!this.asc){rows = rows.reverse();}
+                if (!this.asc){
+                    rows = rows.reverse();
+                    $(this).html($(this).html().replace(' ↓', ' ↑'));
+                } else {
+                    $(this).html($(this).html().replace(' ↑', ' ↓'));
+                }
+                table.find('th').not(this).each(function(){
+                    $(this).html($(this).html().replace(' ↓', '').replace(' ↑', ''));
+                });
                 for (var i = 0; i < rows.length; i++){table.append(rows[i]);}
             });
             function comparer(index) {
