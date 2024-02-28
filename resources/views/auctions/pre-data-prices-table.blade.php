@@ -154,7 +154,10 @@
                                     ->first();
 
                                 // Store the price in the groupedPrices array, using the prefix and suffix as keys
-                                $groupedPrices[$prefix][$suffix] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
+                                $groupedPrices[$prefix][$suffix] = [
+                                    $variation?->price->gross_purchase_price_basic_unit_after_discounts,
+                                    $variation?->id
+                                ];
                             }
                         }
                     @endphp
@@ -167,12 +170,13 @@
                         @foreach($suffixes as $suffix)
                             @php
                                 // Retrieve the price from the groupedPrices array
-                                $price = $groupedPrices[$prefix][$suffix] ?? null;
+                                $price = $groupedPrices[$prefix][$suffix][0] ?? null;
+                                $id = $groupedPrices[$prefix][$suffix][1] ?? null;
                             @endphp
 
                             <td>
                                 @if($price)
-                                    <a href="https://mega1000.pl/single-product/{{ $product->id }}/no-layout" >
+                                    <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout" >
                                         {{ $price }}
                                     </a>
                                 @else
