@@ -118,8 +118,6 @@
                             }
                         }
                     }
-
-                    $groupedItems = array_merge($groupedItems, $targetedGroupedItems);
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
@@ -186,6 +184,30 @@
                     @endphp
 
                     @foreach($groupedItems as $prefix => $suffixes)
+                        @php
+                            natsort($suffixes)
+                        @endphp
+
+                        @foreach($suffixes as $suffix)
+                            @php
+                                // Retrieve the price from the groupedPrices array
+                                $price = $groupedPrices[$prefix][$suffix][0] ?? null;
+                                $id = $groupedPrices[$prefix][$suffix][1] ?? null;
+                            @endphp
+
+                            <td>
+                                @if($price)
+                                    <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout" >
+                                        {{ $price }}
+                                    </a>
+                                @else
+                                    Brak
+                                @endif
+                            </td>
+                        @endforeach
+                    @endforeach
+
+                    @foreach($targetedGroupedItems as $prefix => $suffixes)
                         @php
                             natsort($suffixes)
                         @endphp
