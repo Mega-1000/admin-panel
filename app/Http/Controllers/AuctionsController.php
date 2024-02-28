@@ -274,13 +274,9 @@ class AuctionsController extends Controller
                 ]
             );
 
-            try {
-                $radius = $raw->distance;
-            } catch (Exception $e) {
-                dd ($firm);
-            }
+            $radius = $raw?->distance;
 
-            if ($radius > $firm->warehouses()->first()->radius) {
+            if ($radius ?? 0 > $firm->warehouses()->first()->radius) {
                 $firms->forget($key);
             }
         }
