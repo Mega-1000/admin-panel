@@ -119,7 +119,7 @@
                         }
                     }
 
-//                    $groupedItems = array_merge($groupedItems, $targetedGroupedItems);
+                    $groupedItems = array_merge($groupedItems, $targetedGroupedItems);
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
