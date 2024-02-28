@@ -14,6 +14,7 @@ use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use ParseError;
 
 class ProductsService
@@ -227,6 +228,7 @@ class ProductsService
                     $radius = $query->distance;
                     $warehouse = Warehouse::find($query->id);
 
+                    Log::notice($warehouse);
                     if ($radius > $warehouse->radius && $product?->variation_group === 'styropiany') {
                         $product->blured = true;
                     } else {
