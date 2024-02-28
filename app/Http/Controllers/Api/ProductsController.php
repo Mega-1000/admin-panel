@@ -301,6 +301,8 @@ class ProductsController extends Controller
 
     public function getSingleProduct(Product $product): JsonResponse
     {
+        $product->load('stock');
+
         return response()->json($product);
     }
 }
