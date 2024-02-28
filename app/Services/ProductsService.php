@@ -223,7 +223,7 @@ class ProductsService
                         'firmId' => $product?->firm?->id
                     ]
                 );
-                var_dump($query);
+                var_dump($product?->firm?->id);
 
                 if (!empty($query)) {
                     $radius = $query->distance;
