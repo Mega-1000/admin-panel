@@ -223,12 +223,12 @@ class ProductsService
                         'firmId' => $product?->firm?->id
                     ]
                 );
+                dd($query);
 
                 if (!empty($query)) {
                     $radius = $query->distance;
                     $warehouse = Warehouse::find($query->id);
 
-                    dd($warehouse);
                     if ($radius > $warehouse->radius && $product?->variation_group === 'styropiany') {
                         $product->blured = true;
                     } else {
