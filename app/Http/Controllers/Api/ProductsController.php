@@ -223,12 +223,12 @@ class ProductsController extends Controller
     /**
      * @return ResponseFactory|Response
      */
-    public function getCategoriesTree(): Response|ResponseFactory
+    public function getCategoriesTree(): JsonResponse
     {
         $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get()->toArray();
         $tree = $this->parseTree($allCategories);
 
-        return response(json_encode($tree));
+        return response()->json($tree);
     }
 
     private function parseTree($tree, $root = 0): array
