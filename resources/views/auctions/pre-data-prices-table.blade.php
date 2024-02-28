@@ -234,6 +234,48 @@
             }
 
             function getCellValue(row, index){ return $(row).children('td').eq(index).text(); }
+
+            function moveColumnsToEnd() {
+                var table = $('table');
+                var headers = table.find('th');
+                var rows = table.find('tr');
+
+                // Collect indices of columns to move
+                var indicesToMove = [];
+                headers.each(function(index) {
+                    var text = $(this).text();
+                    if (text.endsWith('031 ETIXX') || text.startsWith('akustyczny')) {
+                        indicesToMove.push(index);
+                    }
+                });
+
+                // Reverse the indices to maintain order when moving
+                indicesToMove.reverse();
+
+                // Move headers
+                indicesToMove.forEach(function(index) {
+                    headers.each(function() {
+                        if ($(this).parent().children().index($(this)) === index) {
+                            $(this).parent().append($(this));
+                        }
+                    });
+                });
+
+                // Move data cells
+                rows.each(function() {
+                    var row = $(this);
+                    indicesToMove.forEach(function(index) {
+                        row.children().each(function() {
+                            if (row.children().index($(this)) === index) {
+                                row.append($(this));
+                            }
+                        });
+                    });
+                });
+            }
+
+            // Call the function to move columns after initial setup
+            moveColumnsToEnd();
         });
     </script>
 
