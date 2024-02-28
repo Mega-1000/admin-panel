@@ -97,27 +97,6 @@
                         list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
                         $groupedItems[$prefix][] = $suffix;
                     }
-
-                    $targetedGroupedItems = []; // To store items with suffix "031 ETIXX" and prefix "akustyczny"
-                    foreach ($groupedItems as $prefix => $suffixes) {
-                        if ($prefix === 'akustyczny') {
-                            // Move all akustyczny prefixed items to targetedGroupedItems
-                            $targetedGroupedItems[$prefix] = $suffixes;
-                            unset($groupedItems[$prefix]); // Remove them from the original array
-                        } else {
-                            foreach ($suffixes as $key => $suffix) {
-                                if (strpos($suffix, '031 ETIXX') !== false) {
-                                    // Move specific suffix items to targetedGroupedItems under the same prefix
-                                    $targetedGroupedItems[$prefix][] = $suffix;
-                                    unset($groupedItems[$prefix][$key]); // Remove from original
-                                }
-                            }
-                            // Clean up any prefixes that no longer have suffixes
-                            if (empty($groupedItems[$prefix])) {
-                                unset($groupedItems[$prefix]);
-                            }
-                        }
-                    }
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
@@ -184,30 +163,6 @@
                     @endphp
 
                     @foreach($groupedItems as $prefix => $suffixes)
-                        @php
-                            natsort($suffixes)
-                        @endphp
-
-                        @foreach($suffixes as $suffix)
-                            @php
-                                // Retrieve the price from the groupedPrices array
-                                $price = $groupedPrices[$prefix][$suffix][0] ?? null;
-                                $id = $groupedPrices[$prefix][$suffix][1] ?? null;
-                            @endphp
-
-                            <td>
-                                @if($price)
-                                    <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout" >
-                                        {{ $price }}
-                                    </a>
-                                @else
-                                    Brak
-                                @endif
-                            </td>
-                        @endforeach
-                    @endforeach
-
-                    @foreach($targetedGroupedItems as $prefix => $suffixes)
                         @php
                             natsort($suffixes)
                         @endphp
