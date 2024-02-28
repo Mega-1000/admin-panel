@@ -172,7 +172,9 @@
 
                             <td>
                                 @if($price)
-                                    {{ $price }}
+                                    <a href="https://mega1000.pl/single-product/{{ $product->id }}/no-layout" >
+                                        {{ $price }}
+                                    </a>
                                 @else
                                     Brak
                                 @endif
