@@ -194,29 +194,48 @@
 
     <script>
         $(document).ready(function(){
+            $('th').each(function(){
+                // Initialize a sort state on each `th`
+                $(this).data('sortState', '');
+            });
+
             $('th').click(function(){
                 var table = $(this).parents('table').eq(0);
-                var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()));
-                this.asc = !this.asc;
-                if (!this.asc){
-                    rows = rows.reverse();
-                    $(this).html($(this).html().replace(' ↓', ' ↑'));
+                var columnIndex = $(this).index();
+                var sortState = $(this).data('sortState');
+                var rows = table.find('tr:gt(0)').toArray().sort(comparer(columnIndex, sortState));
+
+                // Toggle the sort state for this column
+                if (sortState === 'asc') {
+                    $(this).data('sortState', 'desc');
+                    $(this).html($(this).html().replace(' ↓', ' ↑')); // Adjust if using different indicators
                 } else {
-                    $(this).html($(this).html().replace(' ↑', ' ↓'));
+                    $(this).data('sortState', 'asc');
+                    $(this).html($(this).html().replace(' ↑', ' ↓')); // Adjust if using different indicators
                 }
+
+                // Reset sort state indicators for other columns
                 table.find('th').not(this).each(function(){
-                    $(this).html($(this).html().replace(' ↓', '').replace(' ↑', ''));
+                    $(this).data('sortState', ''); // Clear the sort state
+                    $(this).html($(this).html().replace(' ↓', '').replace(' ↑', '')); // Remove any sort indicators
                 });
-                for (var i = 0; i < rows.length; i++){table.append(rows[i]);}
+
+                // Re-append rows in sorted order
+                for (var i = 0; i < rows.length; i++){ table.append(rows[i]); }
             });
-            function comparer(index) {
+
+            function comparer(index, sortState) {
                 return function(a, b) {
                     var valA = getCellValue(a, index), valB = getCellValue(b, index);
-                    return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB);
+                    var result = $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB);
+                    // Reverse the result if the current sort state is descending
+                    return (sortState === 'desc') ? result * -1 : result;
                 };
             }
+
             function getCellValue(row, index){ return $(row).children('td').eq(index).text(); }
         });
     </script>
+
 
 </body>
