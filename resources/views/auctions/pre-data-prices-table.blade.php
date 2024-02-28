@@ -97,6 +97,29 @@
                         list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
                         $groupedItems[$prefix][] = $suffix;
                     }
+
+                    $targetedGroupedItems = []; // To store items with suffix "031 ETIXX" and prefix "akustyczny"
+                    foreach ($groupedItems as $prefix => $suffixes) {
+                        if ($prefix === 'akustyczny') {
+                            // Move all akustyczny prefixed items to targetedGroupedItems
+                            $targetedGroupedItems[$prefix] = $suffixes;
+                            unset($groupedItems[$prefix]); // Remove them from the original array
+                        } else {
+                            foreach ($suffixes as $key => $suffix) {
+                                if (strpos($suffix, '031 ETIXX') !== false) {
+                                    // Move specific suffix items to targetedGroupedItems under the same prefix
+                                    $targetedGroupedItems[$prefix][] = $suffix;
+                                    unset($groupedItems[$prefix][$key]); // Remove from original
+                                }
+                            }
+                            // Clean up any prefixes that no longer have suffixes
+                            if (empty($groupedItems[$prefix])) {
+                                unset($groupedItems[$prefix]);
+                            }
+                        }
+                    }
+
+                    $groupedItems = array_merge($groupedItems, $targetedGroupedItems);
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
@@ -234,48 +257,6 @@
             }
 
             function getCellValue(row, index){ return $(row).children('td').eq(index).text(); }
-
-            function moveColumnsToEnd() {
-                var table = $('table');
-                var headers = table.find('th');
-                var rows = table.find('tr');
-
-                // Collect indices of columns to move
-                var indicesToMove = [];
-                headers.each(function(index) {
-                    var text = $(this).text();
-                    if (text.endsWith('031 ETIXX') || text.startsWith('akustyczny')) {
-                        indicesToMove.push(index);
-                    }
-                });
-
-                // Reverse the indices to maintain order when moving
-                indicesToMove.reverse();
-
-                // Move headers
-                indicesToMove.forEach(function(index) {
-                    headers.each(function() {
-                        if ($(this).parent().children().index($(this)) === index) {
-                            $(this).parent().append($(this));
-                        }
-                    });
-                });
-
-                // Move data cells
-                rows.each(function() {
-                    var row = $(this);
-                    indicesToMove.forEach(function(index) {
-                        row.children().each(function() {
-                            if (row.children().index($(this)) === index) {
-                                row.append($(this));
-                            }
-                        });
-                    });
-                });
-            }
-
-            // Call the function to move columns after initial setup
-            moveColumnsToEnd();
         });
     </script>
 
