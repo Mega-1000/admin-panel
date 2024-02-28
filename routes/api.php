@@ -185,3 +185,4 @@ Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'g
 
 Route::get('/shipment-pay-in-report', ShipmentPayInReportByInvoiceNumber::class)->name('shipment-pay-in-report');
 Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('getPayments');
+Route::get('get-product/{product}', [ProductsController::class, 'getSingleProduct']);

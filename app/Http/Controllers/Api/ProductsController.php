@@ -298,4 +298,9 @@ class ProductsController extends Controller
             'message' => 'success'
         ]);
     }
+
+    public function getSingleProduct(Product $product): JsonResponse
+    {
+        return response()->json($product);
+    }
 }
