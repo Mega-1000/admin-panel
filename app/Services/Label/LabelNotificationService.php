@@ -62,7 +62,7 @@ class LabelNotificationService
         if ($warehouse && $warehouse->firm) {
             $warehouseMail = $warehouse->firm->email;
         }
-        dd($warehouseMail);
+
         if (empty($warehouseMail)) {
             Log::notice('Brak adresu mailowego w firmie, lub magazyn nie istnieje', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
             return;
@@ -98,7 +98,7 @@ class LabelNotificationService
         if (!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($path === null) {
                 $email = new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink, $sendFormInvoice, $order, $self);
-                Mailer::notification()->to($warehouseMail)->send($email);
+                Mailer::create()->to($warehouseMail)->send($email);
                 Log::notice('Wysłano email awizacyjny na mail: ' . $warehouseMail . ' dla zamówienia: ' . $order->id, ['line' => __LINE__, 'file' => __FILE__]);
                 return;
             }
