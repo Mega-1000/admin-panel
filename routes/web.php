@@ -507,7 +507,6 @@ Route::group(['prefix' => 'admin'], function () {
         ])->name('order_messages.destroy');
         Route::get('products/getPrice', 'Api\ProductsController@getCurrentPrices')->name('products.currentPrices');
 
-        Route::post('orders/set-warehouse-and-remove-label', 'OrdersController@setWarehouseAndLabels')->name('order.warehouse.set');
 
         Route::get('orders/status/{id}/message', 'OrdersController@getStatusMessage')->name('order.status.message');
 

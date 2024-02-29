@@ -103,7 +103,7 @@ class LabelNotificationService
                 return;
             }
             $email = new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink, $sendFormInvoice, $order, $self, $path, $packageNumber, $pathSecond);
-            Mailer::notification()->to($warehouseMail)->send($email);
+            Mailer::create()->to($warehouseMail)->send($email);
         }
     }
 

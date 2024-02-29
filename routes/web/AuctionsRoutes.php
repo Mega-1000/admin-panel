@@ -24,3 +24,10 @@ Route::get('auctions/display-pre-data-table/{chat}', [AuctionsController::class,
 Route::get('auctions/display-prices-table',  [AuctionsController::class, 'displayPricesTable'])->name('displayPreDataPricesTable');
 Route::get('auctions/get-styrofoam-types', [AuctionsController::class, 'getStyrofoamTypes']);
 Route::get('auctions/get-quotes-by-styrofoarm-type/{type}', [AuctionsController::class, 'getQuotesByStyrofoamType']);
+
+
+
+
+
+
+

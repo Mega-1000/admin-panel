@@ -77,6 +77,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('import:transactions')->dailyAt('02:30');
         $schedule->job(Jobs\SendMonitoryNotesEmails::class)->everyThirtyMinutes()->between('7:00', '18:00');
+        $schedule->job(Jobs\CheckDeliveryDatesJob::class)->everyThirtyMinutes()->between('7:00', '18:00');
     }
 
     /**
