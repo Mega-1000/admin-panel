@@ -57,11 +57,12 @@ class LabelNotificationService
 
     public static function orderStatusChangeToDispatchNotification(Order $order, bool $self, ?string $path = null, ?string $packageNumber = null, ?string $pathSecond = null): void
     {
-
         $warehouse = $order->warehouse;
+
         if ($warehouse && $warehouse->firm) {
             $warehouseMail = $warehouse->firm->email;
         }
+        dd($warehouseMail);
         if (empty($warehouseMail)) {
             Log::notice('Brak adresu mailowego w firmie, lub magazyn nie istnieje', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
             return;
