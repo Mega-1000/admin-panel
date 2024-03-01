@@ -103,48 +103,35 @@
             const order = {};
 
             window.onload = () => {
-                const offerCheckboxes = document.querySelectorAll('.offer-checkbox');
-                offerCheckboxes.forEach((checkbox) => {
-                    checkbox.addEventListener('change', (e) => {
-                        if (e.target.checked) {
-                            if (order[e.target.dataset.firm]) {
-                                order[e.target.dataset.firm].push(e.target.dataset.product);
-                            } else {
-                                order[e.target.dataset.firm] = [e.target.dataset.product];
-                            }
-                        } else {
-                            delete order[e.target.dataset.firm];
-                        }
-                        console.log(order);
-                    });
-                });
-
                 const submitButton = document.querySelector('#submit-button');
                 submitButton.addEventListener('click', () => {
+                    const selectedProducts = document.querySelectorAll('.offer-checkbox:checked'); // Get all checked checkboxes
+                    const order = Array.from(selectedProducts).map(checkbox => {
+                        const productId = checkbox.getAttribute('data-product-id'); // Assuming each checkbox has a data attribute for product ID
+                        const quantityInput = document.querySelector(`#quantity-${productId}`); // Assuming each quantity input has an id like 'quantity-PRODUCT_ID'
+                        const quantity = quantityInput.value;
+                        return { 'productId': parseInt(productId), 'quantity': parseInt(quantity) };
+                    });
+
                     const form = createForm(order);
                     document.body.appendChild(form);
                     form.submit();
                 });
-
-                const headers = document.querySelectorAll("th");
-                headers.forEach((header, i) => {
-                    header.addEventListener('click', () => sortTable(i));
-                });
-
-                headers[1].click();
             };
 
             function createForm(order) {
+                // Your existing form creation logic, updated to include the order data
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '{{ route('auctions.end-create-orders', ['auction' => $auction->id]) }}';
+                form.action = '{{ route('your.backend.route') }}'; // Update the action to your backend route
                 form.style.display = 'none';
 
                 const orderInput = document.createElement('input');
                 orderInput.name = 'order';
-                orderInput.value = JSON.stringify(order);
+                orderInput.value = JSON.stringify(order); // Convert order object to JSON string
                 form.appendChild(orderInput);
 
+                // Your existing CSRF token logic
                 const csrfInput = document.createElement('input');
                 csrfInput.name = '_token';
                 csrfInput.value = '{{ csrf_token() }}';
@@ -152,6 +139,7 @@
 
                 return form;
             }
+
 
         })();
     </script>
@@ -192,6 +180,9 @@
                                 $name = implode(' ', $words);
                             @endphp
                             {{ $name }}
+
+                            <input type="checkbox" class="offer-checkbox" data-product-id="{{ $product->id }}">
+                            <input type="number" id="quantity-{{ $product->id }}" min="1" value="1"> <!-- Quantity input -->
 
                             <button class="btn btn-primary">
                                 Sortuj
