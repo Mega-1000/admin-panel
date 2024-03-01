@@ -15,6 +15,7 @@ use App\Facades\Mailer;
 use App\Factory\OrderBuilderFactory;
 use App\Helpers\AuctionsHelper;
 use App\Helpers\Exceptions\ChatException;
+use App\Helpers\MessagesHelper;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Http\Requests\UpdateChatAuctionRequest;
@@ -23,6 +24,7 @@ use App\Repositories\ChatAuctionFirms;
 use App\Repositories\Employees;
 use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
+use App\Services\MessageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Exception;
@@ -346,13 +348,26 @@ class AuctionsController extends Controller
 
         $order->items()->delete();
 
+        $companies = [];
         foreach ($products as $product) {
             $product = Product::find($product->productId);
             $orderBuilder->assignItemsToOrder($order, [
                 $product->toArray() + ['amount' => 1],
             ], false);
+
+            $company = Firm::first();
+            $chat = $order->chat;
+
+            if (!in_array($company->id, $companies)) {
+                continue;
+            }
+
+            foreach ($company->employees as $employee) {
+                MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+            }
+            $companies[] = $company->id;
         }
 
-        return Order::find($auction->chat->order->id)->products;
+        return redirect()->back()->with(['success' => true]);
     }
 }

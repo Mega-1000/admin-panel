@@ -147,6 +147,12 @@
 
 <body>
 <div>
+    @if(session()->get('success'))
+        <div class="alert alert-success">
+            Pomyślnie stworzono zamówienie i dodano przedstawicieli do chatu
+        </div>
+    @endif
+
     <div class="container" id="flex-container">
         <div id="chat-container">
             <div class="alert-success alert">
