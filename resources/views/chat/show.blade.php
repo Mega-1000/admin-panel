@@ -125,9 +125,16 @@
                             @endif
                         @endif
                         @if(!empty($chat->auctions->first()))
+                            <br>
                             <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
                                 Zobacz wyniki przetargu
                             </a>
+                            <br>
+                            <form action="{{ route('') }}">
+                                <button class="btn btn-secondary">
+                                    Zakończ przetarg przedwcześnie
+                                </button>
+                            </form>
                         @endif
                         @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
                             <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
