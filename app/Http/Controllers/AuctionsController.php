@@ -342,12 +342,15 @@ class AuctionsController extends Controller
         $products = json_decode($request->get('order'));
 
         $orderBuilder = OrderBuilderFactory::create();
+        $order = Order::find($auction->chat->order->id);
+
+        $order->items()->delete();
 
         foreach ($products as $product) {
             $product = Product::find($product->productId);
-            $orderBuilder->assignItemsToOrder(Order::find($auction->chat->order->id), [
+            $orderBuilder->assignItemsToOrder($order, [
                 $product->toArray() + ['amount' => 1],
-            ]);
+            ], false);
         }
 
         return Order::find($auction->chat->order->id)->products;
