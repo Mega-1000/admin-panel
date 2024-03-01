@@ -347,7 +347,7 @@ class AuctionsController extends Controller
             $product = Product::find($product->productId);
             $orderBuilder->assignItemsToOrder(Order::find($auction->chat->order), [
                 $product->toArray(),
-            ]));
+            ]);
         }
     }
 }
