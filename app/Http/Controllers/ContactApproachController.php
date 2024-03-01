@@ -16,4 +16,11 @@ class ContactApproachController extends Controller
             'done' => false,
         ]));
     }
+
+    public function getApproachesByUser(int $userId): JsonResponse
+    {
+        return response()->json(
+            ContactApproach::query()->where('referred_by_user_id', $userId)->first(),
+        );
+    }
 }

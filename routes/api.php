@@ -188,4 +188,5 @@ Route::get('/shipment-pay-in-report', ShipmentPayInReportByInvoiceNumber::class)
 Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('getPayments');
 Route::get('get-product/{product}', [ProductsController::class, 'getSingleProduct']);
 
+Route::get('contact-approach/{userId}', [ContactApproachController::class, 'getApproachesByUser']);
 Route::post('contact-approach/create', [ContactApproachController::class, 'store']);
