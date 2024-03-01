@@ -243,15 +243,15 @@
                             foreach ($items as $item) {
                                 $variation = App\Entities\Product::where('product_group', $item->product_group)->where('product_name_supplier', $firm->firm->symbol)->first();
 
-                                $prices[] = $variation?->price->gross_purchase_price_basic_unit_after_discounts;
+                                $prices[] = $variation;
                             }
                             @endphp
 
                             @foreach($prices as $price)
                                 <td>
-                                    {{ $price }}
-                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
-                                    <input type="number" id="quantity-{{ $offer->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->
+                                    {{ $price?->price->gross_purchase_price_basic_unit_after_discounts }}
+                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $variation->id }}" data-product-id="{{ $variation->id }}" data-variation-id="{{ $variation->id }}">
+                                    <input type="number" id="quantity-{{ $variation->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->
                                 </td>
                             @endforeach
                         </tr>
