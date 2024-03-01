@@ -123,7 +123,7 @@
             function createForm(order) {
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '{{ route('your.backend.route') }}'; // Update to your backend route
+                form.action = ''; // Update to your backend route
                 form.style.display = 'none';
 
                 const orderInput = document.createElement('input');
