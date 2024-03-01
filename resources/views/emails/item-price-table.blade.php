@@ -21,32 +21,22 @@
     <Tr>
         <Th>Cena jednostkowa netto</Th>
         <Th>
-            <input disabled
-                   value="{{round($item->net_purchase_price_commercial_unit_after_discounts, 2)}}"
-            />
+            {{round($item->net_purchase_price_commercial_unit_after_discounts, 2)}}
         </Th>
         <Th>
-            <input disabled
-                   value="{{round($item->net_purchase_price_basic_unit_after_discounts, 2)}}"
-            />
+           {{round($item->net_purchase_price_basic_unit_after_discounts, 2)}}
         </Th>
         <Th>
-            <input disabled
-                   value="{{round($item->net_purchase_price_calculated_unit_after_discounts, 2)}}"
-            />
+            {{round($item->net_purchase_price_calculated_unit_after_discounts, 2)}}
         </Th>
         @if($bw > 0)
             <Th>
-                <input disabled
-                       value="{{round($item->net_purchase_price_aggregate_unit_after_discounts, 2)}}"
-                />
+                {{round($item->net_purchase_price_aggregate_unit_after_discounts, 2)}}
             </Th>
         @endif
         @if($bx > 0 && $item->net_purchase_price_the_largest_unit_after_discounts > 0)
             <Th>
-                <input disabled
-                       value="{{round($item->net_purchase_price_the_largest_unit_after_discounts, 2)}}"
-                />
+                {{round($item->net_purchase_price_the_largest_unit_after_discounts, 2)}}
             </Th>
         @endif
         <Th/>

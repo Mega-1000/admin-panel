@@ -217,8 +217,6 @@
 
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
                                     <input type="number" id="quantity-{{ $offer->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->
-
-{{--                                        <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-firm="{{ $firm->firm->name }}" data-product="{{ $product->product->name }}">--}}
                                 @else
                                     No offer
                                 @endif
@@ -252,6 +250,8 @@
                             @foreach($prices as $price)
                                 <td>
                                     {{ $price }}
+                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
+                                    <input type="number" id="quantity-{{ $offer->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->
                                 </td>
                             @endforeach
                         </tr>
