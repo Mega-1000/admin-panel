@@ -12,6 +12,7 @@ use App\Entities\Order;
 use App\Entities\Product;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
+use App\Factory\OrderBuilderFactory;
 use App\Helpers\AuctionsHelper;
 use App\Helpers\Exceptions\ChatException;
 use App\Http\Requests\CreateAuctionRequest;
@@ -333,10 +334,20 @@ class AuctionsController extends Controller
         ]);
     }
 
-    public function placeOrderForAuction(int $auctionId, Request $request): RedirectResponse
+    /**
+     * @throws Exception
+     */
+    public function placeOrderForAuction(ChatAuction $auction, Request $request): RedirectResponse
     {
-        $order = json_decode($request->get('order'));
+        $products = json_decode($request->get('order'));
 
-        dd($order);
+        $orderBuilder = OrderBuilderFactory::create();
+
+        foreach ($products as $product) {
+            $product = Product::find($product->productId);
+            $orderBuilder->assignItemsToOrder(Order::find($auction->chat->order, [
+                $product->toArray(),
+            ]));
+        }
     }
 }
