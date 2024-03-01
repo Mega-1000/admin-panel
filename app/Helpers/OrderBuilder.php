@@ -289,6 +289,7 @@ class OrderBuilder
     {
         $weight = 0;
 
+        dd($order);
         $orderItems = $order->items;
         if ($deleteItems) {
             $order->items()->delete();
