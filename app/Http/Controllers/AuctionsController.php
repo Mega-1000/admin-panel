@@ -23,6 +23,7 @@ use App\Repositories\Employees;
 use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
 use App\Services\ProductService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -323,7 +324,7 @@ class AuctionsController extends Controller
     public function endAuctionStore(ChatAuction $auction): RedirectResponse
     {
         $auction->update([
-            'end_of_auction' => now()
+            'end_of_auction' => now()->toDate()
         ]);
 
         return redirect()->back()->with([
