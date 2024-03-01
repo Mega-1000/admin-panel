@@ -368,6 +368,9 @@ class AuctionsController extends Controller
             $companies[] = $company->id;
         }
 
+        $order->auction_order_placed = true;
+        $order->save();
+
         return redirect()->back()->with(['success' => true]);
     }
 }
