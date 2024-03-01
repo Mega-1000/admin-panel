@@ -12,8 +12,7 @@ readonly class CreateChatAuctionDTO
         public string $date_of_delivery,
         public int $price,
         public int $quality,
-    ) {
-    }
+    ) {}
 
     public static function fromRequest(Chat $chat, array $data): self
     {

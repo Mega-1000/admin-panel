@@ -324,7 +324,7 @@ class AuctionsController extends Controller
     {
         $auction->end_of_auction = now();
         $auction->save();
-        dd('okej');
+        dd($auction);
 
         return redirect()->back()->with([
             'message' => 'Pomyślnie zakończono aukcję! Otrzymasz wiadomość na swój adres email z potwierdzeniem',
