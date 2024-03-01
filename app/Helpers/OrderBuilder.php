@@ -302,7 +302,6 @@ class OrderBuilder
             }
         }
 
-        dd($items);
         foreach ($items as $item) {
             $product = Product::find($item['id']);
             // check if order alrleady has this product
