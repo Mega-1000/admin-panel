@@ -105,9 +105,6 @@
                                 Przetarg zakończony
                                 </h3>
                                 <br>
-                                <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
-                                    Zobacz wyniki przetargu
-                                </a>
                             @else
                                 <h3>
                                     Aktywny przretarg
@@ -122,6 +119,13 @@
                                 Jakość: {{ $chat->auctions->first()->quality }} %
                                 <br>
                                 Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
+                                <br>
+                                <form action="{{ route('end-auction.store', $chat->auctions->first()->id) }}" method="post">
+                                    @csrf
+                                    <button class="btn btn-secondary">
+                                        Zakończ przetarg przedwcześnie
+                                    </button>
+                                </form>
                             @endif
                         @endif
                         @if(!empty($chat->auctions->first()))
@@ -130,12 +134,6 @@
                                 Zobacz wyniki przetargu
                             </a>
                             <br>
-                            <form action="{{ route('end-auction.store', $chat->auctions->first()->id) }}" method="post">
-                                @csrf
-                                <button class="btn btn-secondary">
-                                    Zakończ przetarg przedwcześnie
-                                </button>
-                            </form>
                         @endif
                         @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
                             <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
