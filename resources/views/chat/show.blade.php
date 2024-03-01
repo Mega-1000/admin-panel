@@ -130,7 +130,7 @@
                                 Zobacz wyniki przetargu
                             </a>
                             <br>
-                            <form action="{{ route('') }}">
+                            <form action="{{ route('end-auction.store', $chat->auctions->first()->id) }}">
                                 <button class="btn btn-secondary">
                                     Zakończ przetarg przedwcześnie
                                 </button>
