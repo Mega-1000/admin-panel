@@ -110,8 +110,7 @@
                         const productId = checkbox.dataset.productId;
                         const variationId = checkbox.dataset.variationId;
                         const quantityInput = document.querySelector(`#quantity-${variationId}`);
-                        const quantity = quantityInput.value;
-                        return { 'productId': parseInt(productId), 'variationId': parseInt(variationId), 'quantity': parseInt(quantity) };
+                        return { 'productId': parseInt(productId), 'variationId': parseInt(variationId) };
                     });
 
                     const form = createForm(order);
