@@ -365,7 +365,7 @@ class AuctionsController extends Controller
             $company = Firm::first();
             $chat = $order->chat;
 
-            if (!in_array($company->id, $companies)) {
+            if (in_array($company->id, $companies)) {
                 continue;
             }
 
