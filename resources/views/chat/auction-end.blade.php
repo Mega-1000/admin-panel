@@ -105,12 +105,13 @@
             window.onload = () => {
                 const submitButton = document.querySelector('#submit-button');
                 submitButton.addEventListener('click', () => {
-                    const selectedProducts = document.querySelectorAll('.offer-checkbox:checked'); // Get all checked checkboxes
-                    const order = Array.from(selectedProducts).map(checkbox => {
-                        const productId = checkbox.getAttribute('data-product-id'); // Assuming each checkbox has a data attribute for product ID
-                        const quantityInput = document.querySelector(`#quantity-${productId}`); // Assuming each quantity input has an id like 'quantity-PRODUCT_ID'
+                    const selectedOffers = document.querySelectorAll('.offer-checkbox:checked');
+                    const order = Array.from(selectedOffers).map(checkbox => {
+                        const productId = checkbox.dataset.productId;
+                        const variationId = checkbox.dataset.variationId;
+                        const quantityInput = document.querySelector(`#quantity-${variationId}`);
                         const quantity = quantityInput.value;
-                        return { 'productId': parseInt(productId), 'quantity': parseInt(quantity) };
+                        return { 'productId': parseInt(productId), 'variationId': parseInt(variationId), 'quantity': parseInt(quantity) };
                     });
 
                     const form = createForm(order);
@@ -120,27 +121,26 @@
             };
 
             function createForm(order) {
-                // Your existing form creation logic, updated to include the order data
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = ''; // Update the action to your backend route
+                form.action = '{{ route('your.backend.route') }}'; // Update to your backend route
                 form.style.display = 'none';
 
                 const orderInput = document.createElement('input');
+                orderInput.type = 'hidden';
                 orderInput.name = 'order';
-                orderInput.value = JSON.stringify(order); // Convert order object to JSON string
+                orderInput.value = JSON.stringify(order); // Convert order array to JSON string
                 form.appendChild(orderInput);
 
-                // Your existing CSRF token logic
+                // CSRF token setup
                 const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
                 csrfInput.name = '_token';
                 csrfInput.value = '{{ csrf_token() }}';
                 form.appendChild(csrfInput);
 
                 return form;
             }
-
-
         })();
     </script>
 
@@ -181,9 +181,6 @@
                             @endphp
                             {{ $name }}
 
-                            <input type="checkbox" class="offer-checkbox" data-product-id="{{ $product->id }}">
-                            <input type="number" id="quantity-{{ $product->id }}" min="1" value="1"> <!-- Quantity input -->
-
                             <button class="btn btn-primary">
                                 Sortuj
                             </button>
@@ -218,6 +215,8 @@
                                 @if($offer)
                                     {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }}
 
+                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
+                                    <input type="number" id="quantity-{{ $offer->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->
 
 {{--                                        <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-firm="{{ $firm->firm->name }}" data-product="{{ $product->product->name }}">--}}
                                 @else
