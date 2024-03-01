@@ -335,6 +335,8 @@ class AuctionsController extends Controller
 
     public function placeOrderForAuction(int $auctionId, Request $request): RedirectResponse
     {
-        dd($request);
+        $order = json_decode($request->get('order'));
+
+        dd($order);
     }
 }
