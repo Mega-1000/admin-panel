@@ -354,7 +354,9 @@ class AuctionsController extends Controller
         foreach ($products as $product) {
             $product = Product::find($product->productId);
             // prices are taken from offersorder_item_id
-            $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)->where('order_item_id', $order->items()->where('product_id', $product->id)->first()->id)->first();
+            $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
+                ->where('order_item_id', $order->items()->where('product_id', $product->id)->first()->id)
+                ->first();
             dd($offer);
             $orderBuilder->assignItemsToOrder($order, [
                 $product->toArray() + ['amount' => 1] ,
