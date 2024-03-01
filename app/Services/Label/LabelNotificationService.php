@@ -6,6 +6,7 @@ use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderWarehouseNotification;
 use App\Entities\Tag;
+use App\Entities\Warehouse;
 use App\Facades\Mailer;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Mail\LabelAdd;
@@ -57,10 +58,11 @@ class LabelNotificationService
 
     public static function orderStatusChangeToDispatchNotification(Order $order, bool $self, ?string $path = null, ?string $packageNumber = null, ?string $pathSecond = null): void
     {
+        /** @var Warehouse $warehouse */
         $warehouse = $order->warehouse;
 
         if ($warehouse && $warehouse->firm) {
-            $warehouseMail = $warehouse->firm->email;
+            $warehouseMail = $warehouse->warehouse_email;
         }
 
         if (empty($warehouseMail)) {

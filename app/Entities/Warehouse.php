@@ -18,6 +18,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property Collection<User> $users
  * @property Firm $firm
  * @package namespace App\Entities;
+ * @property string $warehouse_email
  */
 class Warehouse extends Model implements Transformable
 {
