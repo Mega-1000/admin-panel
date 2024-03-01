@@ -359,7 +359,7 @@ class AuctionsController extends Controller
                 ->first();
 
             $orderBuilder->assignItemsToOrder($order, [
-                $product->toArray() + ['amount' => 1] ,
+                $product->toArray() + ['amount' => 1, 'gross_selling_price_commercial_unit' => $offer?->basic_price_gross ?? $product->price->gross_selling_price_commercial_unit] ,
             ], false);
 
             $company = Firm::first();
