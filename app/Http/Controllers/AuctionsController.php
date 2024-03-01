@@ -7,6 +7,7 @@ use App\DTO\ChatAuctions\CreateChatAuctionOfferDTO;
 use App\Entities\Chat;
 use App\Entities\ChatAuction;
 use App\Entities\ChatAuctionFirm;
+use App\Entities\ChatAuctionOffer;
 use App\Entities\Firm;
 use App\Entities\Order;
 use App\Entities\Product;
@@ -21,6 +22,7 @@ use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Http\Requests\UpdateChatAuctionRequest;
 use App\Mail\NotificationAboutFirmPanelMail;
 use App\Repositories\ChatAuctionFirms;
+use App\Repositories\ChatAuctionOffers;
 use App\Repositories\Employees;
 use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
@@ -351,8 +353,11 @@ class AuctionsController extends Controller
         $companies = [];
         foreach ($products as $product) {
             $product = Product::find($product->productId);
+            // prices are taken from offersorder_item_id
+            $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)->where('order_item_id', $order->items()->where('product_id', $product->id)->first()->id)->first();
+            dd($offer);
             $orderBuilder->assignItemsToOrder($order, [
-                $product->toArray() + ['amount' => 1],
+                $product->toArray() + ['amount' => 1] ,
             ], false);
 
             $company = Firm::first();
