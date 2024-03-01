@@ -323,6 +323,7 @@ class AuctionsController extends Controller
 
     public function endAuctionStore(ChatAuction $auction): RedirectResponse
     {
+        dd($auction->id);
         ChatAuction::find($auction->id)->update([
             'end_of_auction' => now()->toDate()
         ]);
