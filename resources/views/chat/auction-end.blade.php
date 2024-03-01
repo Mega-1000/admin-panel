@@ -123,7 +123,7 @@
                 // Your existing form creation logic, updated to include the order data
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '{{ route('your.backend.route') }}'; // Update the action to your backend route
+                form.action = ''; // Update the action to your backend route
                 form.style.display = 'none';
 
                 const orderInput = document.createElement('input');
