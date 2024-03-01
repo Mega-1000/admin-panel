@@ -322,9 +322,9 @@ class AuctionsController extends Controller
 
     public function endAuctionStore(ChatAuction $auction): RedirectResponse
     {
-        $auction->end_of_auction = now();
-        $auction->save();
-
+        $auction->update([
+            'end_of_auction' => now()
+        ]);
 
         return redirect()->back()->with([
             'message' => 'Pomyślnie zakończono aukcję! Otrzymasz wiadomość na swój adres email z potwierdzeniem',
