@@ -20,7 +20,7 @@ class ContactApproachController extends Controller
     public function getApproachesByUser(int $userId): JsonResponse
     {
         return response()->json(
-            ContactApproach::query()->where('referred_by_user_id', $userId)->first(),
+            ContactApproach::query()->where('referred_by_user_id', $userId)->get(),
         );
     }
 }
