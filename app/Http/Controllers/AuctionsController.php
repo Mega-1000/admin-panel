@@ -337,7 +337,7 @@ class AuctionsController extends Controller
     /**
      * @throws Exception
      */
-    public function placeOrderForAuction(ChatAuction $auction, Request $request): RedirectResponse
+    public function placeOrderForAuction(ChatAuction $auction, Request $request)
     {
         $products = json_decode($request->get('order'));
 
@@ -349,5 +349,7 @@ class AuctionsController extends Controller
                 $product->toArray() + ['amount' => 1],
             ]);
         }
+
+        return Order::find($auction->chat->order->id)->products;
     }
 }
