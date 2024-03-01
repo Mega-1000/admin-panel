@@ -857,6 +857,51 @@
                 $('#alerts').html('');
             }, 3000);
         }
+
+        // Przykład funkcji sprawdzającej, czy wszystkie produkty w zamówieniu są typu 'styropiany'
+        function areAllProductsStyrofoam(products) {
+            return products.every(product => product.variation_group === 'styropiany');
+        }
+
+        // Funkcja do aktualizacji widoczności dat w interfejsie użytkownika
+        function updateDateVisibility() {
+            // Przykładowe produkty, powinieneś zastąpić to rzeczywistym sposobem ładowania produktów zamówienia
+            const orderProducts = [
+                { id: 1, variation_group: 'styropiany' },
+                // Dodaj tutaj inne produkty z zamówienia
+            ];
+
+            // Sprawdzenie, czy wszystkie produkty są z grupy 'styropiany'
+            if (areAllProductsStyrofoam(orderProducts)) {
+                // Ukrycie opcji 'Wysyłka' w modalu modyfikacji daty
+                document.querySelector("#dateType option[value='shipment']").style.display = 'none';
+
+                // Opcjonalnie: Ustawienie 'Dostawa' jako wybranej wartości
+                document.querySelector("#dateType").value = 'delivery';
+
+                // Ukrycie dat wysyłki z tabeli, jeśli istnieją
+                // Możesz potrzebować dostosować selektor, aby pasował do struktury Twojej tabeli
+                const rows = document.querySelectorAll("#datesTable tbody tr");
+                rows.forEach(row => {
+                    const dateTypeCell = row.cells[0]; // Zakładając, że typ daty jest w pierwszej kolumnie
+                    if (dateTypeCell.textContent.trim() === 'Wysyłka') {
+                        row.style.display = 'none';
+                    }
+                });
+            } else {
+                // Przywrócenie domyślnego widoku, jeśli nie wszystkie produkty są 'styropiany'
+                document.querySelector("#dateType option[value='shipment']").style.display = 'block';
+                // Pokaż wszystkie wiersze, w przypadku gdyby były wcześniej ukryte
+                document.querySelectorAll("#datesTable tbody tr").forEach(row => row.style.display = '');
+            }
+        }
+
+        // Wywołanie funkcji aktualizującej widoczność dat
+        updateDateVisibility();
+
+        // Możesz także wywołać tę funkcję w odpowiedzi na zdarzenia, które zmieniają produkty w zamówieniu,
+        // takie jak dodanie nowego produktu, usunięcie produktu itp.
+
     </script>
 </body>
 
