@@ -26,4 +26,4 @@ Route::get('auctions/display-prices-table',  [AuctionsController::class, 'displa
 Route::get('auctions/get-styrofoam-types', [AuctionsController::class, 'getStyrofoamTypes']);
 Route::get('auctions/get-quotes-by-styrofoarm-type/{type}', [AuctionsController::class, 'getQuotesByStyrofoamType']);
 
-Route::post('end-auction/{ChatAuction}', [AuctionsController::class, 'endAuctionStore'])->name('end-auction.store');
+Route::post('end-auction/{auctionId}', [AuctionsController::class, 'endAuctionStore'])->name('end-auction.store');
