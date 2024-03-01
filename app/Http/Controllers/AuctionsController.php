@@ -341,7 +341,7 @@ class AuctionsController extends Controller
     /**
      * @throws Exception
      */
-    public function placeOrderForAuction(ChatAuction $auction, Request $request)
+    public function placeOrderForAuction(ChatAuction $auction, Request $request): RedirectResponse
     {
         $products = json_decode($request->get('order'));
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\FirmsController;
 use App\Http\Controllers\Api\OrderPackageController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\AuctionsController;
+use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\ShipmentPayInReportByInvoiceNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -186,3 +187,5 @@ Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'g
 Route::get('/shipment-pay-in-report', ShipmentPayInReportByInvoiceNumber::class)->name('shipment-pay-in-report');
 Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('getPayments');
 Route::get('get-product/{product}', [ProductsController::class, 'getSingleProduct']);
+
+Route::post('contact-approach/create', [ContactApproachController::class, 'store']);
