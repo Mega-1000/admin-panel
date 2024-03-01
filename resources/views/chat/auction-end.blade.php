@@ -250,8 +250,8 @@
                             @foreach($prices as $price)
                                 <td>
                                     {{ $price?->price->gross_purchase_price_basic_unit_after_discounts }}
-                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $variation->id }}" data-product-id="{{ $variation->id }}" data-variation-id="{{ $variation->id }}">
-                                    <input type="number" id="quantity-{{ $variation->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->
+                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $price->id }}" data-product-id="{{ $price->id }}" data-variation-id="{{ $price->id }}">
+                                    <input type="number" id="quantity-{{ $price->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->
                                 </td>
                             @endforeach
                         </tr>
