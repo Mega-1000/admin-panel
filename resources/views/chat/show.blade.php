@@ -801,7 +801,7 @@
                     // $('#dates-table').before('<div class="alert alert-info">Daty zostały finalnie zatwierdzone i nie ma możliwości ich modyfikacji</div>');
                 }
 
-                @if($order->items->first()->product->variation_group === 'styropiany')
+                @if(dd($order->items->first()->product->variation_group === 'styropiany'))
                 // Delivery date row
                 html += '<tr>' +
                     '<td>Proponowana data wysyłki (' + key + ')</td>' +
