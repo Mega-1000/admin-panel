@@ -332,4 +332,9 @@ class AuctionsController extends Controller
             'alert-type' => 'success',
         ]);
     }
+
+    public function placeOrderForAuction(int $auctionId, Request $request): RedirectResponse
+    {
+        dd($request);
+    }
 }

@@ -14,6 +14,7 @@ Route::prefix('auctions/{auction}')->name('auctions.')->group(function () {
     Route::get('show', [AuctionsController::class, 'show'])->name('show');
     Route::post('confirm', [AuctionsController::class, 'confirm'])->name('confirm')->middleware('auth');
     Route::get('end', [AuctionsController::class, 'end'])->name('end');
+    Route::post('end', [AuctionsController::class, 'placeOrderForAuction'])->name('place-order-for-auction');
     Route::post('end-create-orders', [AuctionsController::class, 'endCreateOrders'])->name('end-create-orders');
     Route::put('edit', [AuctionsController::class, 'update'])->name('edit');
 });
@@ -27,3 +28,4 @@ Route::get('auctions/get-styrofoam-types', [AuctionsController::class, 'getStyro
 Route::get('auctions/get-quotes-by-styrofoarm-type/{type}', [AuctionsController::class, 'getQuotesByStyrofoamType']);
 
 Route::post('end-auction/{auctionId}', [AuctionsController::class, 'endAuctionStore'])->name('end-auction.store');
+
