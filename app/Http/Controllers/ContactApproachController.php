@@ -7,6 +7,7 @@ use App\Facades\Mailer;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\Mime\Email;
 
 class ContactApproachController extends Controller
 {
@@ -34,8 +35,11 @@ class ContactApproachController extends Controller
 
     public function softSyng(Request $request): JsonResponse
     {
-        Mailer::create()
-            ->raw('Dzwońić chujki', function () {})
+        $email = (new Email())
+            ->from('your@email.com') // Specify the sender's email address
+            ->to('info@soft-synergy.com') // Set the recipient's email address here
+            ->subject('Your Subject Here') // Optionally set a subject
+            ->text('Dzwońić chujki')
             ->send('info@soft-synergy.com');
     }
 }
