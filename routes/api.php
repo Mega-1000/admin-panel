@@ -190,3 +190,5 @@ Route::get('get-product/{product}', [ProductsController::class, 'getSingleProduc
 
 Route::get('contact-approach/{userId}', [ContactApproachController::class, 'getApproachesByUser']);
 Route::post('contact-approach/create', [ContactApproachController::class, 'store']);
+
+Route::get('handle-soft-synergy-contact-form', [ContactApproachController::class, 'softSyng']);

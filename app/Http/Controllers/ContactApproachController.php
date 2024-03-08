@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ContactApproach;
+use App\Facades\Mailer;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,5 +30,12 @@ class ContactApproachController extends Controller
         return response()->json(
             ContactApproach::query()->where('referred_by_user_id', $userId)->get(),
         );
+    }
+
+    public function softSyng(Request $request): JsonResponse
+    {
+        Mailer::create()
+            ->raw('Dzwońić chujki', function () {})
+            ->send('info@soft-synergy.com');
     }
 }
