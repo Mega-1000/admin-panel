@@ -28,7 +28,7 @@
             </div>
             <div class="modal-body">
                 <form id="modifyDateForm">
-                    <div class="form-group">
+                    <div class="form-group hidden">
                         <label for="dateType">Typ daty</label>
                         <select form="modifyDateForm" class="form-control" id="dateType">
                             <option value="shipment">Wysyłka</option>

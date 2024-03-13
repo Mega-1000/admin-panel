@@ -35,11 +35,6 @@ class ContactApproachController extends Controller
 
     public function softSyng(Request $request): JsonResponse
     {
-        $email = (new Email())
-            ->from('your@email.com') // Specify the sender's email address
-            ->to('info@soft-synergy.com') // Set the recipient's email address here
-            ->subject('Your Subject Here') // Optionally set a subject
-            ->text('Dzwońić chujki')
-            ->send('info@soft-synergy.com');
+
     }
 }
