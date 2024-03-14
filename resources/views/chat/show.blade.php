@@ -755,9 +755,9 @@
                     return;
                 }
 
-                const isKonsultant = '{{ $userType == MessagesHelper::TYPE_USER }}'; // For consultant
-                const isKlient = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}'; // For customer
-                const isMagazyn = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}'; // For warehouse
+                const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}'; // For consultant
+                const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}'; // For customer
+                const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}'; // For warehouse
                 const isAccepted = {{ $order?->date_accepted ?? 'false' }};
                 window.userType = '{{ $userType }}';
 
