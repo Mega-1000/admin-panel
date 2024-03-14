@@ -750,14 +750,12 @@ class OrdersController extends Controller
             $updateData = ['message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'];
 
             if ($request->type == 'customer') {
-                if ($request->filled('deliveryDateFrom')) {
+                if ($request->filled('shipmentDateFrom')) {
                     $updateData['consultant' . '_shipment_date_from'] = $request->deliveryDateFrom;
                 }
-                if ($request->filled('deliveryDateTo')) {
+                if ($request->filled('shipmentDateFrom')) {
                     $updateData['consultant' . '_shipment_date_from'] = $request->deliveryDateTo;
                 }
-                dd($updateData);
-
             }
 
             // Only add fields to the update array if they are present in the request
