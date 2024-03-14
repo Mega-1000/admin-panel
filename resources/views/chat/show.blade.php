@@ -772,18 +772,17 @@
 
                 // Determine if the user can modify the date
                 let canModify = false;
-                if (isKlient) {
+                if (isCustomer && key === 'customer') {
                     canModify = true;
                 }
 
-                if (isKonsultant) {
+                if (isConsultant && key === 'consultant') {
                     canModify = true;
                 }
 
-                if (isMagazyn) {
+                if (isWarehouse && key === 'warehouse') {
                     canModify = true;
                 }
-
                 // Determine if the user can accept the date (new functionality)
                 let canAccept = false;
                 if ((isKlient) || (isMagazyn)) {
