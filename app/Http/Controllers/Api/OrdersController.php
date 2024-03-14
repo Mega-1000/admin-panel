@@ -747,18 +747,30 @@ class OrdersController extends Controller
 
         if ($request->has('type')) {
             $order->dates->resetAcceptance();
-            $message = __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje';
-            $updateData = ['message' => $message];
+            $updateData = ['message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'];
+
+            if ($request->type == 'customer') {
+                if ($request->filled('deliveryDateFrom')) {
+                    $updateData['consultant' . '_delivery_date_from'] = $request->deliveryDateFrom;
+                }
+                if ($request->filled('deliveryDateTo')) {
+                    $updateData['consultant' . '_delivery_date_to'] = $request->deliveryDateTo;
+                }
+
+            }
 
             // Only add fields to the update array if they are present in the request
-            $dateFields = ['shipmentDateFrom', 'shipmentDateTo', 'deliveryDateFrom', 'deliveryDateTo'];
-            foreach ($dateFields as $field) {
-                if ($request->filled($field)) {
-                    $updateData[$request->type . '_' . strtolower($field)] = $request->$field;
-                    // Assuming you also want to update the consultant's dates in a similar fashion
-                    // You might need to adjust this part to correctly address your application's data model
-                    $updateData['consultant_' . $request->type . '_' . strtolower($field)] = $request->$field;
-                }
+            if ($request->filled('shipmentDateFrom')) {
+                $updateData[$request->type . '_shipment_date_from'] = $request->shipmentDateFrom;
+            }
+            if ($request->filled('shipmentDateTo')) {
+                $updateData[$request->type . '_shipment_date_to'] = $request->shipmentDateTo;
+            }
+            if ($request->filled('deliveryDateFrom')) {
+                $updateData[$request->type . '_delivery_date_from'] = $request->deliveryDateFrom;
+            }
+            if ($request->filled('deliveryDateTo')) {
+                $updateData[$request->type . '_delivery_date_to'] = $request->deliveryDateTo;
             }
 
             // Always set acceptance to true
@@ -779,11 +791,6 @@ class OrdersController extends Controller
                     'shipment_date_to' => $request->shipmentDateTo ?? $order->dates->{$request->type . '_shipment_date_to'},
                     'delivery_date_from' => $request->deliveryDateFrom ?? $order->dates->{$request->type . '_delivery_date_from'},
                     'delivery_date_to' => $request->deliveryDateTo ?? $order->dates->{$request->type . '_delivery_date_to'},
-                    // Example of adding consultant dates in the response, adjust as needed
-                    'consultant_shipment_date_from' => $request->shipmentDateFrom ?? $order->dates->{'consultant_' . $request->type . '_shipment_date_from'},
-                    'consultant_shipment_date_to' => $request->shipmentDateTo ?? $order->dates->{'consultant_' . $request->type . '_shipment_date_to'},
-                    'consultant_delivery_date_from' => $request->deliveryDateFrom ?? $order->dates->{'consultant_' . $request->type . '_delivery_date_from'},
-                    'consultant_delivery_date_to' => $request->deliveryDateTo ?? $order->dates->{'consultant_' . $request->type . '_delivery_date_to'},
                 ],
                 'acceptance' => [
                     $request->type => true,
