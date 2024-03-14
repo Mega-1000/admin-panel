@@ -674,7 +674,7 @@
                 });
 
                 $('#modifyDateModal').modal('hide');
-                showAlert('success', 'Date successfully modified.');
+                showAlert('success', 'PomyPomyślnie zaaktualizowano daty.');
                 loadOrderDates(); // Refresh dates table
             } catch (error) {
                 console.error('Failed to modify the date:', error);
@@ -737,7 +737,7 @@
                 },
                 success: function(data) {
                     $('#modifyDateModal').modal('hide');
-                    showAlert('success', 'Date successfully modified.');
+                    showAlert('success', 'PomyPomyślnie zaaktualizowano daty.');
                     loadOrderDates(); // Refresh dates table
                 },
                 error: function(xhr, status, error) {
@@ -747,6 +747,7 @@
         }
 
         function populateDatesTable(dates) {
+
             let html = '';
             Object.keys(dates).forEach(function(key) {
                 const date = dates[key]; // Get the date object for the current key
@@ -755,38 +756,38 @@
                     return;
                 }
 
-                const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
-                const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}';
-                const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}';
+                const isKonsultant = '{{ $userType == MessagesHelper::TYPE_USER }}'; // For consultant
+                const isKlient = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}'; // For customer
+                const isMagazyn = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}'; // For warehouse
                 const isAccepted = {{ $order?->date_accepted ?? 'false' }};
                 window.userType = '{{ $userType }}';
 
-                // get full name of userType
+                // get full name of userType in Polish
                 if (window.userType === 'c') {
-                    window.userType = 'customer';
+                    window.userType = 'klient';
                 } else if (window.userType === 'u') {
-                    window.userType = 'consultant';
+                    window.userType = 'konsultant';
                 } else if (window.userType === 'e') {
-                    window.userType = 'warehouse';
+                    window.userType = 'magazyn';
                 }
 
                 // Determine if the user can modify the date
                 let canModify = false;
-                if (isCustomer && key === 'customer') {
+                if (isKlient && key === 'klient') {
                     canModify = true;
                 }
 
-                if (isConsultant && key === 'consultant') {
+                if (isKonsultant && key === 'konsultant') {
                     canModify = true;
                 }
 
-                if (isWarehouse && key === 'warehouse') {
+                if (isMagazyn && key === 'magazyn') {
                     canModify = true;
                 }
 
                 // Determine if the user can accept the date (new functionality)
                 let canAccept = false;
-                if ((isCustomer && key === 'warehouse') || (isWarehouse && key === 'customer')) {
+                if ((isKlient && key === 'magazyn') || (isMagazyn && key === 'klient')) {
                     canAccept = true;
                 }
 
@@ -802,6 +803,9 @@
                 }
 
                 @if($order->items->first()->product->variation_group !== 'styropiany')
+
+
+
                 // Delivery date row
                 html += '<tr>' +
                     '<td>Proponowana data wysyłki (' + key + ')</td>' +

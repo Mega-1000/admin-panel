@@ -4975,7 +4975,7 @@
                 });
 
                 $('#modifyDateModal').modal('hide');
-                showAlert('success', 'Date successfully modified.');
+                showAlert('success', 'PomyPomyślnie zaaktualizowano daty.');
                 loadOrderDates(); // Refresh dates table
             } catch (error) {
                 console.error('Failed to modify the date:', error);
@@ -5038,7 +5038,7 @@
                 },
                 success: function(data) {
                     $('#modifyDateModal').modal('hide');
-                    showAlert('success', 'Date successfully modified.');
+                    showAlert('success', 'PomyPomyślnie zaaktualizowano daty.');
                     loadOrderDates(); // Refresh dates table
                 },
                 error: function(xhr, status, error) {
