@@ -751,12 +751,11 @@ class OrdersController extends Controller
 
             if ($request->type == 'customer') {
                 if ($request->filled('shipmentDateFrom')) {
-                    $updateData['consultant' . '_shipment_date_from'] = $request->deliveryDateFrom;
+                    $updateData['consultant' . '_shipment_date_from'] = $request->shipmentDateFrom;
                 }
-                if ($request->filled('shipmentDateFrom')) {
-                    $updateData['consultant' . '_shipment_date_from'] = $request->deliveryDateTo;
+                if ($request->filled('shipmentDateTo')) {
+                    $updateData['consultant' . '_shipment_date_from'] = $request->shipmentDateTo;
                 }
-                dd($updateData);
             }
 
             // Only add fields to the update array if they are present in the request
