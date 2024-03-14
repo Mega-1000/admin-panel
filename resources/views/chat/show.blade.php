@@ -801,8 +801,6 @@
                     // canModify = false;
                     // $('#dates-table').before('<div class="alert alert-info">Daty zostały finalnie zatwierdzone i nie ma możliwości ich modyfikacji</div>');
                 }
-
-                @if($order->items->first()->product->variation_group !== 'styropiany')
                 let displayKey = '';
 
                 if (key === 'consultant') {
@@ -816,6 +814,8 @@
                 if (key === 'warehouse') {
                     displayKey = 'Magazyn'
                 }
+
+                @if($order->items->first()->product->variation_group !== 'styropiany')
 
                 // Delivery date row
                 html += '<tr>' +
