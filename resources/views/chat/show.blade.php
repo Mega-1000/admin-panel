@@ -747,7 +747,6 @@
         }
 
         function populateDatesTable(dates) {
-
             let html = '';
             Object.keys(dates).forEach(function(key) {
                 const date = dates[key]; // Get the date object for the current key
@@ -773,21 +772,21 @@
 
                 // Determine if the user can modify the date
                 let canModify = false;
-                if (isKlient && key === 'klient') {
+                if (isKlient) {
                     canModify = true;
                 }
 
-                if (isKonsultant && key === 'konsultant') {
+                if (isKonsultant) {
                     canModify = true;
                 }
 
-                if (isMagazyn && key === 'magazyn') {
+                if (isMagazyn) {
                     canModify = true;
                 }
 
                 // Determine if the user can accept the date (new functionality)
                 let canAccept = false;
-                if ((isKlient && key === 'magazyn') || (isMagazyn && key === 'klient')) {
+                if ((isKlient) || (isMagazyn)) {
                     canAccept = true;
                 }
 
