@@ -785,7 +785,7 @@
                 }
                 // Determine if the user can accept the date (new functionality)
                 let canAccept = false;
-                if ((isKlient) || (isMagazyn)) {
+                if ((isCustomer && key === 'warehouse') || (isWarehouse && key === 'customer')) {
                     canAccept = true;
                 }
 
