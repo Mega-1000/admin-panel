@@ -756,6 +756,7 @@ class OrdersController extends Controller
                 if ($request->filled('deliveryDateTo')) {
                     $updateData['consultant' . '_shipment_date_from'] = $request->deliveryDateTo;
                 }
+                dd($updateData);
 
             }
 
