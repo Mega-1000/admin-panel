@@ -750,12 +750,11 @@ class OrdersController extends Controller
             $updateData = ['message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'];
 
             if ($request->type == 'customer') {
-                dd('okokok');
                 if ($request->filled('deliveryDateFrom')) {
-                    $updateData['consultant' . '_delivery_date_from'] = $request->deliveryDateFrom;
+                    $updateData['consultant' . '_shipment_date_from'] = $request->deliveryDateFrom;
                 }
                 if ($request->filled('deliveryDateTo')) {
-                    $updateData['consultant' . '_delivery_date_to'] = $request->deliveryDateTo;
+                    $updateData['consultant' . '_shipment_date_from'] = $request->deliveryDateTo;
                 }
 
             }
