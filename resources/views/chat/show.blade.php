@@ -803,12 +803,23 @@
                 }
 
                 @if($order->items->first()->product->variation_group !== 'styropiany')
+                let displayKey = '';
 
+                if (key === 'consultant') {
+                    displayKey = 'Konsultant'
+                }
 
+                if (key === 'customer') {
+                    displayKey = 'Klient'
+                }
+
+                if (key === 'warehouse') {
+                    displayKey = 'Magazyn'
+                }
 
                 // Delivery date row
                 html += '<tr>' +
-                    '<td>Proponowana data wysyłki (' + key + ')</td>' +
+                    '<td>Proponowana data wysyłki (' + displayKey + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
