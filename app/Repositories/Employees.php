@@ -27,6 +27,10 @@ class Employees
 
         $firms = array_unique(app(ChatAuctionsService::class)->getFirms($variations));
 
+        $firms = array_filter($firms, function ($firm) {
+            return $firm->id != 1;
+        });
+
         $employees = [];
         foreach ($firms as $firm) {
             foreach (Employees::getEmployeesForAuctionOrderByFirm($firm) as $employee) {
@@ -34,18 +38,20 @@ class Employees
             }
         }
 
-        $employees = array_unique($employees);
+        $employees = array_unique($employees, SORT_REGULAR);
 
+        $allEmployees = [];
         foreach ($employees as $employee) {
             $firmAssociatedWithEmployee = Firm::where('email', $employee->email)->first();
 
             if ($firmAssociatedWithEmployee) {
-                foreach ($firmAssociatedWithEmployee->employees as $employee) {
-                    $employees[] = $employee;
+                foreach ($firmAssociatedWithEmployee->employees as $emp) {
+                    $allEmployees[] = $emp;
                 }
             }
         }
 
-        return array_unique($employees);
+        return array_unique($allEmployees, SORT_REGULAR);
+
     }
 }

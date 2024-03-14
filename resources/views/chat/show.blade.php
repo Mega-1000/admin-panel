@@ -112,7 +112,7 @@
                                 <br>
                                 Koniec: {{ $chat->auctions->first()->end_of_auction }}
                                 <br>
-                                data do wysyłki: {{ $chat->auctions->first()->date_of_delivery }}
+                                Wstępna data wysyłki: {{ $chat->auctions->first()->date_of_delivery }}
                                 <br>
                                 Cena: {{ $chat->auctions->first()->price }} %
                                 <br>

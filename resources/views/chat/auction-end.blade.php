@@ -173,7 +173,7 @@
                 <tr>
                     <th>
                         <h5 style="text-align: right">
-                            Ceny za m3
+                            Ceny brutto za m3
                         </h5>
                     </th>
                     @foreach($products as $product)

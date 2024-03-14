@@ -83,7 +83,7 @@
         <table>
             <thead>
             <tr>
-                <th>Ceny za m3</th>
+                <th>Ceny brutto za m3</th>
                 @php
                     $items = isset($order) ? $order->items->pluck('product') : $products;
                 @endphp
