@@ -754,7 +754,7 @@ class OrdersController extends Controller
                     $updateData['consultant' . '_shipment_date_from'] = $request->shipmentDateFrom;
                 }
                 if ($request->filled('shipmentDateTo')) {
-                    $updateData['consultant' . '_shipment_date_from'] = $request->shipmentDateTo;
+                    $updateData['consultant' . '_shipment_date_to'] = $request->shipmentDateTo;
                 }
             }
 
