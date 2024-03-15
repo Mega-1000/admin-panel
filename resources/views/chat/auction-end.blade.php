@@ -221,7 +221,7 @@
                                     {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }}
 
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
-                                    <input type="number" id="quantity-{{ $offer->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->
+{{--                                    <input type="number" id="quantity-{{ $offer->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->--}}
                                 @else
                                     No offer
                                 @endif
