@@ -25,6 +25,7 @@ class UpdateChatAuctionRequest extends FormRequest
     {
         return [
             'end_of_auction' => 'required|date',
+            'date_of_delivery' => 'required|date',
         ];
     }
 }

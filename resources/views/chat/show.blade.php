@@ -94,6 +94,9 @@
                                 @method('PUT')
                                 <input class="form-control" name="end_of_auction" type="datetime-local" value="{{ $chat->auctions()->first()->end_of_auction }}">
 
+                                <input class="form-control" name="date_of_delivery" type="datetime-local" value="{{ $chat->auctions()->first()->date_of_delivery }}">
+
+
                                 <button class="btn btn-primary">
                                     Zmień datę zakończenia przetargu
                                 </button>
