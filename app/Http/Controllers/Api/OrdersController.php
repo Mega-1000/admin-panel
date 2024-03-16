@@ -597,6 +597,10 @@ class OrdersController extends Controller
             ->paginate(10);
 
         foreach ($orders as $order) {
+            $order->auctionCanBeCreated = $order->items->find(function ($item) {
+                $item->variation_group = "styropiany";
+            })->exists();
+
             $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
             $order->total_sum = $order->getSumOfGrossValues();
             $order->bookedPaymentsSum = $order->bookedPaymentsSum();
