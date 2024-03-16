@@ -627,7 +627,7 @@ class MessagesHelper
         /** @var Message $lastMessage */
         $lastMessage = $chat->messages()->orderBy('id', 'desc')->first();
 
-        if($area == 0 && $lastMessage->user) {
+        if($area == 0 && isset($lastMessage->user)) {
             OrderLabelHelper::setBlueLabel($chat);
         }
     }
