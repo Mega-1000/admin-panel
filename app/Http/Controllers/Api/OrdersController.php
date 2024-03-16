@@ -597,9 +597,9 @@ class OrdersController extends Controller
             ->paginate(10);
 
         foreach ($orders as $order) {
-            $order->auctionCanBeCreated = $order->items->find(function ($item) {
+            $order->auctionCanBeCreated = $order->items->contains(function ($item) {
                 return $item->variation_group === "styropiany";
-            })->exists();
+            });
 
             $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
             $order->total_sum = $order->getSumOfGrossValues();
