@@ -92,9 +92,13 @@
                             <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}">
                                 @csrf
                                 @method('PUT')
+                                Zakończenie przetargu
                                 <input class="form-control" name="end_of_auction" type="datetime-local" value="{{ $chat->auctions()->first()->end_of_auction }}">
 
-                                <input class="form-control" name="date_of_delivery" type="datetime-local" value="{{ $chat->auctions()->first()->date_of_delivery }}">
+                                <div class="mt-4">
+                                    Data wysłania przesyłki
+                                    <input class="form-control" name="date_of_delivery" type="datetime-local" value="{{ $chat->auctions()->first()->date_of_delivery }}">
+                                </div>
 
 
                                 <button class="btn btn-primary">
