@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unsignedInteger('firm_id');
             $table->string('token', 255)->unique();
             $table->timestamps();
-
             $table->foreign('firm_id')->references('id')->on('firms')->onDelete('cascade');
         });
     }
