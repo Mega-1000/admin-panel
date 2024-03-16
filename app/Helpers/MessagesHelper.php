@@ -624,7 +624,10 @@ class MessagesHelper
             }
         }
 
-        if($area == 0) {
+        /** @var Message $lastMessage */
+        $lastMessage = $chat->messages()->orderBy('id', 'desc')->first();
+
+        if($area == 0 && $lastMessage->user) {
             OrderLabelHelper::setBlueLabel($chat);
         }
     }
