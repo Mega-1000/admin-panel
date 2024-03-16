@@ -598,7 +598,7 @@ class OrdersController extends Controller
 
         foreach ($orders as $order) {
             $order->auctionCanBeCreated = $order->items->find(function ($item) {
-                $item->variation_group = "styropiany";
+                return $item->variation_group === "styropiany";
             })->exists();
 
             $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
