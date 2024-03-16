@@ -92,7 +92,7 @@
                             <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}">
                                 @csrf
                                 @method('PUT')
-                                <input class="form-control" name="end_of_auction" type="date" value="{{ $chat->auctions()->first()->end_of_auction }}">
+                                <input class="form-control" name="end_of_auction" type="datetime-local" value="{{ $chat->auctions()->first()->end_of_auction }}">
 
                                 <button class="btn btn-primary">
                                     Zmień datę zakończenia przetargu
