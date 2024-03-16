@@ -35,7 +35,7 @@ class Message extends Model
 
     public function user(): ?User
     {
-        return $this->chatUser->user;
+        return $this->chatUser?->user;
     }
 
     public function employee(): ?Employee
