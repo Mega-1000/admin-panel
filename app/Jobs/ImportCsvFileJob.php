@@ -443,7 +443,6 @@ class ImportCsvFileJob implements ShouldQueue
         }
 
         $product->order = $array['order'] !== '?' ? $product['order'] : null;
-
         $product->save();
 
         $product->stock()->update([
@@ -603,7 +602,7 @@ class ImportCsvFileJob implements ShouldQueue
             'number_of_trade_units_in_width_in_global_package' => $line[69],
             'number_of_trade_items_in_p1' => $line[70],
             'allegro_gross_selling_price_after_all_additional_costs' => $line[249],
-            'order' => $line[597],
+            'order' => $line[130],
         ];
 
         foreach ($array as $key => $value) {
