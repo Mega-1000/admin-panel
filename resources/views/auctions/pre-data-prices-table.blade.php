@@ -94,12 +94,7 @@
                             $groupedItems[$prefix][] = ['suffix' => $suffix, 'ean' => $product->ean_of_collective_packing];
                         }
                     }
-                    foreach ($groupedItems as $prefix => &$suffixes) {
-                        usort($suffixes, function ($a, $b) {
-                            return $a['ean'] <=> $b['ean'];
-                        });
-                    }
-                    unset($suffixes);
+
                 @endphp
                 @foreach($groupedItems as $prefix => $suffixes)
                     <th colspan="{{ count($suffixes) }}">{{ $prefix }}</th>
