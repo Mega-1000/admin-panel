@@ -86,23 +86,23 @@
                 <th>Ceny brutto za m3</th>
                 @php
                     $items = isset($order) ? $order->items->pluck('product') : $products;
-                @endphp
-
-                @php
                     $groupedItems = [];
                     foreach ($items as $product) {
-                        $product->name = \App\Helpers\AuctionsHelper::getTrimmedProductGroupName($product);
-                        // Assuming $product->name or similar property exists
-                        // Split name to identify the prefix (e.g., "fasada") and the suffix (e.g., "045")
+                        $product->name = App\Helpers\AuctionsHelper::getTrimmedProductGroupName($product);
                         list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
-                        $groupedItems[$prefix][] = $suffix;
+                        if($product->ean_of_collective_packing !== '?' && isset($product->ean_of_collective_packing)) {
+                            $groupedItems[$prefix][] = ['suffix' => $suffix, 'ean' => $product->ean_of_collective_packing];
+                        }
                     }
+                    foreach ($groupedItems as $prefix => &$suffixes) {
+                        usort($suffixes, function ($a, $b) {
+                            return $a['ean'] <=> $b['ean'];
+                        });
+                    }
+                    unset($suffixes);
                 @endphp
-
                 @foreach($groupedItems as $prefix => $suffixes)
-                    <th  colspan="{{ count($suffixes) }}">
-                        {{ $prefix }}
-                    </th>
+                    <th colspan="{{ count($suffixes) }}">{{ $prefix }}</th>
                 @endforeach
             </tr>
             <tr>

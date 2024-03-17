@@ -366,7 +366,6 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function saveProduct($array, $categoryTree, $isChildProduct)
     {
-        var_dump($array);
         $product = null;
         if (!empty($array['symbol'])) {
             $product = Entities\Product::withTrashed()->where('symbol', $array['symbol'])->first();
