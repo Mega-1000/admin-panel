@@ -443,6 +443,11 @@ class ImportCsvFileJob implements ShouldQueue
         }
 
         $product->order = $array['order'] !== '?' ? $product['order'] : null;
+
+        if ($array['order']) {
+            dd($array);
+        }
+
         $product->save();
 
         $product->stock()->update([
