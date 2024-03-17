@@ -90,11 +90,27 @@
 
                 @php
                     $groupedItems = [];
+                    $eanMapping = []; // Assuming this array maps prefixes to their ean_of_collective_packing
+
                     foreach ($items as $product) {
                         $product->name = \App\Helpers\AuctionsHelper::getTrimmedProductGroupName($product);
                         list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
                         $groupedItems[$prefix][] = $suffix;
+
+                        // If ean_of_collective_packing can be determined directly from the product, update eanMapping accordingly
+                        // For example, if you can do something like $product->ean_of_collective_packing, update the eanMapping here
+                        // $eanMapping[$prefix] = $product->ean_of_collective_packing;
                     }
+
+                    // Assuming $eanMapping is filled here with ean_of_collective_packing for each prefix
+                    // Now sort $groupedItems by ean_of_collective_packing using $eanMapping
+
+                    uksort($groupedItems, function($a, $b) use ($eanMapping) {
+                        return strcmp($eanMapping[$a] ?? '', $eanMapping[$b] ?? '');
+                    });
+
+                    // At this point, $groupedItems is sorted based on ean_of_collective_packing as determined by $eanMapping
+
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
