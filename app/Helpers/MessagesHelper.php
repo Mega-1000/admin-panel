@@ -323,6 +323,8 @@ class MessagesHelper
             throw new ChatException('Cannot save message - User not added to chat');
         }
 
+        dd($this);
+
         $messageObj = new Message();
         $messageObj->message = $message;
         $messageObj->chat_id = $chat->id;

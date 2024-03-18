@@ -52,7 +52,6 @@ readonly class MessageService
         }
 
         $file = $data->file ?? null;
-        dd($data->message, $data->area, $file);
         $message = $helper->addMessage($data->message, $data->area, $file);
         $helper->setLastRead();
 
