@@ -218,8 +218,8 @@ class MessagesController extends Controller
                 throw new Exception('Wrong chat token');
             }
 
-//            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
-//            $assignedMessagesIds = array_flip($assignedMessagesIds);
+            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
+            $assignedMessagesIds = array_flip($assignedMessagesIds);
             $out = '';
             foreach ($chat->messages as $message) {
                 if ($message->id <= $lastId || $area != $message->area) {
