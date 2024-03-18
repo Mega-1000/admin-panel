@@ -1,6 +1,6 @@
 @if(is_a($product, \App\Entities\OrderItem::class))
     <div class="product">
-        <img class="image-product" src="www.admin.mega1000.pl/storage/products/styropianplus_fasada_033_1.jpg"/>
+        <img class="image-product" src="http://www.admin.mega1000.pl/storage/products/styropianplus_fasada_033_1.jpg"/>
         {{$product->product->getImageUrl()}}
         <div class="product-description">
             <h4>
