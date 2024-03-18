@@ -323,8 +323,6 @@ class MessagesHelper
             throw new ChatException('Cannot save message - User not added to chat');
         }
 
-        dd($this);
-
         $messageObj = new Message();
         $messageObj->message = $message;
         $messageObj->chat_id = $chat->id;
@@ -492,6 +490,7 @@ class MessagesHelper
         if (!$chatUser && $this->currentUserId == self::TYPE_USER) {
             return $this->getAdminChatUser();
         }
+        dd($chatUser);
 
         return $chatUser ?? $this->getChat()->whereHas('chatUsers', function ($query) {
             $query->whereHas('employee');
