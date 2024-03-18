@@ -6,6 +6,7 @@
                     @if ($userType != MessagesHelper::TYPE_USER && $message->area != 0)
                         @continue
                     @endif
+                {{dd($message)}}
                     @include ('chat/single_message', ['message' => $message])
                 @endif
             @endforeach
