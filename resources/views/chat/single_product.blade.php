@@ -1,7 +1,6 @@
 @if(is_a($product, \App\Entities\OrderItem::class))
     <div class="product">
-        <img class="image-product" src="{{$product->product->getImageUrl()}}"
-             onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
+        <img src="https://admin.mega1000.pl/storage/products/styropianplus_fasada_040_1.jpg" />
         <div class="product-description">
             <h4>
                 Najniższa cena na ten moment:
