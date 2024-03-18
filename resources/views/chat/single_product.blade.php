@@ -1,7 +1,6 @@
 @if(is_a($product, \App\Entities\OrderItem::class))
     <div class="product">
-        <img class="image-product" src="{{$product->product->getImageUrl()}}"
-             onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
+        <img class="image-product" src="{{$product->product->getImageUrl()}}"/>
         {{$product->product->getImageUrl()}}
         <div class="product-description">
             <h4>
