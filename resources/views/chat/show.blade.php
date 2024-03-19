@@ -207,24 +207,24 @@
                 <h3>Użytkownicy:</h3>
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
-{{--                        @include('chat/users', [--}}
-{{--                            'title'            => 'Klienci:',--}}
-{{--                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',--}}
-{{--                            'users'            => $chatCustomers,--}}
-{{--                            'userType'         => MessagesHelper::TYPE_CUSTOMER,--}}
-{{--                            'currentUserType'  => $userType,--}}
-{{--                            'arePossibleUsers' => false,--}}
-{{--                            'class'            => 'bg-warning alert alert-warning',--}}
-{{--                        ])--}}
-{{--                        @include('chat/users', [--}}
-{{--                            'title'            => 'Pracownicy firm:',--}}
-{{--                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',--}}
-{{--                            'users'            => $chatEmployees,--}}
-{{--                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,--}}
-{{--                            'currentUserType'  => $userType,--}}
-{{--                            'arePossibleUsers' => false,--}}
-{{--                            'class'            => 'bg-info alert alert-info',--}}
-{{--                        ])--}}
+                        @include('chat/users', [
+                            'title'            => 'Klienci:',
+                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
+                            'users'            => $chatCustomers,
+                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => false,
+                            'class'            => 'bg-warning alert alert-warning',
+                        ])
+                        @include('chat/users', [
+                            'title'            => 'Pracownicy firm:',
+                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
+                            'users'            => $chatEmployees,
+                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => false,
+                            'class'            => 'bg-info alert alert-info',
+                        ])
                         @include('chat/users', [
                             'title'            => 'Konsultanci:',
                             'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',

@@ -44,6 +44,9 @@
         Zarządzanie gazetką
     </a>
 
+    <a name="package_template" class="btn btn-primary" href="/admin/packageTemplates/">Lista Szablonów</a>
+    <a name="package_template" class="btn btn-primary" href="/admin/packageTemplates/create">Dodaj szablon</a>
+
     <div class="row">
         <div class="col-md-12">
             @if ($import->processing)
