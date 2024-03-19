@@ -237,6 +237,7 @@ class MessagesController extends Controller
             'possibleEmployees' => $possibleEmployees,
             'possibleCustomers' => $possibleCustomers,
             'userType' => $helper->currentUserType,
+            'userId' => $helper->currentUserId,
             'chatCustomers' => $chatCustomers,
             'chatEmployees' => $chatEmployees,
             'chatBlankUser' => $chatBlankUser,
