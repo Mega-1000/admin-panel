@@ -127,6 +127,8 @@
                                 <br>
                                 Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
                                 <br>
+                                Uwagi: {{ $chat->auctions->first()->notes }}
+                                <br>
                                 <form action="{{ route('end-auction.store', $chat->auctions->first()->id) }}" method="post">
                                     @csrf
                                     <button class="btn btn-secondary">
