@@ -28,6 +28,7 @@ class CreateAuctionRequest extends FormRequest
             'date_of_delivery' => 'required|date',
             'price' => 'required|integer',
             'quality' => 'required|integer',
+            'notes' => 'required|string'
         ];
     }
 }

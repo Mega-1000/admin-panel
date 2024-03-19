@@ -24,6 +24,14 @@
         <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Wstępny termin dostawy (Przynajmniej 2 dni robocze od zakończenia przetargu)</label>
         <input type="datetime-local" id="base-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Wstępny termin dostawy (Przynajmniej 2 dni robocze od zakończenia przetargu)" name="date_of_delivery">
 
+        <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu</label>
+        <textarea
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            placeholder="Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu"
+            name="notes"
+        ></textarea>
+
+
         <label for="base-input" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość</label>
 
         Cena

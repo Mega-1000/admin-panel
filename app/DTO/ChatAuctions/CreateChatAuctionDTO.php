@@ -12,6 +12,7 @@ readonly class CreateChatAuctionDTO
         public string $date_of_delivery,
         public int $price,
         public int $quality,
+        public string $notes,
     ) {}
 
     public static function fromRequest(Chat $chat, array $data): self
@@ -22,6 +23,7 @@ readonly class CreateChatAuctionDTO
             $data['date_of_delivery'],
             $data['price'],
             $data['quality'],
+            $data['notes'],
         );
     }
 }

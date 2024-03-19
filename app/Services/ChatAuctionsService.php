@@ -61,6 +61,7 @@ readonly class ChatAuctionsService
             'date_of_delivery' => $data->date_of_delivery,
             'price' => $data->price,
             'quality' => $data->quality,
+            'notes' => $data->notes
         ]);
     }
 

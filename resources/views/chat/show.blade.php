@@ -157,7 +157,6 @@
                         @endif
                     </div>
                 @endif
-                okej
                 @if ($product_list->count() > 0)
                     <div class="alert alert-warning"><b>Lista produktów:</b>
                         @foreach ($product_list as $product)
