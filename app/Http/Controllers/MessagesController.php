@@ -14,6 +14,7 @@ use App\Jobs\ChatNotificationJob;
 use App\Mail\NotifyFirmAboutAuction;
 use App\Repositories\ChatAuctionFirms;
 use App\Repositories\Chats;
+use App\Services\ChatAuctionsService;
 use App\Services\MessageService;
 use App\Services\ProductService;
 use App\Services\StyrofoarmAuctionService;
