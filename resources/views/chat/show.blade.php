@@ -59,7 +59,6 @@
                         $q->where('id', $userId);
                     })->first();
 
-                    dd($firm)
                 @endphp
                 <a class="btn btn-primary" href="{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
                     Tutaj
