@@ -14,6 +14,7 @@ use App\Jobs\ChatNotificationJob;
 use App\Mail\NotifyFirmAboutAuction;
 use App\Repositories\ChatAuctionFirms;
 use App\Repositories\Chats;
+use App\Repositories\Employees;
 use App\Services\ChatAuctionsService;
 use App\Services\MessageService;
 use App\Services\ProductService;
@@ -315,10 +316,13 @@ class MessagesController extends Controller
     {
         $auction = $chat->auctions->first();
         $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
+        $employees = Employees::getEmployeesForAuction($chat->order);
 
-        Mailer::create()
-            ->to('antoniwoj@o2.pl')
-            ->send(new NotifyFirmAboutAuction($auction, $company, $chatAuctionsService->generateLinkForAuction($auction, $company, 'antoniwoj@o2.pl')));
+        foreach ($employees as $employee) {
+            Mailer::create()
+                ->to($employee->email)
+                ->send(new NotifyFirmAboutAuction($auction, $company, $chatAuctionsService->generateLinkForAuction($auction, $company, $employee->email)));
+        }
 
         return redirect()->back();
     }
