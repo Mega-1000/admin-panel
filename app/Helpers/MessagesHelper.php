@@ -107,7 +107,7 @@ class MessagesHelper
     public function decrypt($token): static
     {
         $data = decrypt($token);
-        $this->chatId = $data['cId'] ?? Order::find($data['oId'] ?? 0)?->chat->id;
+        $this->chatId = $data['cId'] ?? Order::find($data['oId'] ?? 0)?->chat?->id;
         $this->users = $data['u'] ?? [];
         $this->productId = $data['pId'] ?? 0;
         $this->orderId = $data['oId'] ?? 0;
