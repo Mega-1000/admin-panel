@@ -229,8 +229,6 @@ class MessagesController extends Controller
             $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()));
         }
 
-        dd($helper);
-
         return view('chat.show', [
             'isStyropian' => $isStyrofoarm,
             'product_list' => $productList,
