@@ -41,6 +41,8 @@
             Kod pocztowy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}
             <br>
             Numer oferty: {{ $chat_auction_firm->chatAuction->chat->order->id }}
+            <br>
+            Uwagi klienta do tego zamówienia: {{ $chat_auction_firm->chatAuction->notes }}
         </h3>
     </div>
 
