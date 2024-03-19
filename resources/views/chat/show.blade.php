@@ -58,6 +58,8 @@
                     $firm = App\Entities\Firm::whereHas('employees', function ($q) use ($userId) {
                         $q->where('id', $userId);
                     })->first();
+
+                    dd($chat->auctions->first()?->firms, $firm->id)
                 @endphp
                 <a class="btn btn-primary" href="{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
                     Tutaj
