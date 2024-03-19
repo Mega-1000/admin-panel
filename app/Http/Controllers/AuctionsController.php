@@ -210,7 +210,6 @@ class AuctionsController extends Controller
         })->get();
 
         foreach ($employees as $employee) {
-
             Mailer::create()
                 ->to($employee->email)
                 ->send(new NotificationAboutFirmPanelMail(

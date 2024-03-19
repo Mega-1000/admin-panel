@@ -355,6 +355,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('differenceInShipmentCostCookies', DifferenceInShipmentCostCookiesController::class)->name('differenceInShipmentCostCookies');
         //addUsersFromCompanyToChat
         Route::post('addUsersFromCompanyToChat/{chat}', [MessagesController::class, 'addUsersFromCompanyToChat'])->name('addUsersFromCompanyToChat');
+        Route::post('addUsersFromCompanyToAuction/{chat}', [MessagesController::class, 'addUsersFromCompanyToAuction'])->name('addUsersFromCompanyToAuction');
 
         Route::get('shipping-payin-report', ShippingPayinReportController::class)->name('shipping-payin-report');
 

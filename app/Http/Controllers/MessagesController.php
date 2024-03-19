@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Chat;
+use App\Entities\ChatAuctionFirm;
 use App\Entities\Firm;
 use App\Entities\Order;
 use App\Exceptions\DeliverAddressNotFoundException;
+use App\Facades\Mailer;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Jobs\ChatNotificationJob;
+use App\Mail\NotifyFirmAboutAuction;
+use App\Repositories\ChatAuctionFirms;
 use App\Repositories\Chats;
 use App\Services\MessageService;
 use App\Services\ProductService;
@@ -302,6 +306,18 @@ class MessagesController extends Controller
 
 //            ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
         }
+
+        return redirect()->back();
+    }
+
+    public function addUsersFromCompanyToAuction(Chat $chat, Request $request, ChatAuctionFirms $chatAuctionFirmsRepository): RedirectResponse
+    {
+        $auction = $chat->auctions->first();
+        $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
+
+        Mailer::create()
+            ->to('antoniwoj@o2.pl')
+            ->send(new NotifyFirmAboutAuction($auction, $company, $chatAuctionFirmsRepository->generateLinkForAuction($auction, $company, 'antoniwoj@o2.pl')));
 
         return redirect()->back();
     }

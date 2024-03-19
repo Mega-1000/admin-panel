@@ -276,6 +276,22 @@
                                 Dodaj użytkowników
                             </button>
                         </form>
+
+                        @if($userType == MessagesHelper::TYPE_USER)
+                            <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST">
+                                @csrf
+
+                                <h2>
+                                    Dodaj firmę do przetargu
+                                </h2>
+
+                                <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy">
+
+                                <button type="submit" class="btn btn-primary">
+                                    Dodaj firm
+                                </button>
+                            </form>
+                        @endif
                     </table>
                 </div>
                 @if ($userType == MessagesHelper::TYPE_USER)
