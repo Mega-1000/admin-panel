@@ -225,9 +225,9 @@ class MessagesController extends Controller
             StyrofoarmAuctionService::updateAuction($chat, $products);
 
             $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
-
-            dd($chat->users);
-//            $allEmployeesFromRelatedOrders->filter(fn ($employee) => )l
+            $emails = $chat->users->pluck('email');
+            dd($emails);
+            $allEmployeesFromRelatedOrders->filter(fn ($employee) => )
         }
 
         return view('chat.show', [
