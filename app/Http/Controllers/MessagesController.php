@@ -226,7 +226,7 @@ class MessagesController extends Controller
 
             $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
             $emails = $chat->users->pluck('email');
-            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArrray()));
+            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()));
         }
 
         return view('chat.show', [
