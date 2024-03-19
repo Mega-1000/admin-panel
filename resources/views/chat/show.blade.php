@@ -207,7 +207,6 @@
 {{--                <h3>Użytkownicy:</h3>--}}
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
-                        Użytkownicy Aktualnie w chacie
                         @include('chat/users', [
                             'title'            => 'Klienci:',
                             'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
@@ -265,7 +264,6 @@
                                 'class'            => 'bg-info alert alert-info',
                             ])
                         @endif
-                        okej
 
                         @if($userType == MessagesHelper::TYPE_USER)
                             <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST">
