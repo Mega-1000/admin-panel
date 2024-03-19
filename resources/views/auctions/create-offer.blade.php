@@ -42,7 +42,7 @@
             <br>
             Numer oferty: {{ $chat_auction_firm->chatAuction->chat->order->id }}
             <br>
-            Uwagi klienta do tego zamówienia: {{ $chat_auction_firm->chatAuction->notes }}
+            Uwagi klienta do tego zamówienia: {{ $chat_auction_firm->chatAuction->notes ?? 'brak' }}
         </h3>
     </div>
 
