@@ -264,35 +264,37 @@
                             ])
                         @endif
 
-                        <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST">
-                            @csrf
-
-                            <h2>
-                                Dodaj firmę
-                            </h2>
-
-                            <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy">
-
-                            <button type="submit" class="btn btn-primary"> <!-- Use type="submit" to submit the form -->
-                                Dodaj użytkowników
-                            </button>
-                        </form>
-
-{{--                        @if($userType == MessagesHelper::TYPE_USER)--}}
-                            <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST">
+                        @if($userType == MessagesHelper::TYPE_USER)
+                            <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST">
                                 @csrf
 
                                 <h2>
-                                    Dodaj firmę do przetargu
+                                    Dodaj firmę
                                 </h2>
 
                                 <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy">
 
-                                <button type="submit" class="btn btn-primary">
-                                    Dodaj firm
+                                <button type="submit" class="btn btn-primary"> <!-- Use type="submit" to submit the form -->
+                                    Dodaj użytkowników
                                 </button>
                             </form>
-{{--                        @endif--}}
+
+
+                                <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST">
+                                    @csrf
+
+                                    <h2>
+                                        Dodaj firmę do przetargu
+                                    </h2>
+
+                                    <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy">
+
+                                    <button type="submit" class="btn btn-primary">
+                                        Dodaj firm
+                                    </button>
+                                </form>
+    {{--                        @endif--}}
+                        @endif
                     </table>
                 </div>
                 @if ($userType == MessagesHelper::TYPE_USER)
