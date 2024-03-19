@@ -227,7 +227,7 @@ class MessagesController extends Controller
             $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
 
             dd($chat->users);
-            $allEmployeesFromRelatedOrders->filter(fn ($employee) => )
+//            $allEmployeesFromRelatedOrders->filter(fn ($employee) => )l
         }
 
         return view('chat.show', [
