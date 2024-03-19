@@ -265,6 +265,7 @@
                                 'class'            => 'bg-info alert alert-info',
                             ])
                         @endif
+                        okej
 
                         @if($userType == MessagesHelper::TYPE_USER)
                             <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST">
