@@ -54,8 +54,7 @@
         <div class="container" id="flex-container">
             <h1>
                 Jeśli chcesz zaaktualizować swoją ofertę dotyczącą przetargu kliknij
-                {{dd($userId)}}
-                <a class="btn btn-primary" href="{{ $chat->auctions->first()?->firms->where('firm_id', $userId)->first()?->token }}">
+                <a class="btn btn-primary" href="{{ $chat->auctions->first()?->firms->whereHas('employees', function ($q) { $q->find($userId); })->first()?->token }}">
                     Tutaj
                 </a>
             </h1>
