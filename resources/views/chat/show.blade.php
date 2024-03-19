@@ -204,65 +204,65 @@
                 @if($chat->complaint_form)
                     <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-primary call-button">Pokaż formularz reklamacyjny</button>
                 @endif
-                <h3>Użytkownicy:</h3>
-                <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
-                    <table id="chat-users">
-                        @include('chat/users', [
-                            'title'            => 'Klienci:',
-                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
-                            'users'            => $chatCustomers,
-                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => false,
-                            'class'            => 'bg-warning alert alert-warning',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Pracownicy firm:',
-                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
-                            'users'            => $chatEmployees,
-                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => false,
-                            'class'            => 'bg-info alert alert-info',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Konsultanci:',
-                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',
-                            'users'            => $chatConsultants,
-                            'userType'         => MessagesHelper::TYPE_USER,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => false,
-                            'class'            => 'bg-primary alert',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Powiązani klienci:',
-                            'isEmptyMsg'       => 'Brak powiązanych klientów',
-                            'users'            => $possibleCustomers,
-                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => true,
-                            'class'            => 'bg-warning alert alert-warning',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Powiązani pracownicy firm:',
-                            'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
-                            'users'            => $possibleEmployees,
-                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => true,
-                            'class'            => 'bg-info alert alert-info',
-                        ])
-                        @if($chat->auctions()->count() > 0)
-                            @include('chat/users', [
-                                'title'            => 'Pracownicy firm uczestniczących w przetargu:',
-                                'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
-                                'users'            => $allEmployeesFromRelatedOrders ?? new \Illuminate\Support\Collection(),
-                                'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                                'currentUserType'  => $userType,
-                                'arePossibleUsers' => true,
-                                'class'            => 'bg-info alert alert-info',
-                            ])
-                        @endif
+{{--                <h3>Użytkownicy:</h3>--}}
+{{--                <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">--}}
+{{--                    <table id="chat-users">--}}
+{{--                        @include('chat/users', [--}}
+{{--                            'title'            => 'Klienci:',--}}
+{{--                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',--}}
+{{--                            'users'            => $chatCustomers,--}}
+{{--                            'userType'         => MessagesHelper::TYPE_CUSTOMER,--}}
+{{--                            'currentUserType'  => $userType,--}}
+{{--                            'arePossibleUsers' => false,--}}
+{{--                            'class'            => 'bg-warning alert alert-warning',--}}
+{{--                        ])--}}
+{{--                        @include('chat/users', [--}}
+{{--                            'title'            => 'Pracownicy firm:',--}}
+{{--                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',--}}
+{{--                            'users'            => $chatEmployees,--}}
+{{--                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,--}}
+{{--                            'currentUserType'  => $userType,--}}
+{{--                            'arePossibleUsers' => false,--}}
+{{--                            'class'            => 'bg-info alert alert-info',--}}
+{{--                        ])--}}
+{{--                        @include('chat/users', [--}}
+{{--                            'title'            => 'Konsultanci:',--}}
+{{--                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',--}}
+{{--                            'users'            => $chatConsultants,--}}
+{{--                            'userType'         => MessagesHelper::TYPE_USER,--}}
+{{--                            'currentUserType'  => $userType,--}}
+{{--                            'arePossibleUsers' => false,--}}
+{{--                            'class'            => 'bg-primary alert',--}}
+{{--                        ])--}}
+{{--                        @include('chat/users', [--}}
+{{--                            'title'            => 'Powiązani klienci:',--}}
+{{--                            'isEmptyMsg'       => 'Brak powiązanych klientów',--}}
+{{--                            'users'            => $possibleCustomers,--}}
+{{--                            'userType'         => MessagesHelper::TYPE_CUSTOMER,--}}
+{{--                            'currentUserType'  => $userType,--}}
+{{--                            'arePossibleUsers' => true,--}}
+{{--                            'class'            => 'bg-warning alert alert-warning',--}}
+{{--                        ])--}}
+{{--                        @include('chat/users', [--}}
+{{--                            'title'            => 'Powiązani pracownicy firm:',--}}
+{{--                            'isEmptyMsg'       => 'Brak powiązanych pracowników firm',--}}
+{{--                            'users'            => $possibleEmployees,--}}
+{{--                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,--}}
+{{--                            'currentUserType'  => $userType,--}}
+{{--                            'arePossibleUsers' => true,--}}
+{{--                            'class'            => 'bg-info alert alert-info',--}}
+{{--                        ])--}}
+{{--                        @if($chat->auctions()->count() > 0)--}}
+{{--                            @include('chat/users', [--}}
+{{--                                'title'            => 'Pracownicy firm uczestniczących w przetargu:',--}}
+{{--                                'isEmptyMsg'       => 'Brak powiązanych pracowników firm',--}}
+{{--                                'users'            => $allEmployeesFromRelatedOrders ?? new \Illuminate\Support\Collection(),--}}
+{{--                                'userType'         => MessagesHelper::TYPE_EMPLOYEE,--}}
+{{--                                'currentUserType'  => $userType,--}}
+{{--                                'arePossibleUsers' => true,--}}
+{{--                                'class'            => 'bg-info alert alert-info',--}}
+{{--                            ])--}}
+{{--                        @endif--}}
 
                         @if($userType == MessagesHelper::TYPE_USER)
                             <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST">
