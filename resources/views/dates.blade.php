@@ -15,7 +15,6 @@
         </tbody>
     </table>
 </div>
-
 <!-- Modify Date Modal -->
 <div class="modal fade" id="modifyDateModal" tabindex="-1" role="dialog" aria-labelledby="modifyDateModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">

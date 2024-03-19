@@ -52,6 +52,12 @@
 <body>
     <div>
         <div class="container" id="flex-container">
+            <h1>
+                Jeśli chcesz zaaktualizować swoją ofertę dotyczącą przetargu kliknij
+                <a class="btn btn-primary" href="{{ $chat }}">
+                    Tutaj
+                </a>
+            </h1>
             <div id="chat-container">
                 <div class="text-center alert alert-info">{!! $title !!}</div>
                 @if($chat->questions_tree && $userType === MessagesHelper::TYPE_USER)
