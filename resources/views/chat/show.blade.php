@@ -216,24 +216,24 @@
                             'arePossibleUsers' => false,
                             'class'            => 'bg-warning alert alert-warning',
                         ])
-                        @include('chat/users', [
-                            'title'            => 'Pracownicy firm:',
-                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
-                            'users'            => $chatEmployees,
-                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => false,
-                            'class'            => 'bg-info alert alert-info',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Konsultanci:',
-                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',
-                            'users'            => $chatConsultants,
-                            'userType'         => MessagesHelper::TYPE_USER,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => false,
-                            'class'            => 'bg-primary alert',
-                        ])
+{{--                        @include('chat/users', [--}}
+{{--                            'title'            => 'Pracownicy firm:',--}}
+{{--                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',--}}
+{{--                            'users'            => $chatEmployees,--}}
+{{--                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,--}}
+{{--                            'currentUserType'  => $userType,--}}
+{{--                            'arePossibleUsers' => false,--}}
+{{--                            'class'            => 'bg-info alert alert-info',--}}
+{{--                        ])--}}
+{{--                        @include('chat/users', [--}}
+{{--                            'title'            => 'Konsultanci:',--}}
+{{--                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',--}}
+{{--                            'users'            => $chatConsultants,--}}
+{{--                            'userType'         => MessagesHelper::TYPE_USER,--}}
+{{--                            'currentUserType'  => $userType,--}}
+{{--                            'arePossibleUsers' => false,--}}
+{{--                            'class'            => 'bg-primary alert',--}}
+{{--                        ])--}}
 {{--                        @include('chat/users', [--}}
 {{--                            'title'            => 'Powiązani klienci:',--}}
 {{--                            'isEmptyMsg'       => 'Brak powiązanych klientów',--}}
