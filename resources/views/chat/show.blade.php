@@ -59,7 +59,7 @@
                         $q->where('id', $userId);
                     })->first();
                 @endphp
-                <a class="btn btn-primary" href="{{ $chat->auctions->first()?->firms()->where('id', $firm->id)->first()?->token }}">
+                <a class="btn btn-primary" href="{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
                     Tutaj
                 </a>
             </h1>
