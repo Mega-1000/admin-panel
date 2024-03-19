@@ -20,6 +20,7 @@ class ChatAuction extends Model
      * @property integer $chat_id
      * @property Chat $chat
      * @property bool $confirmed
+     * @property string $notes
      */
 
     protected $fillable = [
@@ -29,6 +30,7 @@ class ChatAuction extends Model
         'quality',
         'chat_id',
         'confirmed',
+        'notes',
     ];
 
     /**
