@@ -277,7 +277,7 @@
                             </button>
                         </form>
 
-                        @if($userType == MessagesHelper::TYPE_USER)
+{{--                        @if($userType == MessagesHelper::TYPE_USER)--}}
                             <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST">
                                 @csrf
 
@@ -291,7 +291,7 @@
                                     Dodaj firm
                                 </button>
                             </form>
-                        @endif
+{{--                        @endif--}}
                     </table>
                 </div>
                 @if ($userType == MessagesHelper::TYPE_USER)
