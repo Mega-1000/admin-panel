@@ -310,14 +310,14 @@ class MessagesController extends Controller
         return redirect()->back();
     }
 
-    public function addUsersFromCompanyToAuction(Chat $chat, Request $request, ChatAuctionFirms $chatAuctionFirmsRepository): RedirectResponse
+    public function addUsersFromCompanyToAuction(Chat $chat, Request $request, ChatAuctionsService $chatAuctionsService): RedirectResponse
     {
         $auction = $chat->auctions->first();
         $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
 
         Mailer::create()
             ->to('antoniwoj@o2.pl')
-            ->send(new NotifyFirmAboutAuction($auction, $company, $chatAuctionFirmsRepository->generateLinkForAuction($auction, $company, 'antoniwoj@o2.pl')));
+            ->send(new NotifyFirmAboutAuction($auction, $company, $chatAuctionsService->generateLinkForAuction($auction, $company, 'antoniwoj@o2.pl')));
 
         return redirect()->back();
     }
