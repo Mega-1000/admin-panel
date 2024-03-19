@@ -204,7 +204,7 @@
                 @if($chat->complaint_form)
                     <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-primary call-button">Pokaż formularz reklamacyjny</button>
                 @endif
-{{--                <h3>Użytkownicy:</h3>--}}
+                <h3>Użytkownicy:</h3>
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
                         @include('chat/users', [
@@ -253,7 +253,7 @@
                             'arePossibleUsers' => true,
                             'class'            => 'bg-info alert alert-info',
                         ])
-                        @if($chat->auctions()->count() > 0)
+                        @if($userType == MessagesHelper::TYPE_USER)
                             @include('chat/users', [
                                 'title'            => 'Pracownicy firm uczestniczących w przetargu:',
                                 'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
