@@ -207,6 +207,7 @@
 {{--                <h3>Użytkownicy:</h3>--}}
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
+                        Użytkownicy Aktualnie w chacie
                         @include('chat/users', [
                             'title'            => 'Klienci:',
                             'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
@@ -243,6 +244,7 @@
 {{--                            'arePossibleUsers' => true,--}}
 {{--                            'class'            => 'bg-warning alert alert-warning',--}}
 {{--                        ])--}}
+                        Użytkownicy do dodania:
                         @include('chat/users', [
                             'title'            => 'Powiązani pracownicy firm:',
                             'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
