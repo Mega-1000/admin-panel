@@ -234,15 +234,15 @@
                             'arePossibleUsers' => false,
                             'class'            => 'bg-primary alert',
                         ])
-                        @include('chat/users', [
-                            'title'            => 'Powiązani klienci:',
-                            'isEmptyMsg'       => 'Brak powiązanych klientów',
-                            'users'            => $possibleCustomers,
-                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => true,
-                            'class'            => 'bg-warning alert alert-warning',
-                        ])
+{{--                        @include('chat/users', [--}}
+{{--                            'title'            => 'Powiązani klienci:',--}}
+{{--                            'isEmptyMsg'       => 'Brak powiązanych klientów',--}}
+{{--                            'users'            => $possibleCustomers,--}}
+{{--                            'userType'         => MessagesHelper::TYPE_CUSTOMER,--}}
+{{--                            'currentUserType'  => $userType,--}}
+{{--                            'arePossibleUsers' => true,--}}
+{{--                            'class'            => 'bg-warning alert alert-warning',--}}
+{{--                        ])--}}
                         @include('chat/users', [
                             'title'            => 'Powiązani pracownicy firm:',
                             'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
