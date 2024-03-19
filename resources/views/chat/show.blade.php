@@ -52,18 +52,6 @@
 <body>
     <div>
         <div class="container" id="flex-container">
-            <h1>
-                Jeśli chcesz zaaktualizować swoją ofertę dotyczącą przetargu kliknij
-                @php
-                    $firm = App\Entities\Firm::whereHas('employees', function ($q) use ($userId) {
-                        $q->where('id', $userId);
-                    })->first();
-
-                @endphp
-                <a class="btn btn-primary" href="{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
-                    Tutaj
-                </a>
-            </h1>
             <div id="chat-container">
                 <div class="text-center alert alert-info">{!! $title !!}</div>
                 @if($chat->questions_tree && $userType === MessagesHelper::TYPE_USER)
@@ -80,6 +68,18 @@
                 @if (!empty($faq))
                     <div class="alert-info alert"><b>FAQ:</b> <br>{!! implode('<br/>', $faq) !!}</div>
                 @endif
+                <h1>
+                    Jeśli chcesz zaaktualizować swoją ofertę dotyczącą przetargu kliknij
+                    @php
+                        $firm = App\Entities\Firm::whereHas('employees', function ($q) use ($userId) {
+                            $q->where('id', $userId);
+                        })->first();
+
+                    @endphp
+                    <a class="btn btn-primary" href="/auctions/offer/create/{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
+                        Tutaj
+                    </a>
+                </h1>
                 @if($isStyropian)
                     <div class="mb-4 alert alert-warning">
                         @if($chat->auctions->count() === 0)
