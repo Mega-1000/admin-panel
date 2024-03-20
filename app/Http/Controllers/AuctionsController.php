@@ -352,7 +352,7 @@ class AuctionsController extends Controller
 
         $companies = [];
         foreach ($products as $product) {
-            $product = OrderItem::find($product->productId);
+            $product = Product::find($product->productId);
             // prices are taken from offersorder_item_id
             dd($product);
             $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
