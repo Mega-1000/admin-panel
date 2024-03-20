@@ -384,6 +384,17 @@ class MessagesHelper
             } else {
                 $this->setChatLabel($chat, false, $area);
             }
+
+            if ($this->currentUserType === self::TYPE_EMPLOYEE) {
+                $loopPrevention = [];
+                AddLabelService::addLabels(
+                    $chat->order,
+                    [144],
+                    $loopPrevention,
+                    [],
+                    Auth::user()?->id
+                );
+            }
             if ($this->currentUserType == self::TYPE_CUSTOMER) {
                 $loopPrevention = [];
                 AddLabelService::addLabels(
