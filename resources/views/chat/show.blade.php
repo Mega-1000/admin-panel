@@ -366,54 +366,54 @@
         referrerpolicy="no-referrer"
     ></script>
     <script>
-        const askForPermision = () => {
-            Notification.requestPermission().then((permission) => {
-                if (permission !== "granted") {
-                    const browser = navigator.userAgent.toLowerCase();
+        // const askForPermision = () => {
+        //     Notification.requestPermission().then((permission) => {
+        //         if (permission !== "granted") {
+        //             const browser = navigator.userAgent.toLowerCase();
+        //
+        //             if (browser.indexOf('chrome') > -1) {
+        //                 window.location.href = 'https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DDesktop&hl=pl';
+        //             } else if (browser.indexOf('firefox') > -1) {
+        //                 window.location.href = 'https://support.mozilla.org/pl/kb/powiadomienia-web-push-firefox';
+        //             } else if (browser.indexOf('safari') > -1) {
+        //                 window.location.href = 'https://support.apple.com/pl-pl/guide/safari/sfri40734/mac';
+        //             } else if (browser.indexOf('opera') > -1) {
+        //                 window.location.href = 'https://help.opera.com/pl/latest/web-preferences/';
+        //             } else if (browser.indexOf('edge') > -1) {
+        //                 window.location.href = 'https://support.microsoft.com/pl-pl/microsoft-edge/zarz%C4%85dzanie-powiadomieniami-witryn-internetowych-w-przegl%C4%85darce-microsoft-edge-0c555609-5bf2-479d-a59d-fb30a0b80b2b';
+        //             } else {
+        //                 alert('Nie udało się wykryć przeglądarki');
+        //             }
+        //
+        //             return false;
+        //         }
+        //
+        //         document.querySelector('#bell-icon').src = '/svg/bell-icon.svg';
+        //         document.querySelector('#bell-icon').addEventListener('click', () => {
+        //             alert('Powiadomienia są włączone');
+        //         });
+        //     });
+        // }
 
-                    if (browser.indexOf('chrome') > -1) {
-                        window.location.href = 'https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DDesktop&hl=pl';
-                    } else if (browser.indexOf('firefox') > -1) {
-                        window.location.href = 'https://support.mozilla.org/pl/kb/powiadomienia-web-push-firefox';
-                    } else if (browser.indexOf('safari') > -1) {
-                        window.location.href = 'https://support.apple.com/pl-pl/guide/safari/sfri40734/mac';
-                    } else if (browser.indexOf('opera') > -1) {
-                        window.location.href = 'https://help.opera.com/pl/latest/web-preferences/';
-                    } else if (browser.indexOf('edge') > -1) {
-                        window.location.href = 'https://support.microsoft.com/pl-pl/microsoft-edge/zarz%C4%85dzanie-powiadomieniami-witryn-internetowych-w-przegl%C4%85darce-microsoft-edge-0c555609-5bf2-479d-a59d-fb30a0b80b2b';
-                    } else {
-                        alert('Nie udało się wykryć przeglądarki');
-                    }
-
-                    return false;
-                }
-
-                document.querySelector('#bell-icon').src = '/svg/bell-icon.svg';
-                document.querySelector('#bell-icon').addEventListener('click', () => {
-                    alert('Powiadomienia są włączone');
-                });
-            });
-        }
-
-        Notification.requestPermission().then((permission) => {
-            if (permission !== "granted") {
-                const bellIcon = document.getElementById('bell-icon');
-                bellIcon.addEventListener('click', () => {
-                    askForPermision();
-                });
-
-                bellIcon.src = '/svg/bell-red-icon.svg';
-
-                alert('Prosimy o włączenie powiadomień w przeglądarce');
-                alert('Kliknij w inkonę dzwonka, aby dowiedzieć się więcej');
-
-                return false;
-            }
-
-            document.querySelector('#bell-icon').addEventListener('click', () => {
-                alert('Powiadomienia są włączone');
-            });
-        });
+        // Notification.requestPermission().then((permission) => {
+        //     if (permission !== "granted") {
+        //         const bellIcon = document.getElementById('bell-icon');
+        //         bellIcon.addEventListener('click', () => {
+        //             askForPermision();
+        //         });
+        //
+        //         bellIcon.src = '/svg/bell-red-icon.svg';
+        //
+        //         alert('Prosimy o włączenie powiadomień w przeglądarce');
+        //         alert('Kliknij w inkonę dzwonka, aby dowiedzieć się więcej');
+        //
+        //         return false;
+        //     }
+        //
+        //     document.querySelector('#bell-icon').addEventListener('click', () => {
+        //         alert('Powiadomienia są włączone');
+        //     });
+        // });
 
             $(document).ready(function() {
                 $(function () {
