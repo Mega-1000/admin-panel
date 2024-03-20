@@ -10,6 +10,7 @@ use App\Entities\ChatAuctionFirm;
 use App\Entities\ChatAuctionOffer;
 use App\Entities\Firm;
 use App\Entities\Order;
+use App\Entities\OrderItem;
 use App\Entities\Product;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
@@ -351,8 +352,9 @@ class AuctionsController extends Controller
 
         $companies = [];
         foreach ($products as $product) {
-            $product = Product::find($product->productId);
+            $product = OrderItem::find($product->productId);
             // prices are taken from offersorder_item_id
+            dd($product);
             $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
                 ->where('order_item_id', $order->items()?->where('product_id', $product?->id)?->first()?->id)
                 ->first();
