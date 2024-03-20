@@ -453,7 +453,7 @@ class MessagesHelper
 
     public function sendDateAcceptationMessage(Chat $chat): void
     {
-        $content = 'Daty zostały finalnie zatwierdzone.';
+        $content = 'Daty proponowane przez klienta i realizatora są zgodne i zostały finalnie zawierdzone.';
         $blankChatUser = $this->createOrGetBlankUser($chat);
         $this->chatId = $chat->id;
 
