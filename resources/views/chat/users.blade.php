@@ -1,10 +1,10 @@
 <tr>
 {{--    <th colspan="2" style="height: {{ $users->isEmpty() ? '40px' : '20px'}}; padding-top: 15px;">{{ $title }}--}}
-        @if (collect($users)->isEmpty())
-            <p colspan="2" style="font-weight: 400;">
-                {{ $isEmptyMsg }}
-            </p>
-        @endif
+{{--        @if (collect($users)->isEmpty())--}}
+{{--            <p colspan="2" style="font-weight: 400;">--}}
+{{--                {{ $isEmptyMsg }}--}}
+{{--            </p>--}}
+{{--        @endif--}}
     </th>
 </tr>
 @foreach ($users as $user)
