@@ -238,25 +238,24 @@
                             'arePossibleUsers' => false,
                             'class'            => 'bg-info alert alert-info',
                         ])
-{{--                        @include('chat/users', [--}}
-{{--                            'title'            => 'Konsultanci:',--}}
-{{--                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',--}}
-{{--                            'users'            => $chatConsultants,--}}
-{{--                            'userType'         => MessagesHelper::TYPE_USER,--}}
-{{--                            'currentUserType'  => $userType,--}}
-{{--                            'arePossibleUsers' => false,--}}
-{{--                            'class'            => 'bg-primary alert',--}}
-{{--                        ])--}}
-{{--                        @include('chat/users', [--}}
-{{--                            'title'            => 'Powiązani klienci:',--}}
-{{--                            'isEmptyMsg'       => 'Brak powiązanych klientów',--}}
-{{--                            'users'            => $possibleCustomers,--}}
-{{--                            'userType'         => MessagesHelper::TYPE_CUSTOMER,--}}
-{{--                            'currentUserType'  => $userType,--}}
-{{--                            'arePossibleUsers' => true,--}}
-{{--                            'class'            => 'bg-warning alert alert-warning',--}}
-{{--                        ])--}}
-                        Użytkownicy do dodania:
+                        @include('chat/users', [
+                            'title'            => 'Konsultanci:',
+                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',
+                            'users'            => $chatConsultants,
+                            'userType'         => MessagesHelper::TYPE_USER,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => false,
+                            'class'            => 'bg-primary alert',
+                        ])
+                        @include('chat/users', [
+                            'title'            => 'Powiązani klienci:',
+                            'isEmptyMsg'       => 'Brak powiązanych klientów',
+                            'users'            => $possibleCustomers,
+                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => true,
+                            'class'            => 'bg-warning alert alert-warning',
+                        ])
                         @include('chat/users', [
                             'title'            => 'Powiązani pracownicy firm:',
                             'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
