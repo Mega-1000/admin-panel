@@ -348,13 +348,11 @@ class AuctionsController extends Controller
         $orderBuilder = OrderBuilderFactory::create();
         $order = Order::find($auction->chat->order->id);
 
-//        $order->items()->delete();
+        $order->items()->delete();
 
         $companies = [];
         foreach ($products as $product) {
             $product = Product::find($product->productId);
-            // prices are taken from offersorder_item_id
-            dd($product);
             $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
                 ->where('order_item_id', $order->items()?->where('product_id', $product?->id)?->first()?->id)
                 ->first();
