@@ -9,6 +9,7 @@
     <div class='{{ $message->user() ? 'col-sm-12' : 'col-sm-10' }}'>
         <div
             class="{{ $message->customer() ? 'text-right alert-warning' : ($message->user() ? 'text-left bg-primary' : 'text-left alert-info') }} alert">
+            {{ $message->customer() ? '' : ($message->user() ? '' : 'Powiadomienie systemowe') }}
             @if ($message->customer())
                 <strong> {!! $header !!} </strong> [{{ $message->created_at }}]
             @else

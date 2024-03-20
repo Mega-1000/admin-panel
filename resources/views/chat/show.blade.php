@@ -75,9 +75,8 @@
                             $firm = App\Entities\Firm::whereHas('employees', function ($q) use ($userId) {
                                 $q->where('id', $userId);
                             })->first();
-
                         @endphp
-                        <a class="btn btn-primary" href="/auctions/offer/create/{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
+                        <a class="btn btn-primary" target="_blank" href="/auctions/offer/create/{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
                             Kliknij tutaj aby zmienić ceny
                         </a>
                     </h1>
