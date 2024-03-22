@@ -80,6 +80,7 @@ class ProductsController extends Controller
                 'value_of_price_change_data_second' => $product->value_of_price_change_data_second ?: 0,
                 'value_of_price_change_data_third' => $product->value_of_price_change_data_third ?: 0,
                 'value_of_price_change_data_fourth' => $product->value_of_price_change_data_fourth ?: 0,
+                'order' => $product->order ?: 0,
             ];
 
             if ($product->text_price_change_data_first != null) {
