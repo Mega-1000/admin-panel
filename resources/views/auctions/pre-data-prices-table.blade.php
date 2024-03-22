@@ -89,7 +89,10 @@
                 @endphp
 
                 @php
-                    $items->sortByDesc('order');
+                    $sortedItems = $items->sortByDesc('order')->reject(function ($item) {
+                        return $item['order'] === null || $item['order'] === "?";
+                    });
+
 
                     $groupedItems = [];
                     $eanMapping = []; // Assuming this array maps prefixes to their ean_of_collective_packing
@@ -164,9 +167,6 @@
                     @endphp
 
                     @foreach($groupedItems as $prefix => $suffixes)
-                        @php
-                        @endphp
-
                         @foreach($suffixes as $suffix)
                             @php
                                 // Retrieve the price from the groupedPrices array
