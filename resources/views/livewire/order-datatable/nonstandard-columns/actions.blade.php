@@ -21,9 +21,11 @@
     <span class="hidden-xs hidden-sm">Zwrot</span>
 </a>
 
-<a href="/admin/allegro/return-payment/{{ $order['id'] }}" class="btn btn-sm btn-danger edit">
-    <i class="glyphicon glyphicon-share-alt"></i>
-    <span class="hidden-xs hidden-sm">Zwrot Allegro</span>
+@php
+    App\Entities\Order::find($order['id'])->chat?->users()->where('user_id', Auth::id())->first()?->pivot?->token
+@endphp
+<a href="/admin/allegro/return-payment/{{ $order['id'] }}" class="btn btn-sm btn-primary edit">
+    <span class="hidden-xs hidden-sm">Chat</span>
 </a>
 
 @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === User::ORDER_DELETE_USER)
