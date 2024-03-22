@@ -98,8 +98,11 @@
                         $groupedItems[$prefix][] = $suffix;
                     }
 
-                    // At this point, $groupedItems is sorted based on ean_of_collective_packing as determined by $eanMapping
+                    function compareOrder($a, $b) {
+                        return $a->order - $b->order;
+                    }
 
+                    usort($items, 'compareOrder');
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
