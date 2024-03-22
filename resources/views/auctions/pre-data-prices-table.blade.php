@@ -165,7 +165,6 @@
 
                     @foreach($groupedItems as $prefix => $suffixes)
                         @php
-                            natsort($suffixes)
                         @endphp
 
                         @foreach($suffixes as $suffix)
