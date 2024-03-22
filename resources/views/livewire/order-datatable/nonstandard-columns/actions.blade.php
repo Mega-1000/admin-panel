@@ -24,7 +24,7 @@
 @php
     $messagesHelper = new App\Helpers\MessagesHelper();
     $order['id'] = $order['id'] ?? 0;
-    $messagesHelper->chatId = \App\Entities\Order::find($order['id'])->chat->id;
+    $messagesHelper->chatId = \App\Entities\Order::find($order['id'])?->chat?->id;
     $token = $messagesHelper->getChatToken($order['id'], auth()->id());
 @endphp
 <a href="/chat/{{ $token }}" target="_blank" class="btn btn-sm btn-primary edit">
