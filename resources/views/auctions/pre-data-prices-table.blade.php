@@ -89,7 +89,7 @@
                 @endphp
 
                 @php
-                    $items = $items->sortByAsc('order')->reject(function ($item) {
+                    $items = $items->sortBy('order')->reject(function ($item) {
                         return $item['order'] === null || $item['order'] === "?";
                     });
 
