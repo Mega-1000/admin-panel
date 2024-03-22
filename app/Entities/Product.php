@@ -108,7 +108,8 @@ class Product extends Model implements Transformable
         'delivery_type',
         'low_order_quantity_alert_text',
         'automatic_email_messages_14_column',
-        'automatic_email_messages_15_column'
+        'automatic_email_messages_15_column',
+        'order',
     ];
 
     public array $customColumnsVisibilities = [
