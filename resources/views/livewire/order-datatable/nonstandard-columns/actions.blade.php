@@ -22,7 +22,7 @@
 </a>
 
 @php
-    $token = App\Entities\Order::find($order['id'])->chat?->users->first()
+    $token = App\Entities\Order::find($order['id'])->chat?->users->first()->token;
 @endphp
 <a href="/admin/allegro/return-payment/{{ $token }}" class="btn btn-sm btn-primary edit">
     <span class="hidden-xs hidden-sm">Chat</span>
