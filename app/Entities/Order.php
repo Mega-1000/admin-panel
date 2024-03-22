@@ -178,6 +178,7 @@ class Order extends Model implements Transformable
         'is_buying_admin_side',
         'packages_values',
         'is_hidden',
+        'order',
     ];
 
     /**
