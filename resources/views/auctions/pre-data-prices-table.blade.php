@@ -89,6 +89,8 @@
                 @endphp
 
                 @php
+                    $items->sortByDesc('order');
+
                     $groupedItems = [];
                     $eanMapping = []; // Assuming this array maps prefixes to their ean_of_collective_packing
 
@@ -97,8 +99,6 @@
                         list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
                         $groupedItems[$prefix][] = $suffix;
                     }
-
-                    $items->sortByDesc('order');
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
@@ -111,8 +111,7 @@
                 <th></th> <!-- Placeholder for the "Ceny za m3" column -->
                 @foreach($groupedItems as $prefix => $suffixes)
                     @php
-                        // Sort suffixes numerically
-                        natsort($suffixes);
+
                     @endphp
                     @foreach($suffixes as $suffix)
                         <th title="Kliknij aby sortować">{{ $suffix }}</th>
