@@ -98,11 +98,7 @@
                         $groupedItems[$prefix][] = $suffix;
                     }
 
-                    function compareOrder($a, $b) {
-                        return $a->order - $b->order;
-                    }
-
-                    usort($items, 'compareOrder');
+                    $items->sortByDesc('order');
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
