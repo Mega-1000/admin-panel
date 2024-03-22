@@ -34,6 +34,7 @@ class OrderLabelHelper {
 
     public static function setBlueLabel(Chat $chat): void
     {
+        dd('setBlueLabel');
         $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID, 144);
         if ($chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_BLUE_LABEL_ID)->count() == 0) {
             $chat->order->labels()->attach(MessagesHelper::MESSAGE_BLUE_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
