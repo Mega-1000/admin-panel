@@ -89,10 +89,9 @@
                 @endphp
 
                 @php
-                    $sortedItems = $items->sortByDesc('order')->reject(function ($item) {
+                    $items = $items->sortByDesc('order')->reject(function ($item) {
                         return $item['order'] === null || $item['order'] === "?";
                     });
-
 
                     $groupedItems = [];
                     $eanMapping = []; // Assuming this array maps prefixes to their ean_of_collective_packing
