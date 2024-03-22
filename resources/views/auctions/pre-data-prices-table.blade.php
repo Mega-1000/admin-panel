@@ -206,8 +206,7 @@
 
                 // Toggle the sort state for this column
                 if (sortState === 'asc') {
-                    $(this).data('sortState', 'desc');
-                    $(this).html($(this).html().replace(' ↓', ' ↑')); // Adjust if using different indicators
+                    return
                 } else {
                     $(this).data('sortState', 'asc');
                     $(this).html($(this).html().replace(' ↑', ' ↓')); // Adjust if using different indicators
