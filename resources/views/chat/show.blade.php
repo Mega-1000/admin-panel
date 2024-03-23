@@ -853,21 +853,8 @@
                     displayKey = 'Magazyn'
                 }
 
-                @if($order->items->first()->product->variation_group !== 'styropiany')
-
-                // Delivery date row
                 html += '<tr>' +
-                    '<td>Proponowana data wysyłki (' + displayKey + ')</td>' +
-                    '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
-                    '<td>' + (date.delivery_date_to || 'N/A') + '</td>' +
-                    (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'delivery\', \'' + (date.delivery_date_from || '') + '\', \'' + (date.delivery_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
-                    (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'delivery\', \'' + key + '\')">Akceptuj</div></td>' : '') +
-                    '</tr>';
-                @endif
-
-                // Shipment date row
-                html += '<tr>' +
-                    '<td>Proponowana data dostawy (' + displayKey + ')</td>' +
+                    '<td>Proponowana data wysyłki dla styropianów również dostawy (' + displayKey + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
