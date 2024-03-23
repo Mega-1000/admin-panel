@@ -282,7 +282,7 @@
                                 @csrf
 
                                 <h2>
-                                    Dodaj firmę
+                                    Dodaj firmę do chata
                                 </h2>
 
                                 <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy">
