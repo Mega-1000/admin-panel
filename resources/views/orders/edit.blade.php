@@ -653,40 +653,6 @@
                     @endforeach
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="panel panel-dark panel-collapse">
-                        <div class="panel-heading text-center text-white" style="padding: 5px; color:white;">
-                            <h5 class="panel-title"
-                                data-toggle="collapse"
-                                data-target="#collapseDates">
-                                Preferowane daty wysyłki
-                            </h5>
-                        </div>
-                        <div class="panel-collapse collapse" id="collapseDates">
-                            <div class="panel-body" style="padding:1em">
-                                <div class="col-sm-8">
-                                    @include('dates')
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="col-md-12">
-                                        <div class="form-group row">
-                                            <label class="col-md-8"
-                                                   for="initial_sending_date_consultant">@lang('orders.form.initial_sending_date_consultant')</label>
-                                            <div class="col-md-4">
-                                                <input type="text" class="form-control default-date-picker-now"
-                                                       id="initial_sending_date_consultant"
-                                                       name="initial_sending_date_consultant"
-                                                       value="{{ $order->shipment_date }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-7 chat-preview">
