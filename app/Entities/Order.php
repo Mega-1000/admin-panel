@@ -178,6 +178,8 @@ class Order extends Model implements Transformable
         'is_buying_admin_side',
         'packages_values',
         'is_hidden',
+        'start_of_spedition_period_sent',
+        'near_end_of_spedition_period_sent'
     ];
 
     /**
