@@ -37,6 +37,7 @@ use App\Http\Requests\ScheduleOrderReminderRequest;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\SendReminderAboutOfferJob;
+use App\Jobs\SendSpeditionNotifications;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
@@ -785,6 +786,8 @@ class OrdersController extends Controller
             $order->date_accepted = false;
             $order->save();
         }
+
+        dispatch_now(new SendSpeditionNotifications());
 
         if ($result) {
             $order->dates->refresh();
