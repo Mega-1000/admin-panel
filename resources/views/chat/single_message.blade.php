@@ -8,7 +8,8 @@
     @endif
     <div class='{{ $message->user() ? 'col-sm-12' : 'col-sm-10' }}'>
         <div
-            class="{{ $message->customer() ? 'text-right alert-warning' : ($message->user() ? 'text-left bg-primary' : 'text-left alert-info') }} alert" style="color: green">
+            class="{{ $message->customer() ? 'text-right alert-warning' : ($message->user() ? 'text-left bg-primary' : 'text-left alert-info') }} alert"
+            {{ $message->user() ? 'style="background-color: green"' : '' }}>
             <strong>{{ $message->customer() ? '' : ($message->user() ? '' : 'Wiadomość systemowa') }}</strong>
             @if ($message->customer())
                 <strong> {!! $header !!} </strong> [{{ $message->created_at }}]
