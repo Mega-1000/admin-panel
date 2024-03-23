@@ -276,6 +276,8 @@ class ProductsController extends Controller
             } else {
                 $category->blured = true;
             }
+
+            unset($category->products);
         }
 
         $allCategories = $allCategories->toArray();
