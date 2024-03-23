@@ -228,7 +228,7 @@ class ProductsController extends Controller
      */
     public function getCategoriesTree(): JsonResponse
     {
-        $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get()->toArray();
+        $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get();
 
         foreach ($allCategories as $category) {
             $products = $category->products;
@@ -273,10 +273,9 @@ class ProductsController extends Controller
             } else {
                 $category->blured = true;
             }
-
-
         }
 
+        $allCategories = $allCategories->toArray();
         $tree = $this->parseTree($allCategories);
 
         return response()->json($tree);
