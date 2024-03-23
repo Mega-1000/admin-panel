@@ -239,6 +239,9 @@ class ProductsController extends Controller
 
             $product = $products->first();
             $userZipCode = request()->query('zip-code');
+            if (!$userZipCode) {
+                continue;
+            }
 
             $deliveryAddressLatLon = PostalCodeLatLon::where('postal_code', $userZipCode)->first();
 
