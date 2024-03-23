@@ -854,7 +854,7 @@
                 }
 
                 html += '<tr>' +
-                    '<td>Proponowana data wysyłki dla styropianów również dostawy (' + displayKey + ')</td>' +
+                    '<td>Proponowana data wysyłki (dla styropianów dostawy) (' + displayKey + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
@@ -881,7 +881,6 @@
                 window.location.reload();
             })
         }
-
 
         window.showModifyDateModal = function(orderId, type, from, to, type11) {
             $('#orderId').val(orderId);
