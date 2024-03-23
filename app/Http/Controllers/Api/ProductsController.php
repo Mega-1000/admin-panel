@@ -239,7 +239,7 @@ class ProductsController extends Controller
 
             $product = $products->first();
             $userZipCode = request()->query('zip-code');
-            if (!$userZipCode) {
+            if (!$userZipCode && !$product?->firm) {
                 continue;
             }
 
