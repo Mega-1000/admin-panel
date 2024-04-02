@@ -226,7 +226,7 @@ class ProductsController extends Controller
     /**
      * @return ResponseFactory|Response
      */
-    public function getCategories(Request $request)
+    public function getCategoriesTree(Request $request)
     {
         $userZipCode = $request->query('zip-code');
 
