@@ -485,7 +485,7 @@
 
                         html += '<a href="/admin/warehouses/' + id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                        html += '<span class="hidden-xs hidden-sm">ww @lang('voyager.generic.edit')</span>';
                         html += '</a>';
 
                         html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordWarehouses(' + id + ')">';
