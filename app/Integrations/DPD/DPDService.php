@@ -23,9 +23,9 @@ class DPDService extends SoapClient
     {
         $config_file = __DIR__ . '/../config.php';
         $data = [
-            'fid' => '338556',
-            'username' => '33855601',
-            'password' => '7NxOOlh5LdNL6mez',
+            'fid' => '393841',
+            'username' => '39384101',
+            'password' => 'qVTaMBibTdwaFgTq',
             'wsdl' => 'https://dpdservices.dpd.com.pl/DPDPackageObjServicesService/DPDPackageObjServices?WSDL',
             'lang_code' => 'PL',
             'api_version' => 4,
