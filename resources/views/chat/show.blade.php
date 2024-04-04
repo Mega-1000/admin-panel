@@ -115,7 +115,7 @@
 
 
                                 <button class="btn btn-primary">
-                                    Zmień datę zakończenia przetargu
+                                    Zaaktualizuj daty dotyczące przetargu
                                 </button>
                             </form>
 
