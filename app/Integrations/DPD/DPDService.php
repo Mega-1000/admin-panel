@@ -21,6 +21,7 @@ class DPDService extends SoapClient
 
     public function __construct($fid = null, $username = null, $password = null, $wsdl = null, $lang = null)
     {
+
         $config_file = __DIR__ . '/../config.php';
         $data = [
             'fid' => '393841',
