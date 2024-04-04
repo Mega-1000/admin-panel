@@ -205,6 +205,7 @@ class ProductsController extends Controller
      */
     public function getProduct($id): JsonResponse
     {
+        $id = $id + 1;
         return response()->json(
             Products::getProductByIdWithPrices($id)
         );
