@@ -336,7 +336,6 @@ class OrderBuilder
                 if (empty($item['recalculate']) && isset($oldPrices[$product->id])) {
                     $orderItem->$column = $oldPrices[$product->id][$column];
                 } else {
-                    dd('okej');
                     if ($column === "gross_selling_price_commercial_unit") {
                         $orderItem->$column = !empty($item['gross_selling_price_commercial_unit']) ? $item['gross_selling_price_commercial_unit'] : $price->gross_price_of_packing;
                     } else {
