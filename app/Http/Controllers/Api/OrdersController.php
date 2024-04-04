@@ -597,10 +597,14 @@ class OrdersController extends Controller
             ->where('is_hidden', false)
             ->paginate(10);
 
+        $noAuction = $order->chat->auctions->count() === 0;
+
         foreach ($orders as $order) {
             $order->auctionCanBeCreated = $order->items->contains(function ($item) {
                 return $item->product->variation_group === "styropiany";
-            }) && $order->chat->auctions->count() === 0;
+            }) && $noAuction;
+
+            $order->isAuctionCreated = !$noAuction;
 
             $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
             $order->total_sum = $order->getSumOfGrossValues();
