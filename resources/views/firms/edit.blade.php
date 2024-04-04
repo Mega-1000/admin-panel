@@ -258,6 +258,12 @@
                             <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
                         </button>
                     </form>
+                    <form action="{{ route('employees.request-new-prices', $employee->id) }}" method="POST">
+                        {{ csrf_field() }}
+                        <button>
+                            Poproś o wysłanie aktualnego cennika
+                        </button>
+                    </form>
                 </td>
                 </tr>
 
@@ -485,7 +491,7 @@
 
                         html += '<a href="/admin/warehouses/' + id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm">ww @lang('voyager.generic.edit')</span>';
+                        html += '<span class="hidden-xs hidden-sm">@lang('voyager.generic.edit')</span>';
                         html += '</a>';
 
                         html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordWarehouses(' + id + ')">';

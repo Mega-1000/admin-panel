@@ -6,8 +6,10 @@ use App\Entities\Employee;
 use App\Entities\EmployeeRole;
 use App\Entities\PostalCodeLatLon;
 use App\Entities\Warehouse;
+use App\Facades\Mailer;
 use App\Http\Requests\EmployeeCreateRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
+use App\Mail\RequestNewPricesMail;
 use App\Repositories\EmployeeRepository;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -243,5 +245,16 @@ class EmployeesController extends Controller
             'message' => __('employees.message.change_status'),
             'alert-type' => 'success'
         ])->withInput(['tab' => 'employees']);
+    }
+
+    public function requestNewPrices($id): RedirectResponse
+    {
+        $employee = Employee::find($id);
+
+        Mailer::create()
+            ->to($employee->email)
+            ->send(new RequestNewPricesMail());
+
+        return redirect()->back();
     }
 }

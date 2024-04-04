@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\OrderDatatableColumnsManagementController;
 use App\Entities\OrderPackage;
 use App\Http\Controllers\AddLabelsCSVController;
@@ -244,6 +245,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('employees/create/{firm_id}', 'EmployeesController@create')->name('employees.create');
         Route::post('employees/store/{firm_id}', 'EmployeesController@store')->name('employees.store');
         Route::get('employees/{id}/edit', 'EmployeesController@edit')->name('employees.edit');
+        Route::post('send-email-about-required-prices-update/{id}', [EmployeesController::class, 'requestNewPrices'])->name('employees.request-new-prices');
         Route::put('employees/{id}/update', [
             'uses' => 'EmployeesController@update',
         ])->name('employees.update');
