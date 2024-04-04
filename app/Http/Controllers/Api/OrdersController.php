@@ -219,13 +219,14 @@ class OrdersController extends Controller
             } else {
                 $order->update(['status_id' => 3]);
             }
+            if (!$order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->exist()) {
+                dispatch_now(new OrderStatusChangedNotificationJob($order->id));
 
-            dispatch_now(new OrderStatusChangedNotificationJob($order->id));
-
-            $order->orderOffer()->firstOrNew([
-                'order_id' => $order->id,
-                'message' => Status::find(18)->message,
-            ]);
+                $order->orderOffer()->firstOrNew([
+                    'order_id' => $order->id,
+                    'message' => Status::find(18)->message,
+                ]);
+            }
 
             if ($order->created_at->format('Y-m-d H:i:s') === $order->updated_at->format('Y-m-d H:i:s')) {
                 dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
