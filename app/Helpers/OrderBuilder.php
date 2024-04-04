@@ -334,9 +334,9 @@ class OrderBuilder
             Log::info('Bazowe id produktu: ' . $product->id . ' oraz symbol' . $product->symbol . '. Wynikowe id produktu: ' . $orderItem->product_id);
             foreach (OrderBuilder::getPriceColumns() as $column) {
                 if (empty($item['recalculate']) && isset($oldPrices[$product->id])) {
-                    dd('ijeh');
                     $orderItem->$column = $oldPrices[$product->id][$column];
                 } else {
+                    dd('okej');
                     if ($column === "gross_selling_price_commercial_unit") {
                         $orderItem->$column = !empty($item['gross_selling_price_commercial_unit']) ? $item['gross_selling_price_commercial_unit'] : $price->gross_price_of_packing;
                     } else {
