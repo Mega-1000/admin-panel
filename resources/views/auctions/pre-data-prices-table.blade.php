@@ -175,7 +175,7 @@
 
                             <td>
                                 @if($price)
-                                    <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout" >
+                                    <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout" style="{{ $product->date_of_price_change < now() ? 'color: red;' : '' }}">
                                         {{ $price }}
                                     </a>
                                 @else
