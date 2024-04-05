@@ -252,7 +252,7 @@ class EmployeesController extends Controller
         $employee = Employee::find($id);
 
         Mailer::create()
-            ->to('antoniwoj@o2.pl')
+            ->to($employee->email)
             ->send(new RequestNewPricesMail());
 
         return redirect()->back();
