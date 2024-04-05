@@ -156,10 +156,6 @@
                                     ->where('name', 'like', '%' . $namePattern . '%')
                                     ->orderBy('date_of_price_change', 'desc') // Order by date_of_price_change in descending order
                                     ->first(); // Get the first result after ordering
-                                    if ($variation) {
-
-                                    dd($variation);
-                                    }
 
                                 // Store the price in the groupedPrices array, using the prefix and suffix as keys
                                 $groupedPrices[$prefix][$suffix] = [
@@ -180,7 +176,7 @@
 
                             <td>
                                 @if($price)
-                                    {{ $product->date_of_price_change }}
+                                    {{ $id }}
                                 {{ $product->id }}
                                     @php($dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change))
                                     <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout"
