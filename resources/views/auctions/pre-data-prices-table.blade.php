@@ -176,7 +176,7 @@
                             <td>
                                 @if($price)
                                     <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout"
-                                       {{ $product->date_of_price_change }}
+                                       {{ $product }}
                                        style="{{ \Carbon\Carbon::create($product->date_of_price_change) < now() ? 'color: red;' : '' }}">
                                         {{ $price }}
                                     </a>
