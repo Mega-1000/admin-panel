@@ -175,9 +175,9 @@
 
                             <td>
                                 @if($price)
-                                   {{ $product }} plek
+                                    @php($dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change))
                                     <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout"
-                                       style="{{ \Carbon\Carbon::create($product->date_of_price_change) < now() ? 'color: red;' : '' }}">
+                                       style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
                                         {{ $price }}
                                     </a>
                                 @else
