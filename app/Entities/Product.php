@@ -294,7 +294,7 @@ class Product extends Model implements Transformable
 
     public function getImageUrl()
     {
-        return str_replace("D:\\z\\", config('app.url') . 'storage/products/', $this->url);
+        return dd(str_replace("D:\\z\\", config('app.url') . $this->url_for_website));
     }
 
     public function getProducent()
