@@ -156,6 +156,7 @@
                                     ->where('name', 'like', '%' . $namePattern . '%')
                                     ->orderBy('date_of_price_change', 'desc') // Order by date_of_price_change in descending order
                                     ->first(); // Get the first result after ordering
+                                    dd($variation);
 
                                 // Store the price in the groupedPrices array, using the prefix and suffix as keys
                                 $groupedPrices[$prefix][$suffix] = [
