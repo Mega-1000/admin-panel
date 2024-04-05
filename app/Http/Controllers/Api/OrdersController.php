@@ -600,7 +600,7 @@ class OrdersController extends Controller
 
 
         foreach ($orders as $order) {
-            $noAuction = $order->chat->auctions->count() === 0;
+            $noAuction = $order->chat?->auctions->count() === 0;
 
             $order->auctionCanBeCreated = $order->items->contains(function ($item) {
                 return $item->product->variation_group === "styropiany";
