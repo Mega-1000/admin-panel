@@ -90,11 +90,10 @@ trait WithFilters
 
     public function applyFiltersFromQuery(): void
     {
-        dd('okej');
         foreach (Request::query() as $key => $value) {
             $key = str_replace('_', '.', $key);
 
-
+            dd($key);
             if (isset($this->filters[$key])) {
                 OrderDatatableColumn::where('label', $key)->first()->update(['filter' => $value]);
                 $this->anyFiltersApplied = true;
