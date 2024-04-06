@@ -203,20 +203,20 @@ class ProductsService
             ->paginate($this->getPerPage());
         $products->data = $products->items();
 
-        foreach($products->data as &$product) {
+        foreach ($products->data as &$product) {
             $zipCodeData = PostalCodeLatLon::where('postal_code', $zipCode)->first();
 
             if ($zipCodeData) {
                 $query = DB::selectOne(
                     'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
-                            POW(69.1 * (pc.latitude - :latitude), 2) +
-                            POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
-                            FROM postal_code_lat_lon pc
-                                 JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
-                                 JOIN warehouses w on wa.warehouse_id = w.id
-                            WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
-                            ORDER BY distance
-                        limit 1',
+                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                        FROM postal_code_lat_lon pc
+                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                             JOIN warehouses w on wa.warehouse_id = w.id
+                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                        ORDER BY distance
+                    limit 1',
                     [
                         'latitude' => $zipCodeData->latitude,
                         'longitude' => $zipCodeData->longitude,
@@ -245,7 +245,40 @@ class ProductsService
             }
         }
 
+        $products->data = array_map(function ($product) {
+            $priceString = $this->getPriceString($product);
+            return [
+                'name' => $product->name,
+                'symbol' => $product->symbol,
+                'price' => $priceString,
+            ];
+        }, $products->data);
+
         return $products;
+    }
+
+    private function getPriceString($product): ?string
+    {
+        $priceType = strtolower($product->price_type);
+        $price = false;
+        $unit = false;
+
+        if ($priceType === 'p') {
+            $price = $product->gross_selling_price_basic_unit;
+            $unit = $product->unit_basic;
+        } elseif ($priceType === 'h') {
+            $price = $product->gross_price_of_packing;
+            $unit = $product->unit_commercial;
+        } elseif ($priceType === 'o') {
+            $price = $product->gross_selling_price_calculated_unit;
+            $unit = $product->calculation_unit;
+        }
+
+        if ($price === 0 || !$unit) {
+            return null;
+        }
+
+        return sprintf('%s PLN / %s', $price, $unit);
     }
 
     public function prepareProductData(&$products): void
