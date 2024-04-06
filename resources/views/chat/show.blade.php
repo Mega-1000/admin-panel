@@ -287,8 +287,9 @@
 
                                 <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
                                 <datalist id="suggestions">
-                                    <option value="foo">
-                                    <option value="bar">
+                                    @foreach(\App\Entities\Firm::all() as $firm)
+                                        <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
+                                    @endforeach
                                 </datalist>
 
                                 <button type="submit" class="btn btn-primary"> <!-- Use type="submit" to submit the form -->
