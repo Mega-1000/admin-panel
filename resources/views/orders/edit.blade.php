@@ -1046,11 +1046,7 @@
                             </tr>
                             @foreach($productsVariation[$item->product->id] as $variation)
                                 <tr class="row-{{$variation['id']}}">
-                                    @php
-                                        $product = App\Entities\Product::find($variation['id']);
-                                    @endphp
-                                    @php($dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change))
-                                    <td style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
+                                    <td style="">
                                         {{$variation['name']}}
                                     </td>
                                     <td>
