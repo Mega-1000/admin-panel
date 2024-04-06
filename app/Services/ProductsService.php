@@ -201,7 +201,6 @@ class ProductsService
     {
         $products = Categories::getProductsForCategory($category)
             ->get();
-        $products = $products->items();
 
         foreach ($products as &$product) {
             $zipCodeData = PostalCodeLatLon::where('postal_code', $zipCode)->first();
