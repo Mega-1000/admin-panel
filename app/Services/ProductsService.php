@@ -256,19 +256,19 @@ class ProductsService
 
     private function getPriceString($product): ?string
     {
-        $priceType = strtolower($product->price_type);
+        $priceType = strtolower($product['price_type']);
         $price = false;
         $unit = false;
 
         if ($priceType === 'p') {
-            $price = $product->gross_selling_price_basic_unit;
-            $unit = $product->unit_basic;
+            $price = $product['gross_selling_price_basic_unit'];
+            $unit = $product['unit_basic'];
         } elseif ($priceType === 'h') {
-            $price = $product->gross_price_of_packing;
-            $unit = $product->unit_commercial;
+            $price = $product['gross_price_of_packing'];
+            $unit = $product['unit_commercial'];
         } elseif ($priceType === 'o') {
-            $price = $product->gross_selling_price_calculated_unit;
-            $unit = $product->calculation_unit;
+            $price = $product['gross_selling_price_calculated_unit'];
+            $unit = $product['calculation_unit'];
         }
 
         if ($price === 0 || !$unit) {
