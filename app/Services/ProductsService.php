@@ -256,7 +256,7 @@ class ProductsService
 
     private function getPriceString($product): ?string
     {
-        $priceType = strtolower($product['price_type']);
+        $priceType = strtolower($product['meta_price']);
         $price = false;
         $unit = false;
 
