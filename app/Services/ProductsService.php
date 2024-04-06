@@ -253,7 +253,6 @@ class ProductsService
                 'price' => $priceString,
             ];
         }, $products->data);
-        dd($products->data);
 
         return $products;
     }
