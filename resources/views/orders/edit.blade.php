@@ -1052,6 +1052,7 @@
                                     @endphp
                                     <td style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
                                         {{$variation['name']}}
+                                        {{ $variation['id'] }}
                                     </td>
                                     <td>
                                         {{$variation['gross_selling_price_commercial_unit']}}
