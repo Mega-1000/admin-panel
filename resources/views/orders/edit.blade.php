@@ -1047,8 +1047,8 @@
                             @foreach($productsVariation[$item->product->id] as $variation)
                                 <tr class="row-{{$variation['id']}}">
                                     @php
-                                        $product = Product::where('symbol', substr(Product::find($variation['id'])->symbol, 0, -2))->first()
-                                        $dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change)
+                                        $product = Product::where('symbol', substr(Product::find($variation['id'])->symbol, 0, -2))->first();
+                                        $dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change);
                                     @endphp
                                     <td style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
                                         {{$variation['name']}}
