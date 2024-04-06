@@ -132,7 +132,8 @@
                     <td>
                         <a href="https://mega1000.pl/{{ $firm->symbol }}/{{ \App\Entities\Category::where('name', $firm->symbol)->first()?->id }}/no-layout">
                             {{ $firm->symbol }}
-                            {{ $firm->distance }}
+                            Odległość:
+                            {{ round($firm->distance, 0) }} KM
                         </a>
                     </td>
 
