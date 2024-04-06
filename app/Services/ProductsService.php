@@ -197,7 +197,7 @@ class ProductsService
         return Category::findOrFail((int)$request['category_id']);
     }
 
-    public function getProducts($category, ?string $zipCode = null): LengthAwarePaginator
+    public function getProducts($category, ?string $zipCode = null)
     {
         $products = Categories::getProductsForCategory($category)
             ->get();
