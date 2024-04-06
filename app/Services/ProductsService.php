@@ -253,8 +253,9 @@ class ProductsService
                 'price' => $priceString,
             ];
         }, $products->data);
+        dd($products->data);
 
-//        return $products;
+        return $products;
     }
 
     private function getPriceString($product): ?string
