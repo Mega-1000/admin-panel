@@ -94,8 +94,7 @@ trait WithFilters
             $key = str_replace('_', '.', $key);
 
             if (isset($this->filters[$key])) {
-                OrderDatatableColumn::where('label', $key)->first()->update(['filter' => $value]);
-                dd(OrderDatatableColumn::where('label', $key)->first());
+                OrderDatatableColumn::where('label', $key)->where('user_io', auth()->id())->first()->update(['filter' => $value]);
                 $this->anyFiltersApplied = true;
             }
         }
