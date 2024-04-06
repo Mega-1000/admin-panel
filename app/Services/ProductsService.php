@@ -199,9 +199,20 @@ class ProductsService
 
     public function getProducts($category, ?string $zipCode = null): LengthAwarePaginator
     {
-        $products = Categories::getProductsForCategory($category)
+        $paginatedProducts = Categories::getProductsForCategory($category)
             ->paginate($this->getPerPage());
-        $products->data = $products->items();
+
+// Optional: If you want to transform the results to only include 'name' and 'symbol',
+// you can do so after pagination. However, keep in mind that this will not change the
+// structure of the paginator's items directly but will provide a collection of transformed items.
+        $transformedItems = $paginatedProducts->getCollection()
+            ->mapWithKeys(function ($item) {
+                return [$item['symbol'] => $item['name']];
+            });
+
+// If you need to replace the original items in the paginator with transformed items
+        $paginatedProducts->setCollection($transformedItems);
+
 
         foreach ($products->data as &$product) {
             $zipCodeData = PostalCodeLatLon::where('postal_code', $zipCode)->first();
