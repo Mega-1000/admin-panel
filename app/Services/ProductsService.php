@@ -247,15 +247,12 @@ class ProductsService
 
         $products->data = array_map(function ($product) {
             $priceString = $this->getPriceString($product);
-            return [
+            return (object)[
                 'name' => $product->name,
                 'symbol' => $product->symbol,
                 'price' => $priceString,
             ];
         }, $products->data);
-
-        $arr = json_encode($product->data);
-        $product->data = json_decode($arr);
 
         return $products;
     }
