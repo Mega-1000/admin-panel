@@ -285,7 +285,11 @@
                                     Dodaj firmę do chata
                                 </h2>
 
-                                <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy">
+                                <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
+                                <datalist id="suggestions">
+                                    <option value="foo">
+                                    <option value="bar">
+                                </datalist>
 
                                 <button type="submit" class="btn btn-primary"> <!-- Use type="submit" to submit the form -->
                                     Dodaj użytkowników
