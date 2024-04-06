@@ -90,6 +90,7 @@ trait WithFilters
 
     public function applyFiltersFromQuery(): void
     {
+        dd('okej');
         foreach (Request::query() as $key => $value) {
             $key = str_replace('_', '.', $key);
 
