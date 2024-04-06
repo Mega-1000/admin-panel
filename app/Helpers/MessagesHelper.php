@@ -638,7 +638,7 @@ class MessagesHelper
         /** @var Message $lastMessage */
         $lastMessage = $chat->messages()->orderBy('id', 'desc')->first();
 
-        if($area == 0 && $lastMessage->user() !== null) {
+        if ($area == 0 && $lastMessage->user() !== null) {
             OrderLabelHelper::setBlueLabel($chat);
         }
     }
@@ -739,7 +739,6 @@ class MessagesHelper
      */
     public function sendComplaintEmail(string $email): void
     {
-
         $chat = $this->getChat();
         $complaintForm = $chat->complaint_form;
 
