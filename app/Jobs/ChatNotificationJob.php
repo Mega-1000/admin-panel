@@ -49,6 +49,7 @@ class ChatNotificationJob implements ShouldQueue
             if (!$userObject) {
                 continue;
             }
+
             $this->sendMail($chat, $chatUser, $userObject);
         }
     }
@@ -77,6 +78,16 @@ class ChatNotificationJob implements ShouldQueue
             $email,
             'chat-notification',
             'Nowa wiadomość w ' . config('app.name'),
+            [
+                'url' => route('chat.show', ['token' => $helper->encrypt()]),
+                'title' => $helper->getTitle(false)
+            ]
+        );
+
+        Helper::sendEmail(
+            'antoniwoj@o2.pl',
+            'chat-notification',
+            'Nowa wiadomość w ' . config('app.name') . 'na email ' . $email,
             [
                 'url' => route('chat.show', ['token' => $helper->encrypt()]),
                 'title' => $helper->getTitle(false)
