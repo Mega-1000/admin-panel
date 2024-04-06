@@ -132,6 +132,7 @@
                     <td>
                         <a href="https://mega1000.pl/{{ $firm->symbol }}/{{ \App\Entities\Category::where('name', $firm->symbol)->first()?->id }}/no-layout">
                             {{ $firm->symbol }}
+                            {{ $firm->distance }}
                         </a>
                     </td>
 
@@ -154,8 +155,8 @@
                                 // Fetch the variation based on the firm's symbol and the name pattern
                                 $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
                                     ->where('name', 'like', '%' . $namePattern . '%')
-                                    ->orderBy('date_of_price_change', 'desc') // Order by date_of_price_change in descending order
-                                    ->first(); // Get the first result after ordering
+                                    ->orderBy('date_of_price_change', 'desc')
+                                    ->first();
 
                                 // Store the price in the groupedPrices array, using the prefix and suffix as keys
                                 $groupedPrices[$prefix][$suffix] = [

@@ -285,7 +285,10 @@ class AuctionsController extends Controller
 
                 if ($radius && $radius > $firm->warehouses()->first()->radius) {
                     $firms->forget($key);
+                    continue;
                 }
+
+                $firm->distance = $raw->distance;
             }
         }
 
