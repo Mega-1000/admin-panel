@@ -251,6 +251,8 @@ class ProductsService
                 'name' => $product['name'],
                 'symbol' => $product['symbol'],
                 'price' => $priceString,
+                'id' => $product['id'],
+                'img' => config('app.url') . $product->url_for_website,
             ];
         }, $products->toArray());
     }
