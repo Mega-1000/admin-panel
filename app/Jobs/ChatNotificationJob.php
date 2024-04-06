@@ -42,8 +42,7 @@ class ChatNotificationJob implements ShouldQueue
 
             if(
                 $chatUser->id == $this->currentChatUserId ||
-                $chatUser->is_online == true ||
-                $chatUser->last_read_time < $chatUser->last_notification_time
+                $chatUser->is_online == true
             ) continue;
 
             $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: false;

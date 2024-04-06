@@ -431,7 +431,6 @@ class MessagesHelper
             $email = $chatUser->user->email;
         }
 
-        dd($email);
         (new ChatNotificationJob($chat->id, $email, $chatUser->id))->handle();
 
         return $msg;
