@@ -1048,6 +1048,7 @@
                                 <tr class="row-{{$variation['id']}}">
                                     @php
                                         $product = App\Entities\Product::find($variation['id']);
+                                        dd($product->date_of_price_change);
                                         $dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change)
                                     @endphp
                                     <td style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
