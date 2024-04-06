@@ -254,7 +254,7 @@ class ProductsService
             ];
         }, $products->data);
 
-        return $products;
+//        return $products;
     }
 
     private function getPriceString($product): ?string
