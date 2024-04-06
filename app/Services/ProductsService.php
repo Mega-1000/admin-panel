@@ -200,6 +200,7 @@ class ProductsService
     public function getProducts($category, ?string $zipCode = null)
     {
         $products = Categories::getProductsForCategory($category)
+            ->with('price')
             ->get();
 
         foreach ($products as &$product) {
