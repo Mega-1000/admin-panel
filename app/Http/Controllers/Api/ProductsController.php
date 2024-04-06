@@ -365,7 +365,7 @@ class ProductsController extends Controller
     {
         $category = $this->productsService->getCategory($request->all());
         $products = $this->productsService->getProducts($category, $request->query('zipCode'));
-        $this->productsService->prepareProductData($products);
+//        $this->productsService->prepareProductData($products);
 
         return response()->json($products);
     }
