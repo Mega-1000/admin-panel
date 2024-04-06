@@ -254,6 +254,9 @@ class ProductsService
             ];
         }, $products->data);
 
+        $arr = json_encode($product->data);
+        $product->data = json_decode($arr);
+
         return $products;
     }
 
