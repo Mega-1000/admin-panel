@@ -283,10 +283,10 @@ class ProductsService
 
     public function prepareProductData(&$products): void
     {
-        foreach ($products->data as $productKey => $productValue) {
-            $this->processMediaUrls($productKey, $productValue, $products);
-            $this->getStockAndLogsData($productValue);
-        }
+//        foreach ($products->data as $productKey => $productValue) {
+//            $this->processMediaUrls($productKey, $productValue, $products);
+//            $this->getStockAndLogsData($productValue);
+//        }
     }
 
     protected function checkAndSetProductUrl($productKey, &$productValue): void
