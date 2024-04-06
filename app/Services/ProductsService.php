@@ -251,7 +251,7 @@ class ProductsService
                 'symbol' => $product->symbol,
                 'price' => $priceString,
             ];
-        }, $products);
+        }, $products->toArray());
     }
 
     private function getPriceString($product): ?string
