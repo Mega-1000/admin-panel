@@ -197,7 +197,59 @@ class ProductsService
         return Category::findOrFail((int)$request['category_id']);
     }
 
-    public function getProducts($category, ?string $zipCode = null)
+    public function getProducts($category, ?string $zipCode = null): LengthAwarePaginator
+    {
+        $products = Categories::getProductsForCategory($category)
+            ->paginate($this->getPerPage());
+        $products->data = $products->items();
+
+        foreach($products->data as &$product) {
+            $zipCodeData = PostalCodeLatLon::where('postal_code', $zipCode)->first();
+
+            if ($zipCodeData) {
+                $query = DB::selectOne(
+                    'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                        FROM postal_code_lat_lon pc
+                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                             JOIN warehouses w on wa.warehouse_id = w.id
+                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                        ORDER BY distance
+                    limit 1',
+                    [
+                        'latitude' => $zipCodeData->latitude,
+                        'longitude' => $zipCodeData->longitude,
+                        'firmId' => $product?->firm?->id
+                    ]
+                );
+
+                if (!empty($query)) {
+                    $radius = $query->distance;
+                    $warehouse = Warehouse::find($query->id);
+
+                    if ($radius > $warehouse->radius && $product?->variation_group === 'styropiany') {
+                        $product->blured = true;
+                    } else {
+                        $product->blured = false;
+                    }
+                } else if ($product?->variation_group === 'styropiany') {
+                    $product->blured = true;
+                }
+            }
+        }
+
+        foreach ($products->data as $product) {
+            if ($product->children->count() > 0) {
+                $product->hasChildren = true;
+            }
+        }
+
+        return $products;
+    }
+
+
+    public function getProductsMobile($category, ?string $zipCode = null)
     {
         $products = Categories::getProductsForCategory($category)
             ->with('price')
