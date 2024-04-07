@@ -117,10 +117,10 @@ class ProductsController extends Controller
     public function updateProductsPrice(Request $request)
     {
         try {
-            $this->validate($request, [
-                '*.date_of_price_change' => 'required|date|after:today',
-                '*.date_of_the_new_prices' => 'required|date',
-            ]);
+//            $this->validate($request, [
+//                '*.date_of_price_change' => 'required|date|after:today',
+//                '*.date_of_the_new_prices' => 'required|date',
+//            ]);
             foreach ($request->all() as $item) {
                 $product = Product::find($item['id']);
                 if (empty($product)) {
