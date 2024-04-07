@@ -100,7 +100,7 @@ class ProductsController extends Controller
         }
 
         usort($productsReturnArray['UB'][1], function($a, $b) {
-            return $a['order'] - $b['order'];
+            return $a['order'] ?? 0 - $b['order'] ?? 0;
         });
 
 
