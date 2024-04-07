@@ -92,6 +92,7 @@
                     $items = $items->sortBy('order')->reject(function ($item) {
                         return $item['order'] === null || $item['order'] === "?";
                     });
+                    dd($items);
 
                     $groupedItems = [];
                     $eanMapping = []; // Assuming this array maps prefixes to their ean_of_collective_packing
