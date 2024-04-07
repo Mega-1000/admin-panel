@@ -101,8 +101,8 @@ class ProductsController extends Controller
 
         usort($productsReturnArray['UB'][1], function($a, $b) {
             // Set $aOrder and $bOrder to the value of 'order' key if it exists, or 0 if it doesn't
-            $aOrder = array_key_exists('order', $a) ? $a['order'] : 0;
-            $bOrder = array_key_exists('order', $b) ? $b['order'] : 0;
+            $aOrder = array_key_exists('order', $a) ? $a['order'] : 1000000;
+            $bOrder = array_key_exists('order', $b) ? $b['order'] : 1000000;
 
             // Compare $aOrder and $bOrder
             if ($aOrder == $bOrder) {
