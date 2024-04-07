@@ -208,7 +208,7 @@
                             {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }}
                         </td> <!-- Display the firm symbol -->
                         @php
-                            $displayedFirmSymbols[] = $firm->firm->symbol; // Add the symbol to the tracked array
+                            $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Add the symbol to the tracked array
                         @endphp
 
 {{--                        @foreach($products as $product)--}}
