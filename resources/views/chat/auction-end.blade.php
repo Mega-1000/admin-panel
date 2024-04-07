@@ -243,7 +243,7 @@
 
                             @php
                             $prices = [];
-                            $items = $auction?->chat?->order?->items?->pluck('product') ?? $order?->items?->pluck('product');
+                            $items = isset($auction) ? $auction?->chat?->order?->items?->pluck('product') : $order?->items?->pluck('product');
 
                             foreach ($items as $item) {
                                 $variation = App\Entities\Product::where('product_group', $item->product_group)->where('product_name_supplier', $firm->firm->symbol)->first();
