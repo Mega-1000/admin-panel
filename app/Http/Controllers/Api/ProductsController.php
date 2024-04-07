@@ -104,7 +104,7 @@ class ProductsController extends Controller
         });
 
 
-        return $productsReturnArray['UB'];
+        return $productsReturnArray['UB'][0];
     }
 
     public function updateProductsPrice(Request $request)
