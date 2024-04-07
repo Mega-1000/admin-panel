@@ -1054,7 +1054,7 @@
                                     <td style="{{ $dateOfPriceChange?->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
                                         {{$variation['name']}}
                                         {{ $variation['id'] }}
-                                        {{ $dateOfPriceChange?->lessThan(\Carbon\Carbon::now()) ? '<a href="/admin/firms/' + $firm->id + '/edit">LINK DO FIRMY</a>' : '' }}
+                                        {{ $dateOfPriceChange?->lessThan(\Carbon\Carbon::now()) ? '<a href="/admin/firms/' . (string)$firm->id . '/edit">LINK DO FIRMY</a>' : '' }}
                                     </td>
                                     <td>
                                         {{$variation['gross_selling_price_commercial_unit']}}
