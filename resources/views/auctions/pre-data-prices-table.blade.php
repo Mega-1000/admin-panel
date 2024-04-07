@@ -161,7 +161,7 @@
 
                                 // Store the price in the groupedPrices array, using the prefix and suffix as keys
                                 $groupedPrices[$prefix][$suffix] = [
-                                    $variation?->price->gross_purchase_price_basic_unit_after_discounts,
+                                    $variation?->price->gross_selling_price_basic_unit,
                                     $variation?->id
                                 ];
                             }
