@@ -384,7 +384,7 @@ class AuctionsController extends Controller
 
     public function styrofoamVariationsView(Order $order, ProductService $productService): View
     {
-        $order->items = collect($productService->getVariations($order))->flatten();
+        $order->items = collect($productService->getVariations($order));
         $firms = collect();
         dd($order->items);
 
