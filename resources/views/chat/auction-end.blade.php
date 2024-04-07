@@ -293,10 +293,10 @@
 
             @foreach($firms as $firm)
                 @php
-                    $symbol = $firm->firm->symbol; // Assuming $firm->firm->symbol gives you the symbol you want to display
+                    $symbol =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
                 @endphp
 
-                @if($auction->offers->where('firm_id', $firm->firm->id)->count() === 0 && !in_array($symbol, $displayedSymbols))
+                @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 && !in_array($symbol, $displayedSymbols))
                     <tr>
                         <td>
                             {{ $symbol }}
