@@ -29,3 +29,5 @@ Route::get('auctions/get-quotes-by-styrofoarm-type/{type}', [AuctionsController:
 
 Route::post('end-auction/{auctionId}', [AuctionsController::class, 'endAuctionStore'])->name('end-auction.store');
 
+Route::get('orders/{order}/styro-variations', [AuctionsController::class, 'styrofoamVariationsView'])->name('styrofoamVariationsView');
+

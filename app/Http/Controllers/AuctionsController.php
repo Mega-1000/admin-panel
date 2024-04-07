@@ -381,4 +381,16 @@ class AuctionsController extends Controller
 
         return redirect()->back()->with(['success' => true]);
     }
+
+    public function styrofoamVariationsView(Order $order): View
+    {
+        $firms = collect();
+        foreach($order->items as $item) {
+            $firms->push($item->product->firm);
+        }
+
+        return view('chat.auction-end', [
+            'products' => $order->items,
+        ], compact('order', 'firms'));
+    }
 }
