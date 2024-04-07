@@ -387,6 +387,7 @@ class AuctionsController extends Controller
         $items = collect($productService->getVariations($order));
         $firms = collect();
 
+        dd($items);
         foreach($items as $item) {
             foreach ($item as $i) {
                 $i = Product::find($i['id']);
