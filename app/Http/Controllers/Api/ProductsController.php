@@ -111,8 +111,6 @@ class ProductsController extends Controller
             return ($aOrder < $bOrder) ? -1 : 1;
         });
 
-
-
         return $productsReturnArray; // array
     }
 
