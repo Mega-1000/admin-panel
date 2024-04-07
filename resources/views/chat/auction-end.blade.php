@@ -235,7 +235,7 @@
                         $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
                     @endphp
 
-                    @if( true)
+                    @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || true)
                         <tr>
                             <td>
                                 {{ $symbol }}
@@ -246,7 +246,7 @@
                             $items = isset($auction) ? $auction?->chat?->order?->items?->pluck('product') : $order?->items?->pluck('product');
 
                             foreach ($items as $item) {
-                                $variation = App\Entities\Product::where('product_group', $item->product_group)->where('product_name_supplier', $firm->firm->symbol)->first();
+                                $variation = App\Entities\Product::where('product_group', $item->product_group)->where('product_name_supplier', $symbol)->first();
 
                                 $prices[] = $variation;
                             }
