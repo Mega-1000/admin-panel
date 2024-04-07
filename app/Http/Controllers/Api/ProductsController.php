@@ -100,14 +100,17 @@ class ProductsController extends Controller
         }
 
         usort($productsReturnArray['UB'][1], function($a, $b) {
-            if (array_key_exists('order', $a)) {
-                $a['order'] = 0;
+            // Set $aOrder and $bOrder to the value of 'order' key if it exists, or 0 if it doesn't
+            $aOrder = array_key_exists('order', $a) ? $a['order'] : 0;
+            $bOrder = array_key_exists('order', $b) ? $b['order'] : 0;
+
+            // Compare $aOrder and $bOrder
+            if ($aOrder == $bOrder) {
+                return 0;
             }
-            if (array_key_exists('order', $b)) {
-                $b['order'] = 0;
-            }
-            return $a['order'] ?? 0 - $b['order'] ?? 0;
+            return ($aOrder < $bOrder) ? -1 : 1;
         });
+
 
 
         return $productsReturnArray; // array
