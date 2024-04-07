@@ -386,7 +386,7 @@ class AuctionsController extends Controller
     {
         $firms = collect();
         foreach($order->items as $item) {
-            $firms->push($item->product->firm);
+            $firms->push($item->product);
         }
 
         dd($firms);
