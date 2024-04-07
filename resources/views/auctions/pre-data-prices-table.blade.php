@@ -183,7 +183,7 @@
                                     @php($dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change))
                                     <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout"
                                        style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
-                                        {{ $price}} {{ $product->symbol }}
+                                        {{ $price }}
                                     </a>
                                 @else
                                     Brak
