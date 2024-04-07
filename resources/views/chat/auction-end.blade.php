@@ -199,7 +199,7 @@
                 @endphp
 
                 @foreach($firms as $firm)
-                    @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm->firm->symbol, $displayedFirmSymbols))
+                    @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0)
                         @continue
                     @endif
 
