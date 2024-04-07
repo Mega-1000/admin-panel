@@ -90,7 +90,7 @@
 
                 @php
                     $items = $items->sortBy('order')->reject(function ($item) {
-                        return $item['order'] === null || $item['order'] === "?";
+                        return $item['order'] === null || $item['order'] === 0;
                     });
 
                     $groupedItems = [];
