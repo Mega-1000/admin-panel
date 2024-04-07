@@ -99,12 +99,13 @@ class ProductsController extends Controller
             $productsReturnArray[$groupExp][$numberGroup][] = $array;
         }
 
+        return $productsReturnArray['UB'][0];
         usort($productsReturnArray['UB'][0], function($a, $b) {
             return $a->order - $b->order;
         });
 
 
-        return gettype($productsReturnArray['UB'][0]);
+        return gettype($productsReturnArray['UB'][0]); // array
     }
 
     public function updateProductsPrice(Request $request)
