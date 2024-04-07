@@ -100,11 +100,17 @@ class ProductsController extends Controller
         }
 
         usort($productsReturnArray['UB'][1], function($a, $b) {
+            if (array_key_exists('order', $a)) {
+                $a['order'] = 0;
+            }
+            if (array_key_exists('order', $b)) {
+                $b['order'] = 0;
+            }
             return $a['order'] ?? 0 - $b['order'] ?? 0;
         });
 
 
-        return gettype($productsReturnArray['UB'][0]); // array
+        return $productsReturnArray; // array
     }
 
     public function updateProductsPrice(Request $request)
