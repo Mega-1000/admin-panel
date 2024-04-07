@@ -393,7 +393,6 @@ class AuctionsController extends Controller
                 $firms->push(Firm::where('symbol', $i->product_name_supplier)->first());
             }
         }
-        dd($firms);
 
         return view('chat.auction-end', [
             'products' => $order->items,
