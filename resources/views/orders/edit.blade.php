@@ -29,6 +29,10 @@
     <button type="button" class="btn btn-primary header-button" data-toggle="modal" data-target="#exampleModal">
         Podziel zamówienie
     </button>
+
+    <a href="{{ route('styrofoamVariationsView', $order->id) }}" class="btn btn-primary">
+        Zmień wariacje zamówienia
+    </a>
 @endsection
 
 @section('table')
