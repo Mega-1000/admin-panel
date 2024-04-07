@@ -382,11 +382,12 @@ class AuctionsController extends Controller
         return redirect()->back()->with(['success' => true]);
     }
 
-    public function styrofoamVariationsView(Order $order): View
+    public function styrofoamVariationsView(Order $order, ProductService $productService): View
     {
+     dd($productService->getVariations($order));
         $firms = collect();
         foreach($order->items as $item) {
-            $firms->push(Firm::where('symbol', $item->product->manufacturer)->first());
+            $firms->push($productService->getVariations($order)->first());
         }
 
         return view('chat.auction-end', [
