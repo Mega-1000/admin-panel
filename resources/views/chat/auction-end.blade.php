@@ -235,7 +235,7 @@
                         $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
                     @endphp
 
-                    @if($auction->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() === 0 && !in_array($symbol, $displayedFirmSymbols))
+                    @if(isset($auction) && $auction->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() === 0 && !in_array($symbol, $displayedFirmSymbols))
                         <tr>
                             <td>
                                 {{ $symbol }}
