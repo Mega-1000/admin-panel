@@ -163,7 +163,7 @@
 
                 Twój link to
                 <span style="font-weight: bold">
-                    https://mega1000.pl/sklep?ref={{ base64_encode($auction->chat->order->customer->id) }}
+                    https://mega1000.pl/sklep?ref={{ base64_encode($auction->chat->order->customer->id ?? $order->customer->id) }}
                 </span>
                 - skopiuj go i udostępnij znajomym!
             </div>
@@ -199,7 +199,7 @@
                 @endphp
 
                 @foreach($firms as $firm)
-                    @if($auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm->firm->symbol, $displayedFirmSymbols))
+                    @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm->firm->symbol, $displayedFirmSymbols))
                         @continue
                     @endif
 
@@ -211,22 +211,22 @@
                             $displayedFirmSymbols[] = $firm->firm->symbol; // Add the symbol to the tracked array
                         @endphp
 
-                        @foreach($products as $product)
-                            <td>
-                                @php
-                                    $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->first();
-                                @endphp
+{{--                        @foreach($products as $product)--}}
+{{--                            <td>--}}
+{{--                                @php--}}
+{{--                                    $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->first();--}}
+{{--                                @endphp--}}
 
-                                @if($offer)
-                                    {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }}
+{{--                                @if($offer)--}}
+{{--                                    {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }}--}}
 
-                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
+{{--                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">--}}
 {{--                                    <input type="number" id="quantity-{{ $offer->id }}" class="offer-quantity" min="1" value="1"> <!-- Quantity input -->--}}
-                                @else
-                                    No offer
-                                @endif
-                            </td>
-                        @endforeach
+{{--                                @else--}}
+{{--                                    No offer--}}
+{{--                                @endif--}}
+{{--                            </td>--}}
+{{--                        @endforeach--}}
                     </tr>
                 @endforeach
 
