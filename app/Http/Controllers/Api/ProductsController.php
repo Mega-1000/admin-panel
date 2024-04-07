@@ -99,6 +99,8 @@ class ProductsController extends Controller
             $productsReturnArray[$groupExp][$numberGroup][] = $array;
         }
 
+        return $productsReturnArray['UB'];
+
         return $productsReturnArray;
     }
 
