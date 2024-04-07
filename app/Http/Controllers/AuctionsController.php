@@ -389,6 +389,7 @@ class AuctionsController extends Controller
 
         foreach($order->items as $item) {
             foreach ($item as $i) {
+                dd($i);
                 $firms->push(Firm::where('symbol', $i['product']['manufacturer'])->first());
             }
         }
