@@ -386,10 +386,11 @@ class AuctionsController extends Controller
     {
         $order->items = collect($productService->getVariations($order));
         $firms = collect();
-        dd($order->items);
 
         foreach($order->items as $item) {
-            $firms->push(Firm::where('symbol', $item->product->manufacturer)->first());
+            foreach ($item as $i) {
+                $firms->push(Firm::where('symbol', $i->product->manufacturer)->first());
+            }
         }
 
         return view('chat.auction-end', [
