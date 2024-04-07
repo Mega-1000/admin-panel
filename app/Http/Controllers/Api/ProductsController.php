@@ -122,6 +122,10 @@ class ProductsController extends Controller
 //                '*.date_of_the_new_prices' => 'required|date',
 //            ]);
             foreach ($request->all() as $item) {
+                if (!array_key_exists('id', $item)) {
+                    continue;
+                }
+
                 $product = Product::find($item['id']);
                 if (empty($product)) {
                     continue;
