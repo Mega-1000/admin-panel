@@ -231,7 +231,7 @@
                 @endforeach
 
                 @foreach($firms as $firm)
-                    {{ dd($firm) }}
+                    {{ dd($firms) }}
                     @php
                         $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
                     @endphp
