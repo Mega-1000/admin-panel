@@ -156,7 +156,6 @@
                                 // Fetch the variation based on the firm's symbol and the name pattern
                                 $variation = App\Entities\Product::where('product_name_supplier', $firm->symbol)
                                     ->where('name', 'like', '%' . $namePattern . '%')
-                                    ->orderBy('date_of_price_change', 'desc')
                                     ->first();
 
                                 // Store the price in the groupedPrices array, using the prefix and suffix as keys
