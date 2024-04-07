@@ -386,10 +386,8 @@ class AuctionsController extends Controller
     {
         $firms = collect();
         foreach($order->items as $item) {
-            $firms->push($item->product);
+            $firms->push($item->product->manufacturer);
         }
-
-        dd($firms);
 
         return view('chat.auction-end', [
             'products' => $order->items,
