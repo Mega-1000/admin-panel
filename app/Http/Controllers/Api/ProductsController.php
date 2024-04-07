@@ -99,7 +99,7 @@ class ProductsController extends Controller
             $productsReturnArray[$groupExp][$numberGroup][] = $array;
         }
 
-        usort($productsReturnArray['UB'], function($a, $b) {
+        return usort($productsReturnArray['UB'], function($a, $b) {
             return $a->order - $b->order;
         });
 
