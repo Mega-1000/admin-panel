@@ -184,7 +184,7 @@
                                     @php($dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change))
                                     <a href="https://mega1000.pl/single-product/{{ $id }}/no-layout"
                                        style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
-                                        {{ $price }}
+                                        {{ round($price / 23, 2) }}
                                     </a>
                                 @else
                                     Brak
