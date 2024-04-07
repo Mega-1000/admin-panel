@@ -384,17 +384,15 @@ class AuctionsController extends Controller
 
     public function styrofoamVariationsView(Order $order, ProductService $productService): View
     {
-        $order->items = collect($productService->getVariations($order));
+        $items = collect($productService->getVariations($order));
         $firms = collect();
 
-        foreach($order->items as $item) {
+        foreach($items as $item) {
             foreach ($item as $i) {
                 $i = Product::find($i['id']);
                 $firms->push(Firm::where('symbol', $i->manufacturer)->first());
             }
         }
-
-        dd($firms);
 
         return view('chat.auction-end', [
             'products' => $order->items,
