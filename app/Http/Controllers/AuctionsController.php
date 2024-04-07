@@ -394,10 +394,8 @@ class AuctionsController extends Controller
             }
         }
 
-        dd($firms);
-
         return view('chat.auction-end', [
-            'products' => $order->items,
+            'products' => $items,
         ], compact('order', 'firms'));
     }
 }
