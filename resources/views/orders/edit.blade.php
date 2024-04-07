@@ -1048,13 +1048,11 @@
                                 <tr class="row-{{$variation['id']}}">
                                     @php
                                         $product = \App\Entities\Product::where('symbol', substr(\App\Entities\Product::find($variation['id'])->symbol, 0, -2))->first();
-                                        $firm = $product?->firm;
-                                        $dateOfPriceChange = \Carbon\Carbon::create($product?->date_of_price_change);
+                                        $dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change);
                                     @endphp
-                                    <td style="{{ $dateOfPriceChange?->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
+                                    <td style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
                                         {{$variation['name']}}
                                         {{ $variation['id'] }}
-                                        {{ $dateOfPriceChange?->lessThan(\Carbon\Carbon::now()) ? '<a href="/admin/firms/' . $firm?->id . '/edit">LINK DO FIRMY</a>' : '' }}
                                     </td>
                                     <td>
                                         {{$variation['gross_selling_price_commercial_unit']}}
