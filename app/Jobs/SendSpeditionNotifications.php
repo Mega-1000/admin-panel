@@ -16,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class SendSpeditionNotifications implements ShouldQueue
 {
@@ -39,7 +40,10 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = Label::find(53)->orders;
+        $orders = DB::table('order_labels')->where(['label_id' => 66])->get();
+        foreach ($orders as &$order) {
+            $order = Order::find($orders->order_id);
+        }
         $arr = [];
 
         foreach ($orders as $order) {
