@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Entities\Label;
 use App\Entities\Order;
 use App\Facades\Mailer;
 use App\Mail\ReminderAboutNearEndOfSpeditionPeriod;
@@ -16,7 +15,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 
 class SendSpeditionNotifications implements ShouldQueue
 {
@@ -40,10 +38,7 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = DB::table('order_labels')->where(['label_id' => 66])->get();
-        foreach ($orders as &$order) {
-            $order = Order::find($orders->order_id);
-        }
+        $orders = Order::whereHas('labels', function ($query) {$query->where('labels.id', '=', 53);})->get();
         $arr = [];
 
         foreach ($orders as $order) {
