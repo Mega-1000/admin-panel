@@ -65,7 +65,7 @@ class SendSpeditionNotifications implements ShouldQueue
                 $order->update(['near_end_of_spedition_period_sent' => true]);
             }
 
-            if ($toDate < now() && !$order->labels->includes(243)) {
+            if ($toDate < now() && !$order->labels->contains('id', 243)) {
                 Mailer::create()
                     ->to($order->warehouse->email)
                     ->send(new ReminderAfterSpeditionPeriodEnded());
