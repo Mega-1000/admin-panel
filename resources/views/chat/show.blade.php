@@ -230,7 +230,7 @@
                 @if($chat->complaint_form)
                     <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-primary call-button">Pokaż formularz reklamacyjny</button>
                 @endif
-                <h3>Użytkownicy:</h3>
+                <h3>Zarządzanie użytkownikami chatu:</h3>
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
                         @include('chat/users', [
@@ -321,7 +321,7 @@
                             @include('chat/msg_area')
                         </label>
                         @if(!empty($usersHistory))
-                            <h3>Pokaż:</h3>
+                            <h3>Filtruj pokazywanie wiadomości po użytkownikach:</h3>
                             @include('chat/history')
                         @endif
                         @if( $chat->complaint_form !== '' && $firmWithComplaintEmails->isNotEmpty() )
