@@ -214,6 +214,19 @@
             </div>
             <div class="chat-right-column" style="padding-left: 10px;">
                 <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" style="width: 35px; cursor: pointer">
+                <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST">
+                    @csrf
+
+                    <h2>
+                        Dodaj firmę do przetargu
+                    </h2>
+
+                    <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
+
+                    <button type="submit" class="btn btn-primary">
+                        Dodaj firm
+                    </button>
+                </form>
                 @if($chat->complaint_form)
                     <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-primary call-button">Pokaż formularz reklamacyjny</button>
                 @endif
@@ -296,21 +309,6 @@
                                     Dodaj użytkowników
                                 </button>
                             </form>
-
-
-                                <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST">
-                                    @csrf
-
-                                    <h2>
-                                        Dodaj firmę do przetargu
-                                    </h2>
-
-                                    <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
-
-                                    <button type="submit" class="btn btn-primary">
-                                        Dodaj firm
-                                    </button>
-                                </form>
     {{--                        @endif--}}
                         @endif
                     </table>
