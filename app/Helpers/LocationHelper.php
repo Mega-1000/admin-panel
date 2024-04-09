@@ -39,7 +39,7 @@ class LocationHelper
         return true;
     }
 
-    public static function getDistanceOfProductForZipCode(Firm $firm, string $zipCode): bool
+    public static function getDistanceOfProductForZipCode(Firm $firm, string $zipCode): int
     {
         $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $zipCode)->get()->first();
 
