@@ -11,15 +11,15 @@ class RequestNewPricesMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public string $message;
+    public string $mes;
 
     /**
      * OrderStatusChanged constructor.
      */
-    public function __construct(string $message)
+    public function __construct(string $mes)
     {
         $this->subject = 'Prośba o wysłanie cenników';
-        $this->message = $message;
+        $this->mes = $mes;
     }
 
     /**
