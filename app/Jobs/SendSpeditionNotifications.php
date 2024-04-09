@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Facades\Mailer;
 use App\Mail\ReminderAboutNearEndOfSpeditionPeriod;
@@ -38,9 +39,7 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = Order::whereHas('labels', function ($q) {
-            $q->where('id', 53);
-        })->get();
+        $orders = Label::find(53)->orders;
         $arr = [];
 
         foreach ($orders as $order) {
