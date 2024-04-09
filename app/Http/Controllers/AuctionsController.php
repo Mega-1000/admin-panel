@@ -17,6 +17,7 @@ use App\Facades\Mailer;
 use App\Factory\OrderBuilderFactory;
 use App\Helpers\AuctionsHelper;
 use App\Helpers\Exceptions\ChatException;
+use App\Helpers\LocationHelper;
 use App\Helpers\MessagesHelper;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
@@ -230,9 +231,13 @@ class AuctionsController extends Controller
 
         $firms = array_unique(app(ChatAuctionsService::class)->getFirms($variations));
 
+        foreach ($firms as $firm) {
+            $firm->distance = LocationHelper::getDistanceOfProductForZipCode($firm, $chat->order->addresses->first()->postal_code );
+        }
+
         return view('auctions.pre-data-prices-table', [
             'order' => $chat->order,
-            'firms' => $firms
+            'firms' => $firms,
         ]);
     }
 
