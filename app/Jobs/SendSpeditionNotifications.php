@@ -39,7 +39,7 @@ class SendSpeditionNotifications implements ShouldQueue
     public function handle(): void
     {
         $orders = Order::whereHas('labels', function ($q) {
-            $q->find(53);
+            $q->where('id', 53);
         })->get();
         $arr = [];
 
