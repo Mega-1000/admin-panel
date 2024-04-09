@@ -754,44 +754,44 @@ class OrdersController extends Controller
     public function updateDates(Order $order, Request $request, MessagesHelper $messagesHelper)
     {
         $result = null;
-        WorkingEventsService::createEvent(WorkingEvents::UPDATE_DATES_EVENT, $order->id);
-
-        if ($request->has('type')) {
-            $order->dates->resetAcceptance();
-            $updateData = ['message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'];
-
-            if ($request->type == 'customer') {
-                if ($request->filled('shipmentDateFrom')) {
-                    $updateData['consultant' . '_shipment_date_from'] = $request->shipmentDateFrom;
-                }
-                if ($request->filled('shipmentDateTo')) {
-                    $updateData['consultant' . '_shipment_date_to'] = $request->shipmentDateTo;
-                }
-            }
-
-            // Only add fields to the update array if they are present in the request
-            if ($request->filled('shipmentDateFrom')) {
-                $updateData[$request->type . '_shipment_date_from'] = $request->shipmentDateFrom;
-            }
-            if ($request->filled('shipmentDateTo')) {
-                $updateData[$request->type . '_shipment_date_to'] = $request->shipmentDateTo;
-            }
-            if ($request->filled('deliveryDateFrom')) {
-                $updateData[$request->type . '_delivery_date_from'] = $request->deliveryDateFrom;
-            }
-            if ($request->filled('deliveryDateTo')) {
-                $updateData[$request->type . '_delivery_date_to'] = $request->deliveryDateTo;
-            }
-
-            // Always set acceptance to true
-            $updateData[$request->type . '_acceptance'] = true;
-
-            $result = $order->dates()->update($updateData);
-
-            $messagesHelper->sendDateChangeMessage($order->chat, $request->type);
-            $order->date_accepted = false;
-            $order->save();
-        }
+//        WorkingEventsService::createEvent(WorkingEvents::UPDATE_DATES_EVENT, $order->id);
+//
+//        if ($request->has('type')) {
+//            $order->dates->resetAcceptance();
+//            $updateData = ['message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'];
+//
+//            if ($request->type == 'customer') {
+//                if ($request->filled('shipmentDateFrom')) {
+//                    $updateData['consultant' . '_shipment_date_from'] = $request->shipmentDateFrom;
+//                }
+//                if ($request->filled('shipmentDateTo')) {
+//                    $updateData['consultant' . '_shipment_date_to'] = $request->shipmentDateTo;
+//                }
+//            }
+//
+//            // Only add fields to the update array if they are present in the request
+//            if ($request->filled('shipmentDateFrom')) {
+//                $updateData[$request->type . '_shipment_date_from'] = $request->shipmentDateFrom;
+//            }
+//            if ($request->filled('shipmentDateTo')) {
+//                $updateData[$request->type . '_shipment_date_to'] = $request->shipmentDateTo;
+//            }
+//            if ($request->filled('deliveryDateFrom')) {
+//                $updateData[$request->type . '_delivery_date_from'] = $request->deliveryDateFrom;
+//            }
+//            if ($request->filled('deliveryDateTo')) {
+//                $updateData[$request->type . '_delivery_date_to'] = $request->deliveryDateTo;
+//            }
+//
+//            // Always set acceptance to true
+//            $updateData[$request->type . '_acceptance'] = true;
+//
+//            $result = $order->dates()->update($updateData);
+//
+//            $messagesHelper->sendDateChangeMessage($order->chat, $request->type);
+//            $order->date_accepted = false;
+//            $order->save();
+//        }
 
         dispatch_now(new SendSpeditionNotifications());
 
