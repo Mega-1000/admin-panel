@@ -1,7 +1,7 @@
 Dzień dobry,
 <br>
 <br>
-Zwracamy się z prośbą wysłania aktualnych cenników styropianu {{ $message }} na adres email styropiany@ephpolska.pl oraz wysyłanie wszystkich nowych cenników na ten adres.
+Zwracamy się z prośbą wysłania aktualnych cenników styropianu {{ $mes }} na adres email styropiany@ephpolska.pl oraz wysyłanie wszystkich nowych cenników na ten adres.
 <br>
 <br>
 Elektroniczna Platforma Handlowa Polska
