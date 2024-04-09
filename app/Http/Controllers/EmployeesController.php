@@ -14,6 +14,7 @@ use App\Repositories\EmployeeRepository;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
@@ -247,13 +248,13 @@ class EmployeesController extends Controller
         ])->withInput(['tab' => 'employees']);
     }
 
-    public function requestNewPrices($id): RedirectResponse
+    public function requestNewPrices($id, Request $request): RedirectResponse
     {
         $employee = Employee::find($id);
 
         Mailer::create()
             ->to($employee->email)
-            ->send(new RequestNewPricesMail());
+            ->send(new RequestNewPricesMail($request->get('message')));
 
         return redirect()->back();
     }
