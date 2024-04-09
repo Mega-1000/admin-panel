@@ -233,7 +233,6 @@ class AuctionsController extends Controller
 
         foreach ($firms as $firm) {
             $firm->distance = LocationHelper::getDistanceOfProductForZipCode($firm, $chat->order->addresses->first()->postal_code);
-            dd($firm->distance, $chat->order->addresses->first()->postal_code, $firm);
         }
 
         return view('auctions.pre-data-prices-table', [
