@@ -89,6 +89,13 @@
                         }
                     }
                 }
+
+                // Add the sorting class to the current column header
+                let ths = table.getElementsByTagName("th");
+                for (let i = 0; i < ths.length; i++) {
+                    ths[i].classList.remove("asc", "desc");
+                }
+                ths[n].classList.add(dir);
             }
 
             function shouldSwitchRows(x, y, dir) {
@@ -100,45 +107,13 @@
                 return false;
             }
 
-            const order = {};
-
+            // Add click event listeners to the sort buttons
             window.onload = () => {
-                // Existing setup for submit button
-                const submitButton = document.querySelector('#submit-button');
-                submitButton.addEventListener('click', () => {
-                    // button event handling code here...
-                });
-
-                // Add event listeners to Sort buttons
-                document.querySelectorAll('.btn-sort').forEach(button => {
-                    button.addEventListener('click', () => {
-                        const columnIndex = parseInt(button.getAttribute('data-column'));
-                        sortTable(columnIndex);
-                    });
+                let sortButtons = document.querySelectorAll("th button.btn-primary");
+                sortButtons.forEach((button, index) => {
+                    button.addEventListener("click", () => sortTable(index));
                 });
             };
-
-            function createForm(order) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = ''; // Update to your backend route
-                form.style.display = 'none';
-
-                const orderInput = document.createElement('input');
-                orderInput.type = 'hidden';
-                orderInput.name = 'order';
-                orderInput.value = JSON.stringify(order); // Convert order array to JSON string
-                form.appendChild(orderInput);
-
-                // CSRF token setup
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = '_token';
-                csrfInput.value = '{{ csrf_token() }}';
-                form.appendChild(csrfInput);
-
-                return form;
-            }
         })();
     </script>
 
