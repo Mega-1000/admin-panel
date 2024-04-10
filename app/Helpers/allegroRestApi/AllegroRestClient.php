@@ -27,6 +27,7 @@ class AllegroRestClient extends AllegroApiService
                 $carrierId = CourierName::DPD;
                 break;
         }
+
         $waybill = $package->letter_number;
         $carrierName = $package->service_courier_name;
         $lineItems = ['id' => $this->prepareLineItems($package)];

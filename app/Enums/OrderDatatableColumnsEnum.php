@@ -37,7 +37,7 @@ enum OrderDatatableColumnsEnum
         ['filter' => '', 'order' => 7, 'size' => 100, 'label' => 'labels-fakury zakupu'],
         ['filter' => '', 'order' => 8, 'size' => 100, 'label' => 'labels-platnosci'],
         ['filter' => '', 'order' => 9, 'size' => 100, 'label' => 'labels-info dodatkowe'],
-        ['filter' => '', 'order' => 10, 'size' => 150, 'label' => 'created_at'],
+        ['filter' => '', 'order' => 10, 'size' => 150, 'label' => 'data-stworzenia'],
         ['filter' => '', 'order' => 11, 'size' => 100, 'label' => 'id', 'resetFilters' => true],
         ['filter' => '', 'order' => 12, 'size' => 100, 'label' => 'akcje'],
         ['filter' => '', 'order' => 13, 'size' => 100, 'label' => 'consultant-notices'],
@@ -97,6 +97,10 @@ enum OrderDatatableColumnsEnum
      * @var array<AbstractNonStandardColumnInvocable>
      */
     const NON_STANDARD_COLUMNS = [
+        'data-stworzenia' => [
+            'class' => NonStandardColumnInvocableCreatedAt::class,
+            'data' => []
+        ],
         'akcje' => [
             'class' => NonStandardColumnInvocableActions::class,
             'data' => []
