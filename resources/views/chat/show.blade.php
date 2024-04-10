@@ -89,7 +89,7 @@
                             </a>
                             <div id="auction-instructions" style="display: none; color: white; font-weight: bold; font-size: large; border-radius: 15px; padding: 20px; background-color: #0c0c0c">
                             <p>Poniżej tabela cen brutto produktów z tej oferty których istnieje możliwość dostarczenia na wskazany kod pocztowy.</p>
-                                <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="600px; width: 100%" width="600"></iframe>
+                                <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="600px; width: 100%"></iframe>
                             <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg.
                                 <br>
                                 !!! Jeśli chcesz wykonać inną czynnoś naciśnij przycisk zamknij tą tabelę</p>
