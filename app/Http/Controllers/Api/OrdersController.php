@@ -749,8 +749,19 @@ class OrdersController extends Controller
         $result = null;
         WorkingEventsService::createEvent(WorkingEvents::ACCEPT_DATES_EVENT, $order->id);
 
-        $order->date_accepted = true;
-        $order->save();
+        $type = $request->get('type');
+
+        if ($type === 'warehouse') {
+            $order->dates()->update([
+                'customer_delivery_date_from' => $order->dates->warehouse_delivery_date_from,
+                'customer_delivery_date_to' => $order->dates->warehouse_delivery_date_to,
+                'customer_shipment_date_from' => $order->dates->warehouse_shipment_date_from,
+                'customer_shipment_date_to' => $order->dates->warehouse_shipment_date_to,
+            ]);
+        }
+
+//        $order->date_accepted = true;
+//        $order->save();
 
         $messagesHelper->sendDateAcceptationMessage($order->chat);
     }
