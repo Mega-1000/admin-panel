@@ -89,9 +89,11 @@
                 @endphp
 
                 @php
-                    $items = $items->sortBy('order')->reject(function ($item) {
-                        return $item['order'] === null || $item['order'] === 0;
-                    });
+                    if (!isset($order)) {
+                        $items = $items->sortBy('order')->reject(function ($item) {
+                            return $item['order'] === null || $item['order'] === 0;
+                        });
+                    }
 
                     $groupedItems = [];
                     $eanMapping = []; // Assuming this array maps prefixes to their ean_of_collective_packing
@@ -103,7 +105,6 @@
                     }
                 @endphp
 
-                {{ dd($groupedItems) }}
                 @foreach($groupedItems as $prefix => $suffixes)
                     <th  colspan="{{ count($suffixes) }}">
                         {{ $prefix }}
