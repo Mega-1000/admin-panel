@@ -161,7 +161,7 @@
                 Po więcej informacji kliknij przycisk zobacz więcej
                 <br>
                 <br>
-                <a href="https://mega1000.pl/polec-znajomego" class="btn btn-primary">
+                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
                     Zobacz więcej na temat promocji
                 </a>
             </div>
