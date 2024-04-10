@@ -103,19 +103,18 @@
             const order = {};
 
             window.onload = () => {
+                // Existing setup for submit button
                 const submitButton = document.querySelector('#submit-button');
                 submitButton.addEventListener('click', () => {
-                    const selectedOffers = document.querySelectorAll('.offer-checkbox:checked');
-                    const order = Array.from(selectedOffers).map(checkbox => {
-                        const productId = checkbox.dataset.productId;
-                        const variationId = checkbox.dataset.variationId;
-                        const quantityInput = document.querySelector(`#quantity-${variationId}`);
-                        return { 'productId': parseInt(productId), 'variationId': parseInt(variationId) };
-                    });
+                    // button event handling code here...
+                });
 
-                    const form = createForm(order);
-                    document.body.appendChild(form);
-                    form.submit();
+                // Add event listeners to Sort buttons
+                document.querySelectorAll('.btn-sort').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const columnIndex = parseInt(button.getAttribute('data-column'));
+                        sortTable(columnIndex);
+                    });
                 });
             };
 
@@ -184,7 +183,7 @@
                             @endphp
                             {{ $name }}
 
-                            <button class="btn btn-primary">
+                            <button class="btn btn-primary" data-column="1">
                                 Sortuj
                             </button>
                         </th>
