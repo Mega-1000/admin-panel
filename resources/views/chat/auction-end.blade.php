@@ -228,6 +228,10 @@
                 @endforeach
 
                 @foreach($firms as $firm)
+                    @if(in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
+                        @continue
+                    @endif
+
                     @php
                         $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
                     @endphp
@@ -289,6 +293,9 @@
             @endphp
 
             @foreach($firms as $firm)
+                @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
+                    @continue
+                @endif
                 @php
                     $symbol =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
                 @endphp
