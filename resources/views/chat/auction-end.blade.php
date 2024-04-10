@@ -132,6 +132,10 @@
                 </a>
             </div>
 
+            <div class="alert alert-primary mt-4">
+                Jeśli jesteś zadowolony z ceny konkretnego producenta zaznacz checkboxy przy cenach dla każdego produktu po czym naciśnij przycisk "Wyślij zamówienie"
+            </div>
+
             <table>
                 <thead>
                 <tr>
