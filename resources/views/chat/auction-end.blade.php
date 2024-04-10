@@ -54,14 +54,6 @@
         #chat-container {
             margin-top: 50px;
         }
-
-        th.asc::after {
-            content: " ↓"; /* Change to arrow SVG or symbol as needed */
-        }
-
-        th.desc::after {
-            content: " ↑"; /* Change to arrow SVG or symbol as needed */
-        }
     </style>
 
     <script>
@@ -148,6 +140,7 @@
                             Ceny brutto za m3
                         </h5>
                     </th>
+                    @php($iteration = 1)
                     @foreach($products as $product)
                         <th>
                             @php
@@ -158,10 +151,11 @@
                             @endphp
                             {{ $name }}
 
-                            <button class="btn btn-primary" data-column="1">
+                            <button class="btn btn-primary" data-column="{{ $iteration }}">
                                 Sortuj
                             </button>
                         </th>
+                        @php($iteration++)
                     @endforeach
                 </tr>
                 </thead>
