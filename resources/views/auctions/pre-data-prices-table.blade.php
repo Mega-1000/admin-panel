@@ -84,7 +84,6 @@
             <thead>
             <tr>
                 <th>Ceny brutto za m3</th>
-                {{ dd($order->items) }}
                 @php
                     $items = isset($order) ? $order->items->pluck('product') : $products;
                 @endphp
@@ -104,6 +103,7 @@
                     }
                 @endphp
 
+                {{ dd($groupedItems) }}
                 @foreach($groupedItems as $prefix => $suffixes)
                     <th  colspan="{{ count($suffixes) }}">
                         {{ $prefix }}
