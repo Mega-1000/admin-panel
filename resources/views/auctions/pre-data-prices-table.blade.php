@@ -77,9 +77,9 @@
 
 <body>
     <div style="margin-top: 10px">
-        <h5>
+        <h4>
             Jeśli chcesz sortować po cenie za m3, kliknij na nagłówek kolumny.
-        </h5>
+        </h4>
         <table>
             <thead>
             <tr>
