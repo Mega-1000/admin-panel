@@ -216,7 +216,6 @@
                 <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" style="width: 35px; cursor: pointer">
                 <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST">
                     @csrf
-
                     <h2>
                         Dodaj firmę do przetargu
                     </h2>
