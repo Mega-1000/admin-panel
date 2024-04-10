@@ -133,7 +133,7 @@ class OrdersController extends Controller
     public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
         $data = $request->all();
-        foreach ($data['order_items'] as $item) {
+        foreach ($data['order_items'] as &$item) {
             $item['id'] = Product::where('symbol', $item['symbol'])->first();
         }
 
