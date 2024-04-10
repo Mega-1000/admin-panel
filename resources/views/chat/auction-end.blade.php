@@ -156,16 +156,14 @@
     <div class="container" id="flex-container">
         <div id="chat-container">
             <div class="alert-success alert">
-                Poleć naszą platformę znajomym, a my zaoferujemy Ci 20zł zniżki za każdego nowego użytkownika!
-
+                Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
+                <br>
+                Po więcej informacji kliknij przycisk zobacz więcej
                 <br>
                 <br>
-
-                Twój link to
-                <span style="font-weight: bold">
-                    https://mega1000.pl/sklep?ref={{ base64_encode($auction->chat->order->customer->id ?? $order->customer->id) }}
-                </span>
-                - skopiuj go i udostępnij znajomym!
+                <button class="btn btn-primary">
+                    Zobacz więcej na temat promocji
+                </button>
             </div>
 
             <table>
