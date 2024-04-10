@@ -134,7 +134,7 @@ class OrdersController extends Controller
     {
         $data = $request->all();
         foreach ($data['order_items'] as &$item) {
-            $item['id'] = Product::where('symbol', $item['symbol'])->first();
+            $item['id'] = Product::where('symbol', $item['symbol'])->first()->id;
         }
 
         $customer = Customer::where('login', $data['customer_login'])->first();
