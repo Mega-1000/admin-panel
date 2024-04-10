@@ -254,7 +254,7 @@ class EmployeesController extends Controller
 
         Mailer::create()
             ->to($employee->email)
-            ->send(new RequestNewPricesMail($request->get('message')));
+            ->send(new RequestNewPricesMail($request->get('message') ?? ' '));
 
         return redirect()->back();
     }

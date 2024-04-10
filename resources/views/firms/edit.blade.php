@@ -260,6 +260,7 @@
                     </form>
                     <form action="{{ route('employees.request-new-prices', $employee->id) }}" method="POST">
                         {{ csrf_field() }}
+                        wiadomość dodatkowa do proźby o wysłanie cennika
                         <input class="form-control" name="message" placeholder="wiadomość dodatkowa do proźby o wysłanie cennika">
 
                         <button class="btn btn-primary">
