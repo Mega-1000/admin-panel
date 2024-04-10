@@ -13,6 +13,7 @@ use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Entities\OrderPackage;
+use App\Entities\Product;
 use App\Entities\Status;
 use App\Entities\WorkingEvents;
 use App\Enums\PackageStatus;
@@ -132,6 +133,9 @@ class OrdersController extends Controller
     public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
         $data = $request->all();
+        foreach ($data['order_items'] as $item) {
+            $item['id'] = Product::where('symbol', $item['symbol'])->first();
+        }
 
         $customer = Customer::where('login', $data['customer_login'])->first();
 
