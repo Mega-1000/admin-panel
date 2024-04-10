@@ -217,7 +217,7 @@
 
                                 @if($offer)
                                     {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }}
-
+11
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
                                 @else
                                     No offer
@@ -276,44 +276,44 @@
             </button>
         </div>
 
-        <table class="mb-5">
-            <thead>
-                <tr>
-                    <th>
-                        <h5 style="text-align: right">
-                            Firmy, które nie złożyły spersonalizowanej wyceny dla tego zlecenia
-                        </h5>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
+{{--        <table class="mb-5">--}}
+{{--            <thead>--}}
+{{--                <tr>--}}
+{{--                    <th>--}}
+{{--                        <h5 style="text-align: right">--}}
+{{--                            Firmy, które nie złożyły spersonalizowanej wyceny dla tego zlecenia--}}
+{{--                        </h5>--}}
+{{--                    </th>--}}
+{{--                </tr>--}}
+{{--            </thead>--}}
+{{--            <tbody>--}}
 
-            @php
-                $displayedSymbols = [];
-            @endphp
+{{--            @php--}}
+{{--                $displayedSymbols = [];--}}
+{{--            @endphp--}}
 
-            @foreach($firms as $firm)
-                @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
-                    @continue
-                @endif
-                @php
-                    $symbol =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
-                @endphp
+{{--            @foreach($firms as $firm)--}}
+{{--                @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))--}}
+{{--                    @continue--}}
+{{--                @endif--}}
+{{--                @php--}}
+{{--                    $symbol =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display--}}
+{{--                @endphp--}}
 
-                @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 && !in_array($symbol, $displayedSymbols))
-                    <tr>
-                        <td>
-                            {{ $symbol }}
-                        </td>
-                    </tr>
-                    @php
-                        $displayedSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
-                    @endphp
-                @endif
-            @endforeach
+{{--                @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 && !in_array($symbol, $displayedSymbols))--}}
+{{--                    <tr>--}}
+{{--                        <td>--}}
+{{--                            {{ $symbol }}--}}
+{{--                        </td>--}}
+{{--                    </tr>--}}
+{{--                    @php--}}
+{{--                        $displayedSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again--}}
+{{--                    @endphp--}}
+{{--                @endif--}}
+{{--            @endforeach--}}
 
-            </tbody>
-        </table>
+{{--            </tbody>--}}
+{{--        </table>--}}
     </div>
 </div>
 </body>
