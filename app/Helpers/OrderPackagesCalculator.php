@@ -12,7 +12,11 @@ class OrderPackagesCalculator
         $glskd = 0;
         $dpdd = 0;
 
+
         foreach ($order->items as $item) {
+            if ((int)$item->product->assortment_quantity === 0) {
+                continue;
+            }
             switch ($item->product->delivery_type) {
                 case 'GLS':
                     $glsks += $item->quantity / (int)$item->product->assortment_quantity;
