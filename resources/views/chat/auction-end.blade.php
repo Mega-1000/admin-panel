@@ -188,9 +188,13 @@
                                 @endphp
 
                                 @if($offer)
-                                    {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }} - cena specjalnie dla tego zamówienia
+                                    {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->min('basic_price_gross') }}
 
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
+
+                                    <span style="color: green">
+                                        - cena personalizowana
+                                    </span>
                                 @else
                                     No offer
                                 @endif
