@@ -38,7 +38,7 @@ class OrderWarehouseNotificationController extends Controller
         protected readonly OrderInvoiceRepository               $orderInvoiceRepository
     ) {}
 
-    public function getNotification(int $notificationId): OrderWarehouseNotification
+    public function getNotification(int $notificationId): ?OrderWarehouseNotification
     {
         return OrderWarehouseNotification::find($notificationId);
     }
