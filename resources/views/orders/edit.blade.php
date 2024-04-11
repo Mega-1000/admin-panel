@@ -1051,9 +1051,9 @@
                             @foreach($productsVariation[$item->product->id] as $variation)
                                 <tr class="row-{{$variation['id']}}">
                                     @php
-                                        $product = \App\Entities\Product::where('symbol', substr(\App\Entities\Product::where('id', $variation['id'])->first()->symbol, 0, -2))->first();
-                                        if ($product == null) {
-                                            $product = \App\Entities\Product::where('symbol', substr(\App\Entities\Product::where('id', $variation['id'])->first()->symbol, 0, 0))->first();
+                                        $product = \App\Entities\Product::where('id', substr(\App\Entities\Product::where('id', $variation['id'])->first()->symbol, 0, -2))->first();
+                                        if (empty($product)) {
+                                            $product = \App\Entities\Product::where('symbol', \App\Entities\Product::where('id', $variation['id'])->first()->symbol)->first();
                                         }
                                         $dateOfPriceChange = \Carbon\Carbon::create($product?->date_of_price_change);
                                          $firm = $product?->firm;
