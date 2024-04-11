@@ -79,9 +79,7 @@ class OrderWarehouseNotificationController extends Controller
         if (empty($employees)) {
             $employees = $warehouse->firm->employees;
         }
-
-        var_dump($employees, $warehouse);
-        die();
+        Log::notice($employees, $warehouse);
 
         $helper = new MessagesHelper();
         $helper->orderId = $data['order_id'];
