@@ -59,7 +59,7 @@ class MessagesHelper
     const MESSAGE_GREEN_LABEL_ID = 58;
 
     /**
-     * @throws ChatException
+     * @throws ChatException|Exception
      */
     public function __construct($token = null)
     {
