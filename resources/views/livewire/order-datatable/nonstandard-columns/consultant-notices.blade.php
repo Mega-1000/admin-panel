@@ -5,7 +5,7 @@
 
     @foreach($latestMessages as $message)
         <hr>
-        {{ $message['message'] }} - {{ explode('.', $message['created_at'])[0] }}
+        {{ $message['message'] }} - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
         <br>
         <hr>
     @endforeach
