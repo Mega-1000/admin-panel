@@ -80,6 +80,8 @@ class OrderWarehouseNotificationController extends Controller
             $employees = $warehouse->firm->employees;
         }
 
+        dd($employees, $warehouse);
+
         $helper = new MessagesHelper();
         $helper->orderId = $data['order_id'];
         $helper->currentUserId = $employees->first()->id;
