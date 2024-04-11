@@ -1051,12 +1051,15 @@
                             @foreach($productsVariation[$item->product->id] as $variation)
                                 <tr class="row-{{$variation['id']}}">
                                     @php
-                                        $product = \App\Entities\Product::where('symbol', substr(\App\Entities\Product::where('name', $variation['name'])->first()->symbol, 0, -2))->first();
+                                        $product = \App\Entities\Product::where('symbol', substr(\App\Entities\Product::where('id', $variation['id'])->first()->symbol, 0, -2))->first();
+                                        if ($product == null) {
+                                            $product = \App\Entities\Product::where('symbol', substr(\App\Entities\Product::where('id', $variation['id'])->first()->symbol, 0, 0))->first();
+                                        }
                                         $dateOfPriceChange = \Carbon\Carbon::create($product?->date_of_price_change);
                                          $firm = $product?->firm;
                                     @endphp
                                     <td style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
-                                        {{$variation['name']}}
+                                        {{ $variation['name'] }}
                                         {{ $variation['id'] }}
                                         <a href="/admin/firms/{{ $firm?->id }}/edit">LINK DO FIRMY</a>
                                     </td>
