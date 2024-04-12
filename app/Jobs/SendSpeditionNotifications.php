@@ -38,7 +38,7 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = Order::whereHas('labels', function ($query) {$query->where('labels.id', '=', 53);})->get();
+        $orders = Order::where('id', 85361)->whereHas('labels', function ($query) {$query->where('labels.id', '=', 53);})->get();
         $arr = [];
 
         foreach ($orders as $order) {
@@ -48,7 +48,7 @@ class SendSpeditionNotifications implements ShouldQueue
             if ($fromDate->subDay()->isToday() && !$order->start_of_spedition_period_sent) {
                 Mailer::create()
                     ->to($order->warehouse->email)
-                    ->send(new ReminderAboutStartOfSpeditionPeriod());
+                    ->send(new ReminderAboutStartOfSpeditionPeriod($order));
 
                 $order->update(['start_of_spedition_period_sent' => true]);
             }
@@ -60,7 +60,7 @@ class SendSpeditionNotifications implements ShouldQueue
             if ($toDate->subDay()->isToday() && !$order->near_end_of_spedition_period_sent) {
                 Mailer::create()
                     ->to($order->warehouse->email)
-                    ->send(new ReminderAboutNearEndOfSpeditionPeriod());
+                    ->send(new ReminderAboutNearEndOfSpeditionPeriod($order));
 
                 $order->update(['near_end_of_spedition_period_sent' => true]);
             }
@@ -68,7 +68,7 @@ class SendSpeditionNotifications implements ShouldQueue
             if ($toDate < now() && !$order->labels->contains('id', 243)) {
                 Mailer::create()
                     ->to($order->warehouse->email)
-                    ->send(new ReminderAfterSpeditionPeriodEnded());
+                    ->send(new ReminderAfterSpeditionPeriodEnded($order));
 
                 AddLabelService::addLabels($order, [243], $arr, []);
                 $order->labels()->detach(244);

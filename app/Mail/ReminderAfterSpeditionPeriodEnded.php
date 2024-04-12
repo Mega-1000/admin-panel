@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Entities\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,37 +14,39 @@ class ReminderAfterSpeditionPeriodEnded extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public Order $order;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Order $order)
     {
-        //
+        $this->order = $order;
     }
 
     /**
      * Get the message envelope.
      *
-     * @return \Illuminate\Mail\Mailables\Envelope
+     * @return Envelope
      */
-    public function envelope()
+    public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reminder After Spedition Period Ended',
+            subject: 'Przypomnienie o wysyłce - przedział dat minął',
         );
     }
 
     /**
      * Get the message content definition.
      *
-     * @return \Illuminate\Mail\Mailables\Content
+     * @return Content
      */
-    public function content()
+    public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.reminder-spedition-period-ended',
         );
     }
 
@@ -52,7 +55,7 @@ class ReminderAfterSpeditionPeriodEnded extends Mailable
      *
      * @return array
      */
-    public function attachments()
+    public function attachments(): array
     {
         return [];
     }
