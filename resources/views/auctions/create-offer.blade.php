@@ -125,7 +125,7 @@
                     @include('chat/pricing_table')
 
                     @php
-                        $product->current_firm_offers = $product->chatAuctionOffers->where('firm_id', $chat_auction_firm->id)->sortByDesc('id')->first();
+                        $product->current_firm_offers = $product->chatAuctionOffers->where('firm_id', $chat_auction_firm->firm->id)->sortByDesc('id')->first();
                     @endphp
 
                     <div class="d-flex">

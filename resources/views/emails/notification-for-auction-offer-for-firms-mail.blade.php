@@ -4,7 +4,12 @@ Informujemy że w ofercie numer {{ $chatAuctionOffer->chatAuction->chat->order->
 Prosimy wejść na poniższy link aby zobaczyć na ten moment zaproponowaną najniższą ceną.
 <br>
 <br>
-<a href="{{ route('auctions.offer.create', ['token' => $chatAuctionOffer->auctionFirm->token]) }}">Link do oferty</a>
+<a href="https://admin.mega1000.pl/auctions/offer/create/{{ $chatAuctionOffer->auctionFirm->token }}">
+    Link do oferty
+</a>
+<br>
+<br>
+W razie problemów prosimy o wklejenie następującego linku w okno przeglądarki: https://admin.mega1000.pl/auctions/offer/create/{{ $chatAuctionOffer->auctionFirm->token }}
 <br>
 <br>
 Z pozdrowieniami
