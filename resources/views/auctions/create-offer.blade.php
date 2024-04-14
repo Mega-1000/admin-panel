@@ -128,7 +128,7 @@
                         $product->current_firm_offers = $product->chatAuctionOffers->where('firm_id', $chat_auction_firm->firm->id)->sortByDesc('id')->first();
                     @endphp
 
-                    <div class="d-flex">
+                    <div class="d-flex" style="font-weight: bold; font-size: large">
                         Powiadamiaj mnie w przypadku przebicia najniższej ceny:
                         <input type="checkbox" name="send_notification" value="true" {{ $product->current_firm_offers?->send_notification ? 'checked' : '' }}>
                     </div>
