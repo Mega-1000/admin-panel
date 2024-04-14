@@ -150,7 +150,7 @@
                             Ceny brutto za m3
                         </h5>
                     </th>
-                    @php $iteration = 1; @endphp
+                    @php $iteration = 2; @endphp
                     @foreach($products as $product)
                         <th>
                             @php
