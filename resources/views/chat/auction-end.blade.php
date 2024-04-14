@@ -157,9 +157,9 @@
                             @endphp
                             {{ $name }}
 
-                            <button class="btn btn-primary" data-column="{{ $iteration }}">
-                                Sortuj
-                            </button>
+{{--                            <button class="btn btn-primary" data-column="{{ $iteration }}">--}}
+{{--                                Sortuj--}}
+{{--                            </button>--}}
                         </th>
                         @php $iteration++; @endphp
                     @endforeach
