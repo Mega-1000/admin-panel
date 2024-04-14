@@ -65,17 +65,14 @@
                 let switchcount = 0;
                 while (switching) {
                     switching = false;
-                    let rows = table.rows;
+                    let rows = Array.from(table.rows);
                     for (let i = 1; i < (rows.length - 1); i++) {
                         let shouldSwitch = false;
-                        let x = rows[i].getElementsByTagName("TD")[n];
-                        let y = rows[i + 1].getElementsByTagName("TD")[n];
+                        let x = rows[i].getElementsByTagName("TD")[n].innerText.toLowerCase().trim();
+                        let y = rows[i + 1].getElementsByTagName("TD")[n].innerText.toLowerCase().trim();
                         shouldSwitch = shouldSwitchRows(x, y, dir);
                         if (shouldSwitch) {
-                            // Swap the rows
-                            let temp = rows[i].innerHTML;
-                            rows[i].innerHTML = rows[i + 1].innerHTML;
-                            rows[i + 1].innerHTML = temp;
+                            [rows[i], rows[i + 1]] = [rows[i + 1], rows[i]];
                             switching = true;
                             switchcount++;
                         } else if (switchcount === 0 && dir === "asc") {
@@ -83,6 +80,8 @@
                             switching = true;
                         }
                     }
+                    table.innerHTML = '';
+                    rows.forEach(row => table.appendChild(row));
                 }
 
                 // Add the sorting class to the current column header
@@ -94,13 +93,10 @@
             }
 
             function shouldSwitchRows(x, y, dir) {
-                let xValue = x.innerHTML.toLowerCase().trim();
-                let yValue = y.innerHTML.toLowerCase().trim();
-
                 if (dir === "asc") {
-                    return xValue > yValue;
+                    return x > y;
                 } else if (dir === "desc") {
-                    return xValue < yValue;
+                    return x < y;
                 }
                 return false;
             }
