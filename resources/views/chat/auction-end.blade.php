@@ -72,7 +72,10 @@
                         let y = rows[i + 1].getElementsByTagName("TD")[n];
                         shouldSwitch = shouldSwitchRows(x, y, dir);
                         if (shouldSwitch) {
-                            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                            // Swap the rows
+                            let temp = rows[i].innerHTML;
+                            rows[i].innerHTML = rows[i + 1].innerHTML;
+                            rows[i + 1].innerHTML = temp;
                             switching = true;
                             switchcount++;
                         } else if (switchcount === 0 && dir === "asc") {
@@ -91,10 +94,13 @@
             }
 
             function shouldSwitchRows(x, y, dir) {
+                let xValue = x.innerHTML.toLowerCase().trim();
+                let yValue = y.innerHTML.toLowerCase().trim();
+
                 if (dir === "asc") {
-                    return x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase();
+                    return xValue > yValue;
                 } else if (dir === "desc") {
-                    return x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase();
+                    return xValue < yValue;
                 }
                 return false;
             }

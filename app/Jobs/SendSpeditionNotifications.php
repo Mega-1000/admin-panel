@@ -38,8 +38,7 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = Order::where('id', 85361)->whereHas('labels', function ($query) {$query->where('labels.id', '=', 53);})->get();
-        $arr = [];
+        $orders = Order::where('id', 85361)->get();
 
         foreach ($orders as $order) {
             $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
@@ -47,29 +46,31 @@ class SendSpeditionNotifications implements ShouldQueue
 
             if ($fromDate->subDay()->isToday() && !$order->start_of_spedition_period_sent) {
                 Mailer::create()
-                    ->to($order->warehouse->email)
+                    ->to($order->warehouse->warehouse_email)
                     ->send(new ReminderAboutStartOfSpeditionPeriod($order));
 
                 $order->update(['start_of_spedition_period_sent' => true]);
             }
 
             if ($fromDate->isToday()) {
+                $arr = [];
                 AddLabelService::addLabels($order, [244], $arr, []);
             }
 
             if ($toDate->subDay()->isToday() && !$order->near_end_of_spedition_period_sent) {
                 Mailer::create()
-                    ->to($order->warehouse->email)
+                    ->to($order->warehouse->warehouse_email)
                     ->send(new ReminderAboutNearEndOfSpeditionPeriod($order));
 
                 $order->update(['near_end_of_spedition_period_sent' => true]);
             }
 
-            if ($toDate < now() && !$order->labels->contains('id', 243)) {
+            if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
                 Mailer::create()
-                    ->to($order->warehouse->email)
+                    ->to($order->warehouse->warehouse_email)
                     ->send(new ReminderAfterSpeditionPeriodEnded($order));
 
+                $arr = [];
                 AddLabelService::addLabels($order, [243], $arr, []);
                 $order->labels()->detach(244);
             }
