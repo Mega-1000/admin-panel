@@ -5,7 +5,7 @@
 
 Informujemy że w ofercie numer {{ $chatAuctionOffer->chatAuction->chat->order->id }}  zostało dokonane przebicie najniższej ceny.
 <br>
-z
+
 <br>
 Prosimy wejść na poniższy link aby zobaczyć na ten moment zaproponowaną najniższą ceną.
 <br>

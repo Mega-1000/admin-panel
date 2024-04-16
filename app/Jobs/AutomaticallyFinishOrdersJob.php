@@ -63,8 +63,8 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
             })
             ->get();
         $orders->map(function ($order) {
-            $preventionArray = [];
-            RemoveLabelService::removeLabels($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, [Label::ORDER_ITEMS_REDEEMED_LABEL], Auth::user()?->id);
+//            $preventionArray = [];
+//            RemoveLabelService::removeLabels($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, [Label::ORDER_ITEMS_REDEEMED_LABEL], Auth::user()?->id);
         });
     }
 }
