@@ -18,12 +18,12 @@
     @if($labelGroupName === 'transport')
         @php
             $dateTranslations = [
-                'customer_shipment_date_from' => 'data klient od',
-                'customer_shipment_date_to' => 'data klient do',
-                'consultant_shipment_date_from' => 'Data konsultant od',
-                'consultant_shipment_date_to' => 'Data konsultant do',
-                'warehouse_shipment_date_from' => 'Data magazyn od',
-                'warehouse_shipment_date_to' => 'Data magazyn do'
+                'customer_shipment_date_from' => 'klient od',
+                'customer_shipment_date_to' => 'klient do',
+                'consultant_shipment_date_from' => 'konsultant od',
+                'consultant_shipment_date_to' => 'konsultant do',
+                'warehouse_shipment_date_from' => 'magazyn od',
+                'warehouse_shipment_date_to' => 'magazyn do'
             ];
         @endphp
         @foreach($order['dates'] as $k => $date)

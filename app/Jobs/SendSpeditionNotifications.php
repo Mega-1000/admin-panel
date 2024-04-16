@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class SendSpeditionNotifications implements ShouldQueue
 {
@@ -38,9 +39,14 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = Order::where('id', 85361)->get();
+        $orders = DB::table('order_labels')->where(['label_id' => 53])->get();
 
         foreach ($orders as $order) {
+            $order = Order::find($order->order_id);
+            if ($order->labels->contains(66)) {
+                continue;
+            }
+
             $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
             $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
 
