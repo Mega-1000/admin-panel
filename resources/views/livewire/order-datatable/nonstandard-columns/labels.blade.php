@@ -15,6 +15,13 @@
         @endforeach
     @endif
 
+    @if($labelGroupName === 'transport')
+        {{ $order['dates'] }}
+
+{{--        @foreach($order)--}}
+{{--        @endforeach--}}
+    @endif
+
     <div class="label-container">
         @if(!empty($order))
             @foreach(

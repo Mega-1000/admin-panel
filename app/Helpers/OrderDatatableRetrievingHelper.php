@@ -45,6 +45,7 @@ class OrderDatatableRetrievingHelper
             'task.taskTime',
             'addresses',
             'invoices',
+            'dates'
         ]);
     }
 
