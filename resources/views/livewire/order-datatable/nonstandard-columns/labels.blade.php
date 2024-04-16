@@ -16,8 +16,9 @@
     @endif
 
     @if($labelGroupName === 'transport')
-        @foreach($order['dates'] as $date)
-            {{ $date }}
+        @foreach($order['dates'] as $k => $date)
+            {{ $k }}: {{ $date }}
+            <br>
         @endforeach
     @endif
 
