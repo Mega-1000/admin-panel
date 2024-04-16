@@ -15,30 +15,29 @@
         @endforeach
     @endif
 
-        @if($labelGroupName === 'transport')
-            @php
-                $dateTranslations = [
-                    'customer_shipment_date_from' => 'data klient od',
-                    'customer_shipment_date_to' => 'data klient do',
-                    'consultant_shipment_date_from' => 'data konsultanta od',
-                    'consultant_shipment_date_to' => 'data konsultanta do',
-                    'warehouse_shipment_date_from' => 'data magazynu od',
-                    'warehouse_shipment_date_to' => 'data magazynu do'
-                ];
-
-                function formatDateTime($dateTime) {
-                    return \Carbon\Carbon::parse($dateTime)->timezone('Europe/Warsaw')->format('m-d H:i');
-                }
-            @endphp
-
-            <strong>data klient</strong><br>
-            @foreach(['customer_shipment_date_from', 'customer_shipment_date_to'] as $key)
-                @if(isset($order['dates'][$key]))
-                    {{ $dateTranslations[$key] }} {{ formatDateTime($order['dates'][$key]) }}<br>
-                @endif
-            @endforeach
-        @endif
-
+    @if($labelGroupName === 'transport')
+        @php
+            $dateTranslations = [
+                'customer_shipment_date_from' => 'Data wysyłki klienta od',
+                'customer_shipment_date_to' => 'Data wysyłki klienta do',
+                'consultant_shipment_date_from' => 'Data wysyłki konsultanta od',
+                'consultant_shipment_date_to' => 'Data wysyłki konsultanta do',
+                'warehouse_shipment_date_from' => 'Data wysyłki magazynu od',
+                'warehouse_shipment_date_to' => 'Data wysyłki magazynu do'
+            ];
+        @endphp
+        @php
+            function formatDateTime($dateTime) {
+                return \Carbon\Carbon::parse($dateTime)->timezone('Europe/Warsaw')->format('m-d H:i');
+            }
+        @endphp
+        @foreach($order['dates'] as $k => $date)
+            @if(array_key_exists($k, $dateTranslations))
+                {{ $dateTranslations[$k] }}: {{ formatDateTime($date) }}
+                <br>
+            @endif
+        @endforeach
+    @endif
 
     <div class="label-container">
         @if(!empty($order))
