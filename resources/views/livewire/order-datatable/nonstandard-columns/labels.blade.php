@@ -17,10 +17,10 @@
 
     @if($labelGroupName === 'transport')
         @foreach($order['dates'] as $k => $date)
-            @if($k !== 'message')
+            @if(in_array($k, ['customer_shipment_date_from', 'customer_shipment_date_to', 'consultant_shipment_date_from', 'consultant_shipment_date_to', 'warehouse_shipment_date_from', 'warehouse_shipment_date_to']))
                 {{ $k }}: {{ $date }}
+                <br>
             @endif
-            <br>
         @endforeach
     @endif
 
