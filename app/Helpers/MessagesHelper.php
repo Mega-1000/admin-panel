@@ -490,6 +490,7 @@ class MessagesHelper
 
     public function getCurrentChatUser()
     {
+        dd($this);
         $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
 
         if (!$this->getChat()) {
