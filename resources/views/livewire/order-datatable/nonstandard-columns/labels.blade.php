@@ -28,7 +28,7 @@
         @endphp
         @foreach($order['dates'] as $k => $date)
             @if(array_key_exists($k, $dateTranslations))
-                {{ $dateTranslations[$k] }}: {{  \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') }}
+                {{ $dateTranslations[$k] }}: {{  \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-dH:i') }}
                 <br>
             @endif
         @endforeach
