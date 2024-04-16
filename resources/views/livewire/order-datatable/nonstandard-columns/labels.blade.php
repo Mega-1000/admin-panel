@@ -26,14 +26,9 @@
                 'warehouse_shipment_date_to' => 'Data wysyłki magazynu do'
             ];
         @endphp
-        @php
-            function fdt($dateTime) {
-                return \Carbon\Carbon::parse($dateTime)->timezone('Europe/Warsaw')->format('m-d H:i');
-            }
-        @endphp
         @foreach($order['dates'] as $k => $date)
             @if(array_key_exists($k, $dateTranslations))
-                {{ $dateTranslations[$k] }}: {{ fdt($date) }}
+                {{ $dateTranslations[$k] }}: {{  \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') }}
                 <br>
             @endif
         @endforeach
