@@ -200,7 +200,7 @@ class MessagesController extends Controller
 
         $currentChatUser = $helper->getCurrentChatUser();
 
-        $currentChatUser->is_online = true;
+        $currentChatUser?->is_online ?? $okej = true;
 
         $assignedMessagesIds = [];
         if ($currentChatUser !== null) {
