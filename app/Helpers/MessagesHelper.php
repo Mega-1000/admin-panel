@@ -497,7 +497,7 @@ class MessagesHelper
         }
 
         $chatUser = $this->getChat()->chatUsers()->where($column, $this->currentUserId)->first();
-
+dd($chatUser);
         if (!$chatUser) {
             return $this->getAdminChatUser();
         }
