@@ -27,13 +27,13 @@
             ];
         @endphp
         @php
-            function formatDateTime($dateTime) {
+            function fdt($dateTime) {
                 return \Carbon\Carbon::parse($dateTime)->timezone('Europe/Warsaw')->format('m-d H:i');
             }
         @endphp
         @foreach($order['dates'] as $k => $date)
             @if(array_key_exists($k, $dateTranslations))
-                {{ $dateTranslations[$k] }}: {{ formatDateTime($date) }}
+                {{ $dateTranslations[$k] }}: {{ fdt($date) }}
                 <br>
             @endif
         @endforeach
