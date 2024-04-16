@@ -16,10 +16,9 @@
     @endif
 
     @if($labelGroupName === 'transport')
-        {{ $order['dates'] }}
-
-{{--        @foreach($order)--}}
-{{--        @endforeach--}}
+        @foreach($order['dates'] as $date)
+            {{ $date }}
+        @endforeach
     @endif
 
     <div class="label-container">
