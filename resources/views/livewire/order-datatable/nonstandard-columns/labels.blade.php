@@ -16,9 +16,19 @@
     @endif
 
     @if($labelGroupName === 'transport')
+        @php
+            $dateTranslations = [
+                'customer_shipment_date_from' => 'Data wysyłki klienta od',
+                'customer_shipment_date_to' => 'Data wysyłki klienta do',
+                'consultant_shipment_date_from' => 'Data wysyłki konsultanta od',
+                'consultant_shipment_date_to' => 'Data wysyłki konsultanta do',
+                'warehouse_shipment_date_from' => 'Data wysyłki magazynu od',
+                'warehouse_shipment_date_to' => 'Data wysyłki magazynu do'
+            ];
+        @endphp
         @foreach($order['dates'] as $k => $date)
-            @if(in_array($k, ['customer_shipment_date_from', 'customer_shipment_date_to', 'consultant_shipment_date_from', 'consultant_shipment_date_to', 'warehouse_shipment_date_from', 'warehouse_shipment_date_to']))
-                {{ $k }}: {{ $date }}
+            @if(array_key_exists($k, $dateTranslations))
+                {{ $dateTranslations[$k] }}: {{ $date }}
                 <br>
             @endif
         @endforeach
