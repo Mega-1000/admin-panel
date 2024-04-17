@@ -320,10 +320,16 @@ class MessagesController extends Controller
         $auction = $chat->auctions->first();
         $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
 
-        foreach ($company->employees()->where('name', 'zamowienia towaru')->get() as $employee) {
+        foreach ($company->employees()->whereHas('roles', function ($q) {$q->where('name', 'zamowienia towaru');})->get() as $employee) {
             Mailer::create()
                 ->to($employee->email)
-                ->send(new NotifyFirmAboutAuction($auction, $company, $chatAuctionsService->generateLinkForAuction($auction, $company, $employee->email)));
+                ->send(
+                    new NotifyFirmAboutAuction(
+                        $auction,
+                        $company,
+                        $chatAuctionsService->generateLinkForAuction($auction, $company, $employee->email)
+                    )
+                );
         }
 
         return redirect()->back();
