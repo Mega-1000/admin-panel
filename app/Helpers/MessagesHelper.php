@@ -497,9 +497,9 @@ class MessagesHelper
         }
 
         $chatUser = $this->getChat()->chatUsers()->where($column, $this->currentUserId)->first();
-//        if (!$chatUser) {
-//            return $this->getAdminChatUser();
-//        }
+        if (!$chatUser && $this->currentUserType === self::TYPE_USER) {
+            return $this->getAdminChatUser();
+        }
 
         return $chatUser ?? $this->getChat()->whereHas('chatUsers', function ($query) {
             $query->whereHas('employee');
