@@ -50,6 +50,11 @@ class SendSpeditionNotifications implements ShouldQueue
             $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
             $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
 
+            if ($fromDate->isFuture()) {
+                $arr = [];
+                AddLabelService::addLabels($order, [245], $arr, []);
+            }
+
             if ($fromDate->subDay()->isToday() && !$order->start_of_spedition_period_sent) {
                 Mailer::create()
                     ->to($order->warehouse->warehouse_email)
@@ -61,6 +66,8 @@ class SendSpeditionNotifications implements ShouldQueue
             if ($fromDate->isToday()) {
                 $arr = [];
                 AddLabelService::addLabels($order, [244], $arr, []);
+
+                $order->labels()->detach(245);
             }
 
             if ($toDate->subDay()->isToday() && !$order->near_end_of_spedition_period_sent) {
@@ -71,6 +78,13 @@ class SendSpeditionNotifications implements ShouldQueue
                 $order->update(['near_end_of_spedition_period_sent' => true]);
             }
 
+            if ($toDate->isToday()) {
+                $order->labels()->detach(244);
+
+                $arr = [];
+                AddLabelService::addLabels($order, [74], $arr, []);
+            }
+
             if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
                 Mailer::create()
                     ->to($order->warehouse->warehouse_email)
@@ -78,7 +92,7 @@ class SendSpeditionNotifications implements ShouldQueue
 
                 $arr = [];
                 AddLabelService::addLabels($order, [243], $arr, []);
-                $order->labels()->detach(244);
+                $order->labels()->detach(74);
             }
         }
 
