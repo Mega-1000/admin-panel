@@ -389,7 +389,7 @@ class ProductsController extends Controller
     public function searchProduct(string $query): JsonResponse
     {
         return response()->json(
-            Product::where('name', 'like', '%' . $query .'%')->limit(5)->get()
+            Product::where('name', 'like', '%' . $query .'%')->with('prices')->limit(5)->get()
         );
     }
 }
