@@ -123,6 +123,7 @@ Route::post('order-warehouse-notification/accept/{notificationId}/sendInvoice', 
 Route::post('order-warehouse-notification/accept/{notificationId}/changeStatus', 'Api\OrderWarehouseNotificationController@changeStatus')
     ->name('api.order-warehouse-notification.accept.changeStatus');
 Route::get('order-shipping-cancelled/{package_id}', 'Api\OrdersController@orderPackagesCancelled')->name('api.order-shipping-cancelled');
+Route::get('searchProduct/{query}', [ProductsController::class, 'searchProduct'])->name('searchProduct');
 
 Route::get('get-associated-labels-to-order-from-group/{labelGroupName}', 'Api\LabelsController@getAssociatedLabelsToOrderFromGroup')->name('api.labels.get-associated-labels-to-order-from-group');
 
