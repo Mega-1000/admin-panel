@@ -818,7 +818,7 @@
                     canModify = true;
                 }
 
-                if (key === 'consultant') {
+                if (isConsultant) {
                     canModify = true;
                 }
 
