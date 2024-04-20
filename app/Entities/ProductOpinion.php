@@ -9,5 +9,7 @@ class ProductOpinion extends Model
 {
     use HasFactory;
 
-
+    protected $fillable = [
+        'product_id',
+    ];
 }
