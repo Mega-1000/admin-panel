@@ -389,7 +389,9 @@ class ProductsController extends Controller
     public function searchProduct(string $query): JsonResponse
     {
         return response()->json(
-            Product::where('name', 'like', '%' . $query .'%')->whereHas('children')->with('price')->limit(5)->get()
+            Product::where('name', 'like', '%' . $query .'%')->whereHas('children')->with('price')->limit(5)->get()->each(function (&$product) {
+               $product->meanOpinion = $product->opinions->mean('rating');
+            }),
         );
     }
 }
