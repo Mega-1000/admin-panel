@@ -328,6 +328,6 @@ class Product extends Model implements Transformable
 
     public function opinions(): HasMany
     {
-        $this->hasMany(ProductOpinion::class);
+        return $this->hasMany(ProductOpinion::class);
     }
 }
