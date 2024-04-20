@@ -339,7 +339,7 @@ class ProductsService
 //            $this->processMediaUrls($productKey, $productValue, $products);
 //            $this->getStockAndLogsData($productValue);
 
-            $productValue->meanOpinion = $productValue->opinions->avg('rating');
+            $productValue->meanOpinion = $productValue->opinions->avg('rating') ?? 0;
         }
     }
 
