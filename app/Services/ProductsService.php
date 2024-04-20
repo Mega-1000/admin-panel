@@ -335,10 +335,12 @@ class ProductsService
 
     public function prepareProductData(&$products): void
     {
-//        foreach ($products->data as $productKey => $productValue) {
+        foreach ($products->data as $productKey => &$productValue) {
 //            $this->processMediaUrls($productKey, $productValue, $products);
 //            $this->getStockAndLogsData($productValue);
-//        }
+
+            $productValue->meanOpinion = $productValue->opinions->avg('rating');
+        }
     }
 
     protected function checkAndSetProductUrl($productKey, &$productValue): void
