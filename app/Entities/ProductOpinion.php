@@ -11,6 +11,7 @@ class ProductOpinion extends Model
 
     protected $fillable = [
         'product_id',
-        'rating'
+        'rating',
+        'text'
     ];
 }
