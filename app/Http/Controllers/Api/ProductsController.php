@@ -389,9 +389,19 @@ class ProductsController extends Controller
     public function searchProduct(string $query): JsonResponse
     {
         return response()->json(
-            Product::where('name', 'like', '%' . $query .'%')->whereHas('children')->with('price')->limit(5)->get()->each(function (&$product) {
-               $product->meanOpinion = $product->opinions->mean('rating');
-            }),
+            Product::where('name', 'like', '%' . $query .'%')
+                ->whereHas('children')
+                ->with(['price', 'opinions']) // Eager load 'price' and 'opinions' relationships
+                ->limit(5)
+                ->get()
+                ->each(function ($product) {
+                    // Ensure 'opinions' is not empty to avoid errors when calculating mean
+                    if ($product->opinions->isNotEmpty()) {
+                        $product->meanOpinion = $product->opinions->avg('rating'); // Use avg() instead of mean()
+                    } else {
+                        $product->meanOpinion = null; // Set a default value if no opinions are available
+                    }
+                })
         );
     }
 }
