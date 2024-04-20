@@ -5,6 +5,7 @@ use App\Http\Controllers\AllegroMessageController;
 use App\Http\Controllers\Api\DiscountController;
 use App\Http\Controllers\Api\FirmsController;
 use App\Http\Controllers\Api\OrderPackageController;
+use App\Http\Controllers\Api\ProductOpinionController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ContactApproachController;
@@ -124,6 +125,9 @@ Route::post('order-warehouse-notification/accept/{notificationId}/changeStatus',
     ->name('api.order-warehouse-notification.accept.changeStatus');
 Route::get('order-shipping-cancelled/{package_id}', 'Api\OrdersController@orderPackagesCancelled')->name('api.order-shipping-cancelled');
 Route::get('searchProduct/{query}', [ProductsController::class, 'searchProduct'])->name('searchProduct');
+
+Route::post('/productOpinion/create', [ProductOpinionController::class, 'create']);
+
 
 Route::get('get-associated-labels-to-order-from-group/{labelGroupName}', 'Api\LabelsController@getAssociatedLabelsToOrderFromGroup')->name('api.labels.get-associated-labels-to-order-from-group');
 

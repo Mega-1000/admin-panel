@@ -325,4 +325,9 @@ class Product extends Model implements Transformable
     {
         return LowOrderQuantityAlert::where('item_names', $this->low_order_quantity_alert_text);
     }
+
+    public function opinions(): HasMany
+    {
+        $this->hasMany(ProductOpinion::class);
+    }
 }
