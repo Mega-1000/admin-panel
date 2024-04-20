@@ -374,6 +374,7 @@ class ProductsController extends Controller
     {
         $product->load('stock');
         $product->load('opinions');
+        $product->meanOpinion = $product->opinions->avg('rating') ?? 0;
 
         return response()->json($product);
     }
