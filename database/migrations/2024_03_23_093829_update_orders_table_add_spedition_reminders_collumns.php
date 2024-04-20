@@ -15,8 +15,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->boolean('start_of_spedition_period_sent')->default(false);
-            $table->boolean('near_end_of_spedition_period_sent')->default(false);
+//            $table->boolean('start_of_spedition_period_sent')->default(false);
+//            $table->boolean('near_end_of_spedition_period_sent')->default(false);
         });
     }
 
