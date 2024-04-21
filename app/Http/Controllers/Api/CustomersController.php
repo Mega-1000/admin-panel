@@ -413,4 +413,26 @@ class CustomersController extends Controller
         return response()->json(['access_token' => $customer->createToken('Api code')->accessToken,
             'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE], 200);
     }
+
+    public function registerAccount(Request $request): JsonResponse
+    {
+        $request->validate([
+            'password' => 'required|string',
+            'phone' => 'required|string',
+            'username' => 'required|string'
+        ]);
+
+        $data = $request->all();
+
+        $customer = Customer::create([
+            'login' => $data['username'],
+            'status' => 'ACTIVE',
+            'password' => Hash::make($data['password']),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $customer,
+        ]);
+    }
 }
