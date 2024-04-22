@@ -380,7 +380,7 @@ class ProductsController extends Controller
         ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
         ->orderBy('priority')
         ->orderBy('name')
-        ->get();
+        ->first();
 
         $product->load('stock');
         $product->load('opinions');
