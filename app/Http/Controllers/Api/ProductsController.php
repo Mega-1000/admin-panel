@@ -374,6 +374,16 @@ class ProductsController extends Controller
     {
         $product->load('stock');
         $product->load('opinions');
+        $product->load('price');
+
+        // Assuming $product is already loaded with the 'price' relation
+        if ($product->price) {
+            foreach ($product->price as $key => $value) {
+                $product->$key = $value;
+            }
+        }
+
+
         $product->meanOpinion = $product->opinions->avg('rating') ?? 0;
 
         return response()->json($product);
