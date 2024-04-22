@@ -372,6 +372,7 @@ class ProductsController extends Controller
 
     public function getSingleProduct(Product $product): JsonResponse
     {
+        dd($product->id);
         $product = Product::find($product->id)
         ->select('product_prices.*', 'product_packings.*', 'products.*')
         ->where('products.show_on_page', '=', 1)
