@@ -379,7 +379,8 @@ class ProductsController extends Controller
         ->with('media')
         ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
         ->orderBy('priority')
-        ->orderBy('name');
+        ->orderBy('name')
+        ->get();
 
         $product->load('stock');
         $product->load('opinions');
