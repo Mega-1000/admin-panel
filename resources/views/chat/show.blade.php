@@ -699,11 +699,14 @@
 
         const updateDates = async () => {
             const orderId = $('#orderId').val();
-            const dateType = $('#dateType').val(); // 'shipment' or 'delivery'
+            const dateType = $('#dateType').val();
             const dateFrom = dateType === 'shipment' ? $('#dateFrom').val() : null;
             const dateTo = dateType === 'shipment' ? $('#dateTo').val() : null;
             const deliveryDateFrom = dateType === 'delivery' ? $('#dateFrom').val() : null;
             const deliveryDateTo = dateType === 'delivery' ? $('#dateTo').val() : null;
+
+            // Show loading screen
+            $('#loadingScreen').show();
 
             try {
                 const result = await updateDatesSend({
@@ -716,13 +719,17 @@
                 });
 
                 $('#modifyDateModal').modal('hide');
-                showAlert('success', 'PomyPomyślnie zaaktualizowano daty.');
+                showAlert('success', 'Successfully updated dates.');
                 loadOrderDates(); // Refresh dates table
             } catch (error) {
                 console.error('Failed to modify the date:', error);
                 showAlert('danger', 'Failed to modify the date.');
+            } finally {
+                // Hide loading screen
+                $('#loadingScreen').hide();
             }
         };
+
         const updateDatesSend = (params) => {
             return fetch('/api/orders/' + params.orderId + '/updateDates', {
                 method: 'PUT',
@@ -868,9 +875,11 @@
 
         // Add a new function for accepting dates
         window.acceptDate = function(dateType, key) {
+            // Show loading screen
+            $('#loadingScreen').show();
+
             return fetch('/api/orders/' + {{ $order->id }} + '/acceptDates', {
                 method: 'PUT',
-                credentials: 'same-origin',
                 headers: new Headers({
                     'Content-Type': 'application/json; charset=utf-8',
                     'X-Requested-Width': 'XMLHttpRequest'
@@ -881,7 +890,13 @@
                 })
             }).then((response) => {
                 window.location.reload();
-            })
+            }).catch((error) => {
+                console.error('Error accepting the date:', error);
+                showAlert('danger', 'Failed to accept the date.');
+            }).finally(() => {
+                // Hide loading screen
+                $('#loadingScreen').hide();
+            });
         }
 
         window.showModifyDateModal = function(orderId, type, from, to, type11) {

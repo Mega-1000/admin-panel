@@ -53,4 +53,11 @@
     </div>
 </div>
 
+<div id="loadingScreen" style="display:none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050; justify-content: center; align-items: center;">
+    <div style="padding: 20px; background: white; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+        Saving... Please wait.
+    </div>
+</div>
+
+
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
