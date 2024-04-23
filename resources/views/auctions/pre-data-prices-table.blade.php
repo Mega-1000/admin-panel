@@ -72,22 +72,19 @@
             cursor: pointer;
         }
 
-        /* Add CSS for sorting indicators to enhance visibility */
-        th.sortable::after {
-            content: " ⇅"; /* Neutral state */
-            color: #666;
+        th.sortable {
+            cursor: pointer; /* Zmiana kursora na wskaźnik podczas najechania */
         }
 
-        th.sortable.asc::after {
-            content: " ↓"; /* Ascending state */
+        th.asc::after {
+            content: " ↓"; /* Wskaźnik sortowania rosnącego */
             color: green;
         }
 
-        th.sortable.desc::after {
-            content: " ↑"; /* Descending state */
+        th.desc::after {
+            content: " ↑"; /* Wskaźnik sortowania malejącego */
             color: red;
         }
-
     </style>
 </head>
 
@@ -224,6 +221,20 @@
             });
 
             $('th').click(function(){
+                var $this = $(this);
+                var columnIndex = $this.index();
+                var sortState = $this.data('sortState');
+
+                // Usuń wskaźniki sortowania z innych kolumn
+                $this.siblings().removeClass('asc desc');
+
+                // Przełącz stan sortowania dla tej kolumny
+                if (sortState === 'asc') {
+                    $this.data('sortState', 'desc').addClass('desc').removeClass('asc');
+                } else {
+                    $this.data('sortState', 'asc').addClass('asc').removeClass('desc');
+                }
+
                 var table = $(this).parents('table').eq(0);
                 var columnIndex = $(this).index();
                 var sortState = $(this).data('sortState');
