@@ -218,6 +218,11 @@
 
     <script>
         $(document).ready(function() {
+            $('th').each(function(){
+                // Initialize a sort state on each `th`
+                $(this).data('sortState', '');
+            });
+
             $('th.sortable').click(function() {
                 var table = $(this).parents('table').eq(0);
                 var columnIndex = $(this).index();
