@@ -217,37 +217,31 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function(){
             $('th').each(function(){
                 // Initialize a sort state on each `th`
                 $(this).data('sortState', '');
             });
 
-            $('th.sortable').click(function() {
+            $('th').click(function(){
                 var table = $(this).parents('table').eq(0);
                 var columnIndex = $(this).index();
-                var sortState = $(this).data('sortState') || 'asc'; // Default to ascending on first click
-
+                var sortState = $(this).data('sortState');
                 var rows = table.find('tr:gt(0)').toArray().sort(comparer(columnIndex, sortState));
 
-                // Update the sort state cyclically: asc -> desc -> neutral (clear sort)
+                // Toggle the sort state for this column
                 if (sortState === 'asc') {
-                    $(this).data('sortState', 'desc');
-                    sortState = 'desc';
-                } else if (sortState === 'desc') {
-                    $(this).data('sortState', '');
-                    sortState = '';
+                    return
                 } else {
                     $(this).data('sortState', 'asc');
-                    sortState = 'asc';
+                    $(this).html($(this).html().replace(' ↑', ' ↓')); // Adjust if using different indicators
                 }
 
-                // Update all headers to remove indicators
-                $('th').not(this).removeClass('asc desc').addClass('sortable').data('sortState', '');
-
-                // Apply the current header state
-                $(this).removeClass('asc desc');
-                if(sortState) $(this).addClass(sortState);
+                // Reset sort state indicators for other columns
+                table.find('th').not(this).each(function(){
+                    $(this).data('sortState', ''); // Clear the sort state
+                    $(this).html($(this).html().replace(' ↓', '').replace(' ↑', '')); // Remove any sort indicators
+                });
 
                 // Re-append rows in sorted order
                 for (var i = 0; i < rows.length; i++){ table.append(rows[i]); }
@@ -257,7 +251,8 @@
                 return function(a, b) {
                     var valA = getCellValue(a, index), valB = getCellValue(b, index);
                     var result = $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB);
-                    return (sortState === 'desc') ? -result : result;
+                    // Reverse the result if the current sort state is descending
+                    return (sortState === 'desc') ? result * -1 : result;
                 };
             }
 
