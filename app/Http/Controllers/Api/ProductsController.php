@@ -372,10 +372,11 @@ class ProductsController extends Controller
 
     public function getSingleProduct(Product $product): JsonResponse
     {
-        $product = DB::table('products')->where('id', $product->id)
+        $product = $product->price()->product()
             ->select('product_prices.*', 'product_packings.*', 'products.*')
             ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
+            ->with('media')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
             ->orderBy('priority')
             ->orderBy('name')
