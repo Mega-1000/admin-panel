@@ -72,9 +72,6 @@
             cursor: pointer;
         }
 
-        th.sortable {
-            cursor: pointer; /* Zmiana kursora na wskaźnik podczas najechania */
-        }
     </style>
 </head>
 
