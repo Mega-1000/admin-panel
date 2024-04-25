@@ -54,7 +54,7 @@ class MessagesHelper
     const SHOW_VAR = 'v';
     const NOTIFICATION_TIME = 300;
     const MESSAGE_RED_LABEL_ID = 55;
-    const MESSAGE_BLUE_LABEL_ID = 56;
+    const MESSAGE_BLUE_LABEL_ID = 254;
     const MESSAGE_YELLOW_LABEL_ID = 250;
     const MESSAGE_GREEN_LABEL_ID = 58;
 
