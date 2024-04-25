@@ -321,6 +321,7 @@ class MessagesController extends Controller
         $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
 
         foreach (Employees::getEmployeesForAuction($chat->order) as $employee) {
+            dd($employee);
             Mailer::create()
                 ->to($employee->email)
                 ->send(
