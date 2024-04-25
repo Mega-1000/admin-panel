@@ -45,7 +45,6 @@ class Employees
                 $employees->push($employee);
             }
         }
-        dd($employees);
 
         $employees = $employees->groupBy('firm_id') // Assuming there is a 'firm_id' attribute to group by
             ->map(function ($group) {
@@ -70,6 +69,6 @@ class Employees
             }
         }
 
-        return $allEmployees->unique()->all();
+        return $employees->unique()->all();
     }
 }
