@@ -45,7 +45,7 @@
 
         tr:nth-child(2) {
             position: sticky;
-            top: 39px; /* Adjust to the height of your <th> elements */            background-color: white;
+            top: 39px; /* Adjust to the height of your <th> elements */
             z-index: 1;
         }
 
