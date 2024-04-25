@@ -71,6 +71,7 @@ class LocationHelper
         $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->get()->first();
         $radius = $employee->radius;
 
+        dd($coordinates1, $coordinates2);
         $raw = DB::selectOne(
             'SELECT 1.609344 * SQRT(
             POW(69.1 * (:latitude2 - :latitude1), 2) +
