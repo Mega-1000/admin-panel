@@ -70,12 +70,14 @@ class LocationHelper
         $coordinates1 = DB::table('postal_code_lat_lon')->where('postal_code', $customer->standardAddress()->postal_code)->get()->first();
         $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->get()->first();
         $radius = $employee->radius;
+
+        dd($coordinates2, $coordinates1);
         $raw = DB::selectOne(
             'SELECT 6371 * 2 * ASIN(SQRT(
-        POW(SIN((? - ?) * PI() / 360), 2) +
-        COS(? * PI() / 180) * COS(? * PI() / 180) *
-        POW(SIN((? - ?) * PI() / 360), 2)
-    )) AS distance',
+                POW(SIN((? - ?) * PI() / 360), 2) +
+                COS(? * PI() / 180) * COS(? * PI() / 180) *
+                POW(SIN((? - ?) * PI() / 360), 2)
+            )) AS distance',
             [
                 $coordinates1->latitude,
                 $coordinates2->latitude,
