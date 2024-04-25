@@ -118,12 +118,25 @@
             z-index: auto;
         }
 
+        thead tr:nth-child(2) {
+            position: static;
+            background-color: transparent;
+            z-index: auto;
+        }
+
+        thead td:first-child {
+            position: static;
+            background-color: transparent;
+            z-index: auto;
+        }
+
         tr:nth-child(2) {
             position: sticky;
             top: 39px; /* Adjust to the height of your <th> elements */
             background-color: white;
             z-index: 1; /* Lower z-index for the second <tr> */
         }
+
         td:first-child {
             position: sticky;
             left: 0;
