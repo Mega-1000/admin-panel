@@ -71,6 +71,84 @@
         th {
             cursor: pointer;
         }
+        td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: white;
+            z-index: 1;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            margin: auto;
+            overflow-y: auto; /* Make sure the container allows for scrolling */
+            max-height: 90vh; /* Adjust based on your needs */
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+            }
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%; /* Ensure table fills the container */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 2; /* Increased z-index for <th> elements */
+        }
+
+        tr:nth-child(2) {
+            position: sticky;
+            top: 39px; /* Adjust to the height of your <th> elements */
+            background-color: white;
+            z-index: 1; /* Lower z-index for the second <tr> */
+        }
+
+        td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: white;
+            z-index: 1;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        #chat-container {
+            margin-top: 50px;
+        }
+
+        th.asc::after {
+            content: " ↓"; /* Change to arrow SVG or symbol as needed */
+        }
+
+        th.desc::after {
+            content: " ↑"; /* Change to arrow SVG or symbol as needed */
+        }
+
+        th {
+            cursor: pointer;
+        }
 
     </style>
 </head>
