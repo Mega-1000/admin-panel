@@ -111,6 +111,11 @@
             top: 0;
             z-index: 2; /* Increased z-index for <th> elements */
         }
+        thead tr:nth-child(2) {
+            position: static;
+            background-color: transparent;
+            z-index: auto;
+        }
 
         tr:nth-child(2) {
             position: sticky;
@@ -118,7 +123,6 @@
             background-color: white;
             z-index: 1; /* Lower z-index for the second <tr> */
         }
-
         td:first-child {
             position: sticky;
             left: 0;
