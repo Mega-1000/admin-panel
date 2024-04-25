@@ -45,13 +45,13 @@
             color: white;
             position: sticky;
             top: 0; /* Adjust if you have a specific offset */
-            z-index: 1; /* Ensures the header is above other content */
+            z-index: 10000000; /* Ensures the header is above other content */
         }
 
         tr:nth-child(2) {
             position: sticky;
             top: 39px; /* Adjust to the height of your <th> elements */
-            z-index: 100;
+            z-index: 1000000;
         }
 
         tr:nth-child(even) {
