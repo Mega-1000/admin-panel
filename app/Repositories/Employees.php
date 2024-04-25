@@ -37,7 +37,7 @@ class Employees
                 $firm
             ];
 
-            dd($firm);
+            dd($firms);
         }
 
         $employees = collect();
