@@ -111,7 +111,8 @@
             top: 0;
             z-index: 2; /* Increased z-index for <th> elements */
         }
-        thead tr:nth-child(2) {
+
+        thead {
             position: static;
             background-color: transparent;
             z-index: auto;
