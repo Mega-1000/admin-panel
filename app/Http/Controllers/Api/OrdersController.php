@@ -143,7 +143,7 @@ class OrdersController extends Controller
             $customer = Customer::create([
                 'login' => $data['customer_login'],
                 'status' => 'ACTIVE',
-                'password' => Hash::make($data['phone']),
+                'password' => Hash::make(str_replace("", " ", $data['phone'])),
             ]);
 
             $this->orderService->handleReferral($request->validated('register_reffered_user_id'), $data['customer_login']);
