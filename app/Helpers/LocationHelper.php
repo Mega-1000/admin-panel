@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use App\Entities\Customer;
+use App\Entities\Employee;
 use App\Entities\Firm;
 use App\Entities\Product;
 use Illuminate\Support\Facades\DB;
@@ -61,5 +63,28 @@ class LocationHelper
         );
 
         return $raw?->distance;
+    }
+
+    public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer): int
+    {
+        $coordinates1 = DB::table('postal_code_lat_lon')->where('postal_code', $customer->standardAddress->postal_code)->get()->first();
+        $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->get()->first();
+        $radius = $employee->radius;
+
+        $raw = DB::selectOne(
+            'SELECT 1.609344 * SQRT(
+            POW(69.1 * (:latitude2 - :latitude1), 2) +
+            POW(69.1 * (:longitude2 - :longitude1) * COS(:latitude1 / 57.3), 2)) AS distance',
+            [
+                'latitude1' => $coordinates1->latitude,
+                'longitude1' => $coordinates1->longitude,
+                'latitude2' => $coordinates2->latitude,
+                'longitude2' => $coordinates2->longitude
+            ]
+        );
+
+        $distance = $raw->distance;
+
+        return $radius - $distance;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Entities\Firm;
 use App\Entities\Order;
+use App\Helpers\LocationHelper;
 use App\Services\ChatAuctionsService;
 use App\Services\ProductService;
 use Illuminate\Database\Eloquent\Collection;
@@ -31,27 +32,37 @@ class Employees
             return $firm->id != 1;
         });
 
-        $employees = [];
+        $employees = collect();
         foreach ($firms as $firm) {
             foreach (Employees::getEmployeesForAuctionOrderByFirm($firm) as $employee) {
-                $employees[] = $employee;
+                $employee->finalRadius = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer);
+                $employees->push($employee);
             }
         }
 
-        $employees = array_unique($employees, SORT_REGULAR);
+        $employees = $employees->groupBy('firm_id') // Assuming there is a 'firm_id' attribute to group by
+            ->map(function ($group) {
+                return $group->reduce(function ($carry, $item) {
+                    return ($carry === null || $item->finalRadius > $carry->finalRadius) ? $item : $carry;
+                });
+            });
 
-        $allEmployees = [];
+
+        $employees = $employees->unique(function ($employee) {
+            return $employee->id;  // Assuming each employee has a unique 'id' attribute
+        });
+
+        $allEmployees = collect(); // Initialize as a collection
         foreach ($employees as $employee) {
             $firmAssociatedWithEmployee = Firm::where('email', $employee->email)->first();
 
             if ($firmAssociatedWithEmployee) {
                 foreach ($firmAssociatedWithEmployee->employees as $emp) {
-                    $allEmployees[] = $emp;
+                    $allEmployees->push($emp);
                 }
             }
         }
 
-        return array_unique($allEmployees, SORT_REGULAR);
-
+        return $allEmployees->unique()->toArray();
     }
 }
