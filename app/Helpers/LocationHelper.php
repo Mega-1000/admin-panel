@@ -71,7 +71,6 @@ class LocationHelper
         $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->get()->first();
         $radius = $employee->radius;
 
-        dd($coordinates2, $coordinates1);
         $raw = DB::selectOne(
             'SELECT 6371 * 2 * ASIN(SQRT(
                 POW(SIN((? - ?) * PI() / 360), 2) +
@@ -79,12 +78,12 @@ class LocationHelper
                 POW(SIN((? - ?) * PI() / 360), 2)
             )) AS distance',
             [
-                $coordinates1->latitude,
-                $coordinates2->latitude,
-                $coordinates1->latitude,
-                $coordinates2->latitude,
-                $coordinates1->longitude,
-                $coordinates2->longitude
+                $coordinates1?->latitude,
+                $coordinates2?->latitude,
+                $coordinates1?->latitude,
+                $coordinates2?->latitude,
+                $coordinates1?->longitude,
+                $coordinates2?->longitude
             ]
         );
 
