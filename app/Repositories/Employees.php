@@ -63,6 +63,6 @@ class Employees
             }
         }
 
-        return $allEmployees->unique()->toArray();
+        return $allEmployees->unique()->all();
     }
 }
