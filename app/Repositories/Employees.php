@@ -22,7 +22,7 @@ class Employees
         })->get();
     }
 
-    public static function getEmployeesForAuction(Order $order): array
+    public static function getEmployeesForAuction(Order $order, ?Firm $firm): array
     {
         $variations = app(ProductService::class)->getVariations($order);
 
@@ -31,6 +31,12 @@ class Employees
         $firms = array_filter($firms, function ($firm) {
             return $firm->id != 1;
         });
+
+        if ($firm) {
+            $firms = [
+                $firm
+            ];
+        }
 
         $employees = collect();
         foreach ($firms as $firm) {
