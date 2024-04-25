@@ -195,7 +195,7 @@
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
 
                                     <span style="color: green">
-                                        - cena personalizowana
+                                        - cena specjalnie dla ciebie
                                     </span>
                                 @else
                                     No offer
