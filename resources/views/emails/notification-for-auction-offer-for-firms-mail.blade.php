@@ -1,9 +1,9 @@
 @php
-    $token = \App\Entities\ChatAuctionFirm::where('chat_auction_id', $chatAuctionOffer->chatAuction->id)->where('firm_id', $chatAuctionOffer->firm->id)->first()->token
+    $token = \App\Entities\ChatAuctionFirm::where('chat_auction_id', $chatAuctionOffer?->chatAuction?->id)->where('firm_id', $chatAuctionOffer?->firm?->id)->first()->token
 @endphp
 
 
-Informujemy że w ofercie numer {{ $chatAuctionOffer->chatAuction->chat->order->id }}  zostało dokonane przebicie najniższej ceny.
+Informujemy że w ofercie numer {{ $chatAuctionOffer?->chatAuction?->chat?->order?->id }}  zostało dokonane przebicie najniższej ceny.
 <br>
 
 <br>

@@ -9,6 +9,7 @@ use App\Entities\Order;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
 use App\Helpers\Exceptions\ChatException;
+use App\Helpers\LocationHelper;
 use App\Helpers\MessagesHelper;
 use App\Jobs\ChatNotificationJob;
 use App\Mail\NotifyFirmAboutAuction;
@@ -226,7 +227,13 @@ class MessagesController extends Controller
 
             $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
             $emails = $chat->users->pluck('email');
-            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()));
+            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()))->each(fn (&$employee) =>  $employee->finalRadius = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer));
+
+            $allEmployeesFromRelatedOrders = $allEmployeesFromRelatedOrders->map(function ($group) {
+                return $group->reduce(function ($carry, $item) {
+                    return ($carry === null || $item->finalRadius > $carry->finalRadius) ? $item : $carry;
+                });
+            });
         }
 
         return view('chat.show', [
