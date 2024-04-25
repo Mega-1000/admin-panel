@@ -56,7 +56,7 @@ class MessagesHelper
     const MESSAGE_RED_LABEL_ID = 55;
     const MESSAGE_BLUE_LABEL_ID = 254;
     const MESSAGE_YELLOW_LABEL_ID = 250;
-    const MESSAGE_GREEN_LABEL_ID = 58;
+    const MESSAGE_GREEN_LABEL_ID = 0;
 
     /**
      * @throws ChatException|Exception
