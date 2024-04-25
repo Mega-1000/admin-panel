@@ -319,7 +319,7 @@ class MessagesController extends Controller
     {
         $auction = $chat->auctions->first();
         $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
-        dd(Employees::getEmployeesForAuction($chat->order, $company));
+        dd(Employees::getEmployeesForAuction($chat->order, $company), $company);
         foreach (dd(Employees::getEmployeesForAuction($chat->order, $company)) as $employee) {
             dd($employee);
             Mailer::create()
