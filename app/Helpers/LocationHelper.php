@@ -73,10 +73,10 @@ class LocationHelper
 
         $raw = DB::selectOne(
             'SELECT 6371 * 2 * ASIN(SQRT(
-                POW(SIN((:latitude2 - :latitude1) * PI() / 360), 2) +
-                COS(:latitude1 * PI() / 180) * COS(:latitude2 * PI() / 180) *
-                POW(SIN((:longitude2 - :longitude1) * PI() / 360), 2)
-            )) AS distance',
+        POW(SIN((:latitude2 - :latitude1) * PI() / 360), 2) +
+        COS(:latitude1 * PI() / 180) * COS(:latitude2 * PI() / 180) *
+        POW(SIN((:longitude2 - :longitude1) * PI() / 360), 2)
+    )) AS distance',
             [
                 'latitude1' => $coordinates1->latitude,
                 'longitude1' => $coordinates1->longitude,
@@ -84,7 +84,6 @@ class LocationHelper
                 'longitude2' => $coordinates2->longitude
             ]
         );
-
 
         $distance = $raw->distance;
 
