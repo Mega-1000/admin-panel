@@ -22,7 +22,7 @@ class Employees
         })->get();
     }
 
-    public static function getEmployeesForAuction(Order $order, ?Firm $firm): array
+    public static function getEmployeesForAuction(Order $order, ?Firm $firm = null): array
     {
         $variations = app(ProductService::class)->getVariations($order);
 
