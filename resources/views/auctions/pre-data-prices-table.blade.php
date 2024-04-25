@@ -14,18 +14,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 
     <style>
-        body {            font-family: Arial, sans-serif;
+        body {
+            font-family: Arial, sans-serif;
         }
 
         .container {
             margin: auto;
-            overflow-y: auto; /* Make sure the container allows for scrolling */            max-height: 90vh; /* Adjust based on your needs */
+            overflow-y: auto; /* Make sure the container allows for scrolling */
+            max-height: 90vh; /* Adjust based on your needs */
         }
 
         @media screen and (max-width: 768px) {
             .container {
                 width: 100%;
-            }        }
+            }
+        }
 
         table {
             border-collapse: collapse;
@@ -37,11 +40,13 @@
             padding: 8px;
         }
 
-        th {            background-color: #4CAF50;
+        th {
+            background-color: #4CAF50;
             color: white;
             position: sticky;
             top: 0; /* Adjust if you have a specific offset */
-            z-index: 1; /* Ensures the header is above othe        }
+            z-index: 1; /* Ensures the header is above other content */
+        }
 
         tr:nth-child(2) {
             position: sticky;
@@ -75,6 +80,7 @@
 
     </style>
 </head>
+
 
 <body>
     <div style="margin-top: 10px">
