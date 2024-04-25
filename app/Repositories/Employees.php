@@ -36,8 +36,6 @@ class Employees
             $firms = [
                 $firm
             ];
-
-            dd($firms);
         }
 
         $employees = collect();
@@ -47,6 +45,7 @@ class Employees
                 $employees->push($employee);
             }
         }
+        dd($employees);
 
         $employees = $employees->groupBy('firm_id') // Assuming there is a 'firm_id' attribute to group by
             ->map(function ($group) {
