@@ -142,7 +142,7 @@ class AuctionsController extends Controller
             'chat_auction_id' => $firm->chat_auction_id
         ]));
 
-        return redirect()->back()->with('success', 'Pomyślnie dodano ofertę');
+        return redirect()->back();
     }
 
     /**
