@@ -70,18 +70,19 @@ class LocationHelper
         $coordinates1 = DB::table('postal_code_lat_lon')->where('postal_code', $customer->standardAddress()->postal_code)->get()->first();
         $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->get()->first();
         $radius = $employee->radius;
-
         $raw = DB::selectOne(
             'SELECT 6371 * 2 * ASIN(SQRT(
-        POW(SIN((:latitude2 - :latitude1) * PI() / 360), 2) +
-        COS(:latitude1 * PI() / 180) * COS(:latitude2 * PI() / 180) *
-        POW(SIN((:longitude2 - :longitude1) * PI() / 360), 2)
+        POW(SIN((? - ?) * PI() / 360), 2) +
+        COS(? * PI() / 180) * COS(? * PI() / 180) *
+        POW(SIN((? - ?) * PI() / 360), 2)
     )) AS distance',
             [
-                'latitude1' => $coordinates1->latitude,
-                'longitude1' => $coordinates1->longitude,
-                'latitude2' => $coordinates2->latitude,
-                'longitude2' => $coordinates2->longitude
+                $coordinates1->latitude,
+                $coordinates2->latitude,
+                $coordinates1->latitude,
+                $coordinates2->latitude,
+                $coordinates1->longitude,
+                $coordinates2->longitude
             ]
         );
 
