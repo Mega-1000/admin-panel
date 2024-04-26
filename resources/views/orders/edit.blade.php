@@ -2258,6 +2258,7 @@
                                                data-item-id="{{$item->id}}" disabled
                                                name="item-profit"
                                                value="{{ number_format( ($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23) + $item->additional_cash_on_delivery_cost + $item->order->additional_service_cost, 2) }}">
+                                        {{$item->order->additional_service_cost }}
                                     </td>
                                     <td colspan="3"></td>
                                 </tr>
