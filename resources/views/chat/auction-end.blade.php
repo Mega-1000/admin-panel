@@ -190,7 +190,7 @@
                                 @endphp
 
                                 @if($offer)
-                                    {{ $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'desc')->first() }}
+                                    {{ $auction->offers()->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'desc')->first() }}
 
                                     <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
 
