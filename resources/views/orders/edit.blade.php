@@ -2249,7 +2249,7 @@
                                     </td>
                                 </tr>
                                 <tr class="row-{{$item->id}}">
-                                    <th colspan="4"></th>
+                                    <th colspan="4">Zysk</th>
                                 </tr>
                                 <tr class="selling-row row-{{$item->id}}">
                                     <td>
