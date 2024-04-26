@@ -28,6 +28,7 @@ class OrderLabelHelper {
         if ($hasRed || $hasYellow) {
             return;
         }
+        dd('okrj');
         $chat->order->labels()->detach(MessagesHelper::MESSAGE_BLUE_LABEL_ID);
         $chat->order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
         $chat->save();
