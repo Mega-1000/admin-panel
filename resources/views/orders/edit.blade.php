@@ -2257,7 +2257,7 @@
                                                class="form-control item-profit priceChange"
                                                data-item-id="{{$item->id}}" disabled
                                                name="item-profit"
-                                               value="{{ number_format(($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23) + $item->additional_cash_on_delivery_cost, 2) }}">
+                                               value="{{ number_format($itemOrder->additional_service_cost + ($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23) + $item->additional_cash_on_delivery_cost, 2) }}">
                                     </td>
                                     <td colspan="3"></td>
                                 </tr>
