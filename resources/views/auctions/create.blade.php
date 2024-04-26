@@ -22,7 +22,9 @@
         <input type="datetime-local" id="base-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Data zakończenia przetargu" name="end_of_auction">
 
         <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Wstępny termin dostawy (Przynajmniej 2 dni robocze od zakończenia przetargu)</label>
-        <input type="datetime-local" id="base-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Wstępny termin dostawy (Przynajmniej 2 dni robocze od zakończenia przetargu)" name="date_of_delivery">
+
+        <input type="datetime-local" id="base-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="od" name="date_of_delivery_from">
+        <input type="datetime-local" id="base-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="do" name="date_of_delivery_to">
 
         <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu</label>
         <textarea
