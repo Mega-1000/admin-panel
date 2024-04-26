@@ -56,6 +56,17 @@ readonly class ChatAuctionsService
      */
     public function createAuction(CreateChatAuctionDTO $data): Model
     {
+        $data->chat->order->dates()->update([
+            'customer_shipment_date_from' => $data->date_of_delivery_from,
+            'customer_shipment_date_to' => $data->date_of_delivery_to,
+            'customer_delivery_date_from' => $data->date_of_delivery_from,
+            'customer_delivery_date_to' => $data->date_of_delivery_to,
+            'consultant_shipment_date_from' => $data->date_of_delivery_from,
+            'consultant_shipment_date_to' => $data->date_of_delivery_to,
+            'consultant_delivery_date_from' => $data->date_of_delivery_from,
+            'consultant_delivery_date_to' => $data->date_of_delivery_to,
+        ]);
+
         return $data->chat->auctions()->create([
             'end_of_auction' => $data->end_of_auction,
             'date_of_delivery_from' => $data->date_of_delivery_from,
