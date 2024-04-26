@@ -2249,7 +2249,7 @@
                                     </td>
                                 </tr>
                                 <tr class="row-{{$item->id}}">
-                                    <th colspan="4">asdasd</th>
+                                    <th colspan="4">Zysk</th>
                                 </tr>
                                 <tr class="selling-row row-{{$item->id}}">
                                     <td>
@@ -2257,7 +2257,7 @@
                                                class="form-control item-profit priceChange"
                                                data-item-id="{{$item->id}}" disabled
                                                name="item-profit"
-                                               value="{{ number_format( ($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23) + $item->additional_cash_on_delivery_cost + $item->additional_service_cost, 2) }}">
+                                               value="{{ number_format( ($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23) + $item->additional_cash_on_delivery_cost, 2) }}">
                                     </td>
                                     <td colspan="3"></td>
                                 </tr>
@@ -4323,7 +4323,7 @@
                             '<input name="quantity_commercial[' + id + ']" value="1" data-item-id="' + id + '" type="text" class="form-control price" id="quantity_commercial[' + id + ']">\n' +
                             '</td>\n' +
                             '</tr><tr>\n' +
-                            '<th>Zysk</th>\n' +
+                            '<th>ssZysk</th>\n' +
                             '</tr><tr class="selling-row">\n' +
                             '<td>\n' +
                             '<input type="text" class="form-control item-profit" data-item-id="' + id + '" disabled="" name="item-profit" value="0.00">\n' +
