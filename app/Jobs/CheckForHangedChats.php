@@ -60,10 +60,10 @@ class CheckForHangedChats implements ShouldQueue
 
     private function setLabels(Carbon $redLabelTime, $lastMessage, $chat, Carbon $yellowLabelTime): void
     {
-        if ($redLabelTime->greaterThan($lastMessage->created_at)) {
-            OrderLabelHelper::setRedLabel($chat);
-        } else if ($yellowLabelTime->greaterThan($lastMessage->created_at)) {
-            OrderLabelHelper::setYellowLabel($chat);
-        }
+//        if ($redLabelTime->greaterThan($lastMessage->created_at)) {
+//            OrderLabelHelper::setRedLabel($chat);
+//        } else if ($yellowLabelTime->greaterThan($lastMessage->created_at)) {
+//            OrderLabelHelper::setYellowLabel($chat);
+//        }
     }
 }
