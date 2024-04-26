@@ -132,8 +132,6 @@
                                 <br>
                                 Koniec: {{ $chat->auctions->first()->end_of_auction }}
                                 <br>
-                                Wstępna data wysyłki: {{ $chat->auctions->first()->date_of_delivery }}
-                                <br>
                                 Cena: {{ $chat->auctions->first()->price }} %
                                 <br>
                                 Jakość: {{ $chat->auctions->first()->quality }} %
