@@ -611,7 +611,7 @@ class OrdersController extends Controller
             }) && $noAuction;
 
             $order->isAuctionCreated = !$noAuction;
-            $order->isThereUnansweredChat = $order->labels->includes(254);
+            $order->isThereUnansweredChat =  in_array(254, $order->labels->toArray());
 
             $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
             $order->total_sum = $order->getSumOfGrossValues();
