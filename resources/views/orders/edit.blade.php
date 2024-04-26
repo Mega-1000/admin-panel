@@ -4323,7 +4323,7 @@
                             '<input name="quantity_commercial[' + id + ']" value="1" data-item-id="' + id + '" type="text" class="form-control price" id="quantity_commercial[' + id + ']">\n' +
                             '</td>\n' +
                             '</tr><tr>\n' +
-                            '<th>ssZysk</th>\n' +
+                            '<th>Zysk</th>\n' +
                             '</tr><tr class="selling-row">\n' +
                             '<td>\n' +
                             '<input type="text" class="form-control item-profit" data-item-id="' + id + '" disabled="" name="item-profit" value="0.00">\n' +
