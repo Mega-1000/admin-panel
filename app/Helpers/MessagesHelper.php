@@ -404,6 +404,8 @@ class MessagesHelper
                     ['added_type' => Label::CHAT_TYPE],
                     Auth::user()?->id
                 );
+
+                $chat->order->labels()->detach(self::MESSAGE_BLUE_LABEL_ID);
             } else if (isset(Auth::user()->id) && $area == 0) {
                 $loopPrevention = [];
                 RemoveLabelService::removeLabels(
@@ -412,6 +414,8 @@ class MessagesHelper
                     [],
                     Auth::user()->id
                 );
+
+                $chat->order->labels()->attach(self::MESSAGE_BLUE_LABEL_ID);
             }
             WorkingEventsService::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
         } else {
