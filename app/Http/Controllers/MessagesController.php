@@ -176,7 +176,7 @@ class MessagesController extends Controller
         $notices = '';
 
         if ($chatType == 'order') {
-            $productList = $helper->prepareOrderItemsCollection($helper);
+            $productList = $helper->prepareOrderItemsCollection();
             $products = $productList->pluck('product');
         } else {
             $productList = $products = collect([$helper->getProduct()]);

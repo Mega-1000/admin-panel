@@ -688,11 +688,14 @@ class MessagesHelper
             $chatUser = $this->getCurrentUser();
             $order = $this->getOrder();
 
+
+            dd($chatUser, $order);
             if (is_a($chatUser, Employee::class)) {
                 return $order->items->filter(function ($item) use ($chatUser) {
                     return empty($item->product->firm) || $item->product->firm->id == $chatUser->firm->id;
                 });
             }
+
             return $order->items;
         } catch (Exception $e) {
             Log::error('Cannot prepare product list',
