@@ -44,7 +44,10 @@ class SendSpeditionNotifications implements ShouldQueue
         foreach ($orders as $order) {
             $order = Order::find($order->order_id);
 
+            if ($order->id == 85460) {
+
             dd($order);
+            }
             if ($order->labels->contains(66)) {
                 continue;
             }
