@@ -68,7 +68,7 @@
                 @if (!empty($faq))
                     <div class="alert-info alert"><b>FAQ:</b> <br>{!! implode('<br/>', $faq) !!}</div>
                 @endif
-                @if ($userType == MessagesHelper::TYPE_EMPLOYEE)
+                @if ($userType == MessagesHelper::TYPE_EMPLOYEE && $chat->auction->active)
                     <h1>
                         Jeśli chcesz zaaktualizować swoją ofertę dotyczącą przetargu kliknij
                         @php
