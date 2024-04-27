@@ -101,23 +101,25 @@
                                 </a>
                             </div>
                         @else
-                            <!-- if auction->end_of_auction is in past show message  -->
-                            <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}">
-                                @csrf
-                                @method('PUT')
-                                Zakończenie przetargu
-                                <input class="form-control" name="end_of_auction" type="datetime-local" value="{{ $chat->auctions()->first()->end_of_auction }}">
+                            @if($userType !== MessagesHelper::TYPE_EMPLOYEE)
+                                <!-- if auction->end_of_auction is in past show message  -->
+                                <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}">
+                                    @csrf
+                                    @method('PUT')
+                                    Zakończenie przetargu
+                                    <input class="form-control" name="end_of_auction" type="datetime-local" value="{{ $chat->auctions()->first()->end_of_auction }}">
 
-                                <div class="mt-4">
-                                    Data wysłania przesyłki
-                                    <input class="form-control" name="date_of_delivery" type="datetime-local" value="{{ $chat->auctions()->first()->date_of_delivery }}">
-                                </div>
+                                    <div class="mt-4">
+                                        Data wysłania przesyłki
+                                        <input class="form-control" name="date_of_delivery" type="datetime-local" value="{{ $chat->auctions()->first()->date_of_delivery }}">
+                                    </div>
 
 
-                                <button class="btn btn-primary">
-                                    Zaaktualizuj daty dotyczące przetargu
-                                </button>
-                            </form>
+                                    <button class="btn btn-primary">
+                                        Zaaktualizuj daty dotyczące przetargu
+                                    </button>
+                                </form>
+                            @endif
 
 
                             @if(\Carbon\Carbon::parse(\Carbon\Carbon::now())->gt(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)))
