@@ -46,19 +46,16 @@ class SendSpeditionNotifications implements ShouldQueue
 
             if ($order->id == 85460) {
 
-            dd($order->warehouse);
-            }
             if ($order->labels->contains(66)) {
                 continue;
             }
 
-            if (!$order->dates || !$order->warehouse?->customer_shipment_date_from) {
+            if (!$order->dates || !$order->warehouse?->warehouse_email) {
                 continue;
             }
 
             $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
             $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
-            dd($fromDate, $toDate);
             if ($fromDate->isFuture()) {
                 $arr = [];
                 AddLabelService::addLabels($order, [245], $arr, []);
