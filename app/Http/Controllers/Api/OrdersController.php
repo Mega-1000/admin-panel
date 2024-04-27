@@ -653,7 +653,9 @@ class OrdersController extends Controller
             }
 
             foreach ($item->getAttributes() as $key => $value) {
-                $item->product->$key = $value;
+                if (!in_array($key, ['gross_price_of_packing', 'gross_price_of_packing'])) {
+                    $item->product->$key = $value;
+                }
             }
 
             $item->product->id = $item->product_id;
