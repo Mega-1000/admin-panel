@@ -46,7 +46,7 @@ class SendSpeditionNotifications implements ShouldQueue
 
             if ($order->id == 85460) {
 
-            dd(!$order->warehouse?->customer_shipment_date_from);
+            dd($order->warehouse?->customer_shipment_date_from);
             }
             if ($order->labels->contains(66)) {
                 continue;
