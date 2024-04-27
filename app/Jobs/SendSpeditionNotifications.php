@@ -48,7 +48,7 @@ class SendSpeditionNotifications implements ShouldQueue
                 continue;
             }
 
-            if (!$order->dates || !$order->warehouse) {
+            if (!$order->dates || !$order->warehouse?->customer_shipment_date_from) {
                 continue;
             }
 
