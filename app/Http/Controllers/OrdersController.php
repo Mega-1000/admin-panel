@@ -2065,6 +2065,7 @@ class OrdersController extends Controller
     /**
      * @param $orderId
      * @return RedirectResponse
+     * @throws Exception
      */
     public function sendSelfOrderToWarehouse($orderId): RedirectResponse
     {
