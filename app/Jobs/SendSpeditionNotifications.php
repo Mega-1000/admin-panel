@@ -42,9 +42,9 @@ class SendSpeditionNotifications implements ShouldQueue
         $orders = DB::table('order_labels')->where(['label_id' => 53])->get();
 
         foreach ($orders as $order) {
-            dd($orders);
             $order = Order::find($order->order_id);
 
+            dd($order);
             if ($order->labels->contains(66)) {
                 continue;
             }
