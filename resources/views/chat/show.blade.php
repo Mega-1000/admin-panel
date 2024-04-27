@@ -719,7 +719,7 @@
                 });
 
                 $('#modifyDateModal').modal('hide');
-                showAlert('success', 'Successfully updated dates.');
+                showAlert('success', 'Pomyślnie zapisano daty!');
                 loadOrderDates(); // Refresh dates table
             } catch (error) {
                 console.error('Failed to modify the date:', error);

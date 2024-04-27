@@ -43,12 +43,16 @@ class SendSpeditionNotifications implements ShouldQueue
 
         foreach ($orders as $order) {
             $order = Order::find($order->order_id);
+
             if ($order->labels->contains(66)) {
                 continue;
             }
 
             $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
             $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
+            if($order->id === 85460) {
+dd($fromDate, $toDate);
+            }
 
             if ($fromDate->isFuture()) {
                 $arr = [];
