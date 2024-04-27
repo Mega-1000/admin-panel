@@ -657,8 +657,10 @@ class OrdersController extends Controller
             }
 
             foreach ($item->getAttributes() as $key => $value) {
-                    $item->product->$key = $value;
+                $item->product->$key = $value;
             }
+
+            $item->product->gross_price_of_packing = $item->gross_selling_price_commercial_unit;
 
             $item->product->id = $item->product_id;
 
