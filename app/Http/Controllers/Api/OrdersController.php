@@ -652,6 +652,10 @@ class OrdersController extends Controller
                 $item->product->$key = $value;
             }
 
+            foreach ($item->product->prices->getAttributes() as $key => $value) {
+                $item->product->$key = $value;
+            }
+
             foreach ($item->getAttributes() as $key => $value) {
                 if (!in_array($key, ['gross_price_of_packing', 'gross_price_of_packing'])) {
                     $item->product->$key = $value;
