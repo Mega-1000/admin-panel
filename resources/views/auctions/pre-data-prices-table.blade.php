@@ -118,7 +118,7 @@
             z-index: auto;
         }
 
-        thead tr:nth-child(2) {
+        thead(2) {
             position: static;
             background-color: transparent;
             z-index: auto;
