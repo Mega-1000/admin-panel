@@ -5035,7 +5035,7 @@
                 if (key === 'acceptance') {
                     return;
                 }
-
+                alert(date)
                 html += '<tr>' +
                     '<td>Prpoponowana data wysyłki (' + key + ')</td>' +
                     '<td>' + (date.delivery_date_from || 'N/A') + '</td>' +
