@@ -71,12 +71,6 @@
         th {
             cursor: pointer;
         }
-        td:first-child {
-            position: sticky;
-            left: 0;
-            background-color: white;
-            z-index: 1;
-        }
 
         body {
             font-family: Arial, sans-serif;
@@ -117,19 +111,6 @@
             background-color: transparent;
             z-index: auto;
         }
-
-        thead {
-            position: static;
-            background-color: transparent;
-            z-index: auto;
-        }
-
-        thead td:first-child {
-            position: static;
-            background-color: transparent;
-            z-index: auto;
-        }
-
 
         td:first-child {
             position: sticky;
