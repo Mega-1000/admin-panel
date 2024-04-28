@@ -54,14 +54,6 @@
             z-index: 2; /* Ensure the header row appears above other rows */
         }
 
-        /* Styles for the second row */
-        tbody tr:nth-child(1) {
-            position: sticky;
-            top: 39px; /* Adjust to the height of your <th> elements */
-            background-color: white;
-            z-index: 1; /* Lower z-index than the header row */
-        }
-
         /* Styles for the first column */
         tbody td:first-child {
             position: sticky;
