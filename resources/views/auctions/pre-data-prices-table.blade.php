@@ -230,8 +230,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
-        $(document).ready(function(){
-            $('th').each(function(){
+        $(document).ready(function() {
+            $('th').each(function() {
                 // Initialize a sort state on each `th`
                 $(this).data('sortState', '');
             });
@@ -240,7 +240,7 @@
                 var table = $(this).parents('table').eq(0);
                 var columnIndex = $(this).index();
                 var sortState = $(this).data('sortState');
-                var rows = table.find('tr:gt(0)').toArray().sort(comparer(columnIndex, sortState));
+                var rows = table.find('tbody tr').toArray().sort(comparer(columnIndex, sortState));
 
                 // Remove the 'sorted' class from the thead
                 table.find('thead').removeClass('sorted');
@@ -280,7 +280,9 @@
                 };
             }
 
-            function getCellValue(row, index){ return $(row).children('td').eq(index).text(); }
+            function getCellValue(row, index) {
+                return $(row).children('td').eq(index).text();
+            }
         });
     </script>
 
