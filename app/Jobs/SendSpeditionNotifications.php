@@ -39,65 +39,74 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = DB::table('order_labels')->where(['label_id' => 53])->get();
+        $orders = DB::table('order_labels')->where(['label_id' => 4])->get();
 
         foreach ($orders as $order) {
             $order = Order::find($order->order_id);
-                if ($order->labels->contains(66)) {
-                    continue;
-                }
+            $sendMails = $order->labels->contains(53);
 
-                if (!$order->dates || !$order->warehouse?->warehouse_email) {
-                    continue;
-                }
+            if ($order->labels->contains(66)) {
+                continue;
+            }
 
-                $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
-                $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
-                if ($fromDate->isFuture()) {
-                    $arr = [];
-                    AddLabelService::addLabels($order, [245], $arr, []);
-                }
+            if (!$order->dates || !$order->warehouse?->warehouse_email) {
+                continue;
+            }
 
-                if ($fromDate->subDay()->isToday() && !$order->start_of_spedition_period_sent) {
+            $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
+            $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
+
+            if ($fromDate->isFuture()) {
+                $arr = [];
+                AddLabelService::addLabels($order, [245], $arr, []);
+            }
+
+            if ($fromDate->subDay()->isToday() && !$order->start_of_spedition_period_sent) {
+                if ($sendMails) {
                     Mailer::create()
                         ->to($order->warehouse->warehouse_email)
                         ->send(new ReminderAboutStartOfSpeditionPeriod($order));
-
-                    $order->update(['start_of_spedition_period_sent' => true]);
                 }
 
-                if ($fromDate->isToday()) {
-                    $arr = [];
-                    AddLabelService::addLabels($order, [244], $arr, []);
+                $order->update(['start_of_spedition_period_sent' => true]);
+            }
 
-                    $order->labels()->detach(245);
-                }
+            if ($fromDate->isToday()) {
+                $arr = [];
+                AddLabelService::addLabels($order, [244], $arr, []);
 
-                if ($toDate->subDay()->isToday() && !$order->near_end_of_spedition_period_sent) {
+                $order->labels()->detach(245);
+            }
+
+            if ($toDate->subDay()->isToday() && !$order->near_end_of_spedition_period_sent) {
+                if ($sendMails) {
                     Mailer::create()
                         ->to($order->warehouse->warehouse_email)
                         ->send(new ReminderAboutNearEndOfSpeditionPeriod($order));
-
-                    $order->update(['near_end_of_spedition_period_sent' => true]);
                 }
 
-                if ($toDate->isToday()) {
-                    $order->labels()->detach(244);
+                $order->update(['near_end_of_spedition_period_sent' => true]);
+            }
 
-                    $arr = [];
-                    AddLabelService::addLabels($order, [74], $arr, []);
-                }
+            if ($toDate->isToday()) {
+                $order->labels()->detach(244);
 
-                if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
+                $arr = [];
+                AddLabelService::addLabels($order, [74], $arr, []);
+            }
+
+            if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
+                if ($sendMails) {
                     Mailer::create()
                         ->to($order->warehouse->warehouse_email)
                         ->send(new ReminderAfterSpeditionPeriodEnded($order));
-
-                    $arr = [];
-                    AddLabelService::addLabels($order, [243], $arr, []);
-                    $order->labels()->detach(74);
                 }
+
+                $arr = [];
+                AddLabelService::addLabels($order, [243], $arr, []);
+                $order->labels()->detach(74);
             }
+        }
 
     }
 }

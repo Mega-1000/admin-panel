@@ -3,6 +3,7 @@
 namespace App\Observers\Entities;
 
 use App\Entities\OrderPayment;
+use App\Jobs\SendSpeditionNotifications;
 use App\Repositories\Orders;
 use App\Services\AllegroPaymentsReturnService;
 use App\Services\Label\AddLabelService;
@@ -25,6 +26,7 @@ class OrderPaymentObserver
      * @param OrderPayment $orderPayment
      *
      * @return void
+     * @throws \Exception
      */
     public function created(OrderPayment $orderPayment): void
     {
@@ -32,6 +34,8 @@ class OrderPaymentObserver
         $this->orderPaymentLabelsService->calculateLabels($orderPayment->order);
 
         AllegroPaymentsReturnService::checkAllegroReturn($orderPayment->order);
+
+        dispatch(SendSpeditionNotifications::class);
     }
 
     /**
