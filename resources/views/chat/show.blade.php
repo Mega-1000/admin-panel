@@ -902,8 +902,6 @@
         window.showModifyDateModal = function(orderId, type, from, to, type11) {
             $('#orderId').val(orderId);
             $('#dateType').val(type);
-            const formattedFrom = from.replace(' ', 'T').substring(0, 16); // Convert and trim to 'YYYY-MM-DDTHH:MM'
-            const formattedTo = to.replace(' ', 'T').substring(0, 16);     // Convert and trim to 'YYYY-MM-DDTHH:MM'
 
             $('#dateFrom').val();
             $('#dateTo').val(formattedTo);
