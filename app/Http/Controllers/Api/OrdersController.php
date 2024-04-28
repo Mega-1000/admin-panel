@@ -133,6 +133,7 @@ class OrdersController extends Controller
      */
     public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
+        dd('okej');
         $data = $request->all();
         foreach ($data['order_items'] as &$item) {
             $item['id'] = Product::where('symbol', $item['symbol'])->first()->id;
@@ -241,8 +242,6 @@ class OrdersController extends Controller
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
-                'token' => $customer->createToken('Api code')->accessToken,
-                'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE
             ]);
         } catch (Exception $e) {
             DB::rollBack();
