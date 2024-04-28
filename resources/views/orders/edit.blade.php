@@ -5072,5 +5072,21 @@
         }
     </script>
 
+    <script>
+
+        window.showModifyDateModal = function(orderId, type, from, to, type11) {
+            $('#orderId').val(orderId);
+            $('#dateType').val(type);
+
+            console.log(from);
+            $('#dateFrom').val(from);
+            $('#dateTo').val(to);
+
+            window.type11 = type11;
+            $('#modifyDateModal').modal('show');
+        }
+
+    </script>
+
     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
 @endsection
