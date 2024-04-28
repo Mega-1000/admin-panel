@@ -36,6 +36,14 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
+        function updateOrderLabels($order, $newLabels): void
+        {
+            $allLabels = [244, 245, 74, 243]; // Define all your specific labels here
+            $order->labels()->detach($allLabels);
+            $arr = [];
+            AddLabelService::addLabels($order, $newLabels, $arr, []);
+        }
+
         $orders = DB::table('order_labels')->where('label_id', 5)->whereDate('created_at', '>=', Carbon::now()->subMonths(3))->get();
 
         foreach ($orders as $order) {
@@ -92,14 +100,6 @@ class SendSpeditionNotifications implements ShouldQueue
 
                 updateOrderLabels($order, [243]);
             }
-        }
-
-        function updateOrderLabels($order, $newLabels): void
-        {
-            $allLabels = [244, 245, 74, 243]; // Define all your specific labels here
-            $order->labels()->detach($allLabels);
-            $arr = [];
-            AddLabelService::addLabels($order, $newLabels, $arr, []);
         }
     }
 }
