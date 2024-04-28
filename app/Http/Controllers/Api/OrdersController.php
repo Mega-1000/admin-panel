@@ -728,7 +728,7 @@ class OrdersController extends Controller
         }
         return [
             'customer' => [
-                'delivery_date_from' => 'customer_delivery_date_from',
+                'delivery_date_from' => $dates->customer_delivery_date_from,
                 'delivery_date_to' => 'customer_delivery_date_to',
                 'shipment_date_from' => $dates->getDateAttribute('customer_shipment_date_from'),
                 'shipment_date_to' => $dates->getDateAttribute('customer_shipment_date_to'),
