@@ -239,9 +239,10 @@ class OrdersController extends Controller
 
             $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
 
-            dd('okej');
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
+                'access_token' => $customer->createToken('Api code')->accessToken,
+                'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE
             ]);
         } catch (Exception $e) {
             DB::rollBack();
