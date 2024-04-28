@@ -50,11 +50,9 @@ class SendSpeditionNotifications implements ShouldQueue
             $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
 
             if ($fromDate->isFuture()) {
-                $arr = [];
-                AddLabelService::addLabels($order, [245], $arr, []);
+                updateOrderLabels($order, [245]);
             }
 
-            // Check if the day before the from date is today
             $beforeFromDate = Carbon::create($fromDate)->subDay();
             if ($beforeFromDate->isToday() && !$order->start_of_spedition_period_sent) {
                 if ($sendMails) {
@@ -67,13 +65,9 @@ class SendSpeditionNotifications implements ShouldQueue
             }
 
             if ($fromDate->isPast() && $toDate->isFuture()) {
-                $arr = [];
-                AddLabelService::addLabels($order, [244], $arr, []);
-
-                $order->labels()->detach(245);
+                updateOrderLabels($order, [244]);
             }
 
-            // Check if the day before the to date is today
             $beforeToDate = Carbon::create($toDate)->subDay();
             if ($beforeToDate->isToday() && !$order->near_end_of_spedition_period_sent) {
                 if ($sendMails) {
@@ -86,10 +80,7 @@ class SendSpeditionNotifications implements ShouldQueue
             }
 
             if ($toDate->isToday()) {
-                $order->labels()->detach(244);
-
-                $arr = [];
-                AddLabelService::addLabels($order, [74], $arr, []);
+                updateOrderLabels($order, [74]);
             }
 
             if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
@@ -99,10 +90,16 @@ class SendSpeditionNotifications implements ShouldQueue
                         ->send(new ReminderAfterSpeditionPeriodEnded($order));
                 }
 
-                $arr = [];
-                AddLabelService::addLabels($order, [243], $arr, []);
-                $order->labels()->detach(74);
+                updateOrderLabels($order, [243]);
             }
+        }
+
+        function updateOrderLabels($order, $newLabels): void
+        {
+            $allLabels = [244, 245, 74, 243]; // Define all your specific labels here
+            $order->labels()->detach($allLabels);
+            $arr = [];
+            AddLabelService::addLabels($order, $newLabels, $arr, []);
         }
     }
 }
