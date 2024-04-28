@@ -5055,8 +5055,11 @@
         window.showModifyDateModal = function(orderId, type, from, to, type11) {
             $('#orderId').val(orderId);
             $('#dateType').val(type);
+
+            alert(from)
             $('#dateFrom').val(from);
             $('#dateTo').val(to);
+
             window.type11 = type11;
             $('#modifyDateModal').modal('show');
         }
