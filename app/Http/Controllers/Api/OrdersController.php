@@ -822,7 +822,7 @@ class OrdersController extends Controller
             $order->save();
         }
 
-        dispatch_now(new SendSpeditionNotifications());
+        dispatch(new SendSpeditionNotifications());
 
         if ($result) {
             $order->dates->refresh();
