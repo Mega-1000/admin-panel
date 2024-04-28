@@ -43,6 +43,13 @@
             color: white;
         }
 
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #4CAF50;
+            z-index: 1;
+        }
+
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }

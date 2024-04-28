@@ -50,7 +50,7 @@ class SendSpeditionNotifications implements ShouldQueue
             $order = Order::find($order->order_id);
             $sendMails = $order->labels->contains(53) && $order->warehouse?->warehouse_email;
 
-            if ($order->labels->contains(66) || !$order->dates) {
+            if ($order->labels->contains(66) || $order->labels->contains(230) || !$order->dates) {
                 continue;
             }
 
