@@ -905,7 +905,7 @@
             const formattedFrom = from.replace(' ', 'T').substring(0, 16); // Convert and trim to 'YYYY-MM-DDTHH:MM'
             const formattedTo = to.replace(' ', 'T').substring(0, 16);     // Convert and trim to 'YYYY-MM-DDTHH:MM'
 
-            $('#dateFrom').val(formattedFrom);
+            $('#dateFrom').val('2024-04-28 23:12');
             $('#dateTo').val(formattedTo);
 
             window.type11 = type11;
