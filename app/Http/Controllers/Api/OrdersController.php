@@ -133,7 +133,6 @@ class OrdersController extends Controller
      */
     public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
-        dd('okej');
         $data = $request->all();
         foreach ($data['order_items'] as &$item) {
             $item['id'] = Product::where('symbol', $item['symbol'])->first()->id;
@@ -240,6 +239,7 @@ class OrdersController extends Controller
 
             $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
 
+            dd('okej');
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
             ]);
