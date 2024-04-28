@@ -14,11 +14,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 
     <style>
-        thead.sorted {
-            background-color: #ffa500; /* Orange color */
-            color: white;
-        }
-
         body {
             font-family: Arial, sans-serif;
         }
@@ -54,6 +49,21 @@
             z-index: 2; /* Ensure the header row appears above other rows */
         }
 
+        /* Styles for the second row */
+        tbody tr:nth-child(1) {
+            position: sticky;
+            top: 39px; /* Adjust to the height of your <th> elements */
+            background-color: white;
+            z-index: 1; /* Lower z-index than the header row */
+        }
+
+        /* Styles for the first column */
+        tbody td:first-child {
+            position: sticky;
+            left: 0; /* Stick to the left side of the container */
+            background-color: white;
+            z-index: 1; /* Same z-index as the second row */
+        }
 
         tbody tr:nth-child(even) {
             background-color: #f2f2f2; /* Alternating row background color */
@@ -78,6 +88,12 @@
 
         th {
             cursor: pointer;
+        }
+
+        /* Style for sorted thead */
+        thead.sorted {
+            background-color: #4CAF50; /* Green color */
+            color: white;
         }
     </style>
 </head>
