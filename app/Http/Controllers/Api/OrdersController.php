@@ -728,20 +728,20 @@ class OrdersController extends Controller
         }
         return [
             'customer' => [
-                'delivery_date_from' => $dates->customer_delivery_date_from,
-                'delivery_date_to' => 'customer_delivery_date_to',
+                'delivery_date_from' => $dates->getDateAttribute('customer_shipment_date_from'),
+                'delivery_date_to' => $dates->getDateAttribute('customer_shipment_date_to'),
                 'shipment_date_from' => $dates->getDateAttribute('customer_shipment_date_from'),
                 'shipment_date_to' => $dates->getDateAttribute('customer_shipment_date_to'),
             ],
             'consultant' => [
-                'delivery_date_from' => $dates->getDateAttribute('consultant_delivery_date_from'),
-                'delivery_date_to' => $dates->getDateAttribute('consultant_delivery_date_to'),
+                'delivery_date_from' => $dates->getDateAttribute('consultant_shipment_date_from'),
+                'delivery_date_to' => $dates->getDateAttribute('consultant_shipment_date_to'),
                 'shipment_date_from' => $dates->getDateAttribute('consultant_shipment_date_from'),
                 'shipment_date_to' => $dates->getDateAttribute('consultant_shipment_date_to'),
             ],
             'warehouse' => [
-                'delivery_date_from' => $dates->getDateAttribute('warehouse_delivery_date_from'),
-                'delivery_date_to' => $dates->getDateAttribute('warehouse_delivery_date_to'),
+                'delivery_date_from' => $dates->getDateAttribute('warehouse_shipment_date_from'),
+                'delivery_date_to' => $dates->getDateAttribute('warehouse_shipment_date_to'),
                 'shipment_date_from' => $dates->getDateAttribute('warehouse_shipment_date_from'),
                 'shipment_date_to' => $dates->getDateAttribute('warehouse_shipment_date_to'),
             ],
