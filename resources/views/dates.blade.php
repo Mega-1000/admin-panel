@@ -36,7 +36,7 @@
                     </div>
                     <div class="form-group">
                         <label for="dateFrom">Od</label>
-                        <input form="modifyDateForm" type="datetime" class="form-control" id="dateFrom" required>
+                        <input form="modifyDateForm" type="date" class="form-control" id="dateFrom" required>
                     </div>
                     <div class="form-group">
                         <label for="dateTo">Do</label>
