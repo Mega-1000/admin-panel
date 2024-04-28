@@ -59,6 +59,7 @@ use App\Services\OrderService;
 use App\Services\ProductService;
 use App\Services\WorkingEventsService;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Exception;
 use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -240,6 +241,8 @@ class OrdersController extends Controller
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
+                'token' => $customer->createToken('Api code')->accessToken,
+                'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE
             ]);
         } catch (Exception $e) {
             DB::rollBack();
