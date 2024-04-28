@@ -40,112 +40,33 @@
             padding: 8px;
         }
 
-        th {
+        /* Styles for the table header row */
+        thead th {
             background-color: #4CAF50;
             color: white;
             position: sticky;
-            top: 0; /* Adjust if you have a specific offset */
-            z-index: 1; /* Ensures the header is above other content */
+            top: 0; /* Stick to the top of the container */
+            z-index: 2; /* Ensure the header row appears above other rows */
         }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        td {
-            vertical-align: middle;
-        }
-
-        #chat-container {
-            margin-top: 50px;
-        }
-
-        th.asc::after {
-            content: " ↓"; /* Change to arrow SVG or symbol as needed */
-        }
-
-        th.desc::after {
-            content: " ↑"; /* Change to arrow SVG or symbol as needed */
-        }
-
-        th {
-            cursor: pointer;
-        }
-        td:first-child {
-            position: sticky;
-            left: 0;
-            background-color: white;
-            z-index: 1;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            margin: auto;
-            overflow-y: auto; /* Make sure the container allows for scrolling */
-            max-height: 90vh; /* Adjust based on your needs */
-        }
-
-        @media screen and (max-width: 768px) {
-            .container {
-                width: 100%;
-            }
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%; /* Ensure table fills the container */
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        th {
-            background-color: #4CAF50;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 2; /* Increased z-index for <th> elements */
-        }
-
-        thead {
-            position: static;
-            background-color: transparent;
-            z-index: auto;
-        }
-
-        thead {
-            position: static;
-            background-color: transparent;
-            z-index: auto;
-        }
-
-        thead td:first-child {
-            position: static;
-            background-color: transparent;
-            z-index: auto;
-        }
-
-        tr:nth-child(2) {
+        /* Styles for the second row */
+        tbody tr:nth-child(1) {
             position: sticky;
             top: 39px; /* Adjust to the height of your <th> elements */
             background-color: white;
-            z-index: 1; /* Lower z-index for the second <tr> */
+            z-index: 1; /* Lower z-index than the header row */
         }
 
-        td:first-child {
+        /* Styles for the first column */
+        tbody td:first-child {
             position: sticky;
-            left: 0;
+            left: 0; /* Stick to the left side of the container */
             background-color: white;
-            z-index: 1;
+            z-index: 1; /* Same z-index as the second row */
         }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2; /* Alternating row background color */
         }
 
         td {
@@ -156,6 +77,7 @@
             margin-top: 50px;
         }
 
+        /* Styles for sorting arrows */
         th.asc::after {
             content: " ↓"; /* Change to arrow SVG or symbol as needed */
         }
@@ -167,7 +89,6 @@
         th {
             cursor: pointer;
         }
-
     </style>
 </head>
 
