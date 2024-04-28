@@ -54,13 +54,6 @@
             z-index: 2; /* Ensure the header row appears above other rows */
         }
 
-        /* Styles for the first column */
-        tbody td:first-child {
-            position: sticky;
-            left: 0; /* Stick to the left side of the container */
-            background-color: white;
-            z-index: 1; /* Same z-index as the second row */
-        }
 
         tbody tr:nth-child(even) {
             background-color: #f2f2f2; /* Alternating row background color */
