@@ -41,7 +41,7 @@
         }
 
         /* Styles for the table header row */
-        thead th {
+        thead {
             background-color: #4CAF50;
             color: white;
             position: sticky;
