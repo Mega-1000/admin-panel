@@ -38,20 +38,16 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = DB::table('order_labels')
-            ->where('label_id', 5)
-            ->whereDate('created_at', '>=', Carbon::now()->subMonths(3))
-            ->get();
+        $orders = DB::table('order_labels')->where('label_id', 5)->whereDate('created_at', '>=', Carbon::now()->subMonths(3))->get();
 
         foreach ($orders as $order) {
-            $order = Order::find($order->order_id);
-            $sendMails = $order->labels->contains(53);
-
-            if ($order->labels->contains(66)) {
+            if ($order->order_id !== 85461) {
                 continue;
             }
+            $order = Order::find($order->order_id);
+            $sendMails = $order->labels->contains(53) && $order->warehouse?->warehouse_email;
 
-            if (!$order->dates || !$order->warehouse?->warehouse_email) {
+            if ($order->labels->contains(66) || !$order->dates) {
                 continue;
             }
 
@@ -72,10 +68,13 @@ class SendSpeditionNotifications implements ShouldQueue
 
                 $order->update(['start_of_spedition_period_sent' => true]);
             }
+            $fromDate->subDay();
 
+            dd($fromDate, $toDate, $fromDate->isToday());
             if ($fromDate->isToday()) {
                 $arr = [];
                 AddLabelService::addLabels($order, [244], $arr, []);
+
 
                 $order->labels()->detach(245);
             }
