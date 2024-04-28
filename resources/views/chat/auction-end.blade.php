@@ -43,11 +43,11 @@
             color: white;
         }
 
-        thead th {
+        thead {
             position: sticky;
             top: 0;
-            background-color: #4CAF50;
-            z-index: 1;
+            background-color: #4CAF50; /* Same background color as the header */
+            z-index: 1; /* Ensure that the header is on top of other elements */
         }
 
         tr:nth-child(even) {
