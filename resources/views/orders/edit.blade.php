@@ -5056,7 +5056,6 @@
             $('#orderId').val(orderId);
             $('#dateType').val(type);
 
-            alert(from)
             $('#dateFrom').val(from);
             $('#dateTo').val(to);
 
