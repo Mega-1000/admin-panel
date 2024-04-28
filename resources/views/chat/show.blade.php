@@ -903,8 +903,8 @@
             $('#orderId').val(orderId);
             $('#dateType').val(type);
 
-            $('#dateFrom').val();
-            $('#dateTo').val(formattedTo);
+            $('#dateFrom').val(to);
+            $('#dateTo').val(from);
 
             window.type11 = type11;
             $('#modifyDateModal').modal('show');
