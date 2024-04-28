@@ -14,6 +14,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 
     <style>
+        thead.sorted {
+            background-color: #ffa500; /* Orange color */
+            color: white;
+        }
+
         body {
             font-family: Arial, sans-serif;
         }
@@ -230,28 +235,39 @@
                 $(this).data('sortState', '');
             });
 
-            $('th').click(function(){
+            $('th').click(function() {
                 var table = $(this).parents('table').eq(0);
                 var columnIndex = $(this).index();
                 var sortState = $(this).data('sortState');
                 var rows = table.find('tr:gt(0)').toArray().sort(comparer(columnIndex, sortState));
 
+                // Remove the 'sorted' class from the thead
+                table.find('thead').removeClass('sorted');
+
                 // Toggle the sort state for this column
                 if (sortState === 'asc') {
-                    return
+                    $(this).data('sortState', 'desc');
+                    $(this).html($(this).html().replace(' ↓', ' ↑')); // Adjust if using different indicators
                 } else {
                     $(this).data('sortState', 'asc');
                     $(this).html($(this).html().replace(' ↑', ' ↓')); // Adjust if using different indicators
                 }
 
+                // Add the 'sorted' class to the thead if this column is sorted
+                if (sortState !== '') {
+                    table.find('thead').addClass('sorted');
+                }
+
                 // Reset sort state indicators for other columns
-                table.find('th').not(this).each(function(){
+                table.find('th').not(this).each(function() {
                     $(this).data('sortState', ''); // Clear the sort state
                     $(this).html($(this).html().replace(' ↓', '').replace(' ↑', '')); // Remove any sort indicators
                 });
 
                 // Re-append rows in sorted order
-                for (var i = 0; i < rows.length; i++){ table.append(rows[i]); }
+                for (var i = 0; i < rows.length; i++) {
+                    table.append(rows[i]);
+                }
             });
 
             function comparer(index, sortState) {
