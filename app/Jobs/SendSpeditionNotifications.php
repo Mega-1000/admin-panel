@@ -94,13 +94,13 @@ class SendSpeditionNotifications implements ShouldQueue
                 updateOrderLabels($order, [256]);
             }
 
-            if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
-                if ($sendMails) {
-                    Mailer::create()
-                        ->to($order->warehouse->warehouse_email)
-                        ->send(new ReminderAfterSpeditionPeriodEnded($order));
-                }
+            if ($sendMails && $toDate->isPast() ) {
+                Mailer::create()
+                    ->to($order->warehouse->warehouse_email)
+                    ->send(new ReminderAfterSpeditionPeriodEnded($order));
+            }
 
+            if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
                 updateOrderLabels($order, [243]);
             }
         }
