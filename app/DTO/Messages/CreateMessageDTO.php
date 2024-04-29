@@ -2,7 +2,7 @@
 
 namespace App\DTO\Messages;
 
-use Nyholm\Psr7\UploadedFile;
+use Illuminate\Http\UploadedFile;
 
 readonly final class CreateMessageDTO
 {
