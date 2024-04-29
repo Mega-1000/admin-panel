@@ -2,12 +2,14 @@
 
 namespace App\DTO\Messages;
 
+use Nyholm\Psr7\UploadedFile;
+
 readonly final class CreateMessageDTO
 {
     public function __construct(
         public string $message,
         public string $area,
-        public ?string $file = null,
+        public ?UploadedFile $file = null,
         public ?int $lastId = null,
         public ?string $token = null,
     ) {}
