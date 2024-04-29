@@ -4396,6 +4396,7 @@
             if (profit === 1) {
                 $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
             }
+            alert('okej');
             let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
             $('#orderValueSum').val(sum.toFixed(2));
             $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
