@@ -4393,16 +4393,12 @@
                 additionalServieCost = parseFloat($('#additional_service_cost').val());
             }
 
-            let profit = 0;
-            if ($('#profit').val() !== '') {
-                profit = parseFloat($('#profit').val());
+            if (profit === 1) {
+                $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
             }
-
             let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
             $('#orderValueSum').val(sum.toFixed(2));
             $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
-
-            $('#profitInfo').val((profit + additionalServieCost).toFixed(2));
         }
 
         setTimeout(() => {
@@ -5059,7 +5055,6 @@
             $('#orderId').val(orderId);
             $('#dateType').val(type);
 
-            console.log(from);
             $('#dateFrom').val(from);
             $('#dateTo').val(to);
 
@@ -5074,22 +5069,6 @@
                 $('#alerts').html('');
             }, 3000);
         }
-    </script>
-
-    <script>
-
-        window.showModifyDateModal = function(orderId, type, from, to, type11) {
-            $('#orderId').val(orderId);
-            $('#dateType').val(type);
-
-            console.log(from);
-            $('#dateFrom').val(from);
-            $('#dateTo').val(to);
-
-            window.type11 = type11;
-            $('#modifyDateModal').modal('show');
-        }
-
     </script>
 
     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
