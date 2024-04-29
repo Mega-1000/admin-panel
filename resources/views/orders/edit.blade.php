@@ -4370,36 +4370,37 @@
         });
 
         function updateOrderSum(profit = null) {
-            if ($('#totalPriceInfo').val() === '') {
-                valueOfItemsGross = 0;
-            } else {
-                valueOfItemsGross = parseFloat($('#orderItemsSum').val().replace(',', ''));
-            }
-            if ($('#additional_cash_on_delivery_cost').val() === '') {
-                packingWarehouseCost = 0;
-            } else {
-                packingWarehouseCost = parseFloat($('#additional_cash_on_delivery_cost').val());
-            }
+            setTimeout(() => {
+                if ($('#totalPriceInfo').val() === '') {
+                    valueOfItemsGross = 0;
+                } else {
+                    valueOfItemsGross = parseFloat($('#orderItemsSum').val().replace(',', ''));
+                }
+                if ($('#additional_cash_on_delivery_cost').val() === '') {
+                    packingWarehouseCost = 0;
+                } else {
+                    packingWarehouseCost = parseFloat($('#additional_cash_on_delivery_cost').val());
+                }
 
-            if ($('#shipment_price_for_client').val() == '') {
-                shipmentPriceForClient = 0;
-            } else {
-                shipmentPriceForClient = parseFloat($('#shipment_price_for_client').val());
-            }
+                if ($('#shipment_price_for_client').val() == '') {
+                    shipmentPriceForClient = 0;
+                } else {
+                    shipmentPriceForClient = parseFloat($('#shipment_price_for_client').val());
+                }
 
-            if ($('#additional_service_cost').val() == '') {
-                additionalServieCost = 0;
-            } else {
-                additionalServieCost = parseFloat($('#additional_service_cost').val());
-            }
+                if ($('#additional_service_cost').val() == '') {
+                    additionalServieCost = 0;
+                } else {
+                    additionalServieCost = parseFloat($('#additional_service_cost').val());
+                }
 
-            if (profit === 1) {
-                $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
-            }
-            alert('okej');
-            let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
-            $('#orderValueSum').val(sum.toFixed(2));
-            $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
+                if (profit === 1) {
+                    $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
+                }
+                let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
+                $('#orderValueSum').val(sum.toFixed(2));
+                $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
+            }, 100);
         }
 
         setTimeout(() => {
