@@ -793,6 +793,7 @@ class OrdersController extends Controller
             $updateData = ['message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'];
 
             if ($request->type == 'customer') {
+                dd(Carbon::create($request->shipmentDateFrom));
                 if ($request->filled('shipmentDateFrom')) {
                     $updateData['consultant' . '_shipment_date_from'] =  Carbon::create($request->shipmentDateFrom);
                 }
