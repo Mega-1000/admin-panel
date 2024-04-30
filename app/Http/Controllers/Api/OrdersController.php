@@ -794,7 +794,7 @@ class OrdersController extends Controller
 
             if ($request->type == 'customer') {
                 if ($request->filled('shipmentDateFrom')) {
-                    $updateData['consultant' . '_shipment_date_from'] =  new Carbon($request->shipmentDateFrom, 'UTC');
+                    $updateData['consultant' . '_shipment_date_from'] =  dd(new Carbon($request->shipmentDateFrom, 'UTC'));
                 }
                 if ($request->filled('shipmentDateTo')) {
                     $updateData['consultant' . '_shipment_date_to'] = new Carbon($request->shipmentDateTo, 'UTC');
