@@ -794,25 +794,25 @@ class OrdersController extends Controller
 
             if ($request->type == 'customer') {
                 if ($request->filled('shipmentDateFrom')) {
-                    $updateData['consultant' . '_shipment_date_from'] =  Carbon::create($request->shipmentDateFrom);
+                    $updateData['consultant' . '_shipment_date_from'] =  new Carbon($request->shipmentDateFrom, 'UTC');
                 }
                 if ($request->filled('shipmentDateTo')) {
-                    $updateData['consultant' . '_shipment_date_to'] = Carbon::create($request->shipmentDateTo);
+                    $updateData['consultant' . '_shipment_date_to'] = new Carbon($request->shipmentDateTo, 'UTC');
                 }
             }
 
             // Only add fields to the update array if they are present in the request
             if ($request->filled('shipmentDateFrom')) {
-                $updateData[$request->type . '_shipment_date_from'] = Carbon::create($request->shipmentDateFrom);
+                $updateData[$request->type . '_shipment_date_from'] = new Carbon($request->shipmentDateFrom, 'UTC');
             }
             if ($request->filled('shipmentDateTo')) {
-                $updateData[$request->type . '_shipment_date_to'] = Carbon::create($request->shipmentDateTo);
+                $updateData[$request->type . '_shipment_date_to'] = new Carbon($request->shipmentDateTo, 'UTC');
             }
             if ($request->filled('deliveryDateFrom')) {
-                $updateData[$request->type . '_delivery_date_from'] = Carbon::create($request->deliveryDateFrom);
+                $updateData[$request->type . '_delivery_date_from'] = new Carbon($request->deliveryDateFrom, 'UTC');
             }
             if ($request->filled('deliveryDateTo')) {
-                $updateData[$request->type . '_delivery_date_to'] = Carbon::create($request->deliveryDateTo);
+                $updateData[$request->type . '_delivery_date_to'] = new Carbon($request->deliveryDateTo, 'UTC');
             }
 
             // Always set acceptance to true
