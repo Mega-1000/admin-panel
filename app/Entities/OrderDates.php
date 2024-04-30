@@ -59,7 +59,7 @@ class OrderDates extends Model implements Transformable
     public function getDateAttribute($dateType)
     {
         if (!empty($this->$dateType)) {
-            return $this->$dateType->format('Y-m-d h:m');
+            return $this->$dateType;
         } else {
             return null;
         }
