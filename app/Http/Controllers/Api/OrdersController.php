@@ -1156,9 +1156,9 @@ class OrdersController extends Controller
         return response()->json($warehouses);
     }
 
-    public function setWarehouse($id, $orderId): JsonResponse
+    public function setWarehouse($id, $orderToken): JsonResponse
     {
-        $order = Order::find($orderId);
+        $order = Order::where('token', $orderToken)->first();
         $order->warehouse_id = $id;
         $order->save();
 
