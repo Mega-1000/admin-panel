@@ -193,7 +193,7 @@ Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'g
 
 Route::get('/shipment-pay-in-report', ShipmentPayInReportByInvoiceNumber::class)->name('shipment-pay-in-report');
 Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('getPayments');
-Route::get('/orders/get-warehouses-for-order/{token}', 'Api\OrdersController@getWarehousesForOrder');
+Route::get('orders/get-warehouses-for-order/{token}', 'Api\OrdersController@getWarehousesForOrder');
 Route::get('get-product/{product}', [ProductsController::class, 'getSingleProduct']);
 
 Route::post('/register', [CustomersController::class, 'registerAccount']);
