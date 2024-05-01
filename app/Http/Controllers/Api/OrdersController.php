@@ -1155,4 +1155,9 @@ class OrdersController extends Controller
 
         return response()->json($warehouses);
     }
+
+    public function setWarehouse($id): JsonResponse
+    {
+        return response()->json([]);
+    }
 }
