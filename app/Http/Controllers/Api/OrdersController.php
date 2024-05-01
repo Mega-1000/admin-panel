@@ -1142,4 +1142,17 @@ class OrdersController extends Controller
             'date' => $date->format('Y-m-d H:i')
         ], 200, [], JSON_UNESCAPED_UNICODE);
     }
+
+    public function getWarehousesForOrder($token): JsonResponse
+    {
+        $order = Order::where('token', $token)->first();
+        $warehouses = collect();
+
+        foreach ($order->items as $item) {
+            $warehouses->push($item->product->firm->warehouses);
+        }
+        $warehouses->flatten()->unique('id');
+
+        return response()->json($warehouses);
+    }
 }
