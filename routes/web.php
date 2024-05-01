@@ -818,6 +818,6 @@ Route::post('/product-stock-logs/{productStockLog}/edit', [ProductStockLogsContr
 Route::get('/form/{form:name}/{order}', [FormController::class, 'index'])->name('form');
 Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction'])->name('execute-form-action');
 Route::get('newsletter/generate/{category}', [NewsletterController::class, 'generate'])->name('newsletter.generate');
-Route::get('okej/{token}', function () {
+Route::get('okej', function () {
     return 'okej';
 });
