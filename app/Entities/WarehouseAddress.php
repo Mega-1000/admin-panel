@@ -31,4 +31,13 @@ class WarehouseAddress extends Model implements Transformable
     {
         return $this->belongsTo(Warehouse::class);
     }
+
+    public function stringify()
+    {
+        // Get all attributes of the model
+        $attributes = $this->attributesToArray();
+
+        // Join all attribute values with a space
+        return implode(' ', $attributes);
+    }
 }

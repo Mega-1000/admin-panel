@@ -1149,7 +1149,7 @@ class OrdersController extends Controller
         $warehouses = collect();
 
         foreach ($order->items as $item) {
-            $warehouses->push($item->product->firm->warehouses);
+            $warehouses->push($item->product->firm->warehouses->each(fn ($item) => $item->adresString = $item->address->stringify()));
         }
         $warehouses->flatten()->unique('id');
 
