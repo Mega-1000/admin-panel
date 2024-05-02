@@ -46,7 +46,8 @@ class Employees
             }
         }
 
-        $employees = $employees // Assuming there is a 'firm_id' attribute to group by
+        $employees = $employees
+            ->groupBy('firm_id') // Assuming there is a 'firm_id' attribute to group by
             ->map(function ($group) {
                 return $group->reduce(function ($carry, $item) {
                     return ($carry === null || $item->finalRadius > $carry->finalRadius) ? $item : $carry;
