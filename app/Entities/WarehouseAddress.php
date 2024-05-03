@@ -23,6 +23,9 @@ class WarehouseAddress extends Model implements Transformable
     protected $fillable = [
         'warehouse_id', 'address', 'warehouse_number', 'postal_code', 'city'
     ];
+    protected array $plainAddressColumns = [
+        'address', 'postal_code', 'city'
+    ];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -34,10 +37,8 @@ class WarehouseAddress extends Model implements Transformable
 
     public function stringify()
     {
-        // Get all attributes of the model
-        $attributes = $this->attributesToArray();
+        $fillableAttributes = array_intersect_key($this->attributesToArray(), array_flip($this->plainAddressColumns));
 
-        // Join all attribute values with a space
-        return implode(' ', $attributes);
+        return implode(' ', $fillableAttributes);
     }
 }
