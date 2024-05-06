@@ -84,14 +84,14 @@ class ChatNotificationJob implements ShouldQueue
             ]
         );
 
-        Helper::sendEmail(
-            'antoniwoj@o2.pl',
-            'chat-notification',
-            'Nowa wiadomość w ' . config('app.name') . 'na email ' . $email,
-            [
-                'url' => route('chat.show', ['token' => $helper->encrypt()]),
-                'title' => $helper->getTitle(false)
-            ]
-        );
+//        Helper::sendEmail(
+//            'antoniwoj@o2.pl',
+//            'chat-notification',
+//            'Nowa wiadomość w ' . config('app.name') . 'na email ' . $email,
+//            [
+//                'url' => route('chat.show', ['token' => $helper->encrypt()]),
+//                'title' => $helper->getTitle(false)
+//            ]
+//        );
     }
 }
