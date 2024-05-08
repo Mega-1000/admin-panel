@@ -330,8 +330,12 @@ class OrderService
         AddLabelService::addLabels($order, [236], $arr, [], Auth::user()?->id);
     }
 
-    public function handleReferral(int $idOfParrentUser, string $newCustomerWitchWasRefferedLogin): void
+    public function handleReferral(?int $idOfParrentUser, ?string $newCustomerWitchWasRefferedLogin): void
     {
+        if (!$idOfParrentUser || !$newCustomerWitchWasRefferedLogin) {
+            return;
+        }
+
         $referredCustomer = Customer::where('login', $newCustomerWitchWasRefferedLogin)->first();
         $referredCustomer->update(['id_of_parrent_referral' => $idOfParrentUser]);
     }
