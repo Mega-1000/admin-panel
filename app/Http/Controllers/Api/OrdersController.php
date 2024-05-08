@@ -141,11 +141,10 @@ class OrdersController extends Controller
         $customer = Customer::where('login', $data['customer_login'])->first();
 
         if (!$customer && array_key_exists('customer_login', $data) && array_key_exists('phone', $data)) {
-            return response()->json(str_replace("", " ", $data['phone']));
             $customer = Customer::create([
                 'login' => $data['customer_login'],
                 'status' => 'ACTIVE',
-                'password' => Hash::make(str_replace("", " ", $data['phone'])),
+                'password' => Hash::make(str_replace(" ", "", $data['phone'])),
             ]);
 
             $this->orderService->handleReferral($request->validated('register_reffered_user_id'), $data['customer_login']);
