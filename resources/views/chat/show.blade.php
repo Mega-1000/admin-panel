@@ -31,6 +31,18 @@
         referrerpolicy="no-referrer"
     />
     <style>
+        .file-upload {
+            margin-top: 10px;
+        }
+
+        .file-upload label {
+            cursor: pointer;
+        }
+
+        .file-upload span {
+            margin-left: 10px;
+        }
+
         .darken-page {
             position: fixed;
             top: 0;
@@ -196,13 +208,19 @@
                 <div id="new-message" class="loader-2" style="position: relative;">
                     <div class="row">
                         <div class="col-sm-9">
-                            <textarea required class="form-control" id="message"
-                                style="width: 100%; max-width: 650px; min-width: 200px; height: 100px;"
-                                placeholder="Tutaj wpisz wiadomość"></textarea>
-                            <input id="attachment" name="attachment" type="file" style="margin-top: 10px;" />
+        <textarea required class="form-control" id="message"
+                  style="width: 100%; max-width: 650px; min-width: 200px; height: 100px;"
+                  placeholder="Enter your message here"></textarea>
+                            <div class="file-upload">
+                                <label for="attachment" class="btn btn-primary">
+                                    <i class="fas fa-upload"></i> Upload File
+                                </label>
+                                <input id="attachment" name="attachment" type="file" style="display: none;" />
+                                <span id="file-name"></span>
+                            </div>
                         </div>
                         <div class="col-sm-3">
-                            <input type="submit" value="Wyślij" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
+                            <input type="submit" value="Send" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
                         </div>
                     </div>
                 </div>
@@ -917,6 +935,14 @@
                 $('#alerts').html('');
             }, 3000);
         }
+
+        const fileInput = document.getElementById('attachment');
+        const fileNameSpan = document.getElementById('file-name');
+
+        fileInput.addEventListener('change', function() {
+            const fileName = this.files[0].name;
+            fileNameSpan.textContent = fileName;
+        });
     </script>
 </body>
 
