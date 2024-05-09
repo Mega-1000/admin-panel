@@ -239,7 +239,7 @@ class OrdersController extends Controller
 
             $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
 
-            $order->dates()->update([
+            $order->dates()->create([
                 'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
                 'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
                 'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
