@@ -210,17 +210,17 @@
                         <div class="col-sm-9">
         <textarea required class="form-control" id="message"
                   style="width: 100%; max-width: 650px; min-width: 200px; height: 100px;"
-                  placeholder="Enter your message here"></textarea>
+                  placeholder="Wpisz tu swoją wiadomość..."></textarea>
                             <div class="file-upload">
                                 <label for="attachment" class="btn btn-primary">
-                                    <i class="fas fa-upload"></i> Upload File
+                                    <i class="fas fa-upload"></i> Dołącz plik do wiadomości
                                 </label>
                                 <input id="attachment" name="attachment" type="file" style="display: none;" />
                                 <span id="file-name"></span>
                             </div>
                         </div>
                         <div class="col-sm-3">
-                            <input type="submit" value="Send" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
+                            <input type="submit" value="Wyślij wiadomość" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
                         </div>
                     </div>
                 </div>
