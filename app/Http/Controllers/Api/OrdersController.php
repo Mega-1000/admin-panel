@@ -250,6 +250,12 @@ class OrdersController extends Controller
                 'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
             ]);
 
+            $isOrderStyro = Order::whereHas('items', function ($query) {    $query->whereHas('product', function ($subQuery) {        $subQuery->where('variation_group', 'styropiany');});})->orderBy('created_at', 'desc')->find($order->id)->exists();
+
+            if ($isOrderStyro) {
+                $order->additional_service_cost = 50;
+                $order->save();
+            }
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
