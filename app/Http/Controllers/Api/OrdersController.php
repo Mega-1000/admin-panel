@@ -208,14 +208,14 @@ class OrdersController extends Controller
             }
 
             $order->dates()->update([
-                'customer_shipment_date_from' => $request->get('delivery_start_date'),
-                'customer_shipment_date_to' => $request->get('delivery_end_date'),
-                'customer_delivery_date_from' => $request->get('delivery_start_date'),
-                'customer_delivery_date_to' => $request->get('delivery_end_date'),
-                'consultant_shipment_date_from' => $request->get('delivery_start_date'),
-                'consultant_shipment_date_to' => $request->get('delivery_end_date'),
-                'consultant_delivery_date_from' => $request->get('delivery_start_date'),
-                'consultant_delivery_date_to' => $request->get('delivery_end_date'),
+                'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
+                'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
+                'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
+                'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
+                'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
+                'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
+                'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
+                'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
             ]);
 
             $builderData['token'] = $order->getToken();
