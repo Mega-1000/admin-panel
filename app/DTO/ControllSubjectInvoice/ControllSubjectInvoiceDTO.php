@@ -27,7 +27,7 @@ readonly final class ControllSubjectInvoiceDTO
     public string $paymentMethod;
     public string $buyerVATIN;
     public string $accountingDocument;
-    public string $mpp;
+    public ?string $mpp;
     public string $originalOrders;
     public string $orders;
     public string $flagComment;
