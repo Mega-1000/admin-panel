@@ -41,6 +41,7 @@ class AvisationAcceptanceCheck implements ShouldQueue
         if (!$this->order->labels->has(53)) {
             $arr = [];
             AddLabelService::addLabels($this->order, [77], $arr, []);
+            $this->order->labels()->detach(53);
         }
     }
 }
