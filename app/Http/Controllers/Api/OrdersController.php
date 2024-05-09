@@ -207,17 +207,6 @@ class OrdersController extends Controller
                 }
             }
 
-            $order->dates()->update([
-                'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
-                'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
-                'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
-                'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
-                'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
-                'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
-                'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
-                'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
-            ]);
-
             $builderData['token'] = $order->getToken();
 
             $order->updateQuietly(['packages_values' => $orderPackagesCalculator->calculate($order)]);
@@ -249,6 +238,18 @@ class OrdersController extends Controller
             }
 
             $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
+
+            $order->dates()->update([
+                'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
+                'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
+                'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
+                'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
+                'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
+                'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
+                'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
+                'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
+            ]);
+
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
