@@ -9,6 +9,7 @@ use App\Entities\OrderLabelSchedulerAwait;
 use App\Entities\ShipmentGroup;
 use App\Entities\Task;
 use App\Entities\WorkingEvents;
+use App\Jobs\AvisationAcceptanceCheck;
 use App\Services\AllegroPaymentsReturnService;
 use App\Services\WorkingEventsService;
 use Carbon\Carbon;
@@ -122,6 +123,8 @@ class AddLabelService
 
                 if ($label->id == 52) {  //wyslana do awizacji
                     LabelNotificationService::orderStatusChangeToDispatchNotification($order, $order->customer->id == 4128);
+                    $delay = now()->addHours(2);
+                    dispatch_now(new AvisationAcceptanceCheck($order));
                 }
 
                 if ($label->id == Label::ORDER_ITEMS_CONSTRUCTED) {

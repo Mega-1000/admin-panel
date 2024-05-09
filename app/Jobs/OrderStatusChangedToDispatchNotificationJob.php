@@ -98,9 +98,6 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
         if (!$notification && !$order->isOrderHasLabel(Label::WAREHOUSE_REMINDER)) {
             $subject = "Prośba o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
             $notification = OrderWarehouseNotification::create($dataArray);
-
-            $delay = now()->addHours(2);
-            dispatch_now(new AvisationAcceptanceCheck($order));
         }
 
         $acceptanceFormLink = rtrim(config('app.front_nuxt_url'), "/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
