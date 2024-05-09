@@ -79,6 +79,6 @@
 </p>
 <p>
     Z pozdrowieniami
-    ZESPOL MEGA1000
+    ZESPÓŁ EPH POLSKA
 </p>
 </body>
