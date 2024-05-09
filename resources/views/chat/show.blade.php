@@ -212,7 +212,7 @@
                   style="width: 100%; max-width: 650px; min-width: 200px; height: 100px;"
                   placeholder="Wpisz tu swoją wiadomość..."></textarea>
                             <div class="file-upload">
-                                <label for="attachment" class="btn btn-primary">
+                                <label for="attachment" class="btn btn-primary" style="font-weight: bolder;">
                                     <i class="fas fa-upload"></i> Dołącz plik do wiadomości
                                 </label>
                                 <input id="attachment" name="attachment" type="file" style="display: none;" />
