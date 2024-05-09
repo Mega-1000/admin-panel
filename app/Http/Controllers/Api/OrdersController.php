@@ -207,6 +207,7 @@ class OrdersController extends Controller
                 }
             }
 
+            return response()->json(Carbon::create($request->get('delivery_start_date')));
             $order->dates()->update([
                 'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
                 'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
