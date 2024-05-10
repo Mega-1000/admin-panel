@@ -189,7 +189,7 @@ Route::prefix('discounts')->group(function () {
 });
 
 Route::get('styro-warehouses', function () {
-    return response()->json(\App\Entities\Firm::whereHas('product', function ($q) {
+    return response()->json(\App\Entities\Firm::whereHas('products', function ($q) {
         $q->where('variation_group', 'styropiany');
     })->pluck('products')->flatten());
 });
