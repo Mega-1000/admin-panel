@@ -211,7 +211,7 @@
                                @endif
                            </td>
                        @endforeach
-                       <td>{{ $totalCost }}</td>
+                       <td>{{ $totalCost / 2 }}</td>
                    </tr>
                @endforeach
 
