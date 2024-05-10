@@ -240,7 +240,7 @@
 
                                    if ($variation) {
                                        $prices[] = $variation;
-                                       $totalCost += $variation?->price->net_special_price_basic_unit * $item->product->quantity;
+                                       $totalCost += $variation?->price->net_special_price_basic_unit * $item->quantity;
                                    }
                                }
                            @endphp
