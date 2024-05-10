@@ -189,15 +189,19 @@ Route::prefix('discounts')->group(function () {
 });
 
 Route::get('styro-warehouses', function () {
-    return response()->json(
-        \App\Entities\Firm::whereHas('products', function ($query) {
-            $query->where('variation_group', 'styropiany');
-        })
-            ->with('warehouses')
-            ->get()
-            ->pluck('warehouses')
-            ->flatten()
-    );
+    $warehouses = \App\Entities\Firm::whereHas('products', function ($query) {
+        $query->where('variation_group', 'styropiany');
+    })
+        ->with('warehouses')
+        ->get()
+        ->pluck('warehouses')
+        ->flatten();
+
+    foreach ($warehouses as $warehouse) {
+        $warehouse->firm_symbol = \App\Entities\Firm::find($warehouse->firm_id)->symbol;
+    }
+
+    return response()->json($warehouses);
 });
 
 Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'getByOrder'])
