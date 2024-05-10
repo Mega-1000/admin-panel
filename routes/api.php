@@ -200,7 +200,7 @@ Route::get('styro-warehouses', function () {
 
     foreach ($warehouses as $warehouse) {
         $warehouse->firm_symbol = \App\Entities\Firm::find($warehouse->firm_id)->symbol;
-        $warehouse->link = 'http://mega1000.pl/' . $warehouse->firm_symbol . '/' . Category::where('name', $warehouse->firm_symbol)->id;
+        $warehouse->link = 'http://mega1000.pl/' . $warehouse->firm_symbol . '/' . Category::where('name', $warehouse->firm_symbol)->first()->id;
     }
 
     return response()->json($warehouses);
