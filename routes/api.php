@@ -196,9 +196,6 @@ Route::get('styro-warehouses', function () {
             ->with('products')
             ->get()
             ->pluck('products')
-            ->flatMap(function ($firm) {
-                return $firm->products->where('variation_group', 'styropiany');
-            })
     );
 });
 
