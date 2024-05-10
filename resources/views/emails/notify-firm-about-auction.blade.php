@@ -1,7 +1,8 @@
 <h1>
     !! Prosimy o wypełnienie formularza przetargowego, nawet jeśli Państwa oferta nie będzie najniższa, ponieważ klient może kierować się również jakością. !!
 </h1>
-
+<br>
+<br>
 
 W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na
 dostawę styropianu.
