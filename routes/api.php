@@ -188,6 +188,12 @@ Route::prefix('discounts')->group(function () {
         ->name('discounts.get-categories');
 });
 
+Route::get('styro-warehouses', function () {
+    return response()->json(\App\Entities\Firm::whereHas('product', function ($q) {
+        $q->where('variation_group', 'styropiany');
+    })->pluck('products')->flatten());
+});
+
 Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'getByOrder'])
     ->name('api.get-packages-for-order');
 
