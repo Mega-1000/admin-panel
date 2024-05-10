@@ -35,7 +35,6 @@ class OrderPaymentObserver
 
         AllegroPaymentsReturnService::checkAllegroReturn($orderPayment->order);
 
-        dispatch_now(SendSpeditionNotifications::class);
     }
 
     /**
