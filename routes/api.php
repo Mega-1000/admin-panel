@@ -189,9 +189,16 @@ Route::prefix('discounts')->group(function () {
 });
 
 Route::get('styro-warehouses', function () {
-    return response()->json(\App\Entities\Firm::whereHas('products', function ($q) {
-        $q->where('variation_group', 'styropiany');
-    })->pluck('products')->flatten());
+    return response()->json(
+        \App\Entities\Firm::whereHas('products', function ($query) {
+            $query->where('variation_group', 'styropiany');
+        })
+            ->with('products')
+            ->get()
+            ->flatMap(function ($firm) {
+                return $firm->products->where('variation_group', 'styropiany');
+            })
+    );
 });
 
 Route::get('/get-packages-for-order/{order}', [OrderPackageController::class, 'getByOrder'])
