@@ -241,7 +241,7 @@
                                    if ($variation) {
                                        $prices[] = $variation;
                                        $totalCost += $variation?->price->gross_purchase_price_basic_unit_after_discounts * $item->quantity;
-                                       dd($totalCost);
+                                       dd($variation?->price);
                                    }
                                }
                            @endphp
