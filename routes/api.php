@@ -196,7 +196,7 @@ Route::get('styro-warehouses', function () {
             ->with('products')
             ->get()
             ->pluck('warehouse')
-            ->flatMap();
+            ->flatMap()
     );
 });
 
