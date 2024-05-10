@@ -253,7 +253,7 @@
                                    </td>
                                @endif
                            @endforeach
-                           <td>{{ $totalCost }}</td>
+                           <td>{{ round($totalCost / 3.33, 2) }}</td>
                        </tr>
                        @php
                            $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
