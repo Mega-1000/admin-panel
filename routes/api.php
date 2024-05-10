@@ -1,5 +1,6 @@
 <?php
 
+use App\Entities\Category;
 use App\Entities\ShippingPayInReport;
 use App\Http\Controllers\AllegroMessageController;
 use App\Http\Controllers\Api\CustomersController;
@@ -199,6 +200,7 @@ Route::get('styro-warehouses', function () {
 
     foreach ($warehouses as $warehouse) {
         $warehouse->firm_symbol = \App\Entities\Firm::find($warehouse->firm_id)->symbol;
+        $warehouse->link = 'http://mega1000.pl/' + $warehouse->firm_symbol + '/' + Category::where('name', $warehouse->firm_symbol)->id;
     }
 
     return response()->json($warehouses);
