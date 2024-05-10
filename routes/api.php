@@ -193,7 +193,9 @@ Route::get('styro-warehouses', function () {
         \App\Entities\Firm::whereHas('products', function ($query) {
             $query->where('variation_group', 'styropiany');
         })
-            ->with('warehouses')
+            ->with(['warehouses' => function ($query) {
+                $query->select('id', 'name', 'location', 'firm_symbol'); // Adjust these fields based on your database schema
+            }])
             ->get()
             ->pluck('warehouses')
             ->flatten()
