@@ -15,6 +15,7 @@ use App\Entities\OrderDates;
 use App\Entities\OrderPackage;
 use App\Entities\Product;
 use App\Entities\Status;
+use App\Entities\Warehouse;
 use App\Entities\WorkingEvents;
 use App\Enums\PackageStatus;
 use App\Facades\Mailer;
@@ -1183,6 +1184,20 @@ class OrdersController extends Controller
         $order = Order::where('token', $orderToken)->first();
         $order->warehouse_id = $id;
         $order->save();
+
+        $warehouseAddress = Warehouse::find($id)->address;
+
+        $orderAddress = $order->getDeliveryAddress();
+
+        $orderAddress->address = $warehouseAddress->address;
+        $orderAddress->city = $warehouseAddress->city;
+        $orderAddress->postal_code = $warehouseAddress->postal_code;
+
+        $orderAddress->firstname = 'Magazyn'; // Placeholder or dynamically set
+        $orderAddress->lastname = $warehouseAddress->warehouse->symbol; // Placeholder or dynamically set
+        $orderAddress->phone = $warehouseAddress->warehouse->firm->phone; // Placeholder or dynamically set
+
+        $orderAddress->save();
 
         return response()->json();
     }
