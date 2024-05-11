@@ -25,10 +25,17 @@
                                     <td>{{ $approach->phone_number }}</td>
                                     <td>
                                         @if ($approach->referredByUser)
-                                            {{ $approach->referredByUser }}
+                                            {{ $approach->referredByUser->login }}
                                         @else
                                             -
                                         @endif
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('set-aproach-as-done', $approach->id) }}">
+                                            <button class="btn btn-primary">
+                                                Oznacz telefon jako wykonany
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @empty
