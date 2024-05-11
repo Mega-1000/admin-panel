@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,6 @@ class ContactApproach extends Model
 
     public function referredByUser(): BelongsTo
     {
-        return $this->belongsTo('user', 'id', 'referred_by_user_id');
+        return $this->belongsTo(Customer::class, 'id', 'referred_by_user_id');
     }
 }
