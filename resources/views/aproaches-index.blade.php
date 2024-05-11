@@ -31,11 +31,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <form action="{{ route('set-aproach-as-done', $approach->id) }}">
-                                            <button class="btn btn-primary">
-                                                Oznacz telefon jako wykonany
-                                            </button>
-                                        </form>
+                                        <a href="{{ route('set-aproach-as-done', $approach->id) }}" class="btn btn-primary">
+                                            Oznacz telefon jako wykonany
+                                        </a>
                                     </td>
                                 </tr>
                             @empty
