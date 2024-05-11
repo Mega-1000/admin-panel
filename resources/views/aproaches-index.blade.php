@@ -30,14 +30,6 @@
                                             -
                                         @endif
                                     </td>
-                                    <td>
-                                        <form action="{{ route('approaches.update', $approach->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="done" value="1">
-                                            <button type="submit" class="btn btn-primary btn-sm">Mark as Done</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
