@@ -49,7 +49,8 @@ class ContactApproachController extends Controller
 
     public function setDone(ContactApproach $approach): RedirectResponse
     {
-        $approach->update(['done' => true]);
+        $approach->done = true;
+        $approach->save();
 
         return redirect()->back();
     }
