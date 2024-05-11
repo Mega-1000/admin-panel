@@ -124,7 +124,7 @@ class AddLabelService
                 if ($label->id == 52) {  //wyslana do awizacji
                     LabelNotificationService::orderStatusChangeToDispatchNotification($order, $order->customer->id == 4128);
                     $delay = now()->addHours(2);
-                    dispatch(new AvisationAcceptanceCheck($order))->delay();
+                    dispatch(new AvisationAcceptanceCheck($order))->delay($delay);
                 }
 
                 if ($label->id == Label::ORDER_ITEMS_CONSTRUCTED) {
