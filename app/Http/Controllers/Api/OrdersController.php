@@ -1196,6 +1196,8 @@ class OrdersController extends Controller
         $orderAddress->firstname = 'Magazyn'; // Placeholder or dynamically set
         $orderAddress->lastname = $warehouseAddress->warehouse->symbol; // Placeholder or dynamically set
         $orderAddress->phone = $warehouseAddress->warehouse->firm->phone; // Placeholder or dynamically set
+        $orderAddress->email = $warehouseAddress->warehouse->warehouse_email; // Placeholder or dynamically set
+
 
         $orderAddress->save();
 
