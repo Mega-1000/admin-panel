@@ -31,13 +31,6 @@
     <span class="hidden-xs hidden-sm">Chat</span>
 </a>
 
-@if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === User::ORDER_DELETE_USER)
-    <button class="btn btn-sm btn-danger delete-record" onclick="deleteRecord(' + {{ $order['id'] }} + ')">
-        <i class="voyager-trash"></i>
-        <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
-    </button>
-@endif
-
 <a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>
 
 @if ($order['is_buying_admin_side'])
