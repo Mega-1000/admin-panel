@@ -239,16 +239,18 @@ class OrdersController extends Controller
 
             $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
 
-            $order->dates()->create([
-                'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
-                'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
-                'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
-                'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
-                'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
-                'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
-                'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
-                'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
-            ]);
+            if ($request->get('delivery_start_date') && $request->get('delivery_end_date')) {
+                $order->dates()->create([
+                    'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
+                    'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
+                    'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
+                    'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
+                    'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
+                    'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
+                    'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
+                    'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
+                ]);
+            }
 
             $isOrderStyro = Order::whereHas('items', function ($query) {$query->whereHas('product', function ($subQuery) {$subQuery->where('variation_group', 'styropiany');});})
                 ->find($order->id)
