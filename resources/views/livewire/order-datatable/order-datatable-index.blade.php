@@ -7,6 +7,10 @@
                 </button>
             </div>
 
+            <a href="https://admin.mega1000.pl/polecenia" class="btn btn-primary">
+                Zobacz listę poleceń i WYKONAJ TELEFONY
+            </a>
+
             <form @wire:submit.prevent="updatedPageLength">
                 <div class="d-flex">
                     Ilość zamówień na stronę:
