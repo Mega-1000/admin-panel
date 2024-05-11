@@ -790,18 +790,25 @@ class OrdersController extends Controller
                 'customer_delivery_date_to' => $order->dates->warehouse_delivery_date_to,
                 'customer_shipment_date_from' => $order->dates->warehouse_shipment_date_from,
                 'customer_shipment_date_to' => $order->dates->warehouse_shipment_date_to,
+                'consultant_shipment_date_from' => $order->dates->warehouse_shipment_date_from,
+                'consultant_shipment_date_to' => $order->dates->warehouse_shipment_date_to,
             ]);
+
         } else {
             $order->dates()->update([
                 'warehouse_delivery_date_from' => $order->dates->customer_delivery_date_from,
                 'warehouse_delivery_date_to' => $order->dates->customer_delivery_date_to,
                 'warehouse_shipment_date_from' => $order->dates->customer_shipment_date_from,
                 'warehouse_shipment_date_to' => $order->dates->customer_shipment_date_to,
+                'consultant_shipment_date_from' => $order->dates->customer_shipment_date_from,
+                'consultant_shipment_date_to' => $order->dates->customer_shipment_date_to,
             ]);
         }
 
         $order->date_accepted = true;
         $order->save();
+
+
 
         $messagesHelper->sendDateAcceptationMessage($order->chat);
     }
