@@ -19,6 +19,6 @@ class ContactApproach extends Model
 
     public function referredByUser(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, 'id', 'referred_by_user_id');
+        return $this->belongsTo(Customer::class, 'referred_by_user_id', 'id');
     }
 }
