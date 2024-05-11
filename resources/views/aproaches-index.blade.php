@@ -1,6 +1,5 @@
 <!-- resources/views/aproaches-index.blade.php -->
 
-@extends('layouts.datatable')
 
     <div class="container">
         <div class="row">
