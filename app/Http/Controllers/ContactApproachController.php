@@ -49,6 +49,7 @@ class ContactApproachController extends Controller
 
     public function setDone(ContactApproach $approach): RedirectResponse
     {
+        dd($approach);
         $approach->done = true;
         $approach->save();
 
