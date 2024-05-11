@@ -822,4 +822,4 @@ Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction
 Route::get('newsletter/generate/{category}', [NewsletterController::class, 'generate'])->name('newsletter.generate');
 
 Route::get('polecenia', [ContactApproachController::class, 'index'])->name('contact-aproach.index');
-Route::get('set-aproach-as-done/{ContactApproach}', [ContactApproachController::class, 'setDone'])->name('set-aproach-as-done');
+Route::get('set-aproach-as-done/{id}', [ContactApproachController::class, 'setDone'])->name('set-aproach-as-done');

@@ -47,9 +47,9 @@ class ContactApproachController extends Controller
         ]);
     }
 
-    public function setDone(ContactApproach $approach): RedirectResponse
+    public function setDone(int $id): RedirectResponse
     {
-        dd($approach);
+        $approach = ContactApproach::find($id);
         $approach->done = true;
         $approach->save();
 
