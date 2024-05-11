@@ -25,7 +25,7 @@
                                     <td>{{ $approach->phone_number }}</td>
                                     <td>
                                         @if ($approach->referredByUser)
-                                            {{ $approach->referredByUser->name }}
+                                            {{ $approach->referredByUser }}
                                         @else
                                             -
                                         @endif
