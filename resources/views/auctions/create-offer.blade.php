@@ -146,7 +146,6 @@
         @endif
     </div>
     @endforeach
-    {{ dd($parentProductsDisplayed) }}
 
     <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center">
         @csrf
