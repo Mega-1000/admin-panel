@@ -137,20 +137,32 @@ class AuctionsController extends Controller
      */
     public function storeOffer(string $token, CreateChatAuctionOfferRequest $request): RedirectResponse
     {
-        $firm = ChatAuctionFirm::query()->where('token', $token)->firstOrFail();
+        $firm = ChatAuctionFirm::query()->where('token', $token)->firstorfail();
 
-        // Extract the unique product IDs from the request
-        $productIds = collect($request->validated())->keys()
-            ->map(function ($key) {
-                $parts = explode('.', $key);
-                return $parts[1] ?? null;
-            })->unique()->filter();
+        $pricingData = [];
 
-        dd($productIds);
-        // Create an offer for each product ID
-        foreach ($productIds as $productId) {
+        foreach ($request->all() as $key => $value) {
+            // Extract the item ID and the type of price from the key
+            // Example key: commercial_price_net.251638
+            if (preg_match('/(.+)\.(\d+)/', $key, $matches)) {
+                $priceType = $matches[1]; // e.g., 'commercial_price_net'
+                $itemId = $matches[2];    // e.g., '251638'
 
+                // Initialize the nested array for the item ID if not already initialized
+                if (!isset($pricingData[$itemId])) {
+                    $pricingData[$itemId] = [];
+                }
+
+                // Assign the value to the appropriate type
+                $pricingData[$itemId][$priceType] = $value;
+            }
         }
+
+        dd($pricingData);
+        $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($request->validated() + [
+            'firm_id' => $firm->firm_id,
+            'chat_auction_id' => $firm->chat_auction_id
+        ]));
 
         return redirect()->back();
     }
