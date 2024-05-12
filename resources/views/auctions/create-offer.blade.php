@@ -61,7 +61,7 @@
             $arleadyDisplayed = false;
             $parentProductsDisplayed[] = $product->parentProduct->id;
 
-            if (in_array($product->parentProduct->id, $parentProductsDisplayed)) {
+            if (in_array($product->isAuctionOfferCreation->id, $parentProductsDisplayed)) {
                 $arleadyDisplayed = true;
             }
         @endphp
