@@ -74,10 +74,6 @@
                 <img class="image-product" src="{{$product->product->url_for_website}}"
                      onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
                 <div class="product-description">
-                        <h4>
-                        Najniższa cena na ten moment:
-                        {{ $product->chatAuctionOffers->min('price') }} PLN
-                    </h4>
                     <p>
                         @php
                             $name = $product->product->name;
