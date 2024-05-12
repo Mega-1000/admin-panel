@@ -24,16 +24,6 @@ class CreateChatAuctionOfferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'commercial_price_net' => 'required|numeric',
-            'basic_price_net' => 'required|numeric',
-            'calculated_price_net' => 'required|numeric',
-            'aggregate_price_net' => 'required|numeric',
-            'commercial_price_gross' => 'required|numeric',
-            'basic_price_gross' => 'required|numeric',
-            'calculated_price_gross' => 'required|numeric',
-            'aggregate_price_gross' => 'required|numeric',
-            'order_item_id' => 'required|integer',
-            'send_notification' => 'nullable',
         ];
     }
 }
