@@ -163,13 +163,14 @@ class AuctionsController extends Controller
             $fialItemsToUpdate = $firm->chatAuction->chat->order->items()->whereHas('product', function($q) use($product) {
                 $q->where('parent_id', $product->id);
             })->get();
-            dd($fialItemsToUpdate);
 
-            $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
-                'firm_id' => $firm->firm_id,
-                'chat_auction_id' => $firm->chat_auction_id,
-                'order_item_id' => $k,
-            ]));
+            foreach ($fialItemsToUpdate as $finalItem) {
+                $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
+                    'firm_id' => $firm->firm_id,
+                    'chat_auction_id' => $firm->chat_auction_id,
+                    'order_item_id' => $finalItem->id,
+                ]));
+            }
         }
 
         return redirect()->back();
