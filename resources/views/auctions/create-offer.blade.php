@@ -58,23 +58,12 @@
 
     @foreach($products as $product)
         @php
-            $alreadyDisplayed = false;
-            $parentProductsDisplayed = [];
+            $parentProductsDisplayed[] = $product->product->parentProduct?->id;
 
-            if (isset($product->product->parentProduct)) {
-                $parentProductId = $product->product->parentProduct->id;
-                if (in_array($parentProductId, $parentProductsDisplayed)) {
-                    $alreadyDisplayed = true;
-                } else {
-                    $parentProductsDisplayed[] = $parentProductId;
-                }
-            }
-
-            if (isset($product->product->isAuctionOfferCreation)) {
-                $auctionOfferId = $product->product->isAuctionOfferCreation->id;
-                if (in_array($auctionOfferId, $parentProductsDisplayed)) {
-                    $alreadyDisplayed = true;
-                }
+           if (in_array($product->product->parentProduct?->id, $parentProductsDisplayed)) {
+                $alreadyDisplayed = true;
+            } else {
+               $alreadyDisplayed = false;
             }
         @endphp
 
