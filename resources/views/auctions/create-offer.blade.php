@@ -88,7 +88,7 @@
             </div>
         @endif
 
-    <div class="{{ $arleadyDisplayed ? 'hidden' : '' }}">
+    <div class="{{ $alreadyDisplayed ? 'hidden' : '' }}">
         @if(is_a($product, \App\Entities\OrderItem::class))
             <div class="alert alert-success text-center mb-4">
                 <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers->where('order_item_id', $product->id)->min('basic_price_net') }} PLN</h4>
