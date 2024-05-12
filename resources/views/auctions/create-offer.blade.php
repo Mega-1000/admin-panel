@@ -146,7 +146,7 @@
         @endif
     @endforeach
 
-    <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST">
+    <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main">
         <button class="btn btn-primary">
             Zapisz wszystkie ceny
         </button>
