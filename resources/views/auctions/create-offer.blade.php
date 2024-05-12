@@ -62,9 +62,7 @@
 
            if (in_array($product->product->parentProduct?->id, $parentProductsDisplayed)) {
                 $alreadyDisplayed = true;
-                dd('okejejjeje');
             } else {
-               dd('chyh');
                $alreadyDisplayed = false;
             }
         @endphp
