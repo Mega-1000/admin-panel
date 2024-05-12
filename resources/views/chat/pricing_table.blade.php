@@ -73,7 +73,7 @@
             </td>
         </tr>
     </table>
-@elseif
+@else
     <input class="price net_purchase_price_commercial_unit" name="commercial_price_net"
            value="{{ $productPrices['commercial_price_net'] ?? $product->net_purchase_price_commercial_unit_after_discounts }}"/>
 
