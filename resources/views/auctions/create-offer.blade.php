@@ -58,13 +58,13 @@
 
     @foreach($products as $product)
         @php
-            $parentProductsDisplayed[] = $product->product->parentProduct?->id;
-
-           if (in_array($product->product->parentProduct?->id, $parentProductsDisplayed)) {
+            if (in_array($product->product->parentProduct?->id, $parentProductsDisplayed)) {
                 $alreadyDisplayed = true;
             } else {
-               $alreadyDisplayed = false;
+                $alreadyDisplayed = false;
             }
+
+            $parentProductsDisplayed[] = $product->product->parentProduct?->id;
         @endphp
 
         @if ($errors->any())
