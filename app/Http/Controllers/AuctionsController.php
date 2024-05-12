@@ -158,12 +158,13 @@ class AuctionsController extends Controller
             }
         }
 
-
-        dd($pricingData);
-        $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($request->validated() + [
-            'firm_id' => $firm->firm_id,
-            'chat_auction_id' => $firm->chat_auction_id
-        ]));
+        foreach ($pricingData as $k => $item) {
+            $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
+                'firm_id' => $firm->firm_id,
+                'chat_auction_id' => $firm->chat_auction_id,
+                'order_item_id' => $k,
+            ]));
+        }
 
         return redirect()->back();
     }
