@@ -93,7 +93,7 @@
                         Wartość brutto: {{ $product->price }} PLN
                     </p>
                 </div>
-                <form style="display: flex; flex-direction: column" action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST">
+                <form style="display: flex; gap: 25px; flex-direction: column" action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST">
                     @php
                         $productPrice = \App\Entities\ChatAuctionOffer::where('order_item_id', $product->id)
                                 ->where('firm_id', $chat_auction_firm->firm_id);
