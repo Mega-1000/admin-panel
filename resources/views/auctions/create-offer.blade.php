@@ -70,7 +70,7 @@
                     {{ $chat_auction_firm->chatAuction->offers->where('order_item_id', $product->id)->min('basic_price_net') }} PLN
                 </h4>
             </div>
-            <div class="product">
+            <div class="product" style="display: flex; gap: 10px; flex-direction: column">
                 <img class="image-product" src="{{$product->product->url_for_website}}"
                      onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
                 <div class="product-description">
@@ -143,7 +143,7 @@
         @endif
     @endforeach
 
-    <form style="display: flex; gap: 10px; flex-direction: column" action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST">
+    <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST">
 
 
         <button class="btn btn-primary"></button>
