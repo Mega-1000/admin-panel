@@ -1,4 +1,4 @@
-@if (!isset($isAuctionOfferCreation) && !$isAuctionOfferCreation)
+@if (!isset($isAuctionOfferCreation))
     <table class="price-table">
         <tr>
             <th>Jednostka handlowa ({{ $product->product->packing->unit_commercial }})</th>
