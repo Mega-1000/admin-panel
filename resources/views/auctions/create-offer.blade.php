@@ -51,7 +51,21 @@
         </div>
     @endif
 
+    @php
+        $parentProductsDisplayed = [];
+    @endphp
+
+
     @foreach($products as $product)
+        @php
+            $arleadyDisplayed = false;
+            $parentProductsDisplayed[] = $product->parentProduct;
+
+            if (in_array($product->parentProduct, $parentProductsDisplayed)) {
+                $arleadyDisplayed = true;
+            }
+        @endphp
+
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul>
@@ -62,6 +76,7 @@
             </div>
         @endif
 
+    <div class="{{ $arleadyDisplayed ? 'hidden' : '' }}">
         @if(is_a($product, \App\Entities\OrderItem::class))
             <div class="alert alert-success text-center mb-4">
                 <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers->where('order_item_id', $product->id)->min('basic_price_net') }} PLN</h4>
@@ -128,6 +143,7 @@
                 </div>
             @endif
         @endif
+    </div>
     @endforeach
 
     <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center">
