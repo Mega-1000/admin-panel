@@ -66,7 +66,7 @@
         @if(is_a($product, \App\Entities\OrderItem::class))
             <div class="alert alert-success text-center"  style="width: 50%; margin: 0 auto; padding: 10px; margin-top: 30px">
                 <h4>
-                    Najniższa cena na ten moment:
+                     Najniższa cena na ten moment:
                     {{ $chat_auction_firm->chatAuction->offers->where('order_item_id', $product->id)->min('basic_price_net') }} PLN
                 </h4>
             </div>
@@ -122,7 +122,7 @@
                     <input type="hidden" class="numbers_of_basic_commercial_units_in_pack"
                            value="{{ $product->product->packing->numbers_of_basic_commercial_units_in_pack }}">
                     <input type="hidden" name="order_item_id" value="{{ $product->id }}">
-                    @include('chat/pricing_table')
+                    @include('chat/pricing_table', ['isAuctionOfferCreation' => true])
 
                     @php
                         $product->current_firm_offers = $product->chatAuctionOffers->where('firm_id', $chat_auction_firm->firm->id)->sortByDesc('id')->first();
