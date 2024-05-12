@@ -59,12 +59,11 @@
     @foreach($products as $product)
         @php
             $arleadyDisplayed = false;
+            $parentProductsDisplayed[] = $product->product->parentProduct?->id;
+
             if (in_array($product->product->isAuctionOfferCreation?->id, $parentProductsDisplayed)) {
                 $arleadyDisplayed = true;
-                return;
             }
-
-            $parentProductsDisplayed[] = $product->product->parentProduct?->id;
         @endphp
 
         @if ($errors->any())
