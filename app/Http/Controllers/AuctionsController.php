@@ -141,6 +141,7 @@ class AuctionsController extends Controller
 
         $pricingData = [];
 
+        dd($request->all());
         foreach ($request->all() as $key => $value) {
             // Extract the item ID and the type of price from the key
             // Example key: commercial_price_net.251638
