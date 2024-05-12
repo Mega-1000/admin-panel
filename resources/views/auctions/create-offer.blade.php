@@ -64,6 +64,8 @@
             if (in_array($product->isAuctionOfferCreation?->id, $parentProductsDisplayed)) {
                 $arleadyDisplayed = true;
             }
+
+            dd($parentProductsDisplayed);
         @endphp
 
         @if ($errors->any())
