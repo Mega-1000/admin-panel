@@ -141,11 +141,10 @@ class AuctionsController extends Controller
 
         $pricingData = [];
 
-        dd($request->all());
-        foreach ($request->all() as $key => $value) {
-            // Extract the item ID and the type of price from the key
-            // Example key: commercial_price_net.251638
-            if (preg_match('/(.+)\.(\d+)/', $key, $matches)) {
+        // Iterate over all items in the request data
+        foreach ($request->except('_token') as $key => $value) {
+            // Example key: commercial_price_net_251638
+            if (preg_match('/(.+)_(\d+)/', $key, $matches)) {
                 $priceType = $matches[1]; // e.g., 'commercial_price_net'
                 $itemId = $matches[2];    // e.g., '251638'
 
@@ -158,6 +157,7 @@ class AuctionsController extends Controller
                 $pricingData[$itemId][$priceType] = $value;
             }
         }
+
 
         dd($pricingData);
         $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($request->validated() + [
