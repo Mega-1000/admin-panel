@@ -137,12 +137,20 @@ class AuctionsController extends Controller
      */
     public function storeOffer(string $token, CreateChatAuctionOfferRequest $request): RedirectResponse
     {
-        $firm = ChatAuctionFirm::query()->where('token', $token)->firstorfail();
+        $firm = ChatAuctionFirm::query()->where('token', $token)->firstOrFail();
 
-        $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($request->validated() + [
-            'firm_id' => $firm->firm_id,
-            'chat_auction_id' => $firm->chat_auction_id
-        ]));
+        // Extract the unique product IDs from the request
+        $productIds = collect($request->validated())->keys()
+            ->map(function ($key) {
+                $parts = explode('.', $key);
+                return $parts[1] ?? null;
+            })->unique()->filter();
+
+        dd($productIds);
+        // Create an offer for each product ID
+        foreach ($productIds as $productId) {
+
+        }
 
         return redirect()->back();
     }
