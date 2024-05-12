@@ -88,7 +88,6 @@
             </div>
         @endif
 
-    {{ $parentProductsDisplayed }} {{ $alreadyDisplayed }}
     <div class="{{ $alreadyDisplayed ? 'hidden' : '' }}">
         @if(is_a($product, \App\Entities\OrderItem::class))
             <div class="alert alert-success text-center mb-4">
@@ -158,6 +157,7 @@
         @endif
     </div>
     @endforeach
+    {{ dd($parentProductsDisplayed) }}
 
     <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center">
         @csrf
