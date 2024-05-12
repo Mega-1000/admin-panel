@@ -123,8 +123,30 @@ class AddLabelService
 
                 if ($label->id == 52) {  //wyslana do awizacji
                     LabelNotificationService::orderStatusChangeToDispatchNotification($order, $order->customer->id == 4128);
-                    $delay = now()->addHours(2);
+                    $now = now();
+                    if ($now->isSaturday()) {
+                        $delay = $now->copy()->next(Carbon::MONDAY)->hour(10)->minute(0);
+                    } else {
+                        // Add a two-hour delay
+                        $delay = $now->copy()->addHours(2);
+
+                        // If the time after two hours is not within working hours, adjust accordingly
+                        if ($delay->hour >= 17) {
+                            // Move to the next day if after 5 PM
+                            $delay->addDay()->hour(8)->minute(0);
+                        } elseif ($delay->hour < 8) {
+                            // Set to 8 AM if before 8 AM
+                            $delay->hour(8)->minute(0);
+                        }
+
+                        // If next day is Saturday, skip to Monday
+                        if ($delay->isSaturday()) {
+                            $delay->next(Carbon::MONDAY)->hour(10)->minute(0);
+                        }
+                    }
+
                     dispatch(new AvisationAcceptanceCheck($order))->delay($delay);
+
                 }
 
                 if ($label->id == Label::ORDER_ITEMS_CONSTRUCTED) {

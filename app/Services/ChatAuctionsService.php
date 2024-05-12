@@ -49,6 +49,9 @@ readonly class ChatAuctionsService
     }
 
     /**
+     * - zapisz wszystkie w aktualizacji cen
+     * - 
+     *
      * Create auction
      *
      * @param CreateChatAuctionDTO $data
