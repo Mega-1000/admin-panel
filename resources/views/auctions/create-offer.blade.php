@@ -70,7 +70,7 @@
                     {{ $chat_auction_firm->chatAuction->offers->where('order_item_id', $product->id)->min('basic_price_net') }} PLN
                 </h4>
             </div>
-            <div class="product" style="display: flex; gap: 10px; flex-direction: column">
+            <div class="product">
                 <img class="image-product" src="{{$product->product->url_for_website}}"
                      onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
                 <div class="product-description">
@@ -93,33 +93,36 @@
                         Wartość brutto: {{ $product->price }} PLN
                     </p>
                 </div>
-                @php
-                    $productPrice = \App\Entities\ChatAuctionOffer::where('order_item_id', $product->id)
-                            ->where('firm_id', $chat_auction_firm->firm_id);
-                    $productPrices = [
-                        'commercial_price_net' => $productPrice->min('commercial_price_net'),
-                        'basic_price_net' => $productPrice->min('basic_price_net'),
-                        'calculated_price_net' => $productPrice->min('calculated_price_net'),
-                        'aggregate_price_net' => $productPrice->min('aggregate_price_net'),
-                        'commercial_price_gross' => $productPrice->min('commercial_price_gross'),
-                        'basic_price_gross' => $productPrice->min('basic_price_gross'),
-                        'calculated_price_gross' => $productPrice->min('calculated_price_gross'),
-                        'aggregate_price_gross' => $productPrice->min('aggregate_price_gross'),
-                    ];
 
-                @endphp
+                <div style="display: flex; gap: 10px; flex-direction: column">
+                    @php
+                        $productPrice = \App\Entities\ChatAuctionOffer::where('order_item_id', $product->id)
+                                ->where('firm_id', $chat_auction_firm->firm_id);
+                        $productPrices = [
+                            'commercial_price_net' => $productPrice->min('commercial_price_net'),
+                            'basic_price_net' => $productPrice->min('basic_price_net'),
+                            'calculated_price_net' => $productPrice->min('calculated_price_net'),
+                            'aggregate_price_net' => $productPrice->min('aggregate_price_net'),
+                            'commercial_price_gross' => $productPrice->min('commercial_price_gross'),
+                            'basic_price_gross' => $productPrice->min('basic_price_gross'),
+                            'calculated_price_gross' => $productPrice->min('calculated_price_gross'),
+                            'aggregate_price_gross' => $productPrice->min('aggregate_price_gross'),
+                        ];
 
-                @csrf
-                <input type="hidden" class="unit_consumption"
-                       value="{{ $product->product->packing->unit_consumption }}">
-                <input type="hidden" class="number_of_sale_units_in_the_pack"
-                       value="{{ $product->product->packing->number_of_sale_units_in_the_pack }}">
-                <input type="hidden" class="numbers_of_basic_commercial_units_in_pack"
-                       value="{{ $product->product->packing->numbers_of_basic_commercial_units_in_pack }}">
-                <input type="hidden" name="order_item_id" value="{{ $product->id }}">
+                    @endphp
 
-                @include('chat/pricing_table', ['isAuctionOfferCreation' => true])
+                    @csrf
+                    <input type="hidden" class="unit_consumption"
+                           value="{{ $product->product->packing->unit_consumption }}">
+                    <input type="hidden" class="number_of_sale_units_in_the_pack"
+                           value="{{ $product->product->packing->number_of_sale_units_in_the_pack }}">
+                    <input type="hidden" class="numbers_of_basic_commercial_units_in_pack"
+                           value="{{ $product->product->packing->numbers_of_basic_commercial_units_in_pack }}">
+                    <input type="hidden" name="order_item_id" value="{{ $product->id }}">
 
+                    @include('chat/pricing_table', ['isAuctionOfferCreation' => true])
+
+                </div>
                 @php
                     $product->current_firm_offers = $product->chatAuctionOffers->where('firm_id', $chat_auction_firm->firm->id)->sortByDesc('id')->first();
                 @endphp
