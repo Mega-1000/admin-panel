@@ -1135,6 +1135,8 @@ class OrdersController extends Controller
     {
         try {
             $order->labels()->attach(225);
+            $order->is_hidden = true;
+            $order->save();
         } catch (Throwable $exception) {
             return response()->json([
                 'status' => false,
