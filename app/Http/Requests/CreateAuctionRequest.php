@@ -25,8 +25,6 @@ class CreateAuctionRequest extends FormRequest
     {
         return [
             'end_of_auction' => 'required|date',
-            'date_of_delivery_from' => 'required|date',
-            'date_of_delivery_to' => 'required|date',
             'price' => 'required|integer',
             'quality' => 'required|integer',
             'notes' => 'nullable|string'

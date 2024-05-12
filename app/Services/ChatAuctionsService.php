@@ -58,8 +58,6 @@ readonly class ChatAuctionsService
     {
         return $data->chat->auctions()->create([
             'end_of_auction' => $data->end_of_auction,
-            'date_of_delivery_from' => $data->date_of_delivery_from,
-            'date_of_delivery_to' => $data->date_of_delivery_from,
             'price' => $data->price,
             'quality' => $data->quality,
             'notes' => $data->notes
