@@ -59,9 +59,9 @@
     @foreach($products as $product)
         @php
             $arleadyDisplayed = false;
-            $parentProductsDisplayed[] = $product->parentProduct;
+            $parentProductsDisplayed[] = $product->parentProduct->id;
 
-            if (in_array($product->parentProduct, $parentProductsDisplayed)) {
+            if (in_array($product->parentProduct, $parentProductsDisplayed->id)) {
                 $arleadyDisplayed = true;
             }
         @endphp
@@ -76,7 +76,6 @@
             </div>
         @endif
 
-    {{ $parentProductsDisplayed }}
     <div class="{{ $arleadyDisplayed ? 'hidden' : '' }}">
         @if(is_a($product, \App\Entities\OrderItem::class))
             <div class="alert alert-success text-center mb-4">
