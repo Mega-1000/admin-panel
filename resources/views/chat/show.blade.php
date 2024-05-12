@@ -280,6 +280,7 @@
                             'arePossibleUsers' => true,
                             'class'            => 'bg-warning alert alert-warning',
                         ])
+                        {{ dd($possibleEmployees) }}
                         @include('chat/users', [
                             'title'            => 'Powiązani pracownicy firm:',
                             'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
