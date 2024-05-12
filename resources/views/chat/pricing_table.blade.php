@@ -74,30 +74,32 @@
         </tr>
     </table>
 @else
-    <div>
+    <div class="pricing-table">
         <input class="price net_purchase_price_commercial_unit hidden" form="main" name="commercial_price_net.{{ $product->id }}"
-               value="{{ $productPrices['commercial_price_net'] ?? $product->net_purchase_price_commercial_unit_after_discounts }}"/>
+               value="{{ $productPrices['commercial_price_net'] ?? $product->net_purchase_price_commercial_unit_after_discounts }}" style="display: none;">
 
-        Cena brutto za m3:
-        <input class="price net_purchase_price_basic_unit" form="main" name="basic_price_net.{{ $product->id }}"
-               value="{{ $productPrices['basic_price_net'] ?? $product->net_purchase_price_basic_unit_after_discounts }}"/>
+        <div class="form-group">
+            <label for="basic_price_net.{{ $product->id }}">Cena brutto za m3:</label>
+            <input class="form-control net_purchase_price_basic_unit" form="main" name="basic_price_net.{{ $product->id }}"
+                   value="{{ $productPrices['basic_price_net'] ?? $product->net_purchase_price_basic_unit_after_discounts }}">
+        </div>
 
         <input class="price net_purchase_price_calculated_unit hidden" form="main" name="calculated_price_net.{{ $product->id }}"
-               value="{{ $productPrices['calculated_price_net'] ?? $product->net_purchase_price_calculated_unit_after_discounts }}"/>
+               value="{{ $productPrices['calculated_price_net'] ?? $product->net_purchase_price_calculated_unit_after_discounts }}" style="display: none;">
 
         <input class="price net_purchase_price_aggregate_unit hidden" form="main" name="aggregate_price_net.{{ $product->id }}"
-               value="{{ $productPrices['aggregate_price_net'] ??$product->net_purchase_price_aggregate_unit_after_discounts }}"/>
+               value="{{ $productPrices['aggregate_price_net'] ??$product->net_purchase_price_aggregate_unit_after_discounts }}" style="display: none;">
 
         <input class="price gross_purchase_price_commercial_unit hidden" form="main" name="commercial_price_gross.{{ $product->id }}"
-               value="{{$productPrices['commercial_price_gross'] ?? number_format($product->net_purchase_price_commercial_unit_after_discounts * 1.23, 2)}}"/>
+               value="{{$productPrices['commercial_price_gross'] ?? number_format($product->net_purchase_price_commercial_unit_after_discounts * 1.23, 2)}}" style="display: none;">
 
         <input class="price gross_purchase_price_basic_unit hidden" form="main" name="basic_price_gross.{{ $product->id }}"
-               value="{{ $productPrices['basic_price_gross'] ?? number_format($product->net_purchase_price_basic_unit_after_discounts * 1.23, 2)}}"/>
+               value="{{ $productPrices['basic_price_gross'] ?? number_format($product->net_purchase_price_basic_unit_after_discounts * 1.23, 2)}}" style="display: none;">
 
         <input class="price gross_purchase_price_calculated_unit hidden" form="main" name="calculated_price_gross.{{ $product->id }}"
-               value="{{ $productPrices['calculated_price_gross'] ?? number_format($product->net_purchase_price_calculated_unit_after_discounts * 1.23, 2)}}"/>
+               value="{{ $productPrices['calculated_price_gross'] ?? number_format($product->net_purchase_price_calculated_unit_after_discounts * 1.23, 2)}}" style="display: none;">
 
         <input class="price gross_purchase_price_aggregate_unit hidden" form="main" name="aggregate_price_gross.{{ $product->id }}"
-               value="{{ $productPrices['aggregate_price_gross'] ?? number_format($product->net_purchase_price_aggregate_unit_after_discounts * 1.23, 2)}}"/>
+               value="{{ $productPrices['aggregate_price_gross'] ?? number_format($product->net_purchase_price_aggregate_unit_after_discounts * 1.23, 2)}}" style="display: none;">
     </div>
 @endif
