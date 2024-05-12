@@ -88,6 +88,7 @@
             </div>
         @endif
 
+    {{ $parentProductsDisplayed }} {{ $alreadyDisplayed }}
     <div class="{{ $alreadyDisplayed ? 'hidden' : '' }}">
         @if(is_a($product, \App\Entities\OrderItem::class))
             <div class="alert alert-success text-center mb-4">
