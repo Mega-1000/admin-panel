@@ -60,12 +60,11 @@
         @php
             if (in_array($product->product->parentProduct?->id, $parentProductsDisplayed)) {
                 $alreadyDisplayed = true;
-
-                $totalQuantity = $chat_auction_firm->chatAuction->chat->order
-                    ->items()->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->product->parentProduct->id); })->get()->sum('quantity');
             } else {
                 $alreadyDisplayed = false;
             }
+            $totalQuantity = $chat_auction_firm->chatAuction->chat->order
+                    ->items()->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->product->parentProduct->id); })->get()->sum('quantity');
 
             $parentProductsDisplayed[] = $product->product->parentProduct?->id;
         @endphp
