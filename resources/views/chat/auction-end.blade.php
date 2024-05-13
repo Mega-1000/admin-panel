@@ -200,7 +200,7 @@
 
                            @if($offers !== [])
                                @foreach($offers as $offer)
-                                   {{ $offer->product->symbol }}: {{ $offer }}
+                                   {{ $offer?->product?->symbol }}: {{ $offer }}
                                @endforeach
 
                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
