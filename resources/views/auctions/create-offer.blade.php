@@ -104,8 +104,7 @@
                     <div>
                         @php
                             $productPrice = \App\Entities\ChatAuctionOffer::where('product_id', $product->id)
-                                    ->where('firm_id', $chat_auction_firm->firm_id)
-                                    ->first();
+                                    ->where('firm_id', $chat_auction_firm->firm_id);
                             $productPrices = [
                                 'commercial_price_net' => $productPrice->min('commercial_price_net'),
                                 'basic_price_net' => $productPrice->min('basic_price_net'),
@@ -116,6 +115,8 @@
                                 'calculated_price_gross' => $productPrice->min('calculated_price_gross'),
                                 'aggregate_price_gross' => $productPrice->min('aggregate_price_gross'),
                             ];
+
+                            dd($productPrices);
                         @endphp
 
                         @csrf
