@@ -114,7 +114,7 @@ class OrderWarehouseNotificationController extends Controller
                 'message' => 'Magazyn <strong>wprowadził</strong> daty dotyczące przesyłki.'
             ]);
             /** @var Order $order */
-            $order = Order::query()->findOrFail($data['order_id']);
+            $order = Order::findOrFail($data['order_id']);
             dispatch(new DispatchLabelEventByNameJob($order, "warehouse-notification-accepted"));
 
             return $this->okResponse();
