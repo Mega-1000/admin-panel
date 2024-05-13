@@ -237,7 +237,7 @@
 
                                foreach ($items as $item) {
                                    $variations = App\Entities\Product::where('product_group', $item->product->product_group)->where('product_name_supplier', $symbol)->get();
-                                    $prices[] = $variation;
+                                    $prices[] = $variations;
 
                                     foreach ($variations as $variation) {
                                        if ($variation) {
