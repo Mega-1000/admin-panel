@@ -56,7 +56,9 @@
     @endphp
 
     @foreach($products as $product)
+        eee
         @foreach($product as $product)
+            zz
         @php
             if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
                 $alreadyDisplayed = true;
