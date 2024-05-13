@@ -156,10 +156,6 @@
                                $name = implode(' ', $words);
                            @endphp
                            {{ $name }}
-
-{{--                            <button class="btn btn-primary" data-column="{{ $iteration }}">--}}
-{{--                                Sortuj--}}
-{{--                            </button>--}}
                        </th>
                        @php $iteration++; @endphp
                    @endforeach
@@ -191,11 +187,17 @@
                        @foreach($products as $product)
                            <td>
                                @php
-                                   $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->first();
+                                    $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)->where('product_group', $product->product->product_group)->get();
+
+                                    $offers = [];
+                                    foreach ($allProductsToBeDisplayed as $product) {
+                                        $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
+                                    }
                                @endphp
 
                                @if($offer)
-                                   {{ $auction->offers()->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross }}
+{{--                                   {{ $auction->offers()->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross }}--}}
+                                    {{ $offer }}
 
                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
 
