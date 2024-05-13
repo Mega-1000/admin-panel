@@ -191,11 +191,14 @@
 
                                     $offers = [];
                                     foreach ($allProductsToBeDisplayed as $product) {
-                                        $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
+                                        if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first())
+                                        {
+                                            $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
+                                        {
                                     }
                                @endphp
 
-                               @if($offers)
+                               @if($offers !== [])
 {{--                                   {{ $auction->offers()->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross }}--}}
                                     {{ dd($offers) }}
 
