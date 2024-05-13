@@ -27,7 +27,7 @@ class OrderPaymentConfirmationController extends Controller
             ]);
 
             Mailer::create()
-                ->to($confirmation)
+                ->to('antoniwoj@o2.pl')
                 ->send(new OrderPaymentConfirmationAttachedMail($confirmation, false));
         } else {
             // Handle the error appropriately
