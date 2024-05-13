@@ -187,15 +187,18 @@
                        @foreach($products as $product)
                            <td>
                                @php
-                                    $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)->where('product_group', $product->product->product_group)->get();
+                                   $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)->where('product_group', $product->product->product_group)->get();
 
-                                    $offers = [];
-                                    foreach ($allProductsToBeDisplayed as $product) {
-                                        $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
-                                    }
+                                   $offers = [];
+                                   foreach ($allProductsToBeDisplayed as $product) {
+                                       if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first())
+                                       {
+                                               $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
+                                           {
+                                   }
                                @endphp
 
-                               @if($offer)
+                           @if($offer)
 {{--                                   {{ $auction->offers()->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross }}--}}
 
                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
