@@ -56,7 +56,9 @@
     @endphp
 
 
+    {{ dd($products) }}
     @foreach($products as $product)
+
         @foreach($product as $product)
         @php
             if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
