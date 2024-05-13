@@ -115,8 +115,6 @@
                                 'calculated_price_gross' => $productPrice->min('calculated_price_gross'),
                                 'aggregate_price_gross' => $productPrice->min('aggregate_price_gross'),
                             ];
-
-                            dd($productPrices);
                         @endphp
 
                         @csrf
