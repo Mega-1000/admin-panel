@@ -24,8 +24,9 @@ class ChatAuctionFirms
         foreach ($items as &$item) {
             $product = $item->product;
             $item = Product::where('product_group', $product->product_group)
-
+                ->where('product_name_supplier', ChatAuctionFirm::where('token', $token)->first()->firm->symbol)
                 ->get();
+            dd($item);
         }
         dd($items);
     }
