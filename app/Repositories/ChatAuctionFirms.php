@@ -28,7 +28,8 @@ class ChatAuctionFirms
                 ->where('product_name_supplier', ChatAuctionFirm::where('token', $token)->first()->firm->symbol)
                 ->get();
         }
-        dd($res);
+
+        return $res;
     }
 
     /**

@@ -57,6 +57,7 @@
 
 
     @foreach($products as $product)
+        @foreach($product as $product)
         @php
             if (in_array($product->product->parentProduct?->id, $parentProductsDisplayed)) {
                 $alreadyDisplayed = true;
@@ -64,9 +65,9 @@
                 $alreadyDisplayed = false;
             }
             $totalQuantity = $chat_auction_firm->chatAuction->chat->order
-                    ->items()->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->product->parentProduct->id); })->get()->sum('quantity');
+                    ->items()->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->parentProduct->id); })->get()->sum('quantity');
 
-            $parentProductsDisplayed[] = $product->product->parentProduct?->id;
+            $parentProductsDisplayed[] = $product->parentProduct?->id;
         @endphp
 
         @if ($errors->any())
@@ -85,19 +86,19 @@
                 <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers->where('order_item_id', $product->id)->min('basic_price_net') }} PLN</h4>
             </div>
             <div class="product">
-                <img class="img-fluid" src="{{$product->product->url_for_website}}" onerror="this.onerror=null;this.src='http://via.placeholder.com/300'">
+                <img class="img-fluid" src="{{$product->url_for_website}}" onerror="this.onerror=null;this.src='http://via.placeholder.com/300'">
                 <div class="product-details">
                     <div class="product-description">
                         <h5>
                             @php
-                                $name = $product->product->name;
+                                $name = $product->name;
                                 $words = explode(' ', $name);
                                 array_shift($words);
                                 $name = implode(' ', $words);
                             @endphp
                             {{ $name }}
                         </h5>
-                        <p>Symbol: {{ $product->product->symbol }}</p>
+                        <p>Symbol: {{ $product->symbol }}</p>
                         <p>Ilość paczek: {{ $totalQuantity }}</p>
                         <p>Wartość brutto: {{ $product->price }} PLN</p>
                     </div>
@@ -118,9 +119,9 @@
                         @endphp
 
                         @csrf
-                        <input type="hidden" class="unit_consumption" value="{{ $product->product->packing->unit_consumption }}">
-                        <input type="hidden" class="number_of_sale_units_in_the_pack" value="{{ $product->product->packing->number_of_sale_units_in_the_pack }}">
-                        <input type="hidden" class="numbers_of_basic_commercial_units_in_pack" value="{{ $product->product->packing->numbers_of_basic_commercial_units_in_pack }}">
+                        <input type="hidden" class="unit_consumption" value="{{ $product->packing->unit_consumption }}">
+                        <input type="hidden" class="number_of_sale_units_in_the_pack" value="{{ $product->packing->number_of_sale_units_in_the_pack }}">
+                        <input type="hidden" class="numbers_of_basic_commercial_units_in_pack" value="{{ $product->packing->numbers_of_basic_commercial_units_in_pack }}">
                         <input type="hidden" name="order_item_id" value="{{ $product->id }}">
 
                         @include('chat/pricing_table', ['isAuctionOfferCreation' => true])
@@ -147,6 +148,7 @@
             @endif
         @endif
     </div>
+        @endforeach
     @endforeach
 
     <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center">
