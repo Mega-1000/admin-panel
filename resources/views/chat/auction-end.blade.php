@@ -115,150 +115,101 @@
 
 <body>
 <div>
-   @if(session()->get('success'))
-       <div class="alert alert-success">
-           Pomyślnie stworzono zamówienie i dodano przedstawicieli do chatu
-       </div>
-   @endif
+    @if(session()->get('success'))
+        <div class="alert alert-success">
+            Pomyślnie stworzono zamówienie i dodano przedstawicieli do chatu.
+        </div>
+    @endif
 
-   <div class="container" id="flex-container">
-       <div id="chat-container">
-           <div class="alert-success alert">
-               Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
-               <br>
-               Po więcej informacji kliknij przycisk zobacz więcej
-               <br>
-               <br>
-               <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
-                   Zobacz więcej na temat promocji
-               </a>
-           </div>
+    <div class="container" id="flex-container">
+        <div id="chat-container">
+            <div class="alert-success alert">
+                Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
+                <br>
+                Po więcej informacji kliknij przycisk zobacz więcej
+                <br>
+                <br>
+                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
+                    Zobacz więcej na temat promocji
+                </a>
+            </div>
 
-           <div class="alert alert-primary mt-4">
-               Jeśli jesteś zadowolony z ceny konkretnego producenta zaznacz checkboxy przy cenach dla każdego produktu po czym naciśnij przycisk "Wyślij zamówienie"
-           </div>
+            <div class="alert alert-primary mt-4">
+                Jeśli jesteś zadowolony z ceny konkretnego producenta zaznacz checkboxy przy cenach dla każdego produktu po czym naciśnij przycisk "Wyślij zamówienie"
+            </div>
 
-           <table>
-               <thead>
-               <tr>
-                   <th>
-                       <h5 style="text-align: right">
-                           Ceny brutto za m3
-                       </h5>
-                   </th>
-                   @php $iteration = 2; @endphp
-                   @foreach($products as $product)
-                       <th>
-                           @php
-                               $name = $product->product->name;
-                               $words = explode(' ', $name);
-                               array_shift($words);
-                               $name = implode(' ', $words);
-                           @endphp
-                           {{ $name }}
-                       </th>
-                       @php $iteration++; @endphp
-                   @endforeach
-                   <th>Końcowy koszt zamówienia</th>
-               </tr>
-               </thead>
-               <tbody>
-               @php
-                   $displayedFirmSymbols = [];
-               @endphp
+            <table>
+                <thead>
+                <tr>
+                    <th>
+                        <h5 style="text-align: right">
+                            Ceny brutto za m3
+                        </h5>
+                    </th>
+                    @php $iteration = 2; @endphp
+                    @foreach($products as $product)
+                        <th>
+                            @php
+                                $name = $product->product->name;
+                                $words = explode(' ', $name);
+                                array_shift($words);
+                                $name = implode(' ', $words);
+                            @endphp
+                            {{ $name }}
+                        </th>
+                        @php $iteration++; @endphp
+                    @endforeach
+                    <th>Końcowy koszt zamówienia</th>
+                </tr>
+                </thead>
+                <tbody>
+                @php
+                    $displayedFirmSymbols = [];
+                @endphp
 
-               @foreach($firms as $firm)
-                   @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
-                       @continue
-                   @endif
+                @foreach($firms as $firm)
+                    @if(!isset($auction) || $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm->firm->symbol ?? $firm->symbol, $displayedFirmSymbols))
+                        @continue
+                    @endif
 
-                   <tr>
-                       <td>
-                           {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }}
-                       </td> <!-- Display the firm symbol -->
-                       @php
-                           $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Add the symbol to the tracked array
-                       @endphp
+                    @php
+                        $totalCost = 0;
+                        $displayedFirmSymbols[] = $firm->firm->symbol ?? $firm->symbol;
+                    @endphp
 
-                       @php
-                           $totalCost = 0;
-                       @endphp
+                    <tr>
+                        <td>{{ $firm->firm->symbol ?? $firm->symbol }}</td>
 
-                       @foreach($products as $product)
-                           <td>
-                               @php
-                                    $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)->where('product_group', $product->product->product_group)->get();
+                        @foreach($products as $product)
+                            @php
+                                $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
+                            @endphp
 
-                                    $offers = [];
-                                    foreach ($allProductsToBeDisplayed as $product) {
-                                        if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first())
-                                        {
-                                            $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
-                                        {
-                                    }
-                               @endphp
+                            <td>
+                                @if($offer)
+                                    {{ number_format($offer->basic_price_gross, 2) }} zł
+                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
+                                    <span style="color: green">- cena specjalnie dla ciebie</span>
+                                    @php
+                                        $totalCost += $offer->basic_price_gross * $product->quantity;
+                                    @endphp
+                                @else
+                                    No offer
+                                @endif
+                            </td>
+                        @endforeach
+                        <td>{{ round($totalCost / 3.33, 2) }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
 
-                               @if($offers !== [])
-{{--                                   {{ $auction->offers()->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross }}--}}
-                                    {{ dd($offers) }}
+            <button class="btn btn-primary mt-2 mb-5" id="submit-button">
+                Wyślij zamówienie
+            </button>
+        </div>
+    </div>
 
-                                   <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
-
-                                   <span style="color: green">
-                                       - cena specjalnie dla ciebie
-                                   </span>
-
-                                   @php
-                                       $totalCost += $auction->offers()->where('firm_id',$firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross * $product->quantity;
-                                   @endphp
-                               @else
-                                   No offer
-                               @endif
-                           </td>
-                       @endforeach
-                       <td>{{ round($totalCost / 3.33, 2) }}</td>
-                   </tr>
-                   @foreach($products as $p)
-                       <td>
-                           @php
-                               // Assuming `$product` comes with preloaded 'offers' relationship
-                               $relevantOffers = $p->offers->filter(function($offer) use ($firm) {
-                                   return $offer->firm_id === $firm->id;
-                               });
-
-                               // Just take the first relevant offer
-                               $offer = $relevantOffers->first();
-                           @endphp
-
-                           @if($offer)
-                               {{-- Display the offer's price --}}
-                               {{ number_format($offer->basic_price_gross, 2) }} zł
-
-                               <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $offer->id }}">
-
-                               <span style="color: green">
-                - cena specjalnie dla ciebie
-            </span>
-
-                               @php
-                                   $totalCost += $offer->basic_price_gross * $product->quantity;
-                               @endphp
-                           @else
-                               No offer
-                           @endif
-                       </td>
-                   @endforeach
-
-               </tbody>
-           </table>
-           @endforeach
-
-           <button class="btn btn-primary mt-2 mb-5" id="submit-button">
-               Wyślij zamówienie
-           </button>
-       </div>
-
-   </div>
 </div>
 </body>
 </html>
