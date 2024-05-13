@@ -1218,20 +1218,19 @@
         <button type="submit" form="orders" id="submit" name="submit" value="update"
                 class="btn btn-primary">@lang('voyager.generic.save')</button>
 
-        <h3>Załącz potwierdzenie przelewu</h3>
-        <form action="{{ route('store-payment-confirmation', $orderId) }}">
-            @csrf
-            <input type="file" name="file">
-
-            <button class="btn btn-primary">
-                Wyślij plik do księgowości
-            </button>
-        </form>
-
         <button type="submit" form="orders" id="new-order" name="submit" value="store" class="btn btn-success">Dodaj
             nowe zamówienie
         </button>
         </div>
+    </form>
+    <h3>Załącz potwierdzenie przelewu</h3>
+    <form action="{{ route('store-payment-confirmation', $orderId) }}">
+        @csrf
+        <input type="file" name="file">
+
+        <button class="btn btn-primary">
+            Wyślij plik do księgowości
+        </button>
     </form>
     <div class="order-payments" id="order-payments">
         @if(!empty($uri))
