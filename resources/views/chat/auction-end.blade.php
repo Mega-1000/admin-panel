@@ -204,6 +204,8 @@
                                    {{ $offer }}
                                @endforeach
 
+                               askdojkasdopikaspoidj oaiskdpoaks podk
+
                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
 
                                    <span style="color: green">
