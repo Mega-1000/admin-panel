@@ -41,7 +41,7 @@ class RemoveLabelService
             }
 
             if ($labelId == Label::PACKAGE_NOTIFICATION_SENT_LABEL) {
-                OrderWarehouseNotification::query()->where('order_id', '=', $order->id)->delete();
+//                OrderWarehouseNotification::query()->where('order_id', '=', $order->id)->delete();
             }
 
             /** @var Label $label */
