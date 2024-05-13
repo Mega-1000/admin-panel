@@ -13,7 +13,7 @@ class ChatAuctionFirms
      * @param $token
      * @return Collection
      */
-    public static function getItemsByToken($token): Collection
+    public static function getItemsByToken($token): array
     {
         $items = ChatAuctionFirm::where('token', $token)->first()
             ->chatAuction
