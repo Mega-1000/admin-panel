@@ -1223,7 +1223,7 @@
         </button>
         </div>
     </form>
-    <div>
+    <div style="margin-top: 30px">
         <h5>
             @php
                 $paymentConfirmation = \App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first();
