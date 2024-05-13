@@ -59,7 +59,7 @@
     @foreach($products as $product)
         @foreach($product as $product)
         @php
-            if (in_array($product->product->parentProduct?->id, $parentProductsDisplayed)) {
+            if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
                 $alreadyDisplayed = true;
             } else {
                 $alreadyDisplayed = false;
