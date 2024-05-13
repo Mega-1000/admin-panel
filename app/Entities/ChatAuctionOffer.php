@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\Integrations\Pocztex\masaType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,7 +24,8 @@ class ChatAuctionOffer extends Model
         'calculated_price_gross',
         'aggregate_price_gross',
         'order_item_id',
-        'send_notification'
+        'send_notification',
+        'product_id',
     ];
 
     public function chatAuction(): BelongsTo
