@@ -60,6 +60,9 @@
         @php
             if (in_array($product->product->parentProduct?->id, $parentProductsDisplayed)) {
                 $alreadyDisplayed = true;
+
+                $totalQuantity = $chat_auction_firm->auction->chat->order
+                    ->items()->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->product->parentProduct->id); })->sum('items.quantity');
             } else {
                 $alreadyDisplayed = false;
             }
