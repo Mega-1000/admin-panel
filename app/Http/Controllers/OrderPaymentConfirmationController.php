@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Order;
 use App\Entities\OrderPaymentConfirmation;
 use App\Facades\Mailer;
 use App\Mail\OrderPaymentConfirmationAttachedMail;
@@ -36,5 +37,12 @@ class OrderPaymentConfirmationController extends Controller
 
 
         return redirect()->back();
+    }
+
+    public function confirm($orderId): string
+    {
+        Order::find($orderId)->paymentConfirmation->update(['confirmed', true]);
+
+        return 'Dziękujemy za potwierdzenie otrzymania tej wiadomości!';
     }
 }

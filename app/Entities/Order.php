@@ -216,6 +216,11 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderWarehouseNotification::class);
     }
 
+    public function paymentConfirmation(): HasOne
+    {
+        return $this->hasOne(OrderPaymentConfirmation::class);
+    }
+
     /**
      * @return float|bool|int
      */
