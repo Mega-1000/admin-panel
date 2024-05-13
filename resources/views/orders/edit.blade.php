@@ -1224,10 +1224,16 @@
         </div>
     </form>
     <div>
-        {{
-            \App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first() ?
-                'Potwierdzenie przelewu zostało wysłane ' . App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first()->file_url : ''
-        }}
+        <h5>
+            @php
+                $paymentConfirmation = \App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first();
+            @endphp
+
+            @if($paymentConfirmation)
+                <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
+            @endif
+
+        </h5>
     </div>
     <h3>Załącz potwierdzenie przelewu</h3>
     <form action="{{ route('store-payment-confirmation', $orderId) }}" method="post" enctype="multipart/form-data">
