@@ -1226,7 +1226,7 @@
     <div>
         {{
             \App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first() ?
-                'Potwierdzenie przelewu zostało wysłane' + App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first()->file_url : ''
+                'Potwierdzenie przelewu zostało wysłane ' . App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first()->file_url : ''
         }}
     </div>
     <h3>Załącz potwierdzenie przelewu</h3>
