@@ -57,6 +57,17 @@
 
     @foreach($products as $product)
         @foreach($product as $product)
+        @php
+//            if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
+//                $alreadyDisplayed = true;
+//            } else {
+//                $alreadyDisplayed = false;
+//            }
+//            $totalQuantity = $chat_auction_firm->chatAuction->chat->order
+//                    ->items()->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->parentProduct->id); })->get()->sum('quantity');
+//
+//            $parentProductsDisplayed[] = $product->parentProduct?->id;
+        @endphp
 
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -68,7 +79,7 @@
             </div>
         @endif
 
-    <div style="{{ $alreadyDisplayed ? 'display: none' : '' }}">
+    <div style="{{ false ? 'display: none' : '' }}">
         @if(is_a($product, \App\Entities\OrderItem::class))
             <div class="alert alert-success text-center mb-4">
                 <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers->where('order_item_id', $product->id)->min('basic_price_net') }} PLN</h4>
