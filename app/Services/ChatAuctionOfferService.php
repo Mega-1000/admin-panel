@@ -33,7 +33,7 @@ class ChatAuctionOfferService
             'basic_price_gross' => $data->basic_price_gross,
             'calculated_price_gross' => $data->calculated_price_gross,
             'aggregate_price_gross' => $data->aggregate_price_gross,
-            'order_item_id' => $data->order_item_id,
+            'product_id' => $data->product_id,
             'firm_id' => $data->firm_id,
             'send_notification' => $data->send_notification,
         ]);
