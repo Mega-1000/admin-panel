@@ -272,7 +272,7 @@ class Product extends Model implements Transformable
 
     public function chatAuctionOffers(): HasMany
     {
-        return $this->hasMany(ChatAuctionOffers::class, 'product_id');
+        return $this->hasMany(ChatAuctionOffer::class, 'product_id');
     }
 
     /**
