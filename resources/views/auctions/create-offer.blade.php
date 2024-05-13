@@ -106,14 +106,14 @@
                             $productPrice = \App\Entities\ChatAuctionOffer::where('product_id', $product->id)
                                     ->where('firm_id', $chat_auction_firm->firm_id);
                             $productPrices = [
-                                'commercial_price_net' => $productPrice->filter()->min('commercial_price_net'),
-                                'basic_price_net' => $productPrice->filter()->min('basic_price_net'),
-                                'calculated_price_net' => $productPrice->filter()->min('calculated_price_net'),
-                                'aggregate_price_net' => $productPrice->filter()->min('aggregate_price_net'),
-                                'commercial_price_gross' => $productPrice->filter()->min('commercial_price_gross'),
-                                'basic_price_gross' => $productPrice->filter()->min('basic_price_gross'),
-                                'calculated_price_gross' => $productPrice->filter()->min('calculated_price_gross'),
-                                'aggregate_price_gross' => $productPrice->filter()->min('aggregate_price_gross'),
+                                'commercial_price_net' => $productPrice->coalesce('commercial_price_net', PHP_INT_MAX)->min(),
+                                'basic_price_net' => $productPrice->coalesce('basic_price_net', PHP_INT_MAX)->min(),
+                                'calculated_price_net' => $productPrice->coalesce('calculated_price_net', PHP_INT_MAX)->min(),
+                                'aggregate_price_net' => $productPrice->coalesce('aggregate_price_net', PHP_INT_MAX)->min(),
+                                'commercial_price_gross' => $productPrice->coalesce('commercial_price_gross', PHP_INT_MAX)->min(),
+                                'basic_price_gross' => $productPrice->coalesce('basic_price_gross', PHP_INT_MAX)->min(),
+                                'calculated_price_gross' => $productPrice->coalesce('calculated_price_gross', PHP_INT_MAX)->min(),
+                                'aggregate_price_gross' => $productPrice->coalesce('aggregate_price_gross', PHP_INT_MAX)->min(),
                             ];
                         @endphp
 
