@@ -83,6 +83,7 @@
         @if(is_a($product, \App\Entities\Product::class))
             <div class="alert alert-success text-center mb-4">
                 <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers?->where('product_id', $product->id)->min('basic_price_net') ?? 'Brak ofert na ten moment' }} PLN</h4>
+                {{ $chat_auction_firm->chatAuction->offers?->where('product_id', $product->id)->get() }}
             </div>
             <div class="product">
                 <img class="img-fluid" src="{{$product->url_for_website}}" onerror="this.onerror=null;this.src='http://via.placeholder.com/300'">
