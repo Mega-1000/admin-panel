@@ -49,6 +49,7 @@ class OrderPaymentConfirmationAttachedMail extends Mailable
     {
         return new Content(
             view: 'emails.payment-confirmation',
+            with: ['confirmation' => $this->confirmation],
         );
     }
 
