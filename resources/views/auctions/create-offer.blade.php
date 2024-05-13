@@ -126,7 +126,11 @@
                         @include('chat/pricing_table', ['isAuctionOfferCreation' => true])
                     </div>
                     @php
-                        $product->current_firm_offers = $product->chatAuctionOffers->where('firm_id', $chat_auction_firm->firm->id)->sortByDesc('id')->first();
+                        $product->current_firm_offers = $product
+                            ->chatAuctionOffers
+                            ->where('firm_id', $chat_auction_firm->firm->id)
+                            ->sortByDesc('id')
+                            ->first();
                     @endphp
                     <div class="form-check mt-3">
                         <input class="form-check-input" type="checkbox" name="send_notification.{{ $product->id }}" value="true"

@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\Repositories\ChatAuctionOffers;
 use FontLib\TrueType\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -267,6 +268,11 @@ class Product extends Model implements Transformable
     public function firm(): BelongsTo
     {
         return $this->belongsTo(Firm::class, 'product_name_supplier', 'symbol');
+    }
+
+    public function chatAuctionOffers(): HasMany
+    {
+        return $this->hasMany(ChatAuctionOffers::class, 'product_id')
     }
 
     /**
