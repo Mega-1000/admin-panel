@@ -1223,6 +1223,12 @@
         </button>
         </div>
     </form>
+    <div>
+        {{
+            \App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first() ?
+                'Potwierdzenie przelewu zostało wysłane' + App\Entities\OrderPaymentConfirmation::where('order_id', $orderId)->first()->file_url : ''
+        }}
+    </div>
     <h3>Załącz potwierdzenie przelewu</h3>
     <form action="{{ route('store-payment-confirmation', $orderId) }}" method="post" enctype="multipart/form-data">
         @csrf
