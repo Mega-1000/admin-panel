@@ -99,7 +99,7 @@
                         </h5>
                         <p>Symbol: {{ $product->symbol }}</p>
                         <p>Ilość paczek: {{ $totalQuantity }}</p>
-                        <p>Wartość brutto: {{ $product->price }} PLN</p>
+                        <p>Wartość brutto: {{ $product->price->net_purchase_price_commercial_unit }} PLN</p>
                     </div>
                     <div>
                         @php
