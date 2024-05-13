@@ -99,7 +99,7 @@
                             {{ $name }}
                         </h5>
                         <p>Symbol: {{ $product->product->symbol }}</p>
-                        <p>Ilość: {{ $product->quantity }}</p>
+                        <p>Ilość: {{ $totalQuantity }}</p>
                         <p>Wartość brutto: {{ $product->price }} PLN</p>
                     </div>
                     <div>
