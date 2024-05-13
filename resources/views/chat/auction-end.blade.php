@@ -210,7 +210,7 @@
                                    </span>
 
                                    @php
-                                       $totalCost += $auction->offers()->where('firm_id',$firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross * $product->quantity;
+                                       $totalCost += $auction->offers()->where('firm_id',$firm->firm->id)->where('product_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross * $product->quantity  ;
                                    @endphp
                                @else
                                    No offer
