@@ -198,8 +198,11 @@
                                    }
                                @endphp
 
-                           @if($offer)
+                           @if($offers !== [])
 {{--                                   {{ $auction->offers()->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross }}--}}
+                               @foreach($offers as $offer)
+                                   {{ $offer }}
+                               @endforeach
 
                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
 
