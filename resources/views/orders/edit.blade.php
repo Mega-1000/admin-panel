@@ -1224,7 +1224,7 @@
         </div>
     </form>
     <h3>Załącz potwierdzenie przelewu</h3>
-    <form action="{{ route('store-payment-confirmation', $orderId) }}">
+    <form action="{{ route('store-payment-confirmation', $orderId) }}" method="post">
         @csrf
         <input type="file" name="file">
 
