@@ -236,7 +236,9 @@
                                $totalCost = 0;
 
                                foreach ($items as $item) {
-                                   $variations = App\Entities\Product::where('product_group', $item->product->product_group)->where('product_name_supplier', $symbol)->get();
+                                   $variations = App\Entities\Product::where('product_group', $item->product->product_group)
+                                       ->where('product_name_supplier', $symbol)
+                                       ->get();
                                     $prices[] = $variations;
 
                                     foreach ($variations as $variation) {
@@ -250,7 +252,7 @@
                            @foreach($prices as $price)
                                @if($price)
                                    <td>
-                                       @foreach($prices as $p)
+                                       @foreach($prices[0] as $p)
                                            {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
                                            <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $p->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $p->id }}">
                                        @endforeach
