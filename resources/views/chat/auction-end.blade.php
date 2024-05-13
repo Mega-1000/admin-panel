@@ -236,11 +236,13 @@
                                $totalCost = 0;
 
                                foreach ($items as $item) {
-                                   $variation = App\Entities\Product::where('product_group', $item->product->product_group)->where('product_name_supplier', $symbol)->first();
+                                   $variations = App\Entities\Product::where('product_group', $item->product->product_group)->where('product_name_supplier', $symbol)->get();
 
-                                   if ($variation) {
-                                       $prices[] = $variation;
-                                       $totalCost += $variation?->price->net_special_price_basic_unit * $item->quantity;
+                                   foreach ($variations as $variation) {
+                                       if ($variation) {
+                                           $prices[] = $variation;
+                                           $totalCost += $variation?->price->net_special_price_basic_unit * $item->quantity;
+                                       }
                                    }
                                }
                            @endphp
