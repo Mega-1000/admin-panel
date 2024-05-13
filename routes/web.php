@@ -28,6 +28,7 @@ use App\Http\Controllers\NewsletterMessageController;
 use App\Http\Controllers\NewsletterPacketController;
 use App\Http\Controllers\OrderDatatableController;
 use App\Http\Controllers\OrderInvoiceDocumentsController;
+use App\Http\Controllers\OrderPaymentConfirmationController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\OrdersMessagesController;
 use App\Http\Controllers\OrdersPackagesController;
@@ -823,3 +824,5 @@ Route::get('newsletter/generate/{category}', [NewsletterController::class, 'gene
 
 Route::get('polecenia', [ContactApproachController::class, 'index'])->name('contact-aproach.index');
 Route::get('set-aproach-as-done/{id}', [ContactApproachController::class, 'setDone'])->name('set-aproach-as-done');
+
+Route::post('create-confirmation/{id}', [OrderPaymentConfirmationController::class, 'store'])->name('store-payment-confirmation');
