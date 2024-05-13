@@ -62,7 +62,7 @@
                 $alreadyDisplayed = true;
 
                 $totalQuantity = $chat_auction_firm->chatAuction->chat->order
-                    ->items()->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->product->parentProduct->id); })->sum('items.quantity');
+                    ->items()->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->product->parentProduct->id); })->get()->sum('items.quantity');
             } else {
                 $alreadyDisplayed = false;
             }
