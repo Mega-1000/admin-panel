@@ -826,4 +826,4 @@ Route::get('polecenia', [ContactApproachController::class, 'index'])->name('cont
 Route::get('set-aproach-as-done/{id}', [ContactApproachController::class, 'setDone'])->name('set-aproach-as-done');
 
 Route::post('create-confirmation/{id}', [OrderPaymentConfirmationController::class, 'store'])->name('store-payment-confirmation');
-Route::post('create-confirmation/{id}/confirm', [OrderPaymentConfirmationController::class, 'confirm'])->name('store-payment-confirmation-confirm');
+Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationController::class, 'confirm'])->name('store-payment-confirmation-confirm');
