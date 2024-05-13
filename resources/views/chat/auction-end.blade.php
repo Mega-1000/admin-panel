@@ -215,7 +215,6 @@
                                    No offer
                                @endif
                            </td>
-                       @endforeach
                        <td>{{ round($totalCost / 3.33, 2) }}</td>
                    </tr>
                @endforeach
