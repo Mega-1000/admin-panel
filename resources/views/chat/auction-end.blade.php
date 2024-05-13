@@ -218,11 +218,11 @@
                        @endforeach
                        <td>{{ round($totalCost / 3.33, 2) }}</td>
                    </tr>
-                   @foreach($products as $product)
+                   @foreach($products as $p)
                        <td>
                            @php
                                // Assuming `$product` comes with preloaded 'offers' relationship
-                               $relevantOffers = $product->offers->filter(function($offer) use ($firm) {
+                               $relevantOffers = $p->offers->filter(function($offer) use ($firm) {
                                    return $offer->firm_id === $firm->id;
                                });
 
@@ -234,7 +234,7 @@
                                {{-- Display the offer's price --}}
                                {{ number_format($offer->basic_price_gross, 2) }} zł
 
-                               <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
+                               <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $offer->id }}">
 
                                <span style="color: green">
                 - cena specjalnie dla ciebie
