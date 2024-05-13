@@ -17,6 +17,7 @@ $labels = [
     'wyprodukowana' => '50',
     'wyprodukowano czesciowo' => '51',
     'wyslana do awizacji' => '52',
+    'awizacja pilna' => '77',
     'awizacja przyjeta' => '53',
     'awizacja odrzucona' => '54',
     'dialog rozpoczecie' => '55',
@@ -65,13 +66,13 @@ $labels = [
     'transport gielda wskazanie wstepne- konulstant po zatwierdzeniu poprawnosci wyboru transportu kasuje etykiete ,jezeli nie jest pewien to zostawia ja do przeanalizowania masterowi' => '104',
     'transport hds wskazanie wstepne- zglaszmy spedycji i nastepnie kasujemy ta etykiety po czym dostaniemy ja w kolorze niebieskim co oznaczac bedzie iz czekamy na potwierdzenie oficjlane odbioru' => '105',
     'odbior wlasny wskazanie wstepne-zglaszamy klientowi mozliwosc odbioru we wskazanej dacie i godzinie i czekamy na jego zatwierdzenie jednosczenie kasujac ta etykiete' => '106',
-    
+
     'nie podjeto decyzji w sprawie przyjecia produkcji - nalezy koniecznie przyjac badz odrzucic zlcenie na produkcje (etykieta ta pojawia sie po 2 godzinach braku reakcji) ,po podjeciu decyzji na' => '118',
     'Brak wpłaty zaliczki deklarowanej' => '119',
     'faktura wystawiona z odlozonym skutkiem magazynowym' => '120',
     'bilans finansowy wartosci zamowien ,wplat zlaliczek zaksiegowanych i deklarowanych ,zleconych pobran na listach przewozowych dla danej grupy ofert powiazanych jest niepoprawny' => '134',
-    
-    
+
+
 ];
 
 return [
@@ -119,6 +120,7 @@ return [
         ],
         "remove" => [
             $labels['wyslana do awizacji'],
+            $labels['awizacja brak odpowiedzi'],
         ],
     ],
     "warehouse-notification-denied" => [ //23
