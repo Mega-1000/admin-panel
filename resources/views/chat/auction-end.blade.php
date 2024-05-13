@@ -191,16 +191,12 @@
 
                                     $offers = [];
                                     foreach ($allProductsToBeDisplayed as $product) {
-                                        if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first())
-                                        {
-                                            $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
-                                        {
+                                        $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
                                     }
                                @endphp
 
-                               @if($offers !== [])
+                               @if($offer)
 {{--                                   {{ $auction->offers()->where('firm_id', $firm->firm->id)->where('order_item_id', $product->id)->orderBy('created_at', 'asc')->first()->basic_price_gross }}--}}
-                                    {{ dd($offers) }}
 
                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
 
@@ -218,39 +214,63 @@
                        @endforeach
                        <td>{{ round($totalCost / 3.33, 2) }}</td>
                    </tr>
-                   @foreach($products as $p)
-                       <td>
-                           @php
-                               // Assuming `$product` comes with preloaded 'offers' relationship
-                               $relevantOffers = $p->offers->filter(function($offer) use ($firm) {
-                                   return $offer->firm_id === $firm->id;
-                               });
+               @endforeach
 
-                               // Just take the first relevant offer
-                               $offer = $relevantOffers->first();
+               @foreach($firms as $firm)
+                   @if(in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
+                       @continue
+                   @endif
+
+                   @php
+                       $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
+                   @endphp
+
+                   @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
+                       <tr>
+                           <td>
+                               {{ $symbol }}
+                           </td>
+
+                           @php
+                               $prices = [];
+                               $items = isset($auction) ? $auction?->chat?->order?->items : $order?->items;
+                               $totalCost = 0;
+
+                               foreach ($items as $item) {
+                                   $variations = App\Entities\Product::where('product_group', $item->product->product_group)
+                                       ->where('product_name_supplier', $symbol)
+                                       ->get();
+                                    $prices[] = $variations;
+
+                                    foreach ($variations as $variation) {
+                                       if ($variation) {
+                                           $totalCost += $variation?->price->net_special_price_basic_unit * $item->quantity;
+                                       }
+                                   }
+                               }
                            @endphp
 
-                           @if($offer)
-                               {{-- Display the offer's price --}}
-                               {{ number_format($offer->basic_price_gross, 2) }} zł
+                           @foreach($prices as $price)
+                               @if($price)
+                                   <td>
+                                       @foreach($prices[0] as $p)
+                                           {{ $p->price->product->symbol }}:
+                                           {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
+                                           <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $p->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $p->id }}">
+                                       @endforeach
+                                   </td>
+                               @endif
+                           @endforeach
+                           <td>{{ round($totalCost / 3.33, 2) }}</td>
+                       </tr>
+                       @php
+                           $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
+                       @endphp
+                   @endif
+               @endforeach
 
-                               <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $offer->id }}">
-
-                               <span style="color: green">
-                                    - cena specjalnie dla ciebie
-                                </span>
-
-                               @php
-                                   $totalCost += $offer->basic_price_gross * $product->quantity;
-                               @endphp
-                           @else
-                               No offer
-                           @endif
-                       </td>
-                   @endforeach
                </tbody>
            </table>
-           @endforeach
 
            <button class="btn btn-primary mt-2 mb-5" id="submit-button">
                Wyślij zamówienie
