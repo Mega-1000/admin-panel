@@ -215,9 +215,9 @@
                                    No offer
                                @endif
                            </td>
+                       @endforeach
                        <td>{{ round($totalCost / 3.33, 2) }}</td>
                    </tr>
-               @endforeach
 
                @foreach($firms as $firm)
                    @if(in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
