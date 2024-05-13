@@ -191,7 +191,7 @@
 
                                     $offers = [];
                                     foreach ($allProductsToBeDisplayed as $product) {
-                                        $offer = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
+                                        $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
                                     }
                                @endphp
 
