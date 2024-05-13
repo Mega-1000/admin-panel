@@ -48,7 +48,7 @@ class OrderPaymentConfirmationAttachedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'email.payment-confirmation',
+            view: 'emails.payment-confirmation',
         );
     }
 
