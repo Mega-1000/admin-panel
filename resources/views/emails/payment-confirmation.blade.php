@@ -4,4 +4,4 @@ Dzień dobry,
 Pod następującym linkiem dostępne jest potwierdzenie przelewu wykonanego przez nas: {{ $confirmation->file_url }}
 <br>
 <br>
-Prosimy o potwierdzenie otrzymania przelewu klikając <a href="{{  }}">TUTAJ</a>
+Prosimy o potwierdzenie otrzymania przelewu klikając <a href="">TUTAJ</a>
