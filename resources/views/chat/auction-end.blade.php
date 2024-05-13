@@ -250,8 +250,10 @@
                            @foreach($prices as $price)
                                @if($price)
                                    <td>
-                                       {{ $price?->price->gross_purchase_price_basic_unit_after_discounts }}
-                                       <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $price->id }}" data-product-id="{{ $price->id }}" data-variation-id="{{ $price->id }}">
+                                       @foreach($prices as $p)
+                                           {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
+                                           <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $p->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $p->id }}">
+                                       @endforeach
                                    </td>
                                @endif
                            @endforeach
