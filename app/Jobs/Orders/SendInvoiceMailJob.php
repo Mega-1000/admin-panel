@@ -41,7 +41,7 @@ class SendInvoiceMailJob extends Job implements ShouldQueue
         $tags = $tagRepository->all();
         $message = "";
 
-        $subject = "Faktura Mega1000 - numer zamówienia: {$this->order->id}";
+        $subject = "Faktura EPH Polska - numer zamówienia: {$this->order->id}";
 
         $emailTagHandler->setOrder($this->order);
 

@@ -7,7 +7,7 @@ Przybliżona waga transportu: 0 kg
 Dostawa
 W celu możliwości rozładunku towaru prosimy skontaktować się z odbiorcą lub odbiorcami, których dane podane są poniżej.
 
-Jednocześnie informujemy, iż wszelkie ustalenia co do zasad transportu pozostawimy pomiędzy spedytorem a odbiorcą końcowym i w przypadku wystąpienia problemów z tym związanych obciążają całkowicie stronę spedytora, a wszelkie rozwiązania będzie on ustalał z odbiorcą końcowym z pominięciem firmy MEGA1000
+Jednocześnie informujemy, iż wszelkie ustalenia co do zasad transportu pozostawimy pomiędzy spedytorem a odbiorcą końcowym i w przypadku wystąpienia problemów z tym związanych obciążają całkowicie stronę spedytora, a wszelkie rozwiązania będzie on ustalał z odbiorcą końcowym z pominięciem firmy EPH Polska
 
 Spedytor w szczególności jest zobowiazany ustalić szczegóły i możliwości dojazdu, rozładunku towaru i pobrania należności za towar oraz za transport jeżeli taka wystepuje.
 
@@ -40,7 +40,7 @@ Waga zlecenia: {{ $order->weight }} kg
 
 Wartość za usługe transportową brutto: {{ $order->shipment_price_for_us }} zł
 
-Zleceniodawca tego transportu jest odbiorca towaru i wszelkie ustalenie co do zasad dostawy,rozładunku,terminu itp spedycja obsługująca ustala z nim we własnym zakresie a wszelkie niedomowienia i spory które wynikną w zwiazku z tą dostawą spedycja będzie rozwiązywała samodzielnie z odbiorcą z pominięciem firmy MEGA1000 który jest tylko sprzedawcą.Także ustalenia zasad płatności jak i wartości za wykonaną usługe prosimy uscislić z odbiorcą ponieważ on jest decydentem co do wszelkich aspektow finansowych poniewaz podawane przez nas dane są zawsze tylko wstepne.
+Zleceniodawca tego transportu jest odbiorca towaru i wszelkie ustalenie co do zasad dostawy,rozładunku,terminu itp spedycja obsługująca ustala z nim we własnym zakresie a wszelkie niedomowienia i spory które wynikną w zwiazku z tą dostawą spedycja będzie rozwiązywała samodzielnie z odbiorcą z pominięciem firmy EPH Polska który jest tylko sprzedawcą.Także ustalenia zasad płatności jak i wartości za wykonaną usługe prosimy uscislić z odbiorcą ponieważ on jest decydentem co do wszelkich aspektow finansowych poniewaz podawane przez nas dane są zawsze tylko wstepne.
 
 Uwagi spedycji:
 Do pobrania przez spedycję:

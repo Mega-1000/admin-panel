@@ -42,7 +42,7 @@ class LabelNotificationService
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
         $status = explode('-', $label->name)[0];
-        $subject = "Mega1000 - zmieniono status zamówienia: " . $order->id . ' na status: ' . str_replace('-', '', $status);
+        $subject = "EPH Polska - zmieniono status zamówienia: " . $order->id . ' na status: ' . str_replace('-', '', $status);
         try {
             if (strpos($order->customer->login, 'allegromail.pl') || empty($message)) {
                 return;
