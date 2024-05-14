@@ -259,8 +259,10 @@ class OrdersController extends Controller
 
             if ($isOrderStyro) {
                 $order->additional_service_cost = 50;
-                $order->save();
             }
+
+            $order->customer_name = $request->user_name;
+            $order->save();
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),

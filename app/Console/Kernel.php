@@ -40,7 +40,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckPriceChangesInProductsJob::class)->dailyAt("04:00");
         $schedule->job(Jobs\CheckDateOfProductNewPriceJob::class)->dailyAt("04:30");
         $schedule->job(Jobs\Orders\TriggerOrderLabelSchedulersJob::class)->everyFiveMinutes();
-        $schedule->job(Jobs\WarehouseDispatchPendingReminderJob::class)->everyThirtyMinutes()->between('9:00', '17:00');
+        $schedule->job(Jobs\WarehouseDispatchPendingReminderJob::class)->everyFifteenMinutes()->between('9:00', '17:00');
 
         // monday to saturday between 7 - 19
         $schedule->job(Jobs\CheckNotificationsMailbox::class)->cron('*/15 7-19 * * 1-6');
