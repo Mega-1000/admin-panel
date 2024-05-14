@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\Entities\OrderPaymentConfirmation;
 use App\Facades\Mailer;
 use App\Mail\OrderPaymentConfirmationAttachedMail;
+use App\Services\Label\AddLabelService;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,6 +29,7 @@ class SendPaymentConfirmationProds implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws Exception
      */
     public function handle(): void
     {
@@ -36,8 +39,13 @@ class SendPaymentConfirmationProds implements ShouldQueue
 
         foreach ($confirmations as $confirmation) {
             Mailer::create()
-                ->to('antoniwoj@o2.pl')
+                ->to($confirmation->order->warehouse->warehouse_email)
                 ->send(new OrderPaymentConfirmationAttachedMail($confirmation, true));
+
+            if (!$confirmation->order->labels->has(261)) {
+                $arr = [];
+                AddLabelService::addLabels($confirmation->order, [261], $arr, []);
+            }
         }
     }
 }

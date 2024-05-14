@@ -14,7 +14,29 @@
             </button>
         @endforeach
     @endif
+    @if($labelGroupName === 'transport')
+        <div style="margin-top: 30px">
+            <h5>
+                @php
+                    $paymentConfirmation = \App\Entities\OrderPaymentConfirmation::where('order_id', $order['id'])->first();
+                @endphp
 
+                @if($paymentConfirmation)
+                    <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
+                @endif
+
+            </h5>
+        </div>
+        <h3>Załącz potwierdzenie przelewu</h3>
+        <form action="{{ route('store-payment-confirmation', $order['id']) }}" method="post" enctype="multipart/form-data">
+            @csrf
+            <input type="file" name="file">
+
+            <button class="btn btn-primary">
+                Wyślij plik do księgowości
+            </button>
+        </form>
+    @endif
     @if($labelGroupName === 'transport')
         @php
             $dateTranslations = [
