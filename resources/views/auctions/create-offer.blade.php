@@ -148,7 +148,7 @@
                             @endphp
                             <div class="form-check mt-3">
                                 <div class="form-check mt-3">
-                                    <input class="form-check-input" type="checkbox" name="send_notification.{{ $product->id }}" value="true"
+                                    <input class="form-check-input" type="checkbox" form="main" name="send_notification.{{ $product->id }}" value="true"
                                         {{ $product->current_firm_offers?->send_notification ? 'checked' : '' }} {{ empty($product->current_firm_offers) ? 'checked' : '' }}>
                                     <label class="form-check-label">Powiadamiaj mnie w przypadku przebicia najniższej ceny</label>
                                 </div>
