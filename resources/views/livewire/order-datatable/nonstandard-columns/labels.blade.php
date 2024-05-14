@@ -14,7 +14,7 @@
             </button>
         @endforeach
     @endif
-    @if($labelGroupName === 'transport')
+    @if($labelGroupName === 'platnosci')
         <div style="margin-top: 30px">
             <h5>
                 @php

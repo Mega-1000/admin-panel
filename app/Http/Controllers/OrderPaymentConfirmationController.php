@@ -6,6 +6,7 @@ use App\Entities\Order;
 use App\Entities\OrderPaymentConfirmation;
 use App\Facades\Mailer;
 use App\Mail\OrderPaymentConfirmationAttachedMail;
+use App\Services\Label\AddLabelService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,7 +42,12 @@ class OrderPaymentConfirmationController extends Controller
 
     public function confirm($orderId): string
     {
-        Order::find($orderId)->paymentConfirmation->update(['confirmed', true]);
+        $order = Order::find($orderId);
+        $order->paymentConfirmation->update(['confirmed', true]);
+
+        $order->labels()->detach(259, 261);
+        $arr = [];
+        AddLabelService::addLabels($order, [260], $arr, []);
 
         return 'Dziękujemy za potwierdzenie otrzymania tej wiadomości!';
     }
