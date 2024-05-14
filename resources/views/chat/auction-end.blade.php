@@ -260,9 +260,12 @@
                                @if($price)
                                    <td>
                                        @foreach($prices[0] as $p)
-                                           {{ $p->price->product->symbol }}:
+                                           @if(count($prices[0]) > 1)
+                                            {{ $p->price->product->symbol }}:
+                                           @endif
                                            {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
                                            <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $p->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $p->id }}">
+                                           <br>
                                        @endforeach
                                    </td>
                                @endif
