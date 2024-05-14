@@ -14,7 +14,7 @@
             </button>
         @endforeach
     @endif
-    @if($labelGroupName === 'platnosci')
+    @if($labelGroupName === 'faktury zakupu')
         <div style="margin-top: 30px">
             <h5>
                 @php
