@@ -212,7 +212,7 @@
 
             // Add a marker at the location
             L.marker([lat, lon]).addTo(map)
-                .bindPopup('Przybliżona lokalizacja dostawy Kod pocztowy: ' + zipCode)
+                .bindPopup('Przybliżona lokalizacja dostawy <br> Kod pocztowy: ' + zipCode)
                 .openPopup();
 
             // Center the map on the location
