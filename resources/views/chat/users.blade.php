@@ -11,9 +11,9 @@
     <tr>
         <th class="{{ $class }}" style="height: 90px;">
             @if($userType == MessagesHelper::TYPE_CUSTOMER)
-                <h6>
+                <h5>
                     Klient: {{ $order->customer_name }}
-                </h6>
+                </h5>
             @endif
 
             @if(isset($user->distance))
