@@ -201,6 +201,7 @@
                            @if($offers !== [])
                                @foreach($offers as $offer)
                                    {{ \App\Entities\Product::find($offer->product_id)->symbol }}: {{ $offer->basic_price_gross }}
+                                   <br>
                                @endforeach
 
                                    <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">
