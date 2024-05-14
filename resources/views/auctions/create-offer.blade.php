@@ -47,7 +47,7 @@
     </h3>
     <div class="row mb-4">
         <div class="col-md-6">
-            <p class="text-center" style="font-size: larger">
+            <p class="text-center" style="font-size: 2em">
                 Miejscowość dostawy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->city }}<br>
                 Kod pocztowy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}<br>
                 Numer oferty: {{ $chat_auction_firm->chatAuction->chat->order->id }}<br>
