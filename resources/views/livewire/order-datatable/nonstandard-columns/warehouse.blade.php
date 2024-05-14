@@ -1,4 +1,4 @@
-<a href="{{ $column['firm'] }}">
+<a href="{{ $column }}">
     Przejdź do firmy
 </a>
 <br>
