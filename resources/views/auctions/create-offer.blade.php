@@ -54,7 +54,7 @@
     @php
         $parentProductsDisplayed = [];
     @endphp
-
+    {{ dd($products) }}
     @foreach($products as $product)
         @foreach($product as $product)
         @php

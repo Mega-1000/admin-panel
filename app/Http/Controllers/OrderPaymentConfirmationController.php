@@ -28,6 +28,9 @@ class OrderPaymentConfirmationController extends Controller
                 'file_url' => asset($filePath),
             ]);
 
+            $arr = [];
+            AddLabelService::addLabels(Order::find($orderId), [259], $arr, []);
+
             Mailer::create()
                 ->to(Order::find($orderId)->warehouse->warehouse_email)
                 ->send(new OrderPaymentConfirmationAttachedMail($confirmation, false));
