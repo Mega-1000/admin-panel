@@ -178,5 +178,6 @@ enum OrderDatatableColumnsEnum
      */
     const ADDITIONAL_VIEWS_COLUMNS = [
         'customer.addresses.0.phone' => 'livewire.order-datatable.nonstandard-columns.additionals.phone-nof-no',
+        'warehouse.symbol' => 'livewire.order-datatable.nonstandard-columns.warehouse',
     ];
 }
