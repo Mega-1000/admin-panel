@@ -10,6 +10,12 @@
 @foreach ($users as $user)
     <tr>
         <th class="{{ $class }}" style="height: 90px;">
+            @if($currentUserType == MessagesHelper::TYPE_USER)
+                <h6>
+                    Klient: {{ $order->customer_name }}
+                </h6>
+            @endif
+
             @if(isset($user->distance))
                 Odległość: {{ ceil($user->distance) }} km <br>
             @endif
