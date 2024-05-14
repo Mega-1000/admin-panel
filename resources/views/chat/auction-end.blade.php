@@ -264,7 +264,7 @@
                                             {{ $p->price->product->symbol }}:
                                            @endif
                                            {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
-                                           <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $p->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $p->id }}">
+{{--                                           <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $p->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $p->id }}">--}}
                                            <br>
                                        @endforeach
                                    </td>
