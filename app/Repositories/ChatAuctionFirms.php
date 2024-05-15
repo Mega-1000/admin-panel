@@ -28,11 +28,13 @@ class ChatAuctionFirms
                 ->where('product_name_supplier', ChatAuctionFirm::where('token', $token)->first()->firm->symbol)
                 ->get();
 
+            $product = json_encode($product);
+            $product['quantity'] = $item->quantity;
+            $product = json_encode($product);
+
             $res[] = $product;
-            $product->quantity = $item->quantity;
         }
 
-        dd($res);
         return $res;
     }
 
