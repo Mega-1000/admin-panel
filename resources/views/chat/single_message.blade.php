@@ -1,4 +1,4 @@
-<div class='row message-row'>
+<div class='row '>
     @php
         $header = ChatHelper::getMessageHeader($message);
     @endphp
