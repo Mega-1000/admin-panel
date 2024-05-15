@@ -77,19 +77,16 @@
                 } else {
                     $alreadyDisplayed = false;
                 }
-                $totalQuantity = $chat_auction_firm
-                    ->chatAuction
-                    ->chat
-                    ->order
-                    ->items()
-                    ->whereHas('product', function ($q) use ($product) {
+                $totalQuantity = \App\Entities\OrderItem
+                    ::whereHas('product', function ($q) use ($product) {
                         $q->where('parent_id', $product->parentProduct->id);
                     })
                     ->orWhereHas('product', function ($q) use($product) {
                         $q->where('product_group', $product->product_group);
                     })
-                    ->get();
-                dd($totalQuantity);
+                    ->where('order_id', $chat_auction_firm->chatAuction->chat->order->id)
+                    ->get()
+                    ->sum('quantity');
 
                 $parentProductsDisplayed[] = $product->parentProduct?->id;
             @endphp
