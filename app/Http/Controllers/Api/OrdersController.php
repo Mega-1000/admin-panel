@@ -242,14 +242,14 @@ class OrdersController extends Controller
 
             if ($request->get('delivery_start_date') && $request->get('delivery_end_date')) {
                 $order->dates()->create([
-                    'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
-                    'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
-                    'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
-                    'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
-                    'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date')),
-                    'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date')),
-                    'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date')),
-                    'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date')),
+                    'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+                    'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+                    'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+                    'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+                    'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+                    'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+                    'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+                    'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
                 ]);
             }
 
