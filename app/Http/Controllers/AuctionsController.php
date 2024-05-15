@@ -200,15 +200,15 @@ class AuctionsController extends Controller
                     [
                         'latitude' => $coordinatesOfUser->latitude,
                         'longitude' => $coordinatesOfUser->longitude,
-                        'firmId' => $firm->id
+                        'firmId' => $firm->firm->id
                     ]
                 );
 
                 $radius = $raw?->distance;
 
-                $firm->distance = $raw?->distance;
+                $firm->firm->distance = $raw?->distance;
 
-                if ($radius && $radius > $firm->warehouses()->first()->radius) {
+                if ($radius && $radius > $firm->firm->warehouses()->first()->radius) {
                     $firms->forget($key);
                 }
             }
