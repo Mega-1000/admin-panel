@@ -6,10 +6,18 @@
     @foreach($latestMessages as $message)
         <hr>
         @php
-            $userLogin = \App\Entities\Message::find($message['id'])->user()->login;
+            $m = \App\Entities\Message::find($message['id']);
+            $userType = '';
+            if ($m->user()) {
+                $userType = 'Konsultant';
+            } elseif ($m->customer()) {
+                $userType = 'Klient';
+            } elseif ($m->warehouse()) {
+                $userType = 'Magazyn';
+            }
         @endphp
         {{ $message['message'] }} - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
-        {{ $userLogin }}
+        {{  }}
         <br>
         <hr>
     @endforeach
