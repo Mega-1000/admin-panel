@@ -63,7 +63,7 @@
 
 <body>
     <div>
-            <div class="alert alert-success">
+            <div class="alert alert-success" style="width: 60%; margin: 0 auto">
                 Auction created successfully!
             </div>
 
