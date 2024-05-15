@@ -22,6 +22,7 @@ use App\Helpers\MessagesHelper;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Http\Requests\UpdateChatAuctionRequest;
+use App\Mail\AuctionCreationConfirmation;
 use App\Mail\NotificationAboutFirmPanelMail;
 use App\Repositories\ChatAuctionFirms;
 use App\Repositories\ChatAuctionOffers;
@@ -73,9 +74,15 @@ class AuctionsController extends Controller
      */
     public function store(Chat $chat, CreateAuctionRequest $request): RedirectResponse
     {
-        $this->chatAuctionsService->createAuction(
+        $auction = $this->chatAuctionsService->createAuction(
             CreateChatAuctionDTO::fromRequest($chat, $request->validated())
         );
+
+        Mailer::create()
+            ->to($chat->order->customer->login)
+            ->send(new AuctionCreationConfirmation(
+                $auction
+            ));
 
         return redirect()->to($request->query('backUrl'))->with('auctionCreationSuccess', true);
     }
