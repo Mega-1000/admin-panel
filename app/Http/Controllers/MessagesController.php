@@ -258,7 +258,7 @@ class MessagesController extends Controller
             'order' => $order,
             'usersHistory' => $usersHistory,
             'chatMessages' => $chatMessages,
-            'assignedMessagesIds' => dd(array_flip($assignedMessagesIds)),
+            'assignedMessagesIds' => array_flip($assignedMessagesIds),
             'title' => $helper->getTitle(true),
             'route' => route('api.messages.post-new-message', ['token' => $token]),
             'routeAddUser' => route('api.messages.add-new-user', ['token' => $token]),
