@@ -769,6 +769,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('orderDatatableColumnsFiltering', [OrderDatatableColumnsManagementController::class, 'index'])->name('orderDatatableColumnsFiltering');
 
     Route::post('recalculate-labels-in-orders-based-on-period', RecalculateLabelsInOrdersBasedOnPeriod::class)->name('recalculate-labels-in-orders-based-on-period');
+    Route::get('mark-order-as-selfpickup/{order}', [OrdersController::class, 'markAsSelfPickup']);
 });
 
 
@@ -822,7 +823,6 @@ Route::get('/form/{form:name}/{order}', [FormController::class, 'index'])->name(
 Route::post('/form/{actionName}/{order}', [FormController::class, 'executeAction'])->name('execute-form-action');
 Route::get('newsletter/generate/{category}', [NewsletterController::class, 'generate'])->name('newsletter.generate');
 
-Route::get('mark-order-as-selfpickup/{order}', [OrdersController::class, 'markAsSelfPickup']);
 
 Route::get('polecenia', [ContactApproachController::class, 'index'])->name('contact-aproach.index');
 Route::get('set-aproach-as-done/{id}', [ContactApproachController::class, 'setDone'])->name('set-aproach-as-done');
