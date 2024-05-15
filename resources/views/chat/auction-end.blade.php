@@ -174,7 +174,9 @@
 
                    <tr>
                        <td>
-                           {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }} Odległość: {{ $firm->distance }} KM
+                           {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }}
+                           <br>
+                           Odległość: {{ $firm->distance }} KM
                        </td> <!-- Display the firm symbol -->
                        @php
                            $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Add the symbol to the tracked array
@@ -259,7 +261,9 @@
                    @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                        <tr>
                            <td>
-                               {{ $symbol }} Odległość: {{ $distance }}
+                               {{ $symbol }}
+                               <br>
+                               Odległość: {{ $distance }} KM
                            </td>
 
                            @php
