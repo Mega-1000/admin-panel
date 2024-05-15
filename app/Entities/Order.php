@@ -351,7 +351,7 @@ class Order extends Model implements Transformable
     /**
      * @return Model
      */
-    public function     getDeliveryAddress(): Model
+    public function getDeliveryAddress(): Model
     {
         return $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first() ?? $this->createEmptyDeliveryAddress();
     }

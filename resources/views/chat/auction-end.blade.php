@@ -174,7 +174,7 @@
 
                    <tr>
                        <td>
-                           {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }}
+                           {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }} Odległość: {{ $firm->distance }}
                        </td> <!-- Display the firm symbol -->
                        @php
                            $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Add the symbol to the tracked array

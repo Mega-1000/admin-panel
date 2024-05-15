@@ -183,6 +183,37 @@ class AuctionsController extends Controller
         $order = $auction->chat->order;
         $firms = $this->chatAuctionFirmsRepository->getFirmsByChatAuction($auction->id);
 
+        $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
+
+        if ($coordinatesOfUser) {
+            foreach ($firms as $key => $firm) {
+                $raw = DB::selectOne(
+                    'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                        FROM postal_code_lat_lon pc
+                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                             JOIN warehouses w on wa.warehouse_id = w.id
+                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                        ORDER BY distance
+                    limit 1',
+                    [
+                        'latitude' => $coordinatesOfUser->latitude,
+                        'longitude' => $coordinatesOfUser->longitude,
+                        'firmId' => $firm->id
+                    ]
+                );
+
+                $radius = $raw?->distance;
+
+                $firm->distance = $raw?->distance;
+
+                if ($radius && $radius > $firm->warehouses()->first()->radius) {
+                    $firms->forget($key);
+                }
+            }
+        }
+
         return view('chat.auction-end', [
             'products' => $order->items,
             'offers' => $auction->offers,
