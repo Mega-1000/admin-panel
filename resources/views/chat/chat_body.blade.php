@@ -2,7 +2,6 @@
     <div class="panel-body chat-panel" style="border: 2px solid #000; border-radius: 7px;">
         @if ( isset($chatMessages) )
             @foreach ($chatMessages as $message)
-                {{ $message }}
                 @include ('chat/single_message', ['message' => $message])
             @endforeach
         @endif
