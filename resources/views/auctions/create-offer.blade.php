@@ -85,8 +85,8 @@
                         $q->where('product_group', $product->product_group);
                     })
                     ->where('order_id', $chat_auction_firm->chatAuction->chat->order->id)
-                    ->get()
-                    ->sum('quantity');
+                    ->first()
+                    ->quantity;
 
                 $parentProductsDisplayed[] = $product->parentProduct?->id;
             @endphp
