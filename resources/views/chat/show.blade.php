@@ -212,6 +212,10 @@
                                 <input id="attachment" name="attachment" type="file" style="display: none;" />
                                 <span id="file-name"></span>
                             </div>
+
+                            <a class="btn btn-primary" href="https://mega1000.pl/account?attach-transfer-confirmation={{ $order->id }}" target="_blank">
+                                Podłącz potwierdzenie przelewu
+                            </a>
                         </div>
                         <div class="col-sm-3">
                             <input type="submit" value="Wyślij wiadomość" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
