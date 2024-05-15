@@ -530,7 +530,7 @@
                             ostatniego zamówienia</a>
                         <a href="/admin/orders/{{$order->id}}/getDataFromCustomer" class="btn btn-success">Pobierz dane
                             klienta</a>
-                        <a href="/admin/mark-order-as-selfpickup/{{ $order->id  }}" class="btn btn-primary">
+                        <a href="/admin/mark-order-as-selfpickup/{{$order->id}}" class="btn btn-primary">
                             Odbiór osobisty
                         </a>
                         <div style="width: 50%">
