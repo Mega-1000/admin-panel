@@ -12,7 +12,7 @@
                 $userType = 'Konsultant';
             } elseif ($m->customer()) {
                 $userType = 'Klient';
-            } elseif ($m->warehouse()) {
+            } elseif ($m->employee()) {
                 $userType = 'Magazyn';
             }
         @endphp
