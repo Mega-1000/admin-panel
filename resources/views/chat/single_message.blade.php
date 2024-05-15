@@ -1,4 +1,4 @@
-855878558785587855878558785587
+{{ $message->message }}
 <div class='row message-row' data-messageid="{{ $message->id }}" data-user-id="{{ $message->chat_user_id }}"
     data-area="{{ $message->area }}">
     @php
