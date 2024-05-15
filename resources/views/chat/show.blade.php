@@ -213,7 +213,7 @@
                                 <span id="file-name"></span>
                             </div>
 
-                            <a class="btn btn-primary" href="https://mega1000.pl/account?attach-transfer-confirmation={{ $order->id }}" target="_blank">
+                            <a class="btn btn-primary" style="margin-top: 20px" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
                                 Podłącz potwierdzenie przelewu
                             </a>
                         </div>
