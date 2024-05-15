@@ -14,7 +14,7 @@
             </button>
         @endforeach
     @endif
-    @if($labelGroupName === 'faktury zakupu')
+    @if($labelGroupName === 'fakury zakupu')
         <div style="margin-top: 30px">
             <h5>
                 @php
@@ -33,7 +33,7 @@
             <input type="file" name="file">
 
             <button class="btn btn-primary">
-                Wyślij plik do księgowości
+                Wyślij plik do magazynu
             </button>
         </form>
     @endif
