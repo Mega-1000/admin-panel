@@ -23,6 +23,7 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
+use App\Entities\WarehouseAddress;
 use App\Entities\WorkingEvents;
 use App\Enums\EmailSettingsEnum;
 use App\Enums\LabelStatusEnum;
@@ -3068,7 +3069,7 @@ class OrdersController extends Controller
 
     public function markAsSelfPickup(Order $order): RedirectResponse|string
     {
-        $warehouseAddress = $order->warehouse;
+        $warehouseAddress = WarehouseAddress::where('warehouse_id', $order->warehouse->id)->first();
 
         if (empty($warehouseAddress)) {
             return 'Nie znaleziono magazynu do tego zamówienia';
