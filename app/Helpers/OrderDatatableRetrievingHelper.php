@@ -40,7 +40,7 @@ class OrderDatatableRetrievingHelper
             'files',
             'packages.realCostsForCompany',
             'warehouse',
-            'chat.messages',
+            'chat.messages.user',
             'task.user',
             'task.taskTime',
             'addresses',

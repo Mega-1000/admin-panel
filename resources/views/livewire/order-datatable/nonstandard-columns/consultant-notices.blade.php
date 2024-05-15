@@ -6,6 +6,7 @@
     @foreach($latestMessages as $message)
         <hr>
         {{ $message['message'] }} - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
+        {{ $message['user']['login'] }}
         <br>
         <hr>
     @endforeach
