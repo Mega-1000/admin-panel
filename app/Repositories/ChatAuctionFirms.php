@@ -24,15 +24,14 @@ class ChatAuctionFirms
 
         foreach ($items as &$item) {
             $product = $item->product;
-            $product = Product::where('product_group', $product->product_group)
+            $products = Product::where('product_group', $product->product_group)
                 ->where('product_name_supplier', ChatAuctionFirm::where('token', $token)->first()->firm->symbol)
                 ->get();
 
-            $product = json_encode($product);
-            $product = json_decode($product);
-            $product->quantity = $item->quantity;
-
-            $res[] = $product;
+            foreach ($products as $p) {
+                $p->quantity = $item->quantity;
+                $res[] = $p;
+            }
         }
 
         return $res;
