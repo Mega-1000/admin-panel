@@ -879,7 +879,7 @@
                 }
 
                 html += '<tr>' +
-                    '<td>Proponowana data wydania / dostawy (' + displayKey + ')</td>' +
+                    '<td>Proponowana data wydania - dla styropianów dostawy' + displayKey + ')</td>' +
                     '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                     '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                     (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
