@@ -3,12 +3,8 @@
         {{ dd($chatMessages) }}
         @if ( isset($chatMessages) )
             @foreach ($chatMessages as $message)
-                @if( $userType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id] ))
-                    @if ($userType != MessagesHelper::TYPE_USER && $message->area != 0)
-                        @continue
-                    @endif
-                    @include ('chat/single_message', ['message' => $message])
-                @endif
+                {{ $message }}
+                @include ('chat/single_message', ['message' => $message])
             @endforeach
         @endif
     </div>
