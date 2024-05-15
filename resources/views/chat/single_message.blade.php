@@ -1,7 +1,3 @@
-
-<div class="msg-content" style="white-space: pre-line;">
-    {{ $message->message }}
-</div>
 <div class='row message-row' data-messageid="{{ $message->id }}" data-user-id="{{ $message->chat_user_id }}"
     data-area="{{ $message->area }}">
     @php
@@ -21,6 +17,9 @@
                 [{{ $message->created_at }}]
                 <strong> {!! $header !!} </strong>
             @endif
+            <div class="msg-content" style="white-space: pre-line;">
+                {{ $message->message }}
+            </div>
             @if ($message->attachment_path)
                 <a class="attachment-path" style="display: block; margin-top: 10px; color: #000;"
                     href="{{ asset('storage/' . $message->attachment_path) }}" download="{{ $message->attachment_name }}">

@@ -454,15 +454,18 @@
 
                 if(!isConsultant) return false;
 
-                $('.message-row').each(function() {
-                    const chatUserId = String($(this).data('user-id'));
-                    const area = String($(this).data('area'));
-                    const selectedArea = $('#area').val();
+                @if($userType == MessagesHelper::TYPE_USER)
+                    $('.message-row').each(function() {
+                        const chatUserId = String($(this).data('user-id'));
+                        const area = String($(this).data('area'));
+                        const selectedArea = $('#area').val();
 
-                    if((chatUserId && chatUserId != '{{ $chatBlankUser?->id }}') || selectedArea != 0) {
-                        usersHistoryFilter.has(chatUserId) && selectedArea == area ? $(this).show() : $(this).hide();
-                    }
-                });
+                        if((chatUserId && chatUserId != '{{ $chatBlankUser?->id }}') || selectedArea != 0) {
+                            usersHistoryFilter.has(chatUserId) && selectedArea == area ? $(this).show() : $(this).hide();
+                        }
+                    });
+                @endif
+
                 scrollBottom();
             }
 
@@ -557,7 +560,7 @@
                     function(data) {
                         if (data?.messages?.length > 0) {
                             refreshRate = 1;
-                            if(data.messages != '' && document.hidden) {
+                            if (data.messages != '' && document.hidden) {
                                 blinkTitle({
                                     title: documentTitle,
                                     message: "!!! NOWA WIADOMOŚĆ !!!",
