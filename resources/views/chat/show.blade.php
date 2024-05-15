@@ -451,20 +451,17 @@
             }
 
             const filterMessages = () => {
-
                 if(!isConsultant) return false;
 
-                @if($userType == MessagesHelper::TYPE_USER)
-                    $('.message-row').each(function() {
-                        const chatUserId = String($(this).data('user-id'));
-                        const area = String($(this).data('area'));
-                        const selectedArea = $('#area').val();
+                $('.message-row').each(function() {
+                    const chatUserId = String($(this).data('user-id'));
+                    const area = String($(this).data('area'));
+                    const selectedArea = $('#area').val();
 
-                        if((chatUserId && chatUserId != '{{ $chatBlankUser?->id }}') || selectedArea != 0) {
-                            usersHistoryFilter.has(chatUserId) && selectedArea == area ? $(this).show() : $(this).hide();
-                        }
-                    });
-                @endif
+                    if((chatUserId && chatUserId != '{{ $chatBlankUser?->id }}') || selectedArea != 0) {
+                        usersHistoryFilter.has(chatUserId) && selectedArea == area ? $(this).show() : $(this).hide();
+                    }
+                });
 
                 scrollBottom();
             }
