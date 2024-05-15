@@ -63,6 +63,12 @@
 
 <body>
     <div>
+        @if(session()->has('auctionCreationSuccess'))
+            <div class="alert alert-success">
+                Auction created successfully!
+            </div>
+        @endif
+
         <div class="container" id="flex-container">
             <div id="chat-container">
                 <div class="text-center alert alert-info">{!! $title !!}</div>

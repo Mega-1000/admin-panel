@@ -69,15 +69,15 @@ class AuctionsController extends Controller
      *
      * @param Chat $chat
      * @param CreateAuctionRequest $request
-     * @return Redirector
+     * @return RedirectResponse
      */
-    public function store(Chat $chat, CreateAuctionRequest $request)
+    public function store(Chat $chat, CreateAuctionRequest $request): RedirectResponse
     {
         $this->chatAuctionsService->createAuction(
             CreateChatAuctionDTO::fromRequest($chat, $request->validated())
         );
 
-        return redirect($request->query('backUrl'));
+        return redirect()->to($request->query('backUrl'))->with('auctionCreationSuccess', true);
     }
 
     /**
