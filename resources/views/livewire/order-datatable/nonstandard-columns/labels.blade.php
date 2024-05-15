@@ -30,10 +30,10 @@
         <h6>Załącz potwierdzenie przelewu</h6>
         <form action="{{ route('store-payment-confirmation', $order['id']) }}" method="post" enctype="multipart/form-data">
             @csrf
-            <input type="file" name="file" style="width: 50px">
+            <input type="file" name="file" style="width: 10px">
 
             <button class="btn btn-primary">
-                Wyślij plik do magazynu
+                Wyślij plik
             </button>
         </form>
     @endif
