@@ -6,7 +6,7 @@
     @foreach($latestMessages as $message)
         <hr>
         @php
-            $userLogin = \App\Entities\Message::find($message['id'])->user->login;
+            $userLogin = \App\Entities\Message::find($message['id'])->user()->login;
         @endphp
         {{ $message['message'] }} - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
         {{ $userLogin }}
