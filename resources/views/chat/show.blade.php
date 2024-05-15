@@ -572,7 +572,7 @@
                             }
                             $('.chat-panel').append(data.messages);
                             filterMessages();
-                            scrollBottom();
+                            // scrollBottom();
                         }
                         nextRefresh = $.now() + refreshRate * 1000;
                         running = false;
