@@ -63,8 +63,9 @@
 
 <body>
     <div>
-            <div class="alert alert-success" style="width: 50%; margin: 0 auto">
-                Auction created successfully!
+            <div class="alert alert-success" style="width: 40%; margin: 0 auto">
+                Pomyślnie stworzono przetarg! Tabelę cen można zobaczyć na koncie klienta po zalogowaniu się na konto pod linkiem
+                <a href="https://mega1000.pl/account">https://mega1000.pl/account</a>
             </div>
 
         <div class="container" id="flex-container">
