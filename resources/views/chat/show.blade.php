@@ -58,300 +58,304 @@
             z-index: 2;
         }
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chat-container {
+            height: calc(100vh - 64px);
+        }
+        .chat-messages {
+            height: calc(100% - 80px);
+            overflow-y: auto;
+        }
+        .chat-input {
+            height: 80px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <!-- Select2 JS -->
 </head>
-
-<body>
-    <div>
-        <div class="container" id="flex-container">
-            <div id="chat-container">
-                <div class="text-center alert alert-info">{!! $title !!}</div>
+<body class="bg-gray-100">
+<div class="flex h-screen">
+    <div class="w-1/3 bg-white shadow-md">
+        <div class="p-4 border-b">
+            <h2 class="text-lg font-semibold">Users</h2>
+        </div>
+        <div class="p-4">
+            @include('chat/users', [
+                'title' => 'Klienci:',
+                'isEmptyMsg' => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
+                'users' => $chatCustomers,
+                'userType' => MessagesHelper::TYPE_CUSTOMER,
+                'currentUserType' => $userType,
+                'arePossibleUsers' => false,
+                'class' => 'bg-yellow-100 text-yellow-800 p-3 rounded-md mb-2',
+            ])
+            @include('chat/users', [
+                'title' => 'Pracownicy firm:',
+                'isEmptyMsg' => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
+                'users' => $chatEmployees,
+                'userType' => MessagesHelper::TYPE_EMPLOYEE,
+                'currentUserType' => $userType,
+                'arePossibleUsers' => false,
+                'class' => 'bg-blue-100 text-blue-800 p-3 rounded-md mb-2',
+            ])
+            @include('chat/users', [
+                'title' => 'Konsultanci:',
+                'isEmptyMsg' => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',
+                'users' => $chatConsultants,
+                'userType' => MessagesHelper::TYPE_USER,
+                'currentUserType' => $userType,
+                'arePossibleUsers' => false,
+                'class' => 'bg-green-100 text-green-800 p-3 rounded-md mb-2',
+            ])
+            @include('chat/users', [
+                'title' => 'Powiązani klienci:',
+                'isEmptyMsg' => 'Brak powiązanych klientów',
+                'users' => $possibleCustomers,
+                'userType' => MessagesHelper::TYPE_CUSTOMER,
+                'currentUserType' => $userType,
+                'arePossibleUsers' => true,
+                'class' => 'bg-yellow-100 text-yellow-800 p-3 rounded-md mb-2',
+            ])
+            @include('chat/users', [
+                'title' => 'Powiązani pracownicy firm:',
+                'isEmptyMsg' => 'Brak powiązanych pracowników firm',
+                'users' => $possibleEmployees,
+                'userType' => MessagesHelper::TYPE_EMPLOYEE,
+                'currentUserType' => $userType,
+                'arePossibleUsers' => true,
+                'class' => 'bg-blue-100 text-blue-800 p-3 rounded-md mb-2',
+            ])
+            @if($userType == MessagesHelper::TYPE_USER)
+                @include('chat/users', [
+                    'title' => 'Pracownicy firm uczestniczących w przetargu:',
+                    'isEmptyMsg' => 'Brak powiązanych pracowników firm',
+                    'users' => $allEmployeesFromRelatedOrders ?? new \Illuminate\Support\Collection(),
+                    'userType' => MessagesHelper::TYPE_EMPLOYEE,
+                    'currentUserType' => $userType,
+                    'arePossibleUsers' => true,
+                    'class' => 'bg-blue-100 text-blue-800 p-3 rounded-md mb-2',
+                ])
+            @endif
+            @if($userType == MessagesHelper::TYPE_USER)
+                <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST" class="bg-white shadow-md rounded-md p-4 mb-4">
+                    @csrf
+                    <h2 class="text-lg font-semibold mb-2">Dodaj firmę do chata</h2>
+                    <input type="text" class="form-control mb-2 border border-gray-300 rounded-md px-3 py-2 w-full" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
+                    <datalist id="suggestions">
+                        @foreach(\App\Entities\Firm::all() as $firm)
+                            <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
+                        @endforeach
+                    </datalist>
+                    <button type="submit" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">
+                        Dodaj użytkowników
+                    </button>
+                </form>
+            @endif
+        </div>
+    </div>
+    <div class="w-2/3 flex flex-col">
+        <div class="p-4 bg-white shadow-md">
+            <h2 class="text-lg font-semibold">Chat</h2>
+        </div>
+        <div class="chat-container flex-1 flex flex-col bg-white shadow-md">
+            <div class="chat-messages p-4 flex-1">
                 @if($chat->questions_tree && $userType === MessagesHelper::TYPE_USER)
-                    <div class="text-center alert alert-info">
-                        Ścieżka FAQ użytkownika:<br>
+                    <div class="bg-blue-100 text-blue-800 p-3 rounded-md mb-4">
+                        <h3 class="font-semibold mb-2">Ścieżka FAQ użytkownika:</h3>
                         @foreach(json_decode($chat->questions_tree) as $questionData)
                             -> {{ $questionData->question }}<br>
                         @endforeach
                     </div>
                 @endif
-                @if (!empty($notices))
-                    <div class="alert-info alert">Uwagi konsultanta: <b>{{ $notices }}</b></div>
+                @if(!empty($notices))
+                    <div class="bg-green-100 text-green-800 p-3 rounded-md mb-4">
+                        <strong>Uwagi konsultanta:</strong> {{ $notices }}
+                    </div>
                 @endif
-                @if (!empty($faq))
-                    <div class="alert-info alert"><b>FAQ:</b> <br>{!! implode('<br/>', $faq) !!}</div>
+                @if(!empty($faq))
+                    <div class="bg-yellow-100 text-yellow-800 p-3 rounded-md mb-4">
+                        <strong>FAQ:</strong><br>{!! implode('<br/>', $faq) !!}
+                    </div>
                 @endif
                 @if ($userType == MessagesHelper::TYPE_EMPLOYEE && $chat?->auctions?->first()?->end_of_auction)
-                    <h1>
-                        Jeśli chcesz zaaktualizować swoją ofertę dotyczącą przetargu kliknij
-                        @php
-                            $firm = App\Entities\Firm::whereHas('employees', function ($q) use ($userId) {
-                                $q->where('id', $userId);
-                            })->first();
-                        @endphp
-                        <a class="btn btn-primary" target="_blank" href="/auctions/offer/create/{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
-                            Kliknij tutaj aby zmienić ceny
-                        </a>
-                    </h1>
-                @endif
-                @if($isStyropian)
-                    <div class="mb-4 alert alert-warning">
-                        @if($chat->auctions->count() === 0)
-                            <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
-                                Rozpocznij przetarg
+                    @php
+                        $firm = App\Entities\Firm::whereHas('employees', function ($q) use ($userId) {
+                            $q->where('id', $userId);
+                        })->first();
+                    @endphp
+                    <div class="bg-blue-100 text-blue-800 p-3 rounded-md mb-4">
+                        <h1 class="text-xl font-semibold mb-2">
+                            Jeśli chcesz zaaktualizować swoją ofertę dotyczącą przetargu kliknij
+                            <a class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md" target="_blank" href="/auctions/offer/create/{{ $chat->auctions->first()?->firms()->where('firm_id', $firm->id)->first()?->token }}">
+                                Kliknij tutaj aby zmienić ceny
                             </a>
-                            <div id="auction-instructions" style="display: none; color: white; font-weight: bold; font-size: large; border-radius: 15px; padding: 20px; background-color: #0c0c0c">
-                            <p>Poniżej tabela cen brutto produktów z tej oferty których istnieje możliwość dostarczenia na wskazany kod pocztowy.</p>
-                                <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="600px; width: 100%"></iframe>
-                            <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg.
-                                <br>
-                                !!! Jeśli chcesz wykonać inną czynnoś naciśnij przycisk zamknij tą tabelę</p>
-                                <button class="btn btn-primary" id="dimiss-info">Zamknij tą tabelę</button>
-                                <br>
-                                <br>
-                                <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
+                        </h1>
+                    </div>
+                    @endif
+                    @if($isStyropian)
+                        <div class="mb-4 bg-yellow-100 text-yellow-800 p-3 rounded-md">
+                            @if($chat->auctions->count() === 0)
+                                <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md inline-block mb-2" target="_blank">
                                     Rozpocznij przetarg
                                 </a>
-                            </div>
-                        @else
-                            @if($userType !== MessagesHelper::TYPE_EMPLOYEE)
-                                <!-- if auction->end_of_auction is in past show message  -->
-                                <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}">
-                                    @csrf
-                                    @method('PUT')
-                                    Zakończenie przetargu
-                                    <input class="form-control" name="end_of_auction" type="datetime-local" value="{{ $chat->auctions()->first()->end_of_auction }}">
-
-                                    <button class="btn btn-primary">
-                                        Zaaktualizuj daty dotyczące przetargu
-                                    </button>
-                                </form>
-                            @endif
-
-
-                            @if(\Carbon\Carbon::parse(\Carbon\Carbon::now())->gt(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)))
-                                <h3>
-                                Przetarg zakończony
-                                </h3>
-                                <br>
+                                <div id="auction-instructions" style="display: none; color: white; font-weight: bold; font-size: large; border-radius: 15px; padding: 20px; background-color: #0c0c0c">
+                                    <p>Poniżej tabela cen brutto produktów z tej oferty których istnieje możliwość dostarczenia na wskazany kod pocztowy.</p>
+                                    <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="600px; width: 100%"></iframe>
+                                    <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg.
+                                        <br>
+                                        !!! Jeśli chcesz wykonać inną czynnoś naciśnij przycisk zamknij tą tabelę</p>
+                                    <button class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md" id="dimiss-info">Zamknij tą tabelę</button>
+                                    <br>
+                                    <br>
+                                    <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md" target="_blank">
+                                        Rozpocznij przetarg
+                                    </a>
+                                </div>
                             @else
-                                <h3>
-                                    Aktywny przretarg
-                                </h3>
+                                @if($userType !== MessagesHelper::TYPE_EMPLOYEE)
+                                    <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}" class="bg-white shadow-md rounded-md p-4 mb-4">
+                                        @csrf
+                                        @method('PUT')
+                                        <h3 class="text-lg font-semibold mb-2">Zakończenie przetargu</h3>
+                                        <input class="form-control mb-2 border border-gray-300 rounded-md px-3 py-2 w-full" name="end_of_auction" type="datetime-local" value="{{ $chat->auctions()->first()->end_of_auction }}">
+                                        <button class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">
+                                            Zaaktualizuj daty dotyczące przetargu
+                                        </button>
+                                    </form>
+                                @endif
+                                @if(\Carbon\Carbon::parse(\Carbon\Carbon::now())->gt(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)))
+                                    <h3 class="text-lg font-semibold mb-2">Przetarg zakończony</h3>
+                                    <br>
+                                @else
+                                    <h3 class="text-lg font-semibold mb-2">Aktywny przretarg</h3>
+                                    <br>
+                                    <p>Koniec: {{ $chat->auctions->first()->end_of_auction }}</p>
+                                    <p>Cena: {{ $chat->auctions->first()->price }} %</p>
+                                    <p>Jakość: {{ $chat->auctions->first()->quality }} %</p>
+                                    <p>Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}</p>
+                                    <p>Uwagi: {{ $chat->auctions->first()->notes }}</p>
+                                    <br>
+                                    <form action="{{ route('end-auction.store', $chat->auctions->first()->id) }}" method="post" class="bg-white shadow-md rounded-md p-4 mb-4">
+                                        @csrf
+                                        <button class="btn btn-secondary bg-gray-500 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-md">
+                                            Zakończ przetarg przedwcześnie
+                                        </button>
+                                    </form>
+                                @endif
+                            @endif
+                            @if(!empty($chat->auctions->first()) && !$order->auction_order_placed)
                                 <br>
-                                Koniec: {{ $chat->auctions->first()->end_of_auction }}
+                                <a class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
+                                    Zobacz wyniki przetargu
+                                </a>
                                 <br>
-                                Cena: {{ $chat->auctions->first()->price }} %
-                                <br>
-                                Jakość: {{ $chat->auctions->first()->quality }} %
-                                <br>
-                                Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
-                                <br>
-                                Uwagi: {{ $chat->auctions->first()->notes }}
-                                <br>
-                                <form action="{{ route('end-auction.store', $chat->auctions->first()->id) }}" method="post">
+                            @endif
+                            @if($order->auction_order_placed)
+                                <h1 class="text-2xl font-bold mb-4">Zamówienie zostało złożone i wysłane do fabryki</h1>
+                            @endif
+                            @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
+                                <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}" class="bg-white shadow-md rounded-md p-4 mb-4">
                                     @csrf
-                                    <button class="btn btn-secondary">
-                                        Zakończ przetarg przedwcześnie
+                                    <button class="btn btn-success bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md">
+                                        Rozpocznij przetarg
                                     </button>
                                 </form>
                             @endif
-                        @endif
-                        @if(!empty($chat->auctions->first()) && !$order->auction_order_placed)
-                            <br>
-                            <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
-                                Zobacz wyniki przetargu
-                            </a>
-                            <br>
-                        @endif
-                        @if($order->auction_order_placed)
-                            <h1>
-                                Zamówienie zostało złożone i wysłane do fabryki
-                            </h1>
-                        @endif
-                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
-                            <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
-                                @csrf
-                                <button class="btn btn-success">
-                                    Rozpocznij przetarg
-                                </button>
-                            </form>
-                        @endif
-                    </div>
-                @endif
-                @if ($product_list->count() > 0)
-                    <div class="alert alert-warning"><b>Lista produktów:</b>
-                        @foreach ($product_list as $product)
-
-                            @include('chat/single_product', [
-                                'product' => $product,
-                                'userType' => $userType,
-                            ])
-                        @endforeach
-                    </div>
-                @endif
-                <div class="vue-components">
-                    @php($order = $chat->order)
-                    @include('dates')
-                </div>
-                @if ($chat)
-                    <h2>
-                        Chat magazyn-konsultant-klient
-                    </h2>
-                    @include('chat.chat_body')
-                @endif
-                <div id="new-message" class="loader-2" style="position: relative;">
-                    <div class="row">
-                        <div class="col-sm-9">
-        <textarea required class="form-control" id="message"
-                  style="width: 100%; max-width: 650px; min-width: 200px; height: 100px;"
-                  placeholder="Wpisz tu swoją wiadomość..."></textarea>
-                            <div class="file-upload">
-                                <label for="attachment" class="btn btn-primary" style="font-weight: bolder; font-size: larger;">
-                                    <i class="fas fa-upload"></i> Dołącz plik do wiadomości
-                                </label>
-                                <input id="attachment" name="attachment" type="file" style="display: none;" />
-                                <span id="file-name"></span>
-                            </div>
                         </div>
-                        <div class="col-sm-3">
-                            <input type="submit" value="Wyślij wiadomość" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
+                    @endif
+                    @if ($product_list->count() > 0)
+                        <div class="bg-yellow-100 text-yellow-800 p-3 rounded-md mb-4">
+                            <strong>Lista produktów:</strong>
+                            @foreach ($product_list as $product)
+                                @include('chat/single_product', [
+                                    'product' => $product,
+                                    'userType' => $userType,
+                                ])
+                            @endforeach
                         </div>
+                    @endif
+                    <div class="vue-components">
+                        @php($order = $chat->order)
+                        @include('dates')
                     </div>
-                </div>
-                @if ($userType == MessagesHelper::TYPE_USER)
-                    <button id="call-worker" class="btn bg-primary call-button">Wyślij maila pracownikom</button>
-                @else
-                    <button id="call-mod" class="btn bg-primary call-button">Wezwij moderatora</button>
-                @endif
+                    @if ($chat)
+                        <h2 class="text-xl font-semibold mb-4">Chat magazyn-konsultant-klient</h2>
+                        @include('chat.chat_body')
+                    @endif
             </div>
-            <div class="chat-right-column" style="padding-left: 10px;">
-                <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" style="width: 35px; cursor: pointer">
-                <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST">
-                    @csrf
-                    <h2>
-                        Dodaj firmę do przetargu
-                    </h2>
-
-                    <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
-
-                    <button type="submit" class="btn btn-primary">
-                        Dodaj firm
-                    </button>
-                </form>
-                @if($chat->complaint_form)
-                    <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-primary call-button">Pokaż formularz reklamacyjny</button>
-                @endif
-                <h3>Zarządzanie użytkownikami chatu:</h3>
-                <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
-                    <table id="chat-users">
-                        @include('chat/users', [
-                            'title'            => 'Klienci:',
-                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
-                            'users'            => $chatCustomers,
-                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => false,
-                            'class'            => 'bg-warning alert alert-warning',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Pracownicy firm:',
-                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
-                            'users'            => $chatEmployees,
-                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => false,
-                            'class'            => 'bg-info alert alert-info',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Konsultanci:',
-                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',
-                            'users'            => $chatConsultants,
-                            'userType'         => MessagesHelper::TYPE_USER,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => false,
-                            'class'            => 'bg-primary alert',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Powiązani klienci:',
-                            'isEmptyMsg'       => 'Brak powiązanych klientów',
-                            'users'            => $possibleCustomers,
-                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => true,
-                            'class'            => 'bg-warning alert alert-warning',
-                        ])
-                        @include('chat/users', [
-                            'title'            => 'Powiązani pracownicy firm:',
-                            'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
-                            'users'            => $possibleEmployees,
-                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                            'currentUserType'  => $userType,
-                            'arePossibleUsers' => true,
-                            'class'            => 'bg-info alert alert-info',
-                        ])
-                        @if($userType == MessagesHelper::TYPE_USER)
-                            @include('chat/users', [
-                                'title'            => 'Pracownicy firm uczestniczących w przetargu:',
-                                'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
-                                'users'            => $allEmployeesFromRelatedOrders ?? new \Illuminate\Support\Collection(),
-                                'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                                'currentUserType'  => $userType,
-                                'arePossibleUsers' => true,
-                                'class'            => 'bg-info alert alert-info',
-                            ])
-                        @endif
-
-                        @if($userType == MessagesHelper::TYPE_USER)
-                            <form action="{{ route('addUsersFromCompanyToChat', $chat->id) }}" method="POST">
-                                @csrf
-
-                                <h2>
-                                    Dodaj firmę do chata
-                                </h2>
-
-                                <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
-                                <datalist id="suggestions">
-                                    @foreach(\App\Entities\Firm::all() as $firm)
-                                        <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
-                                    @endforeach
-                                </datalist>
-
-                                <button type="submit" class="btn btn-primary"> <!-- Use type="submit" to submit the form -->
-                                    Dodaj użytkowników
-                                </button>
-                            </form>
-    {{--                        @endif--}}
-                        @endif
-                    </table>
-                </div>
-                @if ($userType == MessagesHelper::TYPE_USER)
-                    <div class="filters-wrapper">
-                        <h3>Filtry:</h3>
-                        <label>
-                            Obszar:
-                            @include('chat/msg_area')
+            <div id="new-message" class="loader-2 bg-gray-100 p-4 flex items-center">
+                <div class="flex-1">
+                    <textarea required class="form-control border border-gray-300 rounded-md px-3 py-2 w-full mb-2" id="message" placeholder="Wpisz tu swoją wiadomość..." rows="3"></textarea>
+                    <div class="file-upload">
+                        <label for="attachment" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">
+                            <i class="fas fa-upload"></i> Dołącz plik do wiadomości
                         </label>
-                        @if(!empty($usersHistory))
-                            <h3>Filtruj pokazywanie wiadomości po użytkownikach:</h3>
-                            @include('chat/history')
-                        @endif
-                        @if( $chat->complaint_form !== '' && $firmWithComplaintEmails->isNotEmpty() )
-                            <div>
-                                <br>
-                                <h4>Reklamacje:</h4>
-                                <select id="complaint_email" style="padding: 5px; margin: 10px 0;">
-                                    @foreach ($firmWithComplaintEmails as $firm)
-                                        <option value="{{ $firm->complaint_email }}">{{ $firm->name }}</option>
-                                    @endforeach
-                                </select>
-                                <button id="call_complaint" class="btn bg-primary">Napisz do firmy z reklamacją</button>
-                            </div>
-                        @endif
+                        <input id="attachment" name="attachment" type="file" style="display: none;" />
+                        <span id="file-name" class="ml-2"></span>
                     </div>
-                @endif
+                </div>
+                <div class="ml-4">
+                    <input type="submit" value="Wyślij wiadomość" class="btn btn-success bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md send-btn" data-action="{{ $route }}">
+                </div>
             </div>
+            @if ($userType == MessagesHelper::TYPE_USER)
+                <button id="call-worker" class="btn bg-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md call-button">Wyślij maila pracownikom</button>
+            @else
+                <button id="call-mod" class="btn bg-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md call-button">Wezwij moderatora</button>
+            @endif
+        </div>
+        <div class="chat-right-column pl-4">
+            <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" style="width: 35px; cursor: pointer">
+            <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST" class="bg-white shadow-md rounded-md p-4 mb-4">
+                @csrf
+                <h2 class="text-lg font-semibold mb-2">Dodaj firmę do przetargu</h2>
+                <input type="text" class="form-control mb-2 border border-gray-300 rounded-md px-3 py-2 w-full" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
+                <datalist id="suggestions">
+                    @foreach(\App\Entities\Firm::all() as $firm)
+                        <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
+                    @endforeach
+                </datalist>
+                <button type="submit" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">
+                    Dodaj firm
+                </button>
+            </form>
+            @if($chat->complaint_form)
+                <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md call-button">Pokaż formularz reklamacyjny</button>
+            @endif
+            <h3 class="text-lg font-semibold mb-2">Zarządzanie użytkownikami chatu:</h3>
+            <div class="chat-users-wrapper overflow-auto max-h-screen">
+                <table id="chat-users" class="w-full">
+                    <!-- User list tables -->
+                </table>
+            </div>
+            @if ($userType == MessagesHelper::TYPE_USER)
+                <div class="filters-wrapper mt-4">
+                    <h3 class="text-lg font-semibold mb-2">Filtry:</h3>
+                    <label>
+                        Obszar:
+                        @include('chat/msg_area')
+                    </label>
+                    @if(!empty($usersHistory))
+                        <h3 class="text-lg font-semibold mb-2">Filtruj pokazywanie wiadomości po użytkownikach:</h3>
+                        @include('chat/history')
+                    @endif
+                    @if( $chat->complaint_form !== '' && $firmWithComplaintEmails->isNotEmpty() )
+                        <div class="mt-4">
+                            <h4 class="text-base font-semibold mb-2">Reklamacje:</h4>
+                            <select id="complaint_email" class="form-control mb-2 border border-gray-300 rounded-md px-3 py-2 w-full">
+                                @foreach ($firmWithComplaintEmails as $firm)
+                                    <option value="{{ $firm->complaint_email }}">{{ $firm->name }}</option>
+                                @endforeach
+                            </select>
+                            <button id="call_complaint" class="btn bg-primary bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md">Napisz do firmy z reklamacją</button>
+                        </div>
+                    @endif
+                </div>
+            @endif
         </div>
     </div>
+</div>
 
     <script type="text/javascript">
         $(document).ready(function() {
