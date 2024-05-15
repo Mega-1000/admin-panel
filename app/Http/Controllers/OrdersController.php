@@ -3066,9 +3066,14 @@ class OrdersController extends Controller
         return response()->json($allWarehousesString);
     }
 
-    public function markAsSelfPickup(Order $order): RedirectResponse
+    public function markAsSelfPickup(Order $order): RedirectResponse|string
     {
         $warehouseAddress = $order->warehouse;
+
+        if (empty($warehouseAddress)) {
+            return 'Nie znaleziono magazynu do tego zamówienia';
+        }
+
         $orderAddress = $order->getDeliveryAddress();
         $orderAddress->address = $warehouseAddress->address;
         $orderAddress->city = $warehouseAddress->city;
