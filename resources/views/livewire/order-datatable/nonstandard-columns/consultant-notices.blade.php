@@ -17,7 +17,7 @@
             }
         @endphp
         {{ $message['message'] }} - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
-        {{  }}
+        {{ $userType }}
         <br>
         <hr>
     @endforeach
