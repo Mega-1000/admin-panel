@@ -46,7 +46,6 @@ class OrderDatatableRetrievingHelper
             'addresses',
             'invoices',
             'dates',
-            'chat.messages.user'
         ]);
     }
 
