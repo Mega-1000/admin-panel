@@ -3065,4 +3065,20 @@ class OrdersController extends Controller
 
         return response()->json($allWarehousesString);
     }
+
+    public function markAsSelfPickup(Order $order): RedirectResponse
+    {
+        $warehouseAddress = $order->warehouse;
+        $orderAddress = $order->getDeliveryAddress();
+        $orderAddress->address = $warehouseAddress->address;
+        $orderAddress->city = $warehouseAddress->city;
+        $orderAddress->postal_code = $warehouseAddress->postal_code;
+        $orderAddress->firstname = 'Magazyn'; // Placeholder or dynamically se
+        $orderAddress->lastname = $warehouseAddress->warehouse->symbol; // Placeholder or dynamically set
+        $orderAddress->phone = $warehouseAddress->warehouse->property->phone; // Placeholder or dynamically set
+        $orderAddress->email = $warehouseAddress->warehouse->warehouse_email; // Placeholder or dynamically set
+        $orderAddress->save();
+
+        return redirect()->back();
+    }
 }

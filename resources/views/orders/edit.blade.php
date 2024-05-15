@@ -530,6 +530,9 @@
                             ostatniego zamówienia</a>
                         <a href="/admin/orders/{{$order->id}}/getDataFromCustomer" class="btn btn-success">Pobierz dane
                             klienta</a>
+                        <a href="/admin/mark-order-as-selfpickup/{{ $order->id  }}" class="btn btn-primary">
+                            Odbiór osobisty
+                        </a>
                         <div style="width: 50%">
                             <label for="firms_data">Symbol firmy</label>
                             <input type="text" class="form-control" id="firms_data" name="firms_data"
