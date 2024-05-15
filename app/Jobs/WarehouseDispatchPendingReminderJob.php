@@ -18,7 +18,7 @@ class WarehouseDispatchPendingReminderJob extends Job implements ShouldQueue
      */
     public function handle(OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository): void
     {
-        $now = new Carbon('now');
+        $now = new Carbon();
 
         if ($this->canNotifyNow($now)) {
             $warehousesToRemind = $orderWarehouseNotificationRepository->findWhere(['waiting_for_response' => true]);

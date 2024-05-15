@@ -77,7 +77,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
             return;
         }
 
-        $subject = "Przypomnienie o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
+        $subject = "Ponownie prosimy o potwierdzenie awizacji do zamówienia o nr. " . $this->orderId;
 
         $dataArray = [
             'order_id' => $this->orderId,
