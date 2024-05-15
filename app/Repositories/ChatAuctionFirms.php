@@ -29,7 +29,7 @@ class ChatAuctionFirms
                 ->get();
 
             $res[] = $product;
-            $product->quantity = $item->quantity;
+            $product->quantity = dd($item->quantity);
         }
 
         return $res;
