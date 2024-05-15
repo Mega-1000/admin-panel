@@ -206,7 +206,7 @@ class AuctionsController extends Controller
 
                 $radius = $raw?->distance;
 
-                $firm->distance = $raw?->distance;
+                $firm->distance = round($raw?->distance, 2);
 
                 if ($radius && $radius > $firm->firm->warehouses()->first()->radius) {
                     $firms->forget($key);

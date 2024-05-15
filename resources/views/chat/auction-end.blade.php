@@ -174,7 +174,7 @@
 
                    <tr>
                        <td>
-                           {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }} Odległość: {{ $firm->distance }}
+                           {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }} Odległość: {{ $firm->distance }} KM
                        </td> <!-- Display the firm symbol -->
                        @php
                            $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Add the symbol to the tracked array
@@ -229,12 +229,37 @@
 
                    @php
                        $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
+
+                        $coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
+
+                        if ($coordinatesOfUser) {
+                                $raw = \DB::selectOne(
+                                    'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                                        FROM postal_code_lat_lon pc
+                                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                                             JOIN warehouses w on wa.warehouse_id = w.id
+                                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                                        ORDER BY distance
+                                    limit 1',
+                                    [
+                                        'latitude' => $coordinatesOfUser->latitude,
+                                        'longitude' => $coordinatesOfUser->longitude,
+                                        'firmId' => $firm->firm->id
+                                    ]
+                                );
+
+                                $radius = $raw?->distance;
+
+                                $distance = round($raw?->distance, 2);
+                        }
                    @endphp
 
                    @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                        <tr>
                            <td>
-                               {{ $symbol }}
+                               {{ $symbol }} Odległość: {{ $distance }}
                            </td>
 
                            @php
