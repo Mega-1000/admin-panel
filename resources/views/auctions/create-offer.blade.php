@@ -70,7 +70,6 @@
     @endphp
 
     @foreach($products as $product)
-        @foreach($product as $product)
             @php
                 if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
                     $alreadyDisplayed = true;
@@ -165,7 +164,6 @@
                     @endif
                 @endif
             </div>
-        @endforeach
     @endforeach
 
     <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center">
