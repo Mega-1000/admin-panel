@@ -28,7 +28,7 @@
             </h5>
         </div>
         <h6>Załącz potwierdzenie przelewu</h6>
-        <form action="{{ route('store-payment-confirmation', $order['id']) }}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('store-payment-confirmation', $order['id']) }}" method="post" style="width: 50px" enctype="multipart/form-data">
             @csrf
             <input type="file" name="file">
 
