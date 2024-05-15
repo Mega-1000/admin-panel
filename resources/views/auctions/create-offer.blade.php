@@ -77,16 +77,6 @@
                 } else {
                     $alreadyDisplayed = false;
                 }
-                $totalQuantity = \App\Entities\OrderItem
-                    ::whereHas('product', function ($q) use ($product) {
-                        $q->where('parent_id', $product->parentProduct->id);
-                    })
-                    ->orWhereHas('product', function ($q) use($product) {
-                        $q->where('product_group', $product->product_group);
-                    })
-                    ->where('order_id', $chat_auction_firm->chatAuction->chat->order->id)
-                    ->first()
-                    ->quantity;
 
                 $parentProductsDisplayed[] = $product->parentProduct?->id;
             @endphp
@@ -120,7 +110,7 @@
                                     {{ $name }}
                                 </h5>
                                 <p>Symbol: {{ $product->symbol }}</p>
-                                <p>Ilość paczek: {{ $totalQuantity }}</p>
+                                <p>Ilość paczek: {{ $product->quantity }}</p>
                                 <p>Wartość brutto: {{ $product->price->net_purchase_price_commercial_unit }} PLN</p>
                             </div>
                             <div>

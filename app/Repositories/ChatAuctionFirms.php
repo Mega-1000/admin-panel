@@ -24,9 +24,12 @@ class ChatAuctionFirms
 
         foreach ($items as &$item) {
             $product = $item->product;
-            $res[] = Product::where('product_group', $product->product_group)
+            $product = Product::where('product_group', $product->product_group)
                 ->where('product_name_supplier', ChatAuctionFirm::where('token', $token)->first()->firm->symbol)
                 ->get();
+
+            $res[] = $product;
+            $product->quantity = $item->quantity;
         }
 
         return $res;
