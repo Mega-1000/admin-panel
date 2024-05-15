@@ -29,8 +29,8 @@ class ChatAuctionFirms
                 ->get();
 
             $product = json_encode($product);
-            $product['quantity'] = $item->quantity;
-            $product = json_encode($product);
+            $product = json_decode($product);
+            $product->quantity = $item->quantity;
 
             $res[] = $product;
         }
