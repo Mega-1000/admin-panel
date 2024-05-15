@@ -40,12 +40,13 @@ class OrderDatatableRetrievingHelper
             'files',
             'packages.realCostsForCompany',
             'warehouse',
-            'chat.messages.user',
+            'chat.messages',
             'task.user',
             'task.taskTime',
             'addresses',
             'invoices',
-            'dates'
+            'dates',
+            'chat.messages.user'
         ]);
     }
 
