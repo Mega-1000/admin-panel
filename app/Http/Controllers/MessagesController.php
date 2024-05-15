@@ -257,7 +257,7 @@ class MessagesController extends Controller
             'product' => $product,
             'order' => $order,
             'usersHistory' => $usersHistory,
-            'chatMessages' => $chatMessages,
+            'chatMessages' => dd($chatMessages),
             'assignedMessagesIds' => array_flip($assignedMessagesIds),
             'title' => $helper->getTitle(true),
             'route' => route('api.messages.post-new-message', ['token' => $token]),
