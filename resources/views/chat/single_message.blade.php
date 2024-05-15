@@ -1,4 +1,5 @@
-<div class='row '>
+<div class='row ' data-messageid="{{ $message->id }}" data-user-id="{{ $message->chat_user_id }}"
+    data-area="{{ $message->area }}">
     @php
         $header = ChatHelper::getMessageHeader($message);
     @endphp
