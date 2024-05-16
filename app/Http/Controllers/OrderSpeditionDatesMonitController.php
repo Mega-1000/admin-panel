@@ -43,6 +43,6 @@ class OrderSpeditionDatesMonitController extends Controller
 
         $messagesHelper->sendShippingInformation($order->chat);
 
-        return view('monits.shipping-today-form', compact('order'));
+        return '<script>alert('Pomyślnie uściślono daty i zapisano numer do kierowcy!')</script>'
     }
 }
