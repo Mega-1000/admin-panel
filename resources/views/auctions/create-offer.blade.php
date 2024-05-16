@@ -110,7 +110,7 @@
                                 </h5>
                                 <p>Symbol: {{ $product->symbol }}</p>
                                 <p>Ilość paczek: {{ $product->quantity }}</p>
-                                <p>Ilość m3: {{ $product->quantity / 3.33 }}</p>
+                                <p>Ilość m3: {{ round($product->quantity / 3.33, 2) }}</p>
                                 <p>Cena podstawowa netto: {{ $product->price->net_purchase_price_commercial_unit }} PLN</p>
                             </div>
                             <div>
