@@ -904,7 +904,7 @@
                         '</tr>';
                 @else
                     html += '<tr>' +
-                        '<td>Proponowana data wysyłki' + displayKey + ')</td>' +
+                        '<td>Proponowana data wysyłki (' + displayKey + ')</td>' +
                         '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                         '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
                         (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
