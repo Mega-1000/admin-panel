@@ -20,4 +20,9 @@ class OrderSpeditionDatesMonitController extends Controller
     {
         return view('monits.shipping-today-form', compact('order'));
     }
+
+    public function shippingTodayStore(Order $order): View
+    {
+        return view('monits.shipping-today-form', compact('order'));
+    }
 }

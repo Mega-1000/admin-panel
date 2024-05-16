@@ -34,4 +34,5 @@ Route::get('orders/{order}/styro-variations', [AuctionsController::class, 'styro
 
 Route::get('orders/set-order-as-not-shipping-today/{order}', [OrderSpeditionDatesMonitController::class, 'notShippingToday'])->name('notShippingToday');
 Route::get('orders/set-order-as-shipping-today/{order}', [OrderSpeditionDatesMonitController::class, 'shippingToday'])->name('shippingToday');
+Route::post('orders/set-order-as-shipping-today/{order}', [OrderSpeditionDatesMonitController::class, 'shippingTodayStore'])->name('shippingTodayStore');
 
