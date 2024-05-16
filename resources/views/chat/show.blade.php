@@ -226,8 +226,6 @@
                                 </a>
                             @endif
 
-                            {{ $userType }}
-
                             @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
                                 <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank">
                                     Podłącz fakture
@@ -236,6 +234,9 @@
                         </div>
                         <div class="col-sm-3">
                             <input type="submit" value="Wyślij wiadomość" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
+                            @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
+                                Uwaga! Prosimy nie wysyłać faktury na chacie a przez przycisk "Podłącz fakture".
+                            @endif
                         </div>
                     </div>
                 </div>
