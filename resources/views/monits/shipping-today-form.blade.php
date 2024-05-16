@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <form action="" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" style="width: 50%; margin: 0 auto">
+    <form action="" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" style="width: 40%; margin: 40px auto 0;">
         <h2 class="text-xl font-bold mb-4">Czas dostawy zamówienia</h2>
         <div class="flex items-center justify-between mb-4">
             <div class="relative">
