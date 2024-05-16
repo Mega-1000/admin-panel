@@ -213,7 +213,7 @@
                                    </span>
 
                                    @php
-                                       $totalCost += $offer->basic_price_gross * $product->quantity;
+                                       $totalCost += collect($offers)->min('basic_price_gross') * $product->quantity;
                                    @endphp
                                @else
                                    No offer
