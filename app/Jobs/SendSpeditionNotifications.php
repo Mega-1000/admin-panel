@@ -76,13 +76,19 @@ class SendSpeditionNotifications implements ShouldQueue
                 $order->update(['start_of_spedition_period_sent' => true]);
             }
 
-            if ($fromDate->isPast() && $toDate->isFuture()) {
-                updateOrderLabels($order, [244]);
+            $currentHour = date('H');
+            $currentMinute = date('i');
 
-                Mailer::create()
-                    ->to($order->warehouse->warehouse_email)
-                    ->send(new SpeditionDatesMonit($order));
+            if (($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) || $currentHour >= 12) {
+                if ($fromDate->isPast() && $toDate->isFuture() && !Carbon::create($order->last_confirmation)->isToday() && !$order->special_data_filled) {
+                    updateOrderLabels($order, [244]);
+
+                    Mailer::create()
+                        ->to($order->warehouse->warehouse_email)
+                        ->send(new SpeditionDatesMonit($order));
+                }
             }
+
 
             $beforeToDate = Carbon::create($toDate)->subDay();
             if ($beforeToDate->isToday() && !$order->near_end_of_spedition_period_sent) {
