@@ -220,9 +220,18 @@
                                 <span id="file-name"></span>
                             </div>
 
-                            <a class="btn btn-primary" style="margin-top: 20px; float: left" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
-                                Podłącz potwierdzenie przelewu
-                            </a>
+                            @if($userType === 'c')
+                                <a class="btn btn-primary" style="margin-top: 20px; float: left" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
+                                    Podłącz potwierdzenie przelewu
+                                </a>
+                            @endif
+
+
+                            @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
+                                <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank">
+                                    Podłącz fakture
+                                </a>
+                            @endif
                         </div>
                         <div class="col-sm-3">
                             <input type="submit" value="Wyślij wiadomość" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
