@@ -347,7 +347,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="years">Ustaw termin płatności: </label>
-                        <input data-index="1" value="{{date("Y")}}" type="text" size="4" maxlength="4" id="invoice-years">
+                        <input data-index="1" value="{{ date("Y")}}" type="text" size="4" maxlength="4" id="invoice-years">
 
                         <input data-index="2" autofocus value="" type="text" size="2" maxlength="2" id="invoice-month">
 
