@@ -214,7 +214,7 @@
 
                                    @php
                                        $totalCost += collect($offers)->min('basic_price_gross') *
-                                       \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)->whereHas('products', function ($q) use ($product) { $q->where('product_group', $product->product_group);})->first();
+                                       \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)->whereHas('product', function ($q) use ($product) { $q->where('product_group', $product->product_group);})->first();
                                    @endphp
                                @else
                                    No offer
