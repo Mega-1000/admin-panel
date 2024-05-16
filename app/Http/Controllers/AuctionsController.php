@@ -166,7 +166,7 @@ class AuctionsController extends Controller
         }
 
         foreach ($pricingData as $k => $item) {
-            $product = Product::find($k)->parentProduct;
+            $product = Product::find($k);
             $fialItemsToUpdate = $product->where('parent_id', $product->id)->get();
 
             foreach ($fialItemsToUpdate as $finalItem) {
