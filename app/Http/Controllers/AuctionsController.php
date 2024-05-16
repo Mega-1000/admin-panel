@@ -168,7 +168,7 @@ class AuctionsController extends Controller
         foreach ($pricingData as $k => $item) {
             $product = Product::find($k)?->parentProduct;
             $fialItemsToUpdate = $firm
-                ->auction
+                ->chatAuction
                 ->chat
                 ->order
                 ->items()
