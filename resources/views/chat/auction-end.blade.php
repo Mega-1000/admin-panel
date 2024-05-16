@@ -213,7 +213,7 @@
                                    </span>
 
                                    @php
-                                   dd(collect($offers)->min('basic_price_gross'), dd(\App\Entities\OrderItem::where('order_id', $auction->chat->order->id)->where('product_id', $product->id)->get());
+                                   dd(collect($offers)->min('basic_price_gross'), dd(\App\Entities\OrderItem::where('order_id', $auction->chat->order->id)->where('product_id', $product->id)->get()));
                                        $totalCost += collect($offers)->min('basic_price_gross') * $product->quantity;
                                    @endphp
                                @else
