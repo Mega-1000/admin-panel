@@ -234,7 +234,7 @@
                         </div>
                         <div class="col-sm-3">
                             <input type="submit" value="Wyślij wiadomość" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
-                            @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
+                            @if($userType === 'e')
                                 Uwaga! Prosimy nie wysyłać faktury na chacie a przez przycisk "Podłącz fakture".
                             @endif
                         </div>
