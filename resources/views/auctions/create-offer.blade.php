@@ -110,7 +110,8 @@
                                 </h5>
                                 <p>Symbol: {{ $product->symbol }}</p>
                                 <p>Ilość paczek: {{ $product->quantity }}</p>
-                                <p>Wartość brutto: {{ $product->price->net_purchase_price_commercial_unit }} PLN</p>
+                                <P>Ilość m3: {{ $product->quantity / 3.33 }}</P>
+                                <p>Cena podstawowa netto: {{ $product->price->net_purchase_price_commercial_unit }} PLN</p>
                             </div>
                             <div>
                                 @php
