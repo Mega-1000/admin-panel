@@ -2,6 +2,7 @@
 
 use App\Entities\ChatAuction;
 use App\Http\Controllers\AuctionsController;
+use App\Http\Controllers\OrderSpeditionDatesMonitController;
 
 Route::prefix('auctions/{chat}')->name('auctions.')->group(function () {
     Route::get('create', [AuctionsController::class, 'create'])->name('create');
@@ -30,4 +31,7 @@ Route::get('auctions/get-quotes-by-styrofoarm-type/{type}', [AuctionsController:
 Route::post('end-auction/{auctionId}', [AuctionsController::class, 'endAuctionStore'])->name('end-auction.store');
 
 Route::get('orders/{order}/styro-variations', [AuctionsController::class, 'styrofoamVariationsView'])->name('styrofoamVariationsView');
+
+Route::get('orders/set-order-as-not-shipping-today/{order}', [OrderSpeditionDatesMonitController::class, 'notShippingToday'])->name('notShippingToday');
+Route::get('orders/set-order-as-shipping-today/{order}', [OrderSpeditionDatesMonitController::class, 'shippingToday'])->name('shippingToday');
 

@@ -7,6 +7,7 @@ use App\Facades\Mailer;
 use App\Mail\ReminderAboutNearEndOfSpeditionPeriod;
 use App\Mail\ReminderAboutStartOfSpeditionPeriod;
 use App\Mail\ReminderAfterSpeditionPeriodEnded;
+use App\Mail\SpeditionDatesMonit;
 use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
 use Exception;
@@ -77,6 +78,10 @@ class SendSpeditionNotifications implements ShouldQueue
 
             if ($fromDate->isPast() && $toDate->isFuture()) {
                 updateOrderLabels($order, [244]);
+
+                Mailer::create()
+                    ->to($order->warehouse->warehouse_email)
+                    ->send(new SpeditionDatesMonit($order));
             }
 
             $beforeToDate = Carbon::create($toDate)->subDay();
