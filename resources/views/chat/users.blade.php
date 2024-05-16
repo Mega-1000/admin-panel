@@ -7,7 +7,7 @@
 {{--        @endif--}}
     </th>
 </tr>
-{{--@foreach ($users as $user)--}}
+@foreach ($users as $user)
     <tr>
         <th class="{{ $class }}" style="height: 90px;">
 {{--            @if($userType == MessagesHelper::TYPE_CUSTOMER)--}}
