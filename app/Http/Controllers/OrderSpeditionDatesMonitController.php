@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
+use App\Helpers\MessagesHelper;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -21,7 +22,7 @@ class OrderSpeditionDatesMonitController extends Controller
         return view('monits.shipping-today-form', compact('order'));
     }
 
-    public function shippingTodayStore(Order $order, Request $request): View
+    public function shippingTodayStore(Order $order, Request $request, MessagesHelper $messagesHelper): View
     {
         $currentDate = date('Y-m-d');
 
@@ -39,6 +40,8 @@ class OrderSpeditionDatesMonitController extends Controller
             'warehouse_delivery_date_from' => $currentDate . ' ' . $timeFrom,
             'warehouse_delivery_date_to' => $currentDate . ' ' . $timeTo,
         ]);
+
+        $messagesHelper->sendShippingInformation($order->chat);
 
         return view('monits.shipping-today-form', compact('order'));
     }

@@ -89,7 +89,6 @@ class SendSpeditionNotifications implements ShouldQueue
                 }
             }
 
-
             $beforeToDate = Carbon::create($toDate)->subDay();
             if ($beforeToDate->isToday() && !$order->near_end_of_spedition_period_sent) {
                 if ($sendMails) {

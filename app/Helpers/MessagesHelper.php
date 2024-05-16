@@ -466,6 +466,25 @@ class MessagesHelper
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
 
+    public function sendShippingInformation(Chat $chat): void
+    {
+        $order = $chat->order;
+        $content = "Fabryka uściśliła daty spedycyjne! Prosimy klienta o potwierdzenie! W przypadku potrzeby kontaktu z kurierem prosimy kontaktować się pod numerem: " . $order->driver_phone;
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+        $this->chatId = $chat->id;
+
+        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+    }
+
+    public function sendAvizationAcceptation(Chat $chat): void
+    {
+        $order = $chat->order;
+        $content = "Informujemy, że awizacja została zaakceptowana przez magazyn wydający. W razie jakichkolwiek pytań w związku z zamówieniem na dalszym etapie prosimy o kontakt " . $order->orderWarehouseNotifications->contact_person . " Tel: " . $order->orderWarehouseNotifications->contact_person_phone;
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+        $this->chatId = $chat->id;
+
+        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+    }
     public function sendDateAcceptationMessage(Chat $chat): void
     {
         $content = 'Daty proponowane przez klienta i realizatora są zgodne i zostały finalnie zawierdzone przez obie strony.';

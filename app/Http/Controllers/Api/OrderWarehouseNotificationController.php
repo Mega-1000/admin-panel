@@ -90,7 +90,7 @@ class OrderWarehouseNotificationController extends Controller
         OrderLabelHelper::setYellowLabel($helper->getChat());
     }
 
-    public function accept(AcceptShipmentRequest $request, $notificationId): JsonResponse
+    public function accept(AcceptShipmentRequest $request, $notificationId, MessagesHelper $messagesHelper): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -116,6 +116,8 @@ class OrderWarehouseNotificationController extends Controller
             /** @var Order $order */
             $order = Order::findOrFail($data['order_id']);
             dispatch(new DispatchLabelEventByNameJob($order, "warehouse-notification-accepted"));
+
+            $messagesHelper->sendAvizationAcceptation($order->chat);
 
             return $this->okResponse();
         } catch (Exception $e) {
