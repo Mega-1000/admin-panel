@@ -171,7 +171,6 @@ class AuctionsController extends Controller
                 ->orWhereHas('product', function ($q) use ($product) { $q->where('product_group', $product->product_group); })
                 ->where('order_id', $firm->chatAuction->chat->order->id)
                 ->get();
-            dd($fialItemsToUpdate);
 
             foreach ($fialItemsToUpdate as $finalItem) {
                 $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
