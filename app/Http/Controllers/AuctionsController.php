@@ -166,7 +166,7 @@ class AuctionsController extends Controller
         }
 
         foreach ($pricingData as $k => $item) {
-            $product = Product::find($k)?->parentProduct ?? Product::find($k);
+            $product = Product::find($k);
             $fialItemsToUpdate = OrderItem::where('order_id', $firm->chatAuction->chat->order->id)
                 ->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->id); })
                 ->get()
