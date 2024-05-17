@@ -172,6 +172,8 @@ class AuctionsController extends Controller
                 ->get()
                 ->pluck('product');
 
+            dd($fialItemsToUpdate);
+
             foreach ($fialItemsToUpdate as $finalItem) {
                 $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
                     'firm_id' => $firm->firm_id,
