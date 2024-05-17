@@ -174,7 +174,6 @@ class AuctionsController extends Controller
                 ->items()
                 ->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->id); })
                 ->get();
-            dd($fialItemsToUpdate);
 
             foreach ($fialItemsToUpdate as $finalItem) {
                 $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
