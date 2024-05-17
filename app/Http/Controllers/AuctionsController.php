@@ -173,6 +173,7 @@ class AuctionsController extends Controller
                 ->order
                 ->items()
                 ->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->id); })
+                ->orWhereHas('product', function ($q) use ($product) { $q->where('product_group', $product->product_group); })
                 ->get();
 
             foreach ($fialItemsToUpdate as $finalItem) {
