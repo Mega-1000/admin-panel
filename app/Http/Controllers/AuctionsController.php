@@ -169,16 +169,13 @@ class AuctionsController extends Controller
             $product = Product::find($k);
             $fialItemsToUpdate = OrderItem::where('order_id', $firm->chatAuction->chat->order->id)
                 ->whereHas('product', function ($q) use ($product) { $q->where('parent_id', $product->id); })
-                ->pluck('product')
                 ->get();
-
-            dd($fialItemsToUpdate);
 
             foreach ($fialItemsToUpdate as $finalItem) {
                 $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
                     'firm_id' => $firm->firm_id,
                     'chat_auction_id' => $firm->chat_auction_id,
-                    'product_id' => $finalItem->id,
+                    'product_id' => $finalItem->product->id,
                 ]));
             }
         }
