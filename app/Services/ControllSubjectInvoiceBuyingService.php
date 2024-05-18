@@ -38,7 +38,7 @@ class ControllSubjectInvoiceBuyingService
         }
         $totalItemsCost = $sumOfPurchase * 1.23;
 
-        if ($order->labels->has(65) && $row->value == $totalItemsCost) {
+        if ($order->labels->has(65) && $row->gross == $totalItemsCost) {
             AddLabelService::addLabels($order->id, [264], $arr, []);
             RemoveLabelService::removeLabels($order->id, [263], $arr , [], auth()->id());
         } else {

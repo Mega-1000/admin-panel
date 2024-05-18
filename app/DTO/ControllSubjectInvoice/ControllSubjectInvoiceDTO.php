@@ -4,34 +4,34 @@ namespace App\DTO\ControllSubjectInvoice;
 
 final class ControllSubjectInvoiceDTO
 {
-    public string $k;
-    public string $deliveryEndDate;
-    public string $warehouseDate;
-    public string $issueDate;
-    public string $number;
-    public string $value;
-    public string $flag;
-    public string $buyerSymbol;
-    public string $notes;
-    public string $buyer;
-    public string $net;
-    public string $vatValue;
-    public string $buyerEmail;
-    public string $s;
-    public string $t;
-    public string $gross;
-    public string $remainingPayment;
-    public string $currency;
-    public string $category;
-    public string $title;
-    public string $paymentMethod;
-    public string $buyerVATIN;
-    public string $accountingDocument;
+    public ?string $k;
+    public ?string $deliveryEndDate;
+    public ?string $warehouseDate;
+    public ?string $issueDate;
+    public ?string $number;
+    public ?string $value;
+    public ?string $flag;
+    public ?string $buyerSymbol;
+    public ?string $notes;
+    public ?string $buyer;
+    public ?string $net;
+    public ?string $vatValue;
+    public ?string $buyerEmail;
+    public ?string $s;
+    public ?string $t;
+    public ?string $gross;
+    public ?string $remainingPayment;
+    public ?string $currency;
+    public ?string $category;
+    public ?string $title;
+    public ?string $paymentMethod;
+    public ?string $buyerVATIN;
+    public ?string $accountingDocument;
     public ?string $mpp;
-    public string $originalOrders;
-    public string $orders;
-    public string $flagComment;
-    public string $toNonExistent;
+    public ?string $originalOrders;
+    public ?string $orders;
+    public ?string $flagComment;
+    public ?string $toNonExistent;
 
     public function __construct(array $data)
     {

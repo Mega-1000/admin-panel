@@ -58,7 +58,6 @@ class ControllSubjectInvoiceDTOFactory
 
         foreach ($csvData as $row) {
             $mappedData = self::mapDataToDTOColumns(array_combine($headers, $row));
-            dd($mappedData);
             $dtos[] = new ControllSubjectInvoiceDTO($mappedData);
         }
 
