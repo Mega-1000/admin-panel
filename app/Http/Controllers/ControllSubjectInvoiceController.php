@@ -15,8 +15,11 @@ class ControllSubjectInvoiceController extends Controller
         Request $request,
     ): View
     {
+        $dto = ControllSubjectInvoiceDTOFactory::createFromCsvFile($request->file('file'));
+
+
         $report = $controllSubjectInvoiceService->handle(
-            ControllSubjectInvoiceDTOFactory::createFromCsvFile($request->file('file')),
+            $dto,
         );
 
         return view('subject-controll.table', compact('report'));

@@ -192,12 +192,12 @@
                     </div>
                 </div>
                 <div class="panel-body">
-                    <select name="invoice-kind">
-                        <option>faktury sprzedazy</option>
-                        <option>faktury zakupu</option>
-                    </select>
-
                     <form method="post" action="{{ route('controll-subject-invoices') }}" enctype="multipart/form-data">
+                        <select name="invoice-kind">
+                            <option>faktury sprzedazy</option>
+                            <option>faktury zakupu</option>
+                        </select>
+
                         @csrf
                         <input type="file" name="file">
 
