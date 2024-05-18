@@ -60,9 +60,7 @@ class AuctionsController extends Controller
      */
     public function create(Chat $chat): View|RedirectResponse
     {
-        if (request()->get('showAuctionInstructions')) {
-            return redirect()->route('auctions.create', $chat->id);
-        }
+        return redirect()->route('auctions.create', $chat->id);
 
         return view('auctions.create', [
             'chat' => $chat,
