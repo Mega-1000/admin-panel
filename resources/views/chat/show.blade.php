@@ -64,7 +64,7 @@
 <body>
     <div>
         @if(session()->has('auctionCreationSuccess'))
-            <div class="alert alert-success" style="width: 45%; margin: 0 auto; margin-top: 30px; font-size: larger">
+            <div class="alert alert-success" style="width: 45%; margin: 0 auto; margin-top: 30px; font-size: larger; font-weight: bold">
                 Pomyślnie stworzono przetarg! Tabelę cen można zobaczyć na koncie klienta po zalogowaniu się na konto pod linkiem. Został również wysłany e-mail z potwierdzeniem.
                 <a href="https://mega1000.pl/account">https://mega1000.pl/account</a>
             </div>
