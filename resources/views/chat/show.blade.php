@@ -103,6 +103,9 @@
                 @if($isStyropian)
                     <div class="mb-4 alert alert-warning">
                         @if($chat->auctions->count() === 0)
+                            @php
+                                redirect()->route('auctions.create', $chat->id)
+                            @endphp
                             <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
                                 Rozpocznij przetarg
                             </a>

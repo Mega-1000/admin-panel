@@ -168,11 +168,11 @@ class AuctionsController extends Controller
         foreach ($pricingData as $k => $item) {
             $product = Product::find($k);
 
-                $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
-                    'firm_id' => $firm->firm_id,
-                    'chat_auction_id' => $firm->chat_auction_id,
-                    'product_id' => $product->id,
-                ]));
+            $this->chatAuctionOfferService->createOffer(CreateChatAuctionOfferDTO::fromRequest($item + [
+                'firm_id' => $firm->firm_id,
+                'chat_auction_id' => $firm->chat_auction_id,
+                'product_id' => $product->id,
+            ]));
         }
 
         return redirect()->back();
