@@ -43,7 +43,7 @@ class ControllSubjectInvoiceBuyingService
         $totalItemsCost = $sumOfPurchase * 1.23;
 
         if ($order->id == 85234) {
-            dd($totalItemsCost, $row->gross);
+            dd($totalItemsCost, (float)$row->gross);
         }
 
         if ($order->labels->has(65) && $row->gross == $totalItemsCost) {
