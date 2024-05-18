@@ -2,7 +2,7 @@
 
 namespace App\DTO\ControllSubjectInvoice;
 
-readonly final class ControllSubjectInvoiceDTO
+final class ControllSubjectInvoiceDTO
 {
     public string $k;
     public string $deliveryEndDate;
