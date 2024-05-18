@@ -28,6 +28,10 @@ class ControllSubjectInvoiceBuyingService
         $order = Order::find($row->notes);
         $arr = [];
 
+        if (!$order) {
+            return;
+        }
+
         $sumOfPurchase = 0;
         $items = $order->items;
 
