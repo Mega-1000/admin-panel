@@ -43,10 +43,10 @@ class ControllSubjectInvoiceBuyingService
         $totalItemsCost = $sumOfPurchase * 1.23;
 
         if ($order->labels->has(65) && $row->gross == $totalItemsCost) {
-            AddLabelService::addLabels($order->id, [264], $arr, []);
+            AddLabelService::addLabels($order, [264], $arr, []);
             RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
         } else {
-            AddLabelService::addLabels($order->id, [263], $arr, []);
+            AddLabelService::addLabels($order, [263], $arr, []);
             RemoveLabelService::removeLabels($order, [264], $arr , [], auth()->id());
         }
     }
