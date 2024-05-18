@@ -72,7 +72,7 @@ class AuctionsController extends Controller
      * @param CreateAuctionRequest $request
      * @return RedirectResponse
      */
-    public function store(Chat $chat, CreateAuctionRequest $request): RedirectResponse
+    public function store(Chat $chat, CreateAuctionRequest $request, MessagesHelper $helper): RedirectResponse
     {
         $auction = $this->chatAuctionsService->createAuction(
             CreateChatAuctionDTO::fromRequest($chat, $request->validated())
@@ -84,7 +84,22 @@ class AuctionsController extends Controller
                 $auction
             ));
 
-        return redirect()->to($request->query('backUrl'))->with('auctionCreationSuccess', true);
+        $chat = Chat::where('order_id', '=', $chat->order->id)->first();
+        $helper = new MessagesHelper();
+
+        if (!$chat) {
+            $helper->orderId = $chat->order->id;
+        } else {
+            $helper->chatId = $chat->id;
+        }
+
+        $helper->currentUserId = $chat->order->id;
+        $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+        $userToken = $helper->encrypt();
+
+        $showAuctionInstructions = request()->query('showAuctionInstructions');
+
+        return redirect()->route('chat.show', ['token' => $userToken, 'showAuctionInstructions' => $showAuctionInstructions])->with('auctionCreationSuccess', true);
     }
 
     /**
