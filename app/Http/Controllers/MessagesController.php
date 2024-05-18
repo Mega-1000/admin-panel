@@ -127,7 +127,7 @@ class MessagesController extends Controller
      * @throws ChatException
      * @throws DeliverAddressNotFoundException
      */
-    private function prepareChatView(string $token): View
+    private function prepareChatView(string $token): View|RedirectResponse
     {
         $helper = new MessagesHelper($token);
         $chat = $helper->getChat();
@@ -135,6 +135,10 @@ class MessagesController extends Controller
         if ($chat === null) {
             $helper->createNewChat();
             $chat = $helper->getChat();
+        }
+
+        if (request()->get('showAuctionInstructions')) {
+            return redirect()->route('auctions.create', $chat->id);
         }
 
         // if no exist any user ID then bind one
