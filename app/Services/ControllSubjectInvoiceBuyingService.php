@@ -40,7 +40,7 @@ class ControllSubjectInvoiceBuyingService
             $quantity = $item['quantity'] ?? 0;
             $sumOfPurchase += floatval($pricePurchase) * intval($quantity);
         }
-        $totalItemsCost = round($sumOfPurchase * 1.23) + $order->shipment_price_for_us;
+        $totalItemsCost = round($sumOfPurchase * 1.23, 2) + $order->shipment_price_for_us;
 
         if ($order->id === 85506) {
             dd($totalItemsCost, (float)str_replace(' ', '', $row->gross) == $totalItemsCost);
