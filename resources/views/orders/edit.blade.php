@@ -95,7 +95,7 @@
             <i class="voyager-plus"></i> <span>@lang('order_packages.create')</span>
         </a>
     </div>
-    <form id="orders" action="/order-invoice-documents/store" method="post" >
+    <form id="orders" action="/order-invoice-documents/store" method="post">
         @csrf
         <div class="orders-general" id="general">
             <input type="hidden" value="{{Session::get('uri')}}" id="uri">
