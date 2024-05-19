@@ -530,9 +530,6 @@
                             ostatniego zamówienia</a>
                         <a href="/admin/orders/{{$order->id}}/getDataFromCustomer" class="btn btn-success">Pobierz dane
                             klienta</a>
-                        <a href="/admin/mark-order-as-selfpickup/{{ $order->id  }}" class="btn btn-primary">
-                            Odbiór osobisty
-                        </a>
                         <div style="width: 50%">
                             <label for="firms_data">Symbol firmy</label>
                             <input type="text" class="form-control" id="firms_data" name="firms_data"
@@ -1220,13 +1217,11 @@
 
         <button type="submit" form="orders" id="submit" name="submit" value="update"
                 class="btn btn-primary">@lang('voyager.generic.save')</button>
-
         <button type="submit" form="orders" id="new-order" name="submit" value="store" class="btn btn-success">Dodaj
             nowe zamówienie
         </button>
         </div>
     </form>
-
     <div class="order-payments" id="order-payments">
         @if(!empty($uri))
             <input id="uri" type="hidden" value="{{$uri}}">
@@ -4375,35 +4370,37 @@
         });
 
         function updateOrderSum(profit = null) {
-            if ($('#totalPriceInfo').val() === '') {
-                valueOfItemsGross = 0;
-            } else {
-                valueOfItemsGross = parseFloat($('#orderItemsSum').val().replace(',', ''));
-            }
-            if ($('#additional_cash_on_delivery_cost').val() === '') {
-                packingWarehouseCost = 0;
-            } else {
-                packingWarehouseCost = parseFloat($('#additional_cash_on_delivery_cost').val());
-            }
+            setTimeout(() => {
+                if ($('#totalPriceInfo').val() === '') {
+                    valueOfItemsGross = 0;
+                } else {
+                    valueOfItemsGross = parseFloat($('#orderItemsSum').val().replace(',', ''));
+                }
+                if ($('#additional_cash_on_delivery_cost').val() === '') {
+                    packingWarehouseCost = 0;
+                } else {
+                    packingWarehouseCost = parseFloat($('#additional_cash_on_delivery_cost').val());
+                }
 
-            if ($('#shipment_price_for_client').val() == '') {
-                shipmentPriceForClient = 0;
-            } else {
-                shipmentPriceForClient = parseFloat($('#shipment_price_for_client').val());
-            }
+                if ($('#shipment_price_for_client').val() == '') {
+                    shipmentPriceForClient = 0;
+                } else {
+                    shipmentPriceForClient = parseFloat($('#shipment_price_for_client').val());
+                }
 
-            if ($('#additional_service_cost').val() == '') {
-                additionalServieCost = 0;
-            } else {
-                additionalServieCost = parseFloat($('#additional_service_cost').val());
-            }
+                if ($('#additional_service_cost').val() == '') {
+                    additionalServieCost = 0;
+                } else {
+                    additionalServieCost = parseFloat($('#additional_service_cost').val());
+                }
 
-            if (profit === 1) {
-                $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
-            }
-            let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
-            $('#orderValueSum').val(sum.toFixed(2));
-            $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
+                if (profit === 1) {
+                    $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
+                }
+                let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
+                $('#orderValueSum').val(sum.toFixed(2));
+                $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
+            }, 100);
         }
 
         setTimeout(() => {
@@ -5060,6 +5057,7 @@
             $('#orderId').val(orderId);
             $('#dateType').val(type);
 
+            console.log(from);
             $('#dateFrom').val(from);
             $('#dateTo').val(to);
 
@@ -5074,6 +5072,22 @@
                 $('#alerts').html('');
             }, 3000);
         }
+    </script>
+
+    <script>
+
+        window.showModifyDateModal = function(orderId, type, from, to, type11) {
+            $('#orderId').val(orderId);
+            $('#dateType').val(type);
+
+            console.log(from);
+            $('#dateFrom').val(from);
+            $('#dateTo').val(to);
+
+            window.type11 = type11;
+            $('#modifyDateModal').modal('show');
+        }
+
     </script>
 
     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
