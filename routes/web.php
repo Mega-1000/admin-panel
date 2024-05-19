@@ -828,9 +828,3 @@ Route::post('create-confirmation/{id}', [OrderPaymentConfirmationController::cla
 Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationController::class, 'confirm'])->name('store-payment-confirmation-confirm');
 
 Route::delete('delete-message/{message}', [MessagesController::class, 'delete'])->name('delete-message');
-Route::post('orders/{id}/u', [OrdersController::class, 'update']);;
-Route::put('orders/{id}/u', [OrdersController::class, 'update']);
-Route::get('orders/{id}/u', [OrdersController::class, 'update']);
-
-Route::get('o/{id}/u', [OrdersController::class, 'test']);
-Route::post('o/{id}/u', [OrdersController::class, 'test']);
