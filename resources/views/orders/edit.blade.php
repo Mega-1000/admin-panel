@@ -98,7 +98,6 @@
     <form id="orders" action="/orders/{{$order->id}}/u"
           method="POST" >
         @csrf
-        @method('PUT')
         <div class="orders-general" id="general">
             <input type="hidden" value="{{Session::get('uri')}}" id="uri">
             {{ Session::forget('uri') }}
