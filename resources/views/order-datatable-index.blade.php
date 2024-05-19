@@ -337,7 +337,37 @@
                 })
             })
         }
+    </script>
 
+    <script>
+        // Pobierz formularz
+        const form = document.getElementById('deleteForm');
+
+        // Pobierz przycisk Usuń
+        const deleteBtn = document.getElementById('deleteBtn');
+
+        // Dodaj zdarzenie submit do formularza
+        form.addEventListener('submit', function(event) {
+            // Zatrzymaj domyślne zachowanie formularza
+            event.preventDefault();
+
+            // Wywołaj SweetAlert2
+            Swal.fire({
+                title: 'Czy na pewno chcesz usunąć?',
+                text: "Tej operacji nie można cofnąć!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Tak, usuń!',
+                cancelButtonText: 'Anuluj'
+            }).then((result) => {
+                // Jeśli użytkownik potwierdzi, wyślij żądanie usuwania
+                if (result.isConfirmed) {
+                    form.submit(); // Wysłanie formularza
+                }
+            });
+        });
     </script>
 @endsection
 <script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>

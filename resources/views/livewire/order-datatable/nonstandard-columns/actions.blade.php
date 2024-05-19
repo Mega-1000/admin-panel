@@ -10,10 +10,10 @@
     Edytuj
 </a>
 
-<form action="/admin/orders/{{$order['id']}}" method="POST">
+<form id="deleteForm" action="/admin/orders/{{$order['id']}}" method="POST">
     @method('delete')
     @csrf
-    <button class="btn btn-danger btn-sm" id="O">Usuń</button>
+    <button class="btn btn-danger btn-sm" id="deleteBtn">Usuń</button>
 </form>
 
 <a href="/admin/orderReturn/{{ $order['id'] }}" class="btn btn-sm btn-danger">
