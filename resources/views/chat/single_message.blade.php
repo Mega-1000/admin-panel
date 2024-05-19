@@ -21,10 +21,10 @@
                 {{ $message->message }}
             </div>
             @if(isset($canDelete) && $canDelete)
-                <form method="post" class="btn btn-sm btn-danger" action="{{ route('delete-message', $message->id) }}">
+                <form method="post" action="{{ route('delete-message', $message->id) }}">
                     @csrf
                     @method('delete')
-                    <button>
+                    <button class="btn btn-sm btn-danger">
                         Usuń
                     </button>
                 </form>
