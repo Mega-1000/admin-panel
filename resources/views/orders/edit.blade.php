@@ -97,8 +97,8 @@
     </div>
     <form id="orders" action="{{ action('OrdersController@update', ['id' => $order->id])}}"
           method="POST" >
-        {{ csrf_field() }}
-        {{ method_field('put') }}
+        @csrf
+        @method('PUT')
         <div class="orders-general" id="general">
             <input type="hidden" value="{{Session::get('uri')}}" id="uri">
             {{ Session::forget('uri') }}
