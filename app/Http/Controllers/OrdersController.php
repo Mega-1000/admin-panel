@@ -1092,6 +1092,11 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function test()
+    {
+        dd('okej');
+    }
+
     /**
      * @param OrderUpdateRequest $request
      * @param $id
