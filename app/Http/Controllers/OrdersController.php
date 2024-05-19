@@ -1099,6 +1099,7 @@ class OrdersController extends Controller
      */
     public function update(OrderUpdateRequest $request, $id): RedirectResponse
     {
+        dd('ok');
         switch ($request->submit) {
             case 'update':
                 break;
