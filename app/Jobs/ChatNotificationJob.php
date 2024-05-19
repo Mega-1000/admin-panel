@@ -71,6 +71,7 @@ class ChatNotificationJob implements ShouldQueue
             $userVisibilityString .= ' ' . $userType;
         }
 
+        dd($userVisibilityString);
         $lastMessage = Message::where('chat_id', $chat->id)->orderBy('created_at', 'desc')->first();
         $lastMessage->users_visibility  = $userVisibilityString;
         $lastMessage->save();
