@@ -74,7 +74,6 @@ class ChatNotificationJob implements ShouldQueue
         $lastMessage = Message::where('chat_id', $chat->id)->orderBy('created_at', 'desc')->first();
         $lastMessage->users_visibility  = $userVisibilityString;
         $lastMessage->save();
-        dd($lastMessage->users_visibility);
     }
 
     private function sendMail($chat, $chatUser, $userObject)
