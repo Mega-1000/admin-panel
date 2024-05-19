@@ -18,6 +18,7 @@
     </a>
     <button type="submit" form="orders" id="submitOrder" name="submit"
             value="update" class="btn btn-primary header-button">@lang('voyager.generic.save')</button>
+    @method('put')
     <button type="submit" form="orders" id="submitOrderAndStay" name="submit"
             value="updateAndStay" class="btn btn-primary header-button">@lang('voyager.generic.saveAndStay')</button>
     <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
