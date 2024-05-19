@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\Message;
 use Exception;
 use App\Entities\Chat;
 use App\Helpers\Helper;
@@ -37,21 +38,42 @@ class ChatNotificationJob implements ShouldQueue
     public function handle()
     {
         $chat = Chat::with(['chatUsers', 'messages'])->find($this->chatId);
+        $userVisibilityString = '';
 
         foreach ($chat->chatUsers as $chatUser) {
-
-            if(
+            if (
                 $chatUser->id == $this->currentChatUserId
             ) continue;
 
-            $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: false;
+            $userType = null;
+            $userObject = null;
+
+            if ($chatUser->user) {
+                $userObject = $chatUser->user;
+                $userType = 'u'; // User
+            } elseif ($chatUser->employee) {
+                $userObject = $chatUser->employee;
+                $userType = 'e'; // Employee
+            } elseif ($chatUser->customer) {
+                $userObject = $chatUser->customer;
+                $userType = 'c'; // Customer
+            } else {
+                $userObject = false; // None of the properties are set
+            }
+
 
             if (!$userObject) {
                 continue;
             }
 
             $this->sendMail($chat, $chatUser, $userObject);
+
+            $userVisibilityString .= ' ' . $userType;
         }
+
+        $lastMessage = Message::where('chat_id', $chat->id)->orderBy('created_at', 'desc')->first();
+        $lastMessage->users_visibility  = $userVisibilityString;
+        $lastMessage->save();
     }
 
     private function sendMail($chat, $chatUser, $userObject)

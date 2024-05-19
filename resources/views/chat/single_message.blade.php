@@ -27,6 +27,7 @@
                     <button class="btn btn-sm btn-danger">
                         Usuń
                     </button>
+                    {{ $message->users_visibility }}
                 </form>
             @endif
             @if ($message->attachment_path)
