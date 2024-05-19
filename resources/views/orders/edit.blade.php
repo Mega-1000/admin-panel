@@ -18,7 +18,6 @@
     </a>
     <button type="submit" form="orders" id="submitOrder" name="submit"
             value="update" class="btn btn-primary header-button">@lang('voyager.generic.save')</button>
-    @method('put')
     <button type="submit" form="orders" id="submitOrderAndStay" name="submit"
             value="updateAndStay" class="btn btn-primary header-button">@lang('voyager.generic.saveAndStay')</button>
     <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
@@ -96,7 +95,7 @@
             <i class="voyager-plus"></i> <span>@lang('order_packages.create')</span>
         </a>
     </div>
-    <form id="orders" action="{{ route('orders.update', ['id' => $order->id])}}"
+    <form id="orders" action="/admin/orders/{{$order->id}}/updat"
           method="POST" >
         @csrf
         @method('PUT')
