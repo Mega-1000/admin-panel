@@ -393,7 +393,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/find-page/{id}', 'OrdersController@findPage')->name('orders.findPage');
         Route::post('orders/find-by-dates', 'OrdersController@findByDates')->name('orders.findByDates');
         Route::delete('orders/{id}/', 'OrdersController@destroy')->name('orders.destroy');
-        Route::post('orders/{id}/updat', 'OrdersController@update')->name('orders.update');
         Route::put('orders/{id}/updateSelf', [
             'uses' => 'OrdersController@updateSelf',
         ])->name('orders.updateSelf');
@@ -829,3 +828,4 @@ Route::post('create-confirmation/{id}', [OrderPaymentConfirmationController::cla
 Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationController::class, 'confirm'])->name('store-payment-confirmation-confirm');
 
 Route::delete('delete-message/{message}', [MessagesController::class, 'delete'])->name('delete-message');
+Route::post('orders/{id}/updat', 'OrdersController@update')->name('orders.update');

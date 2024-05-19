@@ -95,7 +95,7 @@
             <i class="voyager-plus"></i> <span>@lang('order_packages.create')</span>
         </a>
     </div>
-    <form id="orders" action="/admin/orders/{{$order->id}}/updat"
+    <form id="orders" action="/orders/{{$order->id}}/updat"
           method="POST" >
         @csrf
         @method('PUT')
