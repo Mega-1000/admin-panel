@@ -95,8 +95,10 @@
             <i class="voyager-plus"></i> <span>@lang('order_packages.create')</span>
         </a>
     </div>
-    <form id="orders" action="/order-invoice-documents/store" method="post">
-        @csrf
+    <form id="orders" action="{{ action('OrdersController@update', ['id' => $order->id])}}"
+          method="POST" >
+        {{ csrf_field() }}
+        {{ method_field('put') }}
         <div class="orders-general" id="general">
             <input type="hidden" value="{{Session::get('uri')}}" id="uri">
             {{ Session::forget('uri') }}
@@ -113,7 +115,7 @@
                         <select name="status" id="status" class="form-control">
                             @foreach($statuses as $status)
                                 <option
-                                        {{$order->status_id === $status->id ? 'selected="selected"' : ''}} value="{{ $status->id }}">{{ $status->name }}</option>
+                                    {{$order->status_id === $status->id ? 'selected="selected"' : ''}} value="{{ $status->id }}">{{ $status->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -292,7 +294,7 @@
                     </div>
                     <div class="order-data-input">
                         <label
-                                for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
+                            for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
                         <input disabled type="text" class="form-control sumChange"
                                id="shipment_price_for_client_automatic"
                                name="shipment_price_for_client_automatic"
@@ -304,7 +306,7 @@
                                name="shipment_price_for_us"
                                value="{{ $order->shipment_price_for_us ?? '' }}">
                         <label
-                                for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
+                            for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
                         <input disabled type="text" class="form-control priceChange sumChange"
                                id="shipment_price_for_us_automatic"
                                name="shipment_price_for_us_automatic"
@@ -493,7 +495,7 @@
                                            name="order_delivery_address_isAbroad" value="1"
                                            @if ($orderDeliveryAddress?->isAbroad)
                                                checked
-                                            @endif
+                                        @endif
                                     >
                                 </div>
                             </td>
@@ -528,7 +530,7 @@
                             ostatniego zamówienia</a>
                         <a href="/admin/orders/{{$order->id}}/getDataFromCustomer" class="btn btn-success">Pobierz dane
                             klienta</a>
-                        <a href="/admin/mark-order-as-selfpickup/{{$order->id}}" class="btn btn-primary">
+                        <a href="/admin/mark-order-as-selfpickup/{{ $order->id  }}" class="btn btn-primary">
                             Odbiór osobisty
                         </a>
                         <div style="width: 50%">
@@ -545,7 +547,7 @@
                     <h4>Dane z allegro</h4>
                     <div class="order-data-input">
                         <label
-                                for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
+                            for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
                         <input type="text" class="form-control" id="customer.nick_allegro"
                                name="customer.nick_allegro"
                                value="{{ $order->customer->nick_allegro ?? ''}}" disabled readonly>
@@ -563,7 +565,7 @@
                     </div>
                     <div class="order-data-input">
                         <label
-                                for="allegro_transaction_id">Numer transakcji</label>
+                            for="allegro_transaction_id">Numer transakcji</label>
                         <input type="text" class="form-control" id="allegro_transaction_id"
                                name="allegro_transaction_id"
                                value="{{ $order->allegro_transaction_id ?? '' }}">
@@ -753,9 +755,9 @@
                                    class="form-control" id="product_id[{{$item->id}}]">
 
                             <input
-                                    value="{{ $item->quantity }}" type="hidden"
-                                    class="form-control item_quantity" name="item_quantity[{{$item->id}}]"
-                                    data-item-id="{{$item->id}}">
+                                value="{{ $item->quantity }}" type="hidden"
+                                class="form-control item_quantity" name="item_quantity[{{$item->id}}]"
+                                data-item-id="{{$item->id}}">
 
                             <input name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
                                    data-item-id="{{$item->id}}"
@@ -937,10 +939,10 @@
                                            disabled>
                                 @else
                                     <input
-                                            value="{{ $item->product->weight_trade_unit / $item->product->numbers_of_basic_commercial_units_in_pack  }} kg"
-                                            type="text"
-                                            class="form-control price net_purchase_price_commercial_unit priceChange"
-                                            disabled>
+                                        value="{{ $item->product->weight_trade_unit / $item->product->numbers_of_basic_commercial_units_in_pack  }} kg"
+                                        type="text"
+                                        class="form-control price net_purchase_price_commercial_unit priceChange"
+                                        disabled>
                                 @endif
                             </td>
                             <td>
@@ -950,18 +952,18 @@
                                            disabled>
                                 @else
                                     <input
-                                            value="{{ ($item->product->packing->number_of_sale_units_in_the_pack / $item->product->numbers_of_basic_commercial_units_in_pack ?? 1) * $item->product->unit_consumption }} kg"
-                                            type="text"
-                                            class="form-control price net_purchase_price_commercial_unit priceChange"
-                                            disabled>
+                                        value="{{ ($item->product->packing->number_of_sale_units_in_the_pack / $item->product->numbers_of_basic_commercial_units_in_pack ?? 1) * $item->product->unit_consumption }} kg"
+                                        type="text"
+                                        class="form-control price net_purchase_price_commercial_unit priceChange"
+                                        disabled>
                                 @endif
                             </td>
                             <td>
                                 <input
-                                        value="{{ $item->product->packing->number_of_sale_units_in_the_pack * $item->product->number_of_sale_units_in_the_pack }} kg"
-                                        type="text"
-                                        class="form-control price net_purchase_price_commercial_unit priceChange"
-                                        disabled>
+                                    value="{{ $item->product->packing->number_of_sale_units_in_the_pack * $item->product->number_of_sale_units_in_the_pack }} kg"
+                                    type="text"
+                                    class="form-control price net_purchase_price_commercial_unit priceChange"
+                                    disabled>
                             </td>
                         </tr>
                         <tr class="selling-row row-{{$item->id}}">
@@ -1142,7 +1144,7 @@
                                     <p>
                                         Pozycja: {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }}
                                         Ilość na pozycji: {{ $position->position_quantity }}</p>
-                                        {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
+                                    {!! \App\Services\ProductPositioningService::renderPositioningViewHtml($position) !!}
                                     @php
                                         $quantityAll += $position->position_quantity;
                                     @endphp
@@ -1210,8 +1212,8 @@
                     <i onclick="removeLabel({{ $label->id }})" style="cursor: pointer; color: red"
                        class="fas fa-times-circle"></i>
                     <span
-                            style="color: {{ $label->font_color }}; margin-top: 5px; background-color:{{ $label->color }}"><i
-                                style="font-size: 1rem" class="{{ $label->icon_name }}"></i> {{ $label->name }}</span>
+                        style="color: {{ $label->font_color }}; margin-top: 5px; background-color:{{ $label->color }}"><i
+                            style="font-size: 1rem" class="{{ $label->icon_name }}"></i> {{ $label->name }}</span>
                 </div>
             @endforeach
         </div>
@@ -1808,15 +1810,15 @@
                             <tr>
                                 <td colspan="4" style="border: 0px;"></td>
                                 <td style="border: 0px;" class="firstOrder">Zamówienie 1 <input
-                                            type="hidden" name="firstOrderExist" value="0"></td>
+                                        type="hidden" name="firstOrderExist" value="0"></td>
                                 <td style="border: 0px;" class="secondOrder">Zamówienie 2 <input
-                                            type="hidden" name="secondOrderExist" value="0"></td>
+                                        type="hidden" name="secondOrderExist" value="0"></td>
                                 <td style="border: 0px;" class="thirdOrder">Zamówienie 3 <input
-                                            type="hidden" name="thirdOrderExist" value="0"></td>
+                                        type="hidden" name="thirdOrderExist" value="0"></td>
                                 <td style="border: 0px;" class="fourthOrder">Zamówienie 4 <input
-                                            type="hidden" name="fourthOrderExist" value="0"></td>
+                                        type="hidden" name="fourthOrderExist" value="0"></td>
                                 <td style="border: 0px;" class="fifthOrder">Zamówienie 5 <input
-                                            type="hidden" name="fifthOrderExist" value="0"></td>
+                                        type="hidden" name="fifthOrderExist" value="0"></td>
                             </tr>
                             <tr>
                                 <td colspan="4" style="border: 0px;"></td>
@@ -1846,8 +1848,8 @@
                                 @endphp
                                 <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
                                     <td colspan="4"><h4><img
-                                                    src="{!! $item->product->getImageUrl() !!}"
-                                                    style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
+                                                src="{!! $item->product->getImageUrl() !!}"
+                                                style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
                                                 . </strong>{{ $item->product->name }}
                                             (symbol: {{ $item->product->symbol }}) </h4></td>
 
@@ -1860,18 +1862,18 @@
                                            class="form-control" id="product_id[{{$item->id}}]">
 
                                     <input
-                                            value="{{ $item->quantity }}" type="hidden"
-                                            class="form-control item_quantity"
-                                            name="item_quantity[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}">
+                                        value="{{ $item->quantity }}" type="hidden"
+                                        class="form-control item_quantity"
+                                        name="item_quantity[{{$item->id}}]"
+                                        data-item-id="{{$item->id}}">
 
                                     <input
-                                            name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }}"
-                                            type="hidden"
-                                            class="form-control numbers_of_basic_commercial_units_in_pack"
-                                            id="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]">
+                                        name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
+                                        data-item-id="{{$item->id}}"
+                                        value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }}"
+                                        type="hidden"
+                                        class="form-control numbers_of_basic_commercial_units_in_pack"
+                                        id="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]">
                                     <input name="number_of_sale_units_in_the_pack[{{$item->id}}]"
                                            data-item-id="{{$item->id}}"
                                            value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}"
@@ -1879,12 +1881,12 @@
                                            class="form-control number_of_sale_units_in_the_pack"
                                            id="number_of_sale_units_in_the_pack[{{$item->id}}]">
                                     <input
-                                            name="number_of_trade_items_in_the_largest_unit[{{$item->id}}]"
-                                            data-item-id="{{$item->id}}"
-                                            value="{{ $item->product->packing->number_of_trade_items_in_the_largest_unit }}"
-                                            type="hidden"
-                                            class="form-control number_of_trade_items_in_the_largest_unit"
-                                            id="number_of_trade_items_in_the_largest_unit[{{$item->id}}]">
+                                        name="number_of_trade_items_in_the_largest_unit[{{$item->id}}]"
+                                        data-item-id="{{$item->id}}"
+                                        value="{{ $item->product->packing->number_of_trade_items_in_the_largest_unit }}"
+                                        type="hidden"
+                                        class="form-control number_of_trade_items_in_the_largest_unit"
+                                        id="number_of_trade_items_in_the_largest_unit[{{$item->id}}]">
                                     <input name="unit_consumption[{{$item->id}}]"
                                            data-item-id="{{$item->id}}"
                                            value="{{ $item->product->packing->unit_consumption }}"
@@ -1927,12 +1929,12 @@
                                 <tr class="purchase-row row-{{$item->id}}">
                                     <td>
                                         <input
-                                                name="net_purchase_price_commercial_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}"
-                                                value="{{ $item->net_purchase_price_commercial_unit_after_discounts }}"
-                                                type="text"
-                                                class="form-control price net_purchase_price_commercial_unit priceChange"
-                                                id="net_purchase_price_commercial_unit[{{$item->id}}]">
+                                            name="net_purchase_price_commercial_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_purchase_price_commercial_unit_after_discounts }}"
+                                            type="text"
+                                            class="form-control price net_purchase_price_commercial_unit priceChange"
+                                            id="net_purchase_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input name="net_purchase_price_basic_unit[{{$item->id}}]"
@@ -1944,31 +1946,31 @@
                                     </td>
                                     <td>
                                         <input
-                                                name="net_purchase_price_calculated_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}"
-                                                value="{{ $item->net_purchase_price_calculated_unit_after_discounts }}"
-                                                type="text"
-                                                class="form-control price net_purchase_price_calculated_unit priceChange"
-                                                id="net_purchase_price_calculated_unit[{{$item->id}}]">
+                                            name="net_purchase_price_calculated_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_purchase_price_calculated_unit_after_discounts }}"
+                                            type="text"
+                                            class="form-control price net_purchase_price_calculated_unit priceChange"
+                                            id="net_purchase_price_calculated_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input
-                                                name="net_purchase_price_aggregate_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}"
-                                                value="{{ $item->net_purchase_price_aggregate_unit_after_discounts }}"
-                                                type="text"
-                                                class="form-control price net_purchase_price_aggregate_unit priceChange"
-                                                id="net_purchase_price_aggregate_unit[{{$item->id}}]">
+                                            name="net_purchase_price_aggregate_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_purchase_price_aggregate_unit_after_discounts }}"
+                                            type="text"
+                                            class="form-control price net_purchase_price_aggregate_unit priceChange"
+                                            id="net_purchase_price_aggregate_unit[{{$item->id}}]">
                                     </td>
                                 </tr>
                                 <tr class="purchase-row row-{{$item->id}}">
                                     <td>
                                         <input
-                                                name="gross_purchase_price_commercial_unit[{{$item->id}}]"
-                                                value="" type="text"
-                                                data-item-id="{{$item->id}}"
-                                                class="form-control price gross_purchase_price_commercial_unit priceChange"
-                                                id="gross_purchase_price_commercial_unit[{{$item->id}}]">
+                                            name="gross_purchase_price_commercial_unit[{{$item->id}}]"
+                                            value="" type="text"
+                                            data-item-id="{{$item->id}}"
+                                            class="form-control price gross_purchase_price_commercial_unit priceChange"
+                                            id="gross_purchase_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input name="gross_purchase_price_basic_unit[{{$item->id}}]"
@@ -1979,19 +1981,19 @@
                                     </td>
                                     <td>
                                         <input
-                                                name="gross_purchase_price_calculated_unit[{{$item->id}}]"
-                                                value="" type="text"
-                                                data-item-id="{{$item->id}}"
-                                                class="form-control price gross_purchase_price_calculated_unit priceChange"
-                                                id="gross_purchase_price_calculated_unit[{{$item->id}}]">
+                                            name="gross_purchase_price_calculated_unit[{{$item->id}}]"
+                                            value="" type="text"
+                                            data-item-id="{{$item->id}}"
+                                            class="form-control price gross_purchase_price_calculated_unit priceChange"
+                                            id="gross_purchase_price_calculated_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input
-                                                name="gross_purchase_price_aggregate_unit[{{$item->id}}]"
-                                                value="" type="text"
-                                                data-item-id="{{$item->id}}"
-                                                class="form-control price gross_purchase_price_aggregate_unit priceChange"
-                                                id="gross_purchase_price_aggregate_unit[{{$item->id}}]">
+                                            name="gross_purchase_price_aggregate_unit[{{$item->id}}]"
+                                            value="" type="text"
+                                            data-item-id="{{$item->id}}"
+                                            class="form-control price gross_purchase_price_aggregate_unit priceChange"
+                                            id="gross_purchase_price_aggregate_unit[{{$item->id}}]">
                                     </td>
                                 </tr>
                                 <tr class="row-{{$item->id}}">
@@ -2000,12 +2002,12 @@
                                 <tr class="selling-row row-{{$item->id}}">
                                     <td>
                                         <input
-                                                name="net_selling_price_commercial_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}"
-                                                value="{{ $item->net_selling_price_commercial_unit }}"
-                                                type="text"
-                                                class="form-control price net_selling_price_commercial_unit priceChange change-order"
-                                                id="net_selling_price_commercial_unit[{{$item->id}}]">
+                                            name="net_selling_price_commercial_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_selling_price_commercial_unit }}"
+                                            type="text"
+                                            class="form-control price net_selling_price_commercial_unit priceChange change-order"
+                                            id="net_selling_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input name="net_selling_price_basic_unit[{{$item->id}}]"
@@ -2017,30 +2019,30 @@
                                     </td>
                                     <td>
                                         <input
-                                                name="net_selling_price_calculated_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}"
-                                                value="{{ $item->net_selling_price_calculated_unit }}"
-                                                type="text"
-                                                class="form-control price net_selling_price_calculated_unit priceChange change-order"
-                                                id="net_selling_price_calculated_unit[{{$item->id}}]">
+                                            name="net_selling_price_calculated_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_selling_price_calculated_unit }}"
+                                            type="text"
+                                            class="form-control price net_selling_price_calculated_unit priceChange change-order"
+                                            id="net_selling_price_calculated_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input
-                                                name="net_selling_price_aggregate_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}"
-                                                value="{{ $item->net_selling_price_aggregate_unit }}"
-                                                type="text"
-                                                class="form-control price net_selling_price_aggregate_unit priceChange change-order"
-                                                id="net_selling_price_aggregate_unit[{{$item->id}}]">
+                                            name="net_selling_price_aggregate_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_selling_price_aggregate_unit }}"
+                                            type="text"
+                                            class="form-control price net_selling_price_aggregate_unit priceChange change-order"
+                                            id="net_selling_price_aggregate_unit[{{$item->id}}]">
                                     </td>
                                 </tr>
                                 <tr class="selling-row row-{{$item->id}}">
                                     <td>
                                         <input
-                                                name="gross_selling_price_commercial_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}" value="" type="text"
-                                                class="form-control price gross_selling_price_commercial_unit priceChange change-order"
-                                                id="gross_selling_price_commercial_unit[{{$item->id}}]">
+                                            name="gross_selling_price_commercial_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}" value="" type="text"
+                                            class="form-control price gross_selling_price_commercial_unit priceChange change-order"
+                                            id="gross_selling_price_commercial_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input name="gross_selling_price_basic_unit[{{$item->id}}]"
@@ -2050,17 +2052,17 @@
                                     </td>
                                     <td>
                                         <input
-                                                name="gross_selling_price_calculated_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}" value="" type="text"
-                                                class="form-control price gross_selling_price_calculated_unit priceChange change-order"
-                                                id="gross_selling_price_calculated_unit[{{$item->id}}]">
+                                            name="gross_selling_price_calculated_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}" value="" type="text"
+                                            class="form-control price gross_selling_price_calculated_unit priceChange change-order"
+                                            id="gross_selling_price_calculated_unit[{{$item->id}}]">
                                     </td>
                                     <td>
                                         <input
-                                                name="gross_selling_price_aggregate_unit[{{$item->id}}]"
-                                                data-item-id="{{$item->id}}" value="" type="text"
-                                                class="form-control price gross_selling_price_aggregate_unit priceChange change-order"
-                                                id="gross_selling_price_aggregate_unit[{{$item->id}}]">
+                                            name="gross_selling_price_aggregate_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}" value="" type="text"
+                                            class="form-control price gross_selling_price_aggregate_unit priceChange change-order"
+                                            id="gross_selling_price_aggregate_unit[{{$item->id}}]">
                                     </td>
                                 </tr>
                                 <tr class="selling-row row-{{$item->id}}">
@@ -2119,11 +2121,11 @@
                                     </td>
                                     <td colspan="3"></td>
                                     <td class="firstOrder"><input
-                                                name="firstOrderQuantity[{{$item->id}}]"
-                                                type="text" data-item-id="{{$item->id}}"
-                                                data-order-type="first"
-                                                class="form-control splitQuantity"
-                                                id="firstOrderQuantity[{{$item->id}}]">
+                                            name="firstOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="first"
+                                            class="form-control splitQuantity"
+                                            id="firstOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="first">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2133,10 +2135,10 @@
                                         </p>
                                         </p>
                                         <p>Zostało: <span
-                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                    name="firstOrderWeight[{{$item->id}}]"></span>
+                                                name="firstOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="firstWeightValue"
                                                    name="firstOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2146,11 +2148,11 @@
                                         </p>
                                     </td>
                                     <td class="secondOrder"><input
-                                                name="secondOrderQuantity[{{$item->id}}]"
-                                                type="text" data-item-id="{{$item->id}}"
-                                                data-order-type="second"
-                                                class="form-control splitQuantity"
-                                                id="secondOrderQuantity[{{$item->id}}]">
+                                            name="secondOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="second"
+                                            class="form-control splitQuantity"
+                                            id="secondOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="second">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2160,10 +2162,10 @@
                                         </p>
                                         </p>
                                         <p>Zostało: <span
-                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                    name="secondOrderWeight[{{$item->id}}]"></span>
+                                                name="secondOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="secondWeightValue"
                                                    name="secondOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2173,11 +2175,11 @@
                                         </p>
                                     </td>
                                     <td class="thirdOrder"><input
-                                                name="thirdOrderQuantity[{{$item->id}}]"
-                                                type="text" data-item-id="{{$item->id}}"
-                                                data-order-type="third"
-                                                class="form-control splitQuantity"
-                                                id="thirdOrderQuantity[{{$item->id}}]">
+                                            name="thirdOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="third"
+                                            class="form-control splitQuantity"
+                                            id="thirdOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="third">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2186,10 +2188,10 @@
                                             </button>
                                         </p>
                                         <p>Zostało: <span
-                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                    name="thirdOrderWeight[{{$item->id}}]"></span>
+                                                name="thirdOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="thirdWeightValue"
                                                    name="thirdOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2199,11 +2201,11 @@
                                         </p>
                                     </td>
                                     <td class="fourthOrder"><input
-                                                name="fourthOrderQuantity[{{$item->id}}]"
-                                                type="text" data-item-id="{{$item->id}}"
-                                                data-order-type="fourth"
-                                                class="form-control splitQuantity"
-                                                id="fourthOrderQuantity[{{$item->id}}]">
+                                            name="fourthOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="fourth"
+                                            class="form-control splitQuantity"
+                                            id="fourthOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="fourth">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2212,10 +2214,10 @@
                                             </button>
                                         </p>
                                         <p>Zostało: <span
-                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                    name="fourthOrderWeight[{{$item->id}}]"></span>
+                                                name="fourthOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="fourthWeightValue"
                                                    name="fourthOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2225,11 +2227,11 @@
                                         </p>
                                     </td>
                                     <td class="fifthOrder"><input
-                                                name="fifthOrderQuantity[{{$item->id}}]"
-                                                type="text" data-item-id="{{$item->id}}"
-                                                data-order-type="fifth"
-                                                class="form-control splitQuantity"
-                                                id="fifthOrderQuantity[{{$item->id}}]">
+                                            name="fifthOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="fifth"
+                                            class="form-control splitQuantity"
+                                            id="fifthOrderQuantity[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="fifth">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2238,10 +2240,10 @@
                                             </button>
                                         </p>
                                         <p>Zostało: <span
-                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
                                         <p>Waga: <span
-                                                    name="fifthOrderWeight[{{$item->id}}]"></span>
+                                                name="fifthOrderWeight[{{$item->id}}]"></span>
                                             <input type="hidden" class="fifthWeightValue"
                                                    name="fifthOrderWeightValue[{{$item->id}}]"
                                                    value="{{ $item->product->weight_trade_unit ?? 0 }}">
@@ -2292,7 +2294,7 @@
                                                id="additional_service_cost_firstOrder"
                                                name="additional_service_cost_firstOrder">
                                         <p>Zostało: <span
-                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2302,7 +2304,7 @@
                                                id="additional_cash_on_delivery_cost_firstOrder"
                                                name="additional_cash_on_delivery_cost_firstOrder">
                                         <p>Zostało: <span
-                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2312,7 +2314,7 @@
                                                id="shipment_price_for_client_firstOrder"
                                                name="shipment_price_for_client_firstOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2322,7 +2324,7 @@
                                                id="shipment_price_for_us_firstOrder"
                                                name="shipment_price_for_us_firstOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2341,7 +2343,7 @@
                                                id="additional_service_cost_secondOrder"
                                                name="additional_service_cost_secondOrder">
                                         <p>Zostało: <span
-                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2351,7 +2353,7 @@
                                                id="additional_cash_on_delivery_cost_secondOrder"
                                                name="additional_cash_on_delivery_cost_secondOrder">
                                         <p>Zostało: <span
-                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2361,7 +2363,7 @@
                                                id="shipment_price_for_client_secondOrder"
                                                name="shipment_price_for_client_secondOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2371,7 +2373,7 @@
                                                id="shipment_price_for_us_secondOrder"
                                                name="shipment_price_for_us_secondOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2390,7 +2392,7 @@
                                                id="additional_service_cost_thirdOrder"
                                                name="additional_service_cost_thirdOrder">
                                         <p>Zostało: <span
-                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2400,7 +2402,7 @@
                                                id="additional_cash_on_delivery_cost_thirdOrder"
                                                name="additional_cash_on_delivery_cost_thirdOrder">
                                         <p>Zostało: <span
-                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2410,7 +2412,7 @@
                                                id="shipment_price_for_client_thirdOrder"
                                                name="shipment_price_for_client_thirdOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2420,7 +2422,7 @@
                                                id="shipment_price_for_us_thirdOrder"
                                                name="shipment_price_for_us_thirdOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2439,7 +2441,7 @@
                                                id="additional_service_cost_fourthOrder"
                                                name="additional_service_cost_fourthOrder">
                                         <p>Zostało: <span
-                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2449,7 +2451,7 @@
                                                id="additional_cash_on_delivery_cost_fourthOrder"
                                                name="additional_cash_on_delivery_cost_fourthOrder">
                                         <p>Zostało: <span
-                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2459,7 +2461,7 @@
                                                id="shipment_price_for_client_fourthOrder"
                                                name="shipment_price_for_client_fourthOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2469,7 +2471,7 @@
                                                id="shipment_price_for_us_fourthOrder"
                                                name="shipment_price_for_us_fourthOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2488,7 +2490,7 @@
                                                id="additional_service_cost_fifthOrder"
                                                name="additional_service_cost_fifthOrder">
                                         <p>Zostało: <span
-                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2498,7 +2500,7 @@
                                                id="additional_cash_on_delivery_cost_fifthOrder"
                                                name="additional_cash_on_delivery_cost_fifthOrder">
                                         <p>Zostało: <span
-                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2508,7 +2510,7 @@
                                                id="shipment_price_for_client_fifthOrder"
                                                name="shipment_price_for_client_fifthOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2518,7 +2520,7 @@
                                                id="shipment_price_for_us_fifthOrder"
                                                name="shipment_price_for_us_fifthOrder">
                                         <p>Zostało: <span
-                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
                                         </p>
                                     </div>
                                     <div class="form-group">
@@ -2548,7 +2550,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
-                                aria-hidden="true">&times;</span></button>
+                            aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <table id="paymentsTable" class="table table-hover">
