@@ -40,7 +40,7 @@ class ControllSubjectInvoiceBuyingService
             $quantity = $item['quantity'] ?? 0;
             $sumOfPurchase += floatval($pricePurchase) * intval($quantity);
         }
-        $totalItemsCost = $sumOfPurchase * 1.23;
+        $totalItemsCost = ($sumOfPurchase * 1.23) + $order->shipment_price_for_us;
 
         if ($order->labels->contains('id', 65) && (float)str_replace(' ', '', $row->gross) == $totalItemsCost) {
             AddLabelService::addLabels($order, [264], $arr, []);
