@@ -58,7 +58,7 @@
             <i class="voyager-plus"></i> <span>@lang('order_packages.create')</span>
         </a>
     </div>
-    <form id="orders" action="{{ action('OrdersController@update', ['id' => $order->id])}}"
+    <form id="orders" action="{{ route('orders.update', ['id' => $order->id])}}"
           method="POST">
         {{ csrf_field() }}
         {{ method_field('put') }}
