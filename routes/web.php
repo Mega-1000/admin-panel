@@ -833,3 +833,4 @@ Route::put('orders/{id}/u', [OrdersController::class, 'update']);
 Route::get('orders/{id}/u', [OrdersController::class, 'update']);
 
 Route::get('o/{id}/u', [OrdersController::class, 'test']);
+Route::post('o/{id}/u', [OrdersController::class, 'test']);
