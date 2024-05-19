@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Entities\Chat;
 use App\Entities\ChatAuctionFirm;
 use App\Entities\Firm;
+use App\Entities\Message;
 use App\Entities\Order;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
@@ -344,6 +345,13 @@ class MessagesController extends Controller
                     )
                 );
         }
+
+        return redirect()->back();
+    }
+
+    public function delete(Message $message): RedirectResponse
+    {
+        $message->delete();
 
         return redirect()->back();
     }

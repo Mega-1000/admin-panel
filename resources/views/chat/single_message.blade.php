@@ -10,7 +10,7 @@
         <div
             class="{{ $message->customer() ? 'text-right alert-warning' : ($message->user() ? 'text-left bg-primary' : 'text-left alert-info') }} alert"
             {{ $message->user() ? 'style="background-color: green"' : '' }}>
-            <strong>{{ $message->customer() ? '' : ($message->user() ? '' : 'Wiadomość systemowa') }}</strong>
+            <strong>{{ $message->customer() ? '' : ($message->user() ? '' : ($message->employee() ? '' : 'Wiadomość systemowa')) }}</strong>
             @if ($message->customer())
                 <strong> {!! $header !!} </strong> [{{ $message->created_at }}]
             @else
@@ -20,6 +20,15 @@
             <div class="msg-content" style="white-space: pre-line;">
                 {{ $message->message }}
             </div>
+            @if(isset($canDelete) && $canDelete)
+                <form method="post" class="btn btn-sm btn-danger" action="{{ route('delete-message', $message->id) }}">
+                    @csrf
+                    @method('delete')
+                    <button>
+                        Usuń
+                    </button>
+                </form>
+            @endif
             @if ($message->attachment_path)
                 <a class="attachment-path" style="display: block; margin-top: 10px; color: #000;"
                     href="{{ asset('storage/' . $message->attachment_path) }}" download="{{ $message->attachment_name }}">

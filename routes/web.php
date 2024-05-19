@@ -829,3 +829,5 @@ Route::get('set-aproach-as-done/{id}', [ContactApproachController::class, 'setDo
 
 Route::post('create-confirmation/{id}', [OrderPaymentConfirmationController::class, 'store'])->name('store-payment-confirmation');
 Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationController::class, 'confirm'])->name('store-payment-confirmation-confirm');
+
+Route::delete('delete-message/{message}', [MessagesController::class, 'delete'])->name('delete-message');
