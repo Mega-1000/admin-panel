@@ -396,6 +396,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('orders/{id}/update', [
             'uses' => 'OrdersController@update',
         ])->name('orders.update');
+        Route::delete('orders/{id}/update', [
+            'uses' => 'OrdersController@update',
+        ])->name('orders.update');
         Route::put('orders/{id}/updateSelf', [
             'uses' => 'OrdersController@updateSelf',
         ])->name('orders.updateSelf');

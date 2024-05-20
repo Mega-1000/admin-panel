@@ -95,8 +95,10 @@
             <i class="voyager-plus"></i> <span>@lang('order_packages.create')</span>
         </a>
     </div>
-    <form id="orders" action="/order-invoice-documents/store"
+    <form id="orders" action="{{ action('OrdersController@update', ['id' => $order->id])}}"
           method="POST" >
+        {{ csrf_field() }}
+        {{ method_field('put') }}
         <div class="orders-general" id="general">
             <input type="hidden" value="{{Session::get('uri')}}" id="uri">
             {{ Session::forget('uri') }}
