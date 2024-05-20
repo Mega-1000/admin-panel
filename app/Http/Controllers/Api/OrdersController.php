@@ -255,7 +255,7 @@ class OrdersController extends Controller
 
             $isOrderStyro = Order::whereHas('items', function ($query) {$query->whereHas('product', function ($subQuery) {$subQuery->where('variation_group', 'styropiany');});})
                 ->find($order->id)
-                ->exists();
+                ?->exists();
 
             if ($isOrderStyro) {
                 $order->additional_service_cost = 50;
