@@ -27,6 +27,7 @@
                     <button class="btn btn-sm btn-danger">
                         Usuń
                     </button>
+                    <br>
                     {{ $message->users_visibility }}
                 </form>
             @endif
