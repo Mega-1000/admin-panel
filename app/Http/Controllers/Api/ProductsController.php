@@ -242,7 +242,7 @@ class ProductsController extends Controller
     /**
      * @return JsonResponse
      */
-    public function getCategoriesTree(): JsonResponse
+    public function getCategoriesTree()
     {
         $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get();
 
