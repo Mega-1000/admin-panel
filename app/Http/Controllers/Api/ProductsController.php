@@ -246,7 +246,6 @@ class ProductsController extends Controller
     {
         $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get();
 
-
         $categoryRanges = [
             [101, 142],
             [49, 90],
@@ -276,57 +275,57 @@ class ProductsController extends Controller
             return; // Early exit if no postal code is found
         }
 
-        foreach ($filteredCategories as $category) {
-            $products = $category->products;
-
-            if ($products->isEmpty()) {
-                continue;
-            }
-
-            $product = $products->first();
-
-            if (!$product->firm) {
-                continue;
-            }
-
-            $firmId = $product->firm->id;
-
-            $raw = Cache::remember("nearest_warehouse_{$firmId}_{$deliveryAddressLatLon->latitude}_{$deliveryAddressLatLon->longitude}", 60, function() use ($deliveryAddressLatLon, $firmId) {
-                return DB::selectOne(
-                    'SELECT w.id, 1.609344 * SQRT(
-                POW(69.1 * (pc.latitude - :latitude), 2) +
-                POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
-                FROM postal_code_lat_lon pc
-                JOIN warehouse_addresses wa ON pc.postal_code = wa.postal_code
-                JOIN warehouses w ON wa.warehouse_id = w.id
-                WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
-                ORDER BY distance
-                LIMIT 1',
-                    [
-                        'latitude' => $deliveryAddressLatLon->latitude,
-                        'longitude' => $deliveryAddressLatLon->longitude,
-                        'firmId' => $firmId,
-                    ]
-                );
-            });
-
-            if ($raw) {
-                $radius = $raw->distance;
-                $warehouse = Cache::remember("warehouse_{$raw->id}", 60, function() use ($raw) {
-                    return Warehouse::find($raw->id);
-                });
-
-                if ($radius <= $warehouse->radius) {
-                    $category->blured = true;
-                } else {
-                    $category->blured = false;
-                }
-            } else {
-                $category->blured = true;
-            }
-
-            unset($category->products);
-        }
+//        foreach ($filteredCategories as $category) {
+//            $products = $category->products;
+//
+//            if ($products->isEmpty()) {
+//                continue;
+//            }
+//
+//            $product = $products->first();
+//
+//            if (!$product->firm) {
+//                continue;
+//            }
+//
+//            $firmId = $product->firm->id;
+//
+//            $raw = Cache::remember("nearest_warehouse_{$firmId}_{$deliveryAddressLatLon->latitude}_{$deliveryAddressLatLon->longitude}", 60, function() use ($deliveryAddressLatLon, $firmId) {
+//                return DB::selectOne(
+//                    'SELECT w.id, 1.609344 * SQRT(
+//                POW(69.1 * (pc.latitude - :latitude), 2) +
+//                POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+//                FROM postal_code_lat_lon pc
+//                JOIN warehouse_addresses wa ON pc.postal_code = wa.postal_code
+//                JOIN warehouses w ON wa.warehouse_id = w.id
+//                WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+//                ORDER BY distance
+//                LIMIT 1',
+//                    [
+//                        'latitude' => $deliveryAddressLatLon->latitude,
+//                        'longitude' => $deliveryAddressLatLon->longitude,
+//                        'firmId' => $firmId,
+//                    ]
+//                );
+//            });
+//
+//            if ($raw) {
+//                $radius = $raw->distance;
+//                $warehouse = Cache::remember("warehouse_{$raw->id}", 60, function() use ($raw) {
+//                    return Warehouse::find($raw->id);
+//                });
+//
+//                if ($radius <= $warehouse->radius) {
+//                    $category->blured = true;
+//                } else {
+//                    $category->blured = false;
+//                }
+//            } else {
+//                $category->blured = true;
+//            }
+//
+//            unset($category->products);
+//        }
 
         $allCategories = $allCategories->toArray();
         $tree = $this->parseTree($allCategories);
