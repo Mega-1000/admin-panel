@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use App\Entities\Category;
 use App\Entities\Firm;
 use App\Entities\PostalCodeLatLon;
@@ -246,63 +248,86 @@ class ProductsController extends Controller
     {
         $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get();
 
-        foreach ($allCategories as $category) {
-            if (
-                (
-                    ($category->id >= 101 && $category->id <= 142) ||
-                    ($category->id >= 49 && $category->id <= 90) ||
-                    ($category->id >= 4 && $category->id <= 10)
-                )
-            ) {
 
-                $products = $category->products;
+        $categoryRanges = [
+            [101, 142],
+            [49, 90],
+            [4, 10]
+        ];
 
-                if ($products->count() === 0) {
-                    continue;
+        $filteredCategories = $allCategories->filter(function($category) use ($categoryRanges) {
+            foreach ($categoryRanges as $range) {
+                if ($category->id >= $range[0] && $category->id <= $range[1]) {
+                    return true;
                 }
+            }
+            return false;
+        });
 
-                $product = $products->first();
-                $userZipCode = request()->query('zip-code');
-                if (!$userZipCode || !$product?->firm) {
-                    continue;
-                }
+        $userZipCode = request()->query('zip-code');
 
-                $deliveryAddressLatLon = PostalCodeLatLon::where('postal_code', $userZipCode)->first();
+        if (!$userZipCode) {
+            return; // Early exit if no zip code is provided
+        }
 
-                $raw = DB::selectOne(
-                    'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
-                        POW(69.1 * (pc.latitude - :latitude), 2) +
-                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
-                        FROM postal_code_lat_lon pc
-                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
-                             JOIN warehouses w on wa.warehouse_id = w.id
-                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
-                        ORDER BY distance
-                    limit 1',
+        $deliveryAddressLatLon = Cache::remember("postal_code_{$userZipCode}", 60, function() use ($userZipCode) {
+            return PostalCodeLatLon::where('postal_code', $userZipCode)->first();
+        });
+
+        if (!$deliveryAddressLatLon) {
+            return; // Early exit if no postal code is found
+        }
+
+        foreach ($filteredCategories as $category) {
+            $products = $category->products;
+
+            if ($products->isEmpty()) {
+                continue;
+            }
+
+            $product = $products->first();
+
+            if (!$product->firm) {
+                continue;
+            }
+
+            $firmId = $product->firm->id;
+
+            $raw = Cache::remember("nearest_warehouse_{$firmId}_{$deliveryAddressLatLon->latitude}_{$deliveryAddressLatLon->longitude}", 60, function() use ($deliveryAddressLatLon, $firmId) {
+                return DB::selectOne(
+                    'SELECT w.id, 1.609344 * SQRT(
+                POW(69.1 * (pc.latitude - :latitude), 2) +
+                POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                FROM postal_code_lat_lon pc
+                JOIN warehouse_addresses wa ON pc.postal_code = wa.postal_code
+                JOIN warehouses w ON wa.warehouse_id = w.id
+                WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                ORDER BY distance
+                LIMIT 1',
                     [
                         'latitude' => $deliveryAddressLatLon->latitude,
                         'longitude' => $deliveryAddressLatLon->longitude,
-                        'firmId' => $product->firm->id,
+                        'firmId' => $firmId,
                     ]
                 );
+            });
 
-                if (!empty($raw)) {
-                    $radius = $raw->distance;
-                } else {
+            if ($raw) {
+                $radius = $raw->distance;
+                $warehouse = Cache::remember("warehouse_{$raw->id}", 60, function() use ($raw) {
+                    return Warehouse::find($raw->id);
+                });
+
+                if ($radius <= $warehouse->radius) {
                     $category->blured = true;
-                    continue;
-                }
-
-                $warehouse = Warehouse::find($raw->id);
-
-                if ($radius > $warehouse->radius) {
+                } else {
                     $category->blured = false;
-                } else {
-                    $category->blured = true;
                 }
-
-                unset($category->products);
+            } else {
+                $category->blured = true;
             }
+
+            unset($category->products);
         }
 
         $allCategories = $allCategories->toArray();
