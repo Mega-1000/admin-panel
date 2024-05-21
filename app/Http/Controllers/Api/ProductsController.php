@@ -240,61 +240,71 @@ class ProductsController extends Controller
     }
 
     /**
-     * @return ResponseFactory|Response
+     * @return JsonResponse
      */
     public function getCategoriesTree(): JsonResponse
     {
         $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get();
 
-//        foreach ($allCategories as $category) {
-//            $products = $category->products;
-//
-//            if ($products->count() === 0) {
-//                continue;
-//            }
-//
-//            $product = $products->first();
-//            $userZipCode = request()->query('zip-code');
-//            if (!$userZipCode || !$product?->firm) {
-//                continue;
-//            }
-//
-//            $deliveryAddressLatLon = PostalCodeLatLon::where('postal_code', $userZipCode)->first();
-//
-//            $raw = DB::selectOne(
-//                'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
-//                        POW(69.1 * (pc.latitude - :latitude), 2) +
-//                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
-//                        FROM postal_code_lat_lon pc
-//                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
-//                             JOIN warehouses w on wa.warehouse_id = w.id
-//                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
-//                        ORDER BY distance
-//                    limit 1',
-//                [
-//                    'latitude' => $deliveryAddressLatLon->latitude,
-//                    'longitude' => $deliveryAddressLatLon->longitude,
-//                    'firmId' => $product->firm->id,
-//                ]
-//            );
-//
-//            if (!empty($raw)) {
-//                $radius = $raw->distance;
-//            } else {
-//                $category->blured = true;
-//                continue;
-//            }
-//
-//            $warehouse = Warehouse::find($raw->id);
-//
-//            if ($radius > $warehouse->radius) {
-//                $category->blured = false;
-//            } else {
-//                $category->blured = true;
-//            }
-//
-//            unset($category->products);
-//        }
+        foreach ($allCategories as $category) {
+            if (
+                !(
+                    ($category->id >= 101 && $category->id <= 142) ||
+                    ($category->id >= 49 && $category->id <= 90) ||
+                    ($category->id >= 4 && $category->id <= 10)
+                )
+            ) {
+                continue;
+            }
+
+            $products = $category->products;
+
+            if ($products->count() === 0) {
+                continue;
+            }
+
+            $product = $products->first();
+            $userZipCode = request()->query('zip-code');
+            if (!$userZipCode || !$product?->firm) {
+                continue;
+            }
+
+            $deliveryAddressLatLon = PostalCodeLatLon::where('postal_code', $userZipCode)->first();
+
+            $raw = DB::selectOne(
+                'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                        FROM postal_code_lat_lon pc
+                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                             JOIN warehouses w on wa.warehouse_id = w.id
+                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                        ORDER BY distance
+                    limit 1',
+                [
+                    'latitude' => $deliveryAddressLatLon->latitude,
+                    'longitude' => $deliveryAddressLatLon->longitude,
+                    'firmId' => $product->firm->id,
+                ]
+            );
+
+            if (!empty($raw)) {
+                $radius = $raw->distance;
+            } else {
+                $category->blured = true;
+                continue;
+            }
+
+            $warehouse = Warehouse::find($raw->id);
+
+            if ($radius > $warehouse->radius) {
+                $category->blured = false;
+            } else {
+                $category->blured = true;
+            }
+
+            unset($category->products);
+        }
 
         $allCategories = $allCategories->toArray();
         $tree = $this->parseTree($allCategories);
