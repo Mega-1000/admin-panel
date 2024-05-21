@@ -38,8 +38,11 @@ use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Http\Requests\ScheduleOrderReminderRequest;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
+use App\Jobs\ReferFriendNotificastionJob;
+use App\Jobs\ReferFriendNotificationJob;
 use App\Jobs\SendReminderAboutOfferJob;
 use App\Jobs\SendSpeditionNotifications;
+use App\Mail\ReferFriendEmail;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
@@ -263,6 +266,9 @@ class OrdersController extends Controller
 
             $order->customer_name = $request->user_name;
             $order->save();
+
+            $delay = now()->addHours(2);
+            dispatch(new ReferFriendNotificationJob($order))->delay($delay);
 
             return response()->json($builderData + [
                 'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
