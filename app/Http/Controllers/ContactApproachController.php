@@ -41,7 +41,7 @@ class ContactApproachController extends Controller
     public function index(): View
     {
         return view('aproaches-index', [
-            'items' => ContactApproach::where('from_date', '>', now())->orWhere('from_date', null)->where('done', false)->get(),
+            'items' => ContactApproach::where('from_date', '<', now())->orWhere('from_date', null)->where('done', false)->get(),
         ]);
     }
 
