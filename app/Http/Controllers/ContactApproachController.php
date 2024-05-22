@@ -75,6 +75,7 @@ class ContactApproachController extends Controller
 
         $new->done = false;
         $new->save();
+        dd($new);
 
         return redirect()->route('contact-aproach.index');
     }
