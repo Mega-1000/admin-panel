@@ -283,7 +283,6 @@
                            @endphp
 
                            @foreach($prices as $price)
-                               {{ $price->supplier_product_name }}
                                <td>
                                    @foreach($prices[0] as $p)
                                        @if(count($prices[0]) > 1)
