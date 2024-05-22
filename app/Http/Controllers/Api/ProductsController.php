@@ -405,7 +405,6 @@ class ProductsController extends Controller
     {
         $product = $product->stock->product()
             ->select('product_prices.*', 'product_packings.*', 'products.*')
-            ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->with('media')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
