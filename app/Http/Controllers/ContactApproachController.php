@@ -67,11 +67,11 @@ class ContactApproachController extends Controller
         $currentApproach->done = true;
         $currentApproach->save();
 
-        ContactApproach::create($currentApproach->toArray() + [
+        dd(ContactApproach::create($currentApproach->toArray() + [
             'from_date' => $request->get('from_date'),
             'prospect_email' => $request->get('prospect_email'),
             'notes' => $request->get('notes')
-        ]);
+        ]));
 
         return redirect()->route('contact-aproach.index');
     }
