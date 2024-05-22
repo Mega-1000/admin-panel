@@ -282,6 +282,7 @@
                                }
                            @endphp
 
+                           {{ dd($prices) }}
                            @foreach($prices as $price)
                                @if($price)
                                    <td>
