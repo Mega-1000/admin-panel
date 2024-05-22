@@ -509,7 +509,7 @@ class ProductsController extends Controller
                     return Warehouse::find($raw->id);
                 });
 
-                if ($radius <= $warehouse->radius) {
+                if ($radius >= $warehouse->radius) {
                     $category->blured = true;
                 } else {
                     $category->blured = false;
