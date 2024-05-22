@@ -63,7 +63,7 @@ class ContactApproachController extends Controller
 
     public function storeInterested(int $id, Request $request): RedirectResponse
     {
-        $currentApproach = ContactApproach::find($id)->toArray();
+        $currentApproach = ContactApproach::find($id);
         $currentApproach->done = true;
         $currentApproach->save();
 
