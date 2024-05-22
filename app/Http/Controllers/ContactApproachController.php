@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ContactApproach;
+use App\Facades\Mailer;
+use App\Mail\CallApproachHasBeenMadeProspect;
+use App\Mail\CallApproachHasBeenMadeReferee;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -71,6 +74,14 @@ class ContactApproachController extends Controller
         $currentApproach->prospect_email = $request->get('prospect_email');
         $currentApproach->notes = $request->get('notes');
         $currentApproach->save();
+
+        Mailer::create()
+            ->to($currentApproach->referredByUser->login)
+            ->send(new CallApproachHasBeenMadeReferee($currentApproach));
+
+        Mailer::create()
+            ->to($request->get('prospect_email'))
+            ->send(new CallApproachHasBeenMadeProspect($currentApproach));
 
         return redirect()->route('contact-aproach.index');
     }
