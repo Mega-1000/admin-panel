@@ -23,7 +23,7 @@ class ContactApproachController extends Controller
             'phone_number' => $request->get('phone_number'),
             'referred_by_user_id' => $request->get('referred_by_user_id'),
             'done' => false,
-        ]) + ['success' => true]);
+        ])->toArray() + ['success' => true]);
     }
 
     public function getApproachesByUser(int $userId): JsonResponse
