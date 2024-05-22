@@ -828,7 +828,9 @@ Route::get('newsletter/generate/{category}', [NewsletterController::class, 'gene
 
 
 Route::get('polecenia', [ContactApproachController::class, 'index'])->name('contact-aproach.index');
-Route::get('set-aproach-as-done/{id}', [ContactApproachController::class, 'setDone'])->name('set-aproach-as-done');
+Route::get('set-aproach-as-non-interested/{id}', [ContactApproachController::class, 'notInterested'])->name('set-approach-as-non-interested');
+Route::get('set-aproach-as-interested/{id}', [ContactApproachController::class, 'interested'])->name('set-approach-as-interested');
+Route::post('set-aproach-as-interested/{id}', [ContactApproachController::class, 'storeInterested']);
 
 Route::post('create-confirmation/{id}', [OrderPaymentConfirmationController::class, 'store'])->name('store-payment-confirmation');
 Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationController::class, 'confirm'])->name('store-payment-confirmation-confirm');

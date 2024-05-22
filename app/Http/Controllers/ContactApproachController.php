@@ -45,12 +45,30 @@ class ContactApproachController extends Controller
         ]);
     }
 
-    public function setDone(int $id): RedirectResponse
+    public function notInterested(int $id): RedirectResponse
     {
         $approach = ContactApproach::find($id);
         $approach->done = true;
         $approach->save();
 
         return redirect()->back();
+    }
+
+    public function interested(int $id): View
+    {
+        return view('confirm-approach', [
+            'approach' => ContactApproach::find($id),
+        ]);
+    }
+
+    public function storeInterested(int $id, Request $request): RedirectResponse
+    {
+        ContactApproach::create(ContactApproach::find($id)->toArray() + [
+            'from_date' => $request->get('from_date'),
+            'prospect_email' => $request->get('prospect_email'),
+            'notes' => $request->get('notes')
+        ]);
+
+        return redirect()->route('contact-aproach.index');
     }
 }

@@ -14,7 +14,10 @@ class ContactApproach extends Model
     protected $fillable = [
         'phone_number',
         'referred_by_user_id',
-        'done'
+        'done',
+        'from_date',
+        'prospect_email',
+        'notes',
     ];
 
     public function referredByUser(): BelongsTo

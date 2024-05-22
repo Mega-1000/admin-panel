@@ -8,15 +8,15 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Contact Approaches</h4>
+                        <h4>Prośby o kontakt</h4>
                     </div>
                     <div class="card-body">
                         <table class="table table-bordered">
                             <thead>
                             <tr>
-                                <th>Phone Number</th>
-                                <th>Referred By</th>
-                                <th>Actions</th>
+                                <th>Numer telefonu</th>
+                                <th>Email referenta</th>
+                                <th>Akcje</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -31,14 +31,17 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('set-aproach-as-done', $approach->id) }}" class="btn btn-primary">
-                                            Oznacz telefon jako wykonany
+                                        <a href="{{ route('set-approach-as-non-interested', $approach->id) }}" class="btn btn-danger">
+                                            Niezainteresowany
+                                        </a>
+                                        <a href="{{ route('set-approach-as-interested', $approach->id) }}" class="btn btn-success">
+                                            Zainteresowany
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3">No pending approaches found.</td>
+                                    <td colspan="3">Brak wpisów do wyświetlenia.</td>
                                 </tr>
                             @endforelse
                             </tbody>
