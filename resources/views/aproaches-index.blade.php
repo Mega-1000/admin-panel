@@ -16,6 +16,8 @@
                             <tr>
                                 <th>Numer telefonu</th>
                                 <th>Email referenta</th>
+                                <th>Email prospekta</th>
+                                <th>Notatki</th>
                                 <th>Akcje</th>
                             </tr>
                             </thead>
@@ -29,6 +31,12 @@
                                         @else
                                             -
                                         @endif
+                                    </td>
+                                    <td>
+                                        {{ $approach->prospect_email }}
+                                    </td>
+                                    <td>
+                                        {{ $approach->notes }}
                                     </td>
                                     <td>
                                         <a href="{{ route('set-approach-as-non-interested', $approach->id) }}" class="btn btn-danger">
