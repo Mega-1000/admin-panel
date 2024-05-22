@@ -64,18 +64,11 @@ class ContactApproachController extends Controller
     public function storeInterested(int $id, Request $request): RedirectResponse
     {
         $currentApproach = ContactApproach::find($id);
-        $currentApproach->done = true;
+        $currentApproach->from_date = $request->get('from_date');
+        $currentApproach->prospect_email = $request->get('prospect_email');
+        $currentApproach->notes = $request->get('notes');
         $currentApproach->save();
 
-        $new = ContactApproach::create($currentApproach->toArray() + [
-            'from_date' => $request->get('from_date'),
-            'prospect_email' => $request->get('prospect_email'),
-            'notes' => $request->get('notes')
-        ]);
-
-        $new->done = false;
-        $new->save();
-        dd($new);
 
         return redirect()->route('contact-aproach.index');
     }
