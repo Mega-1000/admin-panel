@@ -41,7 +41,7 @@ class ContactApproachController extends Controller
     public function index(): View
     {
         return view('aproaches-index', [
-            'items' => ContactApproach::where('done', false)->get(),
+            'items' => ContactApproach::where('done', false)->where('from_date', '>', now())->get(),
         ]);
     }
 
@@ -68,7 +68,6 @@ class ContactApproachController extends Controller
         $currentApproach->prospect_email = $request->get('prospect_email');
         $currentApproach->notes = $request->get('notes');
         $currentApproach->save();
-
 
         return redirect()->route('contact-aproach.index');
     }
