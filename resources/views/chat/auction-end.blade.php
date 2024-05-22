@@ -258,7 +258,6 @@
                                 $distance = round($raw?->distance, 2);
                         }
                    @endphp
-
                    @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                        <tr>
                            <td>
@@ -276,24 +275,22 @@
                                    $variations = App\Entities\Product::where('product_group', $item->product->product_group)
                                        ->where('product_name_supplier', $symbol)
                                        ->get();
-                                    $prices[] = $variations;
+                                   $prices[] = $variations;
 
                                    $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
                                }
                            @endphp
 
-{{--                           {{ dd($prices) }}--}}
                            @foreach($prices as $price)
                                <td>
-                                   @foreach($prices[0] as $p)
-                                       @if(count($prices[0]) > 1)
-                                        {{ $p->price->product->symbol }}:
+                                   @foreach($price as $p)
+                                       @if(count($price) > 1)
+                                           {{ $p->price->product->symbol }}:
                                        @endif
                                        {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
-{{--                                           <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $p->id }}" data-product-id="{{ $p->id }}" data-variation-id="{{ $p->id }}">--}}
                                        <br>
                                    @endforeach
-                                   </td>
+                               </td>
                            @endforeach
                            <td>{{ round($totalCost / 3.33, 2) }}</td>
                        </tr>
@@ -301,6 +298,7 @@
                            $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
                        @endphp
                    @endif
+
                @endforeach
 
                </tbody>
