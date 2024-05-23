@@ -70,7 +70,7 @@
     @endphp
 
     @foreach($products as $p)
-        {!! $p->count() > 1 ? '<div style="border: 4px red solid; font-weight: bolder; font-size: 24px"> Tylko jednen produkt z zaznaczonych na czerono zostanie wybrany przez klienta' : '' !!}
+        {!! $p->count() > 1 ? '<div style="border: 4px red solid;"> <div style="font-weight: bolder; font-size: 24px"> Tylko jednen produkt z zaznaczonych na czerono zostanie wybrany przez klienta</div>' : '' !!}
             <div style="padding: 10px">
                 @foreach($p as $product)
                     @php
