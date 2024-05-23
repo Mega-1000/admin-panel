@@ -73,8 +73,8 @@
         </div>
 
         <div class="output-container">
-            <input type="text" id="price-input" readonly value="50" name="price" placeholder="Cena" disabled>
-            <input type="text" id="quality-input" readonly value="50" name="quality" placeholder="Jakość" disabled>
+            <input type="text" id="price-input" value="50" name="price" placeholder="Cena">
+            <input type="text" id="quality-input" value="50" name="quality" placeholder="Jakość">
         </div>
 
         <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
