@@ -80,7 +80,7 @@ class SendSpeditionNotifications implements ShouldQueue
             $currentMinute = date('i');
 
             if (($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) || $currentHour >= 12) {
-                if ($fromDate->isPast() && $toDate->isFuture() && !Carbon::create($order->last_confirmation)->isToday() && !$order->special_data_filled && && $order?->warehouse?->warehouse_email) {
+                if ($fromDate->isPast() && $toDate->isFuture() && !Carbon::create($order->last_confirmation)->isToday() && !$order->special_data_filled && $order?->warehouse?->warehouse_email) {
                     updateOrderLabels($order, [244]);
 
                     Mailer::create()
