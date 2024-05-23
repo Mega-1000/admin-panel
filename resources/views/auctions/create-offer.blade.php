@@ -70,103 +70,105 @@
     @endphp
 
     @foreach($products as $p)
-        @foreach($p as $product)
-            @php
-                if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
-                    $alreadyDisplayed = true;
-                } else {
-                    $alreadyDisplayed = false;
-                }
+        <div style="border: 3px red solid;">
+            @foreach($p as $product)
+                @php
+                    if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
+                        $alreadyDisplayed = true;
+                    } else {
+                        $alreadyDisplayed = false;
+                    }
 
-                $parentProductsDisplayed[] = $product->parentProduct?->id;
-            @endphp
+                    $parentProductsDisplayed[] = $product->parentProduct?->id;
+                @endphp
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <div style="{{ $alreadyDisplayed ? 'display: none' : '' }}">
-                @if(is_a($product, \App\Entities\Product::class))
-                    <div class="alert alert-success text-center mb-4">
-                        <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers?->where('product_id', $product->id)->min('basic_price_net') ?? 'Brak ofert na ten moment' }} PLN</h4>
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                    <div class="product">
-                        <img class="img-fluid" src="{{$product->url_for_website}}" onerror="this.onerror=null;this.src='http://via.placeholder.com/300'">
-                        <div class="product-details">
-                            <div class="product-description">
-                                <h5>
+                @endif
+
+                <div style="{{ $alreadyDisplayed ? 'display: none' : '' }}">
+                    @if(is_a($product, \App\Entities\Product::class))
+                        <div class="alert alert-success text-center mb-4">
+                            <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers?->where('product_id', $product->id)->min('basic_price_net') ?? 'Brak ofert na ten moment' }} PLN</h4>
+                        </div>
+                        <div class="product">
+                            <img class="img-fluid" src="{{$product->url_for_website}}" onerror="this.onerror=null;this.src='http://via.placeholder.com/300'">
+                            <div class="product-details">
+                                <div class="product-description">
+                                    <h5>
+                                        @php
+                                            $name = $product->name;
+                                            $words = explode(' ', $name);
+                                            array_shift($words);
+                                            $name = implode(' ', $words);
+                                        @endphp
+                                        {{ $name }}
+                                    </h5>
+                                    <p>Symbol: {{ $product->symbol }}</p>
+                                    <p>Ilość paczek: {{ $product->quantity }}</p>
+                                    <p>Ilość m3: {{ round($product->quantity / 3.33, 2) }}</p>
+                                    <p>Cena podstawowa netto za paczkę: {{ round($product->price->net_purchase_price_basic_unit, 2) }} PLN</p>
+                                </div>
+                                <div>
                                     @php
-                                        $name = $product->name;
-                                        $words = explode(' ', $name);
-                                        array_shift($words);
-                                        $name = implode(' ', $words);
+                                        $productPrice = \App\Entities\ChatAuctionOffer::where('product_id', $product->id)
+                                                ->where('firm_id', $chat_auction_firm->firm_id);
+                                        $productPrices = [
+                                            'commercial_price_net' => $productPrice->min('commercial_price_net'),
+                                            'basic_price_net' => $productPrice->min('basic_price_net'),
+                                            'calculated_price_net' => $productPrice->min('calculated_price_net'),
+                                            'aggregate_price_net' => $productPrice->min('aggregate_price_net'),
+                                            'commercial_price_gross' => $productPrice->min('commercial_price_gross'),
+                                            'basic_price_gross' => $productPrice->min('basic_price_gross'),
+                                            'calculated_price_gross' => $productPrice->min('calculated_price_gross'),
+                                            'aggregate_price_gross' => $productPrice->min('aggregate_price_gross'),
+                                        ];
                                     @endphp
-                                    {{ $name }}
-                                </h5>
-                                <p>Symbol: {{ $product->symbol }}</p>
-                                <p>Ilość paczek: {{ $product->quantity }}</p>
-                                <p>Ilość m3: {{ round($product->quantity / 3.33, 2) }}</p>
-                                <p>Cena podstawowa netto za paczkę: {{ round($product->price->net_purchase_price_basic_unit, 2) }} PLN</p>
-                            </div>
-                            <div>
+
+                                    @csrf
+                                    <input type="hidden" class="unit_consumption" value="{{ $product->packing->unit_consumption }}">
+                                    <input type="hidden" class="number_of_sale_units_in_the_pack" value="{{ $product->packing->number_of_sale_units_in_the_pack }}">
+                                    <input type="hidden" class="numbers_of_basic_commercial_units_in_pack" value="{{ $product->packing->numbers_of_basic_commercial_units_in_pack }}">
+                                    <input type="hidden" name="order_item_id" value="{{ $product->id }}">
+
+                                    @include('chat/pricing_table', ['isAuctionOfferCreation' => true])
+                                </div>
                                 @php
-                                    $productPrice = \App\Entities\ChatAuctionOffer::where('product_id', $product->id)
-                                            ->where('firm_id', $chat_auction_firm->firm_id);
-                                    $productPrices = [
-                                        'commercial_price_net' => $productPrice->min('commercial_price_net'),
-                                        'basic_price_net' => $productPrice->min('basic_price_net'),
-                                        'calculated_price_net' => $productPrice->min('calculated_price_net'),
-                                        'aggregate_price_net' => $productPrice->min('aggregate_price_net'),
-                                        'commercial_price_gross' => $productPrice->min('commercial_price_gross'),
-                                        'basic_price_gross' => $productPrice->min('basic_price_gross'),
-                                        'calculated_price_gross' => $productPrice->min('calculated_price_gross'),
-                                        'aggregate_price_gross' => $productPrice->min('aggregate_price_gross'),
-                                    ];
+                                    $product->current_firm_offers = $product
+                                        ->chatAuctionOffers
+                                        ->where('firm_id', $chat_auction_firm->firm->id)
+                                        ->sortByDesc('id')
+                                        ->first();
                                 @endphp
-
-                                @csrf
-                                <input type="hidden" class="unit_consumption" value="{{ $product->packing->unit_consumption }}">
-                                <input type="hidden" class="number_of_sale_units_in_the_pack" value="{{ $product->packing->number_of_sale_units_in_the_pack }}">
-                                <input type="hidden" class="numbers_of_basic_commercial_units_in_pack" value="{{ $product->packing->numbers_of_basic_commercial_units_in_pack }}">
-                                <input type="hidden" name="order_item_id" value="{{ $product->id }}">
-
-                                @include('chat/pricing_table', ['isAuctionOfferCreation' => true])
-                            </div>
-                            @php
-                                $product->current_firm_offers = $product
-                                    ->chatAuctionOffers
-                                    ->where('firm_id', $chat_auction_firm->firm->id)
-                                    ->sortByDesc('id')
-                                    ->first();
-                            @endphp
-                            <div class="form-check mt-3">
                                 <div class="form-check mt-3">
-                                    <input class="form-check-input" type="checkbox" form="main" name="send_notification.{{ $product->id }}" value="true"
-                                        {{ $product->current_firm_offers?->send_notification ? 'checked' : '' }} {{ empty($product->current_firm_offers) ? 'checked' : '' }}>
-                                    <label class="form-check-label">Powiadamiaj mnie w przypadku przebicia najniższej ceny</label>
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" form="main" name="send_notification.{{ $product->id }}" value="true"
+                                            {{ $product->current_firm_offers?->send_notification ? 'checked' : '' }} {{ empty($product->current_firm_offers) ? 'checked' : '' }}>
+                                        <label class="form-check-label">Powiadamiaj mnie w przypadku przebicia najniższej ceny</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                @else
-                    @if( $product !== null )
-                        <div class="product">
-                            <img class="img-fluid" width="100" height="100" src="{{$product->getImageUrl()}}" onerror="this.onerror=null;this.src='http://via.placeholder.com/300'">
-                            <div class="product-details">
-                                <h5>{{ $product->name }}</h5>
-                                <p>Cena: {{ $product->price->gross_selling_price_commercial_unit }} PLN / {{ $product->packing->unit_commercial }}</p>
+                    @else
+                        @if( $product !== null )
+                            <div class="product">
+                                <img class="img-fluid" width="100" height="100" src="{{$product->getImageUrl()}}" onerror="this.onerror=null;this.src='http://via.placeholder.com/300'">
+                                <div class="product-details">
+                                    <h5>{{ $product->name }}</h5>
+                                    <p>Cena: {{ $product->price->gross_selling_price_commercial_unit }} PLN / {{ $product->packing->unit_commercial }}</p>
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     @endif
-                @endif
-            </div>
-        @endforeach
+                </div>
+            @endforeach
+        </div>
     @endforeach
 
     <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center">
