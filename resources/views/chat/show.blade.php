@@ -751,6 +751,7 @@
                 const tenHoursInMillis = 10 * 60 * 60 * 1000;
                 if ((dateToObj - dateFromObj) < tenHoursInMillis) {
                     showAlert('danger', 'Data początkowa musi być co najmniej 10 godzin wcześniejsza niż data końcowa.');
+                    $('#modifyDateModal').modal('hide');
                     return;
                 }
 
