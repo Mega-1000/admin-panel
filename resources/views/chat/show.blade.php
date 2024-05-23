@@ -771,7 +771,6 @@
 
             // Check if dateFrom is at least 10 hours less than dateTo
             var tenHoursInMillis = 10 * 60 * 60 * 1000;
-            alert((dateToObj - dateFromObj));
             if ((dateToObj - dateFromObj) < tenHoursInMillis) {
                 showAlert('danger', 'Data początkowa musi być co najmniej 10 godzin wcześniejsza niż data końcowa.');
                 return;
