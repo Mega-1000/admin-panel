@@ -51,6 +51,19 @@
     <form class="form-group-default m-6" action="{{ route('auctions.store', ['chat' => $chat->id, 'backUrl' => URL::previous()]) }}" method="post">
         @csrf
 
+        <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Data zakończenia przetargu</label>
+        <input type="datetime-local" id="base-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Data zakończenia przetargu" name="end_of_auction" value="{{ now()->setTime(15, 00) }}">
+
+        <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu</label>
+        <textarea
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            placeholder="Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu"
+            name="notes"
+        ></textarea>
+
+
+        <label for="base-input" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość</label>
+
         <label for="price-quality-slider" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość</label>
 
         <div class="slider-container">
@@ -67,7 +80,7 @@
         </div>
 
 
-        <label for="base-input" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość</label>
+        <label for="base-input" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość (przesuń suwak aby zmienić ten parametr)</label>
 
         Cena
         <input type="text" id="quality-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Cena" value="50" name="price">
