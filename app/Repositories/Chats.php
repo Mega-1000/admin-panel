@@ -59,7 +59,6 @@ class Chats
      */
     public static function getFullChatObject(mixed $chatId): \Illuminate\Database\Eloquent\Builder|array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
     {
-        dd($chatId);
         return Chat::with(['messages' => function ($q) {
             $q->with(['chatUser' => function ($q) {
                 $q->with(['customer' => function ($q) {
