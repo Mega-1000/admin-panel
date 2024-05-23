@@ -217,8 +217,8 @@
                                        @endforeach
 
                                        <span style="color: green">
-                                - specjalnie dla ciebie
-                            </span>
+                                            - specjalnie dla ciebie
+                                        </span>
 
                                        @php
                                            $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
@@ -300,9 +300,7 @@
                                @foreach($prices as $price)
                                    <td>
                                        @foreach($price as $p)
-                                           @if(count($price) > 1)
-                                               {{ $p->price->product->additional_info1 }}:
-                                           @endif
+                                           {{ $p->price->product->additional_info1 }}:
                                            {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
                                            <br>
                                        @endforeach
