@@ -189,40 +189,23 @@
                        @foreach($products as $product)
                            <td>
                                @php
-                                   $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)
-                                       ->where('product_group', $product->product->product_group)
-                                       ->orderBy('price.net_special_price_basic_unit') // Sort by price in ascending order
-                                       ->get();
+                                   $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)->where('product_group', $product->product->product_group)->get();
 
                                    $offers = [];
                                    foreach ($allProductsToBeDisplayed as $product) {
-                                       if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
-                                           $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
+                                       if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first())
+                                       {
+                                               $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
                                        }
                                    }
                                @endphp
 
-                               @if($offers !== [])
-                                   @foreach($offers as $offer)
-                                       {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}: {{ round($offer->basic_price_net * 1.23, 2) }}
-                                       <br>
-                                   @endforeach
-                                   <span style="color: green">
-                                        - specjalnie dla ciebie
-                                    </span>
-
-                                   @php
-                                       $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
-                                       \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)->whereHas('product', function ($q) use ($product) { $q->where('product_group', $product->product_group);})->first()?->quantity;
-                                   @endphp
-                               @else
-                                   No offer
-                               @endif
                            @if($offers !== [])
                                @foreach($offers as $offer)
                                    {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}: {{ round($offer->basic_price_net * 1.23, 2) }}
                                    <br>
                                @endforeach
+{{--                                   <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">--}}
 
                                    <span style="color: green">
                                        - specjalnie dla ciebie
