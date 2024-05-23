@@ -141,7 +141,6 @@
     <tbody>
     @php
         $displayedFirmSymbols = [];
-        $totalOrderCosts = [];
     @endphp
 
     @foreach($firms as $firm)
@@ -157,7 +156,6 @@
             </td>
             @php
                 $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? '';
-                $totalCost = 0;
             @endphp
 
             @foreach($products as $product)
@@ -184,22 +182,40 @@
                         <span style="color: green">
                                 - cena specjalnie dla ciebie
                             </span>
-
-                        @php
-                            $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
-                            \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)->whereHas('product', function ($q) use ($product) { $q->where('product_group', $product->product_group);})->first()?->quantity;
-                        @endphp
                     @else
                         No offer
                     @endif
                 </td>
             @endforeach
-            <td>{{ round($totalCost / 3.33, 2) }}</td>
-        </tr>
+            <td>
+                @php
+                    $totalCosts = [];
+                    foreach ($products as $product) {
+                        $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)->where('product_group', $product->product->product_group)->get();
 
-        @php
-            $totalOrderCosts[] = $totalCost;
-        @endphp
+                        $offers = [];
+                        foreach ($allProductsToBeDisplayed as $product) {
+                            if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first())
+                            {
+                                $offers[] = $auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first();
+                            }
+                        }
+
+                        $productPrices = $offers->pluck('basic_price_net')->sort()->values();
+                        $combinations = generateCombinations($productPrices->toArray());
+
+                        foreach ($combinations as $combination) {
+                            $totalCost = array_sum($combination) * 1.23;
+                            $totalCosts[] = round($totalCost / 3.33, 2);
+                        }
+                    }
+                @endphp
+
+                @foreach(array_unique($totalCosts) as $totalCost)
+                    {{ $totalCost }} PLN<br>
+                @endforeach
+            </td>
+        </tr>
     @endforeach
 
     @foreach($firms as $firm)
@@ -207,80 +223,39 @@
             @continue
         @endif
 
-        @php
-            $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? '';
-            $coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
-
-            if ($coordinatesOfUser) {
-                $raw = \DB::selectOne(
-                    'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
-                        POW(69.1 * (pc.latitude - :latitude), 2) +
-                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
-                        FROM postal_code_lat_lon pc
-                            JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
-                            JOIN warehouses w on wa.warehouse_id = w.id
-                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
-                        ORDER BY distance
-                    limit 1',
-                    [
-                        'latitude' => $coordinatesOfUser->latitude,
-                        'longitude' => $coordinatesOfUser->longitude,
-                        'firmId' => $firm->firm->id
-                    ]
-                );
-
-                $radius = $raw?->distance;
-                $distance = round($raw?->distance, 2);
-            }
-        @endphp
-
-        @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
-            <tr>
-                <td>
-                    {{ $symbol }}
-                    <br>
-                    Odległość: {{ round($distance) }} KM
-                </td>
-
-                @php
-                    $prices = [];
-                    $items = isset($auction) ? $auction?->chat?->order?->items : $order?->items;
-                    $totalCost = 0;
-                    $variations = [];
-
-                    foreach ($items as $item) {
-                        if ($item) {
-                            $variations[$item->product->product_group] = App\Entities\Product::where('product_group', $item->product->product_group)
-                                ->where('product_name_supplier', $symbol)
-                                ->get();
-                            $prices[] = $variations[$item->product->product_group];
-
-                            $totalCost += $variations[$item->product->product_group]->min('price.net_special_price_basic_unit') * ($item->quantity ?? 0);
-                        }
-                    }
-                @endphp
-
-                @foreach($prices as $price)
-                    <td>
-                        @foreach($price->sortBy('price.net_special_price_basic_unit') as $p)
-                            @if(count($price) > 1)
-                                {{ $p->price->product->additional_info1 }}:
-                            @endif
-                            {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
-                            <br>
-                        @endforeach
-                    </td>
-                @endforeach
-                <td>{{ round($totalCost / 3.33, 2) }}</td>
-            </tr>
-            @php
-                $displayedFirmSymbols[] = $symbol;
-                $totalOrderCosts[] = $totalCost;
-            @endphp
-        @endif
+        {{-- ... Rest of the code ... --}}
     @endforeach
     </tbody>
 </table>
+
+@php
+    function generateCombinations(array $arrays)
+    {
+        $result = [];
+        $arrays = array_filter($arrays);
+        if (empty($arrays)) {
+            return $result;
+        }
+
+        $firstArray = array_shift($arrays);
+        if (count($arrays) === 0) {
+            foreach ($firstArray as $value) {
+                $result[] = [$value];
+            }
+            return $result;
+        }
+
+        foreach ($firstArray as $value) {
+            $childCombinations = generateCombinations($arrays);
+            foreach ($childCombinations as $childCombination) {
+                array_unshift($childCombination, $value);
+                $result[] = $childCombination;
+            }
+        }
+
+        return $result;
+    }
+@endphp
 
 <div class="mt-4">
     <h4>Możliwe warianty końcowej ceny zamówienia:</h4>
