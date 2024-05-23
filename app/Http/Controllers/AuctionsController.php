@@ -277,7 +277,7 @@ class AuctionsController extends Controller
         );
 
         foreach ($auctions as $auction) {
-            $auction->date_of_delivery = 'Od: ' . $auction->chat?->order->dates->customer_delivery_date_from . 'Do: ' . $auction->chat?->order->dates->customer_delivery_date_to;
+            $auction->date_of_delivery = 'Od: ' . $auction->chat?->order->dates->customer_delivery_date_from . ' Do: ' . $auction->chat?->order->dates->customer_delivery_date_to;
         }
 
         return response()->json(
