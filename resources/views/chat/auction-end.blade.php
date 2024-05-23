@@ -159,7 +159,7 @@
                        </th>
                        @php $iteration++; @endphp
                    @endforeach
-                   <th>Końcowy koszt zamówienia</th>
+                   <th>Końcowy koszt zamówienia w przypadku wybrania najtańszych opcji</th>
                </tr>
                </thead>
                <tbody>
@@ -208,7 +208,7 @@
 {{--                                   <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">--}}
 
                                    <span style="color: green">
-                                       - cena specjalnie dla ciebie
+                                       - specjalnie dla ciebie
                                    </span>
 
                                    @php
