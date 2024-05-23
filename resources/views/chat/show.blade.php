@@ -952,7 +952,7 @@
               to = today.toISOString().slice(0, 11) + "23:59"
             }
             if (!from) {
-                from = today.toISOString().slice(0, 11) + "23:59"
+                from = today.toISOString().slice(0, 11) + "00:00"
             }
 
             $('#dateFrom').val(to);
