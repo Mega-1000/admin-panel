@@ -1,8 +1,8 @@
-<<div class="container mt-5 p-4 border rounded bg-light shadow-sm">
-    <h2 class="mb-4 text-center">Zarządzanie datami do zamówienia</h2>
+<div class="container mt-5" >
+    <h2>Zarządzanie datami do zamówienia</h2>
     <div id="alerts"></div>
-    <table class="table table-bordered" id="datesTable">
-        <thead class="thead-dark">
+    <table class="table" id="datesTable">
+        <thead>
         <tr>
             <th>Typ daty</th>
             <th>Od</th>
@@ -14,11 +14,7 @@
         <!-- Rows will be populated by JavaScript -->
         </tbody>
     </table>
-    <div class="text-right mt-3">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#modifyDateModal">Dodaj nową datę</button>
-    </div>
 </div>
-
 <!-- Modify Date Modal -->
 <div class="modal fade" id="modifyDateModal" tabindex="-1" role="dialog" aria-labelledby="modifyDateModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -50,43 +46,18 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
-                <button type="button" class="btn btn-primary" id="saveDateChanges" onclick="updateDates(); event.preventDefault();">Zapisz zmiany</button>
+                <div type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</div>
+                <div type="button" class="btn btn-primary" id="saveDateChanges" onclick="updateDates(); event.preventDefault();">Zapisz zmiany</div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="loadingScreen" style="display:none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050; display: flex; justify-content: center; align-items: center;">
+<div id="loadingScreen" style="display:none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050; justify-content: center; align-items: center;">
     <div style="padding: 20px; background: white; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
         Zapisywanie dat, proszę czekać...
     </div>
 </div>
-
-<style>
-    .container {
-        max-width: 900px;
-        margin: auto;
-    }
-    .modal-header, .modal-footer {
-        border: none;
-    }
-    .modal-body {
-        padding: 2rem;
-    }
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        transition: background-color 0.3s, border-color 0.3s;
-    }
-    .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #004085;
-    }
-    .modal-title {
-        font-weight: bold;
-    }
-</style>
 
 
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
