@@ -51,6 +51,9 @@
                 Miejscowość dostawy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->city }}<br>
                 Kod pocztowy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}<br>
                 Numer oferty: {{ $chat_auction_firm->chatAuction->chat->order->id }}<br>
+                Podział procentowy cena/jakość: <br>
+                Cena: {{ $chat_auction_firm->chatAuction->price }} <br>
+                Jakość: {{ $chat_auction_firm->chatAuction->quality }} <br>
                 Uwagi klienta do tego zamówienia: {{ $chat_auction_firm->chatAuction->notes ?? 'brak' }}
             </p>
         </div>

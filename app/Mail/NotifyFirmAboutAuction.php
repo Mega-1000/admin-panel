@@ -35,7 +35,7 @@ class NotifyFirmAboutAuction extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Powiadomienie o przetargu',
+            subject: 'Powiadomienie o przetargu na ofertę: ' . $this->auction->chat->order->id,
         );
     }
 
