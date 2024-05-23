@@ -1,20 +1,50 @@
-<div class="container mt-5" >
-    <h2>Zarządzanie datami do zamówienia</h2>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Harmonogram dostawy</h1>
     <div id="alerts"></div>
-    <table class="table" id="datesTable">
-        <thead>
-        <tr>
-            <th>Typ daty</th>
-            <th>Od</th>
-            <th>Do</th>
-            <th>Akcje</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Rows will be populated by JavaScript -->
-        </tbody>
-    </table>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#shipmentTab">Wysyłka</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#deliveryTab">Dostawa</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div id="shipmentTab" class="tab-pane fade show active">
+            <div class="table-responsive">
+                <table class="table table-striped" id="shipmentTable">
+                    <thead>
+                    <tr>
+                        <th>Od</th>
+                        <th>Do</th>
+                        <th class="text-center">Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="deliveryTab" class="tab-pane fade">
+            <div class="table-responsive">
+                <table class="table table-striped" id="deliveryTable">
+                    <thead>
+                    <tr>
+                        <th>Od</th>
+                        <th>Do</th>
+                        <th class="text-center">Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
 <!-- Modify Date Modal -->
 <div class="modal fade" id="modifyDateModal" tabindex="-1" role="dialog" aria-labelledby="modifyDateModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -27,22 +57,26 @@
             </div>
             <div class="modal-body">
                 <form id="modifyDateForm">
-                    <div class="form-group hidden">
-                        <label for="dateType">Typ daty</label>
-                        <select form="modifyDateForm" class="form-control" id="dateType">
-                            <option value="shipment">Wysyłka</option>
-                            <option value="delivery">Dostawa</option>
-                        </select>
-                    </div>
                     <div class="form-group">
                         <label for="dateFrom">Od</label>
-                        <input form="modifyDateForm" type="datetime-local" value="{{ now()->setTime(00, 00) }}" class="form-control" id="dateFrom" required>
+                        <div class="input-group date" id="datepickerFrom" data-target-input="nearest">
+                            <input form="modifyDateForm" type="text" value="{{ now()->setTime(00, 00)->format('Y-m-d H:i') }}" class="form-control datetimepicker-input" id="dateFrom" data-target="#datepickerFrom" required>
+                            <div class="input-group-append" data-target="#datepickerFrom" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="dateTo">Do</label>
-                        <input form="modifyDateForm" type="datetime-local" value="{{ now()->setTime(23, 59) }}" class="form-control" id="dateTo" required>
+                        <div class="input-group date" id="datepickerTo" data-target-input="nearest">
+                            <input form="modifyDateForm" type="text" value="{{ now()->setTime(23, 59)->format('Y-m-d H:i') }}" class="form-control datetimepicker-input" id="dateTo" data-target="#datepickerTo" required>
+                            <div class="input-group-append" data-target="#datepickerTo" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
                     </div>
                     <input form="modifyDateForm" type="hidden" id="orderId" value="">
+                    <input form="modifyDateForm" type="hidden" id="dateType" value="">
                 </form>
             </div>
             <div class="modal-footer">
@@ -53,9 +87,12 @@
     </div>
 </div>
 
-<div id="loadingScreen" style="display:none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050; justify-content: center; align-items: center;">
-    <div style="padding: 20px; background: white; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
-        Zapisywanie dat, proszę czekać...
+<div id="loadingScreen" class="d-flex justify-content-center align-items-center" style="display:none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050;">
+    <div class="p-4 bg-white rounded shadow">
+        <div class="spinner-border text-primary mb-3" role="status">
+            <span class="sr-only">Ładowanie...</span>
+        </div>
+        <h4>Zapisywanie dat, proszę czekać...</h4>
     </div>
 </div>
 
