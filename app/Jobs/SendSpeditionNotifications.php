@@ -83,9 +83,13 @@ class SendSpeditionNotifications implements ShouldQueue
                 if ($fromDate->isPast() && $toDate->isFuture() && !Carbon::create($order->last_confirmation)->isToday() && !$order->special_data_filled && $order?->warehouse?->warehouse_email) {
                     updateOrderLabels($order, [244]);
 
-                    Mailer::create()
-                        ->to($order->warehouse->warehouse_email)
-                        ->send(new SpeditionDatesMonit($order));
+                    try {
+                        Mailer::create()
+                            ->to($order->warehouse->warehouse_email)
+                            ->send(new SpeditionDatesMonit($order));
+                    } catch (\Exception $exception) {
+
+                    }
                 }
             }
 
