@@ -277,7 +277,7 @@
                                        ->get();
                                    $prices[] = $variations;
 
-                                   $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
+                                  $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
                                }
                            @endphp
 
