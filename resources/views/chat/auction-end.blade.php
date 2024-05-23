@@ -206,11 +206,27 @@
                                    @foreach($offers as $offer)
                                        {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}: {{ round($offer->basic_price_net * 1.23, 2) }}
                                        <br>
-                                       {{--                                   <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">--}}
                                    @endforeach
                                    <span style="color: green">
                                         - specjalnie dla ciebie
                                     </span>
+
+                                   @php
+                                       $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
+                                       \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)->whereHas('product', function ($q) use ($product) { $q->where('product_group', $product->product_group);})->first()?->quantity;
+                                   @endphp
+                               @else
+                                   No offer
+                               @endif
+                           @if($offers !== [])
+                               @foreach($offers as $offer)
+                                   {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}: {{ round($offer->basic_price_net * 1.23, 2) }}
+                                   <br>
+                               @endforeach
+
+                                   <span style="color: green">
+                                       - specjalnie dla ciebie
+                                   </span>
 
                                    @php
                                        $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
@@ -277,7 +293,7 @@
                                        ->get();
                                    $prices[] = $variations;
 
-                                  $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
+                                   $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
                                }
                            @endphp
 
