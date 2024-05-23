@@ -205,7 +205,6 @@
                                    {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}: {{ round($offer->basic_price_net * 1.23, 2) }}
                                    <br>
                                @endforeach
-
 {{--                                   <input type="checkbox" class="offer-checkbox" id="offer-checkbox{{ $offer->id }}" data-product-id="{{ $product->id }}" data-variation-id="{{ $offer->id }}">--}}
 
                                    <span style="color: green">
@@ -263,7 +262,7 @@
                            <td>
                                {{ $symbol }}
                                <br>
-                               Odległość: {{ $distance }} KM
+                               Odległość: {{ round($distance) }} KM
                            </td>
 
                            @php
