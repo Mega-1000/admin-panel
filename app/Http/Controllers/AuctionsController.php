@@ -74,6 +74,26 @@ class AuctionsController extends Controller
      */
     public function store(Chat $chat, CreateAuctionRequest $request, MessagesHelper $helper): RedirectResponse
     {
+        $request->validate([
+            'end_of_auction' => 'required|date|after:now',
+            'notes' => 'nullable|string|max:1000',
+            'price' => 'required|numeric|between:0,100',
+            'quality' => 'required|numeric|between:0,100'
+        ], [
+            'end_of_auction.required' => 'Pole data zakończenia przetargu jest wymagane.',
+            'end_of_auction.date' => 'Pole data zakończenia przetargu musi być prawidłową datą.',
+            'end_of_auction.after' => 'Pole data zakończenia przetargu musi być datą przyszłą.',
+            'notes.string' => 'Pole dodatkowe informacje musi być tekstem.',
+            'notes.max' => 'Pole dodatkowe informacje nie może mieć więcej niż 1000 znaków.',
+            'price.required' => 'Pole cena jest wymagane.',
+            'price.numeric' => 'Pole cena musi być liczbą.',
+            'price.between' => 'Pole cena musi być wartością między 0 a 100.',
+            'quality.required' => 'Pole jakość jest wymagane.',
+            'quality.numeric' => 'Pole jakość musi być liczbą.',
+            'quality.between' => 'Pole jakość musi być wartością między 0 a 100.',
+        ]);
+
+
         $auction = $this->chatAuctionsService->createAuction(
             CreateChatAuctionDTO::fromRequest($chat, $request->validated())
         );
