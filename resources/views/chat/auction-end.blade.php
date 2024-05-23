@@ -201,7 +201,8 @@
                             }
                         }
 
-                        $productPrices = $offers->pluck('basic_price_net')->sort()->values();
+                        $offersCollection = collect($offers); // Convert $offers to a collection
+                        $productPrices = $offersCollection->pluck('basic_price_net')->sort()->values();
                         $combinations = generateCombinations($productPrices->toArray());
 
                         foreach ($combinations as $combination) {
