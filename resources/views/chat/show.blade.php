@@ -765,6 +765,18 @@
         };
 
         const updateDatesSend = (params) => {
+            // Convert date strings to Date objects for comparison
+            var dateFromObj = new Date(params.shipmentDateFrom);
+            var dateToObj = new Date(params.shipmentDateTo);
+
+            // Check if dateFrom is at least 10 hours less than dateTo
+            var tenHoursInMillis = 10 * 60 * 60 * 1000;
+            alert((dateToObj - dateFromObj));
+            if ((dateToObj - dateFromObj) < tenHoursInMillis) {
+                showAlert('danger', 'Data początkowa musi być co najmniej 10 godzin wcześniejsza niż data końcowa.');
+                return;
+            }
+
             return fetch('/api/orders/' + params.orderId + '/updateDates', {
                 method: 'PUT',
                 credentials: 'same-origin',
@@ -809,18 +821,6 @@
         }
 
         function modifyOrderDate(orderId, dateType, dateFrom, dateTo, type) {
-            // Convert date strings to Date objects for comparison
-            var dateFromObj = new Date(dateFrom);
-            var dateToObj = new Date(dateTo);
-
-            // Check if dateFrom is at least 10 hours less than dateTo
-            var tenHoursInMillis = 10 * 60 * 60 * 1000;
-            alert((dateToObj - dateFromObj));
-            if ((dateToObj - dateFromObj) < tenHoursInMillis) {
-                showAlert('danger', 'Data początkowa musi być co najmniej 10 godzin wcześniejsza niż data końcowa.');
-                return;
-            }
-
             $.ajax({
                 url: '/api/orders/' + orderId + '/dates/modify', // Adjust this URL to your API endpoint
                 type: 'POST',
