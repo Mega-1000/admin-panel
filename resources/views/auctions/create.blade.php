@@ -86,8 +86,8 @@
     </div>
 
     <div class="output-container">
-        <input type="text" id="price-input" value="{{ old('price', 50) }}" name="price" placeholder="Cena" disabled>
-        <input type="text" id="quality-input" value="{{ old('quality', 50) }}" name="quality" placeholder="Jakość" disabled>
+        <input type="text" id="price-input" value="{{ old('price', 50) }}" name="price" placeholder="Cena" readonly>
+        <input type="text" id="quality-input" value="{{ old('quality', 50) }}" name="quality" placeholder="Jakość" readonly>
     </div>
     @if ($errors->has('price') || $errors->has('quality'))
         <div class="invalid-feedback">
