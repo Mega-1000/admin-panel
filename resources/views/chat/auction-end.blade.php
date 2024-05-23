@@ -285,7 +285,7 @@
                                <td>
                                    @foreach($price as $p)
                                        @if(count($price) > 1)
-                                           {{ $p->price->product->symbol }}:
+                                           {{ $p->price->product->additional_info1 }}:
                                        @endif
                                        {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
                                        <br>
