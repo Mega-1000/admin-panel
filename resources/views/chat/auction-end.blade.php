@@ -230,32 +230,36 @@
 </table>
 
 @php
-    function generateCombinations(array $arrays)
-    {
-        $result = [];
-        $arrays = array_filter($arrays);
-        if (empty($arrays)) {
-            return $result;
-        }
+    function generateCombinations($arrays)
+ {
+     if (!is_array($arrays)) {
+         return [];
+     }
 
-        $firstArray = array_shift($arrays);
-        if (count($arrays) === 0) {
-            foreach ($firstArray as $value) {
-                $result[] = [$value];
-            }
-            return $result;
-        }
+     $result = [];
+     $arrays = array_filter($arrays);
+     if (empty($arrays)) {
+         return $result;
+     }
 
-        foreach ($firstArray as $value) {
-            $childCombinations = generateCombinations($arrays);
-            foreach ($childCombinations as $childCombination) {
-                array_unshift($childCombination, $value);
-                $result[] = $childCombination;
-            }
-        }
+     $firstArray = array_shift($arrays);
+     if (count($arrays) === 0) {
+         foreach ($firstArray as $value) {
+             $result[] = [$value];
+         }
+         return $result;
+     }
 
-        return $result;
-    }
+     foreach ($firstArray as $value) {
+         $childCombinations = generateCombinations($arrays);
+         foreach ($childCombinations as $childCombination) {
+             array_unshift($childCombination, $value);
+             $result[] = $childCombination;
+         }
+     }
+
+     return $result;
+ }
 @endphp
 
 <div class="mt-4">
