@@ -55,16 +55,17 @@
 <form class="form-group-default m-6" action="{{ route('auctions.store', ['chat' => $chat->id, 'backUrl' => URL::previous()]) }}" method="post">
     @csrf
 
-    <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Data zakończenia przetargu</label>
-    <input type="datetime-local" id="base-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('end_of_auction') is-invalid @enderror" name="end_of_auction" value="{{ old('end_of_auction', now()->setTime(15, 00)) }}">
+    <label for="end_of_auction" class="block mb-2 text-sm font-medium mt-2">Data zakończenia przetargu</label>
+    <input type="datetime-local" id="end_of_auction" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('end_of_auction') is-invalid @enderror" name="end_of_auction" value="{{ old('end_of_auction', now()->setTime(15, 00)) }}">
     @error('end_of_auction')
     <div class="invalid-feedback">
         {{ $message }}
     </div>
     @enderror
 
-    <label for="base-input" class="block mb-2 text-sm font-medium mt-2">Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu</label>
+    <label for="notes" class="block mb-2 text-sm font-medium mt-2">Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu</label>
     <textarea
+        id="notes"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('notes') is-invalid @enderror"
         name="notes"
     >{{ old('notes') }}</textarea>
@@ -81,7 +82,7 @@
             <span>Cena</span>
             <span>Jakość</span>
         </div>
-        <input type="range" id="price-quality-slider" class="slider @error('price') @error('quality') is-invalid @enderror" min="0" max="100" value="{{ old('price', 50) }}" oninput="updateValues()">
+        <input type="range" id="price-quality-slider" class="slider @error('price') is-invalid @enderror @error('quality') is-invalid @enderror" min="0" max="100" value="{{ old('price', 50) }}" oninput="updateValues()">
     </div>
 
     <div class="output-container">
@@ -95,7 +96,7 @@
         </div>
     @endif
 
-    <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Zatwierdź
     </button>
 
