@@ -249,12 +249,14 @@
                     $variations = [];
 
                     foreach ($items as $item) {
-                        $variations[$item->product->product_group] = App\Entities\Product::where('product_group', $item->product->product_group)
-                            ->where('product_name_supplier', $symbol)
-                            ->get();
-                        $prices[] = $variations[$item->product->product_group];
+                        if ($item) {
+                            $variations[$item->product->product_group] = App\Entities\Product::where('product_group', $item->product->product_group)
+                                ->where('product_name_supplier', $symbol)
+                                ->get();
+                            $prices[] = $variations[$item->product->product_group];
 
-                        $totalCost += $variations[$item->product->product_group]->min('price.net_special_price_basic_unit') * $item->quantity;
+                            $totalCost += $variations[$item->product->product_group]->min('price.net_special_price_basic_unit') * ($item->quantity ?? 0);
+                        }
                     }
                 @endphp
 
