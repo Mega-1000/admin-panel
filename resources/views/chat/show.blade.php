@@ -947,8 +947,9 @@
             $('#orderId').val(orderId);
             $('#dateType').val(type);
 
-            $('#dateFrom').val(to);
-            $('#dateTo').val(from);
+            const today = new Date();
+            $('#dateFrom').val(to ?? today.toISOString().slice(0, 11) + "00:00");
+            $('#dateTo').val(from ?? today.toISOString().slice(0, 11) + "23:59");
 
             window.type11 = type11;
             $('#modifyDateModal').modal('show');
