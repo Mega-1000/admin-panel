@@ -70,8 +70,8 @@
     @endphp
 
     @foreach($products as $p)
-        {!! $p->count() > 1 ? '<div style="border: 4px red solid; border-radius: 5px"> <div style="font-weight: bolder; font-size: 24px"> Tylko jednen produkt z zaznaczonych na czerono zostanie wybrany przez klienta</div>' : '' !!}
-            <div style="padding: 10px">
+        {!! $p->count() > 1 ? '<div style="border: 4px red solid; border-radius: 10px"> <div style="font-weight: bolder; font-size: 24px"> Tylko jednen produkt z zaznaczonych na czerono zostanie wybrany przez klienta</div>' : '' !!}
+            <div style="padding: 15px">
                 @foreach($p as $product)
                     @php
                         if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
