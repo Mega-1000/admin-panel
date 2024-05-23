@@ -159,7 +159,7 @@
                        </th>
                        @php $iteration++; @endphp
                    @endforeach
-                   <th>Końcowy koszt zamówienia w przypadku wybrania najtańszych opcji</th>
+                   <th>Wartość w przypadku wybrania najtańszych opcji</th>
                </tr>
                </thead>
                <tbody>
