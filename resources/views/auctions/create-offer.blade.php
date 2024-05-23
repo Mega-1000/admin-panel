@@ -70,7 +70,7 @@
     @endphp
 
     @foreach($products as $p)
-        {!! $p->count() > 1 ? '<div style="border: 4px red solid; font-weight: bolder; font-size: larger"> Tylko jednen produkt z zaznaczonych na czerono zostanie wybrany przez klienta' : '' !!}
+        {!! $p->count() > 1 ? '<div style="border: 4px red solid; font-weight: bolder; font-size: 24px"> Tylko jednen produkt z zaznaczonych na czerono zostanie wybrany przez klienta' : '' !!}
             <div style="padding: 10px">
                 @foreach($p as $product)
                     @php
@@ -149,9 +149,9 @@
                                     @endphp
                                     <div class="form-check mt-3">
                                         <div class="form-check mt-3">
-                                            <input class="form-check-input" type="checkbox" form="main" name="send_notification.{{ $product->id }}" value="true"
+                                            <input class="form-check-input" id="{{ $product->id }}" type="checkbox" form="main" name="send_notification.{{ $product->id }}" value="true"
                                                 {{ $product->current_firm_offers?->send_notification ? 'checked' : '' }} {{ empty($product->current_firm_offers) ? 'checked' : '' }}>
-                                            <label class="form-check-label">Powiadamiaj mnie w przypadku przebicia najniższej ceny</label>
+                                            <label class="form-check-label" for="{{ $product->id }}">Powiadamiaj mnie w przypadku przebicia najniższej ceny</label>
                                         </div>
                                     </div>
                                 </div>
