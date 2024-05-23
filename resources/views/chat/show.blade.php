@@ -947,7 +947,7 @@
             $('#orderId').val(orderId);
             $('#dateType').val(type);
 
-            console.log(to, from)
+            console.log(!!to, from)
 
             //today.toISOString().slice(0, 11) + "00:00"
             //today.toISOString().slice(0, 11) + "23:59"
