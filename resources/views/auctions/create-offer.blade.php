@@ -173,7 +173,7 @@
         </div>
     @endforeach
 
-    <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center">
+    <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center mb-5">
         @csrf
         <button class="btn btn-primary">Zapisz wszystkie ceny</button>
     </form>
