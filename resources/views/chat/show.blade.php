@@ -809,6 +809,17 @@
         }
 
         function modifyOrderDate(orderId, dateType, dateFrom, dateTo, type) {
+            // Convert date strings to Date objects for comparison
+            var dateFromObj = new Date(dateFrom);
+            var dateToObj = new Date(dateTo);
+
+            // Check if dateFrom is at least 10 hours less than dateTo
+            var tenHoursInMillis = 10 * 60 * 60 * 1000;
+            if ((dateToObj - dateFromObj) < tenHoursInMillis) {
+                showAlert('danger', 'Data początkowa musi być co najmniej 10 godzin wcześniejsza niż data końcowa.');
+                return;
+            }
+
             $.ajax({
                 url: '/api/orders/' + orderId + '/dates/modify', // Adjust this URL to your API endpoint
                 type: 'POST',
@@ -820,14 +831,15 @@
                 },
                 success: function(data) {
                     $('#modifyDateModal').modal('hide');
-                    showAlert('success', 'PomyPomyślnie zaaktualizowano daty.');
+                    showAlert('success', 'Pomyślnie zaktualizowano daty.');
                     loadOrderDates(); // Refresh dates table
                 },
                 error: function(xhr, status, error) {
-                    showAlert('danger', 'Failed to modify the date.');
+                    showAlert('danger', 'Nie udało się zmodyfikować daty.');
                 }
             });
         }
+
 
         function populateDatesTable(dates) {
             let html = '';
