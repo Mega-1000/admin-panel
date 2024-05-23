@@ -166,7 +166,7 @@
                             </div>
                         @endif
                     @endif
-                </div>
+                {{ $p->count() > 1 ? '</div>' : '' }}
             @endforeach
         </div>
     @endforeach
