@@ -202,7 +202,7 @@
 
                            @if($offers !== [])
                                @foreach($offers as $offer)
-                                   {{ \App\Entities\Product::find($offer->product_id)->symbol }}: {{ $offer->basic_price_gross }}
+                                   {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}: {{ $offer->basic_price_gross }}
                                    <br>
                                @endforeach
 
