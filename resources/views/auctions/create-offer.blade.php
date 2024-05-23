@@ -70,7 +70,7 @@
     @endphp
 
     @foreach($products as $p)
-        {{ $p->count() > 1 ? '<div style="border: 3px red solid;">' : ''}}
+        {!! $p->count() > 1 ? '<div style="border: 3px red solid;">' : '' !!}
             @foreach($p as $product)
                 @php
                     if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
@@ -166,7 +166,7 @@
                             </div>
                         @endif
                     @endif
-                {{ $p->count() > 1 ? '</div>' : '' }}
+                {!! $p->count() > 1 ? '</div>' : '' !!}
             @endforeach
         </div>
     @endforeach
