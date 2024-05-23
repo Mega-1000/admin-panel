@@ -749,7 +749,7 @@
 
                 // Check if dateFrom is at least 10 hours less than dateTo
                 const tenHoursInMillis = 10 * 60 * 60 * 1000;
-                if (alert(dateToObj - dateFromObj) < tenHoursInMillis) {
+                if (dateFrom - dateTo < tenHoursInMillis) {
                     showAlert('danger', 'Data początkowa musi być co najmniej 10 godzin wcześniejsza niż data końcowa.');
                     $('#modifyDateModal').modal('hide');
                     return;
