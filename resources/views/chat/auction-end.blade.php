@@ -138,6 +138,8 @@
 {{--               Jeśli jesteś zadowolony z ceny konkretnego producenta zaznacz checkboxy przy cenach dla każdego produktu po czym naciśnij przycisk "Wyślij zamówienie"--}}
 {{--           </div>--}}
 
+           {{ $firms }}
+
            <table>
                <thead>
                <tr>
