@@ -138,8 +138,11 @@
 {{--               Jeśli jesteś zadowolony z ceny konkretnego producenta zaznacz checkboxy przy cenach dla każdego produktu po czym naciśnij przycisk "Wyślij zamówienie"--}}
 {{--           </div>--}}
 
-           {{ $firms }}
-
+           @if($firms->count() == 0)
+               <div class="text-center">
+                   <h1>Tu za nie długo zaczną wyświetlać się wyniki twojego przetargu.</h1>
+               </div>
+           @endif
            <table>
                <thead>
                <tr>
