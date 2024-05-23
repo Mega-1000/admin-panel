@@ -30,8 +30,9 @@ class ChatAuctionFirms
 
             foreach ($products as $p) {
                 $p->quantity = $item->quantity;
-                $res[] = $p;
             }
+
+            $res[] = $products;
         }
 
         return $res;
