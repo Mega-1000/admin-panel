@@ -55,9 +55,9 @@ class Chats
      * Get full chat object including messages, chat users, and order
      *
      * @param int $chatId
-     * @return Chat
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder[]
      */
-    public static function getFullChatObject(mixed $chatId): Chat
+    public static function getFullChatObject(mixed $chatId): \Illuminate\Database\Eloquent\Builder|array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
     {
         return Chat::with(['messages' => function ($q) {
             $q->with(['chatUser' => function ($q) {
@@ -72,6 +72,7 @@ class Chats
             $q->oldest();
         }])
         ->with('order')
-        ->find($chatId);
+        ->where('id', $chatId)
+        ->first();
     }
 }
