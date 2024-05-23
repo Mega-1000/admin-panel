@@ -190,7 +190,7 @@ class AuctionsController extends Controller
             ]));
         }
 
-        return redirect()->back();
+        return redirect()->to(url()->previous() . '?success=true');
     }
 
     /**

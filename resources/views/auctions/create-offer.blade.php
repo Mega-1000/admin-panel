@@ -191,7 +191,16 @@
 <script src="{{ asset('js/libs/blink-title.js') }}"></script>
 <script src="{{ asset('js/helpers/dynamic-calculator.js') }}"></script>
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    @if(request()->query('success'))
+        Swal.fire({
+            title: "Pomyślnie zapisano ceny!",
+            text: "Dziękujemy za udział w przetargu!",
+            icon: "question"
+        });
+    @endif
+
     setTimeout(() => {
         const priceInputs = document.getElementsByName('basic_price_net');
         priceInputs.forEach((priceInput) => {
