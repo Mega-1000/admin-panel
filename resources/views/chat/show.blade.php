@@ -968,8 +968,8 @@
                 from = today.toISOString().slice(0, 11) + "00:00"
             }
 
-            $('#dateFrom').val(to);
-            $('#dateTo').val(from);
+            $('#dateFrom').val(from);
+            $('#dateTo').val(to);
 
             window.type11 = type11;
             $('#modifyDateModal').modal('show');
