@@ -36,11 +36,11 @@
                     </div>
                     <div class="form-group">
                         <label for="dateFrom">Od</label>
-                        <input form="modifyDateForm" type="datetime-local" class="form-control" id="dateFrom" required>
+                        <input form="modifyDateForm" type="datetime-local" value="{{ now()->setTime(00, 00) }}" class="form-control" id="dateFrom" required>
                     </div>
                     <div class="form-group">
                         <label for="dateTo">Do</label>
-                        <input form="modifyDateForm" type="datetime-local" class="form-control" id="dateTo" required>
+                        <input form="modifyDateForm" type="datetime-local" value="{{ now()->setTime(23, 59) }}" class="form-control" id="dateTo" required>
                     </div>
                     <input form="modifyDateForm" type="hidden" id="orderId" value="">
                 </form>
