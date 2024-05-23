@@ -318,11 +318,11 @@
 
                    </tbody>
                </table>
-           @endif
 
-           <button class="btn btn-primary mt-2 mb-5" id="submit-button">
-               Wyślij zamówienie
-           </button>
+               <button class="btn btn-primary mt-2 mb-5" id="submit-button">
+                   Wyślij zamówienie
+               </button>
+           @endif
        </div>
 
    </div>
