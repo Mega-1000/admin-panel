@@ -62,7 +62,7 @@
         ></textarea>
 
 
-        <label for="base-input" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość</label>
+        <label for="base-input" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość (przesuń suwak aby zmienić ten parametr)</label>
 
         <label for="price-quality-slider" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość</label>
 
@@ -77,17 +77,6 @@
         <div class="output-container">
             <input type="text" id="price-input" readonly value="50" name="price" placeholder="Cena">
             <input type="text" id="quality-input" readonly value="50" name="quality" placeholder="Jakość">
-        </div>
-
-
-        <label for="base-input" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość (przesuń suwak aby zmienić ten parametr)</label>
-
-        Cena
-        <input type="text" id="quality-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Cena" value="50" name="price">
-
-        <div class="mt-4">
-            Jakość
-            <input type="text" id="price-input" class=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Jakość" value="50" name="quality">
         </div>
 
         <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
