@@ -123,10 +123,11 @@
                 const quantity = parseInt(checkedCheckbox.dataset.quantity);
                 productData.push({ productId, quantity });
             } else {
-                const productIds = Array.from(productGroup.querySelectorAll('span')).map(span => span.textContent.match(/Nazwa produktu: (.*)/)[1]);
-                const quantities = Array.from(productGroup.querySelectorAll('span')).map(span => parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33));
-                productIds.forEach((productId, index) => {
-                    productData.push({ productId, quantity: quantities[index] });
+                const products = Array.from(productGroup.querySelectorAll('span'));
+                products.forEach(span => {
+                    const productId = span.textContent.match(/Nazwa produktu: (.*)/)[1];
+                    const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
+                    productData.push({ productId, quantity });
                 });
             }
         });
