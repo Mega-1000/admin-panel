@@ -113,12 +113,12 @@
     sendOrderButton.addEventListener('click', sendOrder);
 
     function sendOrder() {
+        Swal.fire('Ładowanie...', '')
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', '')) * 3.33;
         const productData = [];
 
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
-        console.log(checkedCheckboxes)
         checkedCheckboxes.forEach(function(checkedCheckbox) {
             const productId = checkedCheckbox.getAttribute('data-product-id');
             const quantity = parseInt(checkedCheckbox.dataset.quantity);
@@ -138,8 +138,9 @@
             },
             body: JSON.stringify({ totalPrice, productData })
         })
-            .then(data => {
-                Swal.fire('Sukces', 'Pomyślnie złożono zamówienie. Zostaniesz przekierowany do banku', 'success')
+            .then(async (data) => {
+                await Swal.fire('Sukces', 'Pomyślnie złożono zamówienie. Zostaniesz przekierowany do banku', 'success')
+                window.location.href = 'https://mega1000.pl/payment?token={{ $order->id }}&total={{ $order->getValue() }}'
             })
             .catch(error => {
                 console.error('Error:', error);
