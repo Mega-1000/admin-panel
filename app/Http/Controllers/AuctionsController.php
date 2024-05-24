@@ -553,6 +553,7 @@ class AuctionsController extends Controller
             $companies[] = $company->id;
         }
 
+        $order->additional_service_cost = 50;
         $order->auction_order_placed = true;
         $order->save();
     }
