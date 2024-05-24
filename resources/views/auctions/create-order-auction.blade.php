@@ -63,7 +63,7 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.querySelectorAll('.product-checkbox').forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
@@ -141,8 +141,7 @@
         })
             .then(response => response.json())
             .then(data => {
-                console.log('Response from the server:', data);
-                // Handle the server response here
+                Swal.fire('Sukces', 'Pomyślnie złożono zamówienie. Zostaniesz przekierowany do banku', 'success')
             })
             .catch(error => {
                 console.error('Error:', error);
