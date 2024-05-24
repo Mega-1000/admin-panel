@@ -520,7 +520,7 @@ class AuctionsController extends Controller
         $companies = [];
 
         foreach ($products as $product) {
-            $productId = $product->productId;
+            $productId = $product->id;
             $quantity = $product->quantity;
 
             $product = Product::find($productId);
