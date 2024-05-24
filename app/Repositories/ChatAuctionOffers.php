@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Entities\ChatAuctionOffer;
+use App\Entities\Firm;
 use FontLib\TrueType\Collection;
 use Illuminate\Database\Eloquent\Model;
 

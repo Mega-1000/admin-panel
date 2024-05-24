@@ -56,7 +56,7 @@ class AuctionsController extends Controller
      * Show the form for creating a new resource.
      *
      * @param Chat $chat
-     * @return View
+     * @return View|RedirectResponse
      */
     public function create(Chat $chat): View|RedirectResponse
     {
@@ -70,6 +70,7 @@ class AuctionsController extends Controller
      *
      * @param Chat $chat
      * @param CreateAuctionRequest $request
+     * @param MessagesHelper $helper
      * @return RedirectResponse
      */
     public function store(Chat $chat, CreateAuctionRequest $request, MessagesHelper $helper): RedirectResponse
@@ -327,6 +328,7 @@ class AuctionsController extends Controller
             [
                 $firm,
                 $auctions,
+                ['haveToFillPrices' => $firm->products->where('date_of_price_change', '<', now())->count() > 0]
             ]
         );
     }
