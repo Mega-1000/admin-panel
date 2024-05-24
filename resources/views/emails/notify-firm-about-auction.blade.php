@@ -46,6 +46,17 @@ najniższą cenę.
 <br>
 <br>
 
+@if ($firm->products->where('date_of_price_change', '<', now())->count() > 0)
+    <div style="color: red; font-weight: bold">
+        !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nie aktualne. Prosimy o zaaktualizowanie ich lub zmiane daty ponownego powiadommoenia w panelu pod linkiem poniżej:
+        <br>
+        <br>
+        <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
+    </div>
+@endif
+<br>
+<br>
+
 W linku poniżej znajdziesz: <br>
 - Dostęp do wszystkich przetargów w których wasza firma zosatła zaproszona do udziału <br>
 - Dokonać zmiany cen tabelarycznych <br>
