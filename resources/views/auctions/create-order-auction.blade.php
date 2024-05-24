@@ -40,7 +40,7 @@
                             @endif
                             <span>
                                     Nazwa produktu: {{ $product->name }} <br>
-                                    Ilość m3: {{ $product->quantity / 3.33 }} <br>
+                                    Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
                                     Cena: {{ $productPrice }}
                                 </span>
                         </div>
