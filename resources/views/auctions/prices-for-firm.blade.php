@@ -58,6 +58,7 @@
 </head>
 
 <body>
+
 @if($firms->count() == 0)
     <div class="text-center">
         <h1>Tu za nie długo zaczną wyświetlać się wyniki twojego przetargu.</h1>
@@ -133,26 +134,22 @@
                             }
 
                             usort($offers, function($a, $b) {
-                                return $a->basic_price_net * 1.23 <=> $b->basic_price_net * 1.23;
+                                return $a->basic_price_net <=> $b->basic_price_net;
                             });
-
-                            $prices = [];
-                            foreach ($offers as $offer) {
-                                $prices[] = round($offer->basic_price_net * 1.23, 2);
-                            }
-
-                            $mediumPrice = count($prices) > 0 ? array_sum($prices) / count($prices) : 0;
                         @endphp
 
                         @if(!empty($offers))
+                            @foreach($offers as $offer)
+                                {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}: {{ round($offer->basic_price_net * 1.23, 2) }}
+                                <br>
+                            @endforeach
+
                             <span style="color: green">
-                                - specjalnie dla ciebie
-                            </span>
-                            <br>
-                            {{ $mediumPrice }}
+                                        - specjalnie dla ciebie
+                                    </span>
 
                             @php
-                                $totalCost += $mediumPrice *
+                                $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
                                 \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                     ->whereHas('product', function ($q) use ($product) {
                                         $q->where('product_group', $product->product_group);
@@ -202,20 +199,19 @@
                                 return $product->price->gross_purchase_price_basic_unit_after_discounts;
                             });
 
-                            $prices[] = $variations->map(function($product) {
-                                return $product->price->gross_purchase_price_basic_unit_after_discounts;
-                            });
+                            $prices[] = $variations;
 
-                            $totalCost += $variations->min('price.gross_purchase_price_basic_unit_after_discounts') * $item->quantity;
+                            $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
                         }
                     @endphp
 
                     @foreach($prices as $price)
                         <td>
-                            @php
-                                $mediumPrice = count($price->toArray()) > 0 ? array_sum($price->toArray()) / count($price->toArray()) : 0;
-                            @endphp
-                            {{ $mediumPrice }}
+                            @foreach($price as $p)
+                                {{ $p->price->product->additional_info1 }}:
+                                {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
+                                <br>
+                            @endforeach
                         </td>
                     @endforeach
                     <td>{{ round($totalCost / 3.33, 2) }}</td>
@@ -230,3 +226,10 @@
         </tbody>
     </table>
 @endif
+</div>
+</div>
+
+</div>
+</body>
+</html>
+
