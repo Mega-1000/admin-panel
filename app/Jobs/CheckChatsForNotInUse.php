@@ -31,7 +31,7 @@ class CheckChatsForNotInUse implements ShouldQueue
      */
     public function handle()
     {
-        $chats = Chat::where('is_active', true)->where('information_about_chat_inactiveness_sent', false)->get();
+        $chats = Chat::where('is_active', true)->where('information_about_chat_inactiveness_sent', false)->where('created_at', '>', Carbon::create('20.05.2024'))->get();
 
         foreach ($chats as $chat) {
             $lastMessageSentTime = $chat->messages->orderBy('created_at', 'desc')->first()->created_at;
