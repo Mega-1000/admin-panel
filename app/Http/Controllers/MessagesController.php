@@ -355,4 +355,12 @@ class MessagesController extends Controller
 
         return redirect()->back();
     }
+
+    public function markChatAsFinished(Chat $chat): string
+    {
+        $chat->is_active = false;
+        $chat->save();
+
+        return '<script>alert('Chat został oznaczony jako nie aktywny, dziękujemy za kożystanie z naszego serwisu.')</script>';
+    }
 }

@@ -836,3 +836,4 @@ Route::post('create-confirmation/{id}', [OrderPaymentConfirmationController::cla
 Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationController::class, 'confirm'])->name('store-payment-confirmation-confirm');
 
 Route::delete('delete-message/{message}', [MessagesController::class, 'delete'])->name('delete-message');
+Route::get('mark-chat-as-finished/{chat}', [MessagesController::class, 'markChatAsFinished'])->name('mark-chat-as-finished');
