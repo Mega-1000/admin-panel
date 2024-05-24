@@ -6,6 +6,7 @@ use App\Integrations\Pocztex\masaType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class ChatAuctionOffer extends Model
@@ -52,5 +53,10 @@ class ChatAuctionOffer extends Model
     public function orderItem(): BelongsTo
     {
         return $this->belongsTo(OrderItem::class);
+    }
+
+    public function product(): HasOne
+    {
+        return $this->hasOne(Product::class);
     }
 }

@@ -44,15 +44,7 @@ class ChatAuctionOffers
      */
     public static function getFirmsForAuctionOfferForEmailRemider(ChatAuctionOffer $chatAuctionOffer): \Illuminate\Support\Collection
     {
-        return ChatAuctionOffer::query()
-            ->join('firms', 'chat_auction_offers.firm_id', '=', 'firms.id') // adjust the columns based on your database structure
-            ->where('send_notification', true)
-            ->where('chat_auction_id', $chatAuctionOffer->chat_auction_id)
-            ->where('order_item_id', $chatAuctionOffer->order_item_id)
-            ->select('chat_auction_offers.*', 'firms.email') // adjust the select based on your needs
-            ->groupBy('firms.email')
-            ->where('commercial_price_net', '>', $chatAuctionOffer->commercial_price_net)
-            ->get();
+        return ChatAuctionOffer::query()->join('firms', 'chat_auction_offers.firm_id', '=', 'firms.id')->where('send_notification', true)->where('chat_auction_id', $chatAuctionOffer->chat_auction_id)->whereHas('product', function ($q) use ($chatAuctionOffer) {$q->where('product_group', $chatAuctionOffer->product->product_group)->where('additional_info1', $chatAuctionOffer->product->additional_info1);})->select('chat_auction_offers.*', 'firms.email')->groupBy('firms.email')->where('commercial_price_net', '>', $chatAuctionOffer->commercial_price_net)->get();
     }
 
 
