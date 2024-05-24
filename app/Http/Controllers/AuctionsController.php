@@ -266,7 +266,7 @@ class AuctionsController extends Controller
         }
 
         if (request()->query('isFirm')) {
-            return view('auctions-prices-for-firm', [
+            return view('auctions.prices-for-firm', [
                 'products' => $order->items,
                 'offers' => $auction->offers,
             ], compact('order', 'firms', 'auction'));
