@@ -113,6 +113,23 @@
     function sendOrder() {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', '')) * 3.33;
+        const productData = [];
+
+        const productGroups = Array.from(document.querySelectorAll('.border-b'));
+        productGroups.forEach(function(productGroup) {
+            const checkedCheckbox = productGroup.querySelector('.product-checkbox:checked');
+            if (checkedCheckbox) {
+                const productId = checkedCheckbox.closest('.border-b').querySelectorAll('span')[0].textContent.match(/Nazwa produktu: (.*)/)[1];
+                const quantity = parseInt(checkedCheckbox.dataset.quantity);
+                productData.push({ productId, quantity });
+            } else {
+                const productIds = Array.from(productGroup.querySelectorAll('span')).map(span => span.textContent.match(/Nazwa produktu: (.*)/)[1]);
+                const quantities = Array.from(productGroup.querySelectorAll('span')).map(span => parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33));
+                productIds.forEach((productId, index) => {
+                    productData.push({ productId, quantity: quantities[index] });
+                });
+            }
+        });
 
         fetch('/test', {
             method: 'POST',
@@ -120,7 +137,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({ totalPrice })
+            body: JSON.stringify({ totalPrice, productData })
         })
             .then(response => response.json())
             .then(data => {
