@@ -47,7 +47,8 @@
     </h3>
     <div class="row mb-4">
         <div class="col-md-6">
-            <p class="text-center" style="font-size: 2em">
+            <p class="text-center" style="font-size: 1.2em">
+                <a href="https://admin.mega1000.pl/auctions/133/end?isFirm=true&firmId=3490">Kliknij aby zobaczyć tabelę wszystkich cen podanych przez wszystkich uczestników</a>
                 Miejscowość dostawy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->city }}<br>
                 Kod pocztowy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}<br>
                 Numer oferty: {{ $chat_auction_firm->chatAuction->chat->order->id }}<br>
