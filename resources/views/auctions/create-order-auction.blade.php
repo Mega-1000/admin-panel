@@ -119,7 +119,7 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const formData = new FormData(document.querySelector('#checkout-form'));
 
-        fetch('{{ route('checkout.store') }}', {
+        fetch('oke', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken
