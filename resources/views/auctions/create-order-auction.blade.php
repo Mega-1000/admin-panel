@@ -39,7 +39,7 @@
                             @if($item->count() > 1)
                                 <input type="radio" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
                             @endif
-                            <span data-product-id="{{ $product->id }}">
+                            <span data-product-id="{{ $product->name }}">
                                 Nazwa produktu: {{ $product->name }} <br>
                                 Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
                                 Cena: {{ $productPrice }}
