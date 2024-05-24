@@ -3,6 +3,7 @@
 use App\Entities\ContactApproach;
 use App\Entities\Order;
 use App\Facades\Mailer;
+use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\OrderDatatableColumnsManagementController;
@@ -840,3 +841,5 @@ Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationControll
 
 Route::delete('delete-message/{message}', [MessagesController::class, 'delete'])->name('delete-message');
 Route::get('mark-chat-as-finished/{chat}', [MessagesController::class, 'markChatAsFinished'])->name('mark-chat-as-finished');
+
+Route::get('/make-order/{firm:symbol}/{order}', [AuctionsController::class, 'makeOrder'])->name('create-order-from-auction');

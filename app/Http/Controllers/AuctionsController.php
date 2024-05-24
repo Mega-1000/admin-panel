@@ -531,4 +531,19 @@ class AuctionsController extends Controller
             'products' => $order->items,
         ], compact('order', 'firms'));
     }
+
+    public function makeOrder(Order $order, Firm $firm): View
+    {
+        $finalItems = collect();
+        $items = $order->items;
+
+        foreach ($items as $item) {
+            $product = Product::where('product_group', $item->product->product_group)->get();
+            $product->quantity = $item->quantity;
+
+            $finalItems->push($product);
+        }
+
+        return view('create-order-auction', compact('order', 'firm', 'finalItems'));
+    }
 }
