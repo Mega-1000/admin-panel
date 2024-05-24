@@ -521,7 +521,7 @@ class AuctionsController extends Controller
 
         foreach ($products as $product) {
             $productId = $product['productId'];
-            $quantity = $product->quantity;
+            $quantity = $product['quantity'];
 
             $product = Product::find($productId);
             $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
