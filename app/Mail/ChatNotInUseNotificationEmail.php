@@ -37,7 +37,6 @@ class ChatNotInUseNotificationEmail extends Mailable
      */
     public function envelope(): Envelope
     {
-        dd('okej');
         return new Envelope(
             subject: 'Czy dialog został zakończony? Brak odpowiedzi na wiadomość na chacie od 2 dni',
         );
