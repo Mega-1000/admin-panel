@@ -64,7 +64,7 @@
         <h1>Tu za nie długo zaczną wyświetlać się wyniki twojego przetargu.</h1>
     </div>
 @else
-    <table class="mx-auto">
+    <table style="width: fit-content; margin: 0 auto">
         <thead>
         <tr>
             <th>
