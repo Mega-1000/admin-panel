@@ -81,8 +81,20 @@
                 const checkedQuantity = parseInt(checkedCheckbox.dataset.quantity);
                 totalPrice += checkedPrice * checkedQuantity;
             } else {
-                const productPrices = Array.from(productGroup.querySelectorAll('.product-checkbox')).map(cb => parseFloat(cb.dataset.price));
-                const productQuantities = Array.from(productGroup.querySelectorAll('.product-checkbox')).map(cb => parseInt(cb.dataset.quantity));
+                const productPrices = Array.from(productGroup.querySelectorAll('.product-checkbox, span')).map(el => {
+                    if (el.classList.contains('product-checkbox')) {
+                        return parseFloat(el.dataset.price);
+                    } else {
+                        return parseFloat(el.textContent.match(/Cena: ([\d\.]+)/)[1]);
+                    }
+                });
+                const productQuantities = Array.from(productGroup.querySelectorAll('.product-checkbox, span')).map(el => {
+                    if (el.classList.contains('product-checkbox')) {
+                        return parseInt(el.dataset.quantity);
+                    } else {
+                        return parseInt(el.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
+                    }
+                });
                 const groupTotalPrice = productPrices.reduce((sum, price, index) => sum + price * productQuantities[index], 0);
                 totalPrice += groupTotalPrice;
             }
