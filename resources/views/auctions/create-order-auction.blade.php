@@ -72,14 +72,22 @@
 
     function updateTotalPrice() {
         let totalPrice = 0;
-        const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
-        checkedCheckboxes.forEach(function(checkbox) {
-            const productGroup = checkbox.closest('.border-b');
-            const productPrices = Array.from(productGroup.querySelectorAll('.product-checkbox')).map(cb => parseFloat(cb.dataset.price));
-            const productQuantities = Array.from(productGroup.querySelectorAll('.product-checkbox')).map(cb => parseInt(cb.dataset.quantity));
-            const selectedProductIndex = Array.from(productGroup.querySelectorAll('.product-checkbox')).indexOf(checkbox);
-            totalPrice += productPrices[selectedProductIndex] * productQuantities[selectedProductIndex];
+        const productGroups = Array.from(document.querySelectorAll('.border-b'));
+
+        productGroups.forEach(function(productGroup) {
+            const checkedCheckbox = productGroup.querySelector('.product-checkbox:checked');
+            if (checkedCheckbox) {
+                const checkedPrice = parseFloat(checkedCheckbox.dataset.price);
+                const checkedQuantity = parseInt(checkedCheckbox.dataset.quantity);
+                totalPrice += checkedPrice * checkedQuantity;
+            } else {
+                const productPrices = Array.from(productGroup.querySelectorAll('.product-checkbox')).map(cb => parseFloat(cb.dataset.price));
+                const productQuantities = Array.from(productGroup.querySelectorAll('.product-checkbox')).map(cb => parseInt(cb.dataset.quantity));
+                const groupTotalPrice = productPrices.reduce((sum, price, index) => sum + price * productQuantities[index], 0);
+                totalPrice += groupTotalPrice;
+            }
         });
+
         document.querySelector('.total-price').textContent = totalPrice.toFixed(2) + 'ZŁ';
     }
 
