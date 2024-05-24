@@ -22,7 +22,7 @@
 
 <body class="bg-gray-100">
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Checkout</h1>
+    <h1 class="text-3xl font-bold mb-6">Wysyłanie zamówienia</h1>
     <div class="bg-white rounded-lg shadow-md p-6">
         @php
             $totalPrice = 0;
