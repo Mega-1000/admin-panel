@@ -39,11 +39,11 @@
                             @if($item->count() > 1)
                                 <input type="radio" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
                             @endif
-                            <span>
-                                    Nazwa produktu: {{ $product->name }} <br>
-                                    Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
-                                    Cena: {{ $productPrice }}
-                                </span>
+                            <span data-product-id="{{ $product->id }}">
+                                Nazwa produktu: {{ $product->name }} <br>
+                                Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
+                                Cena: {{ $productPrice }}
+                            </span>
                         </div>
                     </div>
                 @endforeach
@@ -119,13 +119,13 @@
         productGroups.forEach(function(productGroup) {
             const checkedCheckbox = productGroup.querySelector('.product-checkbox:checked');
             if (checkedCheckbox) {
-                const productId = checkedCheckbox.closest('.border-b').querySelectorAll('span')[0].textContent.match(/Nazwa produktu: (.*)/)[1];
+                const productId = checkedCheckbox.closest('.border-b').querySelector('span').getAttribute('data-product-id');
                 const quantity = parseInt(checkedCheckbox.dataset.quantity);
                 productData.push({ productId, quantity });
             } else {
-                const products = Array.from(productGroup.querySelectorAll('span'));
+                const products = Array.from(productGroup.querySelectorAll('span[data-product-id]'));
                 products.forEach(span => {
-                    const productId = span.textContent.match(/Nazwa produktu: (.*)/)[1];
+                    const productId = span.getAttribute('data-product-id');
                     const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
                     productData.push({ productId, quantity });
                 });
