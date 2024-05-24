@@ -24,16 +24,22 @@
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-6">Checkout</h1>
     <div class="bg-white rounded-lg shadow-md p-6">
+        @php
+            $totalPrice = 0;
+        @endphp
         @foreach($finalItems as $item)
             <div class="border-b py-4">
                 @foreach($item as $product)
+                    @php
+                        $productPrice = empty(\App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->commercial_price_gross) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->commercial_price_gross;
+                    @endphp
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
-                            <input type="checkbox" class="mr-2" @if($item->count() === 1) disabled @endif>
+                            <input type="checkbox" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" @if($item->count() === 1) checked @elseif($loop->first) checked @endif>
                             <span>
                                     Nazwa produktu: {{ $product->name }} <br>
                                     Ilość: {{ $product->quantity }} <br>
-                                    Cena: {{ empty(\App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->commercial_price_gross) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->commercial_price_gross }}
+                                    Cena: {{ $productPrice }}
                                 </span>
                         </div>
                     </div>
@@ -48,7 +54,7 @@
             </div>
             <div>
                 <h2 class="text-xl font-bold mb-2">Total:</h2>
-                <p>$99.99</p> <!-- Replace with actual total price calculation -->
+                <p class="total-price">$0</p>
                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
                     Proceed to Checkout
                 </button>
@@ -56,6 +62,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.product-checkbox').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            updateTotalPrice();
+        });
+    });
+
+    function updateTotalPrice() {
+        let totalPrice = 0;
+        const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
+        checkedCheckboxes.forEach(function(checkbox) {
+            totalPrice += parseFloat(checkbox.dataset.price);
+        });
+        document.querySelector('.total-price').textContent = '$' + totalPrice.toFixed(2);
+    }
+
+    updateTotalPrice();
+</script>
 </body>
 
 </html>
