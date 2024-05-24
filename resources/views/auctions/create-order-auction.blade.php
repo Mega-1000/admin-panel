@@ -88,7 +88,7 @@
             }
         });
 
-        document.querySelector('.total-price').textContent = totalPrice.toFixed(2) / 3.33 + 'ZŁ';
+        document.querySelector('.total-price').textContent = (totalPrice / 3.33).toFixed(2) + 'ZŁ';
     }
 
     updateTotalPrice();
