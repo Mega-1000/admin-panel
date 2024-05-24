@@ -118,6 +118,7 @@
         const productData = [];
 
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
+        console.log(checkedCheckboxes)
         checkedCheckboxes.forEach(function(checkedCheckbox) {
             const productId = checkedCheckbox.closest('.border-b').querySelector('span').getAttribute('data-product-id');
             const quantity = parseInt(checkedCheckbox.dataset.quantity);
