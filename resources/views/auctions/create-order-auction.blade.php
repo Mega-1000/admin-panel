@@ -78,7 +78,7 @@
         checkedCheckboxes.forEach(function(checkbox) {
             totalPrice += parseFloat(checkbox.dataset.price);
         });
-        document.querySelector('.total-price').textContent = '$' + totalPrice.toFixed(2);
+        document.querySelector('.total-price').textContent =  totalPrice.toFixed(2) + ' ZŁ';
     }
 
     updateTotalPrice();
