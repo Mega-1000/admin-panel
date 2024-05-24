@@ -840,6 +840,3 @@ Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationControll
 
 Route::delete('delete-message/{message}', [MessagesController::class, 'delete'])->name('delete-message');
 Route::get('mark-chat-as-finished/{chat}', [MessagesController::class, 'markChatAsFinished'])->name('mark-chat-as-finished');
-Route::get('postcard', function () {
-    Mailer::create()->to('antoniwoj@o2.pl')->send(new ChatNotInUseNotificationEmail(Order::find(85685)->chat));
-});
