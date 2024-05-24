@@ -544,6 +544,6 @@ class AuctionsController extends Controller
             $finalItems->push($product);
         }
 
-        return view('create-order-auction', compact('order', 'firm', 'finalItems'));
+        return view('auctions.create-order-auction', compact('order', 'firm', 'finalItems'));
     }
 }
