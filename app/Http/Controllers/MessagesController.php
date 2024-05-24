@@ -361,6 +361,6 @@ class MessagesController extends Controller
         $chat->is_active = false;
         $chat->save();
 
-        return '<script>alert('Chat został oznaczony jako nie aktywny, dziękujemy za kożystanie z naszego serwisu.')</script>';
+        return '<script>alert("Chat został oznaczony jako nie aktywny, dziękujemy za kożystanie z naszego serwisu.")</script>';
     }
 }
