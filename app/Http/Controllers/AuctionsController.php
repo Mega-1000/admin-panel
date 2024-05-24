@@ -473,48 +473,6 @@ class AuctionsController extends Controller
         ]);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function placeOrderForAuction(ChatAuction $auction, Request $request): RedirectResponse
-    {
-        $products = json_decode($request->get('order'));
-
-        $orderBuilder = OrderBuilderFactory::create();
-        $order = Order::find($auction->chat->order->id);
-
-        $order->items()->delete();
-
-        $companies = [];
-        foreach ($products as $product) {
-            $product = Product::find($product->productId);
-            $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
-                ->where('order_item_id', $order->items()?->where('product_id', $product?->id)?->first()?->id)
-                ->first();
-
-            $orderBuilder->assignItemsToOrder($order, [
-                $product->toArray() + ['amount' => 1, 'gross_selling_price_commercial_unit' => $offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit] ,
-            ], false);
-
-            $company = Firm::first();
-            $chat = $order->chat;
-
-            if (in_array($company->id, $companies)) {
-                continue;
-            }
-
-            foreach ($company->employees as $employee) {
-                MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
-            }
-            $companies[] = $company->id;
-        }
-
-        $order->auction_order_placed = true;
-        $order->save();
-
-        return redirect()->back()->with(['success' => true]);
-    }
-
     public function styrofoamVariationsView(Order $order, ProductService $productService): View
     {
         $items = collect($productService->getVariations($order));
@@ -547,5 +505,55 @@ class AuctionsController extends Controller
         }
 
         return view('auctions.create-order-auction', compact('order', 'firm', 'finalItems'));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function submitOrder(Order $order, Request $request): void
+    {
+        $requestData = $request->all(); // Get the entire request data
+        $products = $requestData['productData']; // Assuming the JavaScript object is sent as part of the request data
+
+        $orderBuilder = OrderBuilderFactory::create();
+        $order->items()->delete();
+        $companies = [];
+
+        foreach ($products as $product) {
+            $productId = $product->productId;
+            $quantity = $product->quantity;
+
+            $product = Product::find($productId);
+            $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
+                ->where('order_item_id', $order->items()?->where('product_id', $product?->id)?->first()?->id)
+                ->first();
+
+            $orderBuilder->assignItemsToOrder(
+                $order,
+                [
+                    $product->toArray() + [
+                        'amount' => $quantity,
+                        'gross_selling_price_commercial_unit' => $offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit
+                    ],
+                ],
+                false
+            );
+
+            $company = Firm::first();
+            $chat = $order->chat;
+
+            if (in_array($company->id, $companies)) {
+                continue;
+            }
+
+            foreach ($company->employees as $employee) {
+                MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+            }
+
+            $companies[] = $company->id;
+        }
+
+        $order->auction_order_placed = true;
+        $order->save();
     }
 }

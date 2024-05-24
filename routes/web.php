@@ -843,3 +843,4 @@ Route::delete('delete-message/{message}', [MessagesController::class, 'delete'])
 Route::get('mark-chat-as-finished/{chat}', [MessagesController::class, 'markChatAsFinished'])->name('mark-chat-as-finished');
 
 Route::get('/make-order/{firm:symbol}/{order}', [AuctionsController::class, 'makeOrder'])->name('create-order-from-auction');
+Route::post('/submit-order/{order}', [AuctionsController::class, 'submitOrder']);
