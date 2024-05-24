@@ -1,6 +1,8 @@
 <?php
 
 use App\Entities\ContactApproach;
+use App\Entities\Order;
+use App\Facades\Mailer;
 use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\OrderDatatableColumnsManagementController;
@@ -42,6 +44,7 @@ use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
 use App\Http\Middleware\FilterOrderInvoiceValue;
+use App\Mail\ChatNotInUseNotificationEmail;
 use http\Client\Request;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -837,3 +840,6 @@ Route::get('create-confirmation/{id}/confirm', [OrderPaymentConfirmationControll
 
 Route::delete('delete-message/{message}', [MessagesController::class, 'delete'])->name('delete-message');
 Route::get('mark-chat-as-finished/{chat}', [MessagesController::class, 'markChatAsFinished'])->name('mark-chat-as-finished');
+Route::get('postcard', function () {
+    Mailer::create()->to('antoniwoj@o2.pl')->send(new ChatNotInUseNotificationEmail(Order::find(85685)->chat));
+});
