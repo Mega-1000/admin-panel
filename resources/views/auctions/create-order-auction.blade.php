@@ -35,7 +35,9 @@
                     @endphp
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
-                            <input type="checkbox" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" @if($item->count() === 1) checked @elseif($loop->first) checked @endif>
+                            @if($item->count() > 1)
+                                <input type="radio" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" @if($loop->first) checked @endif>
+                            @endif
                             <span>
                                     Nazwa produktu: {{ $product->name }} <br>
                                     Ilość: {{ $product->quantity }} <br>
