@@ -117,22 +117,17 @@
         const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', '')) * 3.33;
         const productData = [];
 
-        const productGroups = Array.from(document.querySelectorAll('.border-b'));
-        productGroups.forEach(function(productGroup) {
-            const checkedCheckbox = productGroup.querySelector('.product-checkbox:checked');
-            if (checkedCheckbox) {
-                const productId = checkedCheckbox.closest('.border-b').querySelector('span').getAttribute('data-product-id');
-                const quantity = parseInt(checkedCheckbox.dataset.quantity);
-                productData.push({ productId, quantity });
-            } else {
-                const products = Array.from(productGroup.querySelectorAll('span[data-product-id]'));
-                products.forEach(span => {
-                    const productId = span.getAttribute('data-product-id');
-                    const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
-                    productData.push({ productId, quantity });
-                });
-            }
+        const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
+        checkedCheckboxes.forEach(function(checkedCheckbox) {
+            const productId = checkedCheckbox.closest('.border-b').querySelector('span').getAttribute('data-product-id');
+            const quantity = parseInt(checkedCheckbox.dataset.quantity);
+            productData.push({ productId, quantity });
         });
+
+        if (productData.length === 0) {
+            Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt', 'error');
+            return;
+        }
 
         fetch('/submit-order/{{ $order->id }}', {
             method: 'POST',
