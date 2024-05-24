@@ -37,7 +37,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
                             @if($item->count() > 1)
-                                <input type="radio" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
+                                <input type="radio" data-product-id="{{ $product->id }}" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
                             @endif
                             <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
                                     Nazwa produktu: {{ $product->name }} <br>
@@ -120,7 +120,7 @@
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
         console.log(checkedCheckboxes)
         checkedCheckboxes.forEach(function(checkedCheckbox) {
-            const productId = checkedCheckbox.closest('.border-b').querySelector('span').getAttribute('data-product-id');
+            const productId = checkedCheckbox.getAttribute('data-product-id');
             const quantity = parseInt(checkedCheckbox.dataset.quantity);
             productData.push({ productId, quantity });
         });
