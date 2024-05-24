@@ -20,7 +20,7 @@
             @foreach($item as $product)
                 <span>
                     Nazwa produktu: {{ $product->name }} Ilość: {{ $product->quantity }} Cena:
-                    {{ !!\App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->commercial_price_gross }} {{ $product->price?->basic_price_gross }}
+                    {{ !!\App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->commercial_price_gross }} {{ $product->price?->gross_selling_price_basic_unit }}
                     @if($item->count() > 1) <input type="checkbox"> @endif
                 </span>
             @endforeach
