@@ -532,7 +532,7 @@ class AuctionsController extends Controller
         ], compact('order', 'firms'));
     }
 
-    public function makeOrder(Order $order, Firm $firm): View
+    public function makeOrder(Firm $firm, Order $order): View
     {
         $finalItems = collect();
         $items = $order->items;
