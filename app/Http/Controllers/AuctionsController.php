@@ -539,7 +539,7 @@ class AuctionsController extends Controller
 
         foreach ($items as $item) {
             $product = Product::where('product_group', $item->product->product_group)->where('product_name_supplier', $firm->symbol)->get();
-            $product->quantity = $item->quantity;
+            $product->comments = $item->quantity;
 
             $finalItems->push($product);
         }

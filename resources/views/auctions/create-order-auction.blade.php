@@ -19,7 +19,7 @@
         <div>
             @foreach($item as $product)
                 <span>
-                    Nazwa produktu: {{ $product->name }} Ilość: {{ $product->quantity }}
+                    Nazwa produktu: {{ $product->name }} Ilość: {{ $product->comments }}
                     @if($item->count() > 1) <input type="checkbox"> @endif
                 </span>
             @endforeach
