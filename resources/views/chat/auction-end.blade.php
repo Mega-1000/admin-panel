@@ -307,6 +307,9 @@
                                    </td>
                                @endforeach
                                <td>{{ round($totalCost / 3.33, 2) }}</td>
+                               <a class="btn btn-primary">
+                                   Wyślij zamówienie na tego producenta
+                               </a>
                            </tr>
                            @php
                                $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
