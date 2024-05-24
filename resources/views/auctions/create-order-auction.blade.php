@@ -36,7 +36,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
                             @if($item->count() > 1)
-                                <input type="radio" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" @if($loop->first) checked @endif>
+                                <input type="radio" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
                             @endif
                             <span>
                                     Nazwa produktu: {{ $product->name }} <br>
@@ -76,9 +76,11 @@
         let totalPrice = 0;
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
         checkedCheckboxes.forEach(function(checkbox) {
-            totalPrice += parseFloat(checkbox.dataset.price);
+            const price = parseFloat(checkbox.dataset.price);
+            const quantity = parseInt(checkbox.dataset.quantity);
+            totalPrice += price * quantity;
         });
-        document.querySelector('.total-price').textContent =  totalPrice.toFixed(2) + ' ZŁ';
+        document.querySelector('.total-price').textContent = '$' + totalPrice.toFixed(2);
     }
 
     updateTotalPrice();
