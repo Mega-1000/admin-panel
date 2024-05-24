@@ -538,12 +538,12 @@ class AuctionsController extends Controller
         $items = $order->items;
 
         foreach ($items as $item) {
-            $product = Product::where('product_group', $item->product->product_group)->where('product_name_supplier', $firm->symbol)->get();
-            foreach ($product as $p) {
+            $products = Product::where('product_group', $item->product->product_group)->where('product_name_supplier', $firm->symbol)->get();
+            foreach ($products as $p) {
                 $p->quantity = $item->quantity;
             }
 
-            $finalItems->push($product);
+            $finalItems->push($products);
         }
 
         return view('auctions.create-order-auction', compact('order', 'firm', 'finalItems'));
