@@ -50,6 +50,9 @@
         @endforeach
         <div class="mt-6 flex justify-between">
             <div>
+
+            </div>
+            <div>
                 <h2 class="text-xl font-bold mb-2">Końcowa cena:</h2>
                 <p class="total-price">$0</p>
                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
