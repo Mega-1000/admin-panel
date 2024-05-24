@@ -27,11 +27,7 @@ class ChatNotInUseNotificationEmail extends Mailable
     public function __construct(Chat $chat)
     {
         $this->chat = $chat;
-        $messagesHelper = new MessagesHelper();
-        $orderId = $chat->order->id;
-        $messagesHelper->chatId = Order::find($orderId)?->chat?->id;
-        $token = $messagesHelper->getChatToken($orderId, $chat->order->customer->id, 'c');
-        $this->chatUrl = 'https://admin.mega1000.pl/chat/' . $token;
+        $this->chatUrl = 'https://admin.mega1000.pl/chat/';
     }
 
     /**
