@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.chat_name') }}</title>
 
@@ -104,6 +105,33 @@
     }
 
     updateTotalPrice();
+
+
+    const sendOrderButton = document.querySelector('button');
+    sendOrderButton.addEventListener('click', sendOrder);
+
+    function sendOrder() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', '')) * 3.33;
+
+        fetch('/test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ totalPrice })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response from the server:', data);
+                // Handle the server response here
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle the error here
+            });
+    }
 </script>
 </body>
 
