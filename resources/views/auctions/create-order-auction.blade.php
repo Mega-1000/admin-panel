@@ -50,15 +50,10 @@
         @endforeach
         <div class="mt-6 flex justify-between">
             <div>
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Continue Shopping
-                </button>
-            </div>
-            <div>
-                <h2 class="text-xl font-bold mb-2">Total:</h2>
+                <h2 class="text-xl font-bold mb-2">Końcowa cena:</h2>
                 <p class="total-price">$0</p>
                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
-                    Proceed to Checkout
+                    Wyślij zamówienie
                 </button>
             </div>
         </div>
@@ -80,7 +75,7 @@
             const quantity = parseInt(checkbox.dataset.quantity);
             totalPrice += price * quantity;
         });
-        document.querySelector('.total-price').textContent = '$' + totalPrice.toFixed(2);
+        document.querySelector('.total-price').textContent = totalPrice.toFixed(2) + 'ZŁ';
     }
 
     updateTotalPrice();
