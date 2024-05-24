@@ -93,7 +93,6 @@ class AuctionsController extends Controller
             'quality.between' => 'Pole jakość musi być wartością między 0 a 100.',
         ]);
 
-
         $auction = $this->chatAuctionsService->createAuction(
             CreateChatAuctionDTO::fromRequest($chat, $request->validated())
         );
