@@ -485,6 +485,16 @@ class MessagesHelper
 
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
+
+    public function sendAvisationDeny(Chat $chat, string $notices): void
+    {
+        $content = "Informujemy, że awizacja została odrzudona przez magazyn wydający. Z powodu: " . $notices;
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+        $this->chatId = $chat->id;
+
+        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+    }
+
     public function sendDateAcceptationMessage(Chat $chat): void
     {
         $content = 'Daty proponowane przez klienta i realizatora są zgodne i zostały finalnie zawierdzone przez obie strony.';

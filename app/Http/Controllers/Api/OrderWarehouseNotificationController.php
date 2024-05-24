@@ -43,14 +43,15 @@ class OrderWarehouseNotificationController extends Controller
         return OrderWarehouseNotification::find($notificationId);
     }
 
-    public function deny(DenyShipmentRequest $request, int $notificationId): JsonResponse
+    public function deny(DenyShipmentRequest $request, int $notificationId, MessagesHelper $messagesHelper): JsonResponse
     {
         try {
             $data = $request->validated();
             $data['waiting_for_response'] = false;
             $notification = $this->orderWarehouseNotificationRepository->update($data, $notificationId);
 
-            $this->sendMessage($data, $notification);
+            $messagesHelper->sendAvisationDeny($notification->order->chat, $request->get('customer_notices'));
+
             /** @var Order $order */
             $order = Order::query()->findOrFail($data['order_id']);
             dispatch(new DispatchLabelEventByNameJob($order, "warehouse-notification-denied"));
