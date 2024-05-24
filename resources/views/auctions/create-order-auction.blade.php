@@ -137,7 +137,6 @@
             },
             body: JSON.stringify({ totalPrice, productData })
         })
-            .then(response => response.json())
             .then(data => {
                 Swal.fire('Sukces', 'Pomyślnie złożono zamówienie. Zostaniesz przekierowany do banku', 'success')
             })
