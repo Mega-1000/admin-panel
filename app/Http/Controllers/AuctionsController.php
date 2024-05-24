@@ -538,7 +538,7 @@ class AuctionsController extends Controller
         $items = $order->items;
 
         foreach ($items as $item) {
-            $product = Product::where('product_group', $item->product->product_group)->get();
+            $product = Product::where('product_group', $item->product->product_group)->where('firm_id', $firm->id)->get();
             $product->quantity = $item->quantity;
 
             $finalItems->push($product);
