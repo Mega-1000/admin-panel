@@ -74,9 +74,11 @@
         let totalPrice = 0;
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
         checkedCheckboxes.forEach(function(checkbox) {
-            const price = parseFloat(checkbox.dataset.price);
-            const quantity = parseInt(checkbox.dataset.quantity);
-            totalPrice += price * quantity;
+            const productGroup = checkbox.closest('.border-b');
+            const productPrices = Array.from(productGroup.querySelectorAll('.product-checkbox')).map(cb => parseFloat(cb.dataset.price));
+            const productQuantities = Array.from(productGroup.querySelectorAll('.product-checkbox')).map(cb => parseInt(cb.dataset.quantity));
+            const selectedProductIndex = Array.from(productGroup.querySelectorAll('.product-checkbox')).indexOf(checkbox);
+            totalPrice += productPrices[selectedProductIndex] * productQuantities[selectedProductIndex];
         });
         document.querySelector('.total-price').textContent = totalPrice.toFixed(2) + 'ZŁ';
     }
