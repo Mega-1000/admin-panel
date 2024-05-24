@@ -131,7 +131,7 @@
             }
         });
 
-        fetch('/test', {
+        fetch('/submit-order/{{ $order->id }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
