@@ -168,7 +168,14 @@
             @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                 <tr>
                     <td>
-                        firma {{ $firmCounter }}
+                        firma
+                        @if($firm->firm->id == request()->query('firmId'))
+                            <span style="color: red; font-weight: bold">
+                                {{ $firm->firm->name }}
+                            </span>
+                        @else
+                            {{ $firmCounter }}
+                        @endif
                     </td>
 
                     @php
@@ -211,10 +218,6 @@
 
         </tbody>
     </table>
-
-    <button class="btn btn-primary mt-2 mb-5" id="submit-button">
-        Wyślij zamówienie
-    </button>
 @endif
 </div>
 </div>
