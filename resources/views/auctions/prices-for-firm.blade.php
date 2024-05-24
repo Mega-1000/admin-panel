@@ -85,7 +85,7 @@
                 </th>
                 @php $iteration++; @endphp
             @endforeach
-            <th>Wartość w przypadku wybrania najtańszych opcji</th>
+            <th>Wartość oferty w przypadku wybrania najtańszych opcji</th>
         </tr>
         </thead>
         <tbody>
