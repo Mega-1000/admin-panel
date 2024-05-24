@@ -12,6 +12,49 @@
     <title>{{ config('app.chat_name') }}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 40%;
+            margin: auto;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+            }
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        #chat-container {
+            margin-top: 50px;
+        }
+    </style>
 </head>
 
 <body>
