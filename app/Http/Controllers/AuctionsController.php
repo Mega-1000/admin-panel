@@ -520,10 +520,10 @@ class AuctionsController extends Controller
         $companies = [];
 
         foreach ($products as $product) {
-            $productId = $product->id;
+            $productId = $product['productId'];
             $quantity = $product->quantity;
 
-            $product = Product::find($productId);
+            $product = Product::where('name', $productId)->first();
             $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
                 ->where('order_item_id', $order->items()?->where('product_id', $product?->id)?->first()?->id)
                 ->first();
