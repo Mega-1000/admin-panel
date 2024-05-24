@@ -141,7 +141,7 @@
                                 $prices[] = round($offer->basic_price_net * 1.23, 2);
                             }
 
-                            $mediumPrice = count($prices) > 0 ? array_sum($prices->toArray()) / count($prices) : 0;
+                            $mediumPrice = count($prices) > 0 ? array_sum($prices) / count($prices) : 0;
                         @endphp
 
                         @if(!empty($offers))
