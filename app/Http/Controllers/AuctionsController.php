@@ -221,6 +221,19 @@ class AuctionsController extends Controller
         $order = $auction->chat->order;
         $firms = $this->chatAuctionFirmsRepository->getFirmsByChatAuction($auction->id);
 
+        if ($firms->count() == 0) {
+            $productService = app(ProductService::class);
+            $items = collect($productService->getVariations($order));
+            $firms = collect();
+
+            foreach($items as $item) {
+                foreach ($item as $i) {
+                    $i = Product::find($i['id']);
+                    $firms->push(Firm::where('symbol', $i->product_name_supplier)->first());
+                }
+            }
+        }
+
         $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
 
         if ($coordinatesOfUser) {
@@ -250,6 +263,13 @@ class AuctionsController extends Controller
                     $firms->forget($key);
                 }
             }
+        }
+
+        if (request()->query('isFirm')) {
+            return view('auctions-prices-for-firm', [
+                'products' => $order->items,
+                'offers' => $auction->offers,
+            ], compact('order', 'firms', 'auction'));
         }
 
         return view('chat.auction-end', [
