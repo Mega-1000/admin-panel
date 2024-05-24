@@ -18,6 +18,7 @@ use App\Repositories\ChatAuctionFirms;
 use App\Repositories\Chats;
 use App\Repositories\Employees;
 use App\Services\ChatAuctionsService;
+use App\Services\Label\AddLabelService;
 use App\Services\MessageService;
 use App\Services\ProductService;
 use App\Services\StyrofoarmAuctionService;
@@ -360,6 +361,13 @@ class MessagesController extends Controller
     {
         $chat->is_active = false;
         $chat->save();
+
+        $order = $chat->order;
+
+        $order->labels()->detach(254);
+
+        $arr = [];
+        AddLabelService::addLabels($order, [252], $arr, []);
 
         return '<script>alert("Chat został oznaczony jako nie aktywny, dziękujemy za kożystanie z naszego serwisu.")</script>';
     }
