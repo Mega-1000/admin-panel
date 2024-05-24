@@ -232,6 +232,10 @@ class AuctionsController extends Controller
                     $firms->push(Firm::where('symbol', $i->product_name_supplier)->first());
                 }
             }
+
+            foreach ($firms as $firm) {
+                 $firm->firm = $firm;
+            }
         }
 
         $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
