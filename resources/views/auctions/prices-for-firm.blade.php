@@ -101,7 +101,13 @@
 
             <tr>
                 <td>
-                    firma {{ $firmCounter }}
+                    @if($firm->firm->id == request()->query('firmId'))
+                        <span style="color: red; font-weight: bold">
+                            {{ $firm->firm->name }}
+                        </span>
+                    @else
+                        {{ $firmCounter }}
+                    @endif
                 </td>
                 @php
                     $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Add the symbol to the tracked array
@@ -168,7 +174,7 @@
             @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                 <tr>
                     <td>
-                        firma {{ $firm->firm->id }}
+                        firma
                         @if($firm->firm->id == request()->query('firmId'))
                             <span style="color: red; font-weight: bold">
                                 {{ $firm->firm->name }}
