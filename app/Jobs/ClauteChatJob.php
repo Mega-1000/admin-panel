@@ -96,6 +96,7 @@ Today is ' . now() . '
             try {
                 $response = json_decode(str_replace(',
 }', '}', json_decode($response)->content[0]->text));
+
                 if (isset($response->ChangeDates)) {
                     $dateRange = $response->ChangeDates;
 
