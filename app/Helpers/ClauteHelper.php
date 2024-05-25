@@ -44,8 +44,7 @@ class ClauteHelper
         $response = curl_exec($curl);
         curl_close($curl);
         $responseData = json_decode($response, true);
-        $content = $responseData['content'][0]['text'];
-
-        return $content;
+        dd($responseData);
+        return $responseData['content'][0]['text'];
     }
 }
