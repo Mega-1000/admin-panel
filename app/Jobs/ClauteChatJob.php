@@ -43,7 +43,7 @@ class ClauteChatJob implements ShouldQueue
         $anthropicVersion = "2023-06-01";
 
         $data = [
-            "model" => "claude-3-haiku-20240229",
+            "model" => "claude-3-haiku-20240307",
             "max_tokens" => 1024,
             "messages" => [
                 ["role" => "user", "content" => '
