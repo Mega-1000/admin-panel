@@ -95,7 +95,7 @@ user prompt: "' . $message . '"
 }', '}', json_decode($response)->content[0]->text));
 
 
-                if ($response->AddCompany) {
+                if (isset($response->AddCompany)) {
                     $company = Firm::where('symbol', $response->AddCompany)->first();
                     $helper = new MessagesHelper($request->token);
                     $order = $helper->getOrder();
