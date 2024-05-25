@@ -18,7 +18,7 @@ class ClauteChatJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public Request $request;
+    public array $request;
     /**
      * Create a new job instance.
      *

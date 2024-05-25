@@ -52,7 +52,7 @@ class MessagesController extends Controller
                 'message' => $message,
             ])->render();
 
-            dispatch(new ClauteChatJob((array)$request));
+            dispatch(new ClauteChatJob($request->all()));
 
             return response($msgTemplate);
         } catch (ChatException $e) {
