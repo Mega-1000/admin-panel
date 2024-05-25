@@ -111,7 +111,7 @@ user prompt: "' . $message . '"
                     }
                 }
 
-                if ($response->NoticeForUser) {
+                if (isset($response->NoticeForUser)) {
                     $dto =  CreateMessageDTO::fromRequest($request->validated(), $token);
                     $dto->message = $response->NoticeForUser;
                     $dto->
