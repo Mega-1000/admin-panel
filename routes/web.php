@@ -845,7 +845,7 @@ Route::get('mark-chat-as-finished/{chat}', [MessagesController::class, 'markChat
 Route::get('/make-order/{firm:symbol}/{order}', [AuctionsController::class, 'makeOrder'])->name('create-order-from-auction');
 Route::post('/submit-order/{order}', [AuctionsController::class, 'submitOrder']);
 
-Route::get('claute', function (\Illuminate\Http\Client\Request $request) {
+Route::get('claute', function ( $request) {
     $claute = app(\App\Helpers\ClauteHelper::class);
         $question = $request->query('question');
         return response()->stream(
