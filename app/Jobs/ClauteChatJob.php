@@ -46,17 +46,33 @@ class ClauteChatJob implements ShouldQueue
             "model" => "claude-3-opus-20240229",
             "max_tokens" => 1024,
             "messages" => [
-                ["role" => "user", "content" => 'You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this
-{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }
-if user wants to add some compoany wich is not in list provide response like this { "NoticeForUser": "change it to message for user", }
-There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"
-There is also possibiliy to change date of spedition in this case you have to return response like this
-{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }
-If user wants to perform onne of this actions to add otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more into { "NoticeForUser": "change it to message for user", }
-Is everything certain?
-Do not provide any other type response it will break system
-user prompt: "' . $message . '"
-']
+                ["role" => "user", "content" => '
+                `You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
+
+`{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
+
+`if user wants to add some compoany wich is not in list provide response like this`
+
+`{ "NoticeForUser": "change it to message for user", }`
+
+`There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
+
+`There is also possibiliy to change date of spedition in this case you have to return response like this`
+
+`{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
+
+`If user wants to perform onne of this actions to add otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more into`
+
+`{ "NoticeForUser": "change it to message for user", }`
+
+All response are samples witch just represent format of response not actual response so change it accordingly.
+
+Today is ‘ . now() . ’
+
+`Do not provide any other type response it will break systemuser`
+
+`prompt: "' . $message . '"`
+                ']
             ]
         ];
 
