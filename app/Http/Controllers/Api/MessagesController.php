@@ -91,7 +91,7 @@ user prompt: "' . $message . '"
             } else {
                 try {
                 $response = json_decode(str_replace(',
-}', '}', json_decode(dd($response))->content[0]->text));
+}', '}', json_decode($response)->content[0]->text));
 
 
                 if ($response->NoticeForUser) {
