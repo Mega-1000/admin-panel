@@ -103,10 +103,10 @@ user prompt: "' . $message . '"
                     foreach ($company->employees as $employee) {
                         $chatHelper = new MessagesHelper($order->chat->token);
 
-                        $chatHelper->chatId = $order-chat->id;
+                        $chatHelper->chatId = $order->chat->id;
                         $chatHelper->currentUserType = 'e';
 
-                        $userId = MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+                        $userId = MessageService::createNewCustomerOrEmployee($order->chat, new Request(['type' => 'Employee']), $employee);
                         $chatHelper->currentUserId = $userId;
 
 //            ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
