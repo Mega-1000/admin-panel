@@ -114,10 +114,14 @@ user prompt: "' . $message . '"
                 if (isset($response->NoticeForUser)) {
                     $dto =  CreateMessageDTO::fromRequest($request->validated(), $token);
                     $dto->message = $response->NoticeForUser;
-                    $dto->
 
-                    $message = $this->messageService->addMessage(
-                        $dto
+                    $helper = new MessagesHelper($request->token);
+                    $order = $helper->getOrder();
+
+                    $message = app(MessagesHelper::class)->sendDateChangeMessage(
+                        $dto,
+                        $order->chat,
+                        $dto->message,
                     );
 
                     $msgTemplate .= view('chat/single_message')->with([

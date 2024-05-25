@@ -466,6 +466,20 @@ class MessagesHelper
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
 
+    /**
+     * @throws ChatException
+     */
+    public function sendDateChangeMessage(Chat $chat, string $mess): void
+    {
+        $content = $mess;
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+        $this->chatId = $chat->id;
+
+        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+    }
+
+
+
     public function sendShippingInformation(Chat $chat): void
     {
         $order = $chat->order;
