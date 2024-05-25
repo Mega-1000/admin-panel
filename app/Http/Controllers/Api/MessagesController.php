@@ -109,7 +109,8 @@ user prompt: "' . $message . '"
                         $userId = MessageService::createNewCustomerOrEmployee($order->chat, new Request(['type' => 'Employee']), $employee);
                         $chatHelper->currentUserId = $userId;
 
-//            ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
+
+                        dd($userId);
                     }
                 }
 
