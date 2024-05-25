@@ -98,7 +98,7 @@ user prompt: "' . $message . '"
                             'customer_shipment_date_to' => $endDate,
                             'customer_delivery_date_from' => $startDate,
                             'customer_delivery_date_to' => $endDate,
-                        ])
+                        ]);
                     }
 
                 if (isset($response->AddCompany)) {
