@@ -875,7 +875,7 @@ Route::get('claute', function (\Illuminate\Http\Request $request) {
     if (curl_errno($ch)) {
         echo 'Error:' . curl_error($ch);
     } else {
-        echo json_decode($response)->content;
+        echo dd(json_decode($response));
     }
 
     curl_close($ch);
