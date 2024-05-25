@@ -89,8 +89,12 @@ user prompt: "siemka naklejka dodajta mi izoterma do chata"
             if (curl_errno($ch)) {
                 echo 'Error:' . curl_error($ch);
             } else {
+                try {
                 $response = json_decode(str_replace(',
 }', '}', json_decode($response)->content[0]->text));
+                } catch (\Exception $exception) {
+
+                }
 
                 if ($response->NoticeForUser) {
                     $dto =  CreateMessageDTO::fromRequest($request->validated(), $token);
