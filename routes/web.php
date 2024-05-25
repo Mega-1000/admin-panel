@@ -873,7 +873,7 @@ Route::get('claute', function (\Illuminate\Http\Request $request) {
                     'x-api-key' => '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'
                 ];
 
-                $claute = Anthropic::factory()
+                $claute = \Anthropic\Anthropic::factory()
                     ->withHeaders($headers)
                     ->make();
 
