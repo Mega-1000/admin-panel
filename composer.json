@@ -17,6 +17,7 @@
         "ext-mailparse": "*",
         "ext-soap": "*",
         "ext-zip": "*",
+        "ahmadrosid/anthropic-php": "^1.0",
         "barryvdh/laravel-cors": "v3.0.0",
         "barryvdh/laravel-dompdf": "v2.0.0",
         "bensampo/laravel-enum": "v6.2.2",
