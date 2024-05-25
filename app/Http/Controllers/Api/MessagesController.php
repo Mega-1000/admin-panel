@@ -55,7 +55,7 @@ class MessagesController extends Controller
             $anthropicVersion = "2023-06-01";
 
             $data = [
-                "model" => "claude-3-sonnet-20240229",
+                "model" => "claude-3-sonnet",
                 "max_tokens" => 1024,
                 "messages" => [
                     ["role" => "user", "content" => 'You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this
