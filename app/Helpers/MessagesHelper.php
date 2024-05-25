@@ -476,6 +476,8 @@ class MessagesHelper
         $this->chatId = $chat->id;
 
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+
+        return $content;
     }
 
 
