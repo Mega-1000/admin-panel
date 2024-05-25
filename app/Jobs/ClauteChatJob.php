@@ -100,6 +100,7 @@ user prompt: "' . $message . '"
                             'customer_delivery_date_to' => $endDate,
                         ]);
                     }
+                }
 
                     if (isset($response->AddCompany)) {
                         $company = Firm::where('symbol', $response->AddCompany)->first();
@@ -129,7 +130,6 @@ user prompt: "' . $message . '"
                             $dto->message,
                         );
                     }
-                }
 
             } catch (\Exception $exception) {
                 dd($exception);
