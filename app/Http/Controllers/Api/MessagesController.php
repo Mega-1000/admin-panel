@@ -6,6 +6,7 @@ use App\DTO\Messages\CreateMessageDTO;
 use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\Employee;
+use App\Entities\Firm;
 use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Helpers\Exceptions\ChatException;
@@ -61,7 +62,7 @@ class MessagesController extends Controller
                     ["role" => "user", "content" => 'You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this
 { "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }
 if user wants to add some compoany wich is not in list provide response like this { "NoticeForUser": "change it to message for user", }
-There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR"
+There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"
 There is also possibiliy to change date of spedition in this case you have to return response like this
 { "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }
 If user wants to perform onne of this actions to add otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more into { "NoticeForUser": "change it to message for user", }
@@ -94,6 +95,24 @@ user prompt: "' . $message . '"
 }', '}', json_decode($response)->content[0]->text));
 
 
+                if ($response->AddCompany) {
+                    $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
+                    $helper = new MessagesHelper($request->token);
+                    $order = Order::find($helper->orderId);
+
+                    foreach ($company->employees as $employee) {
+                        $chatHelper = new MessagesHelper($order->chat->token);
+
+                        $chatHelper->chatId = $order-chat->id;
+                        $chatHelper->currentUserType = 'e';
+
+                        $userId = MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+                        $chatHelper->currentUserId = $userId;
+
+//            ChatNotificationJob::sendNewMessageEmail($employee->email, $chatHelper);
+                    }
+                }
+
                 if ($response->NoticeForUser) {
                     $dto =  CreateMessageDTO::fromRequest($request->validated(), $token);
                     $dto->message = $response->NoticeForUser;
@@ -109,7 +128,7 @@ user prompt: "' . $message . '"
                 }
 
                 } catch (\Exception $exception) {
-dd($exception);
+                    dd($exception);
                 }
             }
 
