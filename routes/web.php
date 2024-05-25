@@ -885,7 +885,7 @@ user prompt: "siemka naklejka dodajta mi izoterma do chata"
     if (curl_errno($ch)) {
         echo 'Error:' . curl_error($ch);
     } else {
-        echo json_decode(dd(str_replace('",
+        echo json_decode(dd(str_replace(',
 }', '}', json_decode($response)->content[0]->text)));
 
         if (json_last_error() !== JSON_ERROR_NONE) {
