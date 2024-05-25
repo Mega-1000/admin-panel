@@ -24,7 +24,7 @@ class ClauteChatJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Request $request)
+    public function __construct(array $request)
     {
         $this->request = $request;
     }
@@ -36,7 +36,7 @@ class ClauteChatJob implements ShouldQueue
      */
     public function handle()
     {
-        $message = $this->request->message;
+        $message = $this->request['message'];
         $apiUrl = "https://api.anthropic.com/v1/messages";
         $apiKey = "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";
         $anthropicVersion = "2023-06-01";
@@ -83,7 +83,7 @@ user prompt: "' . $message . '"
 
                 if (isset($response->AddCompany)) {
                     $company = Firm::where('symbol', $response->AddCompany)->first();
-                    $helper = new MessagesHelper($this->request->token);
+                    $helper = new MessagesHelper($this->request['token']);
                     $order = $helper->getOrder();
 
                     foreach ($company->employees as $employee) {
@@ -98,20 +98,16 @@ user prompt: "' . $message . '"
                 }
 
                 if (isset($response->NoticeForUser)) {
-                    $dto =  CreateMessageDTO::fromRequest($this->request->validated(), $token);
+                    $dto =  CreateMessageDTO::fromRequest($this->request->validated(), $this->request['token']);
                     $dto->message = $response->NoticeForUser;
 
-                    $helper = new MessagesHelper($this->request->token);
+                    $helper = new MessagesHelper($this->request['token']);
                     $order = $helper->getOrder();
 
                     $message = app(MessagesHelper::class)->sendMessage(
                         $order->chat,
                         $dto->message,
                     );
-
-                    $msgTemplate .= view('chat/single_message')->with([
-                        'message' => $message,
-                    ])->render();
                 }
 
             } catch (\Exception $exception) {
