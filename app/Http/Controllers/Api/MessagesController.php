@@ -67,7 +67,7 @@ There is also possibiliy to change date of spedition in this case you have to re
 If user wants to perform onne of this actions to add otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more into { "NoticeForUser": "change it to message for user", }
 Is everything certain?
 Do not provide any other type response it will break system
-user prompt: "siemka naklejka dodajta mi izoterma do chata"
+user prompt: "' . $message . '"
 ']
                 ]
             ];
