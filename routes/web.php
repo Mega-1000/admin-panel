@@ -846,70 +846,38 @@ Route::get('/make-order/{firm:symbol}/{order}', [AuctionsController::class, 'mak
 Route::post('/submit-order/{order}', [AuctionsController::class, 'submitOrder']);
 
 Route::get('claute', function (\Illuminate\Http\Request $request) {
-    $claute = app(\App\Helpers\ClauteHelper::class);
-        $question = $request->query('question');
-        return response()->stream(
-            function () use (
-                $question
-            ) {
-                $result_text = "";
-                $last_stream_response = null;
+    $apiUrl = "https://api.anthropic.com/v1/messages";
+    $apiKey = "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";
+    $anthropicVersion = "2023-06-01";
 
-                $model = 'claude-3-opus-20240229';
-                $max_tokens = 4096;
-                $systemMessage = 'You are a helpfull assistant. Answer as concisely as possible.';
-                $temperature = 1;
-                $messages = [
-                    [
-                        'role' => 'user',
-                        'content' => $question
-                    ]
-                ];
+    $data = [
+        "model" => "claude-3-opus-20240229",
+        "max_tokens" => 1024,
+        "messages" => [
+            ["role" => "user", "content" => "Hello, world"]
+        ]
+    ];
 
-                $headers = [
-                    'anthropic-version' => '2023-06-01',
-                    'anthropic-beta' => 'messages-2023-12-15',
-                    'content-type' => 'application/json',
-                    'x-api-key' => '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'
-                ];
+    $payload = json_encode($data);
 
-                $claute = \Anthropic\Anthropic::factory()
-                    ->withHeaders($headers)
-                    ->make();
+    $ch = curl_init($apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "x-api-key: $apiKey",
+        "anthropic-version: $anthropicVersion",
+        "Content-Type: application/json"
+    ]);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
-                $stream = $claute->chat()->createStreamed([
-                    'model' => $model,
-                    'temperature' => $temperature,
-                    'max_tokens' => $max_tokens,
-                    'system' => $systemMessage,
-                    'messages' => $messages,
-                ]);
+    $response = curl_exec($ch);
 
+    if (curl_errno($ch)) {
+        echo 'Error:' . curl_error($ch);
+    } else {
+        echo $response;
+    }
 
-                foreach ($stream as $response) {
-                    $text = $response->choices[0]->delta->content;
-                    if (connection_aborted()) {
-                        break;
-                    }
-                    $data = [
-                        'text' => $text,
-                    ];
-                    $this->send("update", json_encode($data));
-                    $result_text .= $text;
-                    $last_stream_response = $response;
-                }
-
-                $this->send("update", "<END_STREAMING_SSE>");
-
-                logger($last_stream_response->usage->toArray());
-            },
-            200,
-            [
-                'Cache-Control' => 'no-cache',
-                'Connection' => 'keep-alive',
-                'X-Accel-Buffering' => 'no',
-                'Content-Type' => 'text/event-stream',
-            ]
-        );
+    curl_close($ch);
 });
 
