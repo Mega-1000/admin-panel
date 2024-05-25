@@ -469,7 +469,7 @@ class MessagesHelper
     /**
      * @throws ChatException
      */
-    public function sendMessage(Chat $chat, string $mess): void
+    public function sendMessage(Chat $chat, string $mess)
     {
         $content = $mess;
         $blankChatUser = $this->createOrGetBlankUser($chat);
