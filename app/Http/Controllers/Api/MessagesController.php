@@ -55,10 +55,10 @@ class MessagesController extends Controller
             $anthropicVersion = "2023-06-01";
 
             $data = [
-                "model" => "claude-3-sonnet",
+                "model" => "claude-3-sonnet-20240229",
                 "max_tokens" => 1024,
                 "messages" => [
-                    ["role" => "user", "content" => 'You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this
+                    ["role" => "system", "content" => 'You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this
 { "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }
 if user wants to add some compoany wich is not in list provide response like this { "NoticeForUser": "change it to message for user", }
 There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR"
