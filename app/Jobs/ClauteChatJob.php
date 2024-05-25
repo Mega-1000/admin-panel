@@ -67,7 +67,7 @@ class ClauteChatJob implements ShouldQueue
 
 All response are samples witch just represent format of response not actual response so change it accordingly.
 
-Today is ‘ . now() . ’
+Today is ' . now() . '
 
 `Do not provide any other type response it will break systemuser`
 
