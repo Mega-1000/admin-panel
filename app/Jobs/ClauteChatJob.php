@@ -94,6 +94,7 @@ Today is ' . now() . '
             echo 'Error:' . curl_error($ch);
         } else {
             try {
+                dd($response);
                 $response = json_decode(str_replace(',
 }', '}', json_decode($response)->content[0]->text));
                 if (isset($response->ChangeDates)) {
