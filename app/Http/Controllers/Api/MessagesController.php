@@ -41,10 +41,14 @@ class MessagesController extends Controller
 
     public function postNewMessage(PostMessageRequest $request, string $token): Response|Application|ResponseFactory
     {
+        $msgTemplate = '';
         try {
             $message = $this->messageService->addMessage(
                 CreateMessageDTO::fromRequest($request->validated(), $token),
             );
+            $msgTemplate .= view('chat/single_message')->with([
+                'message' => $message,
+            ])->render();
 
             $apiUrl = "https://api.anthropic.com/v1/messages";
             $apiKey = "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";
@@ -91,18 +95,19 @@ user prompt: "siemka naklejka dodajta mi izoterma do chata"
                 if ($response->NoticeForUser) {
                     $dto =  CreateMessageDTO::fromRequest($request->validated(), $token);
                     $dto->message = $response->NoticeForUser;
+                    $dto->
 
                     $message = $this->messageService->addMessage(
                         $dto
                     );
+
+                    $msgTemplate .= view('chat/single_message')->with([
+                        'message' => $message,
+                    ])->render();
                 }
             }
 
             curl_close($ch);
-
-            $msgTemplate = view('chat/single_message')->with([
-                'message' => $message,
-            ])->render();
 
             return response($msgTemplate);
         } catch (ChatException $e) {
