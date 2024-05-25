@@ -98,7 +98,7 @@ user prompt: "' . $message . '"
                 }
 
                 if (isset($response->NoticeForUser)) {
-                    $dto =  CreateMessageDTO::fromRequest($this->request->validated(), $this->request['token']);
+                    $dto =  CreateMessageDTO::fromRequest($this->request, $this->request['token']);
                     $dto->message = $response->NoticeForUser;
 
                     $helper = new MessagesHelper($this->request['token']);
