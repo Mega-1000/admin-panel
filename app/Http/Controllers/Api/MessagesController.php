@@ -92,9 +92,7 @@ user prompt: "siemka naklejka dodajta mi izoterma do chata"
                 try {
                 $response = json_decode(str_replace(',
 }', '}', json_decode($response)->content[0]->text));
-                } catch (\Exception $exception) {
 
-                }
 
                 if ($response->NoticeForUser) {
                     $dto =  CreateMessageDTO::fromRequest($request->validated(), $token);
@@ -108,6 +106,10 @@ user prompt: "siemka naklejka dodajta mi izoterma do chata"
                     $msgTemplate .= view('chat/single_message')->with([
                         'message' => $message,
                     ])->render();
+                }
+
+                } catch (\Exception $exception) {
+
                 }
             }
 
