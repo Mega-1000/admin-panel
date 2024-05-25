@@ -9,101 +9,67 @@
 
     <title>{{ config('app.chat_name') }}</title>
 
-    <!-- Styles -->
-    <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .slider-container {
-            margin-top: 20px;
-        }
-        .labels {
-            display: flex;
-            justify-content: space-between;
-        }
-        .labels span {
-            font-size: 14px;
-        }
-        .output-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-        .output-container input {
-            width: 45%;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
         .slider {
-            width: 100%;
-            margin: 10px 0;
-        }
-        .invalid-feedback {
-            color: red;
-            font-size: 0.875em;
+            accent-color: #3b82f6; /* Customize the accent color */
         }
     </style>
 </head>
 
-<body>
-<form class="form-group-default m-6" action="{{ route('auctions.store', ['chat' => $chat->id, 'backUrl' => URL::previous()]) }}" method="post">
-    @csrf
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+<div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6">
+    <form action="{{ route('auctions.store', ['chat' => $chat->id, 'backUrl' => URL::previous()]) }}" method="post">
+        @csrf
 
-    <label for="end_of_auction" class="block mb-2 text-sm font-medium mt-2">Data zakończenia przetargu</label>
-    <input type="datetime-local" id="end_of_auction" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('end_of_auction') is-invalid @enderror" name="end_of_auction" value="{{ old('end_of_auction', now()->setTime(15, 00)) }}">
-    @error('end_of_auction')
-    <div class="invalid-feedback">
-        {{ $message }}
-    </div>
-    @enderror
-
-    <label for="notes" class="block mb-2 text-sm font-medium mt-2">Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu</label>
-    <textarea
-        id="notes"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('notes') is-invalid @enderror"
-        name="notes"
-    >{{ old('notes') }}</textarea>
-    @error('notes')
-    <div class="invalid-feedback">
-        {{ $message }}
-    </div>
-    @enderror
-
-    <label for="price-quality-slider" class="block mb-2 text-sm font-medium mt-6">Podział procentowy cena/jakość (przesuń suwak aby zmienić ten parametr)</label>
-
-    <div class="slider-container">
-        <div class="labels">
-            <span>Cena</span>
-            <span>Jakość</span>
+        <div class="mb-4">
+            <label for="end_of_auction" class="block mb-2 text-sm font-medium text-gray-700">Data zakończenia przetargu</label>
+            <input type="datetime-local" id="end_of_auction" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('end_of_auction') border-red-500 @enderror" name="end_of_auction" value="{{ old('end_of_auction', now()->setTime(15, 00)) }}">
+            @error('end_of_auction')
+            <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+            @enderror
         </div>
-        <input type="range" id="price-quality-slider" class="slider @error('price') is-invalid @enderror @error('quality') is-invalid @enderror" min="0" max="100" value="{{ old('price', 50) }}" oninput="updateValues()">
-    </div>
 
-    <div class="output-container">
-        <input type="text" id="price-input" value="{{ old('price', 50) }}" name="price" placeholder="Cena" readonly>
-        <input type="text" id="quality-input" value="{{ old('quality', 50) }}" name="quality" placeholder="Jakość" readonly>
-    </div>
-    @if ($errors->has('price') || $errors->has('quality'))
-        <div class="invalid-feedback">
-            @error('price') {{ $message }} @enderror
-            @error('quality') {{ $message }} @enderror
+        <div class="mb-4">
+            <label for="notes" class="block mb-2 text-sm font-medium text-gray-700">Dodatkowe informację do wzięcia pod uwagę przez firmy uczestniczące w przetargu</label>
+            <textarea id="notes" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('notes') border-red-500 @enderror" name="notes">{{ old('notes') }}</textarea>
+            @error('notes')
+            <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+            @enderror
         </div>
-    @endif
 
-    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Zatwierdź
-    </button>
+        <div class="mb-4">
+            <label for="price-quality-slider" class="block mb-2 text-sm font-medium text-gray-700">Podział procentowy cena/jakość (przesuń suwak aby zmienić ten parametr)</label>
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm text-gray-500">Cena</span>
+                <span class="text-sm text-gray-500">Jakość</span>
+            </div>
+            <input type="range" id="price-quality-slider" class="slider w-full @error('price') border-red-500 @enderror @error('quality') border-red-500 @enderror" min="0" max="100" value="{{ old('price', 50) }}" oninput="updateValues()">
+            <div class="flex justify-between mt-2">
+                <input type="text" id="price-input" value="{{ old('price', 50) }}" name="price" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-1/2 p-2.5" placeholder="Cena" readonly>
+                <input type="text" id="quality-input" value="{{ old('quality', 50) }}" name="quality" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-1/2 p-2.5" placeholder="Jakość" readonly>
+            </div>
+            @if ($errors->has('price') || $errors->has('quality'))
+                <p class="mt-2 text-sm text-red-500">
+                    @error('price') {{ $message }} @enderror
+                    @error('quality') {{ $message }} @enderror
+                </p>
+            @endif
+        </div>
 
-    <a href="{{ URL::previous() }}" class="mt-4 bg-red-500 ml-4 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-        Anuluj
-    </a>
-</form>
+        <div class="flex justify-end">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                Zatwierdź
+            </button>
+            <a href="{{ URL::previous() }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Anuluj
+            </a>
+        </div>
+    </form>
+</div>
 
 <script>
     function updateValues() {
