@@ -6,6 +6,7 @@ use App\DTO\Messages\CreateMessageDTO;
 use App\Entities\Firm;
 use App\Helpers\MessagesHelper;
 use App\Services\MessageService;
+use DateTime;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -79,7 +80,26 @@ user prompt: "' . $message . '"
             try {
                 $response = json_decode(str_replace(',
 }', '}', json_decode($response)->content[0]->text));
+                if (isset($response->ChangeDates)) {
+                    $dateRange = $response->ChangeDates;
 
+                    if (preg_match('/from:\s*(\d{2}\.\d{2}\.\d{4})\s*to:\s*(\d{2}\.\d{2}\.\d{4})/', $dateRange, $matches)) {
+                        $startDate = $matches[1];
+                        $endDate = $matches[2];
+
+                        $startDateTime = DateTime::createFromFormat('d.m.Y', $startDate);
+                        $endDateTime = DateTime::createFromFormat('d.m.Y', $endDate);
+
+                        $helper = new MessagesHelper($this->request['token']);
+                        $order = $helper->getOrder();
+
+                        $order->dates->update([
+                            'customer_shipment_date_from' => $startDate,
+                            'customer_shipment_date_to' => $endDate,
+                            'customer_delivery_date_from' => $startDate,
+                            'customer_delivery_date_to' => $endDate,
+                        ])
+                    }
 
                 if (isset($response->AddCompany)) {
                     $company = Firm::where('symbol', $response->AddCompany)->first();
