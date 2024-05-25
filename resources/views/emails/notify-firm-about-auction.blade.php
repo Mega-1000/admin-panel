@@ -2,7 +2,7 @@
     !! Prosimy o wypełnienie formularza przetargowego, nawet jeśli Państwa oferta nie będzie najniższa, ponieważ klient może kierować się również jakością. !!
 </h1>
 <h2>
-    Przetarg dotyczy cen firmy: {{ $firm->firm->name }}
+    Przetarg dotyczy cen firmy: {{ $firm->name }}
 </h2>
 <br>
 <br>
