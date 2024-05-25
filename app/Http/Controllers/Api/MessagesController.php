@@ -109,7 +109,7 @@ user prompt: "siemka naklejka dodajta mi izoterma do chata"
                 }
 
                 } catch (\Exception $exception) {
-
+dd($exception);
                 }
             }
 
