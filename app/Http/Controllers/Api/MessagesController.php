@@ -52,7 +52,7 @@ class MessagesController extends Controller
 
             $apiUrl = "https://api.anthropic.com/v1/messages";
             $apiKey = "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";
-            $anthropicVersion = "2024-05-01";
+            $anthropicVersion = "2023-06-01";
 
             $data = [
                 "model" => "claude-3-sonnet-20240229",
