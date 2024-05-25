@@ -96,7 +96,7 @@ user prompt: "' . $message . '"
 
 
                 if ($response->AddCompany) {
-                    $company = Firm::where('symbol', $request->get('firm_symbol'))->first();
+                    $company = Firm::where('symbol', $response->AddCompany)->first();
                     $helper = new MessagesHelper($request->token);
                     $order = Order::find($helper->orderId);
 
