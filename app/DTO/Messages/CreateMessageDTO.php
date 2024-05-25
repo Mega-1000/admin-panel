@@ -4,7 +4,7 @@ namespace App\DTO\Messages;
 
 use Illuminate\Http\UploadedFile;
 
-readonly final class CreateMessageDTO
+final class CreateMessageDTO
 {
     public function __construct(
         public string $message,
