@@ -43,7 +43,7 @@ class ClauteChatJob implements ShouldQueue
         $anthropicVersion = "2023-06-01";
 
         $data = [
-            "model" => "claude-3-haiku-20240307",
+            "model" => "claude-3-sonnet-20240307",
             "max_tokens" => 1024,
             "messages" => [
                 ["role" => "user", "content" => '
@@ -94,7 +94,6 @@ Today is ' . now() . '
             echo 'Error:' . curl_error($ch);
         } else {
             try {
-                dd($response);
                 $response = json_decode(str_replace(',
 }', '}', json_decode($response)->content[0]->text));
                 if (isset($response->ChangeDates)) {
