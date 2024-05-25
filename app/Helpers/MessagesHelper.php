@@ -469,7 +469,7 @@ class MessagesHelper
     /**
      * @throws ChatException
      */
-    public function sendDateChangeMessage(Chat $chat, string $mess): void
+    public function sendMessage(Chat $chat, string $mess): void
     {
         $content = $mess;
         $blankChatUser = $this->createOrGetBlankUser($chat);

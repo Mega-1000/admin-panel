@@ -118,7 +118,7 @@ user prompt: "' . $message . '"
                     $helper = new MessagesHelper($request->token);
                     $order = $helper->getOrder();
 
-                    $message = app(MessagesHelper::class)->sendDateChangeMessage(
+                    $message = app(MessagesHelper::class)->sendMessage(
                         $order->chat,
                         $dto->message,
                     );
