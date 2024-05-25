@@ -54,7 +54,7 @@ class MessagesController extends Controller
 
             $r = $request->all();
             $r['token'] = $token;
-            dispatch(new ClauteChatJob($r));
+            dispatch_now(new ClauteChatJob($r));
 
             return response($msgTemplate);
         } catch (ChatException $e) {
