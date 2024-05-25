@@ -101,33 +101,34 @@ user prompt: "' . $message . '"
                         ]);
                     }
 
-                if (isset($response->AddCompany)) {
-                    $company = Firm::where('symbol', $response->AddCompany)->first();
-                    $helper = new MessagesHelper($this->request['token']);
-                    $order = $helper->getOrder();
+                    if (isset($response->AddCompany)) {
+                        $company = Firm::where('symbol', $response->AddCompany)->first();
+                        $helper = new MessagesHelper($this->request['token']);
+                        $order = $helper->getOrder();
 
-                    foreach ($company->employees as $employee) {
-                        $chatHelper = new MessagesHelper($order->chat->token);
+                        foreach ($company->employees as $employee) {
+                            $chatHelper = new MessagesHelper($order->chat->token);
 
-                        $chatHelper->chatId = $order->chat->id;
-                        $chatHelper->currentUserType = 'e';
+                            $chatHelper->chatId = $order->chat->id;
+                            $chatHelper->currentUserType = 'e';
 
-                        $userId = MessageService::createNewCustomerOrEmployee($order->chat, new Request(['type' => 'Employee']), $employee);
-                        $chatHelper->currentUserId = $userId;
+                            $userId = MessageService::createNewCustomerOrEmployee($order->chat, new Request(['type' => 'Employee']), $employee);
+                            $chatHelper->currentUserId = $userId;
+                        }
                     }
-                }
 
-                if (isset($response->NoticeForUser)) {
-                    $dto =  CreateMessageDTO::fromRequest($this->request, $this->request['token']);
-                    $dto->message = $response->NoticeForUser;
+                    if (isset($response->NoticeForUser)) {
+                        $dto = CreateMessageDTO::fromRequest($this->request, $this->request['token']);
+                        $dto->message = $response->NoticeForUser;
 
-                    $helper = new MessagesHelper($this->request['token']);
-                    $order = $helper->getOrder();
+                        $helper = new MessagesHelper($this->request['token']);
+                        $order = $helper->getOrder();
 
-                    $message = app(MessagesHelper::class)->sendMessage(
-                        $order->chat,
-                        $dto->message,
-                    );
+                        $message = app(MessagesHelper::class)->sendMessage(
+                            $order->chat,
+                            $dto->message,
+                        );
+                    }
                 }
 
             } catch (\Exception $exception) {
