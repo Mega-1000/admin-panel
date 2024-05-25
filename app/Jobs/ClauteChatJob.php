@@ -69,6 +69,8 @@ All response are samples witch just represent format of response not actual resp
 
 Today is ' . now() . '
 
+If ANYTHINK is uncertain provide respone "no reponse" it is very important! You have to be certain that user want to perform one of this actions
+
 `Do not provide any other type response it will break systemuser`
 
 `prompt: "' . $message . '"`
