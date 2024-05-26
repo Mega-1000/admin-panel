@@ -41,6 +41,6 @@ class FirmRepresentController extends Controller
 
     public function index(): View
     {
-        return \view('representatives.create', ['represents' => FirmRepresent::paginate(20)]);
+        return \view('representatives.index', ['represents' => FirmRepresent::paginate(20)]);
     }
 }
