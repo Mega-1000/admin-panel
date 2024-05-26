@@ -101,7 +101,7 @@
                     <div style="{{ $alreadyDisplayed ? 'display: none' : '' }}">
                         @if(is_a($product, \App\Entities\Product::class))
                             <div class="alert alert-success text-center mb-4">
-                                <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers?->whereHas('product', function ($q) use ($product) {$q->where('product_group', $product->product_group);})->min('basic_price_net') ?? $chat_auction_firm->chatAuction->chat->order->items->whereHas('product', function ($q) use ($product) {$q->where('product_group', $product->product_group)->min('net_purchase_price_commercial_unit'); }) }} PLN</h4>
+                                <h4>Najniższa cena na ten moment: {{ $chat_auction_firm->chatAuction->offers?->whereHas('product', function ($q) use ($product) {$q->where('product_group', $product->product_group);})->min('basic_price_net') ?? $chat_auction_firm->chatAuction->chat->order->items()->whereHas('product', function ($q) use ($product) {$q->where('product_group', $product->product_group)->min('net_purchase_price_commercial_unit'); }) }} PLN</h4>
                             </div>
                             <div class="product">
                                 <img class="img-fluid" src="{{$product->url_for_website}}" onerror="this.onerror=null;this.src='http://via.placeholder.com/300'">
