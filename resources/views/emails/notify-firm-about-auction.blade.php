@@ -18,9 +18,6 @@
         Dodatkowo pod tym linkiem można zobaczyć tabelę z listą zaproponowanych cen przez innych oferentów oraz na którym miejscu znajdujecie się na tej liście.
     </p>
     <p>
-        (uwaga: tutaj kolejność na tej liście powinna być nie według pierwszej kolumny albo może być według pierwszej kolumny, ale pod warunkiem, że w niej będzie się znajdować styropian, którego jest najwięcej w ofercie)
-    </p>
-    <p>
         <a href="{{ route('auctions.offer.create', ['token' => $token]) }}">LINK DO MODUŁU PRZETARGU</a>
     </p>
     <p>
@@ -46,9 +43,6 @@
     </p>
     <p>
         <a href="{{ route('create-represents', ['firm' => $firm->id, 'email' => $auction->firms->where('firm_id', $firm->id)->first()->email_of_employee]) }}">KLIKNIJ LINK ABY JE PODAĆ</a>
-    </p>
-    <p>
-        Jeżeli któryś z pracowników dokona wpisu takich firm, to automatycznie przestajemy wysyłać mu tę wiadomość.
     </p>
     <p>
         Firmy lub telefony do tych firm trzeba dodać do chatu, ale tak aby były widoczne tylko i wyłącznie dla nas.
