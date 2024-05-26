@@ -59,6 +59,8 @@ class Employees
             return $employee->id;  // Assuming each employee has a unique 'id' attribute
         });
 
+        dd($employees);
+
         $allEmployees = collect(); // Initialize as a collection
         foreach ($employees as $employee) {
             $firmAssociatedWithEmployee = Firm::where('email', $employee->email)->first();

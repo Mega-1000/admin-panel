@@ -120,6 +120,7 @@ class AuctionsController extends Controller
         $userToken = $helper->encrypt();
 
         $showAuctionInstructions = request()->query('showAuctionInstructions');
+
         $this->chatAuctionsService->confirmAuction($auction);
 
         return redirect()->route('chat.show', ['token' => $userToken, 'showAuctionInstructions' => $showAuctionInstructions])->with('auctionCreationSuccess', true);
@@ -379,7 +380,6 @@ class AuctionsController extends Controller
                 $filteredProducts->push($product); // Add product to the filtered collection
             }
         }
-
 
         $customersZipCode = request()->query('zip-code');
         $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customersZipCode)->get()->first();
