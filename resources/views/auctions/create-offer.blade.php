@@ -104,7 +104,7 @@
                                 <h4>Najniższa cena na ten moment:
                                     {{
                                         $chat_auction_firm->chatAuction
-                                            ->offers
+                                            ->offers()
                                             ?->whereHas('product', function ($q) use ($product) {$q->where('product_group', $product->product_group);})
                                             ->min('basic_price_net')
                                         ?? $chat_auction_firm
