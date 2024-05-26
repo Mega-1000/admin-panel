@@ -65,6 +65,20 @@ class ClauteChatJob implements ShouldQueue
             $lastRole = $role;
         }
 
+        function array_flatten($array) {
+            $result = [];
+
+            foreach ($array as $item) {
+                if (is_array($item)) {
+                    $result = array_merge($result, array_flatten($item));
+                } else {
+                    $result[] = $item;
+                }
+            }
+
+            return $result;
+        }
+
         $prompt = [
             "role" => "user",
             "content" => '
@@ -81,7 +95,9 @@ class ClauteChatJob implements ShouldQueue
             Today is ' . now() . '
             If ANYTHING is uncertain provide response "no response" it is very important! You have to be certain that user wants to perform one of these actions
             `Do not provide any other type of response it will break the system`
-            Here is previous messages from this chat: ' . implode(' ', $previousMessages). '
+
+            Here is previous messages from this chat: ' . implode(' ', array_flatten($previousMessages)) . '
+
             `prompt: "' . $message . '"`'
         ];
 
