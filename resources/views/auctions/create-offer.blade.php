@@ -116,7 +116,7 @@
                                             @endphp
                                             {{ $name }}
                                         </h5>
-                                        <p>Ilość m3: {{ round($product->quantity * $product->numbers_of_basic_commercial_units_in_pack, 2) }}</p>
+                                        <p>Ilość m3: {{ round($product->quantity * $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }}</p>
                                         <p>Cena podstawowa netto za m3: {{ round($product->price->net_purchase_price_basic_unit, 2) }} PLN</p>
                                     </div>
                                     <div>
