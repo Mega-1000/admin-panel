@@ -46,16 +46,30 @@ class ClauteChatJob implements ShouldQueue
 
         $helper = new MessagesHelper($this->request['token']);
         $chat = $helper->getChat();
+        $previousMessages = [];
+        $lastRole = null;
 
-        $previousMessages = $chat->messages->map(function ($item) {
+        foreach ($chat->messages as $item) {
             $role = $item->customer() ? 'user' : 'assistant';
-            return ['role' => $role, 'content' => $item->message];
-        });
+            $message = $item->message;
+
+            if ($role === 'user' && $lastRole === 'user') {
+                // Concatenate with the last message
+                $previousMessages[count($previousMessages) - 1]['content'] .= ' ' . $message;
+            } else {
+                // Add a new message
+                $previousMessages[] = ['role' => $role, 'content' => $message];
+            }
+
+            // Update the lastRole to the current one
+            $lastRole = $role;
+        }
+
 
         $data = [
             "model" => "claude-3-sonnet-20240229",
             "max_tokens" => 1024,
-            "messages" => $previousMessages->toArray() + [
+            "messages" => $previousMessages + [
                 [
                     "role" => "user", "content" => '
                         `You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
