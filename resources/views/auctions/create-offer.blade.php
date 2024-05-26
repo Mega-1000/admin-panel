@@ -43,12 +43,12 @@
 <body>
 <div class="container my-4">
     <h3 class="text-center mb-4">
-        Prosimy o skorygowanie ceny za m3 i zatwierdzenie poprzez użycie przycisku "Aktualizuj" przy każdym produkcie oddzielnie.
+        Prosimy o skorygowanie ceny za m3 i zatwierdzenie poprzez użycie przycisku "Zapisz wszystkie ceny".
     </h3>
     <div class="row mb-4">
         <div class="col-md-6">
             <p class="text-center" style="font-size: 1.4em">
-                <a target="__blank" href="https://admin.mega1000.pl/auctions/{{ $chat_auction_firm->chatAuction->id }}/end?isFirm=true&firmId={{ $chat_auction_firm->firm->id }}">Kliknij aby zobaczyć tabelę wszystkich cen podanych przez wszystkich uczestników</a>
+                <a target="__blank" href="https://admin.mega1000.pl/auctions/{{ $chat_auction_firm->chatAuction->id }}/end?isFirm=true&firmId={{ $chat_auction_firm->firm->id }}">Kliknij aby zobaczyć tabelę cen innych producentów</a>
                 <br>
                 Miejscowość dostawy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->city }}<br>
                 Kod pocztowy: {{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}<br>
@@ -116,10 +116,8 @@
                                             @endphp
                                             {{ $name }}
                                         </h5>
-                                        <p>Symbol: {{ $product->symbol }}</p>
-                                        <p>Ilość paczek: {{ $product->quantity }}</p>
-                                        <p>Ilość m3: {{ round($product->quantity / 3.33, 2) }}</p>
-                                        <p>Cena podstawowa netto za paczkę: {{ round($product->price->net_purchase_price_basic_unit, 2) }} PLN</p>
+                                        <p>Ilość m3: {{ round($product->quantity * $product->numbers_of_basic_commercial_units_in_pack, 2) }}</p>
+                                        <p>Cena podstawowa netto za m3: {{ round($product->price->net_purchase_price_basic_unit, 2) }} PLN</p>
                                     </div>
                                     <div>
                                         @php
