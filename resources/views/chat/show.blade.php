@@ -66,15 +66,15 @@
         @if(session()->has('auctionCreationSuccess'))
             <div class="alert alert-success" style="width: 45%; margin: 0 auto; margin-top: 30px; font-size: larger; font-weight: bold">
                 <h2> !!! Koniecznie to przeczytaj !!! </h2> <br>
-                Wasze zapytanie ofertowe zostało wysłane do 47 producentów w formie przetargu.<br>
-                Jeżeli chcecie zasięgnąć informacji u pracownika dowolnej fabryki to prosimy poniżej napisać kogo mamy podłączyć do rozmowy i dodatkowo podamy jego numer telefonu. <br>
-                Rozmowa na temat cen z pracownikiem fabryki nie ma większego sensu ponieważ najczęściej przekazuje on numer do najbliższej hurtowni bo nie zależy mu na tym abyście zakupili jak najtaniej  tylko aby rozbudowywać i podtrzymywać jak najszerszą swoją sieć punktów sprzedaży.<br>
-                Natomiast wasze zapytanie ofertowe i tak zostaje wysłane przez nasz system do większości w Polsce przedstawicieli danej fabryki w formie przetargu co daje gwarancje najniższej ceny ponieważ o każdym przebiciu cenowym pozostali przedstawiciele są informowani i proszeniu o ponowne przebicie. <br>
-                Ostatecznie po otrzymaniu najlepszej oferty zakupicie po tej cenie albo bezpośrednio u producenta lub u przedstawiciela który dał najniższą cenę lub przez nasz system - wybór pozostawiamy Państwu. <br>
-                W czasie trawania przetargu zawsze możesz podejrzeć obecny jego stan w tabeli która sie wyświetla po przyciśnieciu przycisku znajdujacego sie powyżej "  Zobacz wyniki przetargu  " <br>
-                <br>
-                Tabelę cen można zobaczyć na koncie klienta po zalogowaniu się na konto pod linkiem. Został również wysłany e-mail z potwierdzeniem.
-                <a href="https://mega1000.pl/account">https://mega1000.pl/account</a>
+                <div>
+                    <h1>Zapytanie Ofertowe</h1>
+                    <p>Wasze zapytanie ofertowe zostało wysłane do 47 producentów w formie przetargu.</p>
+                    <p>Jeżeli chcecie zasięgnąć informacji u pracownika dowolnej fabryki to prosimy poniżej napisać kogo mamy podłączyć do rozmowy i dodatkowo podamy jego numer telefonu.</p>
+                    <p>Rozmowa na temat cen z pracownikiem fabryki nie ma większego sensu ponieważ najczęściej przekazuje on numer do najbliższej hurtowni bo nie zależy mu na tym abyście zakupili jak najtaniej tylko aby rozbudowywać i podtrzymywać jak najszerszą swoją sieć punktów sprzedaży.</p>
+                    <p>Natomiast wasze zapytanie ofertowe i tak zostaje wysłane przez nasz system do większości w Polsce przedstawicieli danej fabryki w formie przetargu co daje gwarancje najniższej ceny ponieważ o każdym przebiciu cenowym pozostali przedstawiciele są informowani i proszeni o ponowne przebicie.</p>
+                    <p>Ostatecznie po otrzymaniu najlepszej oferty zakupicie po tej cenie albo bezpośrednio u producenta lub u przedstawiciela który dał najniższą cenę lub przez nasz system - wybór pozostawiamy Państwu.</p>
+                    <p>W czasie trwania przetargu zawsze możesz podejrzeć obecny jego stan w tabeli która się wyświetla po użyciu przycisku znajdującego się powyżej "<a href="#">Zobacz wyniki przetargu</a>"</p>
+                </div>
             </div>
         @endif
 

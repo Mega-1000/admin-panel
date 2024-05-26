@@ -72,6 +72,7 @@ class AuctionsController extends Controller
      * @param CreateAuctionRequest $request
      * @param MessagesHelper $helper
      * @return RedirectResponse
+     * @throws DeliverAddressNotFoundException
      */
     public function store(Chat $chat, CreateAuctionRequest $request, MessagesHelper $helper): RedirectResponse
     {
@@ -97,6 +98,8 @@ class AuctionsController extends Controller
         $auction = $this->chatAuctionsService->createAuction(
             CreateChatAuctionDTO::fromRequest($chat, $request->validated())
         );
+
+        $this->chatAuctionsService->confirmAuction($auction);
 
         Mailer::create()
             ->to($chat->order->customer->login)
@@ -143,16 +146,6 @@ class AuctionsController extends Controller
     public function success(): View
     {
         return view('auctions.success');
-    }
-
-    /**
-     * @throws DeliverAddressNotFoundException
-     */
-    public function confirm(ChatAuction $auction): RedirectResponse
-    {
-        $this->chatAuctionsService->confirmAuction($auction);
-
-        return redirect()->back();
     }
 
     /**

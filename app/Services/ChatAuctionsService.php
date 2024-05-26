@@ -50,7 +50,7 @@ readonly class ChatAuctionsService
 
     /**
      * - zapisz wszystkie w aktualizacji cen
-     * - 
+     * -
      *
      * Create auction
      *
@@ -70,7 +70,7 @@ readonly class ChatAuctionsService
     /**
      * @throws DeliverAddressNotFoundException
      */
-    public function confirmAuction(ChatAuction $auction): void
+    public function confirmAuction($auction): void
     {
         $order = $auction->chat->order;
         $employees = Employees::getEmployeesForAuction($order);
