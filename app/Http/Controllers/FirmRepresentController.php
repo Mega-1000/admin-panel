@@ -38,4 +38,9 @@ class FirmRepresentController extends Controller
 
         return '<script>alert("Dane zostały zapisane! Dziękujemy za kożystanie z naszego serwisu!")</script>';
     }
+
+    public function index(): View
+    {
+        return \view('representatives.create', ['represents' => FirmRepresent::paginate(20)]);
+    }
 }

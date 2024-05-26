@@ -850,4 +850,5 @@ Route::get('/mark-as-non-represent-policy/{firm}', [FirmRepresentController::cla
 Route::get('/create-represents/{firm}/{email}', [FirmRepresentController::class, 'referRepresentative'])->name('create-represents');
 Route::post('/store-represents/{firm}/{email}', [FirmRepresentController::class, 'storeRepresentatives'])->name('store-represents');
 
+Route::get('/represents', [FirmRepresentController::class, 'index'])->name('represents.index');
 

@@ -11,6 +11,8 @@
                 Zobacz listę poleceń i WYKONAJ TELEFONY
             </a>
 
+            <a href="{{route('represents.index')}}">Lista reprezentantów wpisanych przez fabryki</a>
+
             <form @wire:submit.prevent="updatedPageLength">
                 <div class="d-flex">
                     Ilość zamówień na stronę:
