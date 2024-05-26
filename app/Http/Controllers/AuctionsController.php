@@ -270,7 +270,6 @@ class AuctionsController extends Controller
             ], compact('order', 'firms', 'auction'));
         }
 
-        dd($firms);
         return view('chat.auction-end', [
             'products' => $order->items,
             'offers' => $auction->offers,
