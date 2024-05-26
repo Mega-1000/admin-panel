@@ -1,4 +1,4 @@
-@if(!$auction->firms->where('firm_id', $firm->id)->first()?->practices_representatives_policy && !\App\FirmRepresent::where('email_of_employee', $auction->firms->where('firm_id', $firm->id)->first()->email_of_employee)->first())
+@if($auction->firms->where('firm_id', $firm->id)->first() && !$auction->firms->where('firm_id', $firm->id)->first()?->practices_representatives_policy && !\App\FirmRepresent::where('email_of_employee', $auction->firms->where('firm_id', $firm->id)->first()->email_of_employee)->first())
     <p>
         W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na dostawę styropianu dotyczącego rejonu obsługiwanego przez Ciebie.
     </p>
