@@ -7,7 +7,7 @@
 
     @csrf
     <div id="products" class="grid grid-cols-1 gap-6">
-        @for ($i = 0; $i < 3; $i++)
+        @for ($i = 0; $i < 5; $i++)
             <div class="product-group bg-white shadow-md rounded-lg p-6">
                 <div class="form-group">
                     <label for="products[{{ $i }}][contact_info]" class="block font-medium mb-2">Informacje kontaktowe do przedstawiciela {{ $i }}</label>
