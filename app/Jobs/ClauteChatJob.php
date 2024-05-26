@@ -48,7 +48,7 @@ class ClauteChatJob implements ShouldQueue
         $chat = $helper->getChat();
 
         $previousMessages = $chat->messages->map(function ($item) {
-            $role = $item->customer() ? 'user' : 'consultant';
+            $role = $item->customer() ? 'user' : 'assistant';
             return ['role' => $role, 'content' => $item->message];
         });
 
@@ -94,7 +94,6 @@ class ClauteChatJob implements ShouldQueue
             echo 'Error:' . curl_error($ch);
         } else {
             try {
-                dd($response);
                 $response = json_decode(str_replace(',
 }', '}', json_decode($response)->content[0]->text));
 
