@@ -47,9 +47,9 @@ class ClauteChatJob implements ShouldQueue
         $helper = new MessagesHelper($this->request['token']);
         $chat = $helper->getChat();
 
-        $previousMessages = $chat->messages->foreach(function (&$item) {
+        $previousMessages = $chat->messages->map(function ($item) {
             $role = $item->customer ? 'user' : 'consultant';
-            $item = ['role' => $role, 'content' => $item->message];
+            return ['role' => $role, 'content' => $item->message];
         });
 
         $data = [
