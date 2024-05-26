@@ -55,7 +55,7 @@ class ClauteChatJob implements ShouldQueue
         $data = [
             "model" => "claude-3-sonnet-20240229",
             "max_tokens" => 1024,
-            "messages" => dd([
+            "messages" => [
                 $previousMessages +
                 [
                     "role" => "user", "content" => '
@@ -74,7 +74,7 @@ class ClauteChatJob implements ShouldQueue
                         `Do not provide any other type response it will break systemuser`
                         `prompt: "' . $message . '"`
                 ']
-            ])
+            ]
         ];
 
         $payload = json_encode($data);
