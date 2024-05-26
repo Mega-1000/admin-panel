@@ -847,7 +847,7 @@ Route::get('/make-order/{firm:symbol}/{order}', [AuctionsController::class, 'mak
 Route::post('/submit-order/{order}', [AuctionsController::class, 'submitOrder']);
 
 Route::get('/mark-as-non-represent-policy/{firm}', [FirmRepresentController::class, 'markFirmAsNonRepresentsPolicy'])->name('mark-as-non-represent-policy');
-Route::get('/create-represents/{firm}', [FirmRepresentController::class, 'referRepresentative'])->name('create-represents');
-Route::post('/store-represents/{firm}', [FirmRepresentController::class, 'storeRepresentatives'])->name('store-represents');
+Route::get('/create-represents/{firm}/{email}', [FirmRepresentController::class, 'referRepresentative'])->name('create-represents');
+Route::post('/store-represents/{firm}/{email}', [FirmRepresentController::class, 'storeRepresentatives'])->name('store-represents');
 
 
