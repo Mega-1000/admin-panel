@@ -65,47 +65,25 @@ class ClauteChatJob implements ShouldQueue
             $lastRole = $role;
         }
 
-        if (array_key_exists(0, $previousMessages)) {
-            $previousMessages[0]['role'] = 'user';
-        }
-
-        if ($lastRole == 'user') {
-            $previousMessages[count($previousMessages) - 1]['content'] = '
-                LasUserMessage: "' . $previousMessages[count($previousMessages) - 1]['content'] . '"
-                `You are part of my Laravel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
-                `{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
-                `if user wants to add some company which is not in list provide response like this`
-                `{ "NoticeForUser": "change it to message for user", }`
-                `There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
-                `There is also possibility to change date of spedition in this case you have to return response like this`
-                `{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
-                `If user wants to perform one of these actions otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more info`
-                `{ "NoticeForUser": "change it to message for user", }`
-                All responses are samples which just represent the format of response not the actual response so change it accordingly.
-                Today is ' . now() . '
-                If ANYTHING is uncertain provide response "no response" it is very important! You have to be certain that user wants to perform one of these actions
-                `Do not provide any other type of response it will break the system`
-                `prompt: "' . $message . '"`';
-        } else {
-            $previousMessages[] = [
-                "role" => "user",
-                "content" => '
-                `You are part of my Laravel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
-                `{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
-                `if user wants to add some company which is not in list provide response like this`
-                `{ "NoticeForUser": "change it to message for user", }`
-                `There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
-                `There is also possibility to change date of spedition in this case you have to return response like this`
-                `{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
-                `If user wants to perform one of these actions otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more info`
-                `{ "NoticeForUser": "change it to message for user", }`
-                All responses are samples which just represent the format of response not the actual response so change it accordingly.
-                Today is ' . now() . '
-                If ANYTHING is uncertain provide response "no response" it is very important! You have to be certain that user wants to perform one of these actions
-                `Do not provide any other type of response it will break the system`
-                `prompt: "' . $message . '"`'
-            ];
-        }
+        $prompt = [
+            "role" => "user",
+            "content" => '
+            `You are part of my Laravel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
+            `{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
+            `if user wants to add some company which is not in list provide response like this`
+            `{ "NoticeForUser": "change it to message for user", }`
+            `There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
+            `There is also possibility to change date of spedition in this case you have to return response like this`
+            `{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
+            `If user wants to perform one of these actions otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more info`
+            `{ "NoticeForUser": "change it to message for user", }`
+            All responses are samples which just represent the format of response not the actual response so change it accordingly.
+            Today is ' . now() . '
+            If ANYTHING is uncertain provide response "no response" it is very important! You have to be certain that user wants to perform one of these actions
+            `Do not provide any other type of response it will break the system`
+            Here is previous messages from this chat: ' . (string)$previousMessages . '
+            `prompt: "' . $message . '"`'
+        ];
 
         $data = [
             "model" => "claude-3-sonnet-20240229",
