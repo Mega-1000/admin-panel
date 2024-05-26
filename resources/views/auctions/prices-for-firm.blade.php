@@ -145,8 +145,8 @@
                             @endforeach
 
                             <span style="color: green">
-                                        - specjalnie dla ciebie
-                                    </span>
+                                - cena specjalna w przetargu
+                            </span>
 
                             @php
                                 $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
