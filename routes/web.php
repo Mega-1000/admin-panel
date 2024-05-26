@@ -6,6 +6,7 @@ use App\Facades\Mailer;
 use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\FirmRepresentController;
 use App\Http\Controllers\OrderDatatableColumnsManagementController;
 use App\Entities\OrderPackage;
 use App\Http\Controllers\AddLabelsCSVController;
@@ -844,4 +845,9 @@ Route::get('mark-chat-as-finished/{chat}', [MessagesController::class, 'markChat
 
 Route::get('/make-order/{firm:symbol}/{order}', [AuctionsController::class, 'makeOrder'])->name('create-order-from-auction');
 Route::post('/submit-order/{order}', [AuctionsController::class, 'submitOrder']);
+
+Route::get('/mark-as-non-represent-policy/{firm}', [FirmRepresentController::class, 'markFirmAsNonRepresentsPolicy'])->name('mark-as-non-represent-policy');
+Route::get('/create-represents/{firm}', [FirmRepresentController::class, 'referRepresentative'])->name('create-represents');
+Route::post('/store-represents/{firm}', [FirmRepresentController::class, 'storeRepresentatives'])->name('store-represents');
+
 
