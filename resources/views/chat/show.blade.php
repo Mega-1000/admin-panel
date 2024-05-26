@@ -265,7 +265,7 @@
                     <input type="text" class="form-control" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
 
                     <button type="submit" class="btn btn-primary">
-                        Dodaj firm
+                        Dodaj firmę
                     </button>
                 </form>
                 @if($chat->complaint_form)
