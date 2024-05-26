@@ -28,6 +28,7 @@ class Employees
 
         $firms = array_unique(app(ChatAuctionsService::class)->getFirms($variations));
 
+        dd($firms);
         $firms = array_filter($firms, function ($firm) {
             return $firm->id != 1;
         });
@@ -58,8 +59,6 @@ class Employees
         $employees = $employees->unique(function ($employee) {
             return $employee->id;  // Assuming each employee has a unique 'id' attribute
         });
-
-        dd($employees);
 
         $allEmployees = collect(); // Initialize as a collection
         foreach ($employees as $employee) {
