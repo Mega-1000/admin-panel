@@ -66,7 +66,8 @@ class ClauteChatJob implements ShouldQueue
         }
 
         if ($lastRole == 'user') {
-            $previousMessages[count($previousMessages) - 1]['content'] .= '
+            $previousMessages[count($previousMessages) - 1]['content'] = '
+                LasUserMessage: "' . $previousMessages[count($previousMessages) - 1]['content'] . '"
                 `You are part of my Laravel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
                 `{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
                 `if user wants to add some company which is not in list provide response like this`
@@ -126,7 +127,6 @@ class ClauteChatJob implements ShouldQueue
             echo 'Error:' . curl_error($ch);
         } else {
             try {
-                dd($response);
                 $response = json_decode(str_replace(',
 }', '}', json_decode($response)->content[0]->text));
 
