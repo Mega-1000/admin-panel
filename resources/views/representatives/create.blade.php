@@ -3,7 +3,7 @@
 
 <form action="{{ route('store-represents', $firm->id) }}" method="POST" class="space-y-6 w-1/2 mx-auto">
     @csrf
-    <div id="products" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div id="products" class="grid grid-cols-1 gap-6">
         @for ($i = 0; $i < 3; $i++)
             <div class="product-group bg-white shadow-md rounded-lg p-6">
                 <div class="form-group">
