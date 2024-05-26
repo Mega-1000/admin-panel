@@ -28,7 +28,6 @@ class Employees
 
         $firms = array_unique(app(ChatAuctionsService::class)->getFirms($variations));
 
-        dd($firms);
         $firms = array_filter($firms, function ($firm) {
             return $firm->id != 1;
         });

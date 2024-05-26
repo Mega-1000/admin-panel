@@ -68,7 +68,7 @@ readonly class ChatAuctionsService
     }
 
     /**
-     * @throws DeliverAddressNotFoundException
+     * @throws DeliverAddressNotFoundException|Exception
      */
     public function confirmAuction($auction): void
     {
