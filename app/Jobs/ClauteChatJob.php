@@ -65,6 +65,10 @@ class ClauteChatJob implements ShouldQueue
             $lastRole = $role;
         }
 
+        if (array_key_exists(0, $previousMessages)) {
+            $previousMessages[0]['role'] = 'user';
+        }
+
         if ($lastRole == 'user') {
             $previousMessages[count($previousMessages) - 1]['content'] = '
                 LasUserMessage: "' . $previousMessages[count($previousMessages) - 1]['content'] . '"
