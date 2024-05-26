@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 @endsection
 
+@section('table')
 <body class="bg-gray-100 p-6">
 <div class="container mx-auto">
     <h1 class="text-3xl font-bold mb-6">Reprezantci</h1>
@@ -36,3 +37,4 @@
         {{ $represents->links() }}
     </div>
 </div>
+@endsection
