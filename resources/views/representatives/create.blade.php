@@ -1,7 +1,7 @@
 
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
 
-<form action="{{ route('store-represents', $firm->id) }}" method="POST" class="space-y-6 w-1/2">
+<form action="{{ route('store-represents', $firm->id) }}" method="POST" class="space-y-6 w-1/2 mx-auto">
     @csrf
     <div id="products" class="grid grid-cols-1 md:grid-cols-3 gap-6">
         @for ($i = 0; $i < 3; $i++)
