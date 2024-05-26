@@ -99,7 +99,6 @@ class AuctionsController extends Controller
             CreateChatAuctionDTO::fromRequest($chat, $request->validated())
         );
 
-        $this->chatAuctionsService->confirmAuction($auction);
 
         Mailer::create()
             ->to($chat->order->customer->login)
@@ -121,6 +120,7 @@ class AuctionsController extends Controller
         $userToken = $helper->encrypt();
 
         $showAuctionInstructions = request()->query('showAuctionInstructions');
+        $this->chatAuctionsService->confirmAuction($auction);
 
         return redirect()->route('chat.show', ['token' => $userToken, 'showAuctionInstructions' => $showAuctionInstructions])->with('auctionCreationSuccess', true);
     }
