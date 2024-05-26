@@ -1,6 +1,6 @@
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
 
-<form action="{{ route('store-represents', $firm->id, $emailOfEmployee) }}" method="POST" class="space-y-6 w-1/2 mx-auto">
+<form action="{{ route('store-represents', ['firm' => $firm->id, 'email' => $emailOfEmployee]) }}" method="POST" class="space-y-6 w-1/2 mx-auto">
     <h1 class="mb-4 font-bold text-3xl">
         Prosimy o podanie danych do przedstawicieli którzy będą oferowali państwa produkty w najniższych cenach. Jeśli nie mają Państwo 5 takich prosimy zostawić pola puste.
     </h1>
