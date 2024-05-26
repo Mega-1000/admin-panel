@@ -104,7 +104,7 @@ class ClauteChatJob implements ShouldQueue
         $data = [
             "model" => "claude-3-sonnet-20240229",
             "max_tokens" => 1024,
-            "messages" => $previousMessages,
+            "messages" => $prompt,
         ];
 
         $payload = json_encode($data);
