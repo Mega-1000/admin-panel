@@ -65,29 +65,29 @@ class ClauteChatJob implements ShouldQueue
             $lastRole = $role;
         }
 
+        $previousMessages[] = [
+            "role" => "user",
+            "content" => '
+            `You are part of my Laravel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
+            `{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
+            `if user wants to add some company which is not in list provide response like this`
+            `{ "NoticeForUser": "change it to message for user", }`
+            `There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
+            `There is also possibility to change date of spedition in this case you have to return response like this`
+            `{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
+            `If user wants to perform one of these actions otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more info`
+            `{ "NoticeForUser": "change it to message for user", }`
+            All responses are samples which just represent the format of response not the actual response so change it accordingly.
+            Today is ' . now() . '
+            If ANYTHING is uncertain provide response "no response" it is very important! You have to be certain that user wants to perform one of these actions
+            `Do not provide any other type of response it will break the system`
+            `prompt: "' . $message . '"`'
+        ];
 
         $data = [
             "model" => "claude-3-sonnet-20240229",
             "max_tokens" => 1024,
-            "messages" => dd($previousMessages + [
-                [
-                    "role" => "user", "content" => '
-                        `You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
-                        `{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
-                        `if user wants to add some compoany wich is not in list provide response like this`
-                        `{ "NoticeForUser": "change it to message for user", }`
-                        `There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
-                        `There is also possibiliy to change date of spedition in this case you have to return response like this`
-                        `{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
-                        `If user wants to perform onne of this actions to add otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more into`
-                        `{ "NoticeForUser": "change it to message for user", }`
-                        All response are samples witch just represent format of response not actual response so change it accordingly.
-                        Today is ' . now() . '
-                        If ANYTHINK is uncertain provide respone "no reponse" it is very important! You have to be certain that user want to perform one of this actions
-                        `Do not provide any other type response it will break systemuser`
-                        `prompt: "' . $message . '"`
-                ']
-            ])
+            "messages" => $previousMessages,
         ];
 
         $payload = json_encode($data);
