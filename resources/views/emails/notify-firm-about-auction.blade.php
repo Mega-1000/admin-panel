@@ -45,7 +45,7 @@
         Aby dokonać wpisu o takich firmach prosimy kliknąć link poniżej
     </p>
     <p>
-        <a href="{{ route('create-represents', $firm->id, $auction->firms->where('firm_id', $firm->id)->first()->email_of_employee) }}">KLIKNIJ LINK ABY JE PODAĆ</a>
+        <a href="{{ route('create-represents', ['firm' => $firm->id, 'email' => $auction->firms->where('firm_id', $firm->id)->first()->email_of_employee]) }}">KLIKNIJ LINK ABY JE PODAĆ</a>
     </p>
     <p>
         Jeżeli któryś z pracowników dokona wpisu takich firm, to automatycznie przestajemy wysyłać mu tę wiadomość.
