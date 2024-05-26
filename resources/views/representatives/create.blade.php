@@ -1,7 +1,10 @@
-
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
 
 <form action="{{ route('store-represents', $firm->id) }}" method="POST" class="space-y-6 w-1/2 mx-auto">
+    <h1 class="mb-4">
+        Prosimy o podanie danych do przedstawicieli którzy będą oferowali państwa produkty w najniższych cenach. Jeśli nie mają Państwo 5 takich prosimy zostawić pola puste.
+    </h1>
+
     @csrf
     <div id="products" class="grid grid-cols-1 gap-6">
         @for ($i = 0; $i < 3; $i++)
