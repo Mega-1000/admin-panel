@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\DTO\Messages\CreateMessageDTO;
 use App\Entities\Firm;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Services\MessageService;
 use DateTime;
@@ -34,6 +35,7 @@ class ClauteChatJob implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws ChatException
      */
     public function handle()
     {
@@ -42,38 +44,35 @@ class ClauteChatJob implements ShouldQueue
         $apiKey = "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";
         $anthropicVersion = "2023-06-01";
 
+        $helper = new MessagesHelper($this->request['token']);
+        $chat = $helper->getChat();
+
+        $previousMessages = $chat->messages->map(function (&$item) {
+            $role = $item->customer ? 'user' : 'consultant';
+            $item = ['role' => $role, 'content' => $item->message];
+        });
+
         $data = [
             "model" => "claude-3-sonnet-20240229",
             "max_tokens" => 1024,
             "messages" => [
-                ["role" => "user", "content" => '
-                `You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
-
-`{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
-
-`if user wants to add some compoany wich is not in list provide response like this`
-
-`{ "NoticeForUser": "change it to message for user", }`
-
-`There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
-
-`There is also possibiliy to change date of spedition in this case you have to return response like this`
-
-`{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
-
-`If user wants to perform onne of this actions to add otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more into`
-
-`{ "NoticeForUser": "change it to message for user", }`
-
-All response are samples witch just represent format of response not actual response so change it accordingly.
-
-Today is ' . now() . '
-
-If ANYTHINK is uncertain provide respone "no reponse" it is very important! You have to be certain that user want to perform one of this actions
-
-`Do not provide any other type response it will break systemuser`
-
-`prompt: "' . $message . '"`
+                $previousMessages +
+                [
+                    "role" => "user", "content" => '
+                        `You are part of my larvel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
+                        `{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
+                        `if user wants to add some compoany wich is not in list provide response like this`
+                        `{ "NoticeForUser": "change it to message for user", }`
+                        `There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
+                        `There is also possibiliy to change date of spedition in this case you have to return response like this`
+                        `{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
+                        `If user wants to perform onne of this actions to add otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more into`
+                        `{ "NoticeForUser": "change it to message for user", }`
+                        All response are samples witch just represent format of response not actual response so change it accordingly.
+                        Today is ' . now() . '
+                        If ANYTHINK is uncertain provide respone "no reponse" it is very important! You have to be certain that user want to perform one of this actions
+                        `Do not provide any other type response it will break systemuser`
+                        `prompt: "' . $message . '"`
                 ']
             ]
         ];
