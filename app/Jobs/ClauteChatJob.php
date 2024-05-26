@@ -79,7 +79,7 @@ class ClauteChatJob implements ShouldQueue
             return $result;
         }
 
-        $prompt = [
+        $prompt = [[
             "role" => "user",
             "content" => '
             `You are part of my Laravel system. You have to detect if user wants to add employee of company to the chat if so provide me json response like this`
@@ -99,7 +99,7 @@ class ClauteChatJob implements ShouldQueue
             Here is previous messages from this chat: ' . implode(' ', array_flatten($previousMessages)) . '
 
             `prompt: "' . $message . '"`'
-        ];
+        ]];
 
         $data = [
             "model" => "claude-3-sonnet-20240229",
