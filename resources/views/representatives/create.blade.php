@@ -10,7 +10,7 @@
         @for ($i = 0; $i < 5; $i++)
             <div class="product-group bg-white shadow-md rounded-lg p-6">
                 <div class="form-group">
-                    <label for="products[{{ $i }}][contact_info]" class="block font-medium mb-2">Informacje kontaktowe do przedstawiciela {{ $i + 1 }}</label>
+                    <label for="products[{{ $i }}][contact_info]" class="block font-medium mb-2">Numer telefonu lub nazwa firmy przedstawiciela {{ $i + 1 }}</label>
                     <input type="text" name="products[{{ $i }}][contact_info]" class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                 </div>
             </div>
