@@ -44,6 +44,7 @@ class NotificationsForAuctionOfferForFirmsMail extends Mailable
      */
     public function content(): Content
     {;
+        dd($this->chatAuctionOffer);
         return new Content(
             view: 'emails.notification-for-auction-offer-for-firms-mail',
             with: [

@@ -50,7 +50,6 @@ class SendNotificationsForAuctionOfferForFirmsJob implements ShouldQueue
     private function sendMailToFirm(string $email): void
     {
         Log::info('Message about new lower price offer was sent');
-
         Mailer::create()
             ->to($email)
             ->send(new NotificationsForAuctionOfferForFirmsMail($this->chatAuctionOffer, $email));
