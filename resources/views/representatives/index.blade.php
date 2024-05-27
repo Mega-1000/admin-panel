@@ -18,7 +18,7 @@
             <tr>
                 <th class="py-2 px-4 border-b">id</th>
                 <th class="py-2 px-4 border-b">Info kontaktowe</th>
-                <th class="py-2 px-4 border-b">Email</th>
+                <th class="py-2 px-4 border-b">Email pracownika firmy</th>
             </tr>
             </thead>
             <tbody>
