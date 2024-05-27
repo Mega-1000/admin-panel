@@ -45,7 +45,7 @@
     <h3 class="text-center mb-4">
         Prosimy o skorygowanie ceny za m3 i zatwierdzenie poprzez użycie przycisku "Zapisz wszystkie ceny".
     </h3>
-    <h4 class="text-center">
+    <h4 class="text-center mb-4">
         !! Prosimy o wypełnienie formularza przetargowego, nawet jeśli Państwa oferta nie będzie najniższa, ponieważ klient może kierować się również jakością. !!
     </h4>
     <div class="row mb-4">
@@ -118,7 +118,7 @@
                                             ->whereHas('product', function ($q) use ($product) {
                                                 $q->where('product_group', $product->product_group);
                                             })
-                                            ->min('net_purchase_price_commercial_unit')
+                                            ->min('net_purchase_price_basic_unit')
                                     }} PLN
                                 </h4>
                             </div>
