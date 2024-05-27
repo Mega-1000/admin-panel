@@ -234,7 +234,7 @@
                            @endforeach
                            <td>
                                {{ round($totalCost / 3.33, 2) }}
-                               <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $product->firm->symbol }}/{{ $order->id }}">
+                               <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $product?->firm?->symbol }}/{{ $order->id }}">
                                    Wyślij zamówienie na tego producenta
                                </a>
                            </td>
