@@ -105,21 +105,28 @@
                         @if(is_a($product, \App\Entities\Product::class))
                             <div class="alert alert-success text-center mb-4">
                                 <h4>Najniższa cena na ten moment:
-                                    {{
-                                        $chat_auction_firm->chatAuction
+                                    @php
+                                        $chatAuctionMinPrice = $chat_auction_firm->chatAuction
                                             ->offers()
-                                            ?->whereHas('product', function ($q) use ($product) {$q->where('product_group', $product->product_group);})
-                                            ->min('basic_price_net')
-                                        ?? $chat_auction_firm
-                                            ->chatAuction
+                                            ->whereHas('product', function ($q) use ($product) {
+                                                $q->where('product_group', $product->product_group);
+                                            })
+                                            ->min('basic_price_net');
+
+                                        $orderItemMinPrice = $chat_auction_firm->chatAuction
                                             ->chat
                                             ->order
                                             ->items()
                                             ->whereHas('product', function ($q) use ($product) {
                                                 $q->where('product_group', $product->product_group);
                                             })
-                                            ->min('net_purchase_price_basic_unit')
-                                    }} PLN
+                                            ->min('net_purchase_price_basic_unit');
+
+                                        $minPrice = min($chatAuctionMinPrice ?? INF, $orderItemMinPrice ?? INF);
+                                    @endphp
+
+                                    {{ $minPrice }} PLN
+
                                 </h4>
                             </div>
                             <div class="product">
