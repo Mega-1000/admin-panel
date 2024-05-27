@@ -110,6 +110,7 @@
                                             ->offers()
                                             ->whereHas('product', function ($q) use ($product) {
                                                 $q->where('product_group', $product->product_group);
+                                                $q->where('additional_info1', $product->additional_info1);
                                             })
                                             ->min('basic_price_net');
 
