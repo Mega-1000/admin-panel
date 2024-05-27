@@ -113,13 +113,8 @@
                                             })
                                             ->min('basic_price_net');
 
-                                        $orderItemMinPrice = $chat_auction_firm->chatAuction
-                                            ->chat
-                                            ->order
-                                            ->items()
-                                            ->whereHas('product', function ($q) use ($product) {
-                                                $q->where('product_group', $product->product_group);
-                                            })
+                                        $orderItemMinPrice = \App\Entities\Product::where('product_group', $product->product_group)
+                                            ->where('additional_info1', $product->additional_info1)
                                             ->min('net_purchase_price_basic_unit');
 
                                         $minPrice = min($chatAuctionMinPrice ?? INF, $orderItemMinPrice ?? INF);
