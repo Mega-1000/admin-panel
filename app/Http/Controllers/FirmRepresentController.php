@@ -25,10 +25,14 @@ class FirmRepresentController extends Controller
     public function storeRepresentatives(Firm $firm, string $emailOfEmployee, Request $request): string
     {
         $validated = $request->validate([
-            'products.*.contact_info' => 'required|string|max:255',
+            'products.*.contact_info' => 'nullable|string|max:255',
         ]);
 
         foreach ($validated['products'] as $productData) {
+            if (!array_key_exists('contact_info', $productData)) {
+                continue;
+            }
+
             $represent = new FirmRepresent();
             $represent->contact_info = $productData['contact_info'];
             $represent->email_of_employee = $emailOfEmployee;
