@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Entities\ChatAuctionFirm;
+use App\Entities\OrderItem;
 use App\Entities\Product;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -15,11 +16,12 @@ class ChatAuctionFirms
      */
     public static function getItemsByToken($token): array
     {
-        $items = ChatAuctionFirm::where('token', $token)->first()
+        $order = ChatAuctionFirm::where('token', $token)->first()
             ->chatAuction
             ->chat
-            ->order
-            ->items;
+            ->order;
+
+        $items = $order->items;
         $res = [];
 
         foreach ($items as &$item) {
@@ -29,7 +31,10 @@ class ChatAuctionFirms
                 ->get();
 
             foreach ($products as $p) {
-                $p->quantity = $item->quantity;
+                $p->quantity = OrderItem::where('order_id', $order->id)->whereHas('product', function ($q) use ($p) {
+                    $q->where('product_group', $p->product_group)
+                        ->orWhere('parent_id', $p->parent_id);
+                })->sum('quantity');
             }
 
             $res[] = $products;
