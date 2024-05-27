@@ -1,4 +1,7 @@
-@if($auction->firms->where('firm_id', $firm->id)->first() && !$auction->firms->where('firm_id', $firm->id)->first()?->practices_representatives_policy && !\App\FirmRepresent::where('email_of_employee', $auction->firms->where('firm_id', $firm->id)->first()->email_of_employee)->first())
+
+
+
+1@if(\App\Entities\ChatAuctionFirm::where('token', $token)->first() && !$firm->practices_representatives_policy && !\App\FirmRepresent::where('email_of_employee', $auction->firms->where('token', $token)->first()->email_of_employee)->first())
     <p>
         W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na dostawę styropianu dotyczącego rejonu obsługiwanego przez Ciebie.
     </p>
@@ -42,7 +45,7 @@
         Aby dokonać wpisu o takich firmach prosimy kliknąć link poniżej
     </p>
     <p>
-        <a href="{{ route('create-represents', ['firm' => $firm->id, 'email' => $auction->firms->where('firm_id', $firm->id)->first()->email_of_employee]) }}">KLIKNIJ LINK ABY JE PODAĆ</a>
+        <a href="{{ route('create-represents', ['firm' => $firm->id, 'email' => \App\Entities\ChatAuctionFirm::where('token', $token)->first()->email_of_employee]) }}">KLIKNIJ LINK ABY JE PODAĆ</a>
     </p>
     <p>
         Firmy lub telefony do tych firm trzeba dodać do chatu, ale tak aby były widoczne tylko i wyłącznie dla nas.
