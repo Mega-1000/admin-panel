@@ -116,7 +116,7 @@
 
                                         $orderItemMinPrice = \App\Entities\Product::where('product_group', $product->product_group)
                                             ->where('additional_info1', $product->additional_info1)
-                                            ->min('net_purchase_price_basic_unit');
+                                            ->min('price.net_purchase_price_basic_unit');
 
                                         $minPrice = min($chatAuctionMinPrice ?? INF, $orderItemMinPrice ?? INF);
                                     @endphp
