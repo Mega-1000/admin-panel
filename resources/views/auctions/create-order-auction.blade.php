@@ -32,7 +32,7 @@
             <div class="border-b py-4">
                 @foreach($item as $product)
                     @php
-                        $productPrice = empty(\App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->commercial_price_gross) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->commercial_price_gross;
+                        $productPrice = empty(\App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->basic_price_gross) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->basic_price_gross;
                     @endphp
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
