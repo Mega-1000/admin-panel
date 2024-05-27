@@ -45,6 +45,9 @@
     <h3 class="text-center mb-4">
         Prosimy o skorygowanie ceny za m3 i zatwierdzenie poprzez użycie przycisku "Zapisz wszystkie ceny".
     </h3>
+    <h4 class="text-center">
+        !! Prosimy o wypełnienie formularza przetargowego, nawet jeśli Państwa oferta nie będzie najniższa, ponieważ klient może kierować się również jakością. !!
+    </h4>
     <div class="row mb-4">
         <div class="col-md-6">
             <p class="text-center" style="font-size: 1.4em">

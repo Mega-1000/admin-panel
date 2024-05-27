@@ -52,9 +52,6 @@
         Firmy lub telefony do tych firm trzeba dodać do chatu, ale tak aby były widoczne tylko i wyłącznie dla nas.
     </p>
 @else
-    <h1>
-        !! Prosimy o wypełnienie formularza przetargowego, nawet jeśli Państwa oferta nie będzie najniższa, ponieważ klient może kierować się również jakością. !!
-    </h1>
     <h2>
         Przetarg dotyczy cen firmy: {{ $firm->name }}
     </h2>
