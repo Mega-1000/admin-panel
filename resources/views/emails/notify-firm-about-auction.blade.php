@@ -46,7 +46,7 @@
         Aby dokonać wpisu o takich firmach prosimy kliknąć link poniżej
     </p>
     <p>
-        <a href="{{ route('create-represents', ['firm' => $firm->id, 'email' => \App\Entities\ChatAuctionFirm::where('token', $token)->first()->email_of_employee]) }}">KLIKNIJ LINK ABY JE PODAĆ</a>
+        <a href="{{ route('create-represents', ['firm' => $firm->id, 'email' => \App\Entities\ChatAuctionFirm::where('token', $token)->first()?->email_of_employee]) }}">KLIKNIJ LINK ABY JE PODAĆ</a>
     </p>
     <p>
         Firmy lub telefony do tych firm trzeba dodać do chatu, ale tak aby były widoczne tylko i wyłącznie dla nas.
