@@ -849,4 +849,5 @@ Route::post('/store-represents/{firm}/{email}', [FirmRepresentController::class,
 
 Route::get('/represents', [FirmRepresentController::class, 'index'])->name('represents.index');
 Route::post('/representatives/{id}', [FirmRepresentController::class, 'create'])->name('representatives.create');
+Route::delete('/representatives/{id}', [FirmRepresentController::class, 'delete'])->name('representatives.delete');
 

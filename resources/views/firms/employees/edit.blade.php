@@ -237,12 +237,13 @@
         </button>
     </form>
 
-    <table>
+    <table class="table">
         <thead>
         <tr>
             <th>Telefon</th>
             <th>Email</th>
             <th>Główny</th>
+            <th>Akcje</th>
         </tr>
         </thead>
         <tbody>
@@ -251,6 +252,15 @@
                 <td>{{ $firmRepresentation->phone }}</td>
                 <td>{{ $firmRepresentation->email }}</td>
                 <td>{{ $firmRepresentation->is_main ? 'Tak' : 'Nie' }}</td>
+                <td>
+                    <form action="{{ route('representatives.delete', $firmRepresentation->id) }}" method="post">
+                        @csrf
+                        @method('delete')
+                        <button class="btn btn-danger">
+                            Usuń
+                        </button>
+                    </form>
+                </td>
             </tr>
         @endforeach
         </tbody>
