@@ -161,7 +161,7 @@
             @foreach($firms as $firm)
                 <tr>
                     <td>
-                        <a href="https://mega1000.pl/{{ $firm->symbol }}/{{ \App\Entities\Category::where('name', $firm->symbol)->first()?->id }}/no-layout">
+                        <a href="https://mega1000.pl/{{ $firm->symbol }}/{{ \App\Entities\Category::where('name', $firm->symbol)->first()?->id }}/">
                             {{ $firm->symbol }}
                             Odległość:
                             {{ round($firm?->distance) }}KM
@@ -214,7 +214,7 @@
 
                                 @if($price)
                                     @php($dateOfPriceChange = \Carbon\Carbon::create($product->date_of_price_change))
-                                    <a href="https://mega1000.pl/singleProduct/{{ $id }}/no-layout"
+                                    <a href="https://mega1000.pl/singleProduct/{{ $id }}/"
                                        style="{{ $dateOfPriceChange->lessThan(\Carbon\Carbon::now()) ? 'color: red;' : '' }}">
                                         {{ $price }}
                                     </a>
