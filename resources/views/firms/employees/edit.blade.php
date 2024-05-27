@@ -216,7 +216,8 @@
     <br>
     <br>
 
-    <form action="{{ route('representatives.create', $employee->firm->id) }}">
+    <form action="{{ route('representatives.create', $employee->firm->id) }}" method="POST">
+        @csrf
         Dodaj nowego przedstawiciela
         <br>
         <br>
