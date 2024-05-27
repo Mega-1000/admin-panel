@@ -21,8 +21,8 @@ class NotificationsForAuctionOfferForFirmsMail extends Mailable
      * @return void
      */
     public function __construct(
-        private readonly ChatAuctionOffer $chatAuctionOffer,
-        private readonly string $email,
+        private ChatAuctionOffer $chatAuctionOffer,
+        private string $email,
     ) {}
 
     /**
@@ -44,7 +44,6 @@ class NotificationsForAuctionOfferForFirmsMail extends Mailable
      */
     public function content(): Content
     {;
-        dd($this->chatAuctionOffer);
         return new Content(
             view: 'emails.notification-for-auction-offer-for-firms-mail',
             with: [
