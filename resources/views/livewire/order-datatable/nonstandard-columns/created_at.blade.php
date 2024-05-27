@@ -1,1 +1,1 @@
-{{ explode('.', $order['created_at'])[0] }}
+{{ Carbon::create(explode('.', $order['created_at'])[0])->addHours(2) }}
