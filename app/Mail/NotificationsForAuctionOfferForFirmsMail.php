@@ -48,9 +48,9 @@ class NotificationsForAuctionOfferForFirmsMail extends Mailable
             view: 'emails.notification-for-auction-offer-for-firms-mail',
             with: [
                 'chatAuctionOffer' => $this->chatAuctionOffer,
-                'chatAuctionFirm' => $this->chatAuctionOffer->whereHas('firm', function ($query) {
+                'chatAuctionFirm' => dd($this->chatAuctionOffer->whereHas('firm', function ($query) {
                     $query->where('email', $this->email);
-                })->first(),
+                })->first()),
             ],
         );
     }
