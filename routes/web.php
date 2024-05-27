@@ -47,11 +47,14 @@ use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
 use App\Http\Middleware\FilterOrderInvoiceValue;
 use App\Mail\ChatNotInUseNotificationEmail;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use http\Client\Request;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use TCG\Voyager\Facades\Voyager;
 
+
+Debugbar::disable();
 /*
 |--------------------------------------------------------------------------
 | Web Routes

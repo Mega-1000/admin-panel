@@ -212,6 +212,23 @@
             </div>
             <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
+
+    <form action="{{ route('representatives.create') }}">
+        Dodaj nowego przedstawiciela
+
+        Email
+        <input type="text" class="form-control" name="email">
+
+        Telefon
+        <input type="text" class="form-control" name="phone">
+
+        Imie i nazwisko
+        <input type="text" class="form-control" name="name">
+
+        <button class="btn btn-primary">
+            Zapisz
+        </button>
+    </form>
 @endsection
 
 @section('javascript')
