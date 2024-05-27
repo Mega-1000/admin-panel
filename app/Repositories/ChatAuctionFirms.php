@@ -31,9 +31,9 @@ class ChatAuctionFirms
                 ->get();
 
             foreach ($products as $p) {
-                $p->quantity = dd(OrderItem::where('order_id', $order->id)->whereHas('product', function ($q) use ($p) {
-                    $q->where('product_group', $p->product_group)
-                        ->orWhere('parent_id', $p->parent_id);
+                $p->quantity = dd(OrderItem::where('order_id', $order->id)->whereHas('product', function ($q) use ($product) {
+                    $q->where('product_group', $product->product_group)
+                        ->orWhere('parent_id', $product->parent_id);
                 })->get())->sum('quantity');
             }
 
