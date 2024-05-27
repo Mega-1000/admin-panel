@@ -287,6 +287,14 @@
             }
         });
     </script>
-
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    parent.postMessage({ url: event.target.href }, '*');
+                });
+            });
+        });
+    </script>
 </body>
