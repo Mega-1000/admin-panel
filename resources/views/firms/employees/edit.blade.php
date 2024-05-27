@@ -230,7 +230,7 @@
         Imie i nazwisko
         <input type="text" class="form-control" name="name">
 
-        <input type="text" class="form-control hidden" name="email_of_employee">
+        <input type="text" class="form-control hidden" name="email_of_employee" value="{{ $employee->email }}">
 
         <button class="btn btn-primary">
             Zapisz
