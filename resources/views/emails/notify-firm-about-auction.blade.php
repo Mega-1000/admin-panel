@@ -1,7 +1,7 @@
 @if (
     \App\Entities\ChatAuctionFirm::where('token', $token)->first()
     && !$firm->practices_representatives_policy
-    && !\App\FirmRepresent::where('email_of_employee', $auction->firms->where('token', $token)->first()->email_of_employee)->first()
+    && !\App\FirmRepresent::where('email_of_employee', ChatAuctionFirm::where('token', $token)->first()->email_of_employee)->first()
 )
     <p>
         W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na dostawę styropianu dotyczącego rejonu obsługiwanego przez Ciebie.
