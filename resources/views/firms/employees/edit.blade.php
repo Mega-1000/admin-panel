@@ -164,6 +164,25 @@
                     <label for="postal_code">@lang('employees.form.postal_code')</label>
                     <input type="text" class="form-control" id="postal_code" name="postal_code"
                            value="{{ $employee->postal_code }}">
+
+                    <label for="zip_code_2">@lang('employees.form.postal_code') 2</label>
+                    <input type="text" class="form-control" id="zip_code_2" name="zip_code_2"
+                           value="{{ $employee->postal_code }}">
+
+                    <label for="zip_code_3">@lang('employees.form.postal_code') 3</label>
+                    <input type="text" class="form-control" id="zip_code_3" name="zip_code_3"
+                           value="{{ $employee->postal_code }}">
+
+                    <label for="zip_code_4">@lang('employees.form.postal_code') 4</label>
+                    <input type="text" class="form-control" id="zip_code_4" name="zip_code_4"
+                           value="{{ $employee->postal_code }}">
+
+                    <label for="zip_code_5">@lang('employees.form.postal_code') 5</label>
+                    <input type="text" class="form-control" id="zip_code_5" name="zip_code_5"
+                           value="{{ $employee->postal_code }}">
+
+
+
                     <label>@lang('employees.form.visibility')</label>
                     <input type="checkbox" id="postal_code_visibility" name="postal_code_visibility"
                            val="0"{{$employee->postal_code_visibility == 1 ? '' : 'checked' }}>
