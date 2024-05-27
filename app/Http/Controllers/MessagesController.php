@@ -227,13 +227,15 @@ class MessagesController extends Controller
             }
         }
 
+
         $allEmployeesFromRelatedOrders = [];
         if (isset($order) && get_class($order) === Order::class && $isStyrofoarm) {
             StyrofoarmAuctionService::updateAuction($chat, $products);
+            ////            $employees = Employees::getEmployeesForAuction($order);
 
-            $allEmployeesFromRelatedOrders = collect(Employees::getEmployeesForAuction($order));
+            $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
             $emails = $chat->users->pluck('email');
-            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()))->each(fn ($employee) =>  $employee->finalRadius = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer));
+            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()))->each(fn (&$employee) =>  $employee->finalRadius = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer));
 
 
             $allEmployeesFromRelatedOrders = $allEmployeesFromRelatedOrders
