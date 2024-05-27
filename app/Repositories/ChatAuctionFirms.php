@@ -31,10 +31,10 @@ class ChatAuctionFirms
                 ->get();
 
             foreach ($products as $p) {
-                $p->quantity = dd(OrderItem::where('order_id', $order->id)->whereHas('product', function ($q) use ($p) {
+                $p->quantity = OrderItem::where('order_id', $order->id)->whereHas('product', function ($q) use ($p) {
                     $q->where('product_group', $p->product_group)
                         ->orWhere('parent_id', $p->parent_id);
-                })->sum('quantity'));
+                })->sum('quantity');
             }
 
             $res[] = $products;
