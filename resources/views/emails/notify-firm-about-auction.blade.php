@@ -51,6 +51,12 @@
     <p>
         Firmy lub telefony do tych firm trzeba dodać do chatu, ale tak aby były widoczne tylko i wyłącznie dla nas.
     </p>
+    <p>
+        Jeśli Państwa firma nie praktykuje powyżej wymienionych praktyk prosimy kliknąć na link poniżej a oznaczymy to w naszym systemie.
+    </p>
+    <p>
+        <a href="{{ route('mark-as-non-represent-policy', ['firm' => $firm->id]) }}">KLIKNIJ ABY ZAZNACZYĆ SWOJĄ FIRMĘ JAKO NIE PRAKTUKUJĄCĄ DODATKOWYCH BONUSÓW</a>
+    </p>
 @else
     <h2>
         Przetarg dotyczy cen firmy: {{ $firm->name }}
