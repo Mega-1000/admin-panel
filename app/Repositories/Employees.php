@@ -70,6 +70,6 @@ class Employees
             }
         }
 
-        return dd($employees->unique()->all());
+        return $employees->unique()->all();
     }
 }
