@@ -213,9 +213,13 @@
             <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
 
+    <br>
+    <br>
+
     <form action="{{ route('representatives.create') }}">
         Dodaj nowego przedstawiciela
-
+        <br>
+        <br>
         Email
         <input type="text" class="form-control" name="email">
 
@@ -229,6 +233,25 @@
             Zapisz
         </button>
     </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Telefon</th>
+            <th>Email</th>
+            <th>Główny</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach(\App\FirmRepresent::where('email_of_employee', $employee->email)->get() as $firmRepresentation)
+            <tr>
+                <td>{{ $firmRepresentation->phone }}</td>
+                <td>{{ $firmRepresentation->email }}</td>
+                <td>{{ $firmRepresentation->is_main ? 'Tak' : 'Nie' }}</td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
 @endsection
 
 @section('javascript')
