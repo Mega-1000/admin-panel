@@ -122,7 +122,7 @@
                                         $minPrice = min($chatAuctionMinPrice ?? INF, $orderItemMinPrice ?? INF);
                                     @endphp
 
-                                    {{ $minPrice }} PLN
+                                    {{ round($minPrice, 2) }} PLN
 
                                 </h4>
                             </div>
