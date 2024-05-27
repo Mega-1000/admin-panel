@@ -86,7 +86,46 @@ class ClauteChatJob implements ShouldQueue
             `{ "AddCompany": "COMPANY NAME", "NoticeForUser": "change it to message for user", }`
             `if user wants to add some company which is not in list provide response like this`
             `{ "NoticeForUser": "change it to message for user", }`
-            `There are only these companies: "IZOTERM" "POLSTYR" "SWISSPOR" "AAA"`
+            `There are only these companies: [
+      "IZOLBET",
+      "IZOTERM",
+      "YETICO",
+      "GENDERKA",
+      "GRASTYR",
+      "POLSTYR",
+      "LUBAU",
+      "STYROPMIN",
+      "STYROPAK",
+      "DOMSTYR",
+      "STYROMAP",
+      "EKOBUD",
+      "TERMEX",
+      "AUSTROTHERM",
+      "TERMEX",
+      "STYRMANN",
+      "KRASBUD",
+      "ALBATERM",
+      "PANELTECH",
+      "STYRHOP",
+      "INTHERMO",
+      "STYROPIANPLUS",
+      "SWISSPOR",
+      "TYRON",
+      "ARSANIT",
+      "SONAROL",
+      "KNAUF",
+      "STYROPIANEX",
+      "EUROTERMIKA",
+      "NTB",
+      "EUROSTYR",
+      "ENERPOR",
+      "BESSER",
+      "FWS",
+      "EUROSTYROPIAN",
+      "JUSTYR",
+      "PIOTROWSKI",
+      "THERMICA",
+    ],
             `There is also possibility to change date of spedition in this case you have to return response like this`
             `{ "ChangeDates": "from: 25.05.2024 to: 30.05.2024", "NoticeForUser": "Zmieniłem daty klienta na: od 25.05.2024 do 30.05.2024", }`
             `If user wants to perform one of these actions otherwise return "No message" If you want to send message to user because user wants to perform one of actions but for example you need more info provide response replace notice for user with your message to get more info`
