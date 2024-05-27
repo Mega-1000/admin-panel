@@ -29,7 +29,7 @@ class FirmRepresentController extends Controller
         ]);
 
         foreach ($validated['products'] as $productData) {
-            if (!array_key_exists('contact_info', $productData)) {
+            if (empty($productData['contact_info'])) {
                 continue;
             }
 
