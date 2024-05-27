@@ -167,19 +167,19 @@
 
                     <label for="zip_code_2">@lang('employees.form.postal_code') 2</label>
                     <input type="text" class="form-control" id="zip_code_2" name="zip_code_2"
-                           value="{{ $employee->postal_code }}">
+                           value="{{ $employee->zip_code_2 }}">
 
                     <label for="zip_code_3">@lang('employees.form.postal_code') 3</label>
                     <input type="text" class="form-control" id="zip_code_3" name="zip_code_3"
-                           value="{{ $employee->postal_code }}">
+                           value="{{ $employee->zip_code_3 }}">
 
                     <label for="zip_code_4">@lang('employees.form.postal_code') 4</label>
                     <input type="text" class="form-control" id="zip_code_4" name="zip_code_4"
-                           value="{{ $employee->postal_code }}">
+                           value="{{ $employee->zip_code_4 }}">
 
                     <label for="zip_code_5">@lang('employees.form.postal_code') 5</label>
                     <input type="text" class="form-control" id="zip_code_5" name="zip_code_5"
-                           value="{{ $employee->postal_code }}">
+                           value="{{ $employee->zip_code_5 }}">
 
 
 
