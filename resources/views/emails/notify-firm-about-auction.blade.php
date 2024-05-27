@@ -1,7 +1,8 @@
-
-
-
-1@if(\App\Entities\ChatAuctionFirm::where('token', $token)->first() && !$firm->practices_representatives_policy && !\App\FirmRepresent::where('email_of_employee', $auction->firms->where('token', $token)->first()->email_of_employee)->first())
+@if (
+    \App\Entities\ChatAuctionFirm::where('token', $token)->first()
+    && !$firm->practices_representatives_policy
+    && !\App\FirmRepresent::where('email_of_employee', $auction->firms->where('token', $token)->first()->email_of_employee)->first()
+)
     <p>
         W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na dostawę styropianu dotyczącego rejonu obsługiwanego przez Ciebie.
     </p>
@@ -51,7 +52,6 @@
         Firmy lub telefony do tych firm trzeba dodać do chatu, ale tak aby były widoczne tylko i wyłącznie dla nas.
     </p>
 @else
-
     <h1>
         !! Prosimy o wypełnienie formularza przetargowego, nawet jeśli Państwa oferta nie będzie najniższa, ponieważ klient może kierować się również jakością. !!
     </h1>
@@ -60,43 +60,28 @@
     </h2>
     <br>
     <br>
-    W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na
-    dostawę styropianu.
+    W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na dostawę styropianu.
     <br>
     <br>
-    Prosimy kliknąć poniższy link który przeniesie Was do
-    modułu na którym prowadzony jest przetarg.
+    Prosimy kliknąć poniższy link który przeniesie Was do modułu na którym prowadzony jest przetarg.
     <br>
     <br>
-
-    Podane tam będą wszystkie parametry oraz asortyment dotyczący przetargu oraz
-    możliwość wprowadzenie swoich cen w m3 lub w opakowaniach.
+    Podane tam będą wszystkie parametry oraz asortyment dotyczący przetargu oraz możliwość wprowadzenia swoich cen w m3 lub w opakowaniach.
     <br>
     <br>
-
     <a href="{{ route('auctions.offer.create', ['token' => $token]) }}">{{ route('auctions.offer.create', ['token' => $token]) }}</a>
-
     <br>
     <br>
-    Ze względu na fakt
-    że do przetargu jest zaproszonych wielu sprzedawców i producentów prosimy podać
-    najniższe możliwe ceny aby zwiększyć prawdopodobieństwo wyboru waszej oferty.
-
+    Ze względu na fakt, że do przetargu jest zaproszonych wielu sprzedawców i producentów prosimy podać najniższe możliwe ceny aby zwiększyć prawdopodobieństwo wyboru waszej oferty.
     <br>
     <br>
     Chcielibyśmy również zaznaczyć, że klient nie musi zdecydować się na ofertę najtańszego styropianu więc prosimy o podanie najniższej ceny która jest dla Was akceptowalna.
-
     <br>
     <br>
-    Podane przez państwa ceny nie są widoczne dla innych oferentów jedynie dla klienta. Widoczna dla oferenów jest jedynie najniższa cena dla danego rodzaju styropianu zaproponowana przez jednego z uczestników.
-
+    Podane przez państwa ceny nie są widoczne dla innych oferentów jedynie dla klienta. Widoczna dla oferentów jest jedynie najniższa cena dla danego rodzaju styropianu zaproponowana przez jednego z uczestników.
     <br>
     <br>
-    Ostatecznie sprzedaż klientowi może
-    się odbyć przez was bezpośrednio lub przez naszą firmę lub ewentualnie przez
-    inna firmę którą możecie wskazać jeżeli sprzedaż przez nich gwarantuje
-    najniższą cenę.
-
+    Ostatecznie sprzedaż klientowi może się odbyć przez was bezpośrednio lub przez naszą firmę lub ewentualnie przez inną firmę którą możecie wskazać jeżeli sprzedaż przez nich gwarantuje najniższą cenę.
 @endif
 
 <br>
@@ -104,7 +89,7 @@
 
 @if ($firm->products->where('date_of_price_change', '<', now())->count() > 0)
     <div style="color: red; font-weight: bold">
-        !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nie aktualne. Prosimy o zaaktualizowanie ich lub zmiane daty ponownego powiadomienia w panelu pod linkiem poniżej:
+        !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
         <br>
         <br>
         <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
@@ -114,9 +99,9 @@
 <br>
 
 W linku poniżej znajdziesz: <br>
-- Dostęp do wszystkich przetargów w których wasza firma zosatła zaproszona do udziału <br>
+- Dostęp do wszystkich przetargów w których wasza firma została zaproszona do udziału <br>
 - Możliwość dokonania zmiany cen tabelarycznych <br>
-    <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
+<a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
 <br>
 <br>
-A więc kliknij i dołącz do przetargu.w
+A więc kliknij i dołącz do przetargu.
