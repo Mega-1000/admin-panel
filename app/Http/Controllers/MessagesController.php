@@ -233,7 +233,7 @@ class MessagesController extends Controller
 
             $allEmployeesFromRelatedOrders = collect(Employees::getEmployeesForAuction($order));
             $emails = $chat->users->pluck('email');
-            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()))->each(fn (&$employee) =>  $employee->finalRadius = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer));
+            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()))->each(fn ($employee) =>  $employee->finalRadius = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer));
 
 
             $allEmployeesFromRelatedOrders = $allEmployeesFromRelatedOrders

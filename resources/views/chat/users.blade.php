@@ -16,8 +16,8 @@
 {{--                </h5>--}}
 {{--            @endif--}}
 
-            @if(isset($user->distance))
-                Odległość: {{ ceil($user->distance) }} km <br>
+            @if(isset($user->finalRadius))
+                Odległość: {{ ceil($user->finalRadius) }} km <br>
             @endif
             @if(isset($user->firm?->symbol))
                 Symbol firmy: {{ $user->firm->symbol }} <br>
