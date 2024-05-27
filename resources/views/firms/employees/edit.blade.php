@@ -216,7 +216,7 @@
     <br>
     <br>
 
-    <form action="{{ route('representatives.create') }}">
+    <form action="{{ route('representatives.create', $employee->firm->id) }}">
         Dodaj nowego przedstawiciela
         <br>
         <br>
