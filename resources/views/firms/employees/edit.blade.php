@@ -229,6 +229,8 @@
         Imie i nazwisko
         <input type="text" class="form-control" name="name">
 
+        <input type="text" class="form-control hidden" name="email_of_employee">
+
         <button class="btn btn-primary">
             Zapisz
         </button>

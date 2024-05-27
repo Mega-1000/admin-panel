@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Firm;
 use App\FirmRepresent;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -46,5 +47,18 @@ class FirmRepresentController extends Controller
     public function index(): View
     {
         return \view('representatives.index', ['represents' => FirmRepresent::orderBy('id', 'desc')->paginate(20)]);
+    }
+
+    public function create($id, Request $request): RedirectResponse
+    {
+        $represent = new FirmRepresent();
+        $represent->email_of_employee = $request->get('email_of_employee');
+        $represent->phone = $request->get('phone');
+        $represent->email = $request->get('email');
+        $represent->contact_info = $request->get('phone');
+        $represent->firm_id = $id;
+        $represent->save();
+
+        return redirect()->back();
     }
 }

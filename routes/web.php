@@ -848,5 +848,5 @@ Route::get('/create-represents/{firm}/{email}', [FirmRepresentController::class,
 Route::post('/store-represents/{firm}/{email}', [FirmRepresentController::class, 'storeRepresentatives'])->name('store-represents');
 
 Route::get('/represents', [FirmRepresentController::class, 'index'])->name('represents.index');
-Route::post('/representatives', [FirmRepresentController::class, 'create'])->name('representatives.create');
+Route::post('/representatives/{id}', [FirmRepresentController::class, 'create'])->name('representatives.create');
 
