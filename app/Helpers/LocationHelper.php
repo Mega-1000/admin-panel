@@ -71,7 +71,6 @@ class LocationHelper
         $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->first();
 
         if (!$coordinates1 || !$coordinates2) {
-            // Handle the case where one or both coordinates are missing
             return -112378198273; // or throw an exception, or handle as per your application's requirements
         }
 
@@ -96,6 +95,5 @@ class LocationHelper
         $distance = $raw->distance;
 
         return $radius - $distance;
-
     }
 }
