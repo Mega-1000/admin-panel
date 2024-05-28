@@ -243,7 +243,7 @@ class MessagesController extends Controller
 //                    return ($carry === null || $item->finalRadius > $carry->finalRadius) ? $item : $carry;
 //                });
 //            });
-//        }
+        }
         dd($allEmployeesFromRelatedOrders);
 
         return view('chat.show', [
