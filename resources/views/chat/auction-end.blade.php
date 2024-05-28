@@ -143,6 +143,9 @@
                    <h1>Tu za nie długo zaczną wyświetlać się wyniki twojego przetargu.</h1>
                </div>
            @else
+               @php
+                   $productGroups = \App\Entities\Product::select('product_group')->distinct()->get()->pluck('product_group');
+               @endphp
                <table>
                    <thead>
                    <tr>
