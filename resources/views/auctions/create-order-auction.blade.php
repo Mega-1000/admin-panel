@@ -33,10 +33,10 @@
                 @foreach($item as $product)
                     @php
                         $productPrice = empty(\App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                                        ->where('chat_auction_id', $auction->id)
+                                                        ->where('chat_auction_id', $order->chat->auction->id)
                                                         ->orderBy('basic_price_net', 'asc')
                                                         ->first()) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                                        ->where('chat_auction_id', $auction->id)
+                                                        ->where('chat_auction_id', $order->chat->auction->id)
                                                         ->orderBy('basic_price_net', 'asc')
                                                         ->first();;
                     @endphp
