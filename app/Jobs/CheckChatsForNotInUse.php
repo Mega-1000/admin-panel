@@ -37,7 +37,9 @@ class CheckChatsForNotInUse implements ShouldQueue
             $lastMessageSentTime = $chat->messages->orderBy('created_at', 'desc')->first()->created_at;
 
             if (Carbon::create($lastMessageSentTime)->addDays(2) < now()) {
-                Mailer::create()->to('antoniwoj@o2.pl')->send(new ChatNotInUseNotificationEmail(Order::find(85685)->chat));
+                Mailer::create()
+                    ->to($chat->order->customer->login)
+                    ->send(new ChatNotInUseNotificationEmail($chat));
 
                 $chat->information_about_chat_inactiveness_sent = true;
                 $chat->save();

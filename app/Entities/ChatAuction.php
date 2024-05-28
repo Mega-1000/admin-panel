@@ -31,6 +31,7 @@ class ChatAuction extends Model
         'chat_id',
         'confirmed',
         'notes',
+        'end_info_sent',
     ];
 
     /**
