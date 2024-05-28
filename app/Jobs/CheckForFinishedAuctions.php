@@ -37,10 +37,10 @@ class CheckForFinishedAuctions implements ShouldQueue
 
         foreach ($auctions as $auction) {
             Mailer::create()
-            ->to($auction->chat->order->customer->login)
-            ->send(new AuctionFinishedNotification(
-                $auction,
-            ));
+                ->to($auction->chat->order->customer->login)
+                ->send(new AuctionFinishedNotification(
+                    $auction,
+                ));
         }
     }
 }

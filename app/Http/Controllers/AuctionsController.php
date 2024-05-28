@@ -556,4 +556,9 @@ class AuctionsController extends Controller
         $order->auction_order_placed = true;
         $order->save();
     }
+
+    public function confirm(ChatAuction $auction): JsonResponse
+    {
+        $this->chatAuctionsService->confirmAuction($auction);
+    }
 }
