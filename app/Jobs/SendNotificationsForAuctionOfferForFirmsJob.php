@@ -49,7 +49,8 @@ class SendNotificationsForAuctionOfferForFirmsJob implements ShouldQueue
      */
     private function sendMailToFirm(string $email): void
     {
-        Log::info('Message about new lower price offer was sent');
+        Log::info('Message about new lower price offer was sent' . $this->chatAuctionOffer->id);
+        
         if (
             $this->chatAuctionOffer->whereHas('firm', function ($query) use ($email) {
                 $query->where('email', $email);
