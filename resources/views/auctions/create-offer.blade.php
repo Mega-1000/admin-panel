@@ -259,6 +259,13 @@
             console.log('Nie znaleziono kodu pocztowego');
         }
     });
+    // Get all elements with the specified structure
+    const elementsToRemove = document.querySelectorAll('div[style="border: 4px red solid; border-radius: 10px"]');
+
+    // Loop through the elements and remove them from the DOM
+    elementsToRemove.forEach(element => {
+        element.parentNode.removeChild(element);
+    });
 </script>
 </body>
 </html>
