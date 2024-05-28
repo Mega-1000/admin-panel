@@ -72,7 +72,7 @@ class LocationHelper
 
         if (!$coordinates1 || !$coordinates2) {
             // Handle the case where one or both coordinates are missing
-            return 112378198273; // or throw an exception, or handle as per your application's requirements
+            return -112378198273; // or throw an exception, or handle as per your application's requirements
         }
 
         $radius = $employee->radius;
