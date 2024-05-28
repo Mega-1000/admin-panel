@@ -260,11 +260,16 @@
         }
     });
     // Get all elements with the specified structure
-    const elementsToRemove = document.querySelectorAll('div[style="border: 4px red solid; border-radius: 10px"]');
+    // Get all elements with the specified structure
+    const elementsToCheck = document.querySelectorAll('div[style="border: 4px red solid; border-radius: 10px"]');
 
-    // Loop through the elements and remove them from the DOM
-    elementsToRemove.forEach(element => {
-        element.parentNode.removeChild(element);
+    // Loop through the elements and remove the empty ones
+    elementsToCheck.forEach(element => {
+        // Check if the element has any child nodes
+        if (element.childNodes.length === 0) {
+            // If no child nodes, remove the element
+            element.parentNode.removeChild(element);
+        }
     });
 </script>
 </body>
