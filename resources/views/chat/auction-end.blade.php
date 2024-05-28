@@ -215,6 +215,7 @@
 
                                    @if(!empty($offers))
                                        @foreach($offers as $offer)
+                                           {{ $offer }}
                                            {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
                                            {{ round($offer->basic_price_net * 1.23, 2) }}
                                            <br>
@@ -237,7 +238,7 @@
                                </td>
                            @endforeach
                            <td>
-                               {{ round($totalCost / 3.33, 2) }}
+                               {{ round($totalCost / $product->numbers_of_basic_commercial_units_in_pack, 2) }}
                                <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $product?->firm?->symbol }}/{{ $order->id }}">
                                    Wyślij zamówienie na tego producenta
                                </a>
