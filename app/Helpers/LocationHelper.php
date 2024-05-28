@@ -65,10 +65,17 @@ class LocationHelper
         return $raw?->distance;
     }
 
-    public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer): int
+    public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer)
     {
-        $coordinates1 = DB::table('postal_code_lat_lon')->where('postal_code', $customer->standardAddress()->postal_code)->get()->first();
-        $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->get()->first();
+// Retrieve coordinates for customer and employee
+        $coordinates1 = DB::table('postal_code_lat_lon')->where('postal_code', $customer->standardAddress()->postal_code)->first();
+        $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->first();
+
+        if (!$coordinates1 || !$coordinates2) {
+            // Handle the case where one or both coordinates are missing
+            return null; // or throw an exception, or handle as per your application's requirements
+        }
+
         $radius = $employee->radius;
 
         $raw = DB::selectOne(
@@ -78,17 +85,18 @@ class LocationHelper
                 POW(SIN((? - ?) * PI() / 360), 2)
             )) AS distance',
             [
-                $coordinates1?->latitude,
-                $coordinates2?->latitude,
-                $coordinates1?->latitude,
-                $coordinates2?->latitude,
-                $coordinates1?->longitude,
-                $coordinates2?->longitude
+                $coordinates1->latitude,
+                $coordinates2->latitude,
+                $coordinates1->latitude,
+                $coordinates2->latitude,
+                $coordinates1->longitude,
+                $coordinates2->longitude
             ]
         );
 
         $distance = $raw->distance;
 
         return $radius - $distance;
+
     }
 }
