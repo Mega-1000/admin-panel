@@ -29,6 +29,7 @@ use App\Repositories\ChatAuctionOffers;
 use App\Repositories\Employees;
 use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
+use App\Services\Label\AddLabelService;
 use App\Services\MessageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
@@ -505,8 +506,13 @@ class AuctionsController extends Controller
      */
     public function submitOrder(Order $order, Request $request): void
     {
-        $requestData = $request->all(); // Get the entire request data
-        $products = $requestData['productData']; // Assuming the JavaScript object is sent as part of the request data
+        $requestData = $request->all();
+        $products = $requestData['productData'];
+
+        if ($request->get('cashOnDelivery')) {
+            $arr = [];
+            AddLabelService::addLabels($order, [], $arr, []);
+        }
 
         $orderBuilder = OrderBuilderFactory::create();
         $order->items()->delete();
