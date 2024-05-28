@@ -244,6 +244,7 @@ class MessagesController extends Controller
                 });
             });
         }
+        dd($allEmployeesFromRelatedOrders);
 
         return view('chat.show', [
             'isStyropian' => $isStyrofoarm,
