@@ -184,7 +184,7 @@
                                Odległość: {{ round($firm->distance) }} KM
                            </td>
                            @php
-                               $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Add the symbol to the tracked array
+                               $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? '';
                            @endphp
 
                            @php
@@ -213,6 +213,7 @@
                                    @if(!empty($offers))
                                        {{ implode(' ', $offers) }}
                                        @foreach($offers as $offer)
+                                           {{ $offer->product_id }}
                                            {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
                                            {{ round($offer->basic_price_net * 1.23, 2) }}
                                            <br>
