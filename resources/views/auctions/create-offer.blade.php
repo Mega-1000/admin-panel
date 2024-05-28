@@ -83,7 +83,7 @@
                 @foreach($p as $product)
                     @php
                         if (in_array($product->parentProduct?->id, $parentProductsDisplayed)) {
-                            $alreadyDisplayed = true;
+                            continue;
                         } else {
                             $alreadyDisplayed = false;
                         }
