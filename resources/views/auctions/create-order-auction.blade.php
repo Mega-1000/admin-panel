@@ -67,8 +67,8 @@
                 <h2 class="text-xl font-bold mb-2">Końcowa cena:</h2>
                 <p class="total-price">$0</p>
                 <div id="payment-info" class="hidden">
-                    <p>Do zapłaty teraz: 500zł</p>
-                    <p>Do zapłaty przy odbiorze: <span id="remaining-payment">0</span>zł</p>
+                    <p>Do zapłaty teraz: 500 zł</p>
+                    <p>Do zapłaty przy odbiorze: <span id="remaining-payment">0</span> zł</p>
                 </div>
                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
                     Wyślij zamówienie
@@ -182,7 +182,7 @@
                     message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
                 } else {
                     message += ' Zostaniesz przekierowany do banku.';
-                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`;
+                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? 500 : totalPrice + 50}`;
                 }
                 await Swal.fire('Sukces', message, 'success');
             })
