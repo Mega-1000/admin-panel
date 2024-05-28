@@ -78,7 +78,7 @@
     @endphp
 
     @foreach($products as $p)
-        {!! $p->count() > 1 ? '<div style="border: 4px red solid; border-radius: 10px"> Tylko jednen produkt z zaznaczonych na czerono zostanie wybrany przez klienta' : '' !!}
+        {!! $p->count() > 1 && in_array($p->first()->parentProduct?->id, $parentProductsDisplayed) ? '<div style="border: 4px red solid; border-radius: 10px"> <div style="font-weight: bolder; font-size: 24px"> Tylko jednen produkt z zaznaczonych na czerono zostanie wybrany przez klienta</div>' : '' !!}
             <div style="padding: 15px">
                 @foreach($p as $product)
                     @php
@@ -203,7 +203,7 @@
         @csrf
         <button class="btn btn-primary mt-3">Zapisz wszystkie ceny</button>
     </form>
-</>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('js/app.js') }}"></script>
