@@ -147,22 +147,10 @@
                    <thead>
                    <tr>
                        <th>
-                           <h5 style="text-align: right">
-                               Ceny brutto za m3
-                           </h5>
+                           <h5 style="text-align: right">Ceny brutto za m3</h5>
                        </th>
-                       @php $iteration = 2; @endphp
-                       @foreach($products as $product)
-                           <th>
-                               @php
-                                   $name = $product->product->name;
-                                   $words = explode(' ', $name);
-                                   array_shift($words);
-                                   $name = implode(' ', $words);
-                               @endphp
-                               {{ $name }}
-                           </th>
-                           @php $iteration++; @endphp
+                       @foreach($productGroups as $productGroup)
+                           <th>{{ $productGroup->name }}</th>
                        @endforeach
                        <th>Wartość oferty w przypadku wybrania najtańszych opcji</th>
                    </tr>
@@ -184,52 +172,31 @@
                                Odległość: {{ round($firm->distance) }} KM
                            </td>
                            @php
-                               $displayedFirmSymbols[] =  $firm?->firm?->symbol ?? $firm->symbol ?? '';
-                           @endphp
-
-                           @php
+                               $displayedFirmSymbols[] = $firm?->firm?->symbol ?? $firm->symbol ?? '';
                                $totalCost = 0;
                            @endphp
-
-                           @foreach($products as $product)
+                           @foreach($productGroups as $productGroup)
                                <td>
                                    @php
-                                       $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)
-                                           ->where('product_group', $product->product->product_group)
+                                       $offers = $auction->offers
+                                           ->where('firm_id', $firm->firm->id)
+                                           ->whereHas('product', function ($q) use ($productGroup) {
+                                               $q->where('product_group', $productGroup->id);
+                                           })
+                                           ->sortBy('basic_price_net')
                                            ->get();
-
-                                       $offers = [];
-                                       foreach ($allProductsToBeDisplayed as $product) {
-                                           if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
-                                               $offers[] = $auction->offers
-                                                ->where('product_id', $product->id)
-                                                ->sortBy('basic_price_net')
-                                                ->first();
-                                           }
-                                       }
-
-                                       usort($offers, function($a, $b) {
-                                           return $a->basic_price_net <=> $b->basic_price_net;
-                                       });
                                    @endphp
-
-                                   @if(!empty($offers))
+                                   @if(!$offers->isEmpty())
                                        @foreach($offers as $offer)
-                                           {{ $product->id }}
-                                           {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
-                                               {{ round($offer->basic_price_net * 1.23, 2) }}
+                                           {{ $offer->product->additional_info1 }}: {{ round($offer->basic_price_net * 1.23, 2) }}
                                            <br>
                                        @endforeach
-
-                                       <span style="color: green">
-                                            - specjalnie dla ciebie
-                                        </span>
-
+                                       <span style="color: green">- specjalnie dla ciebie</span>
                                        @php
                                            $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
-                                           \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
-                                               ->whereHas('product', function ($q) use ($product) {
-                                                   $q->where('product_group', $product->product_group);
+                                               \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
+                                               ->whereHas('product', function ($q) use ($productGroup) {
+                                                   $q->where('product_group', $productGroup->id);
                                                })->first()?->quantity;
                                        @endphp
                                    @else
@@ -252,8 +219,7 @@
                        @endif
 
                        @php
-                           $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? ''; // Assuming $firm->firm->symbol gives you the symbol you want to display
-
+                           $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? '';
                            $coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
 
                            if ($coordinatesOfUser) {
@@ -275,7 +241,6 @@
                                );
 
                                $radius = $raw?->distance;
-
                                $distance = round($raw?->distance, 2);
                            }
                        @endphp
@@ -324,11 +289,10 @@
                                </td>
                            </tr>
                            @php
-                               $displayedFirmSymbols[] = $symbol; // Add the symbol to the array so it won't be displayed again
+                               $displayedFirmSymbols[] = $symbol;
                            @endphp
                        @endif
                    @endforeach
-
                    </tbody>
                </table>
            @endif
