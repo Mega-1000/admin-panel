@@ -121,7 +121,7 @@
     function sendOrder() {
         Swal.fire('Ładowanie...', '')
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', '')) * 3.33;
+        const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', ''));
         const productData = [];
 
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
