@@ -73,7 +73,7 @@ readonly class ChatAuctionsService
     public function confirmAuction($auction): void
     {
         $order = $auction->chat->order;
-        $employees = dd(Employees::getEmployeesForAuction($order));
+        $employees = Employees::getEmployeesForAuction($order);
 
         foreach ($employees as $employee) {
             Mailer::create()
