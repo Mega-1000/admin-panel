@@ -38,7 +38,7 @@
                                                         ->first()) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                                         ->where('chat_auction_id', $order->chat->auctions->first()->id)
                                                         ->orderBy('basic_price_net', 'asc')
-                                                        ->first()->basic_price_net;
+                                                        ->first()->basic_price_net * 1.23;
                     @endphp
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
