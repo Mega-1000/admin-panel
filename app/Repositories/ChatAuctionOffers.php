@@ -56,7 +56,7 @@ class ChatAuctionOffers
             ->select('chat_auction_offers.*', 'firms.email')
             ->distinct()
             ->groupBy('chat_auction_offers.firm_id', 'firms.email')
-            ->where('commercial_price_net', '<', $chatAuctionOffer->commercial_price_net)
+            ->where('commercial_price_net', '>', $chatAuctionOffer->commercial_price_net)
             ->where('chat_auction_offers.firm_id', '!=', $chatAuctionOffer->firm_id)
             ->get();
     }
