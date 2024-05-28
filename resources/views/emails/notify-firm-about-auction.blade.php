@@ -3,6 +3,18 @@
     && !$firm->practices_representatives_policy
     && !\App\FirmRepresent::where('email_of_employee', \App\Entities\ChatAuctionFirm::where('token', $token)->first()->email_of_employee)->first()
 )
+    <br>
+    <br>
+
+    @if ($firm->products->where('date_of_price_change', '<', now())->count() > 0)
+        <div style="color: red; font-weight: bold">
+            !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
+            <br>
+            <br>
+            <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
+        </div>
+    @endif
+
     <p>
         W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na dostawę styropianu dotyczącego rejonu obsługiwanego przez Ciebie.
     </p>
@@ -85,18 +97,6 @@
     <br>
     <br>
     Ostatecznie sprzedaż klientowi może się odbyć przez was bezpośrednio lub przez naszą firmę lub ewentualnie przez inną firmę którą możecie wskazać jeżeli sprzedaż przez nich gwarantuje najniższą cenę.
-@endif
-
-<br>
-<br>
-
-@if ($firm->products->where('date_of_price_change', '<', now())->count() > 0)
-    <div style="color: red; font-weight: bold">
-        !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
-        <br>
-        <br>
-        <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
-    </div>
 @endif
 <br>
 <br>
