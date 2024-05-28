@@ -32,7 +32,13 @@
             <div class="border-b py-4">
                 @foreach($item as $product)
                     @php
-                        $productPrice = empty(\App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->basic_price_gross) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::where('product_id', $product->id)->first()?->basic_price_gross;
+                        $productPrice = empty(\App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                                        ->where('chat_auction_id', $auction->id)
+                                                        ->orderBy('basic_price_net', 'asc')
+                                                        ->first()) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                                        ->where('chat_auction_id', $auction->id)
+                                                        ->orderBy('basic_price_net', 'asc')
+                                                        ->first();;
                     @endphp
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
@@ -40,10 +46,10 @@
                                 <input type="radio" data-product-id="{{ $product->id }}" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
                             @endif
                             <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
-                                    Nazwa produktu: {{ $product->name }} <br>
-                                    Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
-                                    Cena: {{ $productPrice }}
-                                </span>
+                                Nazwa produktu: {{ $product->name }} <br>
+                                Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
+                                Cena: {{ $productPrice }}
+                            </span>
                         </div>
                     </div>
                 @endforeach
