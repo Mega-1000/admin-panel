@@ -233,17 +233,17 @@ class MessagesController extends Controller
 
             $allEmployeesFromRelatedOrders = $this->productService->getUsersFromVariations($order);
             $emails = $chat->users->pluck('email');
-            $allEmployeesFromRelatedOrders->filter(fn ($employee) => !in_array($employee->email, $emails->toArray()))->each(fn (&$employee) =>  $employee->finalRadius = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer));
+            $allEmployeesFromRelatedOrders->each(fn (&$employee) =>  $employee->finalRadius = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer));
 
 
-            $allEmployeesFromRelatedOrders = $allEmployeesFromRelatedOrders
-                ->groupBy('firm_id')
-                ->map(function ($group) {
+//            $allEmployeesFromRelatedOrders = $allEmployeesFromRelatedOrders
+//                ->groupBy('firm_id')
+//                ->map(function ($group) {
 //                return $group->reduce(function ($carry, $item) {
 //                    return ($carry === null || $item->finalRadius > $carry->finalRadius) ? $item : $carry;
 //                });
-            });
-        }
+//            });
+//        }
         dd($allEmployeesFromRelatedOrders);
 
         return view('chat.show', [
