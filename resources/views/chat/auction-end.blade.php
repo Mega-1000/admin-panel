@@ -238,7 +238,7 @@
                                </td>
                            @endforeach
                            <td>
-                               {{ round($totalCost / $product->numbers_of_basic_commercial_units_in_pack, 2) }}
+                               {{ round($totalCost / 3.33, 2) }}
                                <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $product?->firm?->symbol }}/{{ $order->id }}">
                                    Wyślij zamówienie na tego producenta
                                </a>
