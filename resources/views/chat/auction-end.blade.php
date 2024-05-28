@@ -215,6 +215,7 @@
 
                                    @if(!empty($offers))
                                        @foreach($offers as $offer)
+                                           {{ $offer->id }}
                                            {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
                                                {{ round($offer->basic_price_net * 1.23, 2) }}
                                            <br>
