@@ -50,6 +50,7 @@
                                 Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
                                 Cena: {{ $productPrice }}
                             </span>
+                            <button class="ml-2 remove-product-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" data-product-id="{{ $product->id }}">Usuń</button>
                         </div>
                     </div>
                 @endforeach
@@ -57,7 +58,10 @@
         @endforeach
         <div class="mt-6 flex justify-between">
             <div>
-
+                <label class="inline-flex items-center">
+                    <input type="checkbox" id="cash-on-delivery" class="form-checkbox">
+                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
+                </label>
             </div>
             <div>
                 <h2 class="text-xl font-bold mb-2">Końcowa cena:</h2>
@@ -85,6 +89,15 @@
                 checkbox.checked = true;
                 updateTotalPrice();
             }
+        });
+    });
+
+    document.querySelectorAll('.remove-product-btn').forEach(function(removeBtn) {
+        removeBtn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const productGroup = this.closest('.border-b');
+            productGroup.remove();
+            updateTotalPrice();
         });
     });
 
@@ -123,6 +136,7 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', ''));
         const productData = [];
+        const cashOnDelivery = document.querySelector('#cash-on-delivery').checked;
 
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
         checkedCheckboxes.forEach(function(checkedCheckbox) {
@@ -132,7 +146,7 @@
         });
 
         if (productData.length === 0) {
-            Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt', 'error');
+            Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt','error');
             return;
         }
 
@@ -142,11 +156,17 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({ totalPrice, productData })
+            body: JSON.stringify({ totalPrice, productData, cashOnDelivery })
         })
             .then(async (data) => {
-                await Swal.fire('Sukces', 'Pomyślnie złożono zamówienie. Zostaniesz przekierowany do banku', 'success')
-                window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`
+                let message = 'Pomyślnie złożono zamówienie.';
+                if (cashOnDelivery) {
+                    message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
+                } else {
+                    message += ' Zostaniesz przekierowany do banku.';
+                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`;
+                }
+                await Swal.fire('Sukces', message, 'success');
             })
             .catch(error => {
                 console.error('Error:', error);
