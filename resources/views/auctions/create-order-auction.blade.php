@@ -66,6 +66,10 @@
             <div>
                 <h2 class="text-xl font-bold mb-2">Końcowa cena:</h2>
                 <p class="total-price">$0</p>
+                <div id="payment-info" class="hidden">
+                    <p>Do zapłaty teraz: 500zł</p>
+                    <p>Do zapłaty przy odbiorze: <span id="remaining-payment">0</span>zł</p>
+                </div>
                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
                     Wyślij zamówienie
                 </button>
@@ -101,6 +105,10 @@
         });
     });
 
+    document.getElementById('cash-on-delivery').addEventListener('change', function() {
+        updateTotalPrice();
+    });
+
     function updateTotalPrice() {
         let totalPrice = 0;
         const productGroups = Array.from(document.querySelectorAll('.border-b'));
@@ -123,7 +131,17 @@
             }
         });
 
-        document.querySelector('.total-price').textContent = (totalPrice / 3.33).toFixed(2) + 'ZŁ';
+        const totalAmount = (totalPrice / 3.33).toFixed(2);
+        document.querySelector('.total-price').textContent = totalAmount + 'ZŁ';
+
+        const cashOnDelivery = document.getElementById('cash-on-delivery').checked;
+        const paymentInfo = document.getElementById('payment-info');
+        if (cashOnDelivery) {
+            paymentInfo.classList.remove('hidden');
+            document.getElementById('remaining-payment').textContent = (totalAmount - 500).toFixed(2) + 'ZŁ';
+        } else {
+            paymentInfo.classList.add('hidden');
+        }
     }
 
     updateTotalPrice();
@@ -132,7 +150,7 @@
     sendOrderButton.addEventListener('click', sendOrder);
 
     function sendOrder() {
-        Swal.fire('Ładowanie...', '')
+        Swal.fire('Ładowanie...', '');
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', ''));
         const productData = [];
@@ -146,7 +164,7 @@
         });
 
         if (productData.length === 0) {
-            Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt','error');
+            Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt', 'error');
             return;
         }
 
