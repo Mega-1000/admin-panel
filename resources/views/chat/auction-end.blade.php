@@ -214,7 +214,6 @@
                                    @endphp
 
                                    @if(!empty($offers))
-                                       {{ implode(' ', $offers) }}
                                        @foreach($offers as $offer)
                                            {{ $offer->product_id }}
                                            {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
