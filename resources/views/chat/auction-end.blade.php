@@ -205,7 +205,7 @@
                                                 ->whereHas('product', function ($q) use ($product) {
                                                     $q->where('parent_id', $product->parent_id);
                                                 })
-                                                ->sortBy('basic_price_net')
+                                                ->orderBy('basic_price_net', 'desc')
                                                 ->first();
                                            }
                                        }
