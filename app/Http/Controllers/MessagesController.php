@@ -239,9 +239,9 @@ class MessagesController extends Controller
             $allEmployeesFromRelatedOrders = $allEmployeesFromRelatedOrders
                 ->groupBy('firm_id')
                 ->map(function ($group) {
-                return $group->reduce(function ($carry, $item) {
-                    return ($carry === null || $item->finalRadius > $carry->finalRadius) ? $item : $carry;
-                });
+//                return $group->reduce(function ($carry, $item) {
+//                    return ($carry === null || $item->finalRadius > $carry->finalRadius) ? $item : $carry;
+//                });
             });
         }
         dd($allEmployeesFromRelatedOrders);
