@@ -146,7 +146,7 @@
         })
             .then(async (data) => {
                 await Swal.fire('Sukces', 'Pomyślnie złożono zamówienie. Zostaniesz przekierowany do banku', 'success')
-                window.location.href = 'https://mega1000.pl/payment?token={{ $order->token }}&total={{ $order->getValue() }}'
+                window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`
             })
             .catch(error => {
                 console.error('Error:', error);
