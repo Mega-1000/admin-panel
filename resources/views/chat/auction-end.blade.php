@@ -202,7 +202,7 @@
                                        foreach ($allProductsToBeDisplayed as $product) {
                                            if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
                                                $offers[] = $auction->offers
-                                                ->whereHas('product_id', $product->id)
+                                                ->where('product_id', $product->id)
                                                 ->sortBy('basic_price_net')
                                                 ->first();
                                            }
