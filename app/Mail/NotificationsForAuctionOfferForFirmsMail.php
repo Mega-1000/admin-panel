@@ -33,7 +33,7 @@ class NotificationsForAuctionOfferForFirmsMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Powiadomienie o nowej ofercie w aukcji',
+            subject: 'Twoja cena w przetargu o id: ' . $this->chatAuctionOffer->chat->order->id . 'została przebita',
         );
     }
 
