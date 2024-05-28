@@ -67,7 +67,6 @@ class LocationHelper
 
     public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer)
     {
-// Retrieve coordinates for customer and employee
         $coordinates1 = DB::table('postal_code_lat_lon')->where('postal_code', $customer->standardAddress()->postal_code)->first();
         $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->first();
 
