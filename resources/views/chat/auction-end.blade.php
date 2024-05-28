@@ -201,14 +201,10 @@
                                        $offers = [];
                                        foreach ($allProductsToBeDisplayed as $product) {
                                            if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
-                                               $offers[] = $auction->offers()
-                                                ->where('product_id', $product->id)
-                                                ->orderBy('basic_price_net', 'desc')
+                                               $offers[] = $auction->offers
+                                                ->whereHas('product_id', $product->id)
+                                                ->sortBy('basic_price_net')
                                                 ->first();
-
-                                               //                       ->whereHas('product', function ($q) use ($product) {
-//                                                    $q->where('parent_id', $product->parent_id);
-//                                                })
                                            }
                                        }
 
