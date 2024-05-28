@@ -203,7 +203,7 @@
                                            if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
                                                $offers[] = $auction->offers
                                                 ->whereHas('product', function ($q) use ($product) {
-                                                    $q->where('parrent_id', $product->parrent_id);
+                                                    $q->where('parent_id', $product->parent_id);
                                                 })
                                                 ->sortBy('basic_price_net')
                                                 ->first();
