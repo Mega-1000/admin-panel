@@ -279,7 +279,7 @@
                                     </a>
 
                                     @if(auth()->id())
-                                        <a href="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $firm->token }}">
+                                        <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $firm->token }}">
                                             Dodaj cenę jako ta firma
                                         </a>
                                     @endif
