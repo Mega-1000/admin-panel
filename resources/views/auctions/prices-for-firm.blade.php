@@ -171,7 +171,9 @@
                                     </span>
                                 @else
                                     {{ $firmCounter }}
-                                    @php($firmCounter++)
+                                    @php
+                                        $firmCounter++;
+                                    @endphp
                                 @endif
                             </td>
 
@@ -261,7 +263,9 @@ $distance = round($raw?->distance, 2);
                                         </span>
                                     @else
                                         {{ $firmCounter }}
-                                        @php($firmCounter++)
+                                        @php
+                                            $firmCounter++;
+                                        @endphp
                                     @endif
                                 </td>
 
