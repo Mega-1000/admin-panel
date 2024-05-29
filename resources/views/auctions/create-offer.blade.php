@@ -59,6 +59,7 @@
                 Podział procentowy cena/jakość: <br>
                 Cena: {{ $chat_auction_firm->chatAuction->price }} <br>
                 Jakość: {{ $chat_auction_firm->chatAuction->quality }} <br>
+                Data zakończenia przetargu: {{ $chat_auction_firm->chatAuction->end_of_auction }}<br>
                 Uwagi klienta do tego zamówienia: {{ $chat_auction_firm->chatAuction->notes ?? 'brak' }}
             </p>
         </div>
