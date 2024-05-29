@@ -221,6 +221,10 @@
                                     Odległość: {{ round($sortedFirm['firm']->distance) }} KM
                                 </td>
 
+                                @php
+                                    $totalCost = 0;
+                                @endphp
+
                                 @foreach($products as $product)
                                     <td>
                                         @php
@@ -242,6 +246,16 @@
                                             usort($offers, function($a, $b) {
                                                 return $a->basic_price_net <=> $b->basic_price_net;
                                             });
+
+                                            $minOffer = collect($offers)->min('basic_price_net');
+                                            $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
+                                            $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
+
+                                            $totalCost += ($minOfferPrice ?? $minPurchasePrice) *
+                                                \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
+                                                    ->whereHas('product', function ($q) use ($product) {
+                                                        $q->where('product_group', $product->product_group);
+                                                    })->first()?->quantity;
                                         @endphp
 
                                         @if(!empty($offers))
@@ -259,7 +273,7 @@
                                 @endforeach
 
                                 <td>
-                                    {{ $sortedFirm['totalCost'] }}
+                                    {{ round($totalCost / 3.33, 2) }}
                                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                         Wyślij zamówienie na tego producenta
                                     </a>
