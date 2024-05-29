@@ -329,7 +329,7 @@ if ($coordinatesOfUser) {
                                         <br>
                                         Odległość: {{ round($distance) }} KM
                                         <br>
-                                        tel przedstawiciela: +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->phone }}
+                                        tel przedstawiciela: +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
                                     </td>
 
                                     @php
