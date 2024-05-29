@@ -220,7 +220,7 @@
                                     <br>
                                     Odległość: {{ round($sortedFirm['firm']->distance) }} KM
                                     <br>
-                                    tel przedstawiciela: +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
+                                    tel przedstawiciela: <br> +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
                                 </td>
 
                                 @php
@@ -276,6 +276,7 @@
 
                                 <td>
                                     {{ round($totalCost / 3.33, 2) }}
+                                    <br>
                                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                         Wyślij zamówienie na tego producenta
                                     </a>
@@ -329,7 +330,7 @@ if ($coordinatesOfUser) {
                                         <br>
                                         Odległość: {{ round($distance) }} KM
                                         <br>
-                                        tel przedstawiciela: +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
+                                        tel przedstawiciela: <br> +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
                                     </td>
 
                                     @php
@@ -364,6 +365,7 @@ if ($coordinatesOfUser) {
 
                                     <td>
                                         {{ round($totalCost / 3.33, 2) }}
+                                        <br>
                                         <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $symbol }}/{{ $order->id }}">
                                             Wyślij zamówienie na tego producenta
                                         </a>
