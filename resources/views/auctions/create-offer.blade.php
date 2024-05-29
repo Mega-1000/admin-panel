@@ -119,7 +119,7 @@
                                             ->get()
                                             ->min('price.net_purchase_price_basic_unit');
 
-                                        $minPrice = min(dd($chatAuctionMinPrice, $orderItemMinPrice) ?? INF, $orderItemMinPrice ?? INF);
+                                        $minPrice = min($chatAuctionMinPrice ?? INF, (int)$orderItemMinPrice == 0 ? 999999 : $orderItemMinPrice ?? INF);
                                     @endphp
 
                                     {{ round($minPrice, 2) }} PLN
