@@ -220,7 +220,9 @@
                                     <br>
                                     Odległość: {{ round($sortedFirm['firm']->distance) }} KM
                                     <br>
-                                    tel przedstawiciela: <br> +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
+                                    @if (\App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone)
+                                        tel przedstawiciela: <br> +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
+                                    @endif
                                 </td>
 
                                 @php
@@ -333,7 +335,9 @@ if ($coordinatesOfUser) {
                                         <br>
                                         Odległość: {{ round($distance) }} KM
                                         <br>
-                                        tel przedstawiciela: <br> +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
+                                        @if(App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee))
+                                            tel przedstawiciela: <br> +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
+                                        @endif
                                     </td>
 
                                     @php
