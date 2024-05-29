@@ -166,7 +166,6 @@
                         <tr>
                             <td>
                                 firma
-                                {{$firm->firm_id}}
                                 @if($firm->firm_id == request()->query('firmId'))
                                     <span style="color: red; font-weight: bold">
                                         {{ $firm->firm->name }}
