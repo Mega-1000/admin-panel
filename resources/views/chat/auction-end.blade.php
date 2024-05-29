@@ -220,7 +220,7 @@
                                     <br>
                                     Odległość: {{ round($sortedFirm['firm']->distance) }} KM
                                     <br>
-                                    Nr tel do przedstawiciela: {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->get()->phone }}
+                                    Nr tel do przedstawiciela: {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
                                 </td>
 
                                 @php
