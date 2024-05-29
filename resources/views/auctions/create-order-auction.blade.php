@@ -70,7 +70,7 @@
                     <p>Do zapłaty teraz: 500 zł</p>
                     <p>Do zapłaty przy odbiorze: <span id="remaining-payment">0</span> zł</p>
                 </div>
-                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
+                <button onclick="sendOrder()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
                     Wyślij zamówienie
                 </button>
             </div>
