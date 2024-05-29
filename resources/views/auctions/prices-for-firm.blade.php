@@ -123,37 +123,24 @@
                         @php
                             $displayedFirmSymbols[] = $firm?->firm?->symbol ?? $firm->symbol ?? '';
                             $totalCost = 0;
-                        @endphp
-
-                        @foreach($products as $product)
-                            @php
-                                $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)
-                                    ->where('product_group', $product->product->product_group)
+                            foreach($products as $product) {
+                                $offers = $auction->offers
+                                    ->where('firm_id', $firm->firm->id)
+                                    ->whereHas('product', function($q) use($product) {
+                                        $q->where('parent_id', $product->product->parent_id);
+                                    })
+                                    ->orderBy('basic_price_net', 'asc')
                                     ->get();
 
-                                $offers = [];
-                                foreach ($allProductsToBeDisplayed as $product) {
-                                    if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
-                                        $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                            ->where('chat_auction_id', $auction->id)
-                                            ->orderBy('basic_price_net', 'asc')
-                                            ->first();
-                                    }
-                                }
-
-                                usort($offers, function($a, $b) {
-                                    return $a->basic_price_net <=> $b->basic_price_net;
-                                });
-
-                                $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
-                                    \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
-                                        ->whereHas('product', function ($q) use ($product) {
+                                if($offers->isNotEmpty()) {
+                                    $cheapestOffer = $offers->first();
+                                    $totalCost += round($cheapestOffer->basic_price_net * 1.23, 2) * $auction->chat->order->items
+                                        ->whereHas('product', function($q) use($product) {
                                             $q->where('product_group', $product->product_group);
-                                        })->first()?->quantity;
-                            @endphp
-                        @endforeach
-
-                        @php
+                                        })
+                                        ->sum('quantity');
+                                }
+                            }
                             $sortedFirms->push([
                                 'firm' => $firm,
                                 'totalCost' => round($totalCost / 3.33, 2)
@@ -180,27 +167,16 @@
                             @foreach($products as $product)
                                 <td>
                                     @php
-                                        $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $sortedFirm['firm']->firm->symbol)
-                                            ->where('product_group', $product->product->product_group)
+                                        $offers = $auction->offers
+                                            ->where('firm_id', $sortedFirm['firm']->firm->id)
+                                            ->whereHas('product', function($q) use($product) {
+                                                $q->where('parent_id', $product->product->parent_id);
+                                            })
+                                            ->orderBy('basic_price_net', 'asc')
                                             ->get();
-
-                                        $offers = [];
-                                        foreach ($allProductsToBeDisplayed as $product) {
-                                            if ($auction->offers->where('firm_id', $sortedFirm['firm']->firm->id)->where('product_id', $product->id)->first()) {
-                                                $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                                    ->where('chat_auction_id', $auction->id)
-                                                    ->orderBy('basic_price_net', 'asc')
-                                                    ->where('firm_id', $sortedFirm['firm']->firm->id)
-                                                    ->first();
-                                            }
-                                        }
-
-                                        usort($offers, function($a, $b) {
-                                            return $a->basic_price_net <=> $b->basic_price_net;
-                                        });
                                     @endphp
 
-                                    @if(!empty($offers))
+                                    @if(!$offers->isEmpty())
                                         @foreach($offers as $offer)
                                             {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
                                             {{ round($offer->basic_price_net * 1.23, 2) }}
@@ -259,8 +235,8 @@ $distance = round($raw?->distance, 2);
                                     firma
                                     @if($firm->firm->id == request()->query('firmId'))
                                         <span style="color: red; font-weight: bold">
-                                            {{ $firm->firm->name }}
-                                        </span>
+                                           {{ $firm->firm->name }}
+                                       </span>
                                     @else
                                         {{ $firmCounter }}
                                         @php
@@ -271,7 +247,7 @@ $distance = round($raw?->distance, 2);
 
                                 @php
                                     $prices = [];
-                                    $items = isset($auction) ? $auction?->chat?->order?->items : $order?->items;
+                                    $items = isset($auction) ? $auction->chat->order->items : $order->items;
                                     $totalCost = 0;
 
                                     foreach ($items as $item) {
@@ -283,9 +259,10 @@ $distance = round($raw?->distance, 2);
                                             return $product->price->gross_purchase_price_basic_unit_after_discounts;
                                         });
 
-                                        $prices[] = $variations;
-
-                                        $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
+                                        if($variations->isNotEmpty()) {
+                                            $cheapestVariation = $variations->first();
+                                            $totalCost += $cheapestVariation->price->net_special_price_basic_unit * $item->quantity;
+                                        }
                                     }
                                 @endphp
 
@@ -293,15 +270,13 @@ $distance = round($raw?->distance, 2);
                                     <td>
                                         @foreach($price as $p)
                                             {{ $p->price->product->additional_info1 }}:
-                                            {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
+                                            {{ $p->price->gross_purchase_price_basic_unit_after_discounts }}
                                             <br>
                                         @endforeach
                                     </td>
                                 @endforeach
 
-                                <td>
-                                    {{ round($totalCost / 3.33, 2) }}
-                                </td>
+                                <td>{{ round($totalCost / 3.33, 2) }}</td>
                             </tr>
                             @php
                                 $displayedFirmSymbols[] = $symbol;
