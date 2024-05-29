@@ -115,7 +115,6 @@
                         $displayedFirmSymbols = [];
                     @endphp
 
-                    {{ dd($firms) }}
                     @foreach($firms as $firm)
                         @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
                             @continue
@@ -167,7 +166,7 @@
                         <tr>
                             <td>
                                 firma
-                                @if($firm->firm->id == request()->query('firmId'))
+                                @if($firm->firm_id == request()->query('firmId'))
                                     <span style="color: red; font-weight: bold">
                                         {{ $firm->firm->name }}
                                     </span>
