@@ -171,7 +171,7 @@
                                         {{ $firm->firm->name }}
                                     </span>
                                 @else
-                                    {{ $firm->firm->id }}
+                                    {{ $firm->firm->name }}
                                     {{ $firmCounter }}
                                     @php
                                         $firmCounter++;
