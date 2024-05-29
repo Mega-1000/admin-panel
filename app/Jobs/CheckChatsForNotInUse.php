@@ -3,7 +3,10 @@
 namespace App\Jobs;
 
 use App\Entities\Chat;
+use App\Entities\Order;
 use App\Facades\Mailer;
+use App\Helpers\MessagesHelper;
+use App\Helpers\SMSHelper;
 use App\Mail\ChatNotInUseNotificationEmail;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -31,7 +34,38 @@ class CheckChatsForNotInUse implements ShouldQueue
      */
     public function handle()
     {
-        $chats = Chat::where('is_active', true)->where('information_about_chat_inactiveness_sent', false)->where('created_at', '>', Carbon::create('2024', '05', '20'))->get();
+        $chats = Chat::where('is_active', true)
+            ->where('information_about_chat_inactiveness_sent', false)
+            ->where('created_at', '>', Carbon::create('2024', '05', '20'))
+            ->get();
+
+        foreach ($chats as $chat) {
+            $lasMessage = $chat->messages->orderBy('created_at', 'desc')->first();
+            $lastMessageSentTime = $lasMessage->created_at;
+
+            $messagesHelper = new MessagesHelper();
+            $messagesHelper->chatId = $chat->id;
+            $token = $messagesHelper->getChatToken($chat->order->id, auth()->id());
+
+            if (Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user?->id) {
+                SMSHelper::sendSms(
+                    $chat->order->customer->phone,
+                    "TESTPHP",
+                    "
+                    Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
+
+
+                    https://admin.mega1000.pl/chat/" . $token . "
+                    ",
+                    "ECO"
+                );
+            }
+        }
+
+        $chats = Chat::where('is_active', true)
+            ->where('information_about_chat_inactiveness_sent', false)
+            ->where('created_at', '>', Carbon::create('2024', '05', '20'))
+            ->get();
 
         foreach ($chats as $chat) {
             $lastMessageSentTime = $chat->messages->orderBy('created_at', 'desc')->first()->created_at;
