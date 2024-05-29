@@ -219,6 +219,8 @@
                                     {{ $sortedFirm['firm']?->firm?->symbol ?? $sortedFirm['firm']->symbol ?? '' }}
                                     <br>
                                     Odległość: {{ round($sortedFirm['firm']->distance) }} KM
+                                    <br>
+                                    Nr tel do przedstawiciela: {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->get() }}
                                 </td>
 
                                 @php
@@ -363,6 +365,7 @@ if ($coordinatesOfUser) {
                                         <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $symbol }}/{{ $order->id }}">
                                             Wyślij zamówienie na tego producenta
                                         </a>
+                                        <br>
 
                                         @if(auth()->id())
                                             <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $firm->token }}">
