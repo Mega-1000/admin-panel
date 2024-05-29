@@ -203,7 +203,7 @@
                                         $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
                                         $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
 
-                                        $totalCost += ($minOfferPrice ?? $minPurchasePrice) *
+                                        $sortedFirm['totalCost'] += ($minOfferPrice ?? $minPurchasePrice) *
                                             \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                                 ->whereHas('product', function ($q) use ($product) {
                                                     $q->where('product_group', $product->product_group);
