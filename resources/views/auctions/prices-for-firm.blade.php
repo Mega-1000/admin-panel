@@ -113,6 +113,7 @@
                     @php
                         $sortedFirms = collect();
                         $displayedFirmSymbols = [];
+                        $firmIdFromQuery = request()->query('firmId');
                     @endphp
 
                     @foreach($firms as $firm)
@@ -166,9 +167,9 @@
                         <tr>
                             <td>
                                 firma
-                                @if($firm->firm_id == request()->query('firmId'))
+                                @if($sortedFirm['firm']->firm->id == $firmIdFromQuery)
                                     <span style="color: red; font-weight: bold">
-                                        {{ $firm->firm->name }}
+                                        {{ $sortedFirm['firm']->firm->name }}
                                     </span>
                                 @else
                                     {{ $firmCounter }}
@@ -258,7 +259,7 @@ $distance = round($raw?->distance, 2);
                             <tr>
                                 <td>
                                     firma
-                                    @if($firm->firm->id == request()->query('firmId'))
+                                    @if($firm->firm->id == $firmIdFromQuery)
                                         <span style="color: red; font-weight: bold">
                                             {{ $firm->firm->name }}
                                         </span>
