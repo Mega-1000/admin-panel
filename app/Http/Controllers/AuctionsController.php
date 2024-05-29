@@ -509,9 +509,11 @@ class AuctionsController extends Controller
         $requestData = $request->all();
         $products = $requestData['productData'];
 
+        $arr = [];
+        AddLabelService::addLabels($order, [206], $arr, []);
         if ($request->get('cashOnDelivery')) {
             $arr = [];
-            AddLabelService::addLabels($order, [], $arr, []);
+            AddLabelService::addLabels($order, [39], $arr, []);
         }
 
         $orderBuilder = OrderBuilderFactory::create();
