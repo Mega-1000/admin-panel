@@ -198,9 +198,20 @@
                                         usort($offers, function($a, $b) {
                                             return $a->basic_price_net <=> $b->basic_price_net;
                                         });
+
+                                        $minOffer = collect($offers)->min('basic_price_net');
+                                        $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
+                                        $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
+
+                                        $totalCost += ($minOfferPrice ?? $minPurchasePrice) *
+                                            \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
+                                                ->whereHas('product', function ($q) use ($product) {
+                                                    $q->where('product_group', $product->product_group);
+                                                })->first()?->quantity;
                                     @endphp
 
-                                    @if(!empty($offers))
+
+                                @if(!empty($offers))
                                         @foreach($offers as $offer)
                                             {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
                                             {{ round($offer->basic_price_net * 1.23, 2) }}
