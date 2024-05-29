@@ -71,17 +71,6 @@
 
     <div class="container" id="flex-container">
         <div id="chat-container">
-            <div class="alert-success alert">
-                Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
-                <br>
-                Po więcej informacji kliknij przycisk zobacz więcej
-                <br>
-                <br>
-                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
-                    Zobacz więcej na temat promocji
-                </a>
-            </div>
-
             @if($firms->count() == 0)
                 <div class="text-center">
                     <h1>Tu za nie długo zaczną wyświetlać się wyniki twojego przetargu.</h1>
