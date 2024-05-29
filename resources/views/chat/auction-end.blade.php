@@ -220,7 +220,7 @@
                                     <br>
                                     Odległość: {{ round($sortedFirm['firm']->distance) }} KM
                                     <br>
-                                    Nr tel do przedstawiciela: {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
+                                    tel przedstawiciela: +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
                                 </td>
 
                                 @php
@@ -328,6 +328,8 @@ if ($coordinatesOfUser) {
                                         {{ $symbol }}
                                         <br>
                                         Odległość: {{ round($distance) }} KM
+                                        <br>
+                                        tel przedstawiciela: +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->emal }}
                                     </td>
 
                                     @php
