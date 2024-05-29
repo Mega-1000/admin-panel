@@ -124,7 +124,7 @@
                             $displayedFirmSymbols[] = $firm?->firm?->symbol ?? $firm->symbol ?? '';
                             $totalCost = 0;
                             foreach($products as $product) {
-                                $offers = $auction->offers
+                                $offers = $auction->offers()
                                     ->where('firm_id', $firm->firm->id)
                                     ->whereHas('product', function($q) use($product) {
                                         $q->where('parent_id', $product->product->parent_id);
@@ -134,7 +134,7 @@
 
                                 if($offers->isNotEmpty()) {
                                     $cheapestOffer = $offers->first();
-                                    $totalCost += round($cheapestOffer->basic_price_net * 1.23, 2) * $auction->chat->order->items
+                                    $totalCost += round($cheapestOffer->basic_price_net * 1.23, 2) * $auction->chat->order->items()
                                         ->whereHas('product', function($q) use($product) {
                                             $q->where('product_group', $product->product_group);
                                         })
@@ -167,7 +167,7 @@
                             @foreach($products as $product)
                                 <td>
                                     @php
-                                        $offers = $auction->offers
+                                        $offers = $auction->offers()
                                             ->where('firm_id', $sortedFirm['firm']->firm->id)
                                             ->whereHas('product', function($q) use($product) {
                                                 $q->where('parent_id', $product->product->parent_id);
