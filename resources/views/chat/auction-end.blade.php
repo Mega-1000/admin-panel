@@ -264,6 +264,9 @@
                                             @foreach($offers as $offer)
                                                 {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
                                                 {{ round($offer->basic_price_net * 1.23, 2) }}
+                                                @if(auth()->id())
+                                                    ({{ $offer->basic_price_net }})
+                                                @endif
                                                 <br>
                                             @endforeach
 
@@ -358,6 +361,9 @@ if ($coordinatesOfUser) {
                                             @foreach($price as $p)
                                                 {{ $p->price->product->additional_info1 }}:
                                                 {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
+                                                @if(auth()->id())
+                                                    ({{ $offer->basic_price_net }})
+                                                @endif
                                                 <br>
                                             @endforeach
                                         </td>
