@@ -137,6 +137,7 @@
                                         $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                             ->where('chat_auction_id', $auction->id)
                                             ->orderBy('basic_price_net', 'asc')
+                                            ->where('firm_id', $firm->firm->id)
                                             ->first();
                                     }
                                 }
