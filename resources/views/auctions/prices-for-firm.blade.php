@@ -267,7 +267,7 @@ $distance = round($raw?->distance, 2);
                                         @php
                                             $firmCounter++;
                                         @endphp
-                                    @endif
+                                    @endif {{$firm->firm->id }}
                                 </td>
 
                                 @php
