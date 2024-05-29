@@ -515,7 +515,7 @@ class AuctionsController extends Controller
         }
 
         $orderBuilder = OrderBuilderFactory::create();
-        $order->items()->delete();
+//        $order->items()->delete();
         $companies = [];
 
         foreach ($products as $product) {
@@ -523,9 +523,9 @@ class AuctionsController extends Controller
             $quantity = $product['quantity'];
 
             $product = Product::find($productId);
-            $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
+            $offer = dd(ChatAuctionOffer::where('firm_id', $product->firm->id)
                 ->where('order_item_id', $order->items()?->where('product_id', $product?->id)?->first()?->id)
-                ->first();
+                ->first());
 
             $orderBuilder->assignItemsToOrder(
                 $order,
