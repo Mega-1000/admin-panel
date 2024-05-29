@@ -233,7 +233,7 @@ $raw = \DB::selectOne(
     FROM postal_code_lat_lon pc
     JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
     JOIN warehouses w on wa.warehouse_id = w.id
-    WHERE w.firm_id = :firmId AND w.status = 'ACTIVE'
+    WHERE w.firm_id = :firmId AND w.status = "ACTIVE"
     ORDER BY distance
     limit 1',
     [
