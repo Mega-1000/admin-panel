@@ -106,12 +106,12 @@
                     @endphp
 
                     @foreach($firms as $firm)
-                        @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
+                        @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || !isset($auction))
                             @continue
                         @endif
 
                         @php
-                            $displayedFirmSymbols[] = $firm?->firm?->symbol ?? $firm->symbol ?? '';
+                            $displayedFirmSymbols[] = $firm->firm->symbol;
                             $totalCost = 0;
                         @endphp
 
@@ -152,7 +152,12 @@
                         @endphp
                     @endforeach
 
-                    @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
+                    @php
+                        $sortedFirms = $sortedFirms->sortBy('totalCost');
+                        $firmCounter = 1;
+                    @endphp
+
+                    @foreach($sortedFirms as $sortedFirm)
                         <tr>
                             <td>
                                 firma
@@ -162,9 +167,6 @@
                                     </span>
                                 @else
                                     {{ $firmCounter }}
-                                    @php
-                                        $firmCounter++;
-                                    @endphp
                                 @endif
                             </td>
 
@@ -209,15 +211,18 @@
                                 {{ $sortedFirm['totalCost'] }}
                             </td>
                         </tr>
+                        @php
+                            $firmCounter++;
+                        @endphp
                     @endforeach
 
                     @foreach($firms as $firm)
-                        @if(in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
+                        @if(in_array($firm->firm->symbol, $displayedFirmSymbols) || !isset($auction))
                             @continue
                         @endif
 
                         @php
-                            $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? '';
+                            $symbol = $firm->firm->symbol;
                             $coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
 
 if ($coordinatesOfUser) {
@@ -228,7 +233,7 @@ $raw = \DB::selectOne(
     FROM postal_code_lat_lon pc
     JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
     JOIN warehouses w on wa.warehouse_id = w.id
-    WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+    WHERE w.firm_id = :firmId AND w.status = 'ACTIVE'
     ORDER BY distance
     limit 1',
     [
@@ -244,7 +249,7 @@ $distance = round($raw?->distance, 2);
 }
                         @endphp
 
-                        @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
+                        @if((isset($auction) && $auction?->offers->where('firm_id', $firm->firm->id)->count() === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                             <tr>
                                 <td>
                                     firma
@@ -254,9 +259,6 @@ $distance = round($raw?->distance, 2);
                                         </span>
                                     @else
                                         {{ $firmCounter }}
-                                        @php
-                                            $firmCounter++;
-                                        @endphp
                                     @endif
                                 </td>
 
@@ -296,6 +298,7 @@ $distance = round($raw?->distance, 2);
                             </tr>
                             @php
                                 $displayedFirmSymbols[] = $symbol;
+                                $firmCounter++;
                             @endphp
                         @endif
                     @endforeach
