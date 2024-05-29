@@ -171,6 +171,7 @@
                                         {{ $firm->firm->name }}
                                     </span>
                                 @else
+                                    {{ $firm->firm->id }}
                                     {{ $firmCounter }}
                                     @php
                                         $firmCounter++;
@@ -267,7 +268,7 @@ $distance = round($raw?->distance, 2);
                                         @php
                                             $firmCounter++;
                                         @endphp
-                                    @endif {{$firm->firm->id }}
+                                    @endif
                                 </td>
 
                                 @php
