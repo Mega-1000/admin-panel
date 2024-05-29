@@ -222,8 +222,6 @@
                 $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? '';
                 $coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
 
-                if$coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
-
                if ($coordinatesOfUser) {
                    $raw = \DB::selectOne(
                        'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
