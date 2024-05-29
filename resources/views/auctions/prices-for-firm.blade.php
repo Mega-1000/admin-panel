@@ -59,6 +59,10 @@
 
 <body>
 <div>
+    @php
+        $displayedFirmSymbols = [];
+        $firmCounter = 1;
+    @endphp
     @if(session()->get('success'))
         <div class="alert alert-success">
             Pomyślnie stworzono zamówienie i dodano przedstawicieli do chatu
