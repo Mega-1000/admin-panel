@@ -362,7 +362,7 @@ if ($coordinatesOfUser) {
                                                 {{ $p->price->product->additional_info1 }}:
                                                 {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
                                                 @if(auth()->id())
-                                                    ({{ $offer->basic_price_net }})
+                                                    ({{ $p?->price->net_purchase_price_basic_unit_after_discounts }})
                                                 @endif
                                                 <br>
                                             @endforeach
