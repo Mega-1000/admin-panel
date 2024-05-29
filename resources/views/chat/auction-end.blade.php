@@ -333,9 +333,9 @@ if ($coordinatesOfUser) {
                                     <td>
                                         {{ $symbol }}
                                         <br>
-                                        Odległość: {{ round($distance) }} KM
+                                        Odległość: {{ round($distance) }} KMies\Employee::where('emai
                                         <br>
-                                        @if(App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee))
+                                        @if(App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first())
                                             tel przedstawiciela: <br> +48 {{ \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first()->phone }}
                                         @endif
                                     </td>
