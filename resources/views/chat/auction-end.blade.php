@@ -277,6 +277,12 @@
                                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                         Wyślij zamówienie na tego producenta
                                     </a>
+
+                                    @if(auth()->id())
+                                        <a href="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $firm->token }}">
+                                            Dodaj cenę jako ta firma
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
