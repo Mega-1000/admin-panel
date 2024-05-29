@@ -35,32 +35,35 @@ class CheckChatsForNotInUse implements ShouldQueue
     public function handle()
     {
         $chats = Chat::where('is_active', true)
-            ->where('information_about_chat_inactiveness_sent', false)
+            ->where('sent_sms', false)
             ->where('created_at', '>', Carbon::create('2024', '05', '20'))
             ->get();
 
-//        foreach ($chats as $chat) {
-//            $lasMessage = $chat->messages->orderBy('created_at', 'desc')->first();
-//            $lastMessageSentTime = $lasMessage->created_at;
-//
-//            $messagesHelper = new MessagesHelper();
-//            $messagesHelper->chatId = $chat->id;
-//            $token = $messagesHelper->getChatToken($chat->order->id, auth()->id());
-//
-//            if (Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user?->id) {
-//                SMSHelper::sendSms(
-//                    $chat->order->customer->phone,
-//                    "TESTPHP",
-//                    "
-//                    Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
-//
-//
-//                    https://admin.mega1000.pl/chat/" . $token . "
-//                    ",
-//                    "ECO"
-//                );
-//            }
-//        }
+        foreach ($chats as $chat) {
+            $lasMessage = $chat->messages->orderBy('created_at', 'desc')->first();
+            $lastMessageSentTime = $lasMessage->created_at;
+
+            $lasMessage->sent_sms = true;
+            $lasMessage->save();
+
+            $messagesHelper = new MessagesHelper();
+            $messagesHelper->chatId = $chat->id;
+            $token = $messagesHelper->getChatToken($chat->order->id, auth()->id());
+
+            if (Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user?->id) {
+                SMSHelper::sendSms(
+                    $chat->order->customer->phone,
+                    "TESTPHP",
+                    "
+                    Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
+
+
+                    https://admin.mega1000.pl/chat/" . $token . "
+                    ",
+                    "ECO"
+                );
+            }
+        }
 
         $chats = Chat::where('is_active', true)
             ->where('information_about_chat_inactiveness_sent', false)
