@@ -43,7 +43,6 @@ class CheckChatsForNotInUse implements ShouldQueue
         //                })->where('sent_sms', false);
         //            })
         //            ->where('created_at', '>', Carbon::create('2024', '05', '20'))
-        //            ->get();
         $chats = Chat::whereHas('messages', function ($q) {$q->whereIn('id', function($subquery) {$subquery->selectRaw('MAX(id)')->from('messages')->groupBy('chat_id');})->where('sent_sms', false);})->where('created_at', '>', Carbon::create('2024', '05', '20'))->get();
 
         foreach ($chats as $chat) {
@@ -55,9 +54,9 @@ class CheckChatsForNotInUse implements ShouldQueue
 
             $messagesHelper = new MessagesHelper();
             $messagesHelper->chatId = $chat->id;
-            $token = $messagesHelper->getChatToken($chat->order->id, $chat->customer->id);
+            $token = $messagesHelper->getChatToken($chat->order->id, $chat->order->customer->id);
 
-            if (Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user?->id) {
+            if (Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user()?->id) {
                 SMSHelper::sendSms(
                     $chat->order->customer->phone,
                     "TESTPHP",
