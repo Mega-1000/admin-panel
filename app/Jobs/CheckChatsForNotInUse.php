@@ -32,10 +32,16 @@ class CheckChatsForNotInUse implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $chats = Chat::where('is_active', true)
-            ->where('sent_sms', false)
+            ->whereHas('messages', function ($q) {
+                $q->whereIn('id', function($subquery) {
+                    $subquery->selectRaw('MAX(id)')
+                        ->from('messages')
+                        ->groupBy('model_id'); // replace 'model_id' with the foreign key that relates messages to your main model
+                })->where('sent_sms', false);
+            })
             ->where('created_at', '>', Carbon::create('2024', '05', '20'))
             ->get();
 
