@@ -459,15 +459,7 @@
 
                     $prices[] = $variations;
 
-                    $validPrices = $variations->filter(function($variation) {
-                        return $variation->price->net_special_price_basic_unit > 0;
-                    });
-
-                    $minPrice = $validPrices->min('price.net_special_price_basic_unit');
-
-                    // Update the total cost with the minimum valid price times the item quantity
-                    $totalCost += $minPrice * $item->quantity;
-
+                    $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
                 }
             @endphp
 
