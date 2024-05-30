@@ -34,19 +34,20 @@ class CheckChatsForNotInUse implements ShouldQueue
      */
     public function handle(): void
     {
-        $chats = Chat::where('is_active', true)
-            ->whereHas('messages', function ($q) {
-                $q->whereIn('id', function($subquery) {
-                    $subquery->selectRaw('MAX(id)')
-                        ->from('messages')
-                        ->groupBy('model_id'); // replace 'model_id' with the foreign key that relates messages to your main model
-                })->where('sent_sms', false);
-            })
-            ->where('created_at', '>', Carbon::create('2024', '05', '20'))
-            ->get();
+        //hats = Chat::where('is_active', true)
+        //            ->whereHas('messages', function ($q) {
+        //                $q->whereIn('id', function($subquery) {
+        //                    $subquery->selectRaw('MAX(id)')
+        //                        ->from('messages')
+        //                        ->groupBy('model_id'); // replace 'model_id' with the foreign key that relates messages to your main model
+        //                })->where('sent_sms', false);
+        //            })
+        //            ->where('created_at', '>', Carbon::create('2024', '05', '20'))
+        //            ->get();
+        $chats = Chat::whereHas('messages', function ($q) {$q->whereIn('id', function($subquery) {$subquery->selectRaw('MAX(id)')->from('messages')->groupBy('chat_id');})->where('sent_sms', false);})->where('created_at', '>', Carbon::create('2024', '05', '20'))->get();
 
         foreach ($chats as $chat) {
-            $lasMessage = $chat->messages->orderBy('created_at', 'desc')->first();
+            $lasMessage = $chat->messages()->orderBy('created_at', 'desc')->first();
             $lastMessageSentTime = $lasMessage->created_at;
 
             $lasMessage->sent_sms = true;
@@ -54,7 +55,7 @@ class CheckChatsForNotInUse implements ShouldQueue
 
             $messagesHelper = new MessagesHelper();
             $messagesHelper->chatId = $chat->id;
-            $token = $messagesHelper->getChatToken($chat->order->id, auth()->id());
+            $token = $messagesHelper->getChatToken($chat->order->id, $chat->customer->id);
 
             if (Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user?->id) {
                 SMSHelper::sendSms(
