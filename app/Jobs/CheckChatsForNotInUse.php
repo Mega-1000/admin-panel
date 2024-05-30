@@ -54,9 +54,9 @@ class CheckChatsForNotInUse implements ShouldQueue
 
             $messagesHelper = new MessagesHelper();
             $messagesHelper->chatId = $chat->id;
-            $token = $messagesHelper->getChatToken($chat->order->id, $chat->order->customer->id);
+            $token = $messagesHelper->getChatToken($chat->order->id, $chat->order->customer?->id, 'c');
 
-            if (Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user()?->id) {
+            if ($token && Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user()?->id) {
                 SMSHelper::sendSms(
                     $chat->order->customer->phone,
                     "TESTPHP",
