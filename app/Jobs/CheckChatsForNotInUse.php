@@ -59,7 +59,7 @@ class CheckChatsForNotInUse implements ShouldQueue
             if ($token && Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user()?->id) {
                 SMSHelper::sendSms(
                     $chat->order->customer->phone,
-                    "TESTPHP",
+                    "EPH Polska",
                     "
                     Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
 
