@@ -1096,6 +1096,7 @@ class OrdersController extends Controller
      * @param OrderUpdateRequest $request
      * @param $id
      * @return RedirectResponse
+     * @throws Exception
      */
     public function update(OrderUpdateRequest $request, $id): RedirectResponse
     {
@@ -1121,9 +1122,17 @@ class OrdersController extends Controller
         }
         $totalPrice = 0;
         $profit = 0;
-        foreach ($request->input('id') as $productId) {
-            $totalPrice += (float)$request->input('net_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId] * 1.23;
-            $profit += (((float)$request->input('net_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId]) - ((float)$request->input('net_purchase_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId])) * 1.23;
+        foreach ($productIds as $productId) {
+            // Retrieve values from the request with default values if keys are not found
+            $netSellingPrice = (float)($request->input('net_selling_price_commercial_unit')[$productId] ?? 0);
+            $quantity = (int)($request->input('quantity_commercial')[$productId] ?? 0);
+            $netPurchasePrice = (float)($request->input('net_purchase_price_commercial_unit')[$productId] ?? 0);
+
+            // Calculate total price
+            $totalPrice += $netSellingPrice * $quantity * 1.23;
+
+            // Calculate profit
+            $profit += (($netSellingPrice * $quantity) - ($netPurchasePrice * $quantity)) * 1.23;
         }
 
         $warehouse = $this->warehouseRepository->findWhere(["symbol" => $request->input('delivery_warehouse')])->first();
