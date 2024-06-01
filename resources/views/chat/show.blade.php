@@ -73,7 +73,7 @@
                     <p>Rozmowa na temat cen z pracownikiem fabryki nie ma większego sensu ponieważ najczęściej przekazuje on numer do najbliższej hurtowni bo nie zależy mu na tym abyście zakupili jak najtaniej tylko aby rozbudowywać i podtrzymywać jak najszerszą swoją sieć punktów sprzedaży.</p>
                     <p>Natomiast wasze zapytanie ofertowe i tak zostaje wysłane przez nasz system do większości w Polsce przedstawicieli danej fabryki w formie przetargu co daje gwarancje najniższej ceny ponieważ o każdym przebiciu cenowym pozostali przedstawiciele są informowani i proszeni o ponowne przebicie.</p>
                     <p>Ostatecznie po otrzymaniu najlepszej oferty zakupicie po tej cenie albo bezpośrednio u producenta lub u przedstawiciela który dał najniższą cenę lub przez nasz system - wybór pozostawiamy Państwu.</p>
-                    <p>W czasie trwania przetargu zawsze możesz podejrzeć obecny jego stan w tabeli która się wyświetla po użyciu przycisku znajdującego się powyżej "<a href="#">Zobacz wyniki przetargu</a>"</p>
+                    <p>W czasie trwania przetargu zawsze możesz podejrzeć obecny jego stan w tabeli która się wyświetla po użyciu przycisku znajdującego się powyżej "<a href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">Zobacz wyniki przetargu</a>"</p>
                 </div>
             </div>
         @endif
