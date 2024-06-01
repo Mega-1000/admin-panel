@@ -1096,7 +1096,6 @@ class OrdersController extends Controller
      * @param OrderUpdateRequest $request
      * @param $id
      * @return RedirectResponse
-     * @throws Exception
      */
     public function update(OrderUpdateRequest $request, $id): RedirectResponse
     {
@@ -1122,7 +1121,7 @@ class OrdersController extends Controller
         }
         $totalPrice = 0;
         $profit = 0;
-        foreach ($productIds as $productId) {
+        foreach ($request->input('id') as $productId) {
             // Retrieve values from the request with default values if keys are not found
             $netSellingPrice = (float)($request->input('net_selling_price_commercial_unit')[$productId] ?? 0);
             $quantity = (int)($request->input('quantity_commercial')[$productId] ?? 0);
