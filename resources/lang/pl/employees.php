@@ -43,7 +43,7 @@ return [
         'sales' => 'Sprzedawca',
         'comments' => 'Uwagi (widoczne dla klienta)',
         'additional_comments' => 'Dodatkowe uwagi(widoczne dla pracowników Mega)',
-        'postal_code' => 'Kod pocztowy (podaj w formacie "XX-XX;zakres")',
+        'postal_code' => 'Kod pocztowy (po średniku podaj zakres")',
         'magazines' => 'Magazyny (Które obsługuje pracownik)',
         'numer' => 'Numer osoby (Potrzebne do czatu, jezeli kilka osob bedzie mialo tą samą pozycje to wybierze według tego numeru)',
         'faq' => 'FAQ podane przez pracownika (np. nie dzwonić w godzinach od 10 do 12)',
