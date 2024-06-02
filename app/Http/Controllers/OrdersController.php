@@ -1434,10 +1434,13 @@ class OrdersController extends Controller
                 'alert-type' => 'success',
             ]);
         }
-        return redirect()->route('orders.index', ['order_id' => $order->id])->with([
-            'message' => __('orders.message.update'),
-            'alert-type' => 'success',
-        ]);
+
+        return redirect(
+            route('orders.index', ['order_id' => $order->id])->with([
+                'message' => __('orders.message.update'),
+                'alert-type' => 'success',
+            ]) . '?page=' . $request->query('page')
+        );
     }
 
     /**

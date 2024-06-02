@@ -189,8 +189,6 @@
                                value="{{ $employee->zip_code_5 }}">
                     </div>
 
-
-
                     <label>@lang('employees.form.visibility')</label>
                     <input type="checkbox" id="postal_code_visibility" name="postal_code_visibility"
                            val="0"{{$employee->postal_code_visibility == 1 ? '' : 'checked' }}>

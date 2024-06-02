@@ -6,7 +6,7 @@
     Zakończ przenoszenie
 </button>
 
-<a class="btn btn-sm btn-primary" href="{{ route('orders.edit', $order['id']) }}">
+<a class="btn btn-sm btn-primary" href="{{ route('orders.edit', $order['id']) }}?page={{ request()->query('page') }}">
     Edytuj
 </a>
 
