@@ -161,25 +161,33 @@
                     >{{ $employee->faq }}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="postal_code">@lang('employees.form.postal_code')</label>
+                    <label for="postal_code">@lang('employees.form.postal_code') 1</label>
                     <input type="text" class="form-control" id="postal_code" name="postal_code"
                            value="{{ $employee->postal_code }}">
 
-                    <label for="zip_code_2">@lang('employees.form.postal_code') 2</label>
-                    <input type="text" class="form-control" id="zip_code_2" name="zip_code_2"
+                    <div class="mt-2">
+                        <label for="zip_code_2">@lang('employees.form.postal_code') 2</label>
+                        <input type="text" class="form-control" id="zip_code_2" name="zip_code_2"
                            value="{{ $employee->zip_code_2 }}">
+                    </div>
 
-                    <label for="zip_code_3">@lang('employees.form.postal_code') 3</label>
-                    <input type="text" class="form-control" id="zip_code_3" name="zip_code_3"
-                           value="{{ $employee->zip_code_3 }}">
+                    <div class="mt-2">
+                        <label for="zip_code_3">@lang('employees.form.postal_code') 3</label>
+                        <input type="text" class="form-control" id="zip_code_3" name="zip_code_3"
+                               value="{{ $employee->zip_code_3 }}">
+                    </div>
 
-                    <label for="zip_code_4">@lang('employees.form.postal_code') 4</label>
-                    <input type="text" class="form-control" id="zip_code_4" name="zip_code_4"
-                           value="{{ $employee->zip_code_4 }}">
+                    <div class="mt-2">
+                        <label for="zip_code_4">@lang('employees.form.postal_code') 4</label>
+                        <input type="text" class="form-control" id="zip_code_4" name="zip_code_4"
+                               value="{{ $employee->zip_code_4 }}">
+                    </div>
 
-                    <label for="zip_code_5">@lang('employees.form.postal_code') 5</label>
-                    <input type="text" class="form-control" id="zip_code_5" name="zip_code_5"
-                           value="{{ $employee->zip_code_5 }}">
+                    <div class="mt-2">
+                        <label for="zip_code_5">@lang('employees.form.postal_code') 5</label>
+                        <input type="text" class="form-control" id="zip_code_5" name="zip_code_5"
+                               value="{{ $employee->zip_code_5 }}">
+                    </div>
 
 
 
