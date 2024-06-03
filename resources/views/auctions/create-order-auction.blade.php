@@ -64,7 +64,7 @@
                 </label>
             </div>
             <div>
-                <h2 class="text-xl font-bold mb-2">Końcowa cena:</h2>
+                <h2 class="text-xl font-bold mb-2">Końcowa wartość oferty brutto:</h2>
                 <p class="total-price">$0</p>
                 <div id="payment-info" class="hidden">
                     <p>Do zapłaty teraz: 500 zł</p>
