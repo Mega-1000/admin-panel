@@ -58,24 +58,23 @@
         @endforeach
         <div class="mt-6 flex justify-between">
             <div>
-                Sposoby płatności : <br>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" id="cash-on-delivery" class="form-checkbox">
+                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
+                </label>
+                <br>
+                Sposoby płatności : <br> <br>
                 a)  10 % przedpłata na konto 1814,75 <br>
                 90 % przy odbiorze towaru przelewem błyskawicznym. <br>
                 Klient zobowiązuje się do przelewu który w przeciągu 30 minut pojawi się na naszym koncie <br>
                 Prosimy wziąść pod uwage możliwości braku sieci i innych przypadków losowych. <br>
                 W przypadku braku wpływu na nasze konto klient ponosi odpowiedzialność wszelkich kosztów z tego wynikających.
                 <br>
-                Dodakowy koszt skorzystania z takiej opcji to 100 zł <br>
+                Dodakowy koszt skorzystania z takiej opcji to 100 zł
                 <br>
                 <br>
                 b) 100 % przedpłata przed dostawą. <br>
                 Klient zobowiązuje się tylko do rozładunku w wspólnie ustalonym terminie z fabryką.
-                <br>
-                <br>
-                <label class="inline-flex items-center">
-                    <input type="checkbox" id="cash-on-delivery" class="form-checkbox">
-                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
-                </label>
             </div>
             <div>
                 <h2 class="text-xl font-bold mb-2">Końcowa wartość oferty brutto:</h2>
