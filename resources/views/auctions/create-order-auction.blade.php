@@ -43,7 +43,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
                             @if($item->count() > 1)
-                                <input type="radio" data-product-id="{{ $product->id }}"  name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
+                                <input type="radio" data-product-id="{{ $product->id }}" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
                             @endif
                             <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
                                 Nazwa produktu: {{ $product->name }} <br>
@@ -171,22 +171,12 @@
         const productData = [];
         const cashOnDelivery = document.querySelector('#cash-on-delivery').checked;
 
-        let checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
-
-        if (checkedCheckboxes.length === 0) {
-            const singleProduct = document.querySelector('.product-text');
-            if (singleProduct) {
-                const productId = singleProduct.getAttribute('data-product-id');
-                const quantity = parseInt(singleProduct.getAttribute('data-quantity'));
-                productData.push({ productId, quantity });
-            }
-        } else {
-            checkedCheckboxes.forEach(function(checkedCheckbox) {
-                const productId = checkedCheckbox.getAttribute('data-product-id');
-                const quantity = parseInt(checkedCheckbox.dataset.quantity);
-                productData.push({ productId, quantity });
-            });
-        }
+        const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
+        checkedCheckboxes.forEach(function(checkedCheckbox) {
+            const productId = checkedCheckbox.getAttribute('data-product-id');
+            const quantity = 11;
+            productData.push({ productId, quantity });
+        });
 
         if (productData.length === 0) {
             Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt', 'error');
@@ -204,10 +194,11 @@
             .then(async (data) => {
                 let message = 'Pomyślnie złożono zamówienie.';
                 if (cashOnDelivery) {
+
                     message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
                 } else {
                     message += ' Zostaniesz przekierowany do banku.';
-                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${cashOnDelivery ? totalPrice / 10 : totalPrice + 50}`;
+                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? totalAmount / 10 : totalPrice + 50}`;
                 }
                 await Swal.fire('Sukces', message, 'success');
             })
@@ -216,7 +207,6 @@
                 // Handle the error here
             });
     }
-
 </script>
 </body>
 
