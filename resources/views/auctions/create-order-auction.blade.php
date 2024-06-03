@@ -47,7 +47,7 @@
                             @endif
                             <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
                                 Nazwa produktu: {{ $product->name }} <br>
-                                Ilość m3: {{ round($product->quantity * $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }} <br>
+                                Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
                                 Wartość brutto: {{ $productPrice }}
                             </span>
                             <button class="ml-2 remove-product-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" data-product-id="{{ $product->id }}">Usuń</button>
@@ -64,7 +64,7 @@
                 </label>
             </div>
             <div>
-                <h2 class="text-xl font-bold mb-2">Wartość brutto towaru w ofercie:</h2>
+                <h2 class="text-xl font-bold mb-2">Wartość brutto towaru w ofercje:</h2>
                 <p class="total-price">$0</p>
                 <div id="payment-info" class="hidden">
                     <p>Do zapłaty teraz: 500 zł</p>
@@ -124,7 +124,7 @@
                 const products = Array.from(productGroup.querySelectorAll('span[data-product-id]'));
                 products.forEach(span => {
                     const productId = span.getAttribute('data-product-id');
-                    const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1]);
+                    const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
                     const price = parseFloat(span.textContent.match(/Cena: ([\d\.]+)/)[1]);
                     totalPrice += price * quantity;
                 });
