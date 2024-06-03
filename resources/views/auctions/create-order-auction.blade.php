@@ -70,6 +70,8 @@
                 <br>
                 b) 100 % przedpłata przed dostawą. <br>
                 Klient zobowiązuje się tylko do rozładunku w wspólnie ustalonym terminie z fabryką.
+                <br>
+                <br>
                 <label class="inline-flex items-center">
                     <input type="checkbox" id="cash-on-delivery" class="form-checkbox">
                     <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
