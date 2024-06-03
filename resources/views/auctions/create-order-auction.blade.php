@@ -67,7 +67,7 @@
                 <h2 class="text-xl font-bold mb-2">Końcowa wartość oferty brutto:</h2>
                 <p class="total-price">$0</p>
                 <div id="payment-info" class="hidden">
-                    <p>Do zapłaty teraz: 500 zł</p>
+                    <p>Do zapłaty teraz: <span id="pobranie"></span> zł</p>
                     <p>Do zapłaty przy odbiorze: <span id="remaining-payment">0</span> zł</p>
                 </div>
                 <button onclick="sendOrder()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
@@ -138,6 +138,7 @@
         const paymentInfo = document.getElementById('payment-info');
         if (cashOnDelivery) {
             paymentInfo.classList.remove('hidden');
+            document.getElementById('pobranie').textContent = totalAmount / 10;
             document.getElementById('remaining-payment').textContent = (totalAmount - totalAmount / 10).toFixed(2) + 'ZŁ';
         } else {
             paymentInfo.classList.add('hidden');
@@ -179,6 +180,7 @@
             .then(async (data) => {
                 let message = 'Pomyślnie złożono zamówienie.';
                 if (cashOnDelivery) {
+
                     message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
                 } else {
                     message += ' Zostaniesz przekierowany do banku.';
