@@ -48,7 +48,7 @@
                             <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
                                 Nazwa produktu: {{ $product->name }} <br>
                                 Ilość m3: {{ round($product->quantity * $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }} <br>
-                                Cena brutto: {{ $productPrice }}
+                                Cena: {{ $productPrice }}
                             </span>
                             <button class="ml-2 remove-product-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" data-product-id="{{ $product->id }}">Usuń</button>
                         </div>
@@ -125,7 +125,7 @@
                 products.forEach(span => {
                     const productId = span.getAttribute('data-product-id');
                     const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
-                    const price = parseFloat(span.textContent.match(/Cena: ([\d\.]+)/)[1]);
+                    const price = parseFloat(span.textContent.match(/Cena brutto: ([\d\.]+)/)[1]);
                     totalPrice += price * quantity;
                 });
             }
