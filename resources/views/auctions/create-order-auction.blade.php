@@ -127,12 +127,9 @@
         let totalPrice = 0;
         const productGroups = Array.from(document.querySelectorAll('.border-b'));
 
-        let hasCheckbox = false; // Variable to track if there are any checkboxes
-
         productGroups.forEach(function(productGroup) {
             const checkedCheckbox = productGroup.querySelector('.product-checkbox:checked');
             if (checkedCheckbox) {
-                hasCheckbox = true; // Checkbox found
                 const productId = checkedCheckbox.closest('.border-b').querySelector('span').getAttribute('data-product-id');
                 const checkedPrice = parseFloat(checkedCheckbox.dataset.price);
                 const checkedQuantity = parseInt(checkedCheckbox.dataset.quantity);
@@ -148,13 +145,6 @@
             }
         });
 
-        if (!hasCheckbox) {
-            // If there are no checkboxes, consider the single product selected
-            const singleProductPrice = parseFloat(document.querySelector('.product-text').getAttribute('data-price'));
-            const singleProductQuantity = parseInt(document.querySelector('.product-text').getAttribute('data-quantity'));
-            totalPrice += singleProductPrice * singleProductQuantity;
-        }
-
         const totalAmount = (totalPrice / 3.33).toFixed(2);
         document.querySelector('.total-price').textContent = totalAmount + 'ZŁ';
 
@@ -168,7 +158,6 @@
             paymentInfo.classList.add('hidden');
         }
     }
-
 
     updateTotalPrice();
 
