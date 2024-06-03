@@ -172,16 +172,28 @@
         const cashOnDelivery = document.querySelector('#cash-on-delivery').checked;
 
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
-        checkedCheckboxes.forEach(function(checkedCheckbox) {
-            const productId = checkedCheckbox.getAttribute('data-product-id');
-            const quantity = parseInt(checkedCheckbox.getAttribute('data-quantity'));
-            productData.push({ productId, quantity });
-        });
+
+        // If no checkboxes are found, assume there's a single product
+        if (checkedCheckboxes.length === 0) {
+            const singleProduct = document.querySelector('.product-text');
+            if (singleProduct) {
+                const productId = singleProduct.getAttribute('data-product-id');
+                const quantity = parseInt(singleProduct.getAttribute('data-quantity'));
+                productData.push({ productId, quantity });
+            }
+        } else {
+            checkedCheckboxes.forEach(function(checkedCheckbox) {
+                const productId = checkedCheckbox.getAttribute('data-product-id');
+                const quantity = parseInt(checkedCheckbox.getAttribute('data-quantity'));
+                productData.push({ productId, quantity });
+            });
+        }
 
         if (productData.length === 0) {
             Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt', 'error');
             return;
         }
+
 
         fetch('/submit-order/{{ $order->id }}', {
             method: 'POST',
