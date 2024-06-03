@@ -60,7 +60,7 @@
             <div>
                 <label class="inline-flex items-center">
                     <input type="checkbox" id="cash-on-delivery" class="form-checkbox">
-                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
+                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym (10%) reszta do 30 min po przyjeździe kierowcy</span>
                 </label>
             </div>
             <div>
