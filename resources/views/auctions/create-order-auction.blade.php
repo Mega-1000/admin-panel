@@ -139,7 +139,7 @@
         if (cashOnDelivery) {
             paymentInfo.classList.remove('hidden');
             document.getElementById('pobranie').textContent = (totalAmount / 10).toFixed(2);
-            document.getElementById('remaining-payment').textContent = (totalAmount - totalAmount / 10).toFixed(2) + 'ZŁ';
+            document.getElementById('remaining-payment').textContent = (totalAmount - totalAmount / 10).toFixed(2);
         } else {
             paymentInfo.classList.add('hidden');
         }
