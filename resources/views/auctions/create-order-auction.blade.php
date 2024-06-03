@@ -164,49 +164,52 @@
     const sendOrderButton = document.querySelector('button');
     sendOrderButton.addEventListener('click', sendOrder);
 
-    function sendOrder() {
-        Swal.fire('Ładowanie...', '');
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', ''));
-        const productData = [];
-        const cashOnDelivery = document.querySelector('#cash-on-delivery').checked;
+    function updateTotalPrice() {
+        let totalPrice = 0;
+        const productGroups = Array.from(document.querySelectorAll('.border-b'));
 
-        const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
-        checkedCheckboxes.forEach(function(checkedCheckbox) {
-            const productId = checkedCheckbox.getAttribute('data-product-id');
-            const quantity = parseInt(checkedCheckbox.dataset.quantity);
-            productData.push({ productId, quantity });
+        let hasCheckbox = false; // Variable to track if there are any checkboxes
+
+        productGroups.forEach(function(productGroup) {
+            const checkedCheckbox = productGroup.querySelector('.product-checkbox:checked');
+            if (checkedCheckbox) {
+                hasCheckbox = true; // Checkbox found
+                const productId = checkedCheckbox.closest('.border-b').querySelector('span').getAttribute('data-product-id');
+                const checkedPrice = parseFloat(checkedCheckbox.dataset.price);
+                const checkedQuantity = parseInt(checkedCheckbox.dataset.quantity);
+                totalPrice += checkedPrice * checkedQuantity;
+            } else {
+                const products = Array.from(productGroup.querySelectorAll('span[data-product-id]'));
+                products.forEach(span => {
+                    const productId = span.getAttribute('data-product-id');
+                    const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
+                    const price = parseFloat(span.textContent.match(/Cena brutto: ([\d\.]+)/)[1]);
+                    totalPrice += price * quantity;
+                });
+            }
         });
 
-        if (productData.length === 0) {
-            Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt', 'error');
-            return;
+        if (!hasCheckbox) {
+            // If there are no checkboxes, consider the single product selected
+            const singleProductPrice = parseFloat(document.querySelector('.product-text').getAttribute('data-price'));
+            const singleProductQuantity = parseInt(document.querySelector('.product-text').getAttribute('data-quantity'));
+            totalPrice += singleProductPrice * singleProductQuantity;
         }
 
-        fetch('/submit-order/{{ $order->id }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ totalPrice, productData, cashOnDelivery })
-        })
-            .then(async (data) => {
-                let message = 'Pomyślnie złożono zamówienie.';
-                if (cashOnDelivery) {
+        const totalAmount = (totalPrice / 3.33).toFixed(2);
+        document.querySelector('.total-price').textContent = totalAmount + 'ZŁ';
 
-                    message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
-                } else {
-                    message += ' Zostaniesz przekierowany do banku.';
-                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? totalAmount / 10 : totalPrice + 50}`;
-                }
-                await Swal.fire('Sukces', message, 'success');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Handle the error here
-            });
+        const cashOnDelivery = document.getElementById('cash-on-delivery').checked;
+        const paymentInfo = document.getElementById('payment-info');
+        if (cashOnDelivery) {
+            paymentInfo.classList.remove('hidden');
+            document.getElementById('pobranie').textContent = (totalAmount / 10).toFixed(2);
+            document.getElementById('remaining-payment').textContent = (totalAmount - totalAmount / 10).toFixed(2);
+        } else {
+            paymentInfo.classList.add('hidden');
+        }
     }
+
 </script>
 </body>
 
