@@ -48,7 +48,7 @@
                             <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
                                 Nazwa produktu: {{ $product->name }} <br>
                                 Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
-                                Wartość brutto: {{ $productPrice }}
+                                Cena: {{ $productPrice }}
                             </span>
                             <button class="ml-2 remove-product-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" data-product-id="{{ $product->id }}">Usuń</button>
                         </div>
@@ -64,7 +64,7 @@
                 </label>
             </div>
             <div>
-                <h2 class="text-xl font-bold mb-2">Wartość brutto towaru w ofercje:</h2>
+                <h2 class="text-xl font-bold mb-2">Końcowa cena:</h2>
                 <p class="total-price">$0</p>
                 <div id="payment-info" class="hidden">
                     <p>Do zapłaty teraz: 500 zł</p>
