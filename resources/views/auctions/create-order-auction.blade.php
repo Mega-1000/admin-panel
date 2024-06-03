@@ -138,7 +138,7 @@
         const paymentInfo = document.getElementById('payment-info');
         if (cashOnDelivery) {
             paymentInfo.classList.remove('hidden');
-            document.getElementById('remaining-payment').textContent = (totalAmount - 500).toFixed(2) + 'ZŁ';
+            document.getElementById('remaining-payment').textContent = (totalAmount - totalAmount / 10).toFixed(2) + 'ZŁ';
         } else {
             paymentInfo.classList.add('hidden');
         }
@@ -182,7 +182,7 @@
                     message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
                 } else {
                     message += ' Zostaniesz przekierowany do banku.';
-                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? 500 : totalPrice + 50}`;
+                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? totalAmount / 10 : totalPrice + 50}`;
                 }
                 await Swal.fire('Sukces', message, 'success');
             })
