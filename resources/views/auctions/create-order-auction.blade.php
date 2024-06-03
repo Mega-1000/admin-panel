@@ -43,7 +43,7 @@
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center">
                             @if($item->count() > 1)
-                                <input type="radio" data-product-id="{{ $product->id }}" data-quantity="{{ round($product->quantity * $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }}" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
+                                <input type="radio" data-product-id="{{ $product->id }}"  name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
                             @endif
                             <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
                                 Nazwa produktu: {{ $product->name }} <br>
