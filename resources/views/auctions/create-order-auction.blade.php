@@ -45,7 +45,7 @@
                             @if($item->count() > 1)
                                 <input type="radio" data-product-id="{{ $product->id }}" name="product-group-{{ $loop->parent->index }}" class="mr-2 product-checkbox" data-price="{{ $productPrice }}" data-quantity="{{ $product->quantity }}" @if($loop->first) checked @endif>
                             @endif
-                            <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
+                            <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}" data-quantity="{{ round($product->quantity * $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }}">
                                 Nazwa produktu: {{ $product->name }} <br>
                                 Ilość m3: {{ round($product->quantity * $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }} <br>
                                 Cena brutto: {{ $productPrice }}
@@ -60,7 +60,7 @@
             <div>
                 <label class="inline-flex items-center">
                     <input type="checkbox" id="cash-on-delivery" class="form-checkbox">
-                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym (w przypadku braku zaznaczenia zakładamy przedpłatę 100%)</span>
+                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym (w przypadku braku zaznaczenia zakładamy przedpłate 100%)</span>
                 </label>
                 <br>
                 <br>
@@ -174,7 +174,7 @@
         const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
         checkedCheckboxes.forEach(function(checkedCheckbox) {
             const productId = checkedCheckbox.getAttribute('data-product-id');
-            const quantity = 11;
+            const quantity = parseInt(checkedCheckbox.getAttribute('data-quantity'));
             productData.push({ productId, quantity });
         });
 
