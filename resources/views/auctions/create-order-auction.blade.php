@@ -124,7 +124,7 @@
                 const products = Array.from(productGroup.querySelectorAll('span[data-product-id]'));
                 products.forEach(span => {
                     const productId = span.getAttribute('data-product-id');
-                    const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * checkedCheckbox.dataset.numbers_of_basic_commercial_units_in_pack);
+                    const quantity = parseInt(span.textContent.match(/Issslość m3: ([\d\.]+)/)[1] * checkedCheckbox.dataset.numbers_of_basic_commercial_units_in_pack);
                     const price = parseFloat(span.textContent.match(/Cena: ([\d\.]+)/)[1]);
                     totalPrice += price * quantity;
                 });
