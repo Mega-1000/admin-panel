@@ -171,12 +171,23 @@
         const productData = [];
         const cashOnDelivery = document.querySelector('#cash-on-delivery').checked;
 
-        const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
-        checkedCheckboxes.forEach(function(checkedCheckbox) {
-            const productId = checkedCheckbox.getAttribute('data-product-id');
-            const quantity = parseInt(checkedCheckbox.dataset.quantity);
-            productData.push({ productId, quantity });
-        });
+        let checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
+
+        // If no checkboxes are found, assume there's a single product
+        if (checkedCheckboxes.length === 0) {
+            const singleProduct = document.querySelector('.product-text');
+            if (singleProduct) {
+                const productId = singleProduct.getAttribute('data-product-id');
+                const quantity = parseInt(singleProduct.getAttribute('data-quantity'));
+                productData.push({ productId, quantity });
+            }
+        } else {
+            checkedCheckboxes.forEach(function(checkedCheckbox) {
+                const productId = checkedCheckbox.getAttribute('data-product-id');
+                const quantity = parseInt(checkedCheckbox.dataset.quantity);
+                productData.push({ productId, quantity });
+            });
+        }
 
         if (productData.length === 0) {
             Swal.fire('Błąd', 'Proszę wybrać co najmniej jeden produkt', 'error');
@@ -194,11 +205,10 @@
             .then(async (data) => {
                 let message = 'Pomyślnie złożono zamówienie.';
                 if (cashOnDelivery) {
-
                     message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
                 } else {
                     message += ' Zostaniesz przekierowany do banku.';
-                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? totalAmount / 10 : totalPrice + 50}`;
+                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${cashOnDelivery ? totalPrice / 10 : totalPrice + 50}`;
                 }
                 await Swal.fire('Sukces', message, 'success');
             })
@@ -207,6 +217,7 @@
                 // Handle the error here
             });
     }
+
 </script>
 </body>
 
