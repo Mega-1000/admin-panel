@@ -60,14 +60,14 @@
             <div>
                 <label class="inline-flex items-center">
                     <input type="checkbox" id="cash-on-delivery" class="form-checkbox">
-                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span> <span id="cash-on-delivery-amount" class="ml-2"></span>
+                    <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
                 </label>
             </div>
             <div>
-                <h2 class="text-xl font-bold mb-2">Wartość brutto całej oferty:</h2>
+                <h2 class="text-xl font-bold mb-2">Wartość brutto towaru w ofercie:</h2>
                 <p class="total-price">$0</p>
                 <div id="payment-info" class="hidden">
-                    <p>Do zapłaty teraz: <span id="pay-now-amount"></span> zł</p>
+                    <p>Do zapłaty teraz: 500 zł</p>
                     <p>Do zapłaty przy odbiorze: <span id="remaining-payment">0</span> zł</p>
                 </div>
                 <button onclick="sendOrder()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
@@ -124,7 +124,7 @@
                 const products = Array.from(productGroup.querySelectorAll('span[data-product-id]'));
                 products.forEach(span => {
                     const productId = span.getAttribute('data-product-id');
-                    const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
+                    const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * checkedCheckbox.dataset.numbers_of_basic_commercial_units_in_pack);
                     const price = parseFloat(span.textContent.match(/Cena: ([\d\.]+)/)[1]);
                     totalPrice += price * quantity;
                 });
@@ -136,17 +136,11 @@
 
         const cashOnDelivery = document.getElementById('cash-on-delivery').checked;
         const paymentInfo = document.getElementById('payment-info');
-        const cashOnDeliveryAmount = document.getElementById('cash-on-delivery-amount');
-        const payNowAmount = document.getElementById('pay-now-amount');
         if (cashOnDelivery) {
             paymentInfo.classList.remove('hidden');
-            const payNow = (totalAmount * 0.1).toFixed(2);
-            payNowAmount.textContent = payNow + ' zł';
-            cashOnDeliveryAmount.textContent = `(${(totalAmount- payNow} zł)`;
-            document.getElementById('remaining-payment').textContent = (totalAmount - payNow).toFixed(2) + ' zł';
+            document.getElementById('remaining-payment').textContent = (totalAmount - 500).toFixed(2) + 'ZŁ';
         } else {
             paymentInfo.classList.add('hidden');
-            cashOnDeliveryAmount.textContent = '';
         }
     }
 
@@ -188,7 +182,7 @@
                     message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
                 } else {
                     message += ' Zostaniesz przekierowany do banku.';
-                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').checked ? (totalPrice * 0.1).toFixed(2) : (totalPrice + 50)}`;
+                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? 500 : totalPrice + 50}`;
                 }
                 await Swal.fire('Sukces', message, 'success');
             })
