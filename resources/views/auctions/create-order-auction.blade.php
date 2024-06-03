@@ -63,7 +63,7 @@
                     <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
                 </label>
                 <br>
-                Sposoby płatności : <br> <br>
+                Sposoby płatności : <br>
                 a)  10 % przedpłata na konto 1814,75 <br>
                 90 % przy odbiorze towaru przelewem błyskawicznym. <br>
                 Klient zobowiązuje się do przelewu który w przeciągu 30 minut pojawi się na naszym koncie <br>
