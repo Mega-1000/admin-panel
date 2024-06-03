@@ -47,7 +47,7 @@
                             @endif
                             <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}">
                                 Nazwa produktu: {{ $product->name }} <br>
-                                Ilość m3: {{ round($product->quantity / 3.33, 2) }} <br>
+                                Ilość m3: {{ round($product->quantity * $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }} <br>
                                 Cena: {{ $productPrice }}
                             </span>
                             <button class="ml-2 remove-product-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" data-product-id="{{ $product->id }}">Usuń</button>
