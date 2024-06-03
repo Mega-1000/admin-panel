@@ -210,7 +210,7 @@
                     message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
                 } else {
                     message += ' Zostaniesz przekierowany do banku.';
-                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? totalAmount / 10 : totalPrice + 50}`;
+                    window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${document.querySelector('#cash-on-delivery').value ? totalPrice / 10 : totalPrice + 50}`;
                 }
                 await Swal.fire('Sukces', message, 'success');
             })
