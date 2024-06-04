@@ -123,7 +123,7 @@
 
                                 $offers = [];
                                 foreach ($allProductsToBeDisplayed as $product) {
-                                    if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
+                                    if ($auction->offers()->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
                                         $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                             ->where('chat_auction_id', $auction->id)
                                             ->orderBy('basic_price_net', 'asc')
@@ -179,7 +179,7 @@
 
                                         $offers = [];
                                         foreach ($allProductsToBeDisplayed as $product) {
-                                            if ($auction->offers->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->first()) {
+                                            if ($auction->offers()->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->first()) {
                                                 $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                                     ->where('chat_auction_id', $auction->id)
                                                     ->orderBy('basic_price_net', 'asc')
