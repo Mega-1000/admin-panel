@@ -198,6 +198,7 @@
                                                 ->orderBy('basic_price_net', 'asc')
                                                 ->first();
                                         }
+
                                         $pcOffers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                             ->where('chat_auction_id', $auction->id)
                                             ->orderBy('basic_price_net', 'asc')
@@ -210,11 +211,6 @@
 
                                     $minOffer = collect($pcOffers)->min('basic_price_net');
 
-                                    if ($minOffer === 0 || empty($offers)) {
-                                        $missingData = true;
-                                        break;
-                                    }
-
                                     $totalCost += round(($minOffer * 1.23), 2) *
                                         \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                             ->whereHas('product', function ($q) use ($product) {
@@ -223,21 +219,12 @@
                                 @endphp
                             @endforeach
 
-                            @if($missingData)
-                                @php
-                                    $firmsWithMissingData->push([
-                                        'firm' => $firm,
-                                        'totalCost' => round($totalCost / 3.33, 2)
-                                    ]);
-                                @endphp
-                            @else
-                                @php
-                                    $sortedFirms->push([
-                                        'firm' => $firm,
-                                        'totalCost' => round($totalCost / 3.33, 2)
-                                    ]);
-                                @endphp
-                            @endif
+                            @php
+                                $sortedFirms->push([
+                                    'firm' => $firm,
+                                    'totalCost' => round($totalCost / 3.33, 2)
+                                ]);
+                            @endphp
                         @endforeach
 
                         @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
