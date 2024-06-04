@@ -360,10 +360,9 @@
                                             $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
                                             $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
 
-                                            $firm['totalCost'] += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
+                                            $totalCost = ($totalCost ?? 0) + ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
 
-                                        {{ $firm['totalCost'] }}
                                         @if(!empty($offers))
                                             @foreach($offers as $offer)
                                                 {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
@@ -382,7 +381,7 @@
                                 @endforeach
 
                                 <td>
-                                    {{ round($firm['totalCost'], 2) }}
+                                    {{ round($totalCost, 2) }}
                                     <br>
                                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $firm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                         Wyślij zamówienie na tego producenta
