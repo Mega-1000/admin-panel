@@ -377,7 +377,7 @@
                                 @endforeach
 
                                 <td>
-                                    {{ round($firm['totalCost'] / 3.33, 2) }}
+                                    {{ round($firm['totalCost'], 2) }}
                                     <br>
                                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $firm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                         Wyślij zamówienie na tego producenta
