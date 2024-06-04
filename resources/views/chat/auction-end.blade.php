@@ -332,8 +332,8 @@
                                 </td>
 
                                 @foreach($products as $product)
-                                    {{ $product->product->product_group }}
                                     <td>
+                                    {{ $product->product->product_group }}
                                         @php
                                             $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm['firm']->firm->symbol)
                                                 ->where('product_group', $product->product->product_group)
