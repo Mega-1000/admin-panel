@@ -112,6 +112,120 @@
     </script>
 
 </head>
+<!DOCTYPE html>
+<html lang="{{ app()->getLocale() }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.chat_name') }}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 40%;
+            margin: auto;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 100%;
+            }
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        #chat-container {
+            margin-top: 50px;
+        }
+    </style>
+
+    <script>
+        (() => {
+            function sortTable(n) {
+                let table = document.querySelector("table");
+                let switching = true;
+                let dir = "asc";
+                let switchcount = 0;
+                while (switching) {
+                    switching = false;
+                    let rows = Array.from(table.rows);
+                    for (let i = 1; i < (rows.length - 1); i++) {
+                        let shouldSwitch = false;
+                        let x = rows[i].getElementsByTagName("TD")[n].innerText.toLowerCase().trim();
+                        let y = rows[i + 1].getElementsByTagName("TD")[n].innerText.toLowerCase().trim();
+                        shouldSwitch = shouldSwitchRows(x, y, dir);
+                        if (shouldSwitch) {
+                            [rows[i], rows[i + 1]] = [rows[i + 1], rows[i]];
+                            switching = true;
+                            switchcount++;
+                        } else if (switchcount === 0 && dir === "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                    table.innerHTML = '';
+                    rows.forEach(row => table.appendChild(row));
+                }
+
+                // Add the sorting class to the current column header
+                let ths = table.getElementsByTagName("th");
+                for (let i = 0; i < ths.length; i++) {
+                    ths[i].classList.remove("asc", "desc");
+                }
+                ths[n].classList.add(dir);
+            }
+
+            function shouldSwitchRows(x, y, dir) {
+                if (dir === "asc") {
+                    return x > y;
+                } else if (dir === "desc") {
+                    return x < y;
+                }
+                return false;
+            }
+
+            // Add click event listeners to the sort buttons
+            window.onload = () => {
+                let sortButtons = document.querySelectorAll("th button.btn-primary");
+                sortButtons.forEach((button, index) => {
+                    button.addEventListener("click", () => sortTable(index));
+                });
+            };
+        })();
+    </script>
+
+</head>
 
 <body>
 <div>
@@ -219,13 +333,7 @@
                     @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
                         <tr>
                             <td>
-                                @if($sortedFirm['firm']->firm->id == request()->query('firmId'))
-                                    <span style="color: red; font-weight: bold">
-                                        {{ $sortedFirm['firm']->firm->name }}
-                                    </span>
-                                @else
-                                    {{ 'firma ' . ($loop->index + 1) }}
-                                @endif
+                                {{ 'firma ' . ($loop->index + 1) }}
                                 <br>
                                 Odległość: {{ round($sortedFirm['firm']->distance) }} KM
                                 <br>
@@ -250,7 +358,8 @@
 
                                         $offers = [];
                                         foreach ($allProductsToBeDisplayed as $product) {
-                                            if ($auction->offers()->where('firm_id', $sortedFirm['firm']->firm->id)->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id); })->first()) {
+                                            if ($auction->offers()->where('firm_id', $sortedFirm['firm']->firm->id)->whereHas('product', function ($q) use ($product) {
+                                                $q->where('parent_id', $product->parent_id); })->first()) {
                                                 $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id); })
                                                     ->where('chat_auction_id', $auction->id)
                                                     ->orderBy('basic_price_net', 'asc')
@@ -290,6 +399,7 @@
 </body>
 
 </html>
+
 
 <script>
     const table = document.querySelector('table');
