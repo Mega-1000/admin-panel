@@ -359,6 +359,8 @@
                                             $minOffer = collect($offers)->min('basic_price_net');
                                             $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
                                             $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
+
+                                            $firm['totalCost'] += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
 
                                         @if(!empty($offers))
