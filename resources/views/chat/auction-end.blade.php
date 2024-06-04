@@ -284,8 +284,6 @@
                                             ->whereHas('product', function ($q) use ($product) {
                                                 $q->where('product_group', $product->product_group);
                                             })->first();
-
-                                            $totalCost += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
 
                                         @if(!empty($offers))
