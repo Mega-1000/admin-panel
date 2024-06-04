@@ -332,6 +332,7 @@
                                 </td>
 
                                 @foreach($products as $product)
+                                    {{ \App\Entities\Product::where('product_name_supplier', $firm['firm']->firm->symbol)->where('product_group', $product->product->product_group)->pluck('parrent_id') }}
                                     <td>
                                         @php
                                             $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm['firm']->firm->symbol)
