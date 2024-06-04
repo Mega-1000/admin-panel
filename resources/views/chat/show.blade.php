@@ -228,7 +228,7 @@
                                     <input id="attachment" name="attachment" type="file" style="display: none;" />
                                     <span id="file-name"></span>
                                 </div>
-                            @else
+                            @endif
 
                             @if($userType === 'c')
                                 <a class="btn btn-primary" style="margin-top: 20px; float: left" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
