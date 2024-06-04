@@ -58,7 +58,7 @@
                     @endforeach
                     <div class="mt-6 flex justify-between">
                         <div>
-                            <h3 class="font-weight-bold h3"> Sposoby płatności: </h3><br>
+                            <h3 style="font-weight: bold; font-size: larger"> Sposoby płatności: </h3><br>
                             a)  10 % przedpłata na konto 1814,75 <br>
                             90 % przy odbiorze towaru przelewem błyskawicznym. <br>
                             Klient zobowiązuje się do przelewu który w przeciągu 30 minut pojawi się na naszym koncie <br>
@@ -70,6 +70,9 @@
                             <br>
                             b) 100 % przedpłata przed dostawą. <br>
                             Klient zobowiązuje się tylko do rozładunku w wspólnie ustalonym terminie z fabryką.
+                            <br>
+                            <br>
+
                             <label class="inline-flex items-center">
                                 <input type="radio" id="full-payment" name="payment-option" class="form-radio" checked>
                                 <span class="ml-2">100 % przedpłata przed dostawą</span>
