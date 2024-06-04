@@ -273,13 +273,10 @@ $firmCounter = 0;
                                     @if(!empty($offers))
                                         @foreach($offers as $offer)
                                             {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
-                                            {{ round($offer->basic_price_net * 1.23, 2) }}
-                                            @if(auth()->id())
-                                                ({{ $offer->basic_price_net }})
-                                            @endif
+                                            {{ $offer->basic_price_net }}
                                             <br>
                                         @endforeach
-                                        <span style="color: green">- specjalnie dla ciebie</span>
+                                        <span style="color: green">- Specjalnie w przetargu</span>
                                     @else
                                         No offer
                                     @endif
