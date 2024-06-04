@@ -123,6 +123,10 @@
 
     <div class="container" id="flex-container">
         <div id="chat-container">
+            <div>
+                Oglądasz tabele zapytania: {{ $order->id }}
+            </div>
+
             <div class="alert-success alert">
                 Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
                 <br>
@@ -293,7 +297,7 @@
                                                 @endif
                                                 <br>
                                             @endforeach
-                                            <span style="color: green">- specjalnie dla cieasdbie</span>
+                                            <span style="color: green">- specjalnie dla ciebie</span>
                                         @else
                                             No offer
                                         @endif
