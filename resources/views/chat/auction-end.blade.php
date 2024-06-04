@@ -293,7 +293,7 @@
                                                 @endif
                                                 <br>
                                             @endforeach
-                                            <span style="color: green">- specjalnie dla sdfasfddsfsdfsdfsdfciebie</span>
+                                            <span style="color: green">- specjalnie dla cieasdbie</span>
                                         @else
                                             No offer
                                         @endif
