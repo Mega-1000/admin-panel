@@ -220,13 +220,15 @@
         <textarea required class="form-control" id="message"
                   style="width: 100%; max-width: 650px; min-width: 200px; height: 100px;"
                   placeholder="Wpisz tu swoją wiadomość..."></textarea>
-                            <div class="file-upload">
-                                <label for="attachment" class="btn btn-primary" style="font-weight: bolder; font-size: larger;">
-                                    <i class="fas fa-upload"></i> Dołącz plik do wiadomości
-                                </label>
-                                <input id="attachment" name="attachment" type="file" style="display: none;" />
-                                <span id="file-name"></span>
-                            </div>
+                            @if($userType !== 'e')
+                                <div class="file-upload">
+                                    <label for="attachment" class="btn btn-primary" style="font-weight: bolder; font-size: larger;">
+                                        <i class="fas fa-upload"></i> Dołącz plik do wiadomości
+                                    </label>
+                                    <input id="attachment" name="attachment" type="file" style="display: none;" />
+                                    <span id="file-name"></span>
+                                </div>
+                            @else
 
                             @if($userType === 'c')
                                 <a class="btn btn-primary" style="margin-top: 20px; float: left" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
