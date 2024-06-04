@@ -383,9 +383,10 @@
                         return !($variation->price->net_special_price_basic_unit == 0 || empty($variation->price->net_special_price_basic_unit));
                     });
 
-                    $minPrice = $validPrices->min('price.net_special_price_basic_unit');
+                    $minPrice = $validPrices->min('price.net_purchase_price_basic_unit_after_discounts');
 
-                    // Update the total cost with the minimum
+                    // Update the total cost with the minimum valid price times the item quantity
+                    $totalCost += $minPrice * $item->quantity;
                 }
             @endphp
 
