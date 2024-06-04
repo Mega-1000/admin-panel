@@ -283,7 +283,8 @@
 
                                             $totalCost += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
-                                        {{ $totalCost }}
+
+                                        {{ $totalCost }}sadasdasd
 
                                         @if(!empty($offers))
                                             @foreach($offers as $offer)
