@@ -227,7 +227,6 @@ $missingData = !isset($auction);
             @endif
         </td>
     </tr>
-    @endforeach
     </table>
 @endif
 <div class="alert-success alert">
