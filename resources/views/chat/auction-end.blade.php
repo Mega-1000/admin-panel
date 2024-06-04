@@ -363,6 +363,7 @@
                                             $firm['totalCost'] += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
 
+                                        {{ $firm['totalCost'] }}
                                         @if(!empty($offers))
                                             @foreach($offers as $offer)
                                                 {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
