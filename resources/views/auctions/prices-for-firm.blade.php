@@ -219,7 +219,7 @@
                     @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
                         <tr>
                             <td>
-                                @if($sortedFirm['firm']->firm->id == $firmIdFromQuery)
+                                @if($sortedFirm['firm']->firm->id == request()->query('firmId'))
                                     <span style="color: red; font-weight: bold">
                                         {{ $sortedFirm['firm']->firm->name }}
                                     </span>
