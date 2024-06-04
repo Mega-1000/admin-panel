@@ -270,7 +270,7 @@
 
                                             $minOffer = collect($offers)->min('basic_price_net');
                                             $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
-                                            $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
+                                            $minPurchasePrice = $allProductsToBeDisplayed->min('price.net_purchase_price_basic_unit_after_discounts') * 1.23;
 
                                             $orderItem = \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                             ->whereHas('product', function ($q) use ($product) {
