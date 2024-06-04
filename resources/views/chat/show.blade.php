@@ -237,7 +237,7 @@
                             @endif
 
                             @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
-                                <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank">
+                                <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary">
                                     Podłącz fakture
                                 </a>
                             @endif
