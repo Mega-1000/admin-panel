@@ -385,8 +385,7 @@
 
                     $minPrice = $validPrices->min('price.net_special_price_basic_unit');
 
-                    // Update the total cost with the minimum valid price times the item quantity
-                    $totalCost += $minPrice * $item->quantity;
+                    // Update the total cost with the minimum
                 }
             @endphp
 
