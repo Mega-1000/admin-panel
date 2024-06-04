@@ -281,8 +281,9 @@
                                                 $q->where('product_group', $product->product_group);
                                             })->first();
 
-                                        $totalCost += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
+                                            $totalCost += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
+                                        {{ $totalCost }}
 
                                         @if(!empty($offers))
                                             @foreach($offers as $offer)
