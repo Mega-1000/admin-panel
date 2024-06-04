@@ -183,7 +183,7 @@
                                 Zamówienie zostało złożone i wysłane do fabryki
                             </h1>
                         @endif
-                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0 && $userType == MessagesHelper::TYPE_EMPLOYEE)
+                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0 || $userType == MessagesHelper::TYPE_EMPLOYEE)
                             <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
                                 @csrf
                                 <button class="btn btn-success">
