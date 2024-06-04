@@ -332,6 +332,7 @@
                                 </td>
 
                                 @foreach($products as $product)
+                                    {{ $product->product->product_group }}
                                     <td>
                                         @php
                                             $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm['firm']->firm->symbol)
@@ -359,7 +360,6 @@
                                         @endphp
 
                                         @if(!empty($offers))
-                                            {{$allProductsToBeDisplayed}}
                                             @foreach($offers as $offer)
                                                 {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
                                                 {{ round($offer->basic_price_net * 1.23, 2) }}
