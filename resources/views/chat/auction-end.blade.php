@@ -252,7 +252,6 @@
 
                                 @foreach($products as $product)
                                     <td>
-                                        asdasdasd
                                         @php
                                             $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $sortedFirm['firm']->firm->symbol)
                                                 ->where('product_group', $product->product->product_group)
@@ -294,7 +293,7 @@
                                                 @endif
                                                 <br>
                                             @endforeach
-
+asdasdasdasd
                                             <span style="color: green">- specjalnie dla ciebie</span>
                                         @else
                                             No offer
