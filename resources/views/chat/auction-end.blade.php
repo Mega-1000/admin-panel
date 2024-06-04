@@ -276,11 +276,12 @@
                                             $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
                                             $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
 
-                                            $totalCost += ($minOfferPrice ?? $minPurchasePrice) *
-                                                \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
-                                                    ->whereHas('product', function ($q) use ($product) {
-                                                        $q->where('product_group', $product->product_group);
-                                                    })->first()?->quantity;
+                                            $orderItem = \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
+                                            ->whereHas('product', function ($q) use ($product) {
+                                                $q->where('product_group', $product->product_group);
+                                            })->first();
+
+                                        $totalCost += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
 
                                         @if(!empty($offers))
@@ -468,7 +469,6 @@
 
                     // Update the total cost with the minimum valid price times the item quantity
                     $totalCost += $minPrice * $item->quantity;
-
                 }
             @endphp
 
