@@ -129,16 +129,6 @@ $firmCounter = 0;
                 Oglądasz tabele zapytania: {{ $order->id }}
             </div>
 
-            <div class="alert-success alert">
-                Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
-                <br>
-                Po więcej informacji kliknij przycisk zobacz więcej
-                <br>
-                <br>
-                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
-                    Zobacz więcej na temat promocji
-                </a>
-            </div>
 
             @if($firms->count() == 0)
                 <div class="text-center">
@@ -299,15 +289,6 @@ $firmCounter = 0;
                             <td>
                                 {{ round($totalCost / 3.33, 2) }}
                                 <br>
-                                <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
-                                    Wyślij zamówienie na tego producenta
-                                </a>
-
-                                @if(auth()->id())
-                                    <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $sortedFirm['firm']->token }}">
-                                        Dodaj cenę jako ta firma
-                                    </a>
-                                @endif
                             </td>
                         </tr>
                     @endforeach
