@@ -214,7 +214,6 @@ $missingData = !isset($auction);
         {{ $sortedFirm['firm']['firm']['name'] ?? $sortedFirm['firm']['name'] }}
     </td>
     @endif
-    @endforeach
     </tr>
     <tr>
         <td>
