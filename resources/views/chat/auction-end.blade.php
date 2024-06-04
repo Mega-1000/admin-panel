@@ -255,7 +255,7 @@
 
                                             $offers = [];
                                             foreach ($allProductsToBeDisplayed as $product) {
-                                                if ($auction->offers->where('firm_id', $sortedFirm['firm']->firm->id)->where('product_id', $product->id)->first()) {
+                                                if ($auction->offers->where('firm_id', $sortedFirm['firm']->firm->id)->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->first()) {
                                                     $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                                         ->where('chat_auction_id', $auction->id)
                                                         ->orderBy('basic_price_net', 'asc')
@@ -311,83 +311,6 @@
                                 </td>
                             </tr>
                         @endforeach
-
-                        @foreach($firmsWithMissingData->sortBy('totalCost') as $firm)
-                            <tr>
-                                <td>
-                                    {{ $firm['firm']?->firm?->symbol ?? $firm['firm']->symbol ?? '' }}
-                                    <br>
-                                    Odległość: {{ round($firm['firm']->distance) }} KM
-                                    <br>
-                                    @php
-                                        $employee = \App\Entities\Employee::where('email', $firm['firm']->email_of_employee)->first();
-                                    @endphp
-                                    @if($employee && $employee->phone)
-                                        tel przedstawiciela: <br> +48 {{ $employee->phone }}
-                                    @endif
-                                </td>
-
-                                @foreach($products as $product)
-                                    <td>
-
-                                        @php
-                                            $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm['firm']->firm->symbol)
-                                                ->where('product_group', $product->product->product_group)
-                                                ->get();
-
-                                            $offers = [];
-                                            foreach ($allProductsToBeDisplayed as $product) {
-                                                if ($auction->offers()->where('firm_id', $firm['firm']->firm->id)->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->first()) {
-                                                    $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                                        ->where('chat_auction_id', $auction->id)
-                                                        ->orderBy('basic_price_net', 'asc')
-                                                        ->where('firm_id', $firm['firm']->firm->id)
-                                                        ->first();
-                                                }
-                                            }
-
-                                            usort($offers, function($a, $b) {
-                                                return $a->basic_price_net <=> $b->basic_price_net;
-                                            });
-
-                                            $minOffer = collect($offers)->min('basic_price_net');
-                                            $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
-                                            $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
-                                        @endphp
-
-                                        @if(!empty($offers))
-                                            @foreach($offers as $offer)
-                                                {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
-                                                {{ round($offer->basic_price_net * 1.23, 2) }}
-                                                @if(auth()->id())
-                                                    ({{ $offer->basic_price_net }})
-                                                @endif
-                                                <br>
-                                            @endforeach
-
-                                            <span style="color: green">- specjalnie dla ciebie</span>
-                                        @else
-                                            No offer
-                                        @endif
-                                    </td>
-                                @endforeach
-
-                                <td>
-                                    {{ round($firm['totalCost'], 2) }}
-                                    <br>
-                                    <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $firm['firm']?->firm?->symbol }}/{{ $order->id }}">
-                                        Wyślij zamówienie na tego producenta
-                                    </a>
-
-                                    @if(auth()->id())
-                                        <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $firm['firm']->token }}">
-                                            Dodaj cenę jako ta firma
-                                        </a>
-                                    @endif
-                                </td>
-                            </tr>
-@endforeach
-
 @foreach($firms as $firm)
     @if(in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
         @continue
