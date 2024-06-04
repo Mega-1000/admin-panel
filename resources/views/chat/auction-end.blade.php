@@ -293,8 +293,7 @@
                                                 @endif
                                                 <br>
                                             @endforeach
-asdasdasdasd
-                                            <span style="color: green">- specjalnie dla ciebie</span>
+                                            <span style="color: green">- specjalnie dla sdfasfddsfsdfsdfsdfciebie</span>
                                         @else
                                             No offer
                                         @endif
