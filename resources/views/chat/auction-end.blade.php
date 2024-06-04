@@ -386,7 +386,7 @@
                     $minPrice = $validPrices->min('price.net_purchase_price_basic_unit_after_discounts') * 1.23;
 
                     if (empty($minPrice)) {
-                        $totalCost += 10000;
+                        $totalCost += 100000000;
                     }
                     $totalCost += $minPrice * $item->quantity;
                 }
