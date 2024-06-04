@@ -240,12 +240,6 @@ $firmCounter = 0;
                                     {{ $firmCounter++ }}
                                 @endif
                                 <br>
-                                @php
-                                    $employee = \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first();
-                                @endphp
-                                @if($employee && $employee->phone)
-                                    tel przedstawiciela: <br> +48 {{ $employee->phone }}
-                                @endif
                             </td>
 
                             @php
