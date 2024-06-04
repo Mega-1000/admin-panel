@@ -252,6 +252,7 @@
 
                                 @foreach($products as $product)
                                     <td>
+                                        asdasdasd
                                         @php
                                             $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $sortedFirm['firm']->firm->symbol)
                                                 ->where('product_group', $product->product->product_group)
@@ -283,8 +284,6 @@
 
                                             $totalCost += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
-
-                                        {{ $totalCost }}sadasdasd
 
                                         @if(!empty($offers))
                                             @foreach($offers as $offer)
