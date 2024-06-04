@@ -51,7 +51,9 @@ readonly class ProductService
         foreach ($orders as $order) {
             if (is_array($order)) {
                 $orderObj = Product::find($order['id']);
-                $orderObj->firm->employees->each(function ($employee) use ($order, &$users) {
+                $orderObj->firm->employees()->whereHas('employeeRoles', function ($query) {
+                    $query->where('name', 'zamowienia towaru');
+                })->get()->each(function ($employee) use ($order, &$users) {
                     if ($employee->status !== 'PENDING') {
                         $users[] = $employee;
 
