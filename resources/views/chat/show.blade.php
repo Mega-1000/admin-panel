@@ -171,7 +171,7 @@
                                 </form>
                             @endif
                         @endif
-                        @if(!empty($chat->auctions->first()) && !$order->auction_order_placed)
+                        @if(!empty($chat->auctions->first()) && !$order->auction_order_placed && $order->)
                             <br>
                             <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
                                 Zobacz wyniki przetargu
@@ -183,7 +183,7 @@
                                 Zamówienie zostało złożone i wysłane do fabryki
                             </h1>
                         @endif
-                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
+                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0 && $userType == MessagesHelper::TYPE_EMPLOYEE)
                             <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
                                 @csrf
                                 <button class="btn btn-success">
