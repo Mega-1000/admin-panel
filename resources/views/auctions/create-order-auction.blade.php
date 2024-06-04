@@ -58,7 +58,7 @@
                     @endforeach
                     <div class="mt-6 flex justify-between">
                         <div>
-                            <h3> Sposoby płatności </h3> : <br>
+                            <h3 class="font-weight-bold h3"> Sposoby płatności: </h3><br>
                             a)  10 % przedpłata na konto 1814,75 <br>
                             90 % przy odbiorze towaru przelewem błyskawicznym. <br>
                             Klient zobowiązuje się do przelewu który w przeciągu 30 minut pojawi się na naszym koncie <br>
