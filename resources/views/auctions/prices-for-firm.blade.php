@@ -357,7 +357,7 @@ $firmCounter = 0;
                                        {{ $symbol }}
                                    </span>
                                     @else
-                                        {{ $firmCounter++ }}
+                                        Firma {{ $firmCounter++ }}
                                     @endif
                                     <br>
                                     @php
