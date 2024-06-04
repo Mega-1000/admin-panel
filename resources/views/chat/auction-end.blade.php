@@ -190,18 +190,25 @@
                                         ->get();
 
                                     $offers = [];
+                                    $pcOffers = [];
                                     foreach ($allProductsToBeDisplayed as $product) {
+                                        if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
                                             $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                                 ->where('chat_auction_id', $auction->id)
                                                 ->orderBy('basic_price_net', 'asc')
                                                 ->first();
+                                        }
+                                        $pcOffers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                            ->where('chat_auction_id', $auction->id)
+                                            ->orderBy('basic_price_net', 'asc')
+                                            ->first();
                                     }
 
                                     usort($offers, function($a, $b) {
                                         return $a->basic_price_net <=> $b->basic_price_net;
                                     });
 
-                                    $minOffer = collect($offers)->min('basic_price_net');
+                                    $minOffer = collect($pcOffers)->min('basic_price_net');
 
                                     if ($minOffer === 0 || empty($offers)) {
                                         $missingData = true;
