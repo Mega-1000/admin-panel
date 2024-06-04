@@ -232,7 +232,14 @@ $firmCounter = 0;
                     @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
                         <tr>
                             <td>
-                                Firma {{ $firmCounter++ }}
+                            </td>
+                                @if($sortedFirm['firm']->firm->id == request()->query('firmId'))
+                                    <span style="color: red; font-weight: bold">
+                                       {{ $sortedFirm['firm']->firm->name }}
+                                   </span>
+                                @else
+                                    {{ $firmCounter++ }}
+                                @endif
                                 <br>
                                 @php
                                     $employee = \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first();
@@ -345,9 +352,13 @@ $firmCounter = 0;
                         @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                             <tr>
                                 <td>
-                                    {{ $symbol }}
-                                    <br>
-                                    Odległość: {{ $distance ?? 'N/A' }} KM
+                                    @if(\App\Entities\Firm::where('symbol', $symbol)->first()->id == request()->query('firmId'))
+                                        <span style="color: red; font-weight: bold">
+                                       {{ $symbol }}
+                                   </span>
+                                    @else
+                                        {{ $firmCounter++ }}
+                                    @endif
                                     <br>
                                     @php
                                         $employee = \App\Entities\Employee::where('email', $firm->email_of_employee)->first();
