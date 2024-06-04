@@ -375,10 +375,7 @@ $firmCounter = 0;
                                         <td>
                                             @foreach($price as $p)
                                                 {{ $p->price->product->additional_info1 }}:
-                                                {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
-                                                @if(auth()->id())
-                                                    ({{ round($p?->price->net_purchase_price_basic_unit_after_discounts, 2) }})
-                                                @endif
+                                                {{ round($p?->price->net_purchase_price_basic_unit_after_discounts, 2) }}
                                                 <br>
                                             @endforeach
                                         </td>
