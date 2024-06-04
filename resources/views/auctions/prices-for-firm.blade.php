@@ -101,17 +101,12 @@
                     <tbody>
                     @php
                         $sortedFirms = collect();
-                        $displayedFirmSymbols = [];
                         $firmIdFromQuery = request()->query('firmId');
                     @endphp
 
                     @foreach($firms as $firm)
-                        @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || !isset($auction))
-                            @continue
-                        @endif
-
                         @php
-                            $displayedFirmSymbols[] = $firm->firm->symbol;
+                            $displayedFirmSymbols[] = $firm?->firm?->symbol ?? $firm?->symbol ?? '';
                             $totalCost = 0;
                         @endphp
 
@@ -122,6 +117,7 @@
                                     ->get();
 
                                 $offers = [];
+                                $pcOffers = [];
                                 foreach ($allProductsToBeDisplayed as $product) {
                                     if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
                                         $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
@@ -130,13 +126,20 @@
                                             ->where('firm_id', $firm->firm->id)
                                             ->first();
                                     }
+
+                                    $pcOffers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                        ->where('chat_auction_id', $auction->id)
+                                        ->orderBy('basic_price_net', 'asc')
+                                        ->first();
                                 }
 
                                 usort($offers, function($a, $b) {
                                     return $a->basic_price_net <=> $b->basic_price_net;
                                 });
 
-                                $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
+                                $minOffer = collect($pcOffers)->min('basic_price_net');
+
+                                $totalCost += round(($minOffer * 1.23), 2) *
                                     \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                         ->whereHas('product', function ($q) use ($product) {
                                             $q->where('product_group', $product->product_group);
@@ -154,7 +157,6 @@
 
                     @php
                         $sortedFirms = $sortedFirms->sortBy('totalCost');
-                        $firmCounter = 1;
                     @endphp
 
                     @foreach($sortedFirms as $sortedFirm)
@@ -163,8 +165,8 @@
                                 firma
                                 @if($sortedFirm['firm']->firm->id == $firmIdFromQuery)
                                     <span style="color: red; font-weight: bold">
-                                        {{ $sortedFirm['firm']->firm->name }}
-                                    </span>
+                                       {{ $sortedFirm['firm']->firm->name }}
+                                   </span>
                                 @else
                                     {{ $firmCounter }}
                                 @endif
@@ -172,141 +174,68 @@
 
                             @foreach($products as $product)
                                 <td>
-                                    @php
-                                        $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $sortedFirm['firm']->firm->symbol)
-                                            ->where('product_group', $product->product->product_group)
-                                            ->get();
-
-                                        $offers = [];
-                                        foreach ($allProductsToBeDisplayed as $product) {
-                                            if ($auction->offers->where('firm_id', $sortedFirm['firm']->firm->id)->where('product_id', $product->id)->first()) {
-                                                $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                                    ->where('chat_auction_id', $auction->id)
-                                                    ->orderBy('basic_price_net', 'asc')
-                                                    ->where('firm_id', $sortedFirm['firm']->firm->id)
-                                                    ->first();
-                                            }
-                                        }
-
-                                        usort($offers, function($a, $b) {
-                                            return $a->basic_price_net <=> $b->basic_price_net;
-                                        });
-                                    @endphp
-
-                                    @if(!empty($offers))
-                                        @foreach($offers as $offer)
-                                            {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
-                                            {{ round($offer->basic_price_net * 1.23, 2) }}
-                                            <br>
-                                        @endforeach
-
-                                        <span style="color: green">- Cena specjalna w przetargu</span>
-                                    @else
-                                        No offer
-                                    @endif
-                                </td>
-                            @endforeach
-
-                            <td>
-                                {{ $sortedFirm['totalCost'] }}
-                            </td>
-                        </tr>
-                        @php
-                            $firmCounter++;
-                        @endphp
-                    @endforeach
-
-                    @foreach($firms as $firm)
-                        @if(in_array($firm->firm->symbol, $displayedFirmSymbols) || !isset($auction))
-                            @continue
-                        @endif
-
-                        @php
-                            $symbol = $firm->firm->symbol;
-                            $coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
-
-                            if ($coordinatesOfUser) {
-                                $raw = \DB::selectOne(
-                                    'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
-                                        POW(69.1 * (pc.latitude - :latitude), 2) +
-                                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
-                                    FROM postal_code_lat_lon pc
-                                    JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
-                                    JOIN warehouses w on wa.warehouse_id = w.id
-                                    WHERE w.firm_id = :firmId AND w.status = "ACTIVE"
-                                    ORDER BY distance
-                                    limit 1',
-                                    [
-                                        'latitude' => $coordinatesOfUser->latitude,
-                                        'longitude' => $coordinatesOfUser->longitude,
-                                        'firmId' => $firm->firm->id
-                                    ]
-                                );
-
-                                $radius = $raw?->distance;
-
-                                $distance = round($raw?->distance, 2);
-                            }
-                        @endphp
-
-                        @if((isset($auction) && $auction?->offers->where('firm_id', $firm->firm->id)->count() === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
-                            <tr>
-                                <td>
-                                    firma
-                                    @if($firm->firm->id == $firmIdFromQuery)
-                                        <span style="color: red; font-weight: bold">
-                                            {{ $firm->firm->name }}
-                                        </span>
-                                    @else
-                                        {{ $firmCounter }}
-                                    @endif
-                                </td>
-
                                 @php
-                                    $prices = [];
-                                    $items = isset($auction) ? $auction?->chat?->order?->items : $order?->items;
-                                    $totalCost = 0;
+                                    $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $sortedFirm['firm']->firm->symbol)
+                                        ->where('product_group', $product->product->product_group)
+                                        ->get();
 
-                                    foreach ($items as $item) {
-                                        $variations = App\Entities\Product::where('product_group', $item->product->product_group)
-                                            ->where('product_name_supplier', $symbol)
-                                            ->get();
+                                    $offers = [];
+                                    foreach ($allProductsToBeDisplayed as $product) {
+                                        if ($auction->offers()->where('firm_id', $sortedFirm['firm']->firm->id)->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->first()) {
+                                            $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                                ->where('chat_auction_id', $auction->id)
+                                                ->orderBy('basic_price_net', 'asc')
+->where('firm_id', $sortedFirm['firm']->firm->id)
+->first();
+}
 
-                                        $variations = $variations->sortBy(function($product) {
-                                            return $product->price->gross_purchase_price_basic_unit_after_discounts;
-                                        });
+usort($offers, function($a, $b) {
+return $a->basic_price_net <=> $b->basic_price_net;
+});
 
-                                        $prices[] = $variations;
+$minOffer = collect($offers)->min('basic_price_net');
 
-                                        $totalCost += $variations->min('price.net_special_price_basic_unit') * $item->quantity;
-                                    }
-                                @endphp
+$totalCost = 0;
+if (isset($auction) && $minOffer) {
+$totalCost += $minOffer;
+}
 
-                                @foreach($prices as $price)
-                                    <td>
-                                        @foreach($price as $p)
-                                            {{ $p->price->product->additional_info1 }}:
-                                            {{ $p?->price->gross_purchase_price_basic_unit_after_discounts }}
-                                            <br>
-                                        @endforeach
-                                    </td>
-                                @endforeach
+$missingData = !isset($auction);
+@endphp
 
-                                <td>
-                                    {{ round($totalCost / 3.33, 2) }}
-                                </td>
-                            </tr>
-                            @php
-                                $displayedFirmSymbols[] = $symbol;
-                                $firmCounter++;
-                            @endphp
-                        @endif
-                    @endforeach
-                    </tbody>
-                </table>
+@if($missingData)
+    <td>
+        <h5 style="color:red">
+            Brak informacji dla tej aukcji
+        </h5>
+    </td>
+@else
+    <td>
+        {{ $sortedFirm['firm']['firm']['name'] ?? $sortedFirm['firm']['name'] }}
+    </td>
+    @endif
+    @endforeach
+    </tr>
+    <tr>
+        <td>
+            @if($missingData)
+                <h5 style="color:red">
+                    Brak informacji dla tej aukcji
+                </h5>
+            @else
+                {{ $sortedFirm['totalCost'] }}
+                <br>
             @endif
-        </div>
-    </div>
+        </td>
+    </tr>
+    @endforeach
+    </table>
+@endif
+<div class="alert-success alert">
+    Więcej informacji...
+</div>
+</div>
+</div>
 </div>
 <script>
     const table = document.querySelector('table');
