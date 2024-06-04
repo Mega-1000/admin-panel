@@ -58,18 +58,7 @@
                     @endforeach
                     <div class="mt-6 flex justify-between">
                         <div>
-                            <label class="inline-flex items-center">
-                                <input type="radio" id="full-payment" name="payment-option" class="form-radio" checked>
-                                <span class="ml-2">100 % przedpłata przed dostawą</span>
-                            </label>
-                            <br>
-                            <label class="inline-flex items-center">
-                                <input type="radio" id="cash-on-delivery" name="payment-option" class="form-radio">
-                                <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
-                            </label>
-                            <br>
-                            <br>
-                            Sposoby płatności : <br>
+                            <h3> Sposoby płatności </h3> : <br>
                             a)  10 % przedpłata na konto 1814,75 <br>
                             90 % przy odbiorze towaru przelewem błyskawicznym. <br>
                             Klient zobowiązuje się do przelewu który w przeciągu 30 minut pojawi się na naszym koncie <br>
@@ -81,6 +70,17 @@
                             <br>
                             b) 100 % przedpłata przed dostawą. <br>
                             Klient zobowiązuje się tylko do rozładunku w wspólnie ustalonym terminie z fabryką.
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="full-payment" name="payment-option" class="form-radio" checked>
+                                <span class="ml-2">100 % przedpłata przed dostawą</span>
+                            </label>
+                            <br>
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="cash-on-delivery" name="payment-option" class="form-radio">
+                                <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
+                            </label>
+                            <br>
+                            <br>
                         </div>
                         <div>
                             <h2 class="text-xl font-bold mb-2">Końcowa wartość oferty brutto:</h2>
