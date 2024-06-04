@@ -237,7 +237,7 @@ $firmCounter = 0;
                                        {{ $sortedFirm['firm']->firm->name }}
                                    </span>
                                 @else
-                                    {{ $firmCounter++ }}
+                                    Firma {{ $firmCounter++ }}
                                 @endif
                                 <br>
                             </td>
