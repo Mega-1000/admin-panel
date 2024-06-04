@@ -68,7 +68,11 @@
                             <br>
                             <label class="inline-flex items-center">
                                 <input type="radio" id="cash-on-delivery" name="payment-option" class="form-radio">
-                                <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym (w przypadku braku zaznaczenia zakładamy przedpłate 100%)</span>
+                                <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="cash-on-delivery" name="payment-option-no" class="form-radio">
+                                <span class="ml-2">Zapłata całości z góry</span>
                             </label>
                             <br>
                             <br>
