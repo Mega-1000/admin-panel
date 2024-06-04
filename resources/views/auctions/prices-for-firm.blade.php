@@ -105,44 +105,41 @@
                         $firmIdFromQuery = request()->query('firmId');
                     @endphp
 
-                    @foreach($firms as $firm)
-                        @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || !isset($auction))
-                            @continue
-                        @endif
-
+                    @foreach($products as $product)
                         @php
-                            $displayedFirmSymbols[] = $firm->firm->symbol;
-                            $totalCost = 0;
-                        @endphp
+                            $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)
+                                ->where('product_group', $product->product->product_group)
+                                ->get();
 
-                        @foreach($products as $product)
-                            @php
-                                $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)
-                                    ->where('product_group', $product->product->product_group)
-                                    ->get();
-
-                                $offers = [];
-                                foreach ($allProductsToBeDisplayed as $product) {
-                                    if ($auction->offers()->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
-                                        $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                            ->where('chat_auction_id', $auction->id)
-                                            ->orderBy('basic_price_net', 'asc')
-                                            ->where('firm_id', $firm->firm->id)
-                                            ->first();
-                                    }
+                            $offers = [];
+                            $pcOffers = [];
+                            foreach ($allProductsToBeDisplayed as $product) {
+                                if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
+                                    $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                        ->where('chat_auction_id', $auction->id)
+                                        ->orderBy('basic_price_net', 'asc')
+                                        ->first();
                                 }
 
-                                usort($offers, function($a, $b) {
-                                    return $a->basic_price_net <=> $b->basic_price_net;
-                                });
+                                $pcOffers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                    ->where('chat_auction_id', $auction->id)
+                                    ->orderBy('basic_price_net', 'asc')
+                                    ->first();
+                            }
 
-                                $totalCost += round((collect($offers)->min('basic_price_net') * 1.23), 2) *
-                                    \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
-                                        ->whereHas('product', function ($q) use ($product) {
-                                            $q->where('product_group', $product->product_group);
-                                        })->first()?->quantity;
-                            @endphp
-                        @endforeach
+                            usort($offers, function($a, $b) {
+                                return $a->basic_price_net <=> $b->basic_price_net;
+                            });
+
+                            $minOffer = collect($pcOffers)->min('basic_price_net');
+
+                            $totalCost += round(($minOffer * 1.23), 2) *
+                                \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
+                                    ->whereHas('product', function ($q) use ($product) {
+                                        $q->where('product_group', $product->product_group);
+                                    })->first()?->quantity;
+                        @endphp
+                    @endforeach
 
                         @php
                             $sortedFirms->push([
