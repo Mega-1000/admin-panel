@@ -191,7 +191,7 @@
 
                                     $offers = [];
                                     foreach ($allProductsToBeDisplayed as $product) {
-                                        if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
+                                        if ($auction->offers->where('firm_id', $firm->firm->id)->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->first()) {
                                             $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                                 ->where('chat_auction_id', $auction->id)
                                                 ->orderBy('basic_price_net', 'asc')
@@ -359,8 +359,6 @@
                                             $minOffer = collect($offers)->min('basic_price_net');
                                             $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
                                             $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
-
-                                            $totalCost = ($totalCost ?? 0) + ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
                                         @endphp
 
                                         @if(!empty($offers))
@@ -381,7 +379,7 @@
                                 @endforeach
 
                                 <td>
-                                    {{ round($totalCost, 2) }}
+                                    {{ round($firm['totalCost'], 2) }}
                                     <br>
                                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $firm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                         Wyślij zamówienie na tego producenta
