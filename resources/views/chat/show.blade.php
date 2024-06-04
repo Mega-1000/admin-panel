@@ -171,7 +171,7 @@
                                 </form>
                             @endif
                         @endif
-                        @if(!empty($chat->auctions->first()) && !$order->auction_order_placed && $order->)
+                        @if(!empty($chat->auctions->first()) && !$order->auction_order_placed)
                             <br>
                             <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
                                 Zobacz wyniki przetargu
