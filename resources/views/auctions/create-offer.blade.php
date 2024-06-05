@@ -108,19 +108,26 @@
                                 <h4>Najniższa cena na ten moment:
                                     @php
                                         $chatAuctionMinPrice = $chat_auction_firm->chatAuction
-                                                         ->offers()
-                                                         ->whereHas('product', function ($q) use ($product) {
-                                                             $q->where('product_group', $product->product_group);
-                                                             $q->where('additional_info1', $product->additional_info1);
-                                                         })
-                                                         ->min('basic_price_net');
+        ->offers()
+        ->whereHas('product', function ($q) use ($product) {
+            $q->where('product_group', $product->product_group);
+            $q->where('additional_info1', $product->additional_info1);
+        })
+        ->min('basic_price_net');
 
-                                                     $orderItemMinPrice = \App\Entities\Product::where('product_group', $product->product_group)
-                                                         ->where('additional_info1', $product->additional_info1)
-                                                         ->get()
-                                                         ->min('price.net_purchase_price_basic_unit');
+    $orderItemMinPrices = \App\Entities\Product::where('product_group', $product->product_group)
+        ->where('additional_info1', $product->additional_info1)
+        ->pluck('price.net_purchase_price_basic_unit')
+        ->reject(function ($price) {
+            return $price == 0; // Remove zero prices
+        })
+        ->sort()
+        ->values(); // Sort prices and re-index array
 
-                                                     $minPrice = min($chatAuctionMinPrice ?? INF, (int)$orderItemMinPrice == 0 ? 999999 : $orderItemMinPrice ?? INF);
+    $secondMinPrice = $orderItemMinPrices->count() > 1 ? $orderItemMinPrices[1] : INF;
+
+    $minPrice = min($chatAuctionMinPrice ?? INF, $secondMinPrice);
+
                                     @endphp
 
                                     {{ round($minPrice, 2) }} PLN
