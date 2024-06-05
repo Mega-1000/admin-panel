@@ -130,7 +130,7 @@
             <div class="alert-success alert">
                 Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
                 <br>
-                Po więcej informacji kliknij przycisk zobacz więcej
+                Wystarczy podać numer telefonu!
                 <br>
                 <br>
                 <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
