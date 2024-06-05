@@ -117,7 +117,7 @@
 
     $orderItemMinPrices = \App\Entities\Product::where('product_group', $product->product_group)
         ->where('additional_info1', $product->additional_info1)
-        ->pluck('price.net_purchase_price_basic_unit')
+        ->pluck('net_purchase_price_basic_unit')
         ->reject(function ($price) {
             return $price == 0; // Remove zero prices
         })
@@ -127,6 +127,7 @@
     $secondMinPrice = $orderItemMinPrices->count() > 1 ? $orderItemMinPrices[1] : INF;
 
     $minPrice = min($chatAuctionMinPrice ?? INF, $secondMinPrice);
+
 
                                     @endphp
 
