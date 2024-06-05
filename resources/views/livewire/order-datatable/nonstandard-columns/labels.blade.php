@@ -18,10 +18,11 @@
         <div style="margin-top: 30px">
             <h5>
                 @php
-                    $paymentConfirmation = \App\Entities\OrderPaymentConfirmation::where('order_id', $order['id'])->first();
+                    $paymentConfirmations = \App\Entities\OrderPaymentConfirmation::where('order_id', $order['id'])->get();
                 @endphp
 
-                @if($paymentConfirmation)
+                @foreach($paymentConfirmations as $paymentConfirmation)
+
                     <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
                 @endif
 
