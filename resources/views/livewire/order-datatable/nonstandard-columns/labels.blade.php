@@ -22,7 +22,6 @@
                 @endphp
 
                 @foreach($paymentConfirmations as $paymentConfirmation)
-
                     <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
                 @endforeach
 

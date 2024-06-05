@@ -92,6 +92,7 @@
                             <div id="payment-info" class="hidden">
                                 <p>Do zapłaty teraz: <span id="pobranie"></span> zł</p>
                                 <p>Do zapłaty przy odbiorze: <span id="remaining-payment">0</span> zł</p>
+                                <p>Dopłata do dostawy pobraniowej: 100 zł</p>
                             </div>
                             <button onclick="sendOrder()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2">
                                 Wyślij zamówienie
