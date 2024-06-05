@@ -401,7 +401,7 @@
                     <td>
                         @foreach($price as $p)
                             {{ $p->price->product->additional_info1 }}:
-                            {{ $p?->price->net_purchase_price_basic_unit_after_discounts * 1.23 }}
+                            {{ round($p?->price->net_purchase_price_basic_unit_after_discounts * 1.23, 2) }}
                             @if(auth()->id())
                                 ({{ round($p?->price->net_purchase_price_basic_unit_after_discounts, 2) }})
                             @endif
