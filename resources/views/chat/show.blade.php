@@ -177,7 +177,7 @@
                                 Zobacz wyniki przetargu
                             </a>
                             <br>
-                        @endifw
+                        @endif
                         @if($order->auction_order_placed)
                             <h1>
                                 Zamówienie zostało złożone i wysłane do fabryki
