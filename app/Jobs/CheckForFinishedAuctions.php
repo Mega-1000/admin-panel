@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Entities\ChatAuction;
 use App\Facades\Mailer;
 use App\Mail\AuctionFinishedNotification;
+use App\Services\Label\AddLabelService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,6 +37,12 @@ class CheckForFinishedAuctions implements ShouldQueue
         $auctions = ChatAuction::where('id', '>', 189)->where('end_of_auction', '<', now())->where('end_info_sent', false)->get();
 
         foreach ($auctions as $auction) {
+            $auction->end_info_sent = true;
+            $auction->save();
+
+            $arr = [];
+            AddLabelService::addLabels($auction->order, [265], $arr, []);
+
             Mailer::create()
                 ->to($auction->chat->order->customer->login)
                 ->send(new AuctionFinishedNotification(
