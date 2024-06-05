@@ -40,8 +40,10 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\ReferFriendNotificastionJob;
 use App\Jobs\ReferFriendNotificationJob;
+use App\Jobs\SearchForInactiveStyroOffers;
 use App\Jobs\SendReminderAboutOfferJob;
 use App\Jobs\SendSpeditionNotifications;
+use App\Mail\NewStyroOfferMade;
 use App\Mail\ReferFriendEmail;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
@@ -235,6 +237,12 @@ class OrdersController extends Controller
                     'order_id' => $order->id,
                     'message' => Status::find(18)->message,
                 ]);
+
+                Mailer::create()
+                    ->to($customer->login)
+                    ->send(new NewStyroOfferMade(
+                        $order,
+                    ));
             }
 
             if ($order->created_at->format('Y-m-d H:i:s') === $order->updated_at->format('Y-m-d H:i:s')) {
