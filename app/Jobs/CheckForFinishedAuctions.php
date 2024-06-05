@@ -41,7 +41,7 @@ class CheckForFinishedAuctions implements ShouldQueue
             $auction->save();
 
             $arr = [];
-            AddLabelService::addLabels($auction->order, [265], $arr, []);
+            AddLabelService::addLabels($auction->chat->order, [265], $arr, []);
 
             Mailer::create()
                 ->to($auction->chat->order->customer->login)
