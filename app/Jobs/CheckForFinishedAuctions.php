@@ -37,17 +37,19 @@ class CheckForFinishedAuctions implements ShouldQueue
         $auctions = ChatAuction::where('id', '>', 189)->where('end_of_auction', '<', now())->where('end_info_sent', false)->get();
 
         foreach ($auctions as $auction) {
-            $auction->end_info_sent = true;
-            $auction->save();
+            if ($auction?->chat->order) {
+                $auction->end_info_sent = true;
+                $auction->save();
 
-            $arr = [];
-            AddLabelService::addLabels($auction->chat->order, [265], $arr, []);
+                $arr = [];
+                AddLabelService::addLabels($auction?->chat->order, [265], $arr, []);
 
-            Mailer::create()
-                ->to($auction->chat->order->customer->login)
-                ->send(new AuctionFinishedNotification(
-                    $auction,
-                ));
+                Mailer::create()
+                    ->to($auction->chat->order->customer->login)
+                    ->send(new AuctionFinishedNotification(
+                        $auction,
+                    ));
+            }
         }
     }
 }
