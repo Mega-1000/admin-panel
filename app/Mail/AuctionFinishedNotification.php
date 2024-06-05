@@ -46,7 +46,7 @@ class AuctionFinishedNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'auction-finished',
+            view: 'emails.auction-finished',
         );
     }
 
