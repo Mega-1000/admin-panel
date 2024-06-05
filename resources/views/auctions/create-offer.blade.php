@@ -117,8 +117,8 @@
 
                                         $orderItemMinPrices = \App\Entities\ProductPrice::whereHas('product', function ($q) use ($product) {
                                             $q->where('product_group', $product->product_group);
+                                            $q->where('additional_info1', $product->additional_info1);
                                             })
-                                            ->where('additional_info1', $product->additional_info1)
                                             ->pluck('net_purchase_price_basic_unit')
                                             ->reject(function ($price) {
                                                 return $price == 0; // Remove zero prices
