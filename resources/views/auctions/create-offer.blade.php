@@ -117,12 +117,11 @@
 
                                         $orderItemMinPrices = \App\Entities\Product::where('product_group', $product->product_group)
                                             ->where('additional_info1', $product->additional_info1)
-                                            ->pluck('price.net_purchase_price_basic_unit')
                                             ->reject(function ($price) {
                                                 return $price == 0; // Remove zero prices
                                             })
                                             ->sort()
-                                            ->values(); // Sort prices and re-index array
+                                            ->values()->pluck('price.net_purchase_price_basic_unit'); // Sort prices and re-index array
 
                                         $secondMinPrice = $orderItemMinPrices->count() > 1 ? $orderItemMinPrices[1] : INF;
 
