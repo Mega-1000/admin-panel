@@ -857,7 +857,7 @@ Route::get('/represents', [FirmRepresentController::class, 'index'])->name('repr
 Route::post('/representatives/{id}', [FirmRepresentController::class, 'create'])->name('representatives.create');
 Route::delete('/representatives/{id}', [FirmRepresentController::class, 'delete'])->name('representatives.delete');
 
-Route::get('/styro-chatrs', function () {
+Route::get('/styro-chatrs', function (Request $request) {
     $interval = $request->input('interval', 'week');
     $startDate = $request->input('start_date', Carbon::now()->subMonth()->startOfMonth());
     $endDate = $request->input('end_date', Carbon::now()->endOfMonth());
@@ -912,6 +912,6 @@ Route::get('/styro-chatrs', function () {
             break;
     }
 
-    return view('orders.chart', compact('labels', 'data', 'interval'));
+    return view('charts', compact('labels', 'data', 'interval'));
 });
 
