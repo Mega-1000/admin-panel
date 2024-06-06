@@ -867,7 +867,7 @@ Route::get('/styro-chatrs', function () {
         DB::raw('COUNT(*) as total')
     )
         ->groupBy('date')
-        ->orderBy('date')
+        ->orderBy('date');
 
     $ordersGroupedByDay = $orders->where('created_at', '>', now()->subDays(30))->get()->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-m-d');
