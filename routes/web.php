@@ -868,17 +868,16 @@ Route::get('/styro-chatrs', function () {
     )
         ->groupBy('date')
         ->orderBy('date')
-        ->get();
 
-    $ordersGroupedByDay = $orders->where('created_at', '>', now()->subDays(30))->groupBy(function ($order) {
+    $ordersGroupedByDay = $orders->where('created_at', '>', now()->subDays(30))->get()->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-m-d');
     });
 
-    $ordersGroupedByWeek = $orders->where('created_at', '>', now()->subDays(60))->groupBy(function ($order) {
+    $ordersGroupedByWeek = $orders->where('created_at', '>', now()->subDays(60))->get()->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-W');
     });
 
-    $ordersGroupedByMonth = $orders->where('created_at', '>', now()->subDays(120))->groupBy(function ($order) {
+    $ordersGroupedByMonth = $orders->where('created_at', '>', now()->subDays(120))->get()->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-m');
     });
 
