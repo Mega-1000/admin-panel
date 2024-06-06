@@ -48,7 +48,7 @@ use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
 use Illuminate\Http\Request;
-use App\Models\Order;
+use App\Entities\Order;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
