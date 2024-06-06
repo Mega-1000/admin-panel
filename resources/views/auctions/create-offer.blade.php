@@ -210,6 +210,15 @@
         </div>
     @endforeach
 
+    @if ($firm->firm->products->where('date_of_price_change', '<', now())->count() > 0)
+        <div style="color: red; font-weight: bold">
+            !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
+            <br>
+            <br>
+            <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
+        </div>
+    @endif
+
     <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center mb-5">
         @csrf
         <button class="btn btn-primary mt-3">Zapisz wszystkie ceny</button>
