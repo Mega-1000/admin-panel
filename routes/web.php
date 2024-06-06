@@ -906,6 +906,6 @@ Route::get('/styro-chatrs', function () {
         $monthData[] = $monthOrders->sum('total');
     }
 
-    return view('orders.chart', compact('dayLabels', 'dayData', 'weekLabels', 'weekData', 'monthLabels', 'monthData'));
+    return view('charts', compact('dayLabels', 'dayData', 'weekLabels', 'weekData', 'monthLabels', 'monthData'));
 });
 
