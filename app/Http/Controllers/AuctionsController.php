@@ -97,17 +97,6 @@ class AuctionsController extends Controller
             'quality.between' => 'Pole jakość musi być wartością między 0 a 100.',
         ]);
 
-        $auction = $this->chatAuctionsService->createAuction(
-            CreateChatAuctionDTO::fromRequest($chat, $request->validated())
-        );
-
-
-        Mailer::create()
-            ->to($chat->order->customer->login)
-            ->send(new AuctionCreationConfirmation(
-                $auction
-            ));
-
         $chat = Chat::where('order_id', '=', $chat->order->id)->first();
         $helper = new MessagesHelper();
 
@@ -120,6 +109,22 @@ class AuctionsController extends Controller
         $helper->currentUserId = $chat->order->id;
         $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
         $userToken = $helper->encrypt();
+
+        if ($chat->auctions->first()) {
+            return redirect()->route('chat.show', ['token' => $userToken])->with('auctionCreationSuccess', true);
+        }
+
+        $auction = $this->chatAuctionsService->createAuction(
+            CreateChatAuctionDTO::fromRequest($chat, $request->validated())
+        );
+
+
+        Mailer::create()
+            ->to($chat->order->customer->login)
+            ->send(new AuctionCreationConfirmation(
+                $auction
+            ));
+
 
         $showAuctionInstructions = request()->query('showAuctionInstructions');
 
