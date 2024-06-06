@@ -14,6 +14,7 @@ use App\Repositories\ChatAuctionOffers;
 use App\Repositories\Employees;
 use App\Repositories\Firms;
 use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -86,6 +87,7 @@ readonly class ChatAuctionsService
         ]);
 
         $arr = [];
+        RemoveLabelService::removeLabels($order, [266], $arr, [], null);
 
         AddLabelService::addLabels(
             $order,

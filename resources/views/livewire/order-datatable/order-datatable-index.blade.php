@@ -34,6 +34,10 @@
             <button class="btn btn-primary" wire:click="updateIsSortingByPreferredInvoiceDate">
                 Filtruj po preferowanych datach wystawienia faktury
             </button>
+            <button class="btn btn-primary" wire:click="updateOnlyStyroFilter">
+                Filtruj po preferowanych datach wystawienia faktury
+            </button>
+
 
             <div class="form-group">
                 <label for="fs_generator">Generator faktur sprzedaży </label>

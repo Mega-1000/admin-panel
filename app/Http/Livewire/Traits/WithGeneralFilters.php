@@ -16,6 +16,7 @@ trait WithGeneralFilters
 {
     public string $orderPackageFilterNumber = '';
     public bool $isSortingByPreferredInvoiceDate = false;
+    public bool $onlyStyro = false;
 
     /**
      * Initialize general filters trait for Livewire component
@@ -26,6 +27,7 @@ trait WithGeneralFilters
     {
         $this->orderPackageFilterNumber = json_decode($this->user->grid_settings)->order_package_filter_number ?? '';
         $this->isSortingByPreferredInvoiceDate = json_decode($this->user->grid_settings)->is_sorting_by_preferred_invoice_date ?? false;
+        $this->onlyStyro = json_decode($this->user->grid_settings)->only_styro ?? false;
     }
 
     /**
@@ -51,6 +53,14 @@ trait WithGeneralFilters
 
         $this->reloadDatatable();
     }
+
+    public function updateOnlyStyroFilter(): void
+    {
+        $this->updateGridSettings('only_styro', !$this->onlyStyro);
+
+        $this->reloadDatatable();
+    }
+
 
     /**
      * Update grid settings in user model based on authenticated user

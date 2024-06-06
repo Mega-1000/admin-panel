@@ -64,6 +64,11 @@ class OrderDatatableRetrievingHelper
             $q->orderByRaw('DATE(preferred_invoice_date) DESC');
         }
 
+        if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'only_styro') && $data->only_styro) {
+            $q->whereHas('items', function ($query) {    $query->whereHas('product', function ($subQuery) {        $subQuery->where('variation_group', 'styropiany');
+            });});
+        }
+
         return $q;
     }
 

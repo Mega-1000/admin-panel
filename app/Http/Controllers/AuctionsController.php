@@ -30,6 +30,7 @@ use App\Repositories\Employees;
 use App\Services\ChatAuctionOfferService;
 use App\Services\ChatAuctionsService;
 use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\MessageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
@@ -515,6 +516,8 @@ class AuctionsController extends Controller
             $arr = [];
             AddLabelService::addLabels($order, [39], $arr, []);
         }
+
+        RemoveLabelService::removeLabels($order, [224, 266], $arr, [], null);
 
         $orderBuilder = OrderBuilderFactory::create();
         $order->items()->delete();
