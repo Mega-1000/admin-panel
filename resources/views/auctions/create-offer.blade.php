@@ -223,7 +223,7 @@
         <button class="btn btn-primary mt-3"
             {{ $chat_auction_firm->firm->products->where('date_of_price_change', '<', now())->count() > 0 ? 'disabled' : '' }}
         >
-            {{ $chat_auction_firm->firm->products->where('date_of_price_change', '<', now())->count() > 0 ? 'Przed zapisaniem cen prosimy o wypełnienie cen podstawowych i odświerzenie strony' : '' }}
+            {{ $chat_auction_firm->firm->products->where('date_of_price_change', '<', now())->count() > 0 ? 'Przed zapisaniem cen prosimy o wypełnienie cen podstawowych i odświerzenie strony' : 'Zapisz wszystkie ceny' }}
         </button>
     </form>
 </div>
