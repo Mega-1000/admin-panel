@@ -215,7 +215,7 @@
             !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
             <br>
             <br>
-            <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}</a>
+            <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $chat_auction_firm->firm->access_token }}">https://mega1000.pl/firms/przetargi?firmToken={{ $chat_auction_firm->firm->access_token }}</a>
         </div>
     @endif
 
