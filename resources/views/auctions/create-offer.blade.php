@@ -214,7 +214,7 @@
         <div style="color: red; font-weight: bold">
             !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
             <br>
-            <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $chat_auction_firm->firm->access_token }}">Aktualizuj cenniki firmy reprezentowanej przez siebie</a>
+            <a class="btn btn-success" href="https://mega1000.pl/firms/przetargi?firmToken={{ $chat_auction_firm->firm->access_token }}">Aktualizuj cenniki firmy reprezentowanej przez siebie</a>
         </div>
     @endif
 
@@ -223,7 +223,7 @@
         <button class="btn btn-primary mt-3"
             {{ $chat_auction_firm->firm->products->where('date_of_price_change', '<', now())->count() > 0 ? 'disabled' : '' }}
         >
-            Zapisz wszystkie ceny
+            {{ $chat_auction_firm->firm->products->where('date_of_price_change', '<', now())->count() > 0 ? 'Przed zapisaniem cen prosimy o wypełnienie cen podstawowych i odświerzenie strony' : '' }}
         </button>
     </form>
 </div>
