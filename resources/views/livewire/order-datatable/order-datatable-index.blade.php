@@ -35,7 +35,7 @@
                 Filtruj po preferowanych datach wystawienia faktury
             </button>
             <button class="btn btn-primary" wire:click="updateOnlyStyroFilter">
-                Filtruj po preferowanych datach wystawienia faktury
+                Tylko styropian
             </button>
 
 
