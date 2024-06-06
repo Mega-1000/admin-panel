@@ -862,7 +862,7 @@ Route::get('/styro-chatrs', function () {
         $query->whereHas('product', function ($subQuery) {
             $subQuery->where('variation_group', 'styropiany');
         });
-    })->where('created_at', '>', now()->subDays(30))->select(
+    })->select(
         DB::raw('DATE(created_at) as date'),
         DB::raw('COUNT(*) as total')
     )
@@ -870,15 +870,15 @@ Route::get('/styro-chatrs', function () {
         ->orderBy('date')
         ->get();
 
-    $ordersGroupedByDay = $orders->groupBy(function ($order) {
+    $ordersGroupedByDay = $orders->where('created_at', '>', now()->subDays(30))->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-m-d');
     });
 
-    $ordersGroupedByWeek = $orders->groupBy(function ($order) {
+    $ordersGroupedByWeek = $orders->where('created_at', '>', now()->subDays(60))->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-W');
     });
 
-    $ordersGroupedByMonth = $orders->groupBy(function ($order) {
+    $ordersGroupedByMonth = $orders->where('created_at', '>', now()->subDays(120))->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-m');
     });
 
