@@ -862,7 +862,7 @@ Route::get('/styro-chatrs', function () {
         $query->whereHas('product', function ($subQuery) {
             $subQuery->where('variation_group', 'styropiany');
         });
-    })->select(
+    })->where('created_at', '>', now()->subDays(30))->select(
         DB::raw('DATE(created_at) as date'),
         DB::raw('COUNT(*) as total')
     )
