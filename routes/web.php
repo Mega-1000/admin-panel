@@ -857,21 +857,15 @@ Route::get('/represents', [FirmRepresentController::class, 'index'])->name('repr
 Route::post('/representatives/{id}', [FirmRepresentController::class, 'create'])->name('representatives.create');
 Route::delete('/representatives/{id}', [FirmRepresentController::class, 'delete'])->name('representatives.delete');
 
-Route::get('/styro-chatrs', function (Request $request) {
-    $interval = $request->input('interval', 'week');
-    $startDate = $request->input('start_date', Carbon::now()->subMonth()->startOfMonth());
-    $endDate = $request->input('end_date', Carbon::now()->endOfMonth());
-
+Route::get('/styro-chatrs', function () {
     $orders = Order::whereHas('items', function ($query) {
         $query->whereHas('product', function ($subQuery) {
             $subQuery->where('variation_group', 'styropiany');
         });
-    })
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->select(
-            DB::raw('DATE(created_at) as date'),
-            DB::raw('COUNT(*) as total')
-        )
+    })->select(
+        DB::raw('DATE(created_at) as date'),
+        DB::raw('COUNT(*) as total')
+    )
         ->groupBy('date')
         ->orderBy('date')
         ->get();
@@ -888,30 +882,30 @@ Route::get('/styro-chatrs', function (Request $request) {
         return Carbon::parse($order->date)->format('Y-m');
     });
 
-    $labels = [];
-    $data = [];
+    $dayLabels = [];
+    $dayData = [];
 
-    switch ($interval) {
-        case 'day':
-            foreach ($ordersGroupedByDay as $day => $dayOrders) {
-                $labels[] = Carbon::parse($day)->format('M d, Y');
-                $data[] = $dayOrders->sum('total');
-            }
-            break;
-        case 'week':
-            foreach ($ordersGroupedByWeek as $weekNumber => $weekOrders) {
-                $labels[] = 'Week ' . $weekNumber;
-                $data[] = $weekOrders->sum('total');
-            }
-            break;
-        case 'month':
-            foreach ($ordersGroupedByMonth as $month => $monthOrders) {
-                $labels[] = Carbon::parse($month)->format('M Y');
-                $data[] = $monthOrders->sum('total');
-            }
-            break;
+    foreach ($ordersGroupedByDay as $day => $dayOrders) {
+        $dayLabels[] = Carbon::parse($day)->format('M d, Y');
+        $dayData[] = $dayOrders->sum('total');
     }
 
-    return view('charts', compact('labels', 'data', 'interval'));
+    $weekLabels = [];
+    $weekData = [];
+
+    foreach ($ordersGroupedByWeek as $weekNumber => $weekOrders) {
+        $weekLabels[] = 'Week ' . $weekNumber;
+        $weekData[] = $weekOrders->sum('total');
+    }
+
+    $monthLabels = [];
+    $monthData = [];
+
+    foreach ($ordersGroupedByMonth as $month => $monthOrders) {
+        $monthLabels[] = Carbon::parse($month)->format('M Y');
+        $monthData[] = $monthOrders->sum('total');
+    }
+
+    return view('charts', compact('dayLabels', 'dayData', 'weekLabels', 'weekData', 'monthLabels', 'monthData'));
 });
 

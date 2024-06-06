@@ -9,36 +9,31 @@
 <body>
 <h1>Order Chart</h1>
 
-<form>
-    <label for="interval">Interval:</label>
-    <select id="interval" name="interval" onchange="updateChart()">
-        <option value="week" {{ $interval === 'week' ? 'selected' : '' }}>Week</option>
-        <option value="month" {{ $interval === 'month' ? 'selected' : '' }}>Month</option>
-        <option value="day" {{ $interval === 'day' ? 'selected' : '' }}>Day</option>
-    </select>
+<h2>Orders by Day</h2>
+<canvas id="dayChart"></canvas>
 
-    <label for="start_date">Start Date:</label>
-    <input type="date" id="start_date" name="start_date" onchange="updateChart()">
+<h2>Orders by Week</h2>
+<canvas id="weekChart"></canvas>
 
-    <label for="end_date">End Date:</label>
-    <input type="date" id="end_date" name="end_date" onchange="updateChart()">
-</form>
-
-<canvas id="chart"></canvas>
+<h2>Orders by Month</h2>
+<canvas id="monthChart"></canvas>
 
 <script>
-    var labels = {!! json_encode($labels) !!};
-    var data = {!! json_encode($data) !!};
-    var interval = "{!! $interval !!}";
+    var dayLabels = {!! json_encode($dayLabels) !!};
+    var dayData = {!! json_encode($dayData) !!};
+    var weekLabels = {!! json_encode($weekLabels) !!};
+    var weekData = {!! json_encode($weekData) !!};
+    var monthLabels = {!! json_encode($monthLabels) !!};
+    var monthData = {!! json_encode($monthData) !!};
 
-    var chartCanvas = document.getElementById('chart').getContext('2d');
-    var chart = new Chart(chartCanvas, {
+    var dayChartCanvas = document.getElementById('dayChart').getContext('2d');
+    var dayChart = new Chart(dayChartCanvas, {
         type: 'line',
         data: {
-            labels: labels,
+            labels: dayLabels,
             datasets: [{
                 label: 'Orders',
-                data: data,
+                data: dayData,
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1
@@ -53,18 +48,49 @@
         }
     });
 
-    function updateChart() {
-        var intervalSelect = document.getElementById('interval');
-        var startDateInput = document.getElementById('start_date');
-        var endDateInput = document.getElementById('end_date');
+    var weekChartCanvas = document.getElementById('weekChart').getContext('2d');
+    var weekChart = new Chart(weekChartCanvas, {
+        type: 'line',
+        data: {
+            labels: weekLabels,
+            datasets: [{
+                label: 'Orders',
+                data: weekData,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 
-        var url = new URL(window.location.href);
-        url.searchParams.set('interval', intervalSelect.value);
-        url.searchParams.set('start_date', startDateInput.value);
-        url.searchParams.set('end_date', endDateInput.value);
-
-        window.location.href = url.toString();
-    }
+    var monthChartCanvas = document.getElementById('monthChart').getContext('2d');
+    var monthChart = new Chart(monthChartCanvas, {
+        type: 'line',
+        data: {
+            labels: monthLabels,
+            datasets: [{
+                label: 'Orders',
+                data: monthData,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 </script>
 </body>
 </html>
