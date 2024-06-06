@@ -47,6 +47,12 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 
+use Illuminate\Http\Request;
+use App\Models\Order;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
+
 
 Debugbar::disable();
 /*
@@ -850,4 +856,44 @@ Route::post('/store-represents/{firm}/{email}', [FirmRepresentController::class,
 Route::get('/represents', [FirmRepresentController::class, 'index'])->name('represents.index');
 Route::post('/representatives/{id}', [FirmRepresentController::class, 'create'])->name('representatives.create');
 Route::delete('/representatives/{id}', [FirmRepresentController::class, 'delete'])->name('representatives.delete');
+
+Route::get('/styro-chatrs', function () {
+    $orders = Order::whereHas('items', function ($query) {
+        $query->whereHas('product', function ($subQuery) {
+            $subQuery->where('variation_group', 'styropiany');
+        });
+    })->select(
+        DB::raw('DATE(created_at) as date'),
+        DB::raw('COUNT(*) as total')
+    )
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
+
+    $ordersGroupedByWeek = $orders->groupBy(function ($order) {
+        return Carbon::parse($order->date)->format('Y-W');
+    });
+
+    $ordersGroupedByMonth = $orders->groupBy(function ($order) {
+        return Carbon::parse($order->date)->format('Y-m');
+    });
+
+    $weekLabels = [];
+    $weekData = [];
+
+    foreach ($ordersGroupedByWeek as $weekNumber => $weekOrders) {
+        $weekLabels[] = 'Week ' . $weekNumber;
+        $weekData[] = $weekOrders->sum('total');
+    }
+
+    $monthLabels = [];
+    $monthData = [];
+
+    foreach ($ordersGroupedByMonth as $month => $monthOrders) {
+        $monthLabels[] = Carbon::parse($month)->format('M Y');
+        $monthData[] = $monthOrders->sum('total');
+    }
+
+    return view('charts', compact('weekLabels', 'weekData', 'monthLabels', 'monthData'));
+});
 
