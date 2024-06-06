@@ -214,7 +214,7 @@
         <div style="color: red; font-weight: bold">
             !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
             <br>
-            <a class="btn btn-success" href="https://mega1000.pl/firms/przetargi?firmToken={{ $chat_auction_firm->firm->access_token }}">Aktualizuj cenniki firmy reprezentowanej przez siebie</a>
+            <a class="btn btn-success" href="https://new.mega1000.pl/magazyn/aktualizacja-cen/{{ $chat_auction_firm->firm->id }}/zaktualizuj?isByFirm=true">Aktualizuj cenniki firmy reprezentowanej przez siebie</a>
         </div>
     @endif
 
