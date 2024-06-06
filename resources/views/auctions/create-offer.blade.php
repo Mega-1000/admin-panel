@@ -220,7 +220,11 @@
 
     <form action="{{ route('auctions.offer.store', ['token' => $chat_auction_firm->token]) }}" method="POST" id="main" class="text-center mb-5">
         @csrf
-        <button class="btn btn-primary mt-3" disabled>Zapisz wszystkie ceny</button>
+        <button class="btn btn-primary mt-3"
+            {{ $chat_auction_firm->firm->products->where('date_of_price_change', '<', now())->count() > 0 ? 'disabled' : '' }}
+        >
+            Zapisz wszystkie ceny
+        </button>
     </form>
 </div>
 
