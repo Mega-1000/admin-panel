@@ -870,6 +870,10 @@ Route::get('/styro-chatrs', function () {
         ->orderBy('date')
         ->get();
 
+    $ordersGroupedByDay = $orders->groupBy(function ($order) {
+        return Carbon::parse($order->date)->format('Y-m-d');
+    });
+
     $ordersGroupedByWeek = $orders->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-W');
     });
@@ -877,6 +881,14 @@ Route::get('/styro-chatrs', function () {
     $ordersGroupedByMonth = $orders->groupBy(function ($order) {
         return Carbon::parse($order->date)->format('Y-m');
     });
+
+    $dayLabels = [];
+    $dayData = [];
+
+    foreach ($ordersGroupedByDay as $day => $dayOrders) {
+        $dayLabels[] = Carbon::parse($day)->format('M d, Y');
+        $dayData[] = $dayOrders->sum('total');
+    }
 
     $weekLabels = [];
     $weekData = [];
@@ -894,6 +906,6 @@ Route::get('/styro-chatrs', function () {
         $monthData[] = $monthOrders->sum('total');
     }
 
-    return view('charts', compact('weekLabels', 'weekData', 'monthLabels', 'monthData'));
+    return view('orders.chart', compact('dayLabels', 'dayData', 'weekLabels', 'weekData', 'monthLabels', 'monthData'));
 });
 
