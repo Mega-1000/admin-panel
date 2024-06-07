@@ -24,6 +24,7 @@ class ControllSubjectInvoiceController extends Controller
             dd('okej');
             $report = $controllSubjectInvoiceService->handle($dto);
         } else {
+            dd('okej1');
             $buyingService->handle($dto);
         }
 
