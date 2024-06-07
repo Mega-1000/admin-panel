@@ -1,4 +1,4 @@
-<form action="{{ route('styro-lead.load-csv') }}" method="POST" enctype="application/x-www-form-urlencoded">
+<form action="{{ route('styro-lead.load-csv') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     <input type="file" name="csv_file">

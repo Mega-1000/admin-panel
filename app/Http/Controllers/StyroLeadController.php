@@ -56,7 +56,6 @@ class StyroLeadController extends Controller
             // Remove the header row
             array_shift($csvData);
 
-            dd($csvData);
             foreach ($csvData as $row) {
                 // Check if the row has at least one non-empty value
                 if (count(array_filter($row)) > 0) {
