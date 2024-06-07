@@ -140,7 +140,6 @@ class OrdersController extends Controller
      */
     public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
-
         $data = $request->all();
 
         $lead = StyroLead::where('email', $data['customer_login'])->first();
