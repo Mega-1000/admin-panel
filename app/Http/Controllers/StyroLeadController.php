@@ -6,18 +6,22 @@ use App\Facades\Mailer;
 use App\Mail\StyroLeadInaugurationMail;
 use App\StyroLead;
 use App\StyroLeadMail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class StyroLeadController extends Controller
 {
-    public function getLogoWithTracker(Request $request)
+    public function index(): View
     {
-        // Get the email ID from the request query parameter
-        $emailId = $request->input('id');
+        return view('styro-leads.index');
+    }
 
-        // Find the email by ID
-        $email = StyroLeadMail::find($emailId);
+
+    public function getLogoWithTracker($id): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $email = StyroLeadMail::find($id);
 
         // Check if the email exists
         if (!$email) {
