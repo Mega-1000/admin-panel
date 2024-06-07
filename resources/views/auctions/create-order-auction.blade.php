@@ -215,13 +215,10 @@
                     })
                         .then(async (data) => {
                             let message = 'Pomyślnie złożono zamówienie.';
-                            if (cashOnDelivery) {
+                            message += ' Zostaniesz przekierowany do banku.';
 
-                                message += ' Zapłata nastąpi przy odbiorze przelewem błyskawicznym.';
-                            } else {
-                                message += ' Zostaniesz przekierowany do banku.';
-                                window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`;
-                            }
+                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`;
+
                             await Swal.fire('Sukces', message, 'success');
                         })
                         .catch(error => {
