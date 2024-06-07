@@ -24,7 +24,7 @@
 
     <input type="file" name="csv_file">
 
-    <button>
+    <button class="btn btn-primary mt-4">
         Zapisz plik
     </button>
 </form>
