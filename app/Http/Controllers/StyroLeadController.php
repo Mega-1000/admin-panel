@@ -62,7 +62,6 @@ class StyroLeadController extends Controller
                     $lead = StyroLead::create([
                         'phone' => $row[0] ?: null,
                         'firm_name' => $row[1] ?: null,
-                        'website_url' => $row[2] ?: null,
                         'email' => $row[3] ?: null,
                     ]);
 
