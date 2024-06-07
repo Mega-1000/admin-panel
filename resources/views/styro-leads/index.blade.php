@@ -28,6 +28,8 @@
     <button class="btn btn-primary mt-4">
         Zapisz plik
     </button>
+
+    Ilość maili odczytanych {{ \App\StyroLead::where('on_website', true)->count() }}
 </form>
 
 <table border="1" class="table">
