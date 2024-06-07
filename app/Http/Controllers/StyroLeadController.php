@@ -15,7 +15,7 @@ class StyroLeadController extends Controller
 {
     public function index(): View
     {
-        return view('styro-leads.index');
+        return view('styro-leads.index', ['leads' => StyroLead::all()]);
     }
 
 
