@@ -61,6 +61,9 @@ class StyroLeadController extends Controller
             array_shift($csvData);
 
             foreach ($csvData as $row) {
+                if (!empty(StyroLead::where('email', $row[3])->find())) {
+                    continue;
+                }
                 // Check if the row has at least one non-empty value
                 if (count(array_filter($row)) > 0) {
                     $lead = StyroLead::create([
