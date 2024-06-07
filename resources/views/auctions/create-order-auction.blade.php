@@ -177,7 +177,7 @@
                 function sendOrder() {
                     Swal.fire('Ładowanie...', '');
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                    const totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', ''));
+                    let totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', ''));
                     const productData = [];
                     const cashOnDelivery = document.querySelector('#cash-on-delivery').checked;
 
@@ -217,9 +217,13 @@
                             let message = 'Pomyślnie złożono zamówienie.';
                             message += ' Zostaniesz przekierowany do banku.';
 
-                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`;
+                            if (cashOnDelivery) {
+                                totalPrice = totalPrice / 10;
+                            }
 
                             await Swal.fire('Sukces', message, 'success');
+
+                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`;
                         })
                         .catch(error => {
                             console.error('Error:', error);
