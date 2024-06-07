@@ -140,6 +140,24 @@ class OrdersController extends Controller
      */
     public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
+        $orders = Order::whereHas('items', function ($query) {$query->whereHas('product', function ($subQuery) {$subQuery->where('variation_group', 'styropiany');});})->whereHas('customer.orders', function ($q) {$q->havingRaw('COUNT(*) > 1');})->orderBy('created_at', 'desc')->get()->unique('customer')->pluck('customer');
+
+        $csvData = $orders->map(function ($customer) {return ['phone_number' => $customer->phone_number ?? 'No phone number available', 'company_name' => $customer->company_name ?? '', 'website_url' => $customer->website_url ?? 'No website available', 'email' => $customer->email ?? 'No email available'];});
+
+        $csv = fopen('php://temp', 'r+');
+        fputcsv($csv, ['phone_number', 'company_name', 'website_url', 'email']);
+
+        foreach ($csvData as $row) {
+            fputcsv($csv, $row);
+        }
+
+        rewind($csv);
+        $csvContents = stream_get_contents($csv);
+        fclose($csv);
+
+        Storage::put('customers.csv', $csvContents);
+
+
         $data = $request->all();
 
         $lead = StyroLead::where('email', $data['customer_login'])->first();
