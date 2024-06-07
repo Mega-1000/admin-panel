@@ -21,6 +21,7 @@ class ControllSubjectInvoiceController extends Controller
 
         $report = [];
         if ($request->get('invoice-kind' === 'faktury sprzedazy')) {
+            dd('okej');
             $report = $controllSubjectInvoiceService->handle($dto);
         } else {
             $buyingService->handle($dto);
