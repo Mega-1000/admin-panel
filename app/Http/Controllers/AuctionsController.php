@@ -537,7 +537,10 @@ class AuctionsController extends Controller
 
             $product = Product::find($productId);
             $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
-                ->where('product_id', $product?->id)
+                ->whereHas('product', function ($q) use ($product) {
+                    $q->where('product_group', $product->product_group)
+                        ->where('additional_info1', $product->additional_info1);
+                })
                 ->first();
 
             $orderBuilder->assignItemsToOrder(
