@@ -570,6 +570,9 @@ class AuctionsController extends Controller
             $companies[] = $company->id;
         }
 
+        $order->warehouse = $order->items->first()->firm->warehouse;
+        $order->save();
+
         $order->additional_service_cost = 50;
         $order->auction_order_placed = true;
         $order->save();
