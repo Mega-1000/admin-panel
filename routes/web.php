@@ -860,6 +860,7 @@ Route::delete('/representatives/{id}', [FirmRepresentController::class, 'delete'
 Route::get('styroLeads', [\App\Http\Controllers\StyroLeadController::class, 'index'])->name('styro-lead.index');
 Route::get('styroLeads/get-tracking-img/{id}', [\App\Http\Controllers\StyroLeadController::class, 'getLogoWithTracker'])->name('styro-lead.tracking-img');
 Route::post('styroLeads/import-csv', [\App\Http\Controllers\StyroLeadController::class, 'importCSV'])->name('styro-lead.load-csv');
+Route::post('goto-website/{id}', [\App\Http\Controllers\StyroLeadController::class, 'visitWebsite'])->name('visit-website');
 
 Route::get('/styro-chatrs', function () {
     $orders = Order::whereHas('items', function ($query) {
