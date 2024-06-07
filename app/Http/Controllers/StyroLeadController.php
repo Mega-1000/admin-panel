@@ -84,7 +84,7 @@ class StyroLeadController extends Controller
 
     public function visitWebsite($id): RedirectResponse
     {
-        $lead = StyroLead::find($id);
+        $lead = StyroLeadMail::find($id)->lead;
         $lead->on_website = true;
 
         return redirect('https://mega1000.pl/styropiany');
