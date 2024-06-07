@@ -27,7 +27,7 @@ class StyroLeadController extends Controller
         if (!$email) {
             abort(404, 'Email not found');
         }
-        $lead = $email->lead;
+        $lead = StyroLead::find($email->styro_lead_id);
 
         $lead->email_read = true;
         $lead->save();
@@ -86,6 +86,7 @@ class StyroLeadController extends Controller
     {
         $lead = StyroLead::find(StyroLeadMail::find($id)->styro_lead_id);
         $lead->on_website = true;
+        $lead->save();
 
         return redirect('https://mega1000.pl/styropiany');
     }
