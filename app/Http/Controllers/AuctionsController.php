@@ -44,6 +44,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Matrix\Builder;
 
 class AuctionsController extends Controller
@@ -544,11 +545,13 @@ class AuctionsController extends Controller
                 [
                     $product->toArray() + [
                         'amount' => $quantity,
-                        'gross_selling_price_commercial_unit' => dd($offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit)
+                        'gross_selling_price_commercial_unit' => $offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit
                     ],
                 ],
                 false
             );
+
+            Log::notice($offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit);
 
             $company = Firm::first();
             $chat = $order->chat;
