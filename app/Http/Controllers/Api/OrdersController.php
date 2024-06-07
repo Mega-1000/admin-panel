@@ -140,13 +140,14 @@ class OrdersController extends Controller
      */
     public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
+        $data = $request->all();
+
         $lead = StyroLead::where('email', $data['customer_login'])->first();
         if (!empty($lead)) {
             $lead->made_inquiry = true;
             $lead->save();
         }
 
-        $data = $request->all();
         foreach ($data['order_items'] as &$item) {
             $item['id'] = Product::where('symbol', $item['symbol'])->first()->id;
         }
