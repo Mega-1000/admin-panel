@@ -20,11 +20,10 @@ class ControllSubjectInvoiceController extends Controller
         $dto = ControllSubjectInvoiceDTOFactory::createFromCsvFile($request->file('file'));
 
         $report = [];
+        $request->get('invoice-kind');
         if ($request->get('invoice-kind' === 'faktury sprzedazy')) {
-            dd('okej');
             $report = $controllSubjectInvoiceService->handle($dto);
         } else {
-            dd('okej1');
             $buyingService->handle($dto);
         }
 
