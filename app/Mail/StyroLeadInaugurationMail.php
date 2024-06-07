@@ -36,7 +36,7 @@ class StyroLeadInaugurationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Chcesz oszczędzić na styropianie?',
+            subject: 'Chcesz zaoszczędzić do 30zł/m3 na styropianie?',
         );
     }
 
