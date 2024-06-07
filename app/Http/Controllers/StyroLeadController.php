@@ -65,7 +65,6 @@ class StyroLeadController extends Controller
                         'website_url' => $row[2] ?: null,
                         'email' => $row[3] ?: null,
                     ]);
-                    dd($lead);
 
                     $mail = $lead->mails()->create([]);
                     Mailer::create()

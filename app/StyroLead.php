@@ -10,6 +10,13 @@ class StyroLead extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'phone',
+        'firm_name',
+        'website_url',
+        'email'
+    ];
+
     public function mails(): HasMany
     {
         return $this->hasMany(StyroLeadMail::class);
