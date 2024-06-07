@@ -142,7 +142,7 @@ class OrdersController extends Controller
     {
         $orders = Order::whereHas('items', function ($query) {$query->whereHas('product', function ($subQuery) {$subQuery->where('variation_group', 'styropiany');});})->whereHas('customer.orders', function ($q) {$q->havingRaw('COUNT(*) > 1');})->orderBy('created_at', 'desc')->get()->unique('customer')->pluck('customer');
 
-        $csvData = $orders->map(function ($customer) {return ['phone_number' => $customer->phone_number ?? 'No phone number available', 'company_name' => $customer->company_name ?? '', 'website_url' => $customer->website_url ?? 'No website available', 'email' => $customer->email ?? 'No email available'];});
+        $csvData = $orders->map(function ($customer) {return ['phone_number' => $customer->addresses->first()->phone ?? 'No phone number available', 'company_name' => $customer->login ?? '', 'website_url' => '' ?? 'No website available', 'email' => $customer->login ?? 'No email available'];});
 
         $csv = fopen('php://temp', 'r+');
         fputcsv($csv, ['phone_number', 'company_name', 'website_url', 'email']);
@@ -155,7 +155,7 @@ class OrdersController extends Controller
         $csvContents = stream_get_contents($csv);
         fclose($csv);
 
-        Storage::put('customers.csv', $csvContents);
+        Storage::put('customers/', $csvContents);
 
 
         $data = $request->all();
