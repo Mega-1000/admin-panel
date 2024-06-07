@@ -19,7 +19,8 @@
 @endsection
 
 @section('app-content')
-    <form action="{{ route('styro-lead.load-csv') }}" method="POST" enctype="multipart/form-data">
+    <div class="browse container-fluid">
+<form action="{{ route('styro-lead.load-csv') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     <input type="file" name="csv_file">
@@ -71,4 +72,5 @@
     @endforeach
     </tbody>
 </table>
+    </div>
 @endsection
