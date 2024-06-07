@@ -29,7 +29,10 @@
         Zapisz plik
     </button>
 
-    Ilość maili odczytanych {{ \App\StyroLead::where('on_website', true)->count() }}
+    <br>
+
+    Ilość osób która weszła na stronę:  {{ \App\StyroLead::where('on_website', true)->count() }}
+    Ilość osób która otworzyła wiadomość:  {{ \App\StyroLead::where('email_read', true)->count() }}
 </form>
 
 <table border="1" class="table">
