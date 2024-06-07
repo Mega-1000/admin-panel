@@ -59,7 +59,7 @@
                     <div class="mt-6 flex justify-between">
                         <div>
                             <h3 style="font-weight: bold; font-size: larger"> Sposoby płatności: </h3>
-                            a)  10 % przedpłata na konto 1814,75 <br>
+                            a)  10 % przedpłata na konto <br>
                             90 % przy odbiorze towaru przelewem błyskawicznym. <br>
                             Klient zobowiązuje się do przelewu który w przeciągu 30 minut pojawi się na naszym koncie <br>
                             Prosimy wziąść pod uwage możliwości braku sieci i innych przypadków losowych. <br>
