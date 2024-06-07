@@ -70,11 +70,16 @@ class StyroLeadController extends Controller
                     ]);
 
                     $mail = $lead->mails()->create([]);
-                    Mailer::create()
-                        ->to($row[3])
-                        ->send(new StyroLeadInaugurationMail(
-                            $mail
-                        ));
+                    try {
+
+                        Mailer::create()
+                            ->to($row[3])
+                            ->send(new StyroLeadInaugurationMail(
+                                $mail
+                            ));
+                    } catch (\Exception $exception) {
+
+                    }
                 }
             }
         }
