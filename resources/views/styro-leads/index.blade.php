@@ -31,8 +31,11 @@
 
     <br>
 
-    Ilość osób która weszła na stronę:  {{ \App\StyroLead::where('on_website', true)->count() }}
-    Ilość osób która otworzyła wiadomość:  {{ \App\StyroLead::where('email_read', true)->count() }}
+    <div style="color: black; font-weight: bold; font-size: larger">
+        Ilość osób która weszła na stronę:  {{ \App\StyroLead::where('on_website', true)->count() }}
+        <br>
+        Ilość osób która otworzyła wiadomość:  {{ \App\StyroLead::where('email_read', true)->count() }}
+    </div>
 </form>
 
 <table border="1" class="table">
