@@ -64,6 +64,7 @@ use App\Services\OrderPackageService;
 use App\Services\OrderService;
 use App\Services\ProductService;
 use App\Services\WorkingEventsService;
+use App\StyroLead;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Exception;
@@ -139,6 +140,12 @@ class OrdersController extends Controller
      */
     public function newOrder(StoreOrderRequest $request, ProductService $productService, OrderPackagesCalculator $orderPackagesCalculator): JsonResponse
     {
+        $lead = StyroLead::where('email', $data['customer_login'])->first();
+        if (!empty($lead)) {
+            $lead->made_inquiry = true;
+            $lead->save();
+        }
+
         $data = $request->all();
         foreach ($data['order_items'] as &$item) {
             $item['id'] = Product::where('symbol', $item['symbol'])->first()->id;
