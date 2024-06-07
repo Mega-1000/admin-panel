@@ -171,8 +171,8 @@
                                 </form>
                             @endif
                         @endif
-                        {{$userType}}ssdad
-                        @if((!empty($chat->auctions->first()) && !$order->auction_order_placed) || $userType == MessagesHelper::TYPE_EMPLOYEE)
+
+                        @if((!empty($chat->auctions->first()) && !$order->auction_order_placed) || $userType == MessagesHelper::TYPE_USER)
                             <br>
                             <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
                                 Zobacz wyniki przetargu
