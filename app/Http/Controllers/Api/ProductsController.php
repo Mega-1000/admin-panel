@@ -261,19 +261,19 @@ class ProductsController extends Controller
             return false;
         });
 
-        $userZipCode = request()->query('zip-code');
+//        $userZipCode = request()->query('zip-code');
 
-        if (!$userZipCode) {
-            return; // Early exit if no zip code is provided
-        }
-
-        $deliveryAddressLatLon = Cache::remember("postal_code_{$userZipCode}", 60, function() use ($userZipCode) {
-            return PostalCodeLatLon::where('postal_code', $userZipCode)->first();
-        });
-
-        if (!$deliveryAddressLatLon) {
-            return; // Early exit if no postal code is found
-        }
+//        if (!$userZipCode) {
+//            return; // Early exit if no zip code is provided
+//        }
+//
+//        $deliveryAddressLatLon = Cache::remember("postal_code_{$userZipCode}", 60, function() use ($userZipCode) {
+//            return PostalCodeLatLon::where('postal_code', $userZipCode)->first();
+//        });
+//
+//        if (!$deliveryAddressLatLon) {
+//            return; // Early exit if no postal code is found
+//        }
 
 //        foreach ($filteredCategories as $category) {
 //            $products = $category->products;
