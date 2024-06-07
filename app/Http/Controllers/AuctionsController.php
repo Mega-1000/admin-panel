@@ -520,7 +520,7 @@ class AuctionsController extends Controller
 
         if ($request->get('cashOnDelivery')) {
             $arr = [];
-            AddLabelService::addLabels($order, [39], $arr, []);
+            AddLabelService::addLabels($order, [267], $arr, []);
         }
 
         $arr = [];
