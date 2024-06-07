@@ -171,7 +171,7 @@
                                 </form>
                             @endif
                         @endif
-                        {{$userType == MessagesHelper::TYPE_EMPLOYEE }}
+                        {{$userType}}ssdad
                         @if((!empty($chat->auctions->first()) && !$order->auction_order_placed) || $userType == MessagesHelper::TYPE_EMPLOYEE)
                             <br>
                             <a class="btn btn-primary" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
