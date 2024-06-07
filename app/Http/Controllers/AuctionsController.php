@@ -544,7 +544,7 @@ class AuctionsController extends Controller
                 [
                     $product->toArray() + [
                         'amount' => $quantity,
-                        'gross_selling_price_commercial_unit' => $offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit
+                        'gross_selling_price_commercial_unit' => dd($offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit)
                     ],
                 ],
                 false
