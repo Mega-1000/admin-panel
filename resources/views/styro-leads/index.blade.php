@@ -1,17 +1,7 @@
-<form action="{{ route('styro-lead.load-csv') }}" method="POST" enctype="multipart/form-data">
-    @csrf
 
-    <input type="file" name="csv_file">
+@extends('layouts.datatable')
 
-    <button>
-        Zapisz plik
-    </button>
-</form>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Styro Leads</title>
+@section('app-header')
     <style>
         .boolean-true {
             background-color: green;
@@ -26,10 +16,20 @@
             display: inline-block;
         }
     </style>
-</head>
-<body>
-<h1>Styro Leads</h1>
-<table border="1">
+@endsection
+
+@section('app-content')
+    <form action="{{ route('styro-lead.load-csv') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+
+    <input type="file" name="csv_file">
+
+    <button>
+        Zapisz plik
+    </button>
+</form>
+
+<table border="1" class="table">
     <thead>
     <tr>
         <th>ID</th>
@@ -71,6 +71,4 @@
     @endforeach
     </tbody>
 </table>
-</body>
-</html>
-
+@endsection
