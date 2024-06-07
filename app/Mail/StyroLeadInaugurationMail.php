@@ -48,7 +48,7 @@ class StyroLeadInaugurationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.styro-inauguration',
+            view: 'emails.styro-inauguration',
             with: [
                 'mail' => $this->mail,
             ]
