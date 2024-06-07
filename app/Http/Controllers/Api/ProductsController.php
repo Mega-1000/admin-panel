@@ -457,8 +457,8 @@ class ProductsController extends Controller
 
         $userZipCode = request()->query('zip-code');
 
-        if (!$userZipCode) {
-            return; // Early exit if no zip code is provided
+        if (empty($userZipCode)) {
+            return $subCategories; // Early exit if no zip code is provided
         }
 
         $deliveryAddressLatLon = Cache::remember("postal_code_{$userZipCode}", 60, function() use ($userZipCode) {
