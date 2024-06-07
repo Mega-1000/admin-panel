@@ -35,6 +35,8 @@
         Ilość osób która weszła na stronę:  {{ \App\StyroLead::where('on_website', true)->count() }}
         <br>
         Ilość osób która otworzyła wiadomość:  {{ \App\StyroLead::where('email_read', true)->count() }}
+        <br>
+        Ilość wszystkich prospectów:  {{ \App\StyroLead::count() }}
     </div>
 </form>
 
