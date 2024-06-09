@@ -129,7 +129,7 @@ class AuctionsController extends Controller
 
         $showAuctionInstructions = request()->query('showAuctionInstructions');
 
-//        $this->chatAuctionsService->confirmAuction($auction);
+        $this->chatAuctionsService->confirmAuction($auction);
 
         return redirect()->route('chat.show', ['token' => $userToken, 'showAuctionInstructions' => $showAuctionInstructions])->with('auctionCreationSuccess', true);
     }
