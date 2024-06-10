@@ -260,5 +260,5 @@ Zawsze proś użytkownika o grubość i powieszchnie i ewentualne inne istotne k
 
     $response = curl_exec($ch);
 
-    return json_decode($response)->content[0]->text);
+    return json_decode($response)->content[0]->text;
 });
