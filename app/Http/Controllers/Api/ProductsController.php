@@ -432,23 +432,86 @@ class ProductsController extends Controller
         return response()->json($products);
     }
 
-    public function searchProduct(string $query): JsonResponse
+    /**
+     * Calculate the Levenshtein distance between two strings.
+     *
+     * @param  string  $str1
+     * @param  string  $str2
+     * @return int
+     */
+    private function levenshteinDistance($str1, $str2)
     {
-        return response()->json(
-            Product::where('name', 'like', '%' . $query .'%')
-                ->whereHas('children')
-                ->with(['price', 'opinions']) // Eager load 'price' and 'opinions' relationships
-                ->limit(5)
-                ->get()
-                ->each(function ($product) {
-                    // Ensure 'opinions' is not empty to avoid errors when calculating mean
-                    if ($product->opinions->isNotEmpty()) {
-                        $product->meanOpinion = $product->opinions->avg('rating'); // Use avg() instead of mean()
-                    } else {
-                        $product->meanOpinion = null; // Set a default value if no opinions are available
-                    }
-                })
-        );
+        $len1 = strlen($str1);
+        $len2 = strlen($str2);
+
+        if ($len1 == 0) return $len2;
+        if ($len2 == 0) return $len1;
+
+        $matrix = [];
+
+        for ($i = 0; $i <= $len1; $i++) {
+            $matrix[$i][0] = $i;
+        }
+
+        for ($j = 0; $j <= $len2; $j++) {
+            $matrix[0][$j] = $j;
+        }
+
+        for ($i = 1; $i <= $len1; $i++) {
+            $char1 = $str1[$i - 1];
+            for ($j = 1; $j <= $len2; $j++) {
+                $char2 = $str2[$j - 1];
+                $cost = ($char1 == $char2) ? 0 : 1;
+                $matrix[$i][$j] = min(
+                    $matrix[$i - 1][$j] + 1,
+                    $matrix[$i][$j - 1] + 1,
+                    $matrix[$i - 1][$j - 1] + $cost
+                );
+            }
+        }
+
+        return $matrix[$len1][$len2];
+    }
+
+    /**
+     * Perform a fuzzy search on the name attribute.
+     *
+     * @param  string  $term
+     * @param  int  $maxDistance
+     * @return \Illuminate\Support\Collection
+     */
+    private function fuzzySearch($term, $maxDistance = 2)
+    {
+        $products = Product::all();
+
+        return $products->filter(function ($product) use ($term, $maxDistance) {
+            return $this->levenshteinDistance($product->name, $term) <= $maxDistance;
+        });
+    }
+
+    /**
+     * Search for products with fuzzy matching and return JSON response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchProduct(Request $request)
+    {
+        $query = $request->input('query');
+
+        $products = $this->fuzzySearch($query)
+            ->filter(function ($product) {
+                return $product->children()->exists();
+            })
+            ->load(['price', 'opinions'])
+            ->take(5)
+            ->map(function ($product) {
+                // Calculate mean opinion
+                $product->meanOpinion = $product->opinions->isNotEmpty() ? $product->opinions->avg('rating') : null;
+                return $product;
+            });
+
+        return response()->json($products);
     }
 
     public function getBlurredCategories(Category $category)
