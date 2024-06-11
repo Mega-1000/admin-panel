@@ -25,6 +25,22 @@
     <form action="{{ route('auctions.store', ['chat' => $chat->id, 'backUrl' => URL::previous()]) }}" method="post">
         @csrf
 
+        @php
+            $previousVariationGroups = $chat->order->customer->orders() ->whereHas('items.product') ->with('items.product') ->get() ->pluck('items.*.product.product_group') ->flatten() ->unique();
+
+            $duplicateOrders = $chat->order->customer->orders()
+                ->whereHas('items', function ($q) use ($previousVariationGroups) {
+                        $q->whereHas('product', function ($q) use ($previousVariationGroups) {
+                        $q->whereIn('product_group', $previousVariationGroups);
+                    });
+                })
+                ->where('id', '!=', $chat->order->id)
+                ->where('created_at', '>', now()->subDays(2))
+                ->whereHas('chat', function ($q) {
+                    $q->whereHas('auctions');
+                })
+                ->first();
+        @endphp
         @if(empty($duplicateOrders))
         <div class="mb-4">
             <label for="end_of_auction" class="block mb-2 text-sm font-medium text-gray-700">Data zakończenia przetargu</label>
@@ -62,22 +78,6 @@
         </div>
 
         <div class="flex justify-end">
-            @php
-            $previousVariationGroups = $chat->order->customer->orders() ->whereHas('items.product') ->with('items.product') ->get() ->pluck('items.*.product.product_group') ->flatten() ->unique();
-
-            $duplicateOrders = $chat->order->customer->orders()
-                ->whereHas('items', function ($q) use ($previousVariationGroups) {
-                        $q->whereHas('product', function ($q) use ($previousVariationGroups) {
-                        $q->whereIn('product_group', $previousVariationGroups);
-                    });
-                })
-                ->where('id', '!=', $chat->order->id)
-                ->where('created_at', '>', now()->subDays(2))
-                ->whereHas('chat', function ($q) {
-                    $q->whereHas('auctions');
-                })
-                ->first();
-            @endphp
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
                     Zatwierdź
                 </button>
