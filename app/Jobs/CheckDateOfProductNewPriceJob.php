@@ -153,6 +153,8 @@ class CheckDateOfProductNewPriceJob implements ShouldQueue
             // cena brutto opakowania na wzór importu z pliku
             $price['gross_price_of_packing'] = $price['gross_selling_price_commercial_unit'];
 
+
+            dd($price);
             $product->price->update($price);
         }
     }
