@@ -61,9 +61,27 @@
         </div>
 
         <div class="flex justify-end">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
-                Zatwierdź
-            </button>
+            @php
+            $previousVariationGroups = $chat->order->customer->orders() ->whereHas('items.product') ->with('items.product') ->get() ->pluck('items.*.product.product_group') ->flatten() ->unique();
+
+            $duplicateOrders = $chat->order->customer->orders()
+                ->whereHas('items', function ($q) use ($previousVariationGroups) {
+                        $q->whereHas('product', function ($q) use ($previousVariationGroups) {
+                        $q->whereIn('product_group', $previousVariationGroups);
+                    });
+                })
+                ->where('id', '!=', $chat->order->id)
+                ->where('created_at', '>', now()->subDays(2))
+                ->whereHas('chat', function ($q) {
+                    $q->whereHas('auction');
+                })
+                ->get();
+            @endphp
+            @if(!$duplicateOrders)
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                    Zatwierdź
+                </button>
+            @endif
             <div id="spinner" class="hidden">
                 <svg class="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
