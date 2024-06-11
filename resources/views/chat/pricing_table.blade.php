@@ -80,7 +80,7 @@
 
         <div class="form-group">
             <label for="basic_price_net.{{ $product->id }}">Zmień cene na:</label>
-            <input type="number" class="form-control net_purchase_price_basic_unit" form="main" name="basic_price_net.{{ $product->id }}"
+            <input type="number" step="0.01" class="form-control net_purchase_price_basic_unit" form="main" name="basic_price_net.{{ $product->id }}"
                    value="{{ $productPrices['basic_price_net'] ?? $product->price->net_purchase_price_basic_unit_after_discounts }}">
         </div>
 
