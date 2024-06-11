@@ -73,7 +73,7 @@
                 ->where('id', '!=', $chat->order->id)
                 ->where('created_at', '>', now()->subDays(2))
                 ->whereHas('chat', function ($q) {
-                    $q->whereHas('auction');
+                    $q->whereHas('auctions');
                 })
                 ->get();
             @endphp
