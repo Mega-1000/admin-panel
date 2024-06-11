@@ -83,6 +83,7 @@
                 </button>
             @else
                 Uwaga!!! Masz już przetarg na swoim koncie zawierający jeden z tych produktów jeśli potrzebujesz zmienić swój przetarg zadzwoń pod numer 507 925 963
+            @endif
             <div id="spinner" class="hidden">
                 <svg class="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
