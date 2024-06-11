@@ -82,7 +82,7 @@
                     Zatwierdź
                 </button>
             @else
-                <div style="color: red">
+                <div style="color: red; font-weight: bolder; font-size: larger">
                     Uwaga!!! Masz już przetarg na swoim koncie zawierający jeden z tych produktów jeśli potrzebujesz zmienić swój przetarg zadzwoń pod numer 507 925 963
                 </div>
             @endif
