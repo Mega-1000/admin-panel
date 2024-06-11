@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\ProductPrice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use App\Entities\Category;
@@ -139,6 +140,13 @@ class ProductsController extends Controller
                 $array['value_of_price_change_data_second'] = (float)str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0);
                 $array['value_of_price_change_data_third'] = (float)str_replace(',', '.', $item['value_of_price_change_data_third'] ?? 0);
                 $array['value_of_price_change_data_fourth'] = (float)str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0);
+
+                $array['value_of_price_change_data_first'] = (float)str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
+
+                ProductPrice::where('product_id', $productsRelatedIds)->update([
+                    'gross_selling_price_basic_unit' => $array['value_of_price_change_data_first']
+                ]);
+
                 Product::whereIn('id', $productsRelatedIds)->update($array);
             }
 
