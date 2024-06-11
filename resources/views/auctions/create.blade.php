@@ -25,6 +25,7 @@
     <form action="{{ route('auctions.store', ['chat' => $chat->id, 'backUrl' => URL::previous()]) }}" method="post">
         @csrf
 
+        @if(empty($duplicateOrders))
         <div class="mb-4">
             <label for="end_of_auction" class="block mb-2 text-sm font-medium text-gray-700">Data zakończenia przetargu</label>
             <input type="datetime-local" id="end_of_auction" class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('end_of_auction') border-red-500 @enderror" name="end_of_auction" value="{{ old('end_of_auction', now()->addDays(3)->setTime(15, 00)) }}">
@@ -77,7 +78,6 @@
                 })
                 ->first();
             @endphp
-            @if(empty($duplicateOrders))
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
                     Zatwierdź
                 </button>
