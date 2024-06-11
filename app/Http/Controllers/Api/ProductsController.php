@@ -143,9 +143,9 @@ class ProductsController extends Controller
 
                 $array['value_of_price_change_data_first'] = (float)str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
 
-//                ProductPrice::where('product_id', $productsRelatedIds)->update([
-//                    '`gross_selling_price_basic_unit`' => $array['value_of_price_change_data_first']
-//                ]);
+                ProductPrice::whereIn('product_id', $productsRelatedIds)->update([
+                    '`gross_selling_price_basic_unit`' => $array['value_of_price_change_data_first']
+                ]);
 
                 Product::whereIn('id', $productsRelatedIds)->update($array);
             }
