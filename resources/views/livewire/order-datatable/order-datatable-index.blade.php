@@ -189,7 +189,7 @@
 
         <tbody>
             @foreach($orders['data'] as $order)
-                <tr>
+                <tr id="id-{{$order['id']}}">
                     @foreach($columns as $column)
                         @php
                             $data = data_get($order, $column['label']);
