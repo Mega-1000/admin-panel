@@ -4,7 +4,6 @@
              onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
         <div class="product-description">
             <h4>
-                Najniższa cena na ten moment:
                 @if($product->chatAuctionOffers->min('commercial_price_net') !== null)
                     {{ $product->chatAuctionOffers->min('commercial_price_net') }} PLN
                 @endif
