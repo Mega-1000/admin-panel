@@ -161,7 +161,7 @@
                                 @endif
 
                                     @if($userType === 'c')
-                                        <a class="btn btn-primary font-bold text-lg" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
+                                        <a class="btn btn-primary font-bold text-lg inline" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
                                             Podłącz potwierdzenie przelewu
                                         </a>
                                     @endif
