@@ -40,7 +40,6 @@
                                                                     ->orderBy('basic_price_net', 'asc')
                                                                     ->first()->basic_price_net * 1.23) * $product->packing->numbers_of_basic_commercial_units_in_pack;
                                 @endphp
-                            okkeoke
                             {{$product->number_of_sale_units_in_the_pack}}
                                 <div class="flex items-center justify-between mb-2">
                                     <div class="flex items-center">
