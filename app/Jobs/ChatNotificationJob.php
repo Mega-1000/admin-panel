@@ -28,7 +28,7 @@ class ChatNotificationJob implements ShouldQueue
         private int $chatId,
         private ?string $senderEmail = null,
         private int $currentChatUserId = 0,
-        public boolean $isMainArea = false
+        public bool $isMainArea = false
     ) {}
 
     /**
