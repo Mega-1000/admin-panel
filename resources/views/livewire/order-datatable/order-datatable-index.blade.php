@@ -189,7 +189,15 @@
 
         <tbody>
             @foreach($orders['data'] as $order)
-                <tr id="id-{{$order['id']}}">
+                @php
+                    $htmlString = $order['id'];
+
+                    $pattern = '/id=taskOrder-(\d+)/';
+
+                    preg_match($pattern, $htmlString, $matches);
+                    $id = $matches[1];
+                @endphp
+                <tr id="id-{{$id}}">
                     @foreach($columns as $column)
                         @php
                             $data = data_get($order, $column['label']);
