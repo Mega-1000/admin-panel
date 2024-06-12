@@ -211,7 +211,7 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
 
     const showSelectWarehouseTemplate = (modal, orderId) => {
         const row = $('#id-' + orderId);
-        const warehouseEl = console.log(row.find('.warehouse-symbol'));
+        const warehouseEl = row.find('.warehouse-symbol');
         const warehouse = warehouseEl.text();
 
         $('.warehouse-template').remove();
