@@ -203,7 +203,7 @@
                             $data = data_get($order, $column['label']);
                         @endphp
 
-                        <td>
+                        <td class="{{ $column['label'] === 'warehouse.symbol' ? 'warehouse-symbol' : '' }}">
                             @if(array_key_exists($column['label'], \App\Enums\OrderDatatableColumnsEnum::ADDITIONAL_VIEWS_COLUMNS) ?? false)
                                     @include(\App\Enums\OrderDatatableColumnsEnum::ADDITIONAL_VIEWS_COLUMNS[$column['label']], ['column' => $column, 'data' => $data, 'wholeOrder' => $order])
                             @endif
