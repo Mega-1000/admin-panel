@@ -554,7 +554,7 @@ class AuctionsController extends Controller
                 false
             );
 
-            $item = $order->items()->where('product_id', $product->id)->first();
+            $item = $order->items()->where('order_id', $order->id)->where('product_id', $product->id)->first();
             $item->gross_selling_price_commercial_unit = $offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit;
             $item->save();
 
