@@ -1,7 +1,7 @@
 <div class="mt-5">
     <h2 class="text-2xl font-bold mb-4">Zarządzanie datami do zamówienia</h2>
     <div id="alerts"></div>
-    <table class="table table-auto border-collapse">
+    <table class="table w-full border-collapse">
         <thead class="bg-gray-200">
         <tr>
             <th class="px-4 py-2 border">Typ daty</th>
