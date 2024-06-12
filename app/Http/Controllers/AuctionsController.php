@@ -571,18 +571,29 @@ class AuctionsController extends Controller
 
             $item->save();
 
-            Log::notice(($offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit) . $item->id . $item->gross_selling_price_commercial_unit);
 
-            $company = Firm::first();
+            $company = $order->items()->first()->product->firm;
+
+
             $chat = $order->chat;
 
             if (in_array($company->id, $companies)) {
                 continue;
             }
 
+            $lowestDistance = PHP_INT_MAX;
+            $closestEmployee = null;
+
             foreach ($company->employees as $employee) {
-                MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $employee);
+                $employee->distance = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer);
+
+                if ($employee->distance < $lowestDistance) {
+                    $lowestDistance = $employee->distance;
+                    $closestEmployee = $employee;
+                }
             }
+
+            MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $closestEmployee);
 
             $companies[] = $company->id;
         }
