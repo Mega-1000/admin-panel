@@ -160,13 +160,13 @@
                                 @endif
 
                                 @if($userType === 'c')
-                                    <a class="btn btn-primary mt-4 float-left" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
+                                    <a class="btn btn-primary mt-4" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
                                         Podłącz potwierdzenie przelewu
                                     </a>
                                 @endif
 
                                 @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
-                                    <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary mt-4">
+                                    <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary mt-4 float-left">
                                         Podłącz fakture
                                     </a>
                                 @endif
@@ -180,15 +180,15 @@
                         </div>
                     </div>
 
-                    @if ($userType == MessagesHelper::TYPE_USER)
-                        <button id="call-worker" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-                            Wyślij maila pracownikom
-                        </button>
-                    @else
-                        <button id="call-mod" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-                            Wezwij moderatora
-                        </button>
-                    @endif
+{{--                    @if ($userType == MessagesHelper::TYPE_USER)--}}
+{{--                        <button id="call-worker" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">--}}
+{{--                            Wyślij maila pracownikom--}}
+{{--                        </button>--}}
+{{--                    @else--}}
+{{--                        <button id="call-mod" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">--}}
+{{--                            Wezwij moderatora--}}
+{{--                        </button>--}}
+{{--                    @endif--}}
                 </div>
 
                 <div class="md:w-1/4 pl-4 mt-8 md:mt-0">
