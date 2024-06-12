@@ -556,10 +556,11 @@ class AuctionsController extends Controller
 
             $item = $order->items()->where('order_id', $order->id)->where('product_id', $product->id)->first();
             $item->gross_selling_price_commercial_unit = $offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit;
-            $item->net_purchase_price_basic_unit = $offer?->basic_price_net ?? $product->net_selling_price_commercial_unit;
             $item->net_selling_price_basic_unit = $offer?->basic_price_net ?? $product->net_selling_price_commercial_unit;
             $item->gross_selling_price_basic_unit = $offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit;
-            $item->gross_purchase_price_basic_unit = $offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit;
+
+            $item->net_purchase_price_basic_unit = ($offer?->basic_price_net ?? $product->net_selling_price_commercial_unit) - 1;
+            $item->gross_purchase_price_basic_unit = $offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit - 1.23;
             $item->save();
 
             Log::notice(($offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit) . $item->id . $item->gross_selling_price_commercial_unit);
