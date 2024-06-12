@@ -1,7 +1,7 @@
 <div class="mt-5">
     <h2 class="text-2xl font-bold mb-4">Zarządzanie datami do zamówienia</h2>
     <div id="alerts"></div>
-    <table class="w-full table-auto border-collapse">
+    <table class="table table-auto border-collapse">
         <thead class="bg-gray-200">
         <tr>
             <th class="px-4 py-2 border">Typ daty</th>
@@ -17,7 +17,7 @@
 </div>
 
 <!-- Modify Date Modal -->
-<div class="modal fixed inset-0 z-50 overflow-auto hidden" id="modifyDateModal" aria-labelledby="modifyDateModalLabel" role="dialog" aria-modal="true">
+<div class="modal fade fixed inset-0 z-50 overflow-auto hidden" id="modifyDateModal" tabindex="-1" role="dialog" aria-labelledby="modifyDateModalLabel" aria-hidden="true">
     <div class="modal-dialog relative w-auto max-w-lg mx-auto my-8">
         <div class="modal-content bg-white rounded-lg shadow-lg">
             <div class="modal-header flex justify-between items-center p-4 border-b">
