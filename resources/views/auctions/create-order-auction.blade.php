@@ -224,7 +224,7 @@
 
                             await Swal.fire('Sukces', message, 'success');
 
-                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}`;
+                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}&credentials={{$order->customer->login}}:{{$order->customer->phone}}`;
                         })
                         .catch(error => {
                             console.error('Error:', error);
