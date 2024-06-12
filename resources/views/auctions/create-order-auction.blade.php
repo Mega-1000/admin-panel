@@ -32,13 +32,13 @@
                         <div class="border-b py-4">
                             @foreach($item as $product)
                                 @php
-                                    $productPrice = empty(\App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                    $productPrice = (empty(\App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                                                     ->where('chat_auction_id', $order->chat->auctions->first()->id)
                                                                     ->orderBy('basic_price_net', 'asc')
                                                                     ->first()) ? $product->price?->gross_selling_price_basic_unit : \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
                                                                     ->where('chat_auction_id', $order->chat->auctions->first()->id)
                                                                     ->orderBy('basic_price_net', 'asc')
-                                                                    ->first()->basic_price_net * 1.23;
+                                                                    ->first()->basic_price_net * 1.23) * $product->numbers_of_basic_commercial_units_in_pack;
                                 @endphp
                                 <div class="flex items-center justify-between mb-2">
                                     <div class="flex items-center">
@@ -149,14 +149,14 @@
                             const products = Array.from(productGroup.querySelectorAll('span[data-product-id]'));
                             products.forEach(span => {
                                 const productId = span.getAttribute('data-product-id');
-                                const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1] * 3.33);
+                                const quantity = parseInt(span.textContent.match(/Ilość m3: ([\d\.]+)/)[1]);
                                 const price = parseFloat(span.textContent.match(/Cena brutto: ([\d\.]+)/)[1]);
                                 totalPrice += price * quantity;
                             });
                         }
                     });
 
-                    const totalAmount = (totalPrice / 3.33).toFixed(2);
+                    const totalAmount = (totalPrice).toFixed(2);
                     document.querySelector('.total-price').textContent = totalAmount +'ZŁ';
                     const cashOnDelivery = document.getElementById('cash-on-delivery').checked;
                     const paymentInfo = document.getElementById('payment-info');
