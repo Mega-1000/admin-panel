@@ -116,8 +116,6 @@ class CheckDateOfProductNewPriceJob implements ShouldQueue
                 4, '.', '');
 
             //cena kartotekowa brutto zakupu bez bonusa dla jednostek
-            $price['gross_purchase_price_basic_unit_after_discounts'] = number_format($price['net_purchase_price_basic_unit_after_discounts'] * 1.23,
-                2, '.', '');
             $price['gross_purchase_price_commercial_unit_after_discounts'] = number_format($price['net_purchase_price_commercial_unit_after_discounts'] * 1.23,
                 2, '.', '');
             $price['gross_purchase_price_calculated_unit_after_discounts'] = number_format($price['net_purchase_price_calculated_unit_after_discounts'] * 1.23,
@@ -128,8 +126,6 @@ class CheckDateOfProductNewPriceJob implements ShouldQueue
                 2, '.', '');
 
             //cena netto sprzedazy dla jednostek
-            $price['net_selling_price_basic_unit'] = number_format($price['net_purchase_price_basic_unit_after_discounts'] * ((100 + $product->price->coating) / 100),
-                2, '.', '');
             $price['net_selling_price_commercial_unit'] = number_format($price['net_purchase_price_commercial_unit_after_discounts'] * ((100 + $product->price->coating) / 100),
                 2, '.', '');
             $price['net_selling_price_calculated_unit'] = number_format($price['net_purchase_price_calculated_unit_after_discounts'] * ((100 + $product->price->coating) / 100),
@@ -137,9 +133,6 @@ class CheckDateOfProductNewPriceJob implements ShouldQueue
             $price['net_selling_price_aggregate_unit'] = number_format($price['net_purchase_price_aggregate_unit_after_discounts'] * ((100 + $product->price->coating) / 100),
                 2, '.', '');
             $price['net_selling_price_the_largest_unit'] = number_format($price['net_purchase_price_the_largest_unit_after_discounts'] * ((100 + $product->price->coating) / 100),
-                2, '.', '');
-            //cena netto sprzedazy dla jednostek
-            $price['gross_selling_price_basic_unit'] = number_format($price['net_purchase_price_basic_unit_after_discounts'] * ((100 + $product->price->coating) / 100) * 1.23,
                 2, '.', '');
             $price['gross_selling_price_commercial_unit'] = number_format($price['net_purchase_price_commercial_unit_after_discounts'] * ((100 + $product->price->coating) / 100) * 1.23,
                 2, '.', '');
