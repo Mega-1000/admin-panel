@@ -569,7 +569,6 @@ class AuctionsController extends Controller
             $item->net_purchase_price_calculated_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
             $item->net_purchase_price_aggregate_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
 
-
             $item->save();
 
             Log::notice(($offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit) . $item->id . $item->gross_selling_price_commercial_unit);
@@ -588,6 +587,7 @@ class AuctionsController extends Controller
             $companies[] = $company->id;
         }
 
+        $order->warehouse_id = LocationHelper::nearestWarehouse($order->customer, $order->items->first()->product->firm)->id;
         $order->additional_service_cost = 50;
         $order->auction_order_placed = true;
         $order->save();

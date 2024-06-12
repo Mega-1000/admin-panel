@@ -6,6 +6,7 @@ use App\Entities\Customer;
 use App\Entities\Employee;
 use App\Entities\Firm;
 use App\Entities\Product;
+use App\Entities\Warehouse;
 use Illuminate\Support\Facades\DB;
 
 class LocationHelper
@@ -95,5 +96,30 @@ class LocationHelper
         $distance = $raw->distance;
 
         return $radius - $distance;
+    }
+
+    public static function nearestWarehouse(Customer $customer, Firm $firm): Warehouse
+    {
+        $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customer->addresses->first()->postal_code)->get()->first();
+
+        $raw = DB::selectOne(
+            'SELECT w.id, w.name, w.address, w.city, w.state, w.postal_code, w.firm_id, pc.latitude, pc.longitude,
+            1.609344 * SQRT(
+                POW(69.1 * (pc.latitude - :latitude), 2) +
+                POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+        FROM postal_code_lat_lon pc
+             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+             JOIN warehouses w on wa.warehouse_id = w.id
+        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+        ORDER BY distance
+        LIMIT 1',
+            [
+                'latitude' => $coordinatesOfUser->latitude,
+                'longitude' => $coordinatesOfUser->longitude,
+                'firmId' => $firm->id
+            ]
+        );
+
+        return Warehouse::find($raw->id);
     }
 }
