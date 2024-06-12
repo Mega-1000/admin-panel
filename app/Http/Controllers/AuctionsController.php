@@ -558,7 +558,7 @@ class AuctionsController extends Controller
             $item->gross_selling_price_commercial_unit = $offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit;
             $item->saveQuietly();
 
-            Log::notice($offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit . $item->id . $item->gross_selling_price_commercial_unit);
+            Log::notice(($offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit) . $item->id . $item->gross_selling_price_commercial_unit);
 
             $company = Firm::first();
             $chat = $order->chat;
