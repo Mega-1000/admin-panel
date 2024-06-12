@@ -352,6 +352,7 @@ class OrderBuilder
 
             $order->items()->save($orderItem);
 
+
             if (!empty($product->weight_trade_unit)) {
                 $weight += $product->weight_trade_unit * $orderItem->quantity;
             }

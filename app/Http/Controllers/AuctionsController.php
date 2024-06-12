@@ -554,6 +554,10 @@ class AuctionsController extends Controller
                 false
             );
 
+            $item = $order->items()->where('product_id', $product->id)->first();
+            $item->gross_selling_price_commercial_unit = $offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit;
+            $item->save();
+
             Log::notice($offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit);
 
             $company = Firm::first();
@@ -569,9 +573,6 @@ class AuctionsController extends Controller
 
             $companies[] = $company->id;
         }
-
-//        $order->warehouse = $order->items->first()->firm->warehouse;
-//        $order->save();
 
         $order->additional_service_cost = 50;
         $order->auction_order_placed = true;
