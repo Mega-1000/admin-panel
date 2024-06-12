@@ -556,7 +556,7 @@ class AuctionsController extends Controller
 
             $item = $order->items()->where('order_id', $order->id)->where('product_id', $product->id)->first();
             $item->gross_selling_price_commercial_unit = $offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit;
-            $item->save();
+            $item->saveQuietly();
 
             Log::notice($offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit);
 
