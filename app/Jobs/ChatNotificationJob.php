@@ -27,7 +27,8 @@ class ChatNotificationJob implements ShouldQueue
     public function __construct(
         private int $chatId,
         private ?string $senderEmail = null,
-        private int $currentChatUserId = 0
+        private int $currentChatUserId = 0,
+        public boolean $isMainArea = false
     ) {}
 
     /**
@@ -40,6 +41,11 @@ class ChatNotificationJob implements ShouldQueue
         $chat = Chat::with(['chatUsers', 'messages'])->find($this->chatId);
         $userVisibilityString = '';
 
+        if (!$this->isMainArea) {
+            return;
+        }
+
+
         foreach ($chat->chatUsers as $chatUser) {
             if (
                 $chatUser->id == $this->currentChatUserId
@@ -47,7 +53,6 @@ class ChatNotificationJob implements ShouldQueue
 
             $userType = null;
             $userObject = null;
-
             if ($chatUser->user) {
                 $userObject = $chatUser->user;
                 $userType = 'u'; // User

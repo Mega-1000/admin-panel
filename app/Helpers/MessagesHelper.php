@@ -419,7 +419,7 @@ class MessagesHelper
             }
             WorkingEventsService::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
         } else {
-            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null && $chatUser->customer_id !== null) {
+            if ($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null && $chatUser->customer_id !== null) {
 
                 $chat->need_intervention = true;
                 $this->sendWaitingMessage($chat);
@@ -435,7 +435,7 @@ class MessagesHelper
             $email = $chatUser->user->email;
         }
 
-        (new ChatNotificationJob($chat->id, $email, $chatUser->id))->handle();
+        (new ChatNotificationJob($chat->id, $email, $chatUser->id, $area === 0))->handle();
 
         return $msg;
     }
