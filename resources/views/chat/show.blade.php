@@ -68,6 +68,87 @@
 
 <body class="bg-gray-100">
 <div class="container mx-auto py-8">
+
+    @if($isStyropian)
+        <div class="mb-4 bg-yellow-100 border-t-4 border-yellow-500 rounded-b text-yellow-900 px-4 py-3 shadow-md" role="alert">
+            @if($chat->auctions->count() === 0)
+                <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" target="_blank">
+                    Rozpocznij przetarg
+                </a>
+                <div id="auction-instructions" style="display: none; color: white; font-weight: bold; font-size: large; border-radius: 15px; padding: 20px; background-color: #0c0c0c" class="hidden text-white font-bold text-lg rounded-lg p-5 bg-gray-800">
+                    <p>Poniżej tabela cen brutto produktów z tej oferty których istnieje możliwość dostarczenia na wskazany kod pocztowy.</p>
+                    <iframe src="{{ route('displayPreDataPricesTableForOrder', $chat->id) }}" height="600px; width: 100%" class="w-full h-96"></iframe>
+                    <p>Jeśli chcesz poprosić firmy o indywidualną wycenę twojego zapytania naciśnij przycisk rozpocznij przetarg.<br>
+                        !!! Jeśli chcesz wykonać inną czynnoś naciśnij przycisk zamknij tą tabelę</p>
+                    <button class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="dimiss-info">Zamknij tą tabelę</button>
+                    <br>
+                    <br>
+                    <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" target="_blank">
+                        Rozpocznij przetarg
+                    </a>
+                </div>
+            @else
+                @if($userType !== MessagesHelper::TYPE_EMPLOYEE)
+                    <!-- if auction->end_of_auction is in past show message  -->
+                    <form method="post" action="{{ route('auctions.edit', ['auction' => $chat->auctions()->first()->id]) }}" class="mb-4">
+                        @csrf
+                        @method('PUT')
+                        <label for="end_of_auction" class="block font-bold mb-2">Zakończenie przetargu</label>
+                        <input class="form-control w-full px-3 py-2 mb-2 border border-gray-300 rounded-md" name="end_of_auction" type="datetime-local" value="{{ $chat->auctions()->first()->end_of_auction }}">
+                        <button class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Zaaktualizuj daty dotyczące przetargu
+                        </button>
+                    </form>
+                @endif
+
+                @if(\Carbon\Carbon::parse(\Carbon\Carbon::now())->gt(\Carbon\Carbon::parse($chat->auctions->first()->end_of_auction)))
+                    <h3 class="text-xl font-bold mb-2">Przetarg zakończony</h3>
+                    <br>
+                @else
+                    <h3 class="text-xl font-bold mb-2">Aktywny przretarg</h3>
+                    <br>
+                    <p class="mb-1">Koniec: {{ $chat->auctions->first()->end_of_auction }}</p>
+                    <p class="mb-1">Cena: {{ $chat->auctions->first()->price }} %</p>
+                    <p class="mb-1">Jakość: {{ $chat->auctions->first()->quality }} %</p>
+                    <p class="mb-1">Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}</p>
+                    <p class="mb-1">Uwagi: {{ $chat->auctions->first()->notes }}</p>
+                    <form action="{{ route('end-auction.store', $chat->auctions->first()->id) }}" method="post" class="mb-4">
+                        @csrf
+                        <button class="btn btn-secondary bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            Zakończ przetarg przedwcześnie
+                        </button>
+                    </form>
+                @endif
+            @endif
+
+            @if((!empty($chat->auctions->first()) && !$order->auction_order_placed) || $userType == MessagesHelper::TYPE_USER && $chat->auctions->first())
+                <br>
+                <a class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4" href="{{ route('auctions.end', ['auction' => $chat->auctions->first()->id]) }}">
+                    Zobacz wyniki przetargu
+                </a>
+                <br>
+            @endif
+
+            @if($order->auction_order_placed)
+                <h1 class="text-2xl font-bold mb-4">Zamówienie zostało złożone i wysłane do fabryki</h1>
+            @endif
+
+            @if((
+                $userType === MessagesHelper::TYPE_USER
+                && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0
+            )
+             || $userType == MessagesHelper::TYPE_EMPLOYEE
+            )
+                <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}" class="mb-4">
+                    @csrf
+                    <button class="btn btn-success bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        Rozpocznij przetarg
+                    </button>
+                </form>
+            @endif
+        </div>
+    @endif
+
     @if(session()->has('auctionCreationSuccess'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mx-auto max-w-3xl" role="alert">
             <h2 class="font-bold">!!! Koniecznie to przeczytaj !!!</h2>
