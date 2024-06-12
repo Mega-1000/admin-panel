@@ -192,15 +192,18 @@
                 </div>
 
                 <div class="md:w-1/4 pl-4 mt-8 md:mt-0">
-                    <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" class="w-8 cursor-pointer mb-4">
-                    <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST" class="mb-8">
-                        @csrf
-                        <h2 class="text-xl font-bold mb-2">Dodaj firmę do przetargu</h2>
-                        <input type="text" class="form-control w-full px-3 py-2 mb-2" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
-                        <button type="submit" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Dodaj firmę
-                        </button>
-                    </form>
+
+                    @if($userType === MessagesHelper::TYPE_USER)
+                        <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" class="w-8 cursor-pointer mb-4">
+                        <form action="{{ route('addUsersFromCompanyToAuction', $chat->id) }}" method="POST" class="mb-8">
+                            @csrf
+                            <h2 class="text-xl font-bold mb-2">Dodaj firmę do przetargu</h2>
+                            <input type="text" class="form-control w-full px-3 py-2 mb-2" name="firm_symbol" placeholder="Wpisz symbol firmy" list="suggestions">
+                            <button type="submit" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Dodaj firmę
+                            </button>
+                        </form>
+                    @endif
 
                     @if($chat->complaint_form)
                         <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
@@ -212,23 +215,23 @@
                     <div class="chat-users-wrapper overflow-auto max-h-screen mb-8">
                         <table id="chat-users" class="w-full">
                             @include('chat/users', [
-    'title' => 'Klienci:',
-    'isEmptyMsg' => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
-    'users' => $chatCustomers,
-    'userType' => MessagesHelper::TYPE_CUSTOMER,
-    'currentUserType' => $userType,
-    'arePossibleUsers' => false,
-    'class' => 'bg-yellow-100 border-yellow-500 text-yellow-900 px-4 py-3 rounded-lg',
-])
+                                'title' => 'Klienci:',
+                                'isEmptyMsg' => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
+                                'users' => $chatCustomers,
+                                'userType' => MessagesHelper::TYPE_CUSTOMER,
+                                'currentUserType' => $userType,
+                                'arePossibleUsers' => false,
+                                'class' => 'bg-yellow-100 border-yellow-500 text-yellow-900 px-4 py-3 rounded-lg',
+                            ])
                             @include('chat/users', [
-                         'title' => 'Pracownicy firm:',
-                         'isEmptyMsg' => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
-                         'users' => $chatEmployees,
-                         'userType' => MessagesHelper::TYPE_EMPLOYEE,
-                         'currentUserType' => $userType,
-                         'arePossibleUsers' => false,
-                         'class' => 'bg-blue-100 border-blue-500 text-blue-900 px-4 py-3 rounded-lg',
-                     ])
+                                 'title' => 'Pracownicy firm:',
+                                 'isEmptyMsg' => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
+                                 'users' => $chatEmployees,
+                                 'userType' => MessagesHelper::TYPE_EMPLOYEE,
+                                 'currentUserType' => $userType,
+                                 'arePossibleUsers' => false,
+                                 'class' => 'bg-blue-100 border-blue-500 text-blue-900 px-4 py-3 rounded-lg',
+                             ])
 
                             @include('chat/users', [
                                 'title' => 'Konsultanci:',
