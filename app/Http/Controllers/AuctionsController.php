@@ -559,8 +559,8 @@ class AuctionsController extends Controller
             $item->net_selling_price_basic_unit = $offer?->basic_price_net ?? $product->net_selling_price_commercial_unit;
             $item->gross_selling_price_basic_unit = $offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_commercial_unit;
 
-            $item->net_purchase_price_basic_unit = $offer?->basic_price_net ?? $product->net_selling_price_commercial_unit / $product->numbers_of_basic_commercial_units_in_pack;
-            $item->net_purchase_price_commercial_unit = $offer?->basic_price_net ?? $product->net_selling_price_commercial_unit / $product->numbers_of_basic_commercial_units_in_pack;
+            $item->net_purchase_price_basic_unit = $offer?->basic_price_net ?? $product->net_selling_price_commercial_unit / $product->pagking->numbers_of_basic_commercial_units_in_pack;
+            $item->net_purchase_price_commercial_unit = $offer?->basic_price_net ?? $product->net_selling_price_commercial_unit / $product->pagking->numbers_of_basic_commercial_units_in_pack;
 
             $item->save();
 
