@@ -149,7 +149,15 @@
                         <div class="row">
                             <div class="col-sm-9">
                                 <textarea required class="form-control w-full max-w-lg min-w-xs h-32 px-3 py-2 mb-4" id="message" placeholder="Wpisz tu swoją wiadomość..."></textarea>
-                                <div class="flex">
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="submit" value="Wyślij wiadomość" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
+                                @if($userType === 'e')
+                                    <p class="mt-2 text-sm text-gray-600">Uwaga! Prosimy nie wysyłać faktury na chacie a przez przycisk "Podłącz fakture".</p>
+                                @endif
+                            </div>
+
+                            <div class="flex">
                                 @if($userType !== 'e')
                                     <div class="file-upload mb-4">
                                         <label for="attachment" class="btn btn-primary font-bold text-lg">
@@ -160,23 +168,16 @@
                                     </div>
                                 @endif
 
-                                    @if($userType === 'c')
-                                        <a class="btn btn-primary font-bold text-lg inline file-upload mb-4" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
-                                            Podłącz potwierdzenie przelewu
-                                        </a>
-                                    @endif
+                                @if($userType === 'c')
+                                    <a class="btn btn-primary font-bold text-lg inline file-upload mb-4" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
+                                        Podłącz potwierdzenie przelewu
+                                    </a>
+                                @endif
 
-                                    @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
-                                        <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary font-bold text-lg">
-                                            Podłącz fakture
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <input type="submit" value="Wyślij wiadomość" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
-                                @if($userType === 'e')
-                                    <p class="mt-2 text-sm text-gray-600">Uwaga! Prosimy nie wysyłać faktury na chacie a przez przycisk "Podłącz fakture".</p>
+                                @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
+                                    <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary font-bold text-lg">
+                                        Podłącz fakture
+                                    </a>
                                 @endif
                             </div>
                         </div>
