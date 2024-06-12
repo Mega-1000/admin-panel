@@ -161,13 +161,13 @@
                                 @endif
 
                                     @if($userType === 'c')
-                                        <a class="btn btn-primary mt-4" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
+                                        <a class="btn btn-primary font-bold text-lg" href="https://mega1000.pl/account?attachtransferconfirmation={{ $order->id }}" target="_blank">
                                             Podłącz potwierdzenie przelewu
                                         </a>
                                     @endif
 
                                     @if($userType === 'e' && $order->orderWarehouseNotifications->count() > 0)
-                                        <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary font-bold text-lg " style="float: left">
+                                        <a href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->orderWarehouseNotifications()->first()->id }}/1/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary font-bold text-lg">
                                             Podłącz fakture
                                         </a>
                                     @endif
