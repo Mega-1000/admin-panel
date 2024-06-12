@@ -103,7 +103,7 @@ class LocationHelper
         $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customer->addresses->first()->postal_code)->get()->first();
 
         $raw = DB::selectOne(
-            'SELECT w.id, w.name, w.address, w.city, w.state, w.postal_code, w.firm_id, pc.latitude, pc.longitude,
+            'SELECT w.id,
             1.609344 * SQRT(
                 POW(69.1 * (pc.latitude - :latitude), 2) +
                 POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
