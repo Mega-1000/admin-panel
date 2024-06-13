@@ -110,9 +110,9 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             if (empty($message) || $message === '<p>&nbsp;</p>') {
                 return;
             }
-            Mailer::create()
-                ->to($mail_to)
-                ->send(new OrderStatusChanged($subject, $message, $pdfPath));
+//            Mailer::create()
+//                ->to($mail_to)
+//                ->send(new OrderStatusChanged($subject, $message, $pdfPath));
         } catch (Exception $e) {
             Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
         }
