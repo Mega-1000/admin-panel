@@ -447,11 +447,12 @@ class ProductsController extends Controller
         $query = strtolower($query);
 
         return response()->json(
-            Product::select('*', DB::raw('MATCH(name) AGAINST(?) AS relevance', [$query]))
+            Product::select('*', DB::raw('MATCH(name) AGAINST(?) AS relevance'))
                 ->whereRaw('MATCH(name) AGAINST(? IN BOOLEAN MODE)', [$query])
                 ->with(['price', 'opinions'])
                 ->orderByDesc('relevance')
                 ->limit(5)
+                ->setBindings([$query, $query])
                 ->get()
                 ->each(function ($product) {
                     if ($product->opinions->isNotEmpty()) {
