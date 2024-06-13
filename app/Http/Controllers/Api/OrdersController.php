@@ -238,7 +238,7 @@ class OrdersController extends Controller
             } else {
                 $order->update(['status_id' => 3]);
             }
-            if (empty($order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->first())) {
+            if (!empty($order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->first())) {
                 dispatch_now(new OrderStatusChangedNotificationJob($order->id));
 
                 $order->orderOffer()->firstOrNew([
