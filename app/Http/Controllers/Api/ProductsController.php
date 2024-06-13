@@ -447,18 +447,17 @@ class ProductsController extends Controller
         $query = strtolower($query);
 
         return response()->json(
-            Product::select('*', DB::raw('MATCH(name) AGAINST(?) AS relevance'))
-                ->whereRaw('MATCH(name) AGAINST(? IN BOOLEAN MODE)', [$query])
-                ->with(['price', 'opinions'])
-                ->orderByDesc('relevance')
+            Product::where('name', 'like', '%' . $query .'%')
+                ->whereHas('children')
+                ->with(['price', 'opinions']) // Eager load 'price' and 'opinions' relationships
                 ->limit(5)
-                ->setBindings([$query, $query])
                 ->get()
                 ->each(function ($product) {
+                    // Ensure 'opinions' is not empty to avoid errors when calculating mean
                     if ($product->opinions->isNotEmpty()) {
-                        $product->meanOpinion = $product->opinions->avg('rating');
+                        $product->meanOpinion = $product->opinions->avg('rating'); // Use avg() instead of mean()
                     } else {
-                        $product->meanOpinion = null;
+                        $product->meanOpinion = null; // Set a default value if no opinions are available
                     }
                 })
         );
