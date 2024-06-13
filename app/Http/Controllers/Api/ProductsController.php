@@ -459,7 +459,7 @@ class ProductsController extends Controller
                     } else {
                         $product->meanOpinion = null;
                     }
-                })
+                });
         );
     }
 
