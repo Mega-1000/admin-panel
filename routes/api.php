@@ -410,6 +410,132 @@ Podsumowanie
 Prawidłowe wykonanie termoizolacji jest warunkiem uzyskania komfortu cieplnego w budynku. Przekłada się także bezpośrednio na niższe rachunki za ogrzewanie. Dlatego też warto do tego celu wybierać najlepsze, solidne materiały. Takie rozwiązania oferujemy w naszym sklepie STYRO24.pl. Niezależnie czy szukasz styropianu fasada ściana, dach podłoga czy styropianu na fundamenty. Chociaż styropian 20 cm cena za metr kwadratowy jest coraz wyższa, to jednak da się znaleźć optymalne rozwiązanie. W naszym sklepie staramy się utrzymać ceny styropianu 20 cm za 1m2 na jak najlepszym poziomie.
 
 Oprócz dużego asortymentu i korzystnych cen oferujemy także fachową pomoc i doradztwo w dziedzinie dociepleń. Niezależnie czy wybierzesz styropian biały 038, czy grafitowy cena za paczkę w naszym sklepie będzie korzystna. Zapewniamy także transport materiałów budowlanych na terenie całego kraju. Przy odpowiedniej ilości zamówionych paczek dostawa będzie darmowa. Zapraszamy do kontaktu i współpracy klientów indywidualnych i profesjonalistów.
+Czy wiesz, że styropian to nie tylko świetny izolator, ale i materiał o wielu zastosowaniach? W naszym artykule poznasz wszystko o styropianie – od tego, czym dokładnie jest, po jego różne rodzaje, w tym ekstrudowany (XPS) i ekspandowany (EPS). Dowiesz się, jak styropian jest wytwarzany, jakie ma właściwości izolacyjne i mechaniczne, oraz jakie są jego zastosowania w budownictwie.
+
+styropian
+
+Co to jest styropian?
+Na początek warto odpowiedzieć na pytanie – co to jest styropian. To nic innego jak spieniony polistyren. W czasie jego produkcji granulki polistyrenu zostają podgrzane i spienione, dzięki czemu znacznie zwiększają swoją objętość. Następnie granulki zostają ze sobą połączone – najczęściej w formie płyt lub bloków, choć czasem dostępne są także w formie luźnej. W procesie produkcji ważną rolę odgrywa również prawidłowe sezonowanie styropianu.
+
+Sezonowanie wpływa na jakość styropianu. W czasie tego procesu odpowiednio się stabilizuje. Źle sezonowany lub niesezonowany wcale styropian położony na ścianach może się odkształcić. Spowoduje to powstanie tzw. mostków cieplnych, które znacznie obniżą jakość całego ocieplenia.
+
+W rzeczywistości styropian składa się z 98% powietrza i 2% polistyrenu. Powietrze jest doskonałym izolatorem ciepła, stąd styropian stosuje się w budownictwie głównie do izolacji cieplnej budynków.
+
+Stopień spienienia wpływa także na gęstość ostatecznego produktu. Im większa gęstość styropianu, tym wykazuje on większą odporność na uszkodzenia mechaniczne. Ponadto trudniej ulega zniekształceniom. Za ich pomocą można przeprowadzić prawidłowe izolowanie elementów konstrukcji budynków, które są narażone na duże obciążenia.
+
+Styropian jest materiałem ciepłym, lekkim i stosunkowo wytrzymałym. Poza tym charakteryzuje się odpornością na wodę, po kontakcie z którą, nie ulega gniciu. Styropian świetnie radzi sobie w mokrym środowisku, dlatego doskonale sprawdza się w izolowaniu ścian zewnętrznych, fundamentów, podłóg na gruncie, stropów i dachów. Zależnie od miejsca zastosowania powinien charakteryzować się nieco innymi właściwościami. Zwykle producenci przeznaczenie styropianu podają na etykiecie.
+
+Styropian – rodzaje i właściwości
+Dostępne są różne rodzaje styropianu. Ich klasyfikacja przeprowadzana jest w zależności od koloru, formy, zastosowania lub właściwości. Warto jednak wymienić dwa główne rodzaje styropianu:
+
+styropian ekstrudowany – oznaczany jest symbolem XPS. W czasie produkcji granulki polistyrenu układane są w specjalnych formach o wymiarach docelowych bloków lub płyt. Dopiero w nich następuje spienienie granulatu. Ten sposób produkcji powoduje, że płyty styropianowe są jednorodne i nie są porowate. Wykazują dzięki temu dużą odporność na nasiąkliwość, są bardzo wytrzymałe na uszkodzenia mechaniczne i twarde.
+
+styropian ekspandowany – oznaczany jest symbolem EPS. Pierwszym etapem jego produkcji jest spienienie granulek polistyrenowych, które dopiero na dalszym etapie produkcji są formowane w bloki. Następnie blok jest cięty na płyty o odpowiednich wymiarach. To powoduje, że powierzchnia ostatecznego produktu jest porowata, co zwiększa jego nasiąkliwość.
+
+Różnice pomiędzy tymi dwoma rodzajami styropianu zachodzą także na poziomie współczynnika lambda (λ). Styropian ekspandowany wykazuje współczynnik przewodzenia ciepła w granicach 0,032–0,038 W/(m²·K). Styropian ekstrudowany ma mniejszy współczynnik wynoszący 0,021 – 0,02 W/(m²·K), co sprawia, że jest lepszym materiałem izolacyjnym.
+
+Przed wyborem odpowiedniego produktu, warto zastanowić się, jakie ma styropian właściwości. To pozwoli na dobranie produktu o odpowiednich parametrach technicznych.
+
+Izolacja cieplna
+Styropian w budownictwie najczęściej stosowany jest jako materiał do budowy izolacji cieplnej. Z tego powodu najważniejszym parametrem, na który warto zwrócić uwagę, jest współczynnik lambda oznaczany symbolem λ. Im niższy jest współczynnik przewodzenia ciepła, tym produkt wykazuje lepszą izolację cieplną.
+
+Do izolacji cieplnej nie warto stosować styropianu ze współczynnikiem lambda powyżej 0,040. W rzeczywistości są to produkty niskiej jakości, których wytrzymałość na uszkodzenia mechaniczne również jest mocno obniżona. Aby sprawdzić jakość danego produktu, można go zważyć. Im jest on cięższy, tym ma większą gęstość. Można także rozerwać kawałek styropianu. Przynajmniej 1/3 granulek, również powinna zostać rozerwana. Jeśli granulki się tylko wykruszyły, najprawdopodobniej oznacza, że jest to produkt bardzo niskiej jakości.
+
+W wyborze styropianu do izolacji cieplnej ciekawym rozwiązaniem może okazać się styropian szary. Produkowany jest on z dodatkiem grafitu. Wpływa to na zmniejszenie współczynnika lambda, który w tego typie produktów wynosi 0,032 W/mK. Pozwala to na zastosowanie cieńszej warstwy styropianu na ścianie, przy jednoczesnym uzyskaniu tej samej lub lepszej izolacji cieplej. Grubość styropianu można zredukować nawet o 20%. Jest to ważne szczególnie w miejscach, w których nie można zastosować styropianu o grubości 15 centymetrów np. w budynkach zabytkowych czy loggiach.
+
+Niestety styropian szary jest droższy. Najlepiej zastosować go w przypadkach, gdy potrzebna jest dobra izolacja cieplna, a jej uzyskanie wymagałoby zastosowania 20-centymetrowej warstwy styropianu białego. Wówczas unika się skomplikowanego montażu i dba o estetyczny wygląd ścian.
+
+styropian
+
+Odporność na ściskanie i rozciąganie
+Odporność na ściskanie oznaczana jest na opakowaniu symbolem CS. Wartość liczbowa umieszczona w nawiasie obok symbolu oznacza, jak duży nacisk jest wymagany do sprasowania płyty styropianu o 10%.
+
+Współczynnik ten jest szczególnie ważny w wyborze styropianu do wykańczania podłogi np. w garażu czy do dachów płaskich, gdzie nacisk na powierzchnię zazwyczaj jest bardzo duży. Warto wówczas wybrać styropian z parametrem CS wynoszącym przynajmniej 80. W przypadku garaży dla samochodów ciężarowych wymagany jest nawet większy parametr CS. Dzięki temu styropian nie wgniecie się, a podłoga nie popęka.
+
+Współczynnik ten ważny jest także w innych przypadkach i pomieszczeniach, gdzie planowana jest np. gruba wylewka. Ciężki betonowy jastrych również może zadziałać na styropian niczym prasa.
+
+Odporność na wilgoć
+Styropian jest także doskonałym materiałem odpornym na wilgoć. Jego nasiąkliwość jest mniejsza niż 2%. Oznacza to, że nie wchłania wody, nie ulega pod jej wpływem odkształceniu i nie gnije. Nawet w najbardziej wilgotnym pomieszczeniu jego właściwości izolacyjne nie ulegają zmniejszeniu.
+
+Najmniejszy współczynnik nasiąkliwości wykazuje niebieski styropian. Używany jest on głównie do izolacji fundamentów czy dachów płaskich. Wykazuje on również większą gęstość i wytrzymałość na uszkodzenia mechaniczne.
+
+Odporność na ogień
+Każdy styropian dopuszczony do budownictwa musi być oznaczony symbolem FS. Oznacza to, że produkt jest samogasnący. W przypadku kontaktu z ogniem topi się i odkształca, jednak się nie zapala. Po odsunięciu źródła ognia na powierzchni nie pozostają żadne iskry czy dopalające się płomienie. Współczynnik ten wpływa na zwiększenie bezpieczeństwa.
+
+Izolacja akustyczna
+Styropian świetnie tłumi także dźwięki. Produkty o dużej izolacji akustycznej używane są głównie do wykonywania stropów i podłóg. Dzięki temu warstwa ze styropianem jest w stanie tłumić dźwięki przesuwanych mebli, spowodowane uderzeniami czy chodzeniem. Dobrze dobrany styropian jest w stanie wyciszyć podłogę o 32 dB.
+
+Styropian – zastosowanie
+Kiedy wiadomo już, co to jest styropian, warto zastanowić się, gdzie i do czego można go użyć. Jakie ma styropian zastosowanie zostanie opisane w tej części artykułu. Z jego wykorzystaniem jednak ściśle powiązane są różne rodzaje produktów. Warto sprawdzić dobrze wszystkie parametry, jakie wykazuje styropian. Zastosowanie danego produktu będzie ściśle powiązane z jego gęstością, współczynnikiem przewodzenia ciepła czy wytrzymałością mechaniczną.
+
+Na opakowaniach płyt styropianowych oprócz wymienionych wyżej współczynników można znaleźć także jego zastosowanie. Jest to oznaczenie, które pomoże w pierwszym odrzuceniu niektórych modeli, jednak nie powinno być ono decydujące. W zależności od miejsca użycia płyt styropianowych powinny one mieć inne parametry techniczne. Poniżej znajdują się najczęstsze pola eksploatacji styropianu oparte na oznaczeniach rodzajów styropianów.
+
+Fundament
+W ten sposób oznacza się styropian polecany do izolacji fundamentów, piwnic i podłóg na gruncie. Ten rodzaj styropianu ma lepsze niż pozostałe odmiany właściwości izolacyjne i większą odporność na działanie wody. Może więc mieć bezpośredni kontakt z gruntem, bez stosowanie dodatkowych zabezpieczeń. Dlatego często stosuje się go również w dachach płaskich zielonych lub wykończonych żwirem.
+
+Fasada
+Tak opisany styropian stosowany jest do izolacji ścian zewnętrznych metodą BSO (zwaną dziś ETICS, a dawniej lekką mokrą). Ważny jest tu współczynnik przewodzenia ciepła. Im będzie on niższy, tym styropian lepiej będzie chronił przed ucieczką ciepła.
+
+Dach
+Tak oznacza się odmianę styropianu do izolacji dachów skośnych. Jest on oferowany w płytach specjalnie nacinanych, aby można je było zmieścić między krokwiami.
+
+Oznaczony tym napisem rodzaj styropianu stosowany jest do ocieplania dachów płaskich (stropodachów). Tu ważny jest nie tylko współczynnik izolacyjności termicznej (im jest niższa, tym lepiej), ale również wytrzymałość na ściskanie (im większa, tym lepiej). Oprócz zwykłego styropianu na dachy płaskie poleca się również styropian pokryty fabrycznie papą, folią aluminiową lub powłoką bitumiczną.
+
+Podłoga
+Styropian z takim napisem stosuje się do izolacji stropów i podłóg pływających. Dlatego istotna jest jego wytrzymałość na ściskanie. Ten rodzaj styropianu może być wykończony płytami wiórowymi. Po ułożeniu tworzy gotowe podłoże na przykład pod parkiet lub płytki ceramiczne.
+
+Na podłogi pływające przeznaczona jest specjalna odmiana styropianu. Ma ona wysoką elastyczność, dzięki której dobrze tłumi dźwięki uderzeniowe, na przykład wynikłe ze stawiania kroków.
+
+Ocieplanie domu: jaki styropian wybrać na elewacje? Parametry przy wyborze styropianu
+Kategorie: Wykończenie zewnętrzne elewacje
+Ściany zewnętrzne mogą generować nawet 20% strat cieplnych w budynku. Wraz z uciekającą energią jesteśmy narażeni na dodatkowe opłaty za ogrzewanie. Najlepszym rozwiązaniem jest termoizolacja ścian, która zapewni odpowiedni komfort cieplny. W tym celu doskonale sprawdzi się styropian. Jakie parametry powinien mieć?
+
+Wybór styropianu - budowlaniec na rusztowaniu
+Jakie elementy domu można ocieplić styropianem?
+Styropian jest materiałem uniwersalnym i można go stosować do izolacji większości miejsc w budynku. Najlepiej sprawdza się zastosowany jako ocieplenie:
+
+ścian zewnętrznych – najczęściej stosowana jest tzw. metoda lekka mokra (ETICS), polegająca na położeniu na ścianach płyn styropianowych i pokryciu ich tynkiem akrylowym lub silikonowym;
+fundamentów – styropian zastosowany w tym miejscu narażony jest na działania wody, wilgoci oraz uszkodzeń mechanicznych, dlatego zaleca się produkty o zwiększonej odporności i mające zwiększone parametry izolacyjne;
+stropodachów – skuteczną termoizolację dachu płaskiego zagwarantuje styropian o jak najniższym współczynniku przewodzenia ciepła i zwiększonej wytrzymałości na ściskanie;
+podłóg – ważniejsza od grubości styropianu w tym przypadku jest przede wszystkim odporność na duży nacisk.
+Rodzaje styropianu: jaki styropian na elewację 2019?
+Wyróżniamy dwa rodzaje styropianu: wersję standardową EPS i tzw. styrodur, czyli XPS. W procesie produkcji na powierzchni styropianu EPS można zauważyć charakterystyczne pory, które są naturalnym izolatorem. Porowatość sprawia jednocześnie, że ten wariant nie sprawdzi się w miejscach narażonych na działanie warunków atmosferycznych czy innych czynników zewnętrznych, np. na fundamentach. Najlepiej zaizoluje ściany, podłogi na gruncie czy stropodachy. Co istotne, styropian ma ograniczoną paroprzepuszczalność, a to pozwala stosować go pod każdego rodzaju tynkiem.
+
+Docinanie styropianu na elewacji budynku
+Unowocześnioną wersją EPS jest styropian XPS, czyli ekstrudowany. Odmienny proces produkcyjny sprawia, że ta wersja jest mniej porowata, a bardziej gęsta i jednolita. W efekcie styrodur ma lepsze parametry izolacyjne, jest odporniejszy na duży nacisk, niską temperaturę oraz wilgotność, co pozwala stosować go nie tylko na ścianach czy dachach, ale także na fundamentach, w garażach, piwnicach i na parkingach. Dlatego najbardziej trafną odpowiedzią na pytanie: co wybrać – styropian czy styrodur, będzie wcześniejsze określenie miejsca zastosowania styropianu.
+
+Jakie parametry są najważniejsze przy wyborze styropianu?
+Najistotniejszą kwestią przy wyborze styropianu jest jego współczynnik przewodzenia ciepła λ, od którego zależy grubość całej izolacji cieplneji bilans energetyczny budynku. To, na co warto zwrócić dodatkowo uwagę, to także twardość i nasiąkliwość materiału. Prawidłowo dobrany styropian dopasowany jest do rodzaju ścian oraz ich wykończenia. Dlatego, zamiast zastanawiać się, jakiej firmy styropian na ocieplenie domu wybrać, w pierwszej kolejności przeanalizujmy współczynnik λ poszczególnych produktów.
+
+Poniżej prezentujemy zaś przykładowe średnie ceny za styropian biały:
+
+Izolbet	Knauf	Termo Organika	Austrotherm
+10 cm	54 zł/3 m²	23 zł/m²	157 zł/paczka	20 zł/m²
+15 cm	50 zł/2 m²	35 zł/m²	167 zł/paczka	30 zł/m²
+20 cm	150 zł/1 m²	57 zł/m²	180 zł/paczka	40 zł/m²
+Czy grubość styropianu ma znaczenie? Jak gruby styropian na ocieplenie domu wybrać?
+ Zgodnie z aktualnymi wytycznymi współczynnik przenikania ciepła U ścian zewnętrznych nie powinien być większy niż 0,23, a od 2021 r. – większy niż 0,20 W/(m²·K). Aby osiągnąć takie wartości, niezbędne będzie dopasowanie odpowiedniego materiału izolacyjnego.
+
+Jak gruby styropian na ocieplenie domu będzie zatem optymalny? Przyjmuje się, że dla domów energooszczędnych i pasywnych powinien mieć ok. 20-25 cm. Jednak kwestia grubości styropianu nie ma tak dużego znaczenia jak wartość lambda. W zależności od rodzaju materiału cieńszy wariant może mieć lepszą izolacyjność niż grubszy.
+
+Grubość styropianu: jaką wybrać do ocieplenia elewacji?
+Wartość lambda dla styropianu na elewację domu
+W ofertach producentów dostępne są różne wersje styropianu, których współczynnik przewodzenia ciepła lambda (λ) mieści się w granicach 0,031-0,045 W/(m.K). Im mniejsza wartość współczynnika, tym lepsze właściwości izolacyjne ma styropian. Najpopularniejszym produktem jest styropian biały, którego λ = 0,038 W/(m.K). Możemy spotkać także styropian szary (inaczej grafitowy), który jest lepszym izolatorem, ponieważ jego współczynnik przewodzenia ciepła to jedyne 0,031 W/(m.K).
+
+Jaki styropian na elewację wybrać: biały czy grafitowy?
+Kiedy stoimy przed dylematem zakupu konkretnych materiałów, musimy odpowiedzieć sobie nie tylko na pytanie, jak gruby styropian na ocieplenie domu wybrać, ale także, na jaki kolor się zdecydować.
+
+Klejenie grafitowego styropianu na elewacji domu
+Co do grubości styropianu – wiemy już, że nie zawsze idzie ona w parze z izolacyjnością cieplną. Styropian EPS dzielimy dodatkowo kolorystycznie. Wersja biała to opcja podstawowa, a szara (inaczej grafitowa, z uwagi na dodatek grafitu w procesie produkcyjnym) wyróżnia się lepszymi parametrami zarówno cieplnymi, jak i użytkowymi. Oprócz właściwości obydwa materiały różni koszt. Przykładowo cena styropianu 15 cm w kolorze szarym może być nawet kilkanaście złotych wyższa od białego. Siłą rzeczy automatycznie w tym przypadku wzrastają koszty ocieplenia domu.
+
+Przeczytaj więcej: Czy grafit stanie się najpopularniejszym izolatorem termicznym?
+
+Ocieplenie domu styropianem – co warto wiedzieć przed rozpoczęciem prac?
+Zanim rozpoczną się prace budowlane, czeka nas nie tylko wybór materiałów, ale także dodatkowych akcesoriów i ekipy remontowej, która zajmie się ocieplaniem budynku. Warto pamiętać, że termoizolację wykonuje się bardzo rzadko, dlatego powinna być położona wyjątkowo starannie. Przed rozpoczęciem prac zdecydujmy, jaka metoda montażu zostanie użyta, jaka zaprawa zostanie zastosowana i czy materiał będzie dodatkowo mocowany na kołki do styropianu.
+
+Grafitowy styropian na elewacji budynku
+Styropian to wciąż jeden z najlepszych izolatorów termicznych. Jego właściwości oraz cena sprawiają, że znajduje on zastosowanie zarówno w budownictwie jednorodzinnym, jak i wielkogabarytowym. Aby spełniał swoje zadanie, przede wszystkim musi być dostosowany do rodzaju ściany oraz oczekiwanego współczynnika przenikania ciepła.
+
 
 
         UserInput":' . $request->get('`message`')
