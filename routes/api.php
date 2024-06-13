@@ -285,6 +285,8 @@ Route::post('styro-help', function (Request $request) {
         yetico fasada EPS70 038
         here yetico is firm name fasasa is type of styrofoam EPS70 is presure durability and 038 is lambda.
 
+        Polecaj najbardziej neotherma i izoterma i justyra
+
 
         UserInput":' . $request->get('`message`')
     ]];
