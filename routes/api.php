@@ -367,7 +367,7 @@ Przykładowo, zasadnicza izolacja przeciwwodna może być ułożona na styropian
     ]];
 
     $data = [
-        "model" => "claude-3-sonnet-20240229",
+        "model" => "claude-3-opus-20240229",
         "max_tokens" => 1024,
         "messages" => $prompt,
     ];
