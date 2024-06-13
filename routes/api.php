@@ -287,12 +287,87 @@ Route::post('styro-help', function (Request $request) {
 
         Polecaj najbardziej neotherma i izoterma i justyra
 
+        Styropian pełni przede wszystkim rolę izolacji cieplnej, dlatego jego zasadniczym parametrem jest przewodność cieplna, oznaczana jako lambda (λ). Im jest ona niższa, tym lepiej. Dla białego styropianu λ wynosi ok. 0,040 W/(m·K). Dla szarego jest zaś niższa, nawet 0,030. Do osiągnięcia takiego samego poziomu izolacyjności wystarcza więc cieńsza warstwa. Wbrew pozorom różnica jest istotna. To wybór pomiędzy np. 15 i 20 cm warstwą ocieplenia.
+
+Uwaga! Nie można mylić U oraz λ. Gotową przegrodę - o konkretnej grubości poszczególnych warstw - opisuje współczynnik przenikania ciepła U. Jego jednostką jest W/(m2·K). Dla ścian maksimum to 0,23 W/(m2·K). Jednak już od przyszłego roku będzie to 0,20.
+
+Ocieplenie ścian styropianem
+Styropian na ścianach trafia przede wszystkim pod tynk cienkowarstwowy. Używa się wówczas tzw. styropianu fasadowego. Poza izolacyjnością cieplną musi go charakteryzować odpowiednio duża odporność na rozrywanie, a mówiąc formalnie - wytrzymałość na rozciąganie prostopadłe do powierzchni czołowej. To parametr określany skrótem TR, w przeciwieństwie do wartości lambda, raczej mało eksponowany. Chociaż znajdziemy go na etykiecie każdego styropianu przeznaczonego na fasady. Jest częścią umieszczonego na nich długiego kodu, np. jako TR100.
+
+Wartości TR100 lub TR80 wymagają producenci tzw. systemów ociepleń czyli tynków cienkowarstwowych i sprzedawanych razem z nimi klejów, gruntów itd. Jeżeli będzie on niższy, styropian nie tylko może okazać się faktycznie zbyt słaby. Ponadto możemy utracić gwarancję producenta systemu ociepleń. TR to parametr wytrzymałościowy, więc wyższa wartość jest jak najbardziej korzystna. Ponadto pozwala się spodziewać, że płyty będą miały również lepszą spoistość, gęstość oraz wytrzymałość na ściskanie. Jednak ten ostatni parametr, określany skrótem CS(10), nie jest wymagany w przypadku styropianu fasadowego i większość producentów nie deklaruje jego konkretnej wartości.
+
+Jednak sam fakt, nazwania styropianu przez producenta mianem "Fasada/Ściana" lub podobnie, to za mało. Bo tak naprawdę nie musi oznaczać żadnych konkretnych cech. Zwracajmy więc uwagę na wartości TR oraz λ. Przypomnijmy, że niższa lambda oznacza lepszą izolacyjność przy tej samej grubości warstwy ocieplenia. Ma to szczególne znaczenie w domach energooszczędnych. Tam chcemy przecież uzyskać ponadstandardową ochronę przed ucieczką ciepła.
+
+Drugą grupą, gdzie grubość ocieplenia okazuje się kluczowa, są budynki poddawane termomodernizacji. W nich już mury bez izolacji mają często 40 cm lub więcej. Tu gruba izolacja może dawać wręcz karykaturalny efekt. Szczególnie w połączeniu z typowymi dla nich niezbyt dużymi oknami. W bardzo pogrubionych murach zaczynają wyglądać niczym otwory strzelnicze.
+
+Wady szarego styropianu do ocieplania ścian
+Stąd rosnąca popularność szarego styropianu. Ma on jednak dwie istotne wady. Po pierwsze, jest droższy od białego. Na szczęście jednak różnica jest znacznie mniejsza niż dawnej, gdy był nowością.
+
+Po drugie, szary styropian jest wrażliwy na bezpośrednie działanie słońca. I koniecznie trzeba go przed nim chronić, nawet gdy temperatura powietrza jest niska. Po prostu na słońcu ciemne płyty mogą się rozgrzać bardzo szybko. Temperatura ich powierzchni przekracza wtedy nawet 100°C. To grozi już stopieniem materiału. Jednak i znacznie mniej nagrzane, a następnie stygnące, po prostu się odkształcają.
+
+Efektem jest niejednokrotnie częściowe lub całkowite oderwanie się świeżo przyklejonych płyt od fasady. Paradoksalnie, już lepiej, gdy całkiem odpadną. To zmusi wykonawcę do wykonania ocieplenia od nowa. Zaś takie odkształcone i częściowo odspojone spróbuje on jednak wyrównać i pokryć tynkiem. A płyty odspoją się całkiem za kilka lat.
+
+Szare płyty styropianowe odspoiły się od ściany pod wpływem nasłonecznienia
+
+Bez zabezpieczenia przed nasłonecznieniem szare płyty styropianowe mogą odspoić się od ściany. Wówczas ocieplenie trzeba wykonać od nowa. (fot. Swisspor)
+Dlatego każdy producent szarego styropianu zaleca żeby ocieplane elewacje były osłonięte siatką rozpiętą na rusztowaniach lub skutecznie zacienione w inny sposób. Metoda jest teoretycznie dobra, ale w praktyce trudna do zrealizowania. Zaś na małych budowach siatki zacieniające to absolutna rzadkość.
+
+Z tego też względu niektórzy producenci wprowadzili szare płyty z cienką białą warstwą zewnętrzną. Odbija ona większość promieniowania słonecznego, zapobiegając w ten sposób przegrzaniu styropianu.
+
+Płyty szarego styropianu z białą warstwą zewnętrzną
+
+Zastosowanie płyt z białą warstwą zewnętrzną pozwala zachować bardzo dobrą izolacyjność szarego styropianu, równocześnie minimalizując ryzyko jego przegrzania i odspojenia w wyniku działania słońca. (fot. Swisspor)
+Oczywiście, warstwy muszą być trwale zespolone, a zewnętrza na tyle gruba, żeby przyklejony styropian dało się przeszlifować. Dodatkowo płyty mogą mieć jeszcze siatkę nacięć kompensujących powstające naprężenia oraz ryflowaną spodnią (szarą) powierzchnię. Chodzi o to żeby zwiększyć efektywną powierzchnię klejenia, bo szary styropian daje nieco gorszą przyczepność dla kleju niż biały.
+
+
+
+To klej jest głównym elementem mocującym ocieplenie na ścianach. Zobacz wykonanie izolacji przy użyciu styropianu grafitowego GALAXY fasada firmy Termo Ogranika.
+Ocieplanie ścian fundamentowych styropianem
+Ściany fundamentowe to bardzo specyficzne miejsce. Ułożona tam izolacja jest praktycznie ciągle narażona na kontakt z wilgocią pochodzącą z gruntu, a okresowo może na nią działać nawet napór wody gruntowej. Wykonuje się na niej rozmaite izolacje przeciwwilgociowe i przeciwwodne, ale te w praktyce nader często okazują się niedoskonałe. Najlepszym przykładem są notorycznie zawilgocone i zalewane niemal każdej wiosny piwnice.
+
+Jednak i właściciele domów niepodpiwniczonych nie powinni myśleć, że ich problem nie dotyczy. Wręcz przeciwnie, bo w domach bez piwnicy zwykle izolacji przeciwwilgociowej na styropianie nie ma wcale. Za taką bowiem nie sposób uznać popularnej folii kubełkowej. Faktycznie pełni ona raczej funkcję osłony styropianu fundamentowego przed uszkodzeniami na czas zasypywania wykopów i zagęszczania w nich gruntu. Zabezpiecza również przed korzeniami roślin.
+
+Dlatego najważniejszą cechą styropianu fundamentowego jest odporność na zawilgocenie i to przy długotrwałym kontakcie z wodą i wilgocią gruntową. Zawilgocony traci bowiem swoje ciepłochronne właściwości. Styropian fasadowy zupełnie się tu nie nadaje. Dlatego opracowano rozmaite odmiany "Hydro" o obniżonej nasiąkliwości, przeznaczone specjalnie na fundamenty. Cechuje je przy tym większa wytrzymałość mechaniczna, szczególnie odporność na ściskanie - CS(10) nawet ok. 150.
+
+To cecha również przydatna, ale wynikająca przede wszystkim z większej gęstości i spoistości takich płyt. Bo tak naprawdę bardzo wysoka wytrzymałość nie jest tu koniecznie potrzebna. Dlatego zwykle przesadą jest stosowanie na ściany fundamentowe polistyrenu ekstrudowanego (XPS). To materiał o bardzo niskiej nasiąkliwości, dużej wytrzymałości i bardzo dobrej izolacyjności cieplnej. Jednak drogi, a jego cech w pełni i tak nie wykorzystamy. Dobrej jakości styropian fundamentowy jest bowiem wystarczający nawet w domach podpiwniczonych.
+
+Ocieplanie fundamentów styropianem Hydro
+
+Na fundamenty stosuje się specjalne odmiany Hydro o obniżonej nasiąkliwości. (fot. Knauf Therm)
+Ocieplanie styropianem podłóg na gruncie
+Gdy podłoga znajduje się na gruncie konieczna jest dobra izolacja cieplna. Ponadto użyty materiał musi cechować wysoka odporność na ściskanie. Bowiem zostanie obciążony wylewką podłogową (jastrychem), ustawionymi sprzętami itd. Zaś 1 m2 samego jastrychu o grubości zaledwie 5 cm to już ponad 100 kg. Dlatego w przypadku styropianów typu Dach/Podłoga podstawą jest wysoka wartość parametru CS(10), czyli wytrzymałość na ściskanie przy 10% odkształceniu względnym.
+
+Mówiąc prostym językiem, to obciążenie powodujące sprasowanie płyty o 1/10 jej pierwotnej grubości, np. z 10 do 9 cm. W praktyce styropian nie jest obciążany aż tak bardzo. To jedynie laboratoryjny test jego wytrzymałości. Do podłóg na gruncie używa się styropianu o CS(10)100, ewentualnie CS(10)80. Ten parametr także jest częścią długiego kodu umieszczonego na etykiecie. A w przypadku styropianów podłogowych producent zawsze deklaruje jakąś jego wartość. Wyższa odporność na ściskanie jest sygnałem, że styropian ma wysoką jakość.
+
+Nawet podłogowe styropiany białe mają przy tym dość niską lambdę poniżej 0,040. Wynika to po prostu z faktu, że styropian o wysokiej wytrzymałości na ściskanie musi mieć dużą gęstość, a to z kolei przekłada się automatycznie na poprawę izolacyjności cieplnej. Jednak nie można pod tym względem porównywać styropianów białych i szarych. Lepszy izolacyjnie styropian szary, wcale nie musi być bardziej wytrzymały od białego.
+
+Kiedy lepiej zastosować styropian szary niż biały? Z całą pewnością zawsze, gdy dysponujemy ograniczoną przestrzenią. Może to być docieplany stary budynek lub nowy, w którym wykonano już podbudowę pod podłogę i wylano już warstwę tzw. chudego betonu. Na podniesienie ostatecznego poziomu podłogi nie możemy więc sobie pozwolić. Inaczej natomiast jest, gdy podłogę na gruncie dopiero trzeba zrobić. Wówczas i tak musimy czymś wypełnić nawet kilkadziesiąt cm pomiędzy poziomem gruntu rodzimego, a docelowym poziomem podłogi. Wtedy fakt, że styropian będzie miał 20 zamiast 15 cm nie jest żadnym problemem.
+
+Warto dodać, że w praktyce styropianu podłogowego nie musi za to charakteryzować szczególna odporność na zawilgocenie. Przynajmniej w sytuacji, gdy leżącą pod nim izolację przeciwwilgociową wykonano prawidłowo. Jednak najczęściej i tak ma on tę cechę, bo jest sprzedawany jako wyrób przeznaczony również do izolacji dachów płaskich (Dach/Podłoga).
+
+Etykieta styropianu odmiany Dach/Podłoga
+
+Styropian odmiany Dach/Podłoga musi wykazywać duża odporność na ściskanie. Tu CS(10) wynosi 100, a lambda jest wyjątkowo niska - zaledwie 0,030 W/(m·K). (fot. Swisspor)
+Czasem bywa za to uzasadnione użycie XPS do izolacji podłóg. Przede wszystkim chodzi o modernizowane budynki, w których miejsca na izolację jest bardzo mało. Wówczas przydaje się bardzo niski współczynnik λ tego materiału. Ponadto możliwa jest nawet konstrukcja podłogi bez warstwy chudego betonu. Płyty układamy na dobrze zagęszczonej warstwie podbudowy oraz izolacji przeciwwilgociowej, zyskując w ten sposób kilka centymetrów.
+
+Zupełnie inne funkcje pełni izolacja ze styropianu w podłodze na stropie. O ile nie jest to skrajna kondygnacja, czyli piwnica lub nieogrzewany strych to nie ma specjalnego znaczenia izolacyjność cieplna. Grubość izolacji może być niewielka, ani lambdą nie ma co się przejmować. Tu używamy specjalnego styropianu, tzw. akustycznego (EPS T), który jest swoistą dźwiękochłonną przekładką pomiędzy konstrukcją stropu i wylewką. Jest on elastyczny i miękki. Do innych zastosowań nie bardzo się nadaje.
+
+Etykieta styropianu EPS T używanego w konstrukcji podłóg na stropach
+
+Od styropianu EPS T używanego w konstrukcji podłóg na stropach wymagamy dobrych właściwości akustycznych, a nie cieplnych, stąd wysoka wartość λ (0,044). (fot. Swisspor)
+Ocieplanie dachu płaskiego styropianem
+Dach płaski to wyzwanie dla wszystkich materiałów izolacyjnych. Działa na niego intensywne promieniowanie słoneczne, mróz, deszcz, a zalegający śnieg potrafi topnieć naprawdę długo. Do tego na taki dach niejednokrotnie ktoś wchodzi - choćby po to żeby zrzucić wspomniany wcześniej śnieg. Warunki są więc ciężkie i zmienne, obciążenia duże, a ryzyko długiego kontaktu z wilgocią całkiem realne.
+
+Na dachach płaskich używa się wytrzymałych mechanicznie i odpornych na wilgoć odmian styropianu typu Dach/Podłoga, czasem polistyrenu ekstrudowanego XPS. W tym przypadku trzeba zwracać szczególną uwagę na parametry materiałów przewidzianych w projekcie. Dachy płaskie to bowiem w istocie dość istotnie różniące się konstrukcje.
+
+Przykładowo, zasadnicza izolacja przeciwwodna może być ułożona na styropianie, lub przeciwnie - pod nim, jeśli będzie to tzw. dach odwrócony. Albo może to być tzw. dach zielony, na którym rosną rośliny. Wówczas trzeba się liczyć z dodatkowym dużym obciążeniem (stale nawet powyżej 250 kg/m2) oraz wilgocią, celowo stale utrzymywaną w warstwach znajdujących się powyżej izola
+
 
         UserInput":' . $request->get('`message`')
     ]];
 
     $data = [
-        "model" => "claude-3-opus-20240229",
+        "model" => "claude-3-sonnet-20240229",
         "max_tokens" => 1024,
         "messages" => $prompt,
     ];
