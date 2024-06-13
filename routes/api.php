@@ -416,7 +416,7 @@ Oprócz dużego asortymentu i korzystnych cen oferujemy także fachową pomoc i 
     ]];
 
     $data = [
-        "model" => "claude-3-opus-20240229",
+        "model" => "claude-3-haiku-20240229",
         "max_tokens" => 1024,
         "messages" => $prompt,
     ];
