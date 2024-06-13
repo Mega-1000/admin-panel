@@ -237,13 +237,13 @@ Route::post('styro-help', function (Request $request) {
         W tekscie wklejonym są wszystkie produkty które oferujemy Jesteś częścią systemu laravel która ma na celu pomóc użytkowniką zamówić styropian i tylko styropian w naszym systemie dostaniesz pierwszą prośbę od użytkownika np { message: "Chce kupić eps 100" } Jeśli są dodatkowe informacje które potrzevujesz od użytkownika odpowiedz w formie formularza html z nazwami które będziesz pamiętał i potem wynik formularza zostanie ci przekazany np { form: "HTML" } po wszystkich częściach formularza musisz wypluć odpowiedz Z wszystkimi produktami które możesz polecić w tym przypadku Potrzebujemy tylko nazwe produktu wybraną z jednych powyżej i ilość m3 którą powinieneś obliczyć
 
 
-        Użytkownik napisał { message: "'. $request->get('message') .'" }
-        wartość formularza: ' . $request->get('formData')  .'
 
-         Bez żadnego non sensu z długością i szerokością płyt
-Zawsze proś użytkownika o grubość i powieszchnie i ewentualne inne istotne kwestie zawsze dodaj przycisk do submitu w formularzu
-            '
+This are styrofoams witch we have in offer. You are part of my laravel program witch sugest customer wtch styrofoam to buy For example userinut: "Szukam taniego styropianu podłogowego" Response: { "message": "Dzień sobry, znalazłem takie produkty na podłogę dla ciebie!", "products": [//products] }
+You have to provide response only in json otherwise you will break system
 
+Always provide all of nescesary product witch you think will be adekwatne
+
+UserInput:' . $request->get('message')
     ]];
 
     $data = [
