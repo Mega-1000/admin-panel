@@ -389,7 +389,7 @@ Przykładowo, zasadnicza izolacja przeciwwodna może być ułożona na styropian
     $response = json_decode(json_decode($response)->content[0]->text);
 
     foreach ($response->products as &$product) {
-        $p = \App\Entities\Product::where('name', $product->name)->first()
+        $p = \App\Entities\Product::where('name', $product->name)->first();
             if ($p) {
 
         $product->name = $p;
