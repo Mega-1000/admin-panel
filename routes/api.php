@@ -277,7 +277,7 @@ Route::post('styro-help', function (Request $request) {
   tyron - standardowy styropian przeważnie w przeciętnej cenie
 
         This are styrofoams witch we have in offer. You are part of my laravel program witch sugest customer wtch styrofoam to buy For example userinut: "Szukam taniego styropianu podłogowego" Response: { "message": "Dzień sobry, znalazłem takie produkty na podłogę dla ciebie!", "products": [{name: "tyron fasada EPS70 038",descripion:"tyron fasada EPS70 038 to średniej jakości styropian ale w bardzo dobrej cenie!"  }] }
-        You have to provide response only in json and in this format otherwise you will break system!
+        You have to provide response only in json and in this format otherwise you will break system! Do not add any letters then json do not add also marking that this is json
 
         Always provide all of nescesary product witch you think will be ok
 
@@ -308,7 +308,6 @@ Route::post('styro-help', function (Request $request) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
     $response = curl_exec($ch);
-    return $response;
 
     $response = json_decode(json_decode($response)->content[0]->text);
     foreach ($response->products as &$product) {
