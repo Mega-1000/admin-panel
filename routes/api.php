@@ -290,7 +290,7 @@ Route::post('styro-help', function (Request $request) {
     ]];
 
     $data = [
-        "model" => "claude-3-opus-20240229",
+        "model" => "claude-3-sonnet-20240229",
         "max_tokens" => 1024,
         "messages" => $prompt,
     ];
