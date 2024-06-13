@@ -308,6 +308,7 @@ Route::post('styro-help', function (Request $request) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
     $response = curl_exec($ch);
+    return $response;
 
     $response = json_decode(json_decode($response)->content[0]->text);
     foreach ($response->products as &$product) {
