@@ -267,7 +267,7 @@ Route::post('styro-help', function (Request $request) {
 
     $response = curl_exec($ch);
 
-    $response = json_decode($response)->content[0]->text;
+    $response = json_decode(json_decode($response)->content[0]->text);
     foreach ($response->products as &$product) {
         $product = \App\Entities\Product::where('name', $product)->first();
     }
