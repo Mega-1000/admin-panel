@@ -46,7 +46,7 @@ class NewStyroOfferMade extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'email.new-styro-offer',
+            view: 'emails.new-styro-offer',
         );
     }
 
