@@ -362,6 +362,55 @@ Na dachach płaskich używa się wytrzymałych mechanicznie i odpornych na wilgo
 
 Przykładowo, zasadnicza izolacja przeciwwodna może być ułożona na styropianie, lub przeciwnie - pod nim, jeśli będzie to tzw. dach odwrócony. Albo może to być tzw. dach zielony, na którym rosną rośliny. Wówczas trzeba się liczyć z dodatkowym dużym obciążeniem (stale nawet powyżej 250 kg/m2) oraz wilgocią, celowo stale utrzymywaną w warstwach znajdujących się powyżej izola
 
+Jeszcze niedawno ten rodzaj styropianu był uważany za produkt luksusowy. Dzisiaj grubość styropianu 20 cm jest już standardem. Przyczyną takiego stanu rzeczy są coraz bardziej rygorystyczne normy dotyczące ociepleń w budownictwie. Jeżeli zastosujemy styropian elewacyjny 20 cm, to możemy być spokojni o komfort cieplny w budynku. Natomiast użycie styropianu grafitowego 20 cm pozwala uzyskać efekt domu pasywnego. Wszyscy chwalą styropian o grubości 20 cm, ale czy jest on  zawsze idealnym rozwiązaniem?
+
+Styropian elewacyjny 20 cm- ocieplenie na miarę XXI wieku
+Dzisiejsze normy w zakresie budownictwa są ściśle podporządkowane ekologii. Bardzo duży nacisk kładzie się na energooszczędność budynków. Dotyczy to zarówno budownictwa mieszkaniowego, jak i obiektów użyteczności publicznej. Rosnące ceny paliw używanych do ogrzewania także wymuszają oszczędzanie energii. Aby jednak zmniejszyć koszty ogrzewania, najpierw trzeba wykonać odpowiednią termoizolację budynku.
+
+Ocieplenie budynku to nie sam styropian elewacyjny. Jest on tylko jednym z elementów całego systemu termoizolacji. Aby dom był skutecznie zabezpieczony przed utratą ciepła, należy także zatroszczyć się o izolację cieplną fundamentów.  Do gruntu ucieka bowiem ciepło z całego budynku poprzez ściany. Także stropy i dachy budynków powinny być zabezpieczone dobrej jakości styropianem. Obecnie najlepsze wartości współczynnika przenikalności cieplnej oferuje styropian grafitowy. Osiąga on parametr Lambda na poziomie 031, a nawet 030 W/mK. Jednak użycie nawet zwykłego białego styropianu o grubości 20 cm zapewnia bardzo dobre parametry izolacyjne przegród.
+
+Naturalne jest, że myśląc o termoizolacji domu, najpierw koncentrujemy się na ociepleniu ścian zewnętrznych. Większość ludzi tak robi i raczej nikogo to nie dziwi. Ocieplanie innych części budynku omówimy w dalszej części, teraz skupmy się na styropianie elewacyjnym. Bardzo duży wybór produktów tego typu znajdziesz z hurtowni STYRO24.pl. Aby jednak myśleć o wyborze konkretnego produktu, warto poznać oferowane przez nas produkty różnych firm. W naszym sklepie znajdziesz styropiany Austrotherm,Swisspor, Genderka, Yetico i wielu innych producentów.
+
+Biały styropian elewacyjny 20 cm - czy jest dość dobry na fasada ściana ?
+Można oczywiście postawić takie pytanie, szczególnie przy szerokiej ofercie styropianów grafitowych na rynku. Odpowiedź zależy jednak od grubości warstwy ocieplenia. Jeżeli mówimy o styropianie elewacyjnym 20 cm, to na pewno biały styropian np. 038 lub 042 sprawdzi się w większości zastosowań i cena za paczkę jest korzystniejsza.  Jedynie w przypadku ścian budynku wykonanych z porothermu można się zastanawiać nad wyborem czegoś lepszego. Tutaj bowiem może znaleźć zastosowanie styropian grafitowy 20 cm. Wtedy uzyskujemy ocieplenie na poziomie domu pasywnego. Nie jest to może odczuwalne w codziennym użytkowaniu , ale w dłuższej perspektywie na pewno się opłaci pomimo wyższej ceny za paczkę.
+
+Można powiedzieć, że niezależnie od wartości współczynnika Lambda biały styropian fasadowy 20 cm daje dobrą izolację. Zawsze można wybrać lepszy styropian grafitowy, ale zależy to od oczekiwań i budżetu inwestora. Odpowiedź na wyżej postawione pytanie jest prosta. Tak, biały styropian o grubości 20 cm jest dobry do większości zastosowań. Współczynnik Lambda na poziomie od 038 do 042 daje już bardzo solidne ocieplenie przy tej grubości styropianu. Jeżeli natomiast oczekujesz czegoś więcej, to zapoznaj się z naszą ofertą styropianów grafitowych na elewację.
+
+Fasada grafit 031- najnowsza technologia ociepleń styropianem elewacyjnym 20 cm
+Coraz bardziej popularnym rozwiązaniem jest styropian fasadowy grafitowy. Przykładem może być tutaj styropian Swisspor Fasada grafit 031 lub styropian Austrotherm Fassada Premium. Te nowoczesne produkty dają możliwość uzyskania efektu domu pasywnego w większości przypadków. Styropian fasadowy grafitowy daje najlepsze możliwe parametry izolacyjne. Jest to zauważalne szczególnie w niższych rachunkach za ogrzewanie. Dlatego też inwestycja w droższy materiał pomimo wyższych cen za paczkę styropianu szybko się zwraca.
+
+Dla najbardziej wymagających użytkowników proponujemy styropiany klasy Fasada grafit 031, czyli najlepsze obecnie produkty na rynku. Jest to segment premium w branży ociepleń, ale nadal w korzystnych cenach. Styropian elewacyjny o grubości 20 cm z domieszką grafitu daje najlepsze możliwe parametry ocieplenia. Nawet styropian biały 038 lub 042 spełniłby swoje zadanie. Jednak styropian 20 cm grafitowy podnosi izolacyjność cieplną na poziom domu pasywnego.
+
+Styropian 20 cm- jakie wybrać krawędzie płyt?
+
+Wielu inwestorów zastanawia się przy zakupie styropianu na elewację czy fundament, jakie wybrać krawędzie płyt. Wiadomo, że krawędzie z frezem (felcem) służą zmniejszeniu mostków termicznych w elewacji. Nawet małe szczeliny pomiędzy płytami powodują ucieczkę ciepła na zewnątrz. Jednak przy grubości styropianu 20 cm zjawisko "mostkowania" jest zredukowane prawie do minimum. Dzieje się tak dlatego, że przy tej grubości płyt montaż styropianu przypomina "murowanie". Możemy dobrze docisnąć do siebie krawędzie płyt i właściwie zlikwidować szczeliny.
+
+Jeżeli jednak kogoś to nie przekonuje, to oczywiście mamy odpowiednie produkty także z felcem. W tym przypadku nie ma już żadnych kompromisów- mostki termiczne całkowicie znikają. Takie frezowane krawędzie ułatwiają też dopasowywanie płyt i przyspieszają pracę. Właściwie taki styropian ma same zalety, a jedyną wadą jest nieco wyższa cena niż standardowych płyt. Jednak w przypadku termoizolacji domu raczej nie warto zbytnio oszczędzać. Każdy powinien sam wybrać jaki rodzaj styropianu elewacyjnego 20 cm zastosować. My jako sprzedawcy możemy jedynie służyć radą i pomocą w zakupie.
+
+Styropian podłogowy 20 cm- czy warto go stosować?
+
+W nowoczesnych projektach domów proponuje się już ocieplanie podłogi na gruncie styropianem o grubości 20 cm. Jest to jak najbardziej słuszne, biorąc pod uwagę ciągle zaostrzane normy dotyczące ociepleń budynków. Do gruntu potrafi przenikać znaczna część ciepła z budynku, szczególnie z popularnego ogrzewania podłogowego. Taki sposób ogrzewania ma duże zalety, jednak pod warunkiem, że dobrze odizolujemy rury grzewcze od podłoża. W przeciwnym razie emitowane ciepło ogrzeje nie tylko wnętrze domu, ale także ziemię pod nim.
+
+Przy układaniu styropianu podłogowego (np. na chudym betonie) warto robić to w dwóch warstwach. W przypadku grubości ocieplenia 20 cm układamy dwie warstwy po 10 cm z pewnym przesunięciem. Krawędzie płyt w obu warstwach nie powinny się pokrywać. Arkusze styropianu obu warstw powinny zachodzić na siebie (tzw. mijanka). Redukujemy wówczas do minimum mostki termiczne, które by wystąpiły przy pojedynczej warstwie styropianu. Dobrze jest też przy 20 cm ocieplenia wybrać twardszy styropian (EPS 100 i więcej). Daje to lepszą wytrzymałość na obciążenia. Reguła jest taka, że im grubsza warstwa, tym powinien być wyższy EPS. Poprawia to znacznie trwałość i stabilność podłogi.
+
+Styropian na fundamenty- jaka grubość się sprawdzi?
+
+Styropian na fundamenty powinien być nieco cieńszy niż ten stosowany na elewacji. Przyjmuje się, że może on być cieńszy o 3-5 cm od styropianu fasada ściana. W ten sposób uzyskamy estetyczny gzyms nad podmurówką domu. Ma to także zalety praktyczne: gzyms osłania niższą część muru przed działaniem wody. Podmurówka i fundament są osłonięte przed deszczem, co podnosi ich trwałość. W praktyce przeważnie stosuje się styropian na fundamenty 15 cm, ale są dostępne także większe grubości.
+
+Styropian na dach o grubości 20 cm- jakie daje korzyści?
+
+Solidne ocieplenie dachu/ stropu budynku to podstawa dla oszczędności ciepła. Możesz oszukać siebie i innych, ale fizyki nie oszukasz! Ciepło zawsze przemieszcza się do góry wraz z ogrzanym powietrzem w budynku. Dlatego tak ważne jest dobre ocieplenie połaci dachowych. Człowiek większość energii cieplnej traci przez głowę- w przypadku budynku sprawa wygląda podobnie. Dlatego wybierając materiał na ocieplenie dachu, warto postawić na jakościowe i sprawdzone produkty.
+
+Do takich na pewno zalicza się styropian Swisspor EPS, czy cały system BIKUTOP tego producenta. Styropapy dobrej jakości oraz kliny spadkowe pozwalają uzyskać szczelność i dobrą izolacyjność połaci dachowej. Już przy współczynniku Lambda 038 uzyskamy całkiem dobrą izolację cieplną. Jednak w tym przypadku najlepszą grubością styropianu będzie 25 cm. Jeżeli zastosujemy na strop styropian grafitowy, to nawet przy grubości 20 cm otrzymamy odpowiednie parametry przegrody. Warto wykorzystać taką możliwość wszędzie tam, gdzie nie możemy położyć grubej warstwy styropianu. Zresztą zasada ta obowiązuje także w przypadku innych części budynku (fasada/ ściana).
+
+Warto pamiętać, że styropian na dach powinien mieć odpowiednią odporność na ściskanie. Polecane są tu produkty od EPS 100 wzwyż (np. styropian Austrotherm EPS 100 036 dach/podłoga, styropian Austrotherm EPS 150 Parking dach/podłoga, Styropmin Dach/Podłoga DP CS PRO 100 036, Swisspor eps 100 036 lub 030). Styropian dobrej jakości zapewni odpowiednią wytrzymałość pokrycia dachowego, kiedy trzeba będzie po nim przejść. Okresowe kontrole kominiarskie czy inspekcje dachu nie będą wtedy problemem. W naszym sklepie STYRO24.pl znajdziesz bardzo duży wybór styropianów dach/podłoga o różnych parametrach. Każdy znajdzie produkt dopasowany do swoich potrzeb.
+
+Podsumowanie
+
+Prawidłowe wykonanie termoizolacji jest warunkiem uzyskania komfortu cieplnego w budynku. Przekłada się także bezpośrednio na niższe rachunki za ogrzewanie. Dlatego też warto do tego celu wybierać najlepsze, solidne materiały. Takie rozwiązania oferujemy w naszym sklepie STYRO24.pl. Niezależnie czy szukasz styropianu fasada ściana, dach podłoga czy styropianu na fundamenty. Chociaż styropian 20 cm cena za metr kwadratowy jest coraz wyższa, to jednak da się znaleźć optymalne rozwiązanie. W naszym sklepie staramy się utrzymać ceny styropianu 20 cm za 1m2 na jak najlepszym poziomie.
+
+Oprócz dużego asortymentu i korzystnych cen oferujemy także fachową pomoc i doradztwo w dziedzinie dociepleń. Niezależnie czy wybierzesz styropian biały 038, czy grafitowy cena za paczkę w naszym sklepie będzie korzystna. Zapewniamy także transport materiałów budowlanych na terenie całego kraju. Przy odpowiedniej ilości zamówionych paczek dostawa będzie darmowa. Zapraszamy do kontaktu i współpracy klientów indywidualnych i profesjonalistów.
+
 
         UserInput":' . $request->get('`message`')
     ]];
@@ -390,28 +439,26 @@ Przykładowo, zasadnicza izolacja przeciwwodna może być ułożona na styropian
 
     foreach ($response->products as &$product) {
         $p = \App\Entities\Product::where('name', $product->name)->first();
-            if ($p) {
+        if ($p) {
+            $product->name = $p;
 
-        $product->name = $p;
+            $product->name = $product->name->stock->product()
+                ->select('product_prices.*', 'product_packings.*', 'products.*')
+                ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
+                ->with('media')
+                ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+                ->orderBy('priority')
+                ->orderBy('name')
+                ->first();
 
-        $product->name = $product->name->stock->product()
-            ->select('product_prices.*', 'product_packings.*', 'products.*')
-            ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
-            ->with('media')
-            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->orderBy('priority')
-            ->orderBy('name')
-            ->first();
+            $product->name->load('stock');
+            $product->name->load('opinions');
+            $product->name->load('price');
 
-        $product->name->load('stock');
-        $product->name->load('opinions');
-        $product->name->load('price');
+            $product->name->similarProducts = $product->name->category->products()->whereHas('children')->with('price')->get();
 
-        $product->name->similarProducts = $product->name->category->products()->whereHas('children')->with('price')->get();
-
-        $product->name->meanOpinion = $product->name->opinions->avg('rating') ?? 0;
-
-            }
+            $product->name->meanOpinion = $product->name->opinions->avg('rating') ?? 0;
+        }
     }
 
     return $response;
