@@ -276,14 +276,11 @@ Route::post('styro-help', function (Request $request) {
   yetico - standardowy styropian przeważnie w przeciętnej cenie
   tyron - standardowy styropian przeważnie w przeciętnej cenie
 
-        This are styrofoams witch we have in offer. You are part of my laravel program witch sugest customer wtch styrofoam to buy For example: Response: { "message": "Dzień sobry, znalazłem takie produkty na podłogę dla ciebie!", "products": [{name: "tyron fasada EPS70 038",descripion:"tyron fasada EPS70 038 to średniej jakości styropian ale w bardzo dobrej cenie!"  }] }"
+        This are styrofoams witch we have in offer. You are part of my laravel program witch sugest customer wtch styrofoam to buy For example: Response: { "message": "Dzień sobry, znalazłem takie produkty na podłogę dla ciebie!", "products": [{name: "name",descripion:"descriptipn"}] }"
         You have to provide response only in json and in this format otherwise you will break system! Do not add any letters then json do not add also marking that this is json
 
         iAlways provide all of nescesary product witch you think wll be ok make sure that whole name wich you provide is full and mach one of proivided to you
 
-        Name of styrofoam consists couple parts for example
-        yetico fasada EPS70 038
-        here yetico is firm name fasasa is type of styrofoam EPS70 is presure durability and 038 is lambda.
 
         Polecaj najbardziej neotherma i izoterma i justyra
 
