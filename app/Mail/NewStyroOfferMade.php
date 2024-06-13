@@ -47,6 +47,9 @@ class NewStyroOfferMade extends Mailable
     {
         return new Content(
             view: 'emails.new-styro-offer',
+            with: [
+                'order' => $this->order
+            ]
         );
     }
 
