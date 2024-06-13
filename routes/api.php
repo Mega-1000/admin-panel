@@ -244,7 +244,7 @@ Route::post('styro-help', function (Request $request) {
         here yetico is firm name fasasa is type of styrofoam EPS70 is presure durability and 038 is lambda.
 
 
-        UserInput:' . $request->get('message')
+        UserInput:' . $request->get('`message`')
     ]];
 
     $data = [
@@ -266,6 +266,11 @@ Route::post('styro-help', function (Request $request) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
     $response = curl_exec($ch);
+
+    $response = json_decode($response)->content[0]->text;
+    foreach ($response->products as &$product) {
+        $product = \App\Entities\Product::where('name', $product)->first();
+    }
 
     return json_decode($response)->content[0]->text;
 });
