@@ -272,5 +272,5 @@ Route::post('styro-help', function (Request $request) {
         $product = \App\Entities\Product::where('name', $product)->first();
     }
 
-    return json_decode($response)->content[0]->text;
+    return $response;
 });
