@@ -415,7 +415,7 @@
                 @if($missingData)
                     Missing data
                 @else
-                    {{ round($totalCost / $p->packing->numbers_of_basic_commercial_units_in_pack, 2) }}
+                    {{ round($totalCost / $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }}
                     <br>
                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $symbol }}/{{ $order->id }}">
                         Wyślij zamówienie na tego producenta
