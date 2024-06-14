@@ -1438,7 +1438,7 @@ class OrdersController extends Controller
         return redirect()->route('orders.index', [
             'order_id' => $order->id,
             'page' => $request->query('page')
-        ])->with([
+        ])->withFragment('id-' . $order->id)->with([
             'message' => __('orders.message.update'),
             'alert-type' => 'success',
         ]);
