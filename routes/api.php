@@ -294,6 +294,7 @@ Route::post('styro-help', function (Request $request) {
         "messages" => [
             [
                 'content' => $prompt,
+                'role' => 'user'
             ]
         ],
     ];
