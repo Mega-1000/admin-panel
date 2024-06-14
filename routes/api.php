@@ -301,6 +301,11 @@ Route::post('styro-help', function (Request $request) {
         styropian 031 to grafit
         fasada to styropian elewacyjny
 
+        <example>
+            userInput: Szukam styropianu grafitowego na elewacje
+            { "message": "Dzień sobry, znalazłem takie produkty grafitowe elewacje dla ciebie!", "products": [{name: "styropianplus fasada 031",descripion:""}, {name: "neotherm fasada 031",descripion:""}, {name: "izoterm fasada 031",descripion:""}, {name: "swisspor fasada 031",descripion:""}] }"
+        </example>
+
 
 
         Polecaj najbardziej neotherma i izoterma i justyra
