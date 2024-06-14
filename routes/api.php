@@ -235,7 +235,7 @@ Route::post('styro-help', function (Request $request) {
         "content" =>  [
             [
                 'type' => 'text',
-                'text' => 'szukam styropianu na posadzke',
+                'text' => 'styropian dobrej jakości na elewacje',
             ]
         ]
     ]
