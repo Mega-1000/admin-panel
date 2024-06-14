@@ -229,10 +229,14 @@ Route::post('styro-help', function (Request $request) {
     $anthropicVersion = "2023-06-01";
 
 
-    $prompt = [[
+    $prompt = [
+        [
         "role" => "user",
-        "content" =>  $request->get('`message`')
-    ]];
+        "content" =>  [
+            $request->get('`message`')
+            ]
+    ]
+    ];
 
     $data = [
         "model" => "claude-3-haiku-20240307",
