@@ -235,7 +235,7 @@ Route::post('styro-help', function (Request $request) {
         "content" =>  [
             [
                 'type' => 'text',
-                'text' => 'grafitowy styropian na fasade',
+                'text' => $request->get('message'),
             ]
         ]
     ]
