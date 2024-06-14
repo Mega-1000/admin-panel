@@ -235,7 +235,7 @@ Route::post('styro-help', function (Request $request) {
         "content" =>  [
             [
                 'message' => $request->get('`message`'),
-                'type' => 'user'
+                'type' => 'text'
             ]
         ]
     ]
