@@ -292,8 +292,9 @@ Route::post('styro-help', function (Request $request) {
         iAlways provide all of nescesary product witch you think wll be ok make sure that whole name wich you provide is full and mach one of proivided to you
         DO NOT USE PRODUCTS WITCH ARE NOT IN PASTED TO YOU
         I HAVE PASTED YOU ALSO PRICES OF ALL PRODUCTS SO SUGEST BY IT
+        DO NOT HALUCINATE
 
-        na elewacje polecaj najbardziej 038 i 031 grafitowy nie eps 70
+        na elewacje nie polecaj eps 70 chyba że użytkownik potrzevuje tego parametru
 
 
 
