@@ -45,6 +45,15 @@ class NewStyroOfferMade extends Mailable
      */
     public function content(): Content
     {
+        $products = Product::where('variation_group', 'styropiany')->whereHas('children')->get();
+
+        $result = '';
+
+        foreach ($products as $product) {
+            $result .= 'Name: ' . $product->name . ', Price: ' . $product->price->net_purchase_price_commercial_unit . '; ';
+        }
+
+        $result = rtrim($result, '; ');
         return new Content(
             view: 'emails.new-styro-offer',
             with: [
