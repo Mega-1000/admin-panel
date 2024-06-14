@@ -283,6 +283,7 @@ Name: styropianplus fasada 044, Price: 42.90; Name: styropianplus fasada 042, Pr
 
         Polecaj najbardziej neotherma i izoterma i justyra
 
+        na elewacje polecaj najbardziej 038 i 031 grafitowy nie eps 70
 
         UserInput":' . $request->get('`message`')
     ]];
