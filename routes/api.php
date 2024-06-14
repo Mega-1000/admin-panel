@@ -236,7 +236,7 @@ Route::post('styro-help', function (Request $request) {
             [
                 'type' => 'text',
                 'text' => [
-                    'text' =>  $request->get('message'),
+                    'text' =>  'coś na elewacje',
                 ]
             ]
         ]
