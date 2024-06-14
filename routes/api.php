@@ -303,7 +303,22 @@ Route::post('styro-help', function (Request $request) {
 
         <example>
             userInput: Szukam styropianu grafitowego na elewacje
-            { "message": "Dzień sobry, znalazłem takie produkty grafitowe elewacje dla ciebie!", "products": [{name: "styropianplus fasada 031",descripion:""}, {name: "neotherm fasada 031",descripion:""}, {name: "izoterm fasada 031",descripion:""}, {name: "swisspor fasada 031",descripion:""}] }"
+            { "message": "Dzień sobry, znalazłem takie produkty grafitowe elewacje dla ciebie!","products": [{name: "styropianplus fasada 031",descripion:""}, {name: "neotherm fasada 031",descripion:""}, {name: "izoterm fasada 031",descripion:""}, {name: "swisspor fasada 031",descripion:""}] }"
+        </example>
+
+        <example>
+            userInput: Szukam najtańszego styropianu na elewacje
+            { "message": "Dzień sobry, znalazłem takie produkty elewacje dla ciebie!","products": [{name: "postyr fasada 045",descripion:""}, {name: "arsanit fasada 045",descripion:""}, {name: "izoterm fasada 045",descripion:""}, {name: "genderka fasada 045",descripion:""}] }"
+        </example>
+
+        <example>
+            userInput: Szukam styropianu na posadzke
+            { "message": "Dzień sobry, znalazłem takie produkty na posadzke dla ciebie!","products": [{name: "izoterm eps100 038",descripion:""}, {name: "izoterm eps100 036",descripion:""}, {name: "neotherm eps100 036", description: ""}, {name: "syropianplus eps100 036",descripion:""}] }"
+        </example>
+
+                <example>
+            userInput: Szukam styropianu grafitowego na elewacje
+            { "message": "Dzień sobry, znalazłem takie produkty grafitowe elewacje dla ciebie!","products": [{name: "styropianplus fasada 031",descripion:""}, {name: "neotherm fasada 031",descripion:""}, {name: "izoterm fasada 031",descripion:""}, {name: "swisspor fasada 031",descripion:""}] }"
         </example>
 
 
