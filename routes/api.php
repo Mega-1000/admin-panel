@@ -233,7 +233,9 @@ Route::post('styro-help', function (Request $request) {
         [
         "role" => "user",
         "content" =>  [
-            'message' => $request->get('`message`')
+            [
+                'message' => $request->get('`message`')
+            ]
         ]
     ]
     ];
