@@ -297,6 +297,11 @@ Route::post('styro-help', function (Request $request) {
         na elewacje nie polecaj eps 70 chyba że użytkownik potrzevuje tego parametru
 
 
+        styropian z serii eps 100 to styropian posadzkowy
+        styropian 031 to grafit
+        fasada to styropian elewacyjny
+
+
 
         Polecaj najbardziej neotherma i izoterma i justyra
 
