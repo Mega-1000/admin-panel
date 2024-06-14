@@ -291,10 +291,14 @@ Route::post('styro-help', function (Request $request) {
 
         iAlways provide all of nescesary product witch you think wll be ok make sure that whole name wich you provide is full and mach one of proivided to you
 
+        na elewacje polecaj najbardziej 038 i 031 grafitowy nie eps 70
+
+
 
         Polecaj najbardziej neotherma i izoterma i justyra
 
-        na elewacje polecaj najbardziej 038 i 031 grafitowy nie eps 70
+        więc jeśli użytkownik szuka najtańszego styropianu na elewacje poleć mu  fasada 038 zamiast eps 70 083
+
 
 ',
         "max_tokens" => 1024,
