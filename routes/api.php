@@ -291,12 +291,7 @@ Route::post('styro-help', function (Request $request) {
 
 ',
         "max_tokens" => 1024,
-        "messages" => [
-            [
-                'content' => $prompt,
-                'role' => 'user'
-            ]
-        ],
+        "messages" => $prompt,
     ];
 
     $payload = json_encode($data);
