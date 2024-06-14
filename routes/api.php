@@ -290,6 +290,8 @@ Route::post('styro-help', function (Request $request) {
         You have to provide response only in json and in this format otherwise you will break system! Do not add any letters then json do not add also marking that this is json
 
         iAlways provide all of nescesary product witch you think wll be ok make sure that whole name wich you provide is full and mach one of proivided to you
+        DO NOT USE PRODUCTS WITCH ARE NOT IN PASTED TO YOU
+        I HAVE PASTED YOU ALSO PRICES OF ALL PRODUCTS SO SUGEST BY IT
 
         na elewacje polecaj najbardziej 038 i 031 grafitowy nie eps 70
 
