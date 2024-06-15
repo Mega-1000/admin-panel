@@ -130,7 +130,8 @@ readonly class OrderObserver
 
         if (
             round(round($sumOfGrossValues, 2) + round($depositPaidData['returnedValue'], 2) - round($depositPaidData['balance'], 2) - round($depositPaidData['wtonValue'], 2) - round($depositPaidData['externalFirmValue'], 2)) == 0.0 &&
-            $order->payments->count() > 0
+            $order->payments->count() > 0 &&
+            !$order->labels->has(240)
         ) {
             $order = Order::find($order->id);
             $LpArray = [];
