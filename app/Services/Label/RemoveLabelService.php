@@ -10,7 +10,9 @@ use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
 use App\Entities\WorkingEvents;
 use App\Enums\ProductStockLogActionEnum;
+use App\Facades\Mailer;
 use App\Jobs\TimedLabelJob;
+use App\Mail\UserHasBeenNotifiedAboutEndOfAuction;
 use App\Services\WorkingEventsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +34,14 @@ class RemoveLabelService
             Auth::loginUsingId($userId);
         }
         foreach ($labelIdsToRemove as $labelId) {
+            if ($labelId === 265) {
+                $arr = [];
+                AddLabelService::addLabels($order, [269], $arr, []);
+
+                Mailer::create()
+                    ->to($order->customer->login)
+                    ->send(new UserHasBeenNotifiedAboutEndOfAuction());
+            }
             if (array_key_exists('already-removed', $loopPreventionArray) && in_array($labelId, $loopPreventionArray['already-removed'])) {
                 continue;
             }
