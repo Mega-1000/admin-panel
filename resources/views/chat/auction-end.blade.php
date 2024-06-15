@@ -415,7 +415,7 @@
                 @if($missingData)
                     Missing data
                 @else
-                    {{ round($totalCost / 3, 2) }}
+                    {{ round($totalCost / 3.3, 2) }}
                     <br>
                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $symbol }}/{{ $order->id }}">
                         Wyślij zamówienie na tego producenta
