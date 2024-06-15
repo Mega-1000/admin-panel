@@ -65,6 +65,7 @@ function removeTimedLabel(orderId, labelId) {
         data: {time: $('#time_label_removal').val()}
     }).done(function (res) {
         window.location.href = '#id-' + orderId;
+                    window.location.reload();
     });
 }
 
@@ -162,6 +163,7 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
             url: '/api/get-labels-scheduler-await/{{ \Illuminate\Support\Facades\Auth::user()->id }}'
         }).done(function (res) {
             window.location.href = '#id-' + orderId;
+                    window.location.reload();
         });
     };
 
@@ -465,6 +467,7 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
         }
 
         window.location.href = '#id-' + orderId;
+                    window.location.reload();
     })
         .fail((error) => {
             if (error.responseText === 'warehouse not found') {
@@ -486,6 +489,7 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
                     $('#set-magazine').modal('hide');
 
                     window.location.href = '#id-' + orderId;
+                    window.location.reload();
                 })
             }
         });
