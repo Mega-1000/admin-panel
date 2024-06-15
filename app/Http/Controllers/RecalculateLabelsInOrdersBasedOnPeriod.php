@@ -67,7 +67,7 @@ class RecalculateLabelsInOrdersBasedOnPeriod extends Controller
                 $LpArray = [];
                 RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()->id);
             } else {
-                if (!$order->labels->has(240)) {
+                if (!$order->labels->contains('id', 240)) {
                     AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
                 }
             }
