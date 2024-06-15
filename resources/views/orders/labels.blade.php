@@ -69,7 +69,7 @@
                 </label>
                 <button title="{{ $labelsButtons[157]->name}}"
                         data-label-id="157" class="add-label"><i
-                        style="color: {{ ($labelsButtons[Label::MASTER_MARK])->color }};
+                        style="color: {{ ($labelsButtons[157])->color }};
                             margin-top: 5px;"
                         class="{{ $labelsButtons[157]->icon_name }}"></i>
                 </button>
@@ -84,7 +84,7 @@
                 </label>
                 <button title="{{ $labelsButtons[158]->name}}"
                         data-label-id="158" class="add-label"><i
-                        style="color: {{ ($labelsButtons[Label::MASTER_MARK])->color }};
+                        style="color: {{ ($labelsButtons[158])->color }};
                             margin-top: 5px;"
                         class="{{ $labelsButtons[158]->icon_name }}"></i>
                 </button>
@@ -96,14 +96,14 @@
                 <label>
                     s pil
                 </label>
-                <button title="{{ $labelsButtons[158]->name}}"
-                        data-label-id="158" class="add-label"><i
-                        style="color: {{ ($labelsButtons[Label::MASTER_MARK])->color }};
+                <button title="{{ $labelsButtons[268]->name}}"
+                        data-label-id="268" class="add-label"><i
+                        style="color: {{ ($labelsButtons[268])->color }};
                             margin-top: 5px;"
-                        class="{{ $labelsButtons[158]->icon_name }}"></i>
+                        class="{{ $labelsButtons[268]->icon_name }}"></i>
                 </button>
                 <h6 title="{{ $labelsButtons[158]->name}}"
-                    data-label-id="158" class="add-label">
+                    data-label-id="268" class="add-label">
                 </h6>
             </div>
 
