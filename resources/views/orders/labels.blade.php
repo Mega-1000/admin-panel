@@ -60,6 +60,53 @@
                     data-label-id="{{Label::MASTER_MARK}}" class="add-label">
                 </h6>
             </div>
+
+
+
+            <div class="col-md-1 label-with-desc-pair">
+                <label>
+                    pil
+                </label>
+                <button title="{{ $labelsButtons[157]->name}}"
+                        data-label-id="157" class="add-label"><i
+                        style="color: {{ ($labelsButtons[Label::MASTER_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[157]->icon_name }}"></i>
+                </button>
+                <h6 title="{{ $labelsButtons[157]->name}}"
+                    data-label-id="157" class="add-label">
+                </h6>
+            </div>
+
+            <div class="col-md-1 label-with-desc-pair">
+                <label>
+                    m pil
+                </label>
+                <button title="{{ $labelsButtons[158]->name}}"
+                        data-label-id="158" class="add-label"><i
+                        style="color: {{ ($labelsButtons[Label::MASTER_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[158]->icon_name }}"></i>
+                </button>
+                <h6 title="{{ $labelsButtons[158]->name}}"
+                    data-label-id="{{158}}" class="add-label">
+                </h6>
+            </div>
+            <div class="col-md-1 label-with-desc-pair">
+                <label>
+                    s pil
+                </label>
+                <button title="{{ $labelsButtons[158]->name}}"
+                        data-label-id="158" class="add-label"><i
+                        style="color: {{ ($labelsButtons[Label::MASTER_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[158]->icon_name }}"></i>
+                </button>
+                <h6 title="{{ $labelsButtons[158]->name}}"
+                    data-label-id="158" class="add-label">
+                </h6>
+            </div>
+
         </div>
     </div>
     <div class="col-md-6">
