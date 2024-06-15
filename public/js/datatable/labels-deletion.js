@@ -485,7 +485,7 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
                     })
                     $('#set-magazine').modal('hide');
 
-                    Liwewire.emit('reloadDatatable');
+                    window.location.href = '#id-' + orderId;
                 })
             }
         });
