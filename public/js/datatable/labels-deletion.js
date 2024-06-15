@@ -464,7 +464,7 @@ const removeMultiLabel = (orderId, labelId, ids, delivery_warehouse = null) => {
             addingTaskToPlanner(orderId, delivery_warehouse);
         }
 
-        Liwewire.emit('reloadDatatable');
+        window.location.href = '#id-' + orderId;
     })
         .fail((error) => {
             if (error.responseText === 'warehouse not found') {
