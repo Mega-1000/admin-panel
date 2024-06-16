@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Entities\Order;
+use App\Entities\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
