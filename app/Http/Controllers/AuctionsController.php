@@ -608,4 +608,15 @@ class AuctionsController extends Controller
     {
         $this->chatAuctionsService->confirmAuction($auction);
     }
+
+    public function markAsNotActive($orderId): string
+    {
+        $order = Order::find($orderId);
+
+        $arr = [];
+        RemoveLabelService::removeLabels($order, [269], $arr, [], null);
+        AddLabelService::addLabels($order, [225], $arr, []);
+
+        return '<script>alert("Zapisaliśmy brak zainteresowania ofertą z Państwa strony!")</script>';
+    }
 }

@@ -36,3 +36,4 @@ Route::get('orders/set-order-as-not-shipping-today/{order}', [OrderSpeditionDate
 Route::get('orders/set-order-as-shipping-today/{order}', [OrderSpeditionDatesMonitController::class, 'shippingToday'])->name('shippingToday');
 Route::post('orders/set-order-as-shipping-today/{order}', [OrderSpeditionDatesMonitController::class, 'shippingTodayStore'])->name('shippingTodayStore');
 
+Route::get('auction-not-active/{id}', [AuctionsController::class, 'markAsNotActive']);
