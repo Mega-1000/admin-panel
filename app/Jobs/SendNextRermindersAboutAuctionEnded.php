@@ -2,12 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Entities\Label;
 use App\Entities\Order;
 use App\Facades\Mailer;
 use App\Mail\NextRemindersAboutAuctionEndedMail;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -32,9 +30,9 @@ class SendNextRermindersAboutAuctionEnded implements ShouldQueue
     public function handle()
     {
         $orders = Order::whereHas('labels', function ($query) {
-            $query->whereIn('labels.id', 269);
+            $query->where('labels.id', 269);
         })->whereDoesntHave('labels', function ($query) {
-            $query->whereIn('labels.id', 225);
+            $query->where('labels.id', 225);
         })->get();
 
         foreach ($orders as $order) {
