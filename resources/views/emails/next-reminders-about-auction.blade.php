@@ -7,7 +7,7 @@ Chcieli byśmy przypomnieć, że oferta przetargowa o numerze: {{ $order->id }} 
 Jeśli chcą Państwo złożyć zamówienie na jedną z ofertę prosimy o kliknięcie przycisku "Wyślij zamówienie na tego producenta" na tabeli cen.
 <br><br>
 
-<a href="https://admin.mega1000.pl/auctions/{{ $order->auctions->first()->id }}/end" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-align: center; text-decoration: none; border-radius: 5px; transition: background-color 0.3s ease;">
+<a href="https://admin.mega1000.pl/auctions/{{ $order->chat->auctions?->first()->id }}/end" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-align: center; text-decoration: none; border-radius: 5px; transition: background-color 0.3s ease;">
     Tabela cen zaproponowanych w przetargu
 </a>
 
