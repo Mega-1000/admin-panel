@@ -38,7 +38,11 @@ class SendNextRermindersAboutAuctionEnded implements ShouldQueue
         })->get();
 
         foreach ($orders as $order) {
-            Mailer::create()->to($email)->send(new NextRemindersAboutAuctionEndedMail($o));
+            Mailer::create()
+                ->to($order->customer->login)
+                ->send(new NextRemindersAboutAuctionEndedMail(
+                    $order
+                ));
         }
     }
 }
