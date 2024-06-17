@@ -11,7 +11,7 @@
                     $chunks = str_split($fileName, 8);
                 @endphp
 
-                {{ $chunk[0] }}
+                {{ $chunks[0] }}
 
             </a>
 
