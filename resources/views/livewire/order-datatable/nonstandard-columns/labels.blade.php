@@ -6,7 +6,7 @@
 
         @foreach($order['files'] as $file)
             <a href="{{ route('orders.getFile', ['id' => $order['id'], 'file_id' => $file['hash']]) }}" target="_blank">
-                {{ str_split((string)$file['file_name'] ?? 'brak',6)}}
+                {{ $file['file_name'] }}
             </a>
 
             <button onclick="getFilesList({{ $order['id'] }})">
