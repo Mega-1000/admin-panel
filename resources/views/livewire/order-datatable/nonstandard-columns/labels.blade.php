@@ -6,7 +6,15 @@
 
         @foreach($order['files'] as $file)
             <a href="{{ route('orders.getFile', ['id' => $order['id'], 'file_id' => $file['hash']]) }}" target="_blank">
-                {{ $file['file_name'] }}
+                @php
+                    $fileName = $file['file_name'];
+                    $chunks = str_split($fileName, 8);
+                @endphp
+
+                @foreach ($chunks as $chunk)
+                    {{ $chunk }}<br>
+                @endforeach
+
             </a>
 
             <button onclick="getFilesList({{ $order['id'] }})">
