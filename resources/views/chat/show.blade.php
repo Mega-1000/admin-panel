@@ -150,7 +150,7 @@
     @endif
 
     @if(session()->has('auctionCreationSuccess'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mx-auto max-w-3xl" role="alert">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mx-auto" role="alert">
             <h2 class="font-bold">!!! Koniecznie to przeczytaj !!!</h2>
             <div>
                 <h1 class="text-2xl font-bold">Zapytanie Ofertowe</h1>
