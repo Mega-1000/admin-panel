@@ -426,7 +426,7 @@ class ProductsController extends Controller
         $product->load('opinions');
         $product->load('price');
 
-        $product->similarProducts = $product->price->products()->whereHas('children')->with('price')->get();
+        $product->similarProducts = $product->category?->products()->whereHas('children')->with('price')->get();
 
         $product->meanOpinion = $product->opinions->avg('rating') ?? 0;
 
