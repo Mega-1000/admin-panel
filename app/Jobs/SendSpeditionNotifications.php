@@ -61,8 +61,13 @@ class SendSpeditionNotifications implements ShouldQueue
             ) {
                 continue;
             }
+
             if ($fromDate->isFuture()) {
                 $this->updateOrderLabels($order, [245]);
+            }
+
+            if ($order->id == 85773) {
+                dd('test');
             }
 
             $beforeFromDate = Carbon::create($fromDate)->subDay();
