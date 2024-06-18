@@ -137,6 +137,7 @@ readonly class OrderObserver
             RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()?->id);
         } else {
             if (!$order->labels->contains('id', 240)) {
+                dd('twoja starta');
                 AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
             }
         }
