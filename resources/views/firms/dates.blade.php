@@ -190,6 +190,7 @@
 
             @php
                 $userType = 'c';
+                $isStyropian = true;
             @endphp
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}'; // For consultant
