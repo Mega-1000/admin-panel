@@ -69,9 +69,6 @@ class SendSpeditionNotifications implements ShouldQueue
 
             $beforeFromDate = Carbon::create($fromDate)->subDay();
             if ($beforeFromDate->isToday() && !$order->start_of_spedition_period_sent) {
-                if ($order->id == 85773) {
-                    dd('test');
-                }
                 if ($sendMails) {
                     Mailer::create()
                         ->to($order->warehouse->warehouse_email)
@@ -83,6 +80,10 @@ class SendSpeditionNotifications implements ShouldQueue
 
             $currentHour = date('H');
             $currentMinute = date('i');
+
+            if ($order->id == 85773) {
+                dd('test');
+            }
 
             if (($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) || $currentHour >= 12) {
                 if ($fromDate->isPast() && $toDate->isFuture() && !Carbon::create($order->last_confirmation)->isToday() && !$order->special_data_filled && $order?->warehouse?->warehouse_email) {
