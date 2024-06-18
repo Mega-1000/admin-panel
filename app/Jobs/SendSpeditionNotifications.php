@@ -45,7 +45,7 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = DB::table('order_labels')->where('label_id', 5)->whereDate('created_at', '>=', Carbon::now()->subMonths(3))->get();
+        $orders = DB::table('order_labels')->where('label_id', 53)->whereDate('created_at', '>=', Carbon::now()->subMonths(3))->get();
 
         foreach ($orders as $order) {
             $order = Order::find($order->order_id);
