@@ -3103,7 +3103,7 @@ class OrdersController extends Controller
 
     public function orderView($orderId): Application|Factory|\Illuminate\Contracts\View\View
     {
-        return view('dates', [
+        return view('firms.dates', [
             'order' => Order::find($orderId)
         ]);
     }
