@@ -98,7 +98,9 @@ readonly class OrderObserver
             if ($order->isPaymentRegulated()) {
                 dispatch(new DispatchLabelEventByNameJob($order, "payment-equal-to-order-value"));
             } else {
-                dispatch(new DispatchLabelEventByNameJob($order, "required-payment-before-unloading"));
+                if (!$order->labels->contains('id', 240)) {
+                    dispatch(new DispatchLabelEventByNameJob($order, "required-payment-before-unloading"));
+                }
             }
         }
 
@@ -137,7 +139,6 @@ readonly class OrderObserver
             RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()?->id);
         } else {
             if (!$order->labels->contains('id', 240)) {
-                dd('twoja starta');
                 AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
             }
         }
