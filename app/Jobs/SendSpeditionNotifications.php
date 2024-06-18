@@ -29,6 +29,14 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function __construct() {}
 
+    public function updateOrderLabels ($order, $newLabels): void
+    {
+        $allLabels = [244, 245, 74, 243]; // Define all your specific labels here
+        $order->labels()->detach($allLabels);
+        $arr = [];
+        AddLabelService::addLabels($order, $newLabels, $arr, []);
+    }
+
     /**
      * Execute the job.
      *
@@ -37,14 +45,6 @@ class SendSpeditionNotifications implements ShouldQueue
      */
     public function handle(): void
     {
-        function updateOrderLabels($order, $newLabels): void
-        {
-            $allLabels = [244, 245, 74, 243]; // Define all your specific labels here
-            $order->labels()->detach($allLabels);
-            $arr = [];
-            AddLabelService::addLabels($order, $newLabels, $arr, []);
-        }
-
         $orders = DB::table('order_labels')->where('label_id', 5)->whereDate('created_at', '>=', Carbon::now()->subMonths(3))->get();
 
         foreach ($orders as $order) {
@@ -62,7 +62,7 @@ class SendSpeditionNotifications implements ShouldQueue
                 continue;
             }
             if ($fromDate->isFuture()) {
-                updateOrderLabels($order, [245]);
+                $this->updateOrderLabels($order, [245]);
             }
 
             $beforeFromDate = Carbon::create($fromDate)->subDay();
@@ -81,7 +81,7 @@ class SendSpeditionNotifications implements ShouldQueue
 
             if (($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) || $currentHour >= 12) {
                 if ($fromDate->isPast() && $toDate->isFuture() && !Carbon::create($order->last_confirmation)->isToday() && !$order->special_data_filled && $order?->warehouse?->warehouse_email) {
-                    updateOrderLabels($order, [244]);
+                    $this->updateOrderLabels($order, [244]);
 
                     try {
                         Mailer::create()
@@ -105,7 +105,7 @@ class SendSpeditionNotifications implements ShouldQueue
             }
 
             if ($toDate->isToday()) {
-                updateOrderLabels($order, [256]);
+                $this->updateOrderLabels($order, [256]);
             }
 
             if ($sendMails && $toDate->isPast() && !$order->end_of_spedition_period_sent) {
@@ -118,7 +118,7 @@ class SendSpeditionNotifications implements ShouldQueue
             }
 
             if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
-                updateOrderLabels($order, [243]);
+                $this->updateOrderLabels($order, [243]);
             }
         }
     }
