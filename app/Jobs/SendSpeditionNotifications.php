@@ -66,12 +66,12 @@ class SendSpeditionNotifications implements ShouldQueue
                 $this->updateOrderLabels($order, [245]);
             }
 
-            if ($order->id == 85773) {
-                dd('test');
-            }
 
             $beforeFromDate = Carbon::create($fromDate)->subDay();
             if ($beforeFromDate->isToday() && !$order->start_of_spedition_period_sent) {
+                if ($order->id == 85773) {
+                    dd('test');
+                }
                 if ($sendMails) {
                     Mailer::create()
                         ->to($order->warehouse->warehouse_email)
