@@ -96,25 +96,53 @@
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 
 <script>
-    loadOrderDates();
+    const showAlert = (type, message) => {
+        const alertHtml = '<div class="alert alert-' + type + '">' + message + '</div>';
+        $('#alerts').html(alertHtml);
+        setTimeout(function() {
+            $('#alerts').html('');
+        }, 3000);
+    };
+
+    window.showModifyDateModal = function(orderId, type, from, to, type11) {
+        $('#orderId').val(orderId);
+        $('#dateType').val(type);
+
+        const today = new Date();
+        const defaultTo = new Date(today);
+        defaultTo.setDate(defaultTo.getDate() + 2);
+
+        if (!to) {
+            to = defaultTo.toISOString().slice(0, 16);
+        }
+        if (!from) {
+            from = today.toISOString().slice(0, 16);
+        }
+
+        $('#dateFrom').val(from);
+        $('#dateTo').val(to);
+
+        const dateTo = new Date(to);
+        if (dateTo <= defaultTo) {
+            showAlert('danger', 'Domyślna data końcowa jest mniej niż dwa dni od teraz.');
+        }
+
+        window.type11 = type11;
+        $('#modifyDateModal').modal('show');
+    };
 
     const updateDates = async () => {
         const orderId = $('#orderId').val();
         const dateType = $('#dateType').val();
-        const dateFrom = dateType === 'shipment' ? $('#dateFrom').val() : null;
-        const dateTo = dateType === 'shipment' ? $('#dateTo').val() : null;
-        const deliveryDateFrom = dateType === 'delivery' ? $('#dateFrom').val() : null;
-        const deliveryDateTo = dateType === 'delivery' ? $('#dateTo').val() : null;
+        const dateFrom = $('#dateFrom').val();
+        const dateTo = $('#dateTo').val();
 
-// Show loading screen
         $('#loadingScreen').show();
 
         try {
-// Convert date strings to Date objects for comparison
             const dateFromObj = new Date(dateFrom);
             const dateToObj = new Date(dateTo);
 
-// Check if dateFrom is at least 10 hours less than dateTo
             const tenHoursInMillis = 10 * 60 * 60 * 1000;
             if ((dateToObj - dateFromObj) < tenHoursInMillis) {
                 showAlert('danger', 'Data początkowa musi być co najmniej 10 godzin wcześniejsza niż data końcowa.');
@@ -127,18 +155,17 @@
                 type: window.type11,
                 shipmentDateFrom: dateFrom,
                 shipmentDateTo: dateTo,
-                deliveryDateFrom: deliveryDateFrom,
-                deliveryDateTo: deliveryDateTo,
+                deliveryDateFrom: null,
+                deliveryDateTo: null,
             });
 
             $('#modifyDateModal').modal('hide');
             showAlert('success', 'Pomyślnie zapisano daty!');
-            loadOrderDates(); // Refresh dates table
+            loadOrderDates();
         } catch (error) {
             console.error('Failed to modify the date:', error);
             showAlert('danger', 'Failed to modify the date.');
         } finally {
-// Hide loading screen
             $('#loadingScreen').hide();
         }
     };
@@ -159,21 +186,13 @@
                 deliveryDateTo: params.deliveryDateTo
             })
         }).then((response) => {
-            return response.json()
-        })
-    }
-
-    function showAlert(type, message) {
-        const alertHtml = '<div class="alert alert-' + type + '">' + message + '</div>';
-        $('#alerts').html(alertHtml);
-        setTimeout(function() {
-            $('#alerts').html('');
-        }, 3000);
-    }
+            return response.json();
+        });
+    };
 
     function loadOrderDates() {
         $.ajax({
-            url: '/api/orders/{{ $order->id }}/getDates', // Adjust this URL to your API endpoint
+            url: '/api/orders/{{ $order->id }}/getDates',
             type: 'GET',
             credentials: 'same-origin',
             success: function(data) {
@@ -187,179 +206,27 @@
         });
     }
 
-    function modifyOrderDate(orderId, dateType, dateFrom, dateTo, type) {
-        $.ajax({
-            url: '/api/orders/' + orderId + '/dates/modify', // Adjust this URL to your API endpoint
-            type: 'POST',
-            credentials: 'same-origin',
-            data: {
-                dateType: dateType,
-                dateFrom: dateFrom,
-                dateTo: dateTo
-            },
-            success: function(data) {
-                $('#modifyDateModal').modal('hide');
-                showAlert('success', 'Pomyślnie zaktualizowano daty.');
-                loadOrderDates(); // Refresh dates table
-            },
-            error: function(xhr, status, error) {
-                showAlert('danger', 'Nie udało się zmodyfikować daty.');
-            }
-        });
-    }
-
-
     function populateDatesTable(dates) {
         let html = '';
         Object.keys(dates).forEach(function(key) {
-            const date = dates[key]; // Get the date object for the current key
-
-            if (key === 'acceptance') {
-                return;
-            }
-
-            @php
-                $userType = 'c';
-                $isStyropian = true;
-            @endphp
-
-            const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}'; // For consultant
-            const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}'; // For customer
-            const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}'; // For warehouse
-            const isAccepted = {{ $order?->date_accepted ?? 'false' }};
-            window.userType = '{{ $userType }}';
-
-// get full name of userType in Polish
-            if (window.userType === 'c') {
-                window.userType = 'klient';
-            } else if (window.userType === 'u') {
-                window.userType = 'konsultant';
-            } else if (window.userType === 'e') {
-                window.userType = 'magazyn';
-            }
-
-// Determine if the user can modify the date
-            let canModify = false;
-            if (isCustomer && key === 'customer') {
-                canModify = true;
-            }
-
-            if (isConsultant) {
-                canModify = true;
-            }
-
-            if (isWarehouse && key === 'warehouse') {
-                canModify = true;
-            }
-// Determine if the user can accept the date (new functionality)
-            let canAccept = false;
-            if ((isCustomer && key === 'warehouse') || (isWarehouse && key === 'customer')) {
-                canAccept = true;
-            }
-
-// there have to be at least one date to accept
-            if (!date.delivery_date_from && !date.shipment_date_from && !date.delivery_date_to && !date.shipment_date_to) {
-                canAccept = false;
-            }
-
-            if (isAccepted) {
-                canAccept = false;
-// canModify = false;
-// $('#dates-table').before('<div class="alert alert-info">Daty zostały finalnie zatwierdzone i nie ma możliwości ich modyfikacji</div>');
-            }
+            const date = dates[key];
             let displayKey = '';
 
             if (key === 'consultant') {
-                displayKey = 'Konsultant'
+                displayKey = 'Konsultant';
+            } else if (key === 'customer') {
+                displayKey = 'Klient';
+            } else if (key === 'warehouse') {
+                displayKey = 'Magazyn';
             }
 
-            if (key === 'customer') {
-                displayKey = 'Klient'
-            }
-
-            if (key === 'warehouse') {
-                displayKey = 'Magazyn'
-            }
-
-            @if ($isStyropian)
-                html += '<tr>' +
+            html += '<tr>' +
                 '<td>Proponowana data dostawy (' + displayKey + ')</td>' +
                 '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
                 '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
-                (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
-                (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'shipment\', \'' + key + '\')">Akceptuj</div></td>' : '') +
+                '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' +
                 '</tr>';
-            @else
-                html += '<tr>' +
-                '<td>Proponowana data wysyłki (' + displayKey + ')</td>' +
-                '<td>' + (date.shipment_date_from || 'N/A') + '</td>' +
-                '<td>' + (date.shipment_date_to || 'N/A') + '</td>' +
-                (canModify ? '<td><div class="btn btn-primary btn-sm" onclick="showModifyDateModal(\'\', \'shipment\', \'' + (date.shipment_date_from || '') + '\', \'' + (date.shipment_date_to || '') + '\', \'' + key + '\')">Modyfikuj</div></td>' : '') +
-                (canAccept ? '<td><div class="btn btn-success btn-sm" onclick="acceptDate(\'shipment\', \'' + key + '\')">Akceptuj</div></td>' : '') +
-                '</tr>';
-            @endif
         });
         $('#datesTable tbody').html(html);
     }
-
-    // Add a new function for accepting dates
-    window.acceptDate = function(dateType, key) {
-// Show loading screen
-        $('#loadingScreen').show();
-
-        return fetch('/api/orders/' + {{ $order->id }} + '/acceptDates', {
-            method: 'PUT',
-            headers: new Headers({
-                'Content-Type': 'application/json; charset=utf-8',
-                'X-Requested-Width': 'XMLHttpRequest'
-            }),
-            body: JSON.stringify({
-                type: key,
-                userType: window.userType
-            })
-        }).then((response) => {
-            window.location.reload();
-        }).catch((error) => {
-            console.error('Error accepting the date:', error);
-            showAlert('danger', 'Failed to accept the date.');
-        }).finally(() => {
-// Hide loading screen
-            $('#loadingScreen').hide();
-        });
-    }
-
-    window.showModifyDateModal = function(orderId, type, from, to, type11) {
-        $('#orderId').val(orderId);
-        $('#dateType').val(type);
-
-        const today = new Date();
-        if (!to) {
-            to = today.toISOString().slice(0, 11) + "23:59"
-        }
-        if (!from) {
-            from = today.toISOString().slice(0, 11) + "00:00"
-        }
-
-        $('#dateFrom').val(from);
-        $('#dateTo').val(to);
-
-        window.type11 = type11;
-        $('#modifyDateModal').modal('show');
-    }
-
-    function showAlert(type, message) {
-        const alertHtml = '<div class="alert alert-' + type + '">' + message + '</div>';
-        $('#alerts').html(alertHtml);
-        setTimeout(function() {
-            $('#alerts').html('');
-        }, 3000);
-    }
-
-    const fileInput = document.getElementById('attachment');
-    const fileNameSpan = document.getElementById('file-name');
-
-    fileInput.addEventListener('change', function() {
-        const fileName = this.files[0].name;
-        fileNameSpan.textContent = fileName;
-    });
 </script>
