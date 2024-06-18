@@ -861,6 +861,7 @@ Route::get('styroLeads', [\App\Http\Controllers\StyroLeadController::class, 'ind
 Route::get('styroLeads/get-tracking-img/{id}', [\App\Http\Controllers\StyroLeadController::class, 'getLogoWithTracker'])->name('styro-lead.tracking-img');
 Route::post('styroLeads/import-csv', [\App\Http\Controllers\StyroLeadController::class, 'importCSV'])->name('styro-lead.load-csv');
 Route::get('goto-website/{id}', [\App\Http\Controllers\StyroLeadController::class, 'visitWebsite'])->name('visit-website');
+Route::get('dates-order-dates/{orderId}', [OrdersController::class, 'orderView']);
 
 Route::get('/styro-chatrs', function () {
     $orders = Order::whereHas('items', function ($query) {

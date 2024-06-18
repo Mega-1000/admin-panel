@@ -3100,4 +3100,11 @@ class OrdersController extends Controller
 
         return redirect()->back();
     }
+
+    public function orderView($orderId): Application|Factory|\Illuminate\Contracts\View\View
+    {
+        return view('dates', [
+            'order' => Order::find($orderId)
+        ]);
+    }
 }
