@@ -188,6 +188,10 @@
                 return;
             }
 
+            @php
+                $userType = 'c';
+            @endphp
+
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}'; // For consultant
             const isCustomer = '{{ $userType == MessagesHelper::TYPE_CUSTOMER }}'; // For customer
             const isWarehouse = '{{ $userType == MessagesHelper::TYPE_EMPLOYEE }}'; // For warehouse
