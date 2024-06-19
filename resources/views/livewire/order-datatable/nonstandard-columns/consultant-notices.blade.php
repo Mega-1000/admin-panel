@@ -6,16 +6,6 @@
 
     .message-full {
         display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        padding: 12px 16px;
-        z-index: 1;
-    }
-
-    .message-container:hover .message-full {
-        display: block;
     }
 </style>
 
@@ -49,3 +39,16 @@
         <hr>
     @endforeach
 @endif
+
+<script>
+    const messageContainers = document.querySelectorAll('.message-container');
+
+    messageContainers.forEach(container => {
+        const preview = container.querySelector('.message-preview');
+        const full = container.querySelector('.message-full');
+
+        preview.addEventListener('click', () => {
+            full.style.display = full.style.display === 'none' ? 'inline' : 'none';
+        });
+    });
+</script>
