@@ -207,8 +207,9 @@ class OrderWarehouseNotificationController extends Controller
         WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
         $type = $request->input('payment-type');
         $promiseDate = now()->addDay();
+        $payer = $order->customer->login;
 
-        $orderPayment = app(OrderPaymentService::class)->payOrder($order->id, $request->input('declared_sum', '0'), $request->input('payer'),
+        $orderPayment = app(OrderPaymentService::class)->payOrder($order->id, $request->input('declared_sum', '0'), $payer,
             null, true,
             false, $promiseDate,
             $type, false,
@@ -239,7 +240,7 @@ class OrderWarehouseNotificationController extends Controller
 
             $orderPayment = app(OrderPaymentService::class)->payOrder(
                 $order->id, $order->getValue() - $order->payments->sum('declared_sum'),
-                $request->input('payer'),
+                $payer,
                 null, true,
                 false, $promiseDate,
                 $type, false,
