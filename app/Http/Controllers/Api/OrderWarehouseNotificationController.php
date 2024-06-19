@@ -20,6 +20,7 @@ use App\Repositories\OrderInvoiceRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderWarehouseNotificationRepository;
 use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use App\Services\WorkingEventsService;
@@ -272,6 +273,8 @@ class OrderWarehouseNotificationController extends Controller
         $prev = [];
         AddLabelService::addLabels($order, [52], $prev, [], Auth::user()->id);
         AddLabelService::addLabels($order, [73], $prev, [], Auth::user()->id);
+
+        $order->labels()->detach([44, 224, 68]);
 
         return redirect()->route('orders.index');
     }

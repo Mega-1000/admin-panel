@@ -95,7 +95,7 @@ class NonStandardColumnInvocableOfferBalance extends AbstractNonStandardColumnIn
 
     private function calculateZ(array $order, float $sumOfSelling, float $sumOfPurchase): float
     {
-        return $sumOfSelling + floatval($order['additional_cash_on_delivery_cost'] ?? 0) - ($sumOfPurchase * 1.23);
+        return $sumOfSelling + floatval($order['additional_cash_on_delivery_cost'] ?? 0) - ($sumOfPurchase * 1.23) + $order['additional_service_cost'];
     }
 
     private function calculateBZO(float $Z, $RKTBO, $PSIK, $PSW, $WAC, $ZP): int
