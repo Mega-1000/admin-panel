@@ -407,7 +407,7 @@ Route::group(['prefix' => 'admin'], function () {
         ])->name('orders.update');
         Route::delete('orders/{id}/update', [
             'uses' => 'OrdersController@update',
-        ])->name('orders.update');
+        ]);
         Route::put('orders/{id}/updateSelf', [
             'uses' => 'OrdersController@updateSelf',
         ])->name('orders.updateSelf');
@@ -863,6 +863,7 @@ Route::get('styroLeads/get-tracking-img/{id}', [\App\Http\Controllers\StyroLeadC
 Route::post('styroLeads/import-csv', [\App\Http\Controllers\StyroLeadController::class, 'importCSV'])->name('styro-lead.load-csv');
 Route::get('goto-website/{id}', [\App\Http\Controllers\StyroLeadController::class, 'visitWebsite'])->name('visit-website');
 Route::get('dates-order-dates/{orderId}', [OrdersController::class, 'orderView']);
+
 Route::get('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'createAvisation'])->name('createAvisation');
 Route::post('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'storeAvisation'])->name('storeAvisation');
 
