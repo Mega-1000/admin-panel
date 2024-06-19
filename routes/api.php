@@ -420,7 +420,7 @@ Route::post('auctions/save', function (Request $request) {
 
     $builderData = $orderBuilder->newStore([], $customer);
     $order = Order::find($builderData['id']);
-    $this->assignItemsToOrder($order, $products);
+    $builderData->assignItemsToOrder($order, $products);
 
     DB::commit();
 
