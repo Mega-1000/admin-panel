@@ -1,5 +1,16 @@
 <?php
 
+use App\Entities\Customer;
+use App\Entities\FirmSource;
+use App\Entities\Status;
+use App\Facades\Mailer;
+use App\Helpers\BackPackPackageDivider;
+use App\Helpers\GetCustomerForAdminEdit;
+use App\Helpers\GetCustomerForNewOrder;
+use App\Helpers\OrderBuilder;
+use App\Helpers\OrderPackagesCalculator;
+use App\Helpers\OrderPriceCalculator;
+use App\Helpers\TransportSumCalculator;
 use App\Http\Controllers\Api\OrderWarehouseNotificationController;
 use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ContactApproachController;
@@ -44,7 +55,14 @@ use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
 use App\Http\Middleware\FilterOrderInvoiceValue;
+use App\Jobs\DispatchLabelEventByNameJob;
+use App\Jobs\OrderStatusChangedNotificationJob;
+use App\Jobs\ReferFriendNotificationJob;
+use App\Mail\NewStyroOfferMade;
+use App\Services\OrderAddressesService;
+use App\Services\ProductService;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 

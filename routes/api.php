@@ -1,7 +1,16 @@
 <?php
 
 use App\Entities\Category;
+use App\Entities\Customer;
+use App\Entities\FirmSource;
+use App\Entities\Order;
 use App\Entities\ShippingPayInReport;
+use App\Entities\Status;
+use App\Helpers\BackPackPackageDivider;
+use App\Helpers\GetCustomerForNewOrder;
+use App\Helpers\OrderBuilder;
+use App\Helpers\OrderPriceCalculator;
+use App\Helpers\TransportSumCalculator;
 use App\Http\Controllers\AllegroMessageController;
 use App\Http\Controllers\Api\CustomersController;
 use App\Http\Controllers\Api\DiscountController;
@@ -12,7 +21,15 @@ use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\ShipmentPayInReportByInvoiceNumber;
+use App\Jobs\DispatchLabelEventByNameJob;
+use App\Jobs\OrderStatusChangedNotificationJob;
+use App\Mail\NewStyroOfferMade;
+use App\Services\OrderAddressesService;
+use App\Services\ProductService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -373,3 +390,91 @@ Route::post('styro-help', function (Request $request) {
 
     return $response;
 });
+
+Route::post('auctions/save', function (Request $request) {
+    $products = [];
+    foreach ($request->auctionData as $product) {
+        $productR = \App\Entities\Product::where('name', 'like', '%', $product['styrofoamType'], '%')->whereDoesntHave('children')->first()->toArray();
+        $productR['quantity'] = $product->quantity;
+        $products[] = $productR;
+    }
+
+    $customer = Customer::create([
+        'login' => $request->userInfo->email,
+        'status' => 'ACTIVE',
+        'password' => Hash::make($request->userInfo->phone),
+    ]);
+
+
+    DB::beginTransaction();
+
+    $orderBuilder = (new OrderBuilder())
+        ->setPackageGenerator(new BackPackPackageDivider())
+        ->setPriceCalculator(new OrderPriceCalculator())
+        ->setProductService(app(ProductService::class));
+
+    $orderBuilder
+        ->setTotalTransportSumCalculator(new TransportSumCalculator())
+        ->setUserSelector(new GetCustomerForNewOrder());
+
+    $builderData = $orderBuilder->newStore([], $customer);
+    $order = Order::find($builderData['id']);
+    $this->assignItemsToOrder($order, $products);
+
+    DB::commit();
+
+    $order = Order::find($builderData['id']);
+    $order->firm_source_id = FirmSource::byFirmAndSource(config('orders.firm_id'), 2)->value('id');
+    $order->packages_values = json_encode($data['packages']  ?? null);
+    $order->save();
+
+    $orderAddresses = $order->addresses()->get();
+
+    if (empty($data['cart_token'])) {
+        foreach ($orderAddresses as $orderAddress) {
+            OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer);
+        }
+    }
+    $order->update(['status_id' => 3]);
+
+    dispatch_now(new OrderStatusChangedNotificationJob($order->id));
+
+    $order->orderOffer()->firstOrNew([
+        'order_id' => $order->id,
+        'message' => Status::find(18)->message,
+    ]);
+
+    Mailer::create()
+        ->to($customer->login)
+        ->send(new NewStyroOfferMade(
+            $order,
+        ));
+
+    if ($order->created_at->format('Y-m-d H:i:s') === $order->updated_at->format('Y-m-d H:i:s')) {
+        dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
+    }
+
+    $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
+
+    if ($request->get('delivery_start_date') && $request->get('delivery_end_date')) {
+        $order->dates()->create([
+            'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+            'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+            'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+            'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+            'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+            'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+            'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+            'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+        ]);
+    }
+
+    $order->additional_service_cost = 50;
+    $order->customer_name = $request->userInfo->email;
+    $order->save();
+
+    $delay = now()->addHours(2);
+
+    dispatch(new ReferFriendNotificationJob($order))->delay($delay);
+});
+
