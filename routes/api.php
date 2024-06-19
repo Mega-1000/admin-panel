@@ -23,6 +23,7 @@ use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\ShipmentPayInReportByInvoiceNumber;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
+use App\Jobs\ReferFriendNotificationJob;
 use App\Mail\NewStyroOfferMade;
 use App\Services\OrderAddressesService;
 use App\Services\ProductService;
@@ -400,9 +401,9 @@ Route::post('auctions/save', function (Request $request) {
     }
 
     $customer = Customer::create([
-        'login' => $request->userInfo->email,
+        'login' => $request->userInfo['email'],
         'status' => 'ACTIVE',
-        'password' => Hash::make($request->userInfo->phone),
+        'password' => Hash::make($request->userInfo['phone']),
     ]);
 
 
@@ -456,21 +457,21 @@ Route::post('auctions/save', function (Request $request) {
 
     $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
 
-    if ($request->get('delivery_start_date') && $request->get('delivery_end_date')) {
-        $order->dates()->create([
-            'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
-            'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
-            'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
-            'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
-            'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
-            'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
-            'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
-            'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
-        ]);
-    }
+//    if ($request->get('delivery_start_date') && $request->get('delivery_end_date')) {
+//        $order->dates()->create([
+//            'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+//            'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+//            'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+//            'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+//            'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+//            'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+//            'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
+//            'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
+//        ]);
+//    }
 
     $order->additional_service_cost = 50;
-    $order->customer_name = $request->userInfo->email;
+    $order->customer_name = $request->userInfo['email'];
     $order->save();
 
     $delay = now()->addHours(2);
