@@ -8,7 +8,7 @@
 
 
     Magazyn do awizacji
-    <input type="text" value="{{ $order->warehouse->symbol }}" name="warehouse-symbol">
+    <input type="text" value="{{ $order->warehouse?->symbol }}" name="warehouse-symbol">
     <br>
     <br>
 
