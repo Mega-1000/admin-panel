@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Entities\Order;
 use App\Entities\OrderWarehouseNotification;
 use App\Entities\Warehouse;
+use App\Entities\WorkingEvents;
+use App\Enums\OrderPaymentLogTypeEnum;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderLabelHelper;
+use App\Helpers\PriceHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 use App\Http\Requests\Api\OrderWarehouseNotification\DenyShipmentRequest;
@@ -15,12 +18,17 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Repositories\OrderInvoiceRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderWarehouseNotificationRepository;
+use App\Services\OrderPaymentLogService;
+use App\Services\OrderPaymentService;
+use App\Services\WorkingEventsService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class OrderWarehouseNotificationController extends Controller
 {
@@ -186,5 +194,75 @@ class OrderWarehouseNotificationController extends Controller
             );
             die();
         }
+    }
+
+    public function createAvisation(Order $order): View
+    {
+        return view('create-avisation-fast', compact('order'));
+    }
+
+    public function storeAvisation(Order $order, Request $request): RedirectResponse
+    {
+        WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
+        $type = $request->input('payment-type');
+        $promiseDate = now()->addDay();
+
+        $orderPayment = app(OrderPaymentService::class)->payOrder($order->id, $request->input('declared_sum', '0'), $request->input('payer'),
+            null, true,
+            false, $promiseDate,
+            $type, false,
+        );
+        $orderPayment->deletable = true;
+        $orderPayment->save();
+
+        $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
+        $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
+
+        app(OrderPaymentLogService::class)->create(
+            $order->id,
+            $orderPayment->id,
+            $orderPayment->order->customer_id,
+            $orderPaymentsSum,
+            $orderPaymentAmount,
+            $request->input('created_at') ?: Carbon::now(),
+            $request->input('notices') ?: '',
+            $request->input('declared_sum', '0') ?? '0',
+            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+            true,
+        );
+
+        if ($order->payments->sum('declared_sum') !== $order->getValue()) {
+            WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
+            $type = $request->input('payment-type');
+            $promiseDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
+
+            $orderPayment = app(OrderPaymentService::class)->payOrder(
+                $order->id, $order->getValue() - $order->payments->sum('declared_sum'),
+                $request->input('payer'),
+                null, true,
+                false, $promiseDate,
+                $type, false,
+            );
+            $orderPayment->deletable = true;
+            $orderPayment->save();
+
+            $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
+            $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
+
+            app(OrderPaymentLogService::class)->create(
+                $order->id,
+                $orderPayment->id,
+                $orderPayment->order->customer_id,
+                $orderPaymentsSum,
+                $orderPaymentAmount,
+                $request->input('created_at') ?: Carbon::now(),
+                $request->input('notices') ?: '',
+                $request->input('declared_sum', '0') ?? '0',
+                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                true,
+            );
+        }
+
+        return redirect()->route('orders.index');
     }
 }

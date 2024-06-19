@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\OrderWarehouseNotificationController;
 use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\EmployeesController;
@@ -862,6 +863,8 @@ Route::get('styroLeads/get-tracking-img/{id}', [\App\Http\Controllers\StyroLeadC
 Route::post('styroLeads/import-csv', [\App\Http\Controllers\StyroLeadController::class, 'importCSV'])->name('styro-lead.load-csv');
 Route::get('goto-website/{id}', [\App\Http\Controllers\StyroLeadController::class, 'visitWebsite'])->name('visit-website');
 Route::get('dates-order-dates/{orderId}', [OrdersController::class, 'orderView']);
+Route::get('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'createAvisation'])->name('createAvisation');
+Route::post('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'storeAvisation'])->name('storeAvisation');
 
 Route::get('/styro-chatrs', function () {
     $orders = Order::whereHas('items', function ($query) {
