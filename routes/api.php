@@ -6,6 +6,7 @@ use App\Entities\FirmSource;
 use App\Entities\Order;
 use App\Entities\ShippingPayInReport;
 use App\Entities\Status;
+use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\OrderBuilder;
@@ -411,11 +412,6 @@ Route::post('auctions/save', function (Request $request) {
         ]);
     }
 
-    $address = $customer->addresses->first();
-    $address->phone = $request->userInfo['phone'];
-    $address->save();
-
-
     DB::beginTransaction();
 
     $orderBuilder = (new OrderBuilder())
@@ -430,6 +426,7 @@ Route::post('auctions/save', function (Request $request) {
     $builderData = $orderBuilder->newStore([], $customer);
     $order = Order::find($builderData['id']);
     $orderBuilder->assignItemsToOrder($order, $products);
+    $orderBuilder->updateOrderAddress($order, [], 'DELIVERY_ADDRESS', $request->userInfo['phone'], 'order', $request->userInfo['email'],);
 
     DB::commit();
 
@@ -465,19 +462,6 @@ Route::post('auctions/save', function (Request $request) {
     }
 
     $order->chat->chatUsers->first()->update(['customer_id' => $customer->id]);
-
-//    if ($request->get('delivery_start_date') && $request->get('delivery_end_date')) {
-//        $order->dates()->create([
-//            'customer_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
-//            'customer_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
-//            'customer_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
-//            'customer_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
-//            'consultant_shipment_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
-//            'consultant_shipment_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
-//            'consultant_delivery_date_from' => Carbon::create($request->get('delivery_start_date'))->setTime(7, 0),
-//            'consultant_delivery_date_to' => Carbon::create($request->get('delivery_end_date'))->setTime(20, 0),
-//        ]);
-//    }
 
     $order->additional_service_cost = 50;
     $order->customer_name = $request->userInfo['email'];
