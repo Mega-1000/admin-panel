@@ -31,19 +31,21 @@
 
 <style>
     .message-container {
-        display: inline-block;
         position: relative;
+        display: inline-block;
     }
 
     .message-full {
         display: none;
-        position: absolute;
         background-color: #fff;
         border: 1px solid #ddd;
         padding: 5px;
         z-index: 10;
-        white-space: pre-wrap; /* Ensures long messages wrap properly */
-        max-width: 300px; /* Adjust as needed */
+        white-space: pre-wrap;
+        max-width: 300px;
+        position: absolute;
+        top: 100%;
+        left: 0;
     }
 
     .message-container:hover .message-full {
