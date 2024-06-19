@@ -29,6 +29,7 @@ use App\Mail\NewStyroOfferMade;
 use App\Services\OrderAddressesService;
 use App\Services\ProductService;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -470,5 +471,11 @@ Route::post('auctions/save', function (Request $request) {
     $delay = now()->addHours(2);
 
     dispatch(new ReferFriendNotificationJob($order))->delay($delay);
+
+    return response()->json($builderData + [
+        'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
+        'access_token' => $customer->createToken('Api code')->accessToken,
+        'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE
+    ]);
 });
 

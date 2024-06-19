@@ -31,7 +31,7 @@ class SendSpeditionNotifications implements ShouldQueue
 
     public function updateOrderLabels ($order, $newLabels): void
     {
-        $allLabels = [244, 245, 74, 243]; // Define all your specific labels here
+        $allLabels = [244, 245, 74, 243, 256]; // Define all your specific labels here
         $order->labels()->detach($allLabels);
         $arr = [];
         AddLabelService::addLabels($order, $newLabels, $arr, []);
