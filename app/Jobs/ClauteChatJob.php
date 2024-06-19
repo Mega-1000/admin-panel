@@ -134,6 +134,7 @@ class ClauteChatJob implements ShouldQueue
             Today is ' . now() . '
             If ANYTHING is uncertain provide response "no response" it is very important! You have to be certain that user wants to perform one of these actions
             `Do not provide any other type of response it will break the system`
+            NEVER provide response when you are not 100% certain about user ubtention to perform one of this actions NEVER REMEMBER IT WILL BREAK THE SYSTEM
 
             Here is previous messages from this chat: ' . implode(' ', array_flatten($previousMessages)) . '
 
