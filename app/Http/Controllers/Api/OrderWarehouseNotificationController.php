@@ -19,6 +19,7 @@ use App\Jobs\OrderStatusChangedToDispatchNotificationJob;
 use App\Repositories\OrderInvoiceRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderWarehouseNotificationRepository;
+use App\Services\Label\AddLabelService;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use App\Services\WorkingEventsService;
@@ -27,6 +28,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -264,24 +266,12 @@ class OrderWarehouseNotificationController extends Controller
                 true,
             );
         }
-
         $order->warehouse_id = Warehouse::where('symbol', $request->input('warehouse-symbol'))->first()->id;
         $order->save();
 
-        $now = new Carbon();
-
-        if ($this->canNotifyNow($now)) {
-            $warehousesToRemind = app(OrderWarehouseNotificationRepository::class)->findWhere(['waiting_for_response' => true]);
-
-            if (!empty($warehousesToRemind)) {
-                foreach ($warehousesToRemind as $warehouseNotification) {
-                    if ($this->shouldNotifyWithEmail($warehouseNotification, $now)) {
-                        Log::notice('Wysyłka powiadomienie dla zamówienia: ' . $warehouseNotification->order_id , ['line' => __LINE__, 'file' => __FILE__]);
-                        dispatch_now(new OrderStatusChangedToDispatchNotificationJob($warehouseNotification->order_id));
-                    }
-                }
-            }
-        }
+        $prev = [];
+        AddLabelService::addLabels($order, [52], $prev, [], Auth::user()->id);
+        AddLabelService::addLabels($order, [73], $prev, [], Auth::user()->id);
 
         return redirect()->route('orders.index');
     }
