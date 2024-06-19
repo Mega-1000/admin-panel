@@ -15,10 +15,31 @@
             } elseif ($m->employee()) {
                 $userType = 'Magazyn';
             }
+            $messageText = $message['message'];
+            $firstFiveWords = implode(' ', array_slice(explode(' ', $messageText), 0, 5));
         @endphp
-        {{ $message['message'] }} - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
+        <span class="message-preview">{{ $firstFiveWords }}...</span>
+        <span class="message-full">{{ $messageText }}</span>
+        - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
         {{ $userType }}
         <br>
         <hr>
     @endforeach
 @endif
+
+<style>
+    .message-full {
+        display: none;
+    }
+    .message-preview:hover + .message-full {
+        display: inline;
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 5px;
+        z-index: 10;
+    }
+    .message-preview {
+        cursor: pointer;
+    }
+</style>
