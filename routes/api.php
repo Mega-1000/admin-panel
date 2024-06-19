@@ -423,7 +423,7 @@ Route::post('auctions/save', function (Request $request) {
         ->setTotalTransportSumCalculator(new TransportSumCalculator())
         ->setUserSelector(new GetCustomerForNewOrder());
 
-    $builderData = $orderBuilder->newStore([], $customer);
+    $builderData = $orderBuilder->newStore(['phone' => $request->userInfo['phone']], $customer);
     $order = Order::find($builderData['id']);
     $orderBuilder->assignItemsToOrder($order, $products);
     $orderBuilder->updateOrderAddress($order, [], 'DELIVERY_ADDRESS', $request->userInfo['phone'], 'order', $request->userInfo['email'],);
