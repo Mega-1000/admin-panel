@@ -1,3 +1,24 @@
+<style>
+    .message-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .message-full {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        padding: 12px 16px;
+        z-index: 1;
+    }
+
+    .message-container:hover .message-full {
+        display: block;
+    }
+</style>
+
 @if(array_key_exists('chat', $data) && !empty($data['chat']) && array_key_exists('messages', $data['chat']))
     @php
         $latestMessages = collect($data['chat']['messages'])->sortByDesc('created_at')->take(3);
@@ -23,36 +44,8 @@
             <span class="message-full">{{ $messageText }}</span>
         </div>
         - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
-        {{ $userType }}adsads
+        {{ $userType }}
         <br>
         <hr>
     @endforeach
 @endif
-
-<style>
-    .message-container {
-        position: relative;
-        display: inline-block;
-    }
-
-    .message-full {
-        display: none;
-        background-color: #fff;
-        border: 1px solid #ddd;
-        padding: 5px;
-        z-index: 10;
-        white-space: pre-wrap;
-        max-width: 300px;
-        position: absolute;
-        top: 100%;
-        left: 0;
-    }
-
-    .message-container:hover .message-full {
-        display: block;
-    }
-
-    .message-preview {
-        cursor: pointer;
-    }
-</style>
