@@ -400,11 +400,20 @@ Route::post('auctions/save', function (Request $request) {
         $products[] = $productR;
     }
 
-    $customer = Customer::create([
-        'login' => $request->userInfo['email'],
-        'status' => 'ACTIVE',
-        'password' => Hash::make($request->userInfo['phone']),
-    ]);
+
+    $customer = Customer::where('login', $request->userInfo['email'])->first();
+
+    if (!$customer) {
+        $customer = Customer::create([
+            'login' => $request->userInfo['email'],
+            'status' => 'ACTIVE',
+            'password' => Hash::make($request->userInfo['phone']),
+        ]);
+    }
+
+    $address = $customer->addresses->first();
+    $address->phone = $request->userInfo['phone'];
+    $address->save();
 
 
     DB::beginTransaction();
