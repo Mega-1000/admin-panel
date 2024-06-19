@@ -45,7 +45,7 @@
         @endphp
         <div class="message-container">
             <span class="message-preview">{{ $firstFiveWords }}...</span>
-{{--            <span class="message-full">{{ $messageText }}</span>--}}
+            <span class="message-full">{{ $messageText }}</span>
         </div>
         - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
         {{ $userType }}
