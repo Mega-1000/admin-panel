@@ -38,7 +38,7 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
     <br>
     <br>
     Fakturę prosimy wysyawić na następujące dane: <br>
-    @if ($order->warehouse->firm !== 'neotherm')
+    @if ($order->warehouse->firm->symbol !== 'NEOTHERM')
         ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
         ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
         50-020 Wrocław<br/>
