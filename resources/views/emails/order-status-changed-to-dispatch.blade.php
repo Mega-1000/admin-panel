@@ -56,7 +56,7 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
     'city',
     'postal_code',
     'email'
-])->toArray()) !!}
+])) !!}
 
     @endif
 </p>
@@ -174,7 +174,7 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
     'city',
     'postal_code',
     'email'
-])->toArray()) !!}
+])) !!}
 
     @endif
 </p>
