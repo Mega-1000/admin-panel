@@ -155,10 +155,28 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
 
 <p>
     Od<br>
-    ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
-    ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
-    50-020 Wrocław<br/>
-    NIP: 8971930266<br/>
+
+    @if ($order->warehouse->firm->symbol !== 'NEOTHERM')
+        ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
+        ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
+        50-020 Wrocław<br/>
+        NIP: 8971930266<br/>
+    @else
+        {!! implode('<br>', $order->getInvoiceAddress()->only([
+    'firstname',
+    'lastname',
+    'firmname',
+    'nip',
+    'phone_code',
+    'phone',
+    'address',
+    'flat_number',
+    'city',
+    'postal_code',
+    'email'
+])->toArray()) !!}
+
+    @endif
 </p>
 <p>
     Dane do dostawy: <br/>
