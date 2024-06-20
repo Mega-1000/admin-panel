@@ -11,7 +11,7 @@ getAvailableWarehousesString();
 const showSelectWarehouseTemplate = (modal, orderId) => {
     const row = $('#id-' + orderId);
     const warehouseEl = row.find('.warehouse-symbol');
-    const warehouse = warehouseEl.text().replaceAll(' ', '');
+    const warehouse = warehouseEl.text().replace(/[^a-zA-ZżźćńółęąśŻŹĆĄŚĘŁÓŃ-]/g, '');
 
     $('.warehouse-template').remove();
 

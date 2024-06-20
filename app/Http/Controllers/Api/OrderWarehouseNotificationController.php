@@ -157,8 +157,8 @@ class OrderWarehouseNotificationController extends Controller
                     'is_visible_for_client' => (boolean)$request->isVisibleForClient,
                 ]);
 
-                $arr = [];
-                AddLabelService::addLabels($order, [263], $arr, []);
+
+                $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
 
                 $invoiceRequest = $order->invoiceRequests()->first();
 
