@@ -45,10 +45,6 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
         NIP: 8971930266<br/>
     @else
         {!! implode('<br>', $order->getInvoiceAddress()->toArray()) !!}
-        ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
-        ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
-        50-020 Wrocław<br/>
-        NIP: 8971930266<br/>
     @endif
 </p>
 <p>
