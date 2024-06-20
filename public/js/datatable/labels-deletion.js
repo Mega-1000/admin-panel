@@ -152,18 +152,18 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
                             },
                         })
                         $('#set-magazine').modal('hide');
-                        refreshDtOrReload(orderId)
+                        refreshDtOrReload()
                     })
                 }
             });
     }
 
-    let refreshDtOrReload = function (orderId) {
+    let refreshDtOrReload = function () {
         $.ajax({
             url: '/api/get-labels-scheduler-await/{{ \Illuminate\Support\Facades\Auth::user()->id }}'
         }).done(function (res) {
-            window.location.href = ('#id-' + orderId);
-            window.location.reload();
+             window.location.href = '#id-' + orderId;
+                    window.location.reload();
         });
     };
 

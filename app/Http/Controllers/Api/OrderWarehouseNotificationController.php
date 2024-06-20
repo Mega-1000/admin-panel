@@ -156,6 +156,10 @@ class OrderWarehouseNotificationController extends Controller
                     'invoice_name' => $filename,
                     'is_visible_for_client' => (boolean)$request->isVisibleForClient,
                 ]);
+
+                $arr = [];
+                AddLabelService::addLabels($order, [263], $arr, []);
+
                 $invoiceRequest = $order->invoiceRequests()->first();
 
                 if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {

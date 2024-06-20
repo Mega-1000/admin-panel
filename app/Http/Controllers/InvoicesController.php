@@ -7,6 +7,7 @@ use App\Entities\OrderInvoice;
 use App\Entities\SubiektInvoices;
 use App\Http\Requests\AddInvoiceToOrder;
 use App\Http\Requests\UploadInvoiceRequest;
+use App\Services\Label\AddLabelService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -52,6 +53,11 @@ class InvoicesController extends Controller
                 'invoice_type' => $request->type,
                 'invoice_name' => $filename
             ]);
+
+            $arr = [];
+            AddLabelService::addLabels($order, [263], $arr, []);
+
+
             return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
         } catch (\Exception $exception) {
             error_log(print_r($exception->getMessage(), 1));
