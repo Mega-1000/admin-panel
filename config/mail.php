@@ -124,7 +124,7 @@ return [
     'mailers' => [
         'notifications' => [
             'transport' => 'smtp',
-            'host' => env('MAIL_NOTIFICATION_HOST', 's104.linuxpl.com'),
+            'host' => env('MAIL_NOTIFICATION_HOST', 's84.cyber-folks.pl'),
             'username' => env('MAIL_NOTIFICATION_USERNAME', 'awizacje@ephpolska.pl'),
             'password' => env('MAIL_NOTIFICATION_PASSWORD', '1!Qaa2@Wss'),
             'port' => env('MAIL_NOTIFICATION_PORT', 587),
