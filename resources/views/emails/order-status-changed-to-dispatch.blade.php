@@ -38,10 +38,18 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
     <br>
     <br>
     Fakturę prosimy wysyawić na następujące dane: <br>
-    ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
-    ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
-    50-020 Wrocław<br/>
-    NIP: 8971930266<br/>
+    @if ($order->warehouse->firm !== 'neotherm')
+        ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
+        ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
+        50-020 Wrocław<br/>
+        NIP: 8971930266<br/>
+    @else
+        {!! implode('<br>', $order->getInvoiceAddress()->toArray()) !!}
+        ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
+        ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
+        50-020 Wrocław<br/>
+        NIP: 8971930266<br/>
+    @endif
 </p>
 <p>
     Faktura powinna byc bez pieczątek i podpisów i po wydrukowaniu powinna wyglądać jak oryginał. (Prosimy nie wysyłać pocztą tradycyjną bo i tak nie dotrze do księgowości).
