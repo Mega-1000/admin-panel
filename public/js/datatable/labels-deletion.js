@@ -12,7 +12,7 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
     const row = $('#id-' + orderId);
     const warehouseEl = row.find('.warehouse-symbol');
     const warehouse = warehouseEl.text().replace(/[^a-zA-ZżźćńółęąśŻŹĆĄŚĘŁÓŃ-]/g, '').replace(/\s+/g, '');
-
+    console.log(warehouse)
 
     $('.warehouse-template').remove();
 
