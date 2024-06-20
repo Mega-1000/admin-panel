@@ -162,7 +162,7 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
         $.ajax({
             url: '/api/get-labels-scheduler-await/{{ \Illuminate\Support\Facades\Auth::user()->id }}'
         }).done(function (res) {
-            window.location.href = ('#id-' + orderId.replace(/\s+/g, ''));
+            window.location.href = ('#id-' + orderId.replace(/[^a-zA-ZżźćńółęąśŻŹĆĄŚĘŁÓŃ-]/g, ''));
                     window.location.reload();
         });
     };
