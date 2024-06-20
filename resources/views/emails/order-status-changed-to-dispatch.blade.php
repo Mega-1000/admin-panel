@@ -44,7 +44,20 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
         50-020 Wrocław<br/>
         NIP: 8971930266<br/>
     @else
-        {!! implode('<br>', $order->getInvoiceAddress()->toArray()) !!}
+        {!! implode('<br>', $order->getInvoiceAddress()->only([
+    'firstname',
+    'lastname',
+    'firmname',
+    'nip',
+    'phone_code',
+    'phone',
+    'address',
+    'flat_number',
+    'city',
+    'postal_code',
+    'email'
+])->toArray()) !!}
+
     @endif
 </p>
 <p>
