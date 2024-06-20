@@ -25,8 +25,6 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
                 <div class="form-group" style="width: 15%; padding: 5px;">
                     <label for="delivery_warehouse2">Magazyn obsługujący</label>`
                     +
-                    warehouse ? warehouse : ''
-                    +
                     `<input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}"> `
                     +
                 `</div><br>
