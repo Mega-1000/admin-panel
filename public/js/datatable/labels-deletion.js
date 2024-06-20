@@ -23,9 +23,13 @@ const showSelectWarehouseTemplate = (modal, orderId) => {
                 <div class="warehouse-template">
                 <p>Magazyn nie został przypisany, przypisz magazyn przed wysłaniem</p>
                 <div class="form-group" style="width: 15%; padding: 5px;">
-                    <label for="delivery_warehouse2">Magazyn obsługujący</label>
-                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}">
-                </div><br>
+                    <label for="delivery_warehouse2">Magazyn obsługujący</label>`
+                    +
+                    warehouse ? warehouse : ''
+                    +
+                    `<input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}"> `
+                    +
+                `</div><br>
                 </div>`;
 
     const modalBody = modal.find('.modal-body');
