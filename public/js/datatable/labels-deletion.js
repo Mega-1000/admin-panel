@@ -152,18 +152,18 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
                             },
                         })
                         $('#set-magazine').modal('hide');
-                        refreshDtOrReload()
+                        refreshDtOrReload(orderId)
                     })
                 }
             });
     }
 
-    let refreshDtOrReload = function () {
+    let refreshDtOrReload = function (orderId) {
         $.ajax({
             url: '/api/get-labels-scheduler-await/{{ \Illuminate\Support\Facades\Auth::user()->id }}'
         }).done(function (res) {
-            window.location.href = ('#id-' + orderId.replace(/[^a-zA-ZżźćńółęąśŻŹĆĄŚĘŁÓŃ-]/g, ''));
-                    window.location.reload();
+            window.location.href = ('#id-' + orderId);
+            window.location.reload();
         });
     };
 
