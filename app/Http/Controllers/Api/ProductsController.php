@@ -143,7 +143,7 @@ class ProductsController extends Controller
                     'gross_selling_price_basic_unit' => $array['value_of_price_change_data_first'] * 1.23,
                     'net_purchase_price_basic_unit_after_discounts' => $array['value_of_price_change_data_first'],
                     'gross_purchase_price_basic_unit_after_discounts' => $array['value_of_price_change_data_first'] * 1.23,
-                    'net_selling_price_basic_unit' => $array['value_of_price_change_data_first'] * 1.23,
+                    'net_selling_price_basic_unit' => $array['value_of_price_change_data_first'],
                 ]);
 
                 Product::whereIn('id', $productsRelatedIds)->update($array);
