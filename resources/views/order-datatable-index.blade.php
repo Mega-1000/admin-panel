@@ -388,7 +388,6 @@
 
     <script>
         function getInvoicesLists(id) {
-            alert('okej')
             $.ajax({
                 url: '/admin/orders/' + id + '/invoices',
             }).done(function (data) {
