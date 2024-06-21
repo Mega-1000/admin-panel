@@ -363,7 +363,7 @@
             })
 
             const phoneInformationsFive = document.getElementsByClassName('tooltip-message-five-' + id);
-            phoneInformations.forEach((phoneInformation) => {
+            phoneInformationsFive.forEach((phoneInformation) => {
                 phoneInformation.style.display = 'none';
             })
         }
