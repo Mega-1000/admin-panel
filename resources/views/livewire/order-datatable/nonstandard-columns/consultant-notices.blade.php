@@ -28,33 +28,35 @@
         $latestMessages = collect($data['chat']['messages'])->sortByDesc('created_at')->take(3);
     @endphp
 
-    @foreach($latestMessages as $message)
-        <hr>
-        @php
-            $m = \App\Entities\Message::find($message['id']);
-            $userType = '';
-            if ($m->user()) {
-                $userType = 'Konsultant';
-            } elseif ($m->customer()) {
-                $userType = 'Klient';
-            } elseif ($m->employee()) {
-                $userType = 'Magazyn';
-            }
-            $messageText = $message['message'];
-            $words = explode(' ', $messageText);
-            $firstFiveWords = implode(' ', array_slice($words, 0, 5));
-        @endphp
-        <div class="message-container">
-            <span class="message-preview"     onmouseover="showMessageInformations('{{ $order['created_at'] }}')"
-                  onmouseout="hideMessageInformations('{{ $order['created_at'] }}')">{{ $firstFiveWords }}...</span>
+    <div onmouseover="showMessageInformations('{{ $order['created_at'] }}')"
+         onmouseout="hideMessageInformations('{{ $order['created_at'] }}')">
+        @foreach($latestMessages as $message)
+            <hr>
+            @php
+                $m = \App\Entities\Message::find($message['id']);
+                $userType = '';
+                if ($m->user()) {
+                    $userType = 'Konsultant';
+                } elseif ($m->customer()) {
+                    $userType = 'Klient';
+                } elseif ($m->employee()) {
+                    $userType = 'Magazyn';
+                }
+                $messageText = $message['message'];
+                $words = explode(' ', $messageText);
+                $firstFiveWords = implode(' ', array_slice($words, 0, 5));
+            @endphp
+            <div class="message-container">
+                <span class="tooltip-message-five-{{ $order['created_at'] }}">{{ $firstFiveWords }}...</span>
 
-            <div class="tooltip-message-{{ $order['created_at'] }}" style="display: none">
-                {{ $messageText }}
+                <div class="tooltip-message-{{ $order['created_at'] }}" style="display: none">
+                    {{ $messageText }}
+                </div>
             </div>
-        </div>
-        - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
-        {{ $userType }}
-        <br>
-        <hr>
-@endforeach
+            - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
+            {{ $userType }}
+            <br>
+            <hr>
+    @endforeach
+    </div>
 @endif

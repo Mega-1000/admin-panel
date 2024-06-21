@@ -361,6 +361,11 @@
             phoneInformations.forEach((phoneInformation) => {
                 phoneInformation.style.display = 'block';
             })
+
+            const phoneInformationsFive = document.getElementsByClassName('tooltip-message-five-' + id);
+            phoneInformations.forEach((phoneInformation) => {
+                phoneInformation.style.display = 'none';
+            })
         }
 
         const hideMessageInformations = (id) => {
