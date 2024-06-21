@@ -204,6 +204,22 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" id="order_invoices_delete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" id="invoice__container">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="X"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Wybierz fakturę do usunięcia</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="remove-selected-invoice" data-dismiss="modal">Usuń wybraną fakturę.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('scripts')
@@ -368,6 +384,30 @@
                 }
             });
         });
+    </script>
+
+    <script>
+        function getInvoicesList(id) {
+            $.ajax({
+                url: '/admin/orders/' + id + '/invoices',
+            }).done(function (data) {
+                $('#order_invoices_delete').modal('show');
+                if (data === null) {
+                    return;
+                }
+                $('#invoice__list').remove();
+                let parent = document.getElementById("invoice__container");
+                let invoiceSelect = document.createElement("SELECT");
+                invoiceSelect.id = "invoice__list";
+                parent.appendChild(invoiceSelect);
+                data.forEach((invoice) => {
+                    let option = document.createElement("option");
+                    option.value = invoice.id;
+                    option.text = invoice.invoice_name;
+                    invoiceSelect.appendChild(option);
+                })
+            })
+        }
     </script>
 @endsection
 <script src="{{ asset('js/datatable/drag-and-drop.js') }}"></script>
