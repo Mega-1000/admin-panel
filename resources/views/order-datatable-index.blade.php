@@ -357,12 +357,12 @@
 
     <script>
         const showMessageInformations = (id) => {
-            const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
+            const phoneInformations = document.getElementById('tooltip-message-info-' + id);
             phoneInformations.style.display = 'block';
         }
 
         const hideMessageInformations = (id) => {
-            const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
+            const phoneInformations = document.getElementById('tooltip-message-info-' + id);
             phoneInformations.style.display = 'none';
         }
 
