@@ -180,7 +180,7 @@
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                     let totalPrice = parseFloat(document.querySelector('.total-price').textContent.replace('ZŁ', ''));
                     const productData = [];
-                    const cashOnDelivery = document.querySelector('#cash-on-delivery').checked;
+                    const cashOnDelivery = document.querySelector('#cash-on-delivery')?.checked;
 
                     const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
 
