@@ -79,11 +79,11 @@
                                 <input type="radio" id="full-payment" name="payment-option" class="form-radio" checked>
                                 <span class="ml-2">100 % przedpłata przed dostawą</span>
                             </label>
-                            <br>
-                            <label class="inline-flex items-center">
-                                <input type="radio" id="cash-on-delivery" name="payment-option" class="form-radio">
-                                <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>
-                            </label>
+{{--                            <br>--}}
+{{--                            <label class="inline-flex items-center">--}}
+{{--                                <input type="radio" id="cash-on-delivery" name="payment-option" class="form-radio">--}}
+{{--                                <span class="ml-2">Zapłata przy odbiorze przelewem błyskawicznym</span>--}}
+{{--                            </label>--}}
                             <br>
                             <br>
                         </div>
@@ -224,7 +224,7 @@
 
                             await Swal.fire('Sukces', message, 'success');
 
-                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${totalPrice + 50}&credentials={{$order->customer->login}}:{{$order->customer->phone}}`;
+                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${150 + 50}&credentials={{$order->customer->login}}:{{$order->customer->phone}}`;
                         })
                         .catch(error => {
                             console.error('Error:', error);
