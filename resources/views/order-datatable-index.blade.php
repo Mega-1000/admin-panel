@@ -357,14 +357,14 @@
 
     <script>
         const showMessageInformations = (id) => {
-            const phoneInformations = document.querySelectorAll('tooltip-message-' + id);
+            const phoneInformations = document.querySelectorAll('#tooltip-message-' + id);
             phoneInformations.forEach((phoneInformation) => {
                 phoneInformation.style.display = 'block';
             })
         }
 
         const hideMessageInformations = (id) => {
-            const phoneInformations = document.getElementById('tooltip-message-' + id);
+            const phoneInformations = document.getElementById('#tooltip-message-' + id);
             phoneInformations.style.display = 'none';
         }
 
