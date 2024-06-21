@@ -442,7 +442,7 @@ Route::post('auctions/save', function (Request $request) {
     if (empty($data['cart_token'])) {
         foreach ($orderAddresses as $orderAddress) {
             OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer);
-            $orderAddress->zipCode = $request->userInfo['zipCode'];
+            $orderAddress->postal_code = $request->userInfo['zipCode'];
             $orderAddress->save();
         }
     }
