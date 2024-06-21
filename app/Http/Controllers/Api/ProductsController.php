@@ -118,10 +118,6 @@ class ProductsController extends Controller
     public function updateProductsPrice(Request $request)
     {
         try {
-//            $this->validate($request, [
-//                '*.date_of_price_change' => 'required|date|after:today',
-//                '*.date_of_the_new_prices' => 'required|date',
-//            ]);
             foreach ($request->all() as $item) {
                 if (!array_key_exists('id', $item)) {
                     continue;
@@ -146,7 +142,8 @@ class ProductsController extends Controller
                 ProductPrice::whereIn('product_id', $productsRelatedIds)->update([
                     'gross_selling_price_basic_unit' => $array['value_of_price_change_data_first'] * 1.23,
                     'net_purchase_price_basic_unit_after_discounts' => $array['value_of_price_change_data_first'],
-                    'gross_purchase_price_basic_unit_after_discounts' => $array['value_of_price_change_data_first'] * 1.23
+                    'gross_purchase_price_basic_unit_after_discounts' => $array['value_of_price_change_data_first'] * 1.23,
+                    'net_selling_price_basic_unit' => $array['value_of_price_change_data_first'] * 1.23,
                 ]);
 
                 Product::whereIn('id', $productsRelatedIds)->update($array);
