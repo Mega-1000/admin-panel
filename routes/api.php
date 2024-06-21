@@ -437,11 +437,12 @@ Route::post('auctions/save', function (Request $request) {
     $order->save();
 
 
-    return response()->json($order->addresses()->get());
 
     if (empty($data['cart_token'])) {
         foreach ($orderAddresses as $orderAddress) {
             OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer);
+            $orderAddress->zipCode = $request->userInfo['zipCode'];
+            $orderAddress->save();
         }
     }
     $order->update(['status_id' => 3]);
