@@ -397,11 +397,15 @@ Route::post('styro-help', function (Request $request) {
 Route::post('auctions/save', function (Request $request) {
     $products = [];
     foreach ($request->auctionData as $product) {
-        $productR = \App\Entities\Product::where('name', 'like', '%'. $product['styrofoamType']. '%')
-            ->where('name', 'like', '%', $product['thikness'], '%')
+        $productR = \App\Entities\Product::where('name', 'like', '%' . $product['styrofoamType'] . '%')
+            ->where('name', 'like', '%' . $product['thikness'] . '%')
             ->whereDoesntHave('children')
-            ->first()
-            ->toArray();
+            ->first();
+
+        if ($productR) {
+            $productR = $productR->toArray();
+        }
+
 
         $productR['amount'] = $product['quantity'];
         $products[] = $productR;
