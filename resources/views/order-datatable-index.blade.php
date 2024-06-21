@@ -356,7 +356,6 @@
     </script>
 
     <script>
-
         const showMessageInformations = (id) => {
             const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
             phoneInformations.style.display = 'block';
