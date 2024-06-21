@@ -41,7 +41,7 @@ Suma: <br /><b>{{ number_format($totalCost, 2) }}</b>
         @endif
     @endforeach
     <br />
-    <div class="remove__invoices" onclick="getInvoicesList({{ $order['id'] }})">Usuń</div>
+    <div class="remove__invoices" onclick="getInvoicesLists({{ $order['id'] }})">Usuń</div>
 @endif
 
 @php
