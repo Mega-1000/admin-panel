@@ -45,8 +45,8 @@
             $firstFiveWords = implode(' ', array_slice($words, 0, 5));
         @endphp
         <div class="message-container">
-            <span class="message-preview"     onmouseover="showMessageInformations('{{ $wholeOrder['id'] }}')"
-                  onmouseout="hideMessageInformations('{{ $wholeOrder['id'] }}')">{{ $firstFiveWords }}...</span>
+            <span class="message-preview"     onmouseover="showMessageInformations('{{ $order['id'] }}')"
+                  onmouseout="hideMessageInformations('{{ $order['id'] }}')">{{ $firstFiveWords }}...</span>
 
             <div class="tooltip-phone-info"  id="tooltip-message-{{ $order['id'] }}" style="display: none">
                 {{ $messageText }}
