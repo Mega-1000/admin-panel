@@ -437,6 +437,7 @@ Route::post('auctions/save', function (Request $request) {
     $order->save();
 
 
+    $orderAddresses = $order->addresses()->get();
 
     if (empty($data['cart_token'])) {
         foreach ($orderAddresses as $orderAddress) {
@@ -445,6 +446,7 @@ Route::post('auctions/save', function (Request $request) {
             $orderAddress->save();
         }
     }
+
     $order->update(['status_id' => 3]);
 
     dispatch_now(new OrderStatusChangedNotificationJob($order->id));
