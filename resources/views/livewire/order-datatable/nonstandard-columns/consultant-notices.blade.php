@@ -22,8 +22,6 @@
         display: block;
     }
 </style>
-</head>
-<body>
 
 @if(array_key_exists('chat', $data) && !empty($data['chat']) && array_key_exists('messages', $data['chat']))
     @php
@@ -43,7 +41,8 @@
                 $userType = 'Magazyn';
             }
             $messageText = $message['message'];
-            $firstFiveWords = implode(' ', array_slice(explode(' ', $messageText), 0, 5));
+            $words = explode(' ', $messageText);
+            $firstFiveWords = implode(' ', array_slice($words, 0, 5));
         @endphp
         <div class="message-container">
             <span class="message-preview">{{ $firstFiveWords }}...</span>
