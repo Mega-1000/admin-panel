@@ -48,7 +48,7 @@
             <span class="message-preview"     onmouseover="showMessageInformations('{{ $order['created_at'] }}')"
                   onmouseout="hideMessageInformations('{{ $order['created_at'] }}')">{{ $firstFiveWords }}...</span>
 
-            <div class="tooltip-phone-info"  id="tooltip-message-{{ $order['created_at'] }}" style="display: none">
+            <div class="tooltip-message-{{ $order['created_at'] }}" style="display: none">
                 {{ $messageText }}
             </div>
         </div>

@@ -357,7 +357,7 @@
 
     <script>
         const showMessageInformations = (id) => {
-            const phoneInformations = document.querySelectorAll('#tooltip-message-' + id);
+            const phoneInformations = document.getElementsByClassName('tooltip-message-' + id);
             phoneInformations.forEach((phoneInformation) => {
                 phoneInformation.style.display = 'block';
             })
