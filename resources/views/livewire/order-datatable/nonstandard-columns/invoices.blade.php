@@ -35,7 +35,7 @@ Suma: <br /><b>{{ number_format($totalCost, 2) }}</b>
                 <p class="invoice__invisible">Niewidoczna</p>
             @endif
 
-            <a href="#" class="change__invoice--visibility" onclick="changeInvoiceVisibility({{ $invoice['id'] }})">Zmień widoczność</a>
+            <a href="#" class="change__invoice--visibility" onclick="changeInvoiceVisibility({{ $invoice['id'] }})">Zmieńwidoczność</a>
 
             <hr>
         @endif
