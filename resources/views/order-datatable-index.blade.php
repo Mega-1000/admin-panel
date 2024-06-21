@@ -357,14 +357,19 @@
 
     <script>
         const showMessageInformations = (id) => {
-            const phoneInformations = document.getElementById('tooltip-message-' + id);
-            phoneInformations.style.display = 'block';
+            const phoneInformations = document.querySelectorAll('.tooltip-message[data-id="' + id + '"]');
+            phoneInformations.forEach(element => {
+                element.style.display = 'block';
+            });
         }
 
         const hideMessageInformations = (id) => {
-            const phoneInformations = document.getElementById('tooltip-message-' + id);
-            phoneInformations.style.display = 'none';
+            const phoneInformations = document.querySelectorAll('.tooltip-message[data-id="' + id + '"]');
+            phoneInformations.forEach(element => {
+                element.style.display = 'none';
+            });
         }
+
 
         // Pobierz formularz
         const form = document.getElementById('deleteForm');
