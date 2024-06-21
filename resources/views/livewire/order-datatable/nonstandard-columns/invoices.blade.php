@@ -41,7 +41,13 @@ Suma: <br /><b>{{ number_format($totalCost, 2) }}</b>
         @endif
     @endforeach
     <br />
-    <div class="remove__invoices" onclick="getInvoicesLists('{{ $order['id'] }})'">Usuń</div>
+    @php
+        if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
+              $id = $matches[1];
+          }
+    @endphp
+
+    <div class="remove__invoices" onclick="getInvoicesLists({{ $id }})">Usuń</div>
 @endif
 
 @php
