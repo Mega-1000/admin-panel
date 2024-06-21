@@ -356,6 +356,17 @@
     </script>
 
     <script>
+
+        const showMessageInformations = (id) => {
+            const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
+            phoneInformations.style.display = 'block';
+        }
+
+        const hideMessageInformations = (id) => {
+            const phoneInformations = document.getElementById('tooltip-phone-info-' + id);
+            phoneInformations.style.display = 'none';
+        }
+
         // Pobierz formularz
         const form = document.getElementById('deleteForm');
 
