@@ -437,7 +437,7 @@ Route::post('auctions/save', function (Request $request) {
     $order->save();
 
 
-    $orderAddresses = dd($order->addresses()->get());
+    return response()->json($order->addresses()->get());
 
     if (empty($data['cart_token'])) {
         foreach ($orderAddresses as $orderAddress) {
