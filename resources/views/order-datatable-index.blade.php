@@ -369,8 +369,15 @@
         }
 
         const hideMessageInformations = (id) => {
-            const phoneInformations = document.getElementById('#tooltip-message-' + id);
-            phoneInformations.style.display = 'none';
+            const phoneInformations = document.getElementsByClassName('tooltip-message-' + id);
+            phoneInformations.forEach((phoneInformation) => {
+                phoneInformation.style.display = 'none';
+            })
+
+            const phoneInformationsFive = document.getElementsByClassName('tooltip-message-five-' + id);
+            phoneInformationsFive.forEach((phoneInformation) => {
+                phoneInformation.style.display = 'block';
+            })
         }
 
         // Pobierz formularz
