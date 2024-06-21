@@ -224,7 +224,7 @@
 
                             await Swal.fire('Sukces', message, 'success');
 
-                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${150}&credentials={{$order->customer->login}}:{{$order->customer->phone}}`;
+                            window.location.href = `https://mega1000.pl/payment?token={{ $order->token }}&total=${150}&credentials={{$order->customer->login}}:{{$order->customer->phone}}&message=Zapłać teraz 150zł zaliczki a my skontaktujemy cię bezpośrednio z producentem`;
                         })
                         .catch(error => {
                             console.error('Error:', error);
