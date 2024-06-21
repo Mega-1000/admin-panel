@@ -8,10 +8,22 @@
         cursor: pointer;
     }
 
+    .message-full {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        padding: 12px 16px;
+        z-index: 1;
+    }
+
     .message-container:hover .message-full {
         display: block;
     }
 </style>
+</head>
+<body>
 
 @if(array_key_exists('chat', $data) && !empty($data['chat']) && array_key_exists('messages', $data['chat']))
     @php
@@ -35,17 +47,11 @@
         @endphp
         <div class="message-container">
             <span class="message-preview">{{ $firstFiveWords }}...</span>
-            <span class="message-full" style="        display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        padding: 12px 16px;
-        z-index: 1;">{{ $messageText }}</span>
+            <span class="message-full">{{ $messageText }}</span>
         </div>
         - {{ \Carbon\Carbon::parse(explode('.', $message['created_at'])[0])->addHours(2) }}
         {{ $userType }}
         <br>
         <hr>
-    @endforeach
+@endforeach
 @endif
