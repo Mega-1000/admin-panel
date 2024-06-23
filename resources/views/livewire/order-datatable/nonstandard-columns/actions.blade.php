@@ -31,10 +31,6 @@
     <span class="hidden-xs hidden-sm">Chat</span>
 </a>
 
-<a href="/chat/{{ $token }}" target="_blank" class="btn btn-sm btn-primary">
-    <span class="hidden-xs hidden-sm">Chat</span>
-</a>
-
 <a href="{{ route('createAvisation', $order['id'])}}" class="btn btn-sm btn-primary">
     <span class="hidden-xs hidden-sm">
         Szybka awizacja
