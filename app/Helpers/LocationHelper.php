@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class LocationHelper
 {
-    public static function getAvaiabilityOfProductForZipCode(Firm $firm, string $zipCode): bool
+    public static function getAvaiabilityOfProductForZipCode(?Firm $firm, string $zipCode): bool
     {
         $coordinatesOfUser = DB::table('postal_code_lat_lon')
             ->where('postal_code', $zipCode)
             ->get()
             ->first();
 
-        if ($firm || $coordinatesOfUser) {
+        if (!$firm || $coordinatesOfUser) {
             return true;
         }
 
