@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class LocationHelper
 {
-    public function getAvaiabilityOfProductForZipCode(Product $product, string $zipCode): bool
+    public static function getAvaiabilityOfProductForZipCode(Product $product, string $zipCode): bool
     {
         $firm = $product->firm;
         $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $zipCode)->get()->first();
