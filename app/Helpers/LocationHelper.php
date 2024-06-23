@@ -18,7 +18,7 @@ class LocationHelper
             ->get()
             ->first();
 
-        if (!$firm || $coordinatesOfUser) {
+        if (!$firm || !$coordinatesOfUser) {
             return true;
         }
 
