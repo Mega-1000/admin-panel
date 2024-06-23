@@ -13,8 +13,15 @@ class LocationHelper
 {
     public static function getAvaiabilityOfProductForZipCode(Product $product, string $zipCode): bool
     {
-        $firm = $product->firm;
-        $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $zipCode)->get()->first();
+        $firm = $product?->firm;
+        $coordinatesOfUser = DB::table('postal_code_lat_lon')
+            ->where('postal_code', $zipCode)
+            ->get()
+            ->first();
+
+        if ($firm || $coordinatesOfUser) {
+            return true;
+        }
 
         $raw = DB::selectOne(
             'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
