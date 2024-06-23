@@ -31,7 +31,7 @@ class SendSpeditionNotifications implements ShouldQueue
 
     public function updateOrderLabels ($order, $newLabels): void
     {
-        $allLabels = [244, 245, 74, 243, 256]; // Define all your specific labels here
+        $allLabels = [244, 245, 74, 243, 256, 270]; // Define all your specific labels here
         $order->labels()->detach($allLabels);
         $arr = [];
         AddLabelService::addLabels($order, $newLabels, $arr, []);
@@ -50,8 +50,11 @@ class SendSpeditionNotifications implements ShouldQueue
         foreach ($orders as $order) {
             $order = Order::find($order->order_id);
             $sendMails = $order->labels->contains('id', 53) &&
-                $order->labels->contains('id',179) &&
                 $order->warehouse?->warehouse_email;
+
+            if ($order->labels->contains('id', 179)) {
+                continue;
+            }
 
             $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
             $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
@@ -91,12 +94,14 @@ class SendSpeditionNotifications implements ShouldQueue
                         $this->updateOrderLabels($order, [270]);
                     }
 
-                    try {
-                        Mailer::create()
-                            ->to($order->warehouse->warehouse_email)
-                            ->send(new SpeditionDatesMonit($order));
-                    } catch (\Exception $exception) {
+                    if ($sendMails) {
+                        try {
+                            Mailer::create()
+                                ->to($order->warehouse->warehouse_email)
+                                ->send(new SpeditionDatesMonit($order));
+                        } catch (\Exception $exception) {
 
+                        }
                     }
                 }
             }
