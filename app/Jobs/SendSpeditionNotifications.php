@@ -49,7 +49,7 @@ class SendSpeditionNotifications implements ShouldQueue
 
         foreach ($orders as $order) {
             $order = Order::find($order->order_id);
-            $sendMails = $order->labels->contains(53) && $order->warehouse?->warehouse_email;
+            $sendMails = $order->labels->contains(53, 179) && $order->warehouse?->warehouse_email;
 
             $fromDate = Carbon::create($order->dates->warehouse_shipment_date_from ?? $order->dates->customer_shipment_date_from);
             $toDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
