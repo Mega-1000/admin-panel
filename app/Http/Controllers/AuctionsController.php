@@ -460,6 +460,7 @@ class AuctionsController extends Controller
             ->unique('product_name_supplier');
 
         foreach ($products as $product) {
+            dd($product->firm);
             LocationHelper::getAvaiabilityOfProductForZipCode($product, \request()->query('zipCode'));
         }
 
