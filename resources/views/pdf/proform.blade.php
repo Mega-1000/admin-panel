@@ -64,13 +64,13 @@
                         @else
 
                         <div class="h3">
-                            !!!!!!!!!!  ZMIANA NUMERU KONTA ORAZ NAZWY FIRMY OD 2023-12-13 !!!!!!!!!!!!!<br/>
-                            ELETKRONICZNA PLATFORMA HANDLOWA POLSKA SPOLKA Z O O <br/>
+                            !!!!!!!!!!  ZMIANA NUMERU KONTA ORAZ NAZWY FIRMY !!!!!!!!!!!!!<br/>
+                            ELETKRONICZNA PLATFORMA HANDLOWA EU SPOLKA Z O O <br/>
                         </div>
                         PIŁSUDSKIEGO 74/320 <br/>
                         50-020 WROCŁAW <br/>
                         NIP 8971930266 <br/>
-                        numer konta 80 1140 2004 0000 3602 8433 3856 mBank S A<br/><br/>
+                        numer konta 51 1140 2004 0000 3102 8491 5362 mBank S A<br/><br/>
                         Telefony: www.ephpolska.pl w zakładce <b>kontakt</b><br/>
                         E-mail ogólny: info@ephpolska.pl<br/>
                         Sklep: www.ephpolska.pl<br/>
