@@ -155,7 +155,7 @@ class OrderService
                 'address' => 'Jaracz',
                 'postal_code' => '50-305',
                 'city' => 'Wrocław',
-                'nip' => '8982272269',
+                'nip' => '9121945342',
                 'type' => 'INVOICE_ADDRESS',
                 'order_id' => $order->id,
                 'email' => 'info@ephpolska.pl',

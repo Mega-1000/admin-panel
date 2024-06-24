@@ -39,7 +39,7 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
     <br>
     Fakturę prosimy wysyawić na następujące dane: <br>
     @if ($order->warehouse->firm->symbol !== 'NEOTHERM')
-        ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
+        ELEKTRONICZNA PLATFORMA HANDLOWA EU SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
         ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
         50-020 Wrocław<br/>
         NIP: 8971930266<br/>
@@ -157,7 +157,7 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
     Od<br>
 
     @if ($order->warehouse->firm->symbol !== 'NEOTHERM')
-        ELEKTRONICZNA PLATFORMA HANDLOWA POLSKA SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
+        ELEKTRONICZNA PLATFORMA HANDLOWA EU SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
         ul. marsz. Józefa Piłsudskiego 74/ 320<br/>
         50-020 Wrocław<br/>
         NIP: 8971930266<br/>

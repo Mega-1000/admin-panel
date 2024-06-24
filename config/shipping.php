@@ -5,7 +5,7 @@ return [
     'sender' => [
         'name' => env('SENDER_NAME', 'Elektroniczna Platforma Handlowa Sp z o. o.'),
         'contact_person' => env('SENDER_CONTACT_PERSON', 'Wojciech Weissbrot'),
-        'tax_number' => env('SENDER_TAX_NUMBER', '8982272269'),
+        'tax_number' => env('SENDER_TAX_NUMBER', '9121945342'),
         'post_code' => env('SENDER_POST_CODE', '50-305'),
         'city' => env('SENDER_CITY', 'Wrocław'),
         'street' => env('SENDER_STREET', 'Stefana Jaracza'),
@@ -18,7 +18,7 @@ return [
     'payer' => [
         'name' => env('PAYER_NAME', 'Elektroniczna Platforma Handlowa Sp z o. o.'),
         'contact_person' => env('SENDER_CONTACT_PERSON', 'Wojciech Weissbrot'),
-        'tax_number' => env('PAYER_TAX_NUMBER', '8982272269'),
+        'tax_number' => env('PAYER_TAX_NUMBER', '9121945342'),
         'post_code' => env('PAYER_POST_CODE', '50-305'),
         'city' => env('PAYER_CITY', 'Wrocław'),
         'street' => env('PAYER_STREET', 'Stefana Jaracza'),
