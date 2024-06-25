@@ -8,6 +8,7 @@ use App\Entities\Chat;
 use App\Entities\ChatAuction;
 use App\Entities\ChatAuctionFirm;
 use App\Entities\ChatAuctionOffer;
+use App\Entities\ContactApproach;
 use App\Entities\Firm;
 use App\Entities\Order;
 use App\Entities\OrderItem;
@@ -625,5 +626,21 @@ class AuctionsController extends Controller
         AddLabelService::addLabels($order, [225], $arr, []);
 
         return '<script>alert("Zapisaliśmy brak zainteresowania ofertą z Państwa strony!")</script>';
+    }
+
+    public function SubmitOfferAskForm(Request $request): JsonResponse
+    {
+        $data = $request->all();
+
+        ContactApproach::create([
+            'phone_number' => $data['phone'],
+            'referred_by_user_id' => 29321,
+            'done' => false,
+            'notes' => implode(' ', $data),
+        ]);
+
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

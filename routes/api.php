@@ -242,6 +242,7 @@ Route::post('contact-approach/create', [ContactApproachController::class, 'store
 
 Route::get('handle-soft-synergy-contact-form', [ContactApproachController::class, 'softSyng']);
 Route::get('get-blurred-categories/{category}', [ProductsController::class, 'getBlurredCategories']);
+Route::post('submit-offer-ask-form', [AuctionsController::class, 'SubmitOfferAskForm']);
 
 Route::post('styro-help', function (Request $request) {
     $apiUrl = "https://api.anthropic.com/v1/messages";
