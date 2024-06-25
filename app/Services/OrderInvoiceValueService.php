@@ -15,7 +15,10 @@ final class OrderInvoiceValueService
      */
     public static function createFromDTO(ControllSubjectInvoiceDTO $dto, Order $order): OrderInvoiceValue
     {
-        if (OrderInvoiceValue::where('invoice_number', $dto->number)->exists() && OrderInvoiceValue::where('invoice_number', $dto->number)->first()->value === $dto->value) {
+        if (
+            OrderInvoiceValue::where('invoice_number', $dto->number)->exists() &&
+            OrderInvoiceValue::where('invoice_number', $dto->number)->first()->value === $dto->value
+        ) {
             return OrderInvoiceValue::where('invoice_number', $dto->number)->first();
         }
 
@@ -24,7 +27,7 @@ final class OrderInvoiceValueService
             'value' => $dto->value,
             'invoice_number' => $dto->number,
             'issue_date' => $dto->issueDate,
-            'type' => request()->get('invoice-kind') === 'faktury sprzedazy' ? 'selling' : 'buying',
+            'type' => 'selling',
         ]);
     }
 
