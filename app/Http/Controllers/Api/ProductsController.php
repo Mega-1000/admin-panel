@@ -445,7 +445,7 @@ class ProductsController extends Controller
 
         return response()->json(
             Product::where('name', 'like', '%' . $query .'%')
-                ->whereHas('children')
+//                ->whereHas('children')
                 ->with(['price', 'opinions']) // Eager load 'price' and 'opinions' relationships
                 ->limit(5)
                 ->get()
