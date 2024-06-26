@@ -26,6 +26,7 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\ReferFriendNotificationJob;
 use App\Mail\NewStyroOfferMade;
+use App\Services\Label\AddLabelService;
 use App\Services\OrderAddressesService;
 use App\Services\ProductService;
 use Carbon\Carbon;
@@ -485,6 +486,9 @@ Route::post('auctions/save', function (Request $request) {
     $delay = now()->addHours(2);
 
     dispatch(new ReferFriendNotificationJob($order))->delay($delay);
+
+    $arr = [];
+    AddLabelService::addLabels($order, [271], $arr, []);
 
     return response()->json($builderData + [
         'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
