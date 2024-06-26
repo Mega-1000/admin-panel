@@ -9,23 +9,32 @@ use App\Services\Label\RemoveLabelService;
 
 class ControllSubjectInvoiceBuyingService
 {
-
     /**
      * @param array<ControllSubjectInvoiceDTO> $data
      * @return void
      */
     public function handle(array $data): void
     {
-        foreach ($data as $dto) {
-            $this->handleSingle($dto);
+        $groupedData = $this->groupDataByOrder($data);
+
+        foreach ($groupedData as $orderNotes => $invoices) {
+            $this->handleSingle($orderNotes, $invoices);
         }
     }
 
-    private function handleSingle(ControllSubjectInvoiceDTO $row): void
+    private function groupDataByOrder(array $data): array
     {
-        $row->notes = preg_replace('/\D/', '', $row->notes);
+        $grouped = [];
+        foreach ($data as $dto) {
+            $orderNotes = preg_replace('/\D/', '', $dto->notes);
+            $grouped[$orderNotes][] = $dto;
+        }
+        return $grouped;
+    }
 
-        $order = Order::find($row->notes);
+    private function handleSingle(string $orderNotes, array $invoices): void
+    {
+        $order = Order::find($orderNotes);
         $arr = [];
 
         if (!$order) {
@@ -42,7 +51,12 @@ class ControllSubjectInvoiceBuyingService
         }
         $totalItemsCost = round($sumOfPurchase * 1.23, 2) + $order->shipment_price_for_us;
 
-        if ($order->labels->contains('id', 65) && (float)str_replace(' ', '', $row->gross) == $totalItemsCost) {
+        $totalGross = 0;
+        foreach ($invoices as $invoice) {
+            $totalGross += (float)str_replace(' ', '', $invoice->gross);
+        }
+
+        if ($order->labels->contains('id', 65) && $totalGross == $totalItemsCost) {
             AddLabelService::addLabels($order, [264], $arr, []);
             RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
         } else {
