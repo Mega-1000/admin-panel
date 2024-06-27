@@ -48,8 +48,9 @@ class CheckChatsForNotInUse implements ShouldQueue
                 SMSHelper::sendSms(
                     // $chat->order->customer->phone,
                     576205389,
-                    "TEST",
-                    "https://admin.mega1000.pl/chat/$token",
+                    "EPH Polska",
+                    "Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
+https://admin.mega1000.pl/chat/$token",
                 );
 
                 $lasMessage->sent_sms = true;
