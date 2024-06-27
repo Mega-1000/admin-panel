@@ -26,8 +26,6 @@ class AuctionsHelper
             $trimmedName = substr($trimmedName, 0, -2);
         }
 
-        list($prefix, $suffix) = preg_split('/\s+/', "$product->name", 2) + [null, ''];
-
-        return $prefix;
+        return $trimmedName;
     }
 }

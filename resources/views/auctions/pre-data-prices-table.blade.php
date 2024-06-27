@@ -126,7 +126,7 @@
                 @endphp
 
                 @foreach($groupedItems as $prefix => $suffixes)
-                    <th  colspan="{{ count($suffixes) }}">
+                    <th colspan="{{ count($suffixes) }}">
                         {{ $prefix }}
                     </th>
                 @endforeach
