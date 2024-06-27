@@ -12,9 +12,8 @@ class SMSHelper
             'to' => $msisdn,
             'from' => $from,
             'message' => $message,
-            'bulkVariant' => $bulkVariant,
+            'bulkVariant' => 'BAUER2',
             'doubleEncode' => false,
-            'sendDate' => now(),
         ];
 
         $headers = array(
