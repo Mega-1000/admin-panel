@@ -238,7 +238,8 @@ class OrdersController extends Controller
             } else {
                 $order->update(['status_id' => 3]);
             }
-            if (!empty($order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->first())) {
+
+//            if (!empty($order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->first())) {
                 dispatch_now(new OrderStatusChangedNotificationJob($order->id));
 
                 $order->orderOffer()->firstOrNew([
@@ -251,7 +252,7 @@ class OrdersController extends Controller
                     ->send(new NewStyroOfferMade(
                         $order,
                     ));
-            }
+//            }
 
             if ($order->created_at->format('Y-m-d H:i:s') === $order->updated_at->format('Y-m-d H:i:s')) {
                 dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));

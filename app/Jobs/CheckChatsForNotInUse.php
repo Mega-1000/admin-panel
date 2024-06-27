@@ -49,9 +49,6 @@ class CheckChatsForNotInUse implements ShouldQueue
             $lasMessage = $chat->messages()->orderBy('created_at', 'desc')->first();
             $lastMessageSentTime = $lasMessage->created_at;
 
-            $lasMessage->sent_sms = true;
-            $lasMessage->save();
-
             $messagesHelper = new MessagesHelper();
             $messagesHelper->chatId = $chat->id;
             $token = $messagesHelper->getChatToken($chat->order->id, $chat->order->customer?->id, 'c');
@@ -68,6 +65,9 @@ class CheckChatsForNotInUse implements ShouldQueue
                     ",
                     "ECO"
                 );
+
+                $lasMessage->sent_sms = true;
+                $lasMessage->save();
             }
         }
 
