@@ -46,7 +46,6 @@ class CheckChatsForNotInUse implements ShouldQueue
 
             if ($token && !$lasMessage && !empty($lasMessage->user_id)) {
                 SMSHelper::sendSms(
-                    // $chat->order->customer->phone,
                     576205389,
                     "EPH Polska",
                     "Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
