@@ -44,7 +44,7 @@ class CheckChatsForNotInUse implements ShouldQueue
             $messagesHelper->chatId = $chat->id;
             $token = $messagesHelper->getChatToken($chat->order->id, $chat->order->customer?->id, 'c');
 
-            if ($token && Carbon::create($lastMessageSentTime)->addHours(4) > now() && $lasMessage?->user()?->id) {
+            if ($token && $lasMessage?->user()?->id) {
                 SMSHelper::sendSms(
                     // $chat->order->customer->phone,
                     576205389,
@@ -53,7 +53,7 @@ class CheckChatsForNotInUse implements ShouldQueue
                     Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
 
 
-                    https://admin.mega1000.pl/chat/
+                    https://admin.mega1000.pl/chat/ " . $token . "
                     ",
                     "ECO"
                 );
