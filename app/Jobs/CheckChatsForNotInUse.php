@@ -49,7 +49,7 @@ class CheckChatsForNotInUse implements ShouldQueue
                     // $chat->order->customer->phone,
                     576205389,
                     "TEST",
-                    "okej",
+                    "https://admin.mega1000.pl/chat/$token",
                 );
 
                 $lasMessage->sent_sms = true;
