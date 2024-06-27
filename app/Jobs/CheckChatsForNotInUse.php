@@ -34,15 +34,6 @@ class CheckChatsForNotInUse implements ShouldQueue
      */
     public function handle(): void
     {
-        //hats = Chat::where('is_active', true)
-        //            ->whereHas('messages', function ($q) {
-        //                $q->whereIn('id', function($subquery) {
-        //                    $subquery->selectRaw('MAX(id)')
-        //                        ->from('messages')
-        //                        ->groupBy('model_id'); // replace 'model_id' with the foreign key that relates messages to your main model
-        //                })->where('sent_sms', false);
-        //            })
-        //            ->where('created_at', '>', Carbon::create('2024', '05', '20'))
         $chats = Chat::whereHas('messages', function ($q) {$q->whereIn('id', function($subquery) {$subquery->selectRaw('MAX(id)')->from('messages')->groupBy('chat_id');})->where('sent_sms', false);})->where('created_at', '>', Carbon::create('2024', '05', '20'))->get();
 
         foreach ($chats as $chat) {
@@ -53,9 +44,10 @@ class CheckChatsForNotInUse implements ShouldQueue
             $messagesHelper->chatId = $chat->id;
             $token = $messagesHelper->getChatToken($chat->order->id, $chat->order->customer?->id, 'c');
 
-            if ($token && Carbon::create($lastMessageSentTime)->addHours(4) < now() && $lasMessage?->user()?->id) {
+            if ($token && Carbon::create($lastMessageSentTime)->addHours(4) > now() && $lasMessage?->user()?->id) {
                 SMSHelper::sendSms(
-                    $chat->order->customer->phone,
+                    // $chat->order->customer->phone,
+                    576205389,
                     "EPH Polska",
                     "
                     Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
