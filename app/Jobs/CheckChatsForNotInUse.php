@@ -48,7 +48,7 @@ class CheckChatsForNotInUse implements ShouldQueue
                 SMSHelper::sendSms(
                     // $chat->order->customer->phone,
                     576205389,
-                    "EPH Polska",
+                    "EPH Polska - nieodczytana wiadomość na chacie",
                     "
                     Dzień dobry, informujemy że na panelu klienta w EPH Polska masz nie odczytaną wiadomość na chacie. Kliknij tutaj aby ją wyświetlić i odpisać:
 
