@@ -443,7 +443,7 @@ class AuctionsController extends Controller
         $productGroups = [];
 
         foreach ($styrofoamTypes as $product) {
-            $parentCategoryName = $product->category->parent->name ?? 'Uncategorized';
+            $parentCategoryName = $product->category->parentCategory->name ?? 'Uncategorized';
             $group = AuctionsHelper::getTrimmedProductGroupName($product);
 
             if (!isset($productGroups[$parentCategoryName])) {
