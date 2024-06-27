@@ -400,7 +400,7 @@ Route::post('auctions/save', function (Request $request) {
     $products = [];
     foreach ($request->auctionData as $product) {
         $productR = \App\Entities\Product::where('name', 'like', '%' . $product['styrofoamType'] . '%')
-            ->where('name', 'like', '%' . $product['thikness'] . '%')
+            ->where('name', 'like', '%' . $product['thickness'] . '%')
             ->whereDoesntHave('children')
             ->first();
 
