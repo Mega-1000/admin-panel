@@ -13,7 +13,8 @@ class SMSHelper
             'from' => $from,
             'message' => $message,
             'bulkVariant' => $bulkVariant,
-            'doubleEncode' => false
+            'doubleEncode' => false,
+            'sendDate' => now(),
         ];
 
         $headers = array(
