@@ -25,6 +25,7 @@ use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Http\Requests\UpdateChatAuctionRequest;
 use App\Mail\AuctionCreationConfirmation;
 use App\Mail\NotificationAboutFirmPanelMail;
+use App\Mail\RealizationStartedConfirmation;
 use App\Repositories\ChatAuctionFirms;
 use App\Repositories\ChatAuctionOffers;
 use App\Repositories\Employees;
@@ -610,6 +611,12 @@ class AuctionsController extends Controller
         $order->additional_service_cost = 50;
         $order->auction_order_placed = true;
         $order->save();
+
+        Mailer::create()
+            ->to($order->customer->login)
+            ->send(new RealizationStartedConfirmation(
+                $order
+            ));
     }
 
     public function confirm(ChatAuction $auction): JsonResponse

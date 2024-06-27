@@ -39,7 +39,7 @@
 
 <a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>
 
-@if ($order['is_buying_admin_side'])
+{{--@if ($order['is_buying_admin_side'])--}}
     <a class="btn btn-primary" href="/admin/accept-products/{{ $order['id'] }}" target="__blank">Przyjmij na stany magazynowe</a>
-@endif
+{{--@endif--}}
 
