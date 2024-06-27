@@ -44,7 +44,7 @@ class CheckChatsForNotInUse implements ShouldQueue
             $messagesHelper->chatId = $chat->id;
             $token = $messagesHelper->getChatToken($chat->order->id, $chat->order->customer?->id, 'c');
 
-            if ($token) {
+            if ($token && !$lasMessage && !empty($lasMessage->user_id)) {
                 SMSHelper::sendSms(
                     // $chat->order->customer->phone,
                     576205389,
