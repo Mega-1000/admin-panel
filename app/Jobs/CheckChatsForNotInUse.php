@@ -50,7 +50,6 @@ class CheckChatsForNotInUse implements ShouldQueue
                     576205389,
                     "TEST",
                     "okej",
-                    "PRO"
                 );
 
                 $lasMessage->sent_sms = true;

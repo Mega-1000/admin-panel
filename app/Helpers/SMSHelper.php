@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 class SMSHelper
 {
-    public static function sendSms($msisdn, $from, $message, $bulkVariant = "PRO")
+    public static function sendSms($msisdn, $from, $message)
     {
         $appKey = "JDJhJDEyJFJ0aUM3b25LSmpHY0VhejE1cWpRYmU0VTVlMk8yU3Joa1lOWm5tQ2VGdnR4YkttUG1yUTVP";
 
