@@ -44,7 +44,7 @@ class CheckChatsForNotInUse implements ShouldQueue
             $messagesHelper->chatId = $chat->id;
             $token = $messagesHelper->getChatToken($chat->order->id, $chat->order->customer?->id, 'c');
 
-//            if ($token && Carbon::create($lastMessageSentTime)->addHours(4) > now() && $lasMessage?->user()?->id) {
+            if ($token && Carbon::create($lastMessageSentTime)->addHours(4) > now() && $lasMessage?->user()?->id) {
                 SMSHelper::sendSms(
                     // $chat->order->customer->phone,
                     576205389,
@@ -60,7 +60,7 @@ class CheckChatsForNotInUse implements ShouldQueue
 
                 $lasMessage->sent_sms = true;
                 $lasMessage->save();
-//            }
+            }
         }
 
         $chats = Chat::where('is_active', true)
