@@ -12,7 +12,7 @@ class SMSHelper
             'to' => $msisdn,
             'from' => $from,
             'message' => $message,
-            'bulkVariant' => 'pro',
+            'bulkVariant' => 'PRO',
             'doubleEncode' => false,
         ];
 

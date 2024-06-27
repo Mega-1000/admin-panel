@@ -49,7 +49,8 @@ class CheckChatsForNotInUse implements ShouldQueue
                     // $chat->order->customer->phone,
                     576205389,
                     "TEST",
-                    "ECO"
+                    "okej",
+                    "PRO"
                 );
 
                 $lasMessage->sent_sms = true;
