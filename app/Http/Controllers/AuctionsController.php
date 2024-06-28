@@ -20,6 +20,7 @@ use App\Helpers\AuctionsHelper;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\LocationHelper;
 use App\Helpers\MessagesHelper;
+use App\Helpers\SMSHelper;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Http\Requests\UpdateChatAuctionRequest;
@@ -615,6 +616,13 @@ class AuctionsController extends Controller
         $order->additional_service_cost = 50;
         $order->auction_order_placed = true;
         $order->save();
+
+        SMSHelper::sendSms(
+            576205389,
+            "EPH Polska",
+            "Dzień dobry, rozpocząłeś realizacje zamówienia na platformie eph polska. Prosimy o opłacenie faktury proformy pod następującym linkiem: https://mega1000.pl/payment?token=$order->token&total=$order->getValue()",
+        );
+
 
         Mailer::create()
             ->to($order->customer->login)
