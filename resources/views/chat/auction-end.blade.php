@@ -222,7 +222,7 @@
                             @php
                                 $sortedFirms->push([
                                     'firm' => $firm,
-                                    'totalCost' => round($totalCost, 2)
+                                    'totalCost' => $product->packing->numbers_of_basic_commercial_units_in_pack
                                 ]);
                             @endphp
                         @endforeach
@@ -297,7 +297,7 @@
                                 @endforeach
 
                                 <td>
-                                    {{ round($totalCost, 2) }} {{$product->packing->numbers_of_basic_commercial_units_in_pack}}
+                                    {{ round($totalCost, 2) }}
                                     <br>
                                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                         Wyślij zamówienie na tego producenta
