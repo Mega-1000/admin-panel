@@ -5,7 +5,7 @@ Zauważyliśmy, że zamówienie o numerze {{ $order->id }} zostało zatwierdzone
 <br>
 <br>
 Prosimy o opłacenie zamówienia pod linkiem
-<a href="https://admin.mega1000.pl/order-proform-pdf/{{ $order->id}}">
+<a href="https://mega1000.pl/payment/{{ $order->token}}">
     FAKTURA PROFORMA
 </a>
 <br>
