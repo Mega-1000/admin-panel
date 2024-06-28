@@ -388,7 +388,7 @@
                     if (empty($minPrice)) {
                         $totalCost += 100000000;
                     }
-                    $totalCost += ($minPrice * $item->quantity) * $product->packing->numbers_of_basic_commercial_units_in_pack;
+                    $totalCost += ($minPrice * $item->quantity) * $item->product->packing->numbers_of_basic_commercial_units_in_pack;
                 }
             @endphp
 
