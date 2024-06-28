@@ -211,18 +211,18 @@
 
                                     $minOffer = collect($pcOffers)->min('basic_price_net');
 
-                                    $totalCost += round(($minOffer * 1.23), 2) *
+                                    $totalCost += (round(($minOffer * 1.23), 2) *
                                         \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                             ->whereHas('product', function ($q) use ($product) {
                                                 $q->where('product_group', $product->product_group);
-                                            })->first()?->quantity;
+                                            })->first()?->quantity) * $product->packing->numbers_of_basic_commercial_units_in_pack;
                                 @endphp
                             @endforeach
 
                             @php
                                 $sortedFirms->push([
                                     'firm' => $firm,
-                                    'totalCost' => round($totalCost / 3.33, 2)
+                                    'totalCost' => round($totalCost, 2)
                                 ]);
                             @endphp
                         @endforeach
@@ -277,7 +277,7 @@
                                                 $q->where('product_group', $product->product_group);
                                             })->first();
 
-                                            $totalCost += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
+                                            $totalCost += (($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0)) * $product->packing->numbers_of_basic_commercial_units_in_pack;
                                         @endphp
 
                                         @if(!empty($offers))
@@ -297,7 +297,7 @@
                                 @endforeach
 
                                 <td>
-                                    {{ round($totalCost * $product->packing->numbers_of_basic_commercial_units_in_pack, 2) }}
+                                    {{ round($totalCost, 2) }}
                                     <br>
                                     <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                         Wyślij zamówienie na tego producenta
@@ -388,7 +388,7 @@
                     if (empty($minPrice)) {
                         $totalCost += 100000000;
                     }
-                    $totalCost += $minPrice * $item->quantity;
+                    $totalCost += ($minPrice * $item->quantity) * $product->packing->numbers_of_basic_commercial_units_in_pack;
                 }
             @endphp
 
