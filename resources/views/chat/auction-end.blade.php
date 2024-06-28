@@ -422,7 +422,8 @@
                     </a>
 
                     @if(auth()->id())
-                        <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{$symbol}}{{ App\Entities\Firm::where('symbol', $symbol)->first()->token }}">
+                        <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/
+                        {{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $symbol)->where('chat_auction_id', $order->chat->auction->id)->first()->id)->first()->token }}">
                             Dodaj cenę jako ta firma
                         </a>
                     @endif
