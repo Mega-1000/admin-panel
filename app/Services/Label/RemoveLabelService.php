@@ -34,7 +34,8 @@ class RemoveLabelService
         }
 
         foreach ($labelIdsToRemove as $labelId) {
-            if ($labelId === 265) {
+            if ($labelId == 265) {
+                dd('okej');
                 $arr = [];
                 AddLabelService::addLabels($order, [269], $arr, []);
 
