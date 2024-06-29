@@ -35,12 +35,11 @@ class RemoveLabelService
 
         foreach ($labelIdsToRemove as $labelId) {
             if ($labelId == 265) {
-                dd('okej');
                 $arr = [];
                 AddLabelService::addLabels($order, [269], $arr, []);
 
                 Mailer::create()
-                    ->to($order->customer->login)
+                    ->to(dd($order->customer->login))
                     ->send(new UserHasBeenNotifiedAboutEndOfAuction());
             }
 
