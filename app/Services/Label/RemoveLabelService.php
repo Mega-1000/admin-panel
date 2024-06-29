@@ -40,7 +40,9 @@ class RemoveLabelService
 
                 Mailer::create()
                     ->to($order->customer->login)
-                    ->send(new UserHasBeenNotifiedAboutEndOfAuction());
+                    ->send(new UserHasBeenNotifiedAboutEndOfAuction(
+                        $order->chat->auctions->first()
+                    ));
             }
 
             if (array_key_exists('already-removed', $loopPreventionArray) && in_array($labelId, $loopPreventionArray['already-removed'])) {

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Entities\ChatAuction;
 use App\StyroLeadMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -13,14 +14,16 @@ class UserHasBeenNotifiedAboutEndOfAuction extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public StyroLeadMail $mail;
+    public ChatAuction $auction;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct() {}
+    public function __construct(ChatAuction $auction) {
+        $this->auction = $auction;
+    }
 
     /**
      * Get the message envelope.
