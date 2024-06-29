@@ -23,6 +23,7 @@ class RemoveLabelService
 {
     public static function removeLabels(Order $order, array $labelIdsToRemove, array &$loopPreventionArray, array $customLabelIdsToAddAfterRemoval, ?int $userId, ?string $time = null): array
     {
+        dd('okej');
 
         WorkingEventsService::createEvent(WorkingEvents::LABEL_REMOVE_EVENT, $order->id);
 
