@@ -42,6 +42,7 @@ class RemoveLabelService
                     ->to($order->customer->login)
                     ->send(new UserHasBeenNotifiedAboutEndOfAuction());
             }
+
             if (array_key_exists('already-removed', $loopPreventionArray) && in_array($labelId, $loopPreventionArray['already-removed'])) {
                 continue;
             }
