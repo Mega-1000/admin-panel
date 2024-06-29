@@ -39,7 +39,7 @@ class RemoveLabelService
                 AddLabelService::addLabels($order, [269], $arr, []);
 
                 Mailer::create()
-                    ->to(dd($order->customer->login))
+                    ->to($order->customer->login)
                     ->send(new UserHasBeenNotifiedAboutEndOfAuction());
             }
 
