@@ -23,8 +23,6 @@ class RemoveLabelService
 {
     public static function removeLabels(Order $order, array $labelIdsToRemove, array &$loopPreventionArray, array $customLabelIdsToAddAfterRemoval, ?int $userId, ?string $time = null): array
     {
-        dd('okej');
-
         WorkingEventsService::createEvent(WorkingEvents::LABEL_REMOVE_EVENT, $order->id);
 
         if (count($labelIdsToRemove) < 1) {
@@ -34,6 +32,7 @@ class RemoveLabelService
         if (Auth::user() === null && $userId !== null) {
             Auth::loginUsingId($userId);
         }
+
         foreach ($labelIdsToRemove as $labelId) {
             if ($labelId === 265) {
                 $arr = [];
