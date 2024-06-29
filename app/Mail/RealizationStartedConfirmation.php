@@ -34,7 +34,7 @@ class RealizationStartedConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Ralizacja zamówienia o id: '  . $this->order->id . ' została rozpoczęta',
+            subject: 'Realizacja zamówienia o id: '  . $this->order->id . ' została rozpoczęta',
         );
     }
 
