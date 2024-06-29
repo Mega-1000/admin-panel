@@ -533,6 +533,9 @@ class AuctionsController extends Controller
         $arr = [];
         AddLabelService::addLabels($order, [206], $arr, []);
 
+        $order->customer_acceptation_date = now();
+        $order->save();
+
         if ($request->get('cashOnDelivery')) {
             $arr = [];
             AddLabelService::addLabels($order, [267], $arr, []);
