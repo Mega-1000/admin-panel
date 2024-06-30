@@ -79,11 +79,11 @@
                 <form action="{{ route('save-contact-to-driver', $order['id']) }}">
                     <input type="datetime-local" id="next_contact_date" name="next_contact_date">
 
-                    <button class="btn btn-success" name="successed">
+                    <button class="btn btn-success" name="successed" value="true">
                         Kontakt udany
                     </button>
 
-                    <button class="btn btn-danger" name="unsuccessed">
+                    <button class="btn btn-danger" name="unsuccessed" value="true">
                         Kontakt nieudany
                     </button>
                 </form>
