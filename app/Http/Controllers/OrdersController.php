@@ -3112,6 +3112,8 @@ class OrdersController extends Controller
     public function saveContactToDriver(Order $order): RedirectResponse
     {
         $contactDate = request()->query('next-contact-date');
+        $arr = [];
+        RemoveLabelService::removeLabels($order, [276], $arr, [], Auth::user()->id);
 
         if (request()->query('successed')) {
             $arr = [];
