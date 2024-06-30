@@ -65,15 +65,21 @@
             $hasLabel276 = false;
             if (!empty($order['labels'])) {
                 foreach ($order['labels'] as $label) {
-                    if ($label['id'] === 276 || $label['id'] === 279) {
+                    if ($label['id'] === 276 )
+                    {
                         $hasLabel276 = true;
+                        break;
+                    }
+
+                    if ($label['id'] === 279) {
+                        $hasLabel279 = true;
                         break;
                     }
                 }
             }
         @endphp
 
-        @if ($hasLabel276)
+        @if ($hasLabel276 || $hasLabel279)
             <div class="mt-4">
                 Wpisz datę następnego kontaktu:
                 <form action="{{ route('save-contact-to-driver', $order['id']) }}">
@@ -83,9 +89,11 @@
                         Kontakt udany
                     </button>
 
-                    <button class="btn btn-danger" name="unsuccessed" value="true">
-                        Kontakt nieudany
-                    </button>
+                    @if($hasLabel279)
+                        <button class="btn btn-danger" name="unsuccessed" value="true">
+                            Kontakt nieudany
+                        </button>
+                    @endif
                 </form>
             </div>
         @endif
