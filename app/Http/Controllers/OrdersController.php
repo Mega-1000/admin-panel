@@ -3135,10 +3135,10 @@ class OrdersController extends Controller
             'order_id' => 86144,
             'label_id' => 5,
             'label_id_to_handle' => 276,
-            'type' => 'B',
-            'action' => 'to_add_type_b',
+            'type' => 'C',
+            'action' => 'to_add_type_c',
             'trigger_time' => Carbon::create(now()),
-        ])->order;
+        ]);
 
 
         return redirect()->back();
