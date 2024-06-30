@@ -3146,7 +3146,7 @@ class OrdersController extends Controller
         OrderLabelScheduler::query()->create([
             'order_id' => $order->id,
             'label_id' => $label->id,
-            'label_id_to_handle' => $label->id,
+            'label_id_to_handle' => $removeLabels,
             'type' => 'C',
             'action' => 'to_remove_type_c',
             'trigger_time' => Carbon::create($contactDate),
