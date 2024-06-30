@@ -3133,12 +3133,12 @@ class OrdersController extends Controller
 
         OrderLabelScheduler::query()->create([
             'order_id' => 86144,
-            'label_id' => 276,
+            'label_id' => 5,
             'label_id_to_handle' => 276,
             'type' => 'B',
             'action' => 'to_add_type_b',
             'trigger_time' => Carbon::create(now()),
-        ]);
+        ])->order;
 
 
         return redirect()->back();
