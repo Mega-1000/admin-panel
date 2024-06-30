@@ -3107,4 +3107,11 @@ class OrdersController extends Controller
             'order' => Order::find($orderId)
         ]);
     }
+
+    public function saveContactToDriver(): RedirectResponse
+    {
+
+
+        return redirect()->back();
+    }
 }

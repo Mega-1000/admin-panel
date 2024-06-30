@@ -809,6 +809,7 @@ Route::get('/order-offer-pdf/{id}', 'OrderOfferController@getPdf');
 Route::get('/order-proform-pdf/{id}', 'OrderOfferController@getProform');
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
 
+Route::get('save-contact-to-driver/{order}', [OrdersController::class, 'saveContactToDriver'])->name('save-contact-to-driver');
 Route::group([], __DIR__ . '/web/AuctionsRoutes.php');
 
 Route::get('/debug', 'DebugController@index');

@@ -60,6 +60,21 @@
                 <br>
             @endif
         @endforeach
+
+        @if ($order['labels'])
+            Wpisz datę następnego kontaktu:
+            <form action="{{ route('save-contact-to-driver', $order['id']) }}">
+                <input type="date" id="next_contact_date" name="next_contact_date">
+
+                <button class="btn btn-success" name="successed">
+                    Kontakt udany
+                </button>
+
+                <button class="btn btn-danger" name="unsuccessed">
+                    Kontakt nieudany
+                </button>
+            </form>
+        @endif
     @endif
 
     <div class="label-container">
