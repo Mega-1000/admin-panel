@@ -77,7 +77,7 @@
             <div class="mt-4">
                 Wpisz datę następnego kontaktu:
                 <form action="{{ route('save-contact-to-driver', $order['id']) }}">
-                    <input type="date" id="next_contact_date" name="next_contact_date">
+                    <input type="datetime-local" id="next_contact_date" name="next_contact_date">
 
                     <button class="btn btn-success" name="successed">
                         Kontakt udany
