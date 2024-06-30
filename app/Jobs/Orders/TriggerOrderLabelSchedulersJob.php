@@ -40,10 +40,7 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
         $this->dateHelper = $dateHelper;
         $now = new Carbon();
 
-        $schedules = $orderLabelSchedulerRepository->findWhere([
-            "triggered_at" => null,
-            ["trigger_time", "<", $now],
-        ]);
+        $schedules = $orderLabelSchedulerRepository->findWhere(["triggered_at" => null, ["trigger_time", "<", $now],]);
 
         if (!count($schedules)) {
             return;

@@ -3136,7 +3136,7 @@ class OrdersController extends Controller
             'label_id' => $label->id,
             'label_id_to_handle' => $label->id,
             'type' => 'A',
-            'action' => 'to_remove_type_a',
+            'action' => 'to_add_type_a',
             'trigger_time' => Carbon::create($contactDate),
         ]);
 
