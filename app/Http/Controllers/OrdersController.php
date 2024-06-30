@@ -3132,12 +3132,12 @@ class OrdersController extends Controller
         $pivot = $label->pivot;
 
         OrderLabelScheduler::query()->create([
-            'order_id' => 86144,
-            'label_id' => 5,
-            'label_id_to_handle' => 276,
+            'order_id' => $order->id,
+            'label_id' => $label->id,
+            'label_id_to_handle' => $label->id,
             'type' => 'C',
             'action' => 'to_add_type_c',
-            'trigger_time' => Carbon::create(now()),
+            'trigger_time' => Carbon::create($contactDate),
         ]);
 
 
