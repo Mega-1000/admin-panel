@@ -3116,15 +3116,18 @@ class OrdersController extends Controller
         RemoveLabelService::removeLabels($order, [276], $arr, [], Auth::user()->id);
 
         if (request()->query('successed')) {
+            $removeLabels = 278;
             $arr = [];
-            AddLabelService::addLabels($order, [278],$arr, [], Auth::user()->id);
+            AddLabelService::addLabels($order, [$removeLabels],$arr, [], Auth::user()->id);
 
             $label = Label::find(279);
         }
 
         if (request()->query('unsuccessed')) {
+            $removeLabels = 277;
+
             $arr = [];
-            AddLabelService::addLabels($order, [277],$arr, [], Auth::user()->id);
+            AddLabelService::addLabels($order, [$removeLabels],$arr, [], Auth::user()->id);
 
             $label = Label::find(276);
         }
@@ -3137,6 +3140,15 @@ class OrdersController extends Controller
             'label_id_to_handle' => $label->id,
             'type' => 'C',
             'action' => 'to_add_type_c',
+            'trigger_time' => Carbon::create($contactDate),
+        ]);
+
+        OrderLabelScheduler::query()->create([
+            'order_id' => $order->id,
+            'label_id' => $label->id,
+            'label_id_to_handle' => $label->id,
+            'type' => 'C',
+            'action' => 'to_remove_type_c',
             'trigger_time' => Carbon::create($contactDate),
         ]);
 
