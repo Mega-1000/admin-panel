@@ -47,7 +47,10 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
         }
 
         foreach ($schedules as $schedule) {
-
+            if (!$schedule->order) {
+                $schedule->delete();
+                continue;
+            }
             if (!$this->canTriggerByType($schedule->type, $now)) {
                 continue;
             }
