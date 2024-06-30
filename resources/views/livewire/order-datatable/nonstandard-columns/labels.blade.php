@@ -65,7 +65,7 @@
             $hasLabel276 = false;
             if (!empty($order['labels'])) {
                 foreach ($order['labels'] as $label) {
-                    if ($label['id'] === 276) {
+                    if ($label['id'] === 276 || $label['id'] === 279) {
                         $hasLabel276 = true;
                         break;
                     }

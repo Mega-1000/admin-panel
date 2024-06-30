@@ -3113,26 +3113,34 @@ class OrdersController extends Controller
     {
         $contactDate = request()->query('next-contact-date');
         $arr = [];
-        RemoveLabelService::removeLabels($order, [276], $arr, [], Auth::user()->id);
+        $motherLabel = $order->labels()->include('id', 276) ? 276 : 279;
 
-        if (request()->query('successed')) {
-            $removeLabels = 278;
+        RemoveLabelService::removeLabels($order, [$motherLabel], $arr, [], Auth::user()->id);
+
+        if ($motherLabel === 279) {
+            $removeLabels = 280;
             $arr = [];
-            AddLabelService::addLabels($order, [$removeLabels],$arr, [], Auth::user()->id);
+            AddLabelService::addLabels($order, [$removeLabels], $arr, [], Auth::user()->id);
 
-            $label = Label::find(279);
+            $label = Label::find(281);
+        } else {
+            if (request()->query('successed')) {
+                $removeLabels = 278;
+                $arr = [];
+                AddLabelService::addLabels($order, [$removeLabels], $arr, [], Auth::user()->id);
+
+                $label = Label::find(279);
+            }
+
+            if (request()->query('unsuccessed')) {
+                $removeLabels = 277;
+
+                $arr = [];
+                AddLabelService::addLabels($order, [$removeLabels], $arr, [], Auth::user()->id);
+
+                $label = Label::find(276);
+            }
         }
-
-        if (request()->query('unsuccessed')) {
-            $removeLabels = 277;
-
-            $arr = [];
-            AddLabelService::addLabels($order, [$removeLabels],$arr, [], Auth::user()->id);
-
-            $label = Label::find(276);
-        }
-
-        $pivot = $label->pivot;
 
         OrderLabelScheduler::query()->create([
             'order_id' => $order->id,
