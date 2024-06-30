@@ -3113,7 +3113,7 @@ class OrdersController extends Controller
     {
         $contactDate = request()->query('next-contact-date');
         $arr = [];
-        $motherLabel = $order->labels()->include('id', 276) ? 276 : 279;
+        $motherLabel = $order->labels->contains('id', 276) ? 276 : 279;
 
         RemoveLabelService::removeLabels($order, [$motherLabel], $arr, [], Auth::user()->id);
 
