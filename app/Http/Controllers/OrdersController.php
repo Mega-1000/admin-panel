@@ -13,6 +13,7 @@ use App\Entities\Order;
 use App\Entities\OrderFiles;
 use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
+use App\Entities\OrderLabelScheduler;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
 use App\Entities\PackageTemplate;
@@ -3108,8 +3109,34 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function saveContactToDriver(): RedirectResponse
+    public function saveContactToDriver(Order $order): RedirectResponse
     {
+        $contactDate = request()->query('next-contact-date');
+
+        if (request()->query('successed')) {
+            $arr = [];
+            AddLabelService::addLabels($order, [278],$arr, [], Auth::user()->id);
+
+            $label = Label::find(279);
+        }
+
+        if (request()->query('unsuccessed')) {
+            $arr = [];
+            AddLabelService::addLabels($order, [277],$arr, [], Auth::user()->id);
+
+            $label = Label::find(276);
+        }
+
+        $pivot = $label->pivot;
+
+        OrderLabelScheduler::query()->create([
+            'order_id' => $order->id,
+            'label_id' => $label->id,
+            'label_id_to_handle' => $pivot->label_to_handle_id,
+            'type' => 'A',
+            'action' => 'to_remove_type_a',
+            'trigger_time' => Carbon::create($contactDate),
+        ]);
 
 
         return redirect()->back();

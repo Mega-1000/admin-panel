@@ -208,7 +208,7 @@ class AddLabelService
         }
     }
 
-    private static function addScheduler(Order $order, Label $label, $pivot, string $type, string $action): void
+    public static function addScheduler(Order $order, Label $label, $pivot, string $type, string $action): void
     {
         $now = Carbon::now();
         if (!empty($pivot->$action)) {

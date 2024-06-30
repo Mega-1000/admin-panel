@@ -61,7 +61,19 @@
             @endif
         @endforeach
 
-        @if ($order['labels'])
+        @php
+            $hasLabel276 = false;
+            if (!empty($order['labels'])) {
+                foreach ($order['labels'] as $label) {
+                    if ($label['id'] === 276) {
+                        $hasLabel276 = true;
+                        break;
+                    }
+                }
+            }
+        @endphp
+
+        @if ($hasLabel276)
             <div class="mt-4">
                 Wpisz datę następnego kontaktu:
                 <form action="{{ route('save-contact-to-driver', $order['id']) }}">
