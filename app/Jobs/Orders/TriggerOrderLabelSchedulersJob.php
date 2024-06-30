@@ -57,6 +57,7 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
                 $schedule->delete();
                 continue;
             }
+
             /** @var Order $order */
             $order = Order::query()->findOrFail($schedule->order_id);
             $loopPrevention = [];
@@ -78,9 +79,9 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
 
     protected function canTriggerByType($type, Carbon $date)
     {
-        if (!$this->dateHelper->isThatDateWorkingDay($date)) {
-            return false;
-        }
+//        if (!$this->dateHelper->isThatDateWorkingDay($date)) {
+//            return false;
+//        }
 
         if ($type == "A") {
             if (!$this->dateHelper->isTimeBetween(7, 21)) {
