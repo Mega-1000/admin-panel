@@ -63,7 +63,7 @@
 
         @php
             $hasLabel276 = false;
-            hasLabel279 = false;
+            $hasLabel279 = false;
             if (!empty($order['labels'])) {
                 foreach ($order['labels'] as $label) {
                     if ($label['id'] === 276 )
