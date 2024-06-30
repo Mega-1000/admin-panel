@@ -57,7 +57,6 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
 
 
             if (!$schedule->order->hasLabel($schedule->label_id) && ($schedule->type !== "C" && !empty($schedule->label_id))) {
-                dd('okej');
                 $schedule->delete();
                 continue;
             }
