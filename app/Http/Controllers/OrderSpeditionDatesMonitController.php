@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Order;
 use App\Helpers\MessagesHelper;
+use App\Services\Label\AddLabelService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -43,6 +44,9 @@ class OrderSpeditionDatesMonitController extends Controller
 
         $messagesHelper->sendShippingInformation($order->chat);
 
-        return '<script>alert('Pomyślnie uściślono daty i zapisano numer do kierowcy!')</script>'
+        $arr = [];
+        AddLabelService::addLabels($order, [276], $arr, []);
+
+        return '<script>alert('Pomyślnie uściślono daty i zapisano numer do kierowcy!')</script>';
     }
 }

@@ -86,13 +86,32 @@ class SendSpeditionNotifications implements ShouldQueue
             $currentHour = date('H');
             $currentMinute = date('i');
 
-            if (($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) || $currentHour >= 10) {
-                if ($fromDate->isPast() && $toDate->isFuture() && !Carbon::create($order->last_confirmation)->isToday() && !$order->special_data_filled && $order?->warehouse?->warehouse_email) {
-                    $this->updateOrderLabels($order, [244]);
 
-                    if ($currentHour >= 10) {
+            // Jeśli datach wysyłki zamówienia zawiera się data obecna dodaję etykietę 244 i wysyłam prośbę o wypełnienie danych specjalnych do fabryki
+            // o 11:00 zaczyna się wysyłanie maili do fabryki co 15 minut
+            // jeśli fabryka nie wypełni danych specjalnych do godziny 14:00 to dodaję etykietę 270
+            if (
+                ($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) ||
+                $currentHour >= 11
+            ) {
+                if (
+                    $fromDate->isPast() &&
+                    $toDate->isFuture() &&
+                    !Carbon::create($order->last_confirmation)->isToday() &&
+                    !$order->special_data_filled &&
+                    $order?->warehouse?->warehouse_email &&
+                    !$order->labels->contains('id', 244)
+                ) {
+                    if ($currentHour === 11) {
                         $this->updateOrderLabels($order, [270]);
                     }
+
+                    $this->updateOrderLabels($order, [244]);
+
+                    if ($currentHour >= 14) {
+                        $this->updateOrderLabels($order, [275]);
+                    }
+
 
                     if ($sendMails) {
                         try {

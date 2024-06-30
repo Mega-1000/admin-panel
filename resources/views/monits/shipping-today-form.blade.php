@@ -14,11 +14,11 @@
         <div class="flex items-center justify-between mb-4">
             <div class="relative">
                 <label for="time_from" class="block text-gray-700 font-bold mb-2">Od:</label>
-                <input name="time_from" required type="time" id="time_from" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <input name="time_from" required type="time" value="{{ now()->addDay() }}" id="time_from" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="relative">
                 <label for="time_to" class="block text-gray-700 font-bold mb-2">Do:</label>
-                <input name="time_to" required type="time" id="time_to" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <input name="time_to" required type="time" value="{{ now()->addDays(2) }}" id="time_to" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
         </div>
         <div class="mb-6">

@@ -34,7 +34,7 @@ class SpeditionDatesMonit extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Prośba o informację na temat wysyłki',
+            subject: 'Prośba o informację na temat wysyłki o numerze:' . $this->order->id,
         );
     }
 
