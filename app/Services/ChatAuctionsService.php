@@ -73,28 +73,28 @@ readonly class ChatAuctionsService
      */
     public function confirmAuction($auction): void
     {
-//        $order = $auction->chat->order;
-//        $employees = Employees::getEmployeesForAuction($order);
-//
-//        foreach ($employees as $employee) {
-//            Mailer::create()
-//                ->to($employee->email)
-//                ->send(new NotifyFirmAboutAuction($auction, $employee->firm, $this->generateLinkForAuction($auction, $employee->firm, $employee->email)));
-//        }
-//
-//        $auction->update([
-//            'confirmed' => true,
-//        ]);
-//
-//        $arr = [];
-//        RemoveLabelService::removeLabels($order, [266, 95], $arr, [], null);
-//
-//        AddLabelService::addLabels(
-//            $order,
-//            [224],
-//            $arr,
-//            [],
-//        );
+        $order = $auction->chat->order;
+        $employees = Employees::getEmployeesForAuction($order);
+
+        foreach ($employees as $employee) {
+            Mailer::create()
+                ->to($employee->email)
+                ->send(new NotifyFirmAboutAuction($auction, $employee->firm, $this->generateLinkForAuction($auction, $employee->firm, $employee->email)));
+        }
+
+        $auction->update([
+            'confirmed' => true,
+        ]);
+
+        $arr = [];
+        RemoveLabelService::removeLabels($order, [266, 95], $arr, [], null);
+
+        AddLabelService::addLabels(
+            $order,
+            [224],
+            $arr,
+            [],
+        );
     }
 
     /**
