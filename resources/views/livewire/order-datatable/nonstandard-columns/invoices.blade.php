@@ -30,7 +30,7 @@ wartość towaru: <br />
         @if ($invoice['invoice_type'] === 'buy')
             <a target="_blank" href="/storage/invoices/{{ $invoice['invoice_name'] }}" style="margin-top: 5px;">Faktura</a>
 
-            @if ($invoice['is_visible_for_client'])
+
 {{--                <p class="invoice__visible">Widoczna</p>--}}
 {{--            @else--}}
 {{--                <p class="invoice__invisible">Niewidoczna</p>--}}
