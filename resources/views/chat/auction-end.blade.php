@@ -277,7 +277,7 @@
                                                 $q->where('product_group', $product->product_group);
                                             })->first();
 
-                                            $totalCost += (($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0)) * $product->packing->numbers_of_basic_commercial_units_in_pack;
+                                            $totalCost += ($minOfferPrice * ($orderItem?->quantity ?? 0)) * $product->packing->numbers_of_basic_commercial_units_in_pack;
                                         @endphp
 
                                         @if(!empty($offers))
