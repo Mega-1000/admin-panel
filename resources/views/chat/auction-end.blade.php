@@ -270,7 +270,7 @@
 
                                             $minOffer = collect($offers)->min('basic_price_net');
                                             $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
-                                            $minPurchasePrice = $allProductsToBeDisplayed->min('price.net_purchase_price_basic_unit_after_discounts') * 1.23;
+                                            $minPurchasePrice = $allProductsToBeDisplayed->min('price.net_selling_price_basic_unit') * 1.23;
 
                                             $orderItem = \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                             ->whereHas('product', function ($q) use ($product) {
@@ -383,7 +383,7 @@
                         return !($variation->price->net_special_price_basic_unit == 0 || empty($variation->price->net_special_price_basic_unit));
                     });
 
-                    $minPrice = $validPrices->min('price.net_purchase_price_basic_unit_after_discounts') * 1.23;
+                    $minPrice = $validPrices->min('price.net_selling_price_basic_unit') * 1.23;
 
                     if (empty($minPrice)) {
                         $totalCost += 100000000;
