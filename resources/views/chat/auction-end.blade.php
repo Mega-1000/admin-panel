@@ -278,10 +278,6 @@
                                             })->first();
 
                                             $totalCost += ($minOfferPrice * ($orderItem?->quantity ?? 0)) * $product->packing->numbers_of_basic_commercial_units_in_pack;
-
-                                            // Calculate the special price (e.g., 5% discount)
-                                            $specialDiscountPercentage = 0.05;
-                                            $specialPrice = $minOfferPrice ? round($minOfferPrice * (1 - $specialDiscountPercentage), 2) : null;
                                         @endphp
 
                                         @if(!empty($offers))
@@ -293,9 +289,7 @@
                                                 @endif
                                                 <br>
                                             @endforeach
-                                            <span style="color: green">
-                                                - specjalnie dla ciebie: {{ $specialPrice }}
-                                            </span>
+                                            <span style="color: green">- specjalnie dla ciebie</span>
                                         @else
                                             No offer
                                         @endif
