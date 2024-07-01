@@ -301,7 +301,8 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
                 modal.modal('hide');
             });
         });
-    } else {
+    }
+    // else {
         // let payDateLabelId = '63'
         // if (labelId == payDateLabelId) {
         //     let modalSetTime = $('#set_time');
@@ -338,7 +339,8 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
         //         });
         //     });
         //     return;
-        } else if (addedType == "chat") {
+        // }
+        else if (addedType == "chat") {
             const url = `/admin/chat/${1}/${orderId}`;
             window.location.href = url
             return
