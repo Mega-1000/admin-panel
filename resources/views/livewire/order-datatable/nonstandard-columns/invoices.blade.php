@@ -12,10 +12,6 @@
     $transportCost = 0;
 @endphp
 
-
-{{--@php $totalCost = $totalItemsCost + $transportCost; @endphp--}}
-Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
-<br />
 wartość towaru: <br />
 {{ number_format($totalItemsCost, 2) }}<br/>
 
@@ -24,7 +20,9 @@ wartość towaru: <br />
     {{ $order['shipment_price_for_us'] }}<br />
     @php $transportCost = floatval($order['shipment_price_for_us']); @endphp
 @endif
-<hr>
+
+@php $totalCost = $totalItemsCost + $transportCost; @endphp
+Suma: <br /><b>{{ number_format($totalCost, 2) }}</b>
 
 @if (isset($order['invoices']))
     @foreach ($order['invoices'] as $invoice)
