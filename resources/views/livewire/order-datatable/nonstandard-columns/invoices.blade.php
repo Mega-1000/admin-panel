@@ -22,7 +22,7 @@ wartość towaru: <br />
 @endif
 
 @php $totalCost = $totalItemsCost + $transportCost; @endphp
-Suma: <br /><b>{{ number_format($totalCost, 2) }}</b>
+Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
 
 @if (isset($order['invoices']))
     @foreach ($order['invoices'] as $invoice)
