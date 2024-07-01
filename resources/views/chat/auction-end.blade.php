@@ -391,6 +391,7 @@
                     $totalCost += ($minPrice * $item->quantity) * $item->product->packing->numbers_of_basic_commercial_units_in_pack;
                 }
             @endphp
+            {{ ($minPrice * $item->quantity) * $item->product->packing->numbers_of_basic_commercial_units_in_pack }}ok
 
             @if($missingData)
                 @foreach($products as $product)
