@@ -455,7 +455,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
         Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
         Route::get('orders/{id}/invoices', 'OrdersController@getInvoices')->name('orders.getInvoices');
-        Route::get('delete-invoice', 'InvoicesController@delete')->name('orders.deleteInvoice');
         Route::patch('orders/invoice/{id}/visibility', 'Api\InvoicesController@changeInvoiceVisibility')->name('orders.changeInvoiceVisibility');
         Route::get('orders/{id}/files', 'OrdersController@getFiles')->name('orders.getFiles');
         Route::post('orders/allegro-payment', 'OrdersPaymentsController@payAllegro')->name('orders.allegroPayments');
@@ -802,6 +801,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('recalculate-labels-in-orders-based-on-period', RecalculateLabelsInOrdersBasedOnPeriod::class)->name('recalculate-labels-in-orders-based-on-period');
     Route::get('mark-order-as-selfpickup/{order}', [OrdersController::class, 'markAsSelfPickup']);
 });
+
+Route::get('delete-invoice', 'InvoicesController@delete')->name('orders.deleteInvoice');
 
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
