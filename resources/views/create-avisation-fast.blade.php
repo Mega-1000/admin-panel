@@ -16,12 +16,13 @@
         <br>
 
 
-        Dostępne magazyny:
-        @foreach($order->items->first()->product->firm->warehouses as $warehouse)
-            {{ $warehouse->symbol }}
-        @endforeach
         Magazyn do awizacji
-        <input type="text" value="{{ $order->warehouse?->symbol }}" name="warehouse-symbol">
+
+        <select name="warehouse-symbol">
+            @foreach($order->items->first()->product->firm->warehouses as $warehouse)
+                <option>{{ $warehouse->symbol }}</option>
+            @endforeach
+        </select>
         <br>
         <br>
 
