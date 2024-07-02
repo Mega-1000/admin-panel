@@ -1663,7 +1663,7 @@ class OrdersController extends Controller
         OrderLabelScheduler::query()->create([
             'order_id' => $order->id,
             'label_id' => 5,
-            'label_id_to_handle' => 63,
+            'label_id_to_handle' => 64,
             'type' => 'C',
             'action' => 'to_remove_type_c',
             'trigger_time' => Carbon::create($date['year']),
