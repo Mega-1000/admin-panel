@@ -348,15 +348,7 @@
                     <div class="form-group">
                         <div class="form-group">
                             <label for="years">Ustaw termin płatności: </label>
-                            <input data-index="1" value="{{ date("Y")}}" type="text" size="4" maxlength="4" id="invoice-years">
-
-                            <input data-index="2" autofocus value="" type="text" size="2" maxlength="2" id="invoice-month">
-
-                            <input data-index="3" value="" type="text" size="2" maxlength="2" id="invoice-days">
-
-                            <input data-index="4" value="" type="text" size="2" maxlength="2" id="invoice-hours" placeholder="HH">
-
-                            <input data-index="5" value="" type="text" size="2" maxlength="2" id="invoice-minutes" placeholder="MM">
+                            <input data-index="1" type="datetime-local" type="text" size="4" maxlength="4" id="invoice-years">
 
                             <p id="invoice-date-error" hidden style="color: red">Błędny format daty</p>
                             <p id="set-date-error" hidden style="color: red">Błędny format daty</p>
