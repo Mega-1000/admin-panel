@@ -1657,7 +1657,7 @@ class OrdersController extends Controller
             'label_id_to_handle' => 282,
             'type' => 'C',
             'action' => 'to_add_type_c',
-            'trigger_time' => Carbon::createFromDate($date['year'], $date['month'], $date['day']),
+            'trigger_time' => Carbon::create($date['year']),
         ]);
 
         OrderLabelScheduler::query()->create([
@@ -1666,7 +1666,7 @@ class OrdersController extends Controller
             'label_id_to_handle' => 63,
             'type' => 'C',
             'action' => 'to_remove_type_c',
-            'trigger_time' => Carbon::createFromDate($date['year'], $date['month'], $date['day']),
+            'trigger_time' => Carbon::create($date['year']),
         ]);
 
         try {
