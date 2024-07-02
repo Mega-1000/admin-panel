@@ -1650,7 +1650,9 @@ class OrdersController extends Controller
         $data = $request->all();
         $date = $data['date'];
         $order = Order::findOrFail($data['order_id']);
-
+        $arr = [];
+        AddLabelService::addLabels($order, [64], $arr, []);
+        $order->labels()->detach(63);
         OrderLabelScheduler::query()->create([
             'order_id' => $order->id,
             'label_id' => 5,
