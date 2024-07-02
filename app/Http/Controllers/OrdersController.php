@@ -1669,17 +1669,17 @@ class OrdersController extends Controller
             'trigger_time' => Carbon::create($date['year']),
         ]);
 
-        try {
-            $d = Carbon::createFromDate($date['year'], $date['month'], $date['day']);
-        } catch (Exception $ex) {
-            if ($ex instanceof ModelNotFoundException) {
-                return response()->json('Dane zamówienie nie istnieje', 400);
-            }
-            return response()->json('Błędny format daty', 400);
-        }
-        $dat = $d->format('Y-m-d');
-        $order->payment_deadline = $dat;
-        $order->save();
+//        try {
+//            $d = Carbon::createFromDate($date['year'], $date['month'], $date['day']);
+//        } catch (Exception $ex) {
+//            if ($ex instanceof ModelNotFoundException) {
+//                return response()->json('Dane zamówienie nie istnieje', 400);
+//            }
+//            return response()->json('Błędny format daty', 400);
+//        }
+//        $dat = $d->format('Y-m-d');
+//        $order->payment_deadline = $dat;
+//        $order->save();
 
         return ['status' => true];
     }
