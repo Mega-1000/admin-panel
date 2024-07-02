@@ -116,7 +116,7 @@
                     onmouseover="showLabelName(this, '{{ $label['name'] }}')"
                     onmouseout="hideLabelName(this)"
                 >
-                    <i class="{{ $label['icon_name'] }}" style="font-size: 30px; background-color: {{ $label['color'] }}; color: #ffffff; padding: 10px; {{  $label['id'] === 64 && \Carbon\Carbon::create($order['payment_deadline']) < \Carbon\Carbon::now() ? 'border: solid 10px red' : '' }}"></i>
+                    <i class="{{ $label['icon_name'] }}" style="font-size: 30px; background-color: {{ $label['color'] }}; color: #ffffff; padding: 10px;"></i>
                     <div class="label-popup">{{ $label['name'] }}</div>
                 </span>
             @endforeach

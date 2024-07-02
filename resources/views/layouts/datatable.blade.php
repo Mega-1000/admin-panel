@@ -342,24 +342,30 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Ustaw termin płatnośći</h4>
+                    <h4 class="modal-title">W`isz date i czas zaplaty za fakture</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="years">Ustaw termin płatności: </label>
-                        <input data-index="1" value="{{ date("Y")}}" type="text" size="4" maxlength="4" id="invoice-years">
+                        <div class="form-group">
+                            <label for="years">Ustaw termin płatności: </label>
+                            <input data-index="1" value="{{ date("Y")}}" type="text" size="4" maxlength="4" id="invoice-years">
 
-                        <input data-index="2" autofocus value="" type="text" size="2" maxlength="2" id="invoice-month">
+                            <input data-index="2" autofocus value="" type="text" size="2" maxlength="2" id="invoice-month">
 
-                        <input data-index="3" value="" type="text" size="2" maxlength="2" id="invoice-days" >
-                        <p id="invoice-date-error" hidden style="color: red">Błędny format daty</p>
-                        <p id="set-date-error" hidden style="color: red">Błędny format daty</p>
+                            <input data-index="3" value="" type="text" size="2" maxlength="2" id="invoice-days">
 
+                            <input data-index="4" value="" type="text" size="2" maxlength="2" id="invoice-hours" placeholder="HH">
+
+                            <input data-index="5" value="" type="text" size="2" maxlength="2" id="invoice-minutes" placeholder="MM">
+
+                            <p id="invoice-date-error" hidden style="color: red">Błędny format daty</p>
+                            <p id="set-date-error" hidden style="color: red">Błędny format daty</p>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-dismiss="modal">Anuluj</button>
-                    <button data-index="4" type="button" class="btn btn-danger" id="remove-label-and-set-date">Usuń etykietę</button>
+                    <button data-index="4" type="button" class="btn btn-danger" id="remove-label-and-set-date">Zatwierdź</button>
                 </div>
             </div>
         </div>

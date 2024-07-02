@@ -1647,10 +1647,29 @@ class OrdersController extends Controller
 
     public function setPaymentDeadline(Request $request)
     {
+        $data = $request->all();
+        $date = $data['date'];
+        $order = Order::findOrFail($data['order_id']);
+
+        OrderLabelScheduler::query()->create([
+            'order_id' => $order->id,
+            'label_id' => 5,
+            'label_id_to_handle' => 282,
+            'type' => 'C',
+            'action' => 'to_add_type_c',
+            'trigger_time' => Carbon::createFromDate($date['year'], $date['month'], $date['day']),
+        ]);
+
+        OrderLabelScheduler::query()->create([
+            'order_id' => $order->id,
+            'label_id' => 5,
+            'label_id_to_handle' => 63,
+            'type' => 'C',
+            'action' => 'to_remove_type_c',
+            'trigger_time' => Carbon::createFromDate($date['year'], $date['month'], $date['day']),
+        ]);
+
         try {
-            $data = $request->all();
-            $order = Order::findOrFail($data['order_id']);
-            $date = $data['date'];
             $d = Carbon::createFromDate($date['year'], $date['month'], $date['day']);
         } catch (Exception $ex) {
             if ($ex instanceof ModelNotFoundException) {
