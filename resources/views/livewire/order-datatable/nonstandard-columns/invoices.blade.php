@@ -38,6 +38,7 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
 
 {{--            <a href="#" class="change__invoice--visibility" onclick="changeInvoiceVisibility({{ $invoice['id'] }})">Zmieńwidoczność</a>--}}
 
+            <a class="remove__invoices" href="/delete-invoice?id={{ $invoice['id'] }}">Usuń</a>
             <hr>
         @endif
     @endforeach
@@ -48,7 +49,6 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
           }
     @endphp
 
-    <div class="remove__invoices" onclick="getInvoicesLists({{ $id }})">Usuń</div>
 @endif
 
 @php

@@ -79,4 +79,10 @@ class InvoicesController extends Controller
         return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
     }
 
+    public function delete(): RedirectResponse
+    {
+        OrderInvoice::find(request()->query('id'))->delete();
+
+        return redirect()->back();
+    }
 }
