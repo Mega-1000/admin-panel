@@ -305,40 +305,40 @@ function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, tim
     else {
         let payDateLabelId = '63'
         if (labelId == payDateLabelId) {
-            // let modalSetTime = $('#set_time');
-            // modalSetTime.modal('show');
-            // $('#set_time').on('shown.bs.modal', function () {
-            //     $('#invoice-month').focus()
-            // })
-            // modalSetTime.find("#remove-label-and-set-date").off().on('click', () => {
-            //     if ($('#invoice-month').val() > 12 || $('#invoice-days').val() > 31) {
-            //         $('#invoice-date-error').removeAttr('hidden')
-            //         return
-            //     }
-            //     $.ajax({
-            //         type: "POST",
-            //         url: '/admin/orders/payment-deadline',
-            //         data: {
-            //             order_id: orderId,
-            //             date: {
-            //                 year: $('#invoice-years').val(),
-            //                 month: $('#invoice-month').val(),
-            //                 day: $('#invoice-days').val(),
-            //             }
-            //         },
-            //     }).done(function (data) {
-            //         removeLabelRequest();
-            //         refreshDtOrReload()
-            //         modalSetTime.modal('hide')
-            //         $('#invoice-month').val('')
-            //         $('#invoice-days').val('')
-            //     }).fail(function (data) {
-            //         $('#invoice-date-error').removeAttr('hidden')
-            //         $('#invoice-date-error').text(data.responseText ? data.responseText : 'Nieznany błąd2')
-            //
-            //     });
-            // });
-            // return;
+            let modalSetTime = $('#set_time');
+            modalSetTime.modal('show');
+            $('#set_time').on('shown.bs.modal', function () {
+                $('#invoice-month').focus()
+            })
+            modalSetTime.find("#remove-label-and-set-date").off().on('click', () => {
+                if ($('#invoice-month').val() > 12 || $('#invoice-days').val() > 31) {
+                    $('#invoice-date-error').removeAttr('hidden')
+                    return
+                }
+                $.ajax({
+                    type: "POST",
+                    url: '/admin/orders/payment-deadline',
+                    data: {
+                        order_id: orderId,
+                        date: {
+                            year: $('#invoice-years').val(),
+                            month: $('#invoice-month').val(),
+                            day: $('#invoice-days').val(),
+                        }
+                    },
+                }).done(function (data) {
+                    removeLabelRequest();
+                    refreshDtOrReload()
+                    modalSetTime.modal('hide')
+                    $('#invoice-month').val('')
+                    $('#invoice-days').val('')
+                }).fail(function (data) {
+                    $('#invoice-date-error').removeAttr('hidden')
+                    $('#invoice-date-error').text(data.responseText ? data.responseText : 'Nieznany błąd2')
+
+                });
+            });
+            return;
         }
         else if (addedType == "chat") {
             const url = `/admin/chat/${1}/${orderId}`;
