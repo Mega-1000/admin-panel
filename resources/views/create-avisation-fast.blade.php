@@ -17,7 +17,7 @@
 
 
         Dostępne magazyny:
-        @foreach($order->items->first()->manufacturer->warehouses as $warehouse)
+        @foreach($order->items->first()->product->firm->warehouses as $warehouse)
             {{ $warehouse->symbol }}
         @endforeach
         Magazyn do awizacji
