@@ -68,7 +68,6 @@
             try {
                 $date = \Carbon\Carbon::create('last_confirmation')->isToday();
             } catch (\Exception $e) {
-                $date = false;
             }
         @endphp
 
