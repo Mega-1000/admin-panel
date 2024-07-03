@@ -103,7 +103,6 @@ class SendSpeditionNotifications implements ShouldQueue
                 ) {
                     $this->updateOrderLabels($order, [244]);
 
-                    dd($sendMails);
                     if ($currentHour == 10) {
                         $this->updateOrderLabels($order, [270]);
                     }
