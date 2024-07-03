@@ -33,9 +33,9 @@ class SendPaymentConfirmationProds implements ShouldQueue
      */
     public function handle(): void
     {
-        $confirmations = OrderPaymentConfirmation::where('confirmed', false)
-            ->where('created_at', '<', now()->subMinutes(30))
-            ->get();
+        $confirmations = OrderPaymentConfirmation::where('confirmed', false)->where('created_at', '<', now()->subMinutes(30))->whereDoesntHave('labels', function ($q) {
+            $q->where('labels.id', 260);
+        })->get();
 
         foreach ($confirmations as $confirmation) {
             Mailer::create()
