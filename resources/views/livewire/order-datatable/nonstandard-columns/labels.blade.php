@@ -125,6 +125,6 @@
 
     @if($labelGroupName === 'produkcja')
         {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()->created_at ?? '' }}
-        {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()->warehouse->warehouse_email ?? '' }}
+        {{ substr(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()->warehouse->warehouse_email ?? '', 16) }}
     @endif
 </div>
