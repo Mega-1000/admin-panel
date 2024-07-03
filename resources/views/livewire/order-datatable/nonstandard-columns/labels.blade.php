@@ -62,7 +62,7 @@
             @endif
         @endforeach
 
-        @if(\Carbon\Carbon::create(['last_confirmation'])->isToday())
+        @if(\Carbon\Carbon::create('last_confirmation')->isToday())
             <div style="color: green">
                 Magazyn potwierdził, że nie zamówienie nie wyjedzie jutro
             </div>
