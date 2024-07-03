@@ -72,13 +72,6 @@
                     }
                 }
             @endphp
-
-            @if($hasLabel)
-                <hr>
-                Numer telefonu do działu spedycji: {{ $order['warehouse']['shipment_after_pay_phone'] ?? '' }}
-                <hr>
-            @endif
-
         @foreach($order['dates'] ?? [] as $k => $date)
             @if(array_key_exists($k, $dateTranslations))
                 {{ $dateTranslations[$k] ?? '' }}: {{  isset($date) ? \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') : 'Brak' ?? '' }}
@@ -101,7 +94,14 @@
             </div>
         @endif
 
-        @php
+        @if($hasLabel)
+            <hr>
+            Numer telefonu do działu spedycji: {{ $order['warehouse']['shipment_after_pay_phone'] ?? '' }}
+            <hr>
+        @endif
+
+
+            @php
             $hasLabel276 = false;
             $hasLabel279 = false;
             if (!empty($order['labels'])) {
