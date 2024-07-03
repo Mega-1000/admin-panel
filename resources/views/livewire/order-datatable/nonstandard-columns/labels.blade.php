@@ -55,6 +55,30 @@
             ];
         @endphp
 
+        @php
+            $hasLabel = false;
+            if (!empty($order['labels'])) {
+                foreach ($order['labels'] as $label) {
+                    if ($label['id'] === 270)
+                    {
+                        $hasLabel = true;
+                        break;
+                    }
+
+                    if ($label['id'] === 275) {
+                        $hasLabel = true;
+                        break;
+                    }
+                }
+            }
+        @endphp
+
+        @if()
+            <hr>
+                Numer telefonu do działu spedycji: {{ $order['warehouse']['shipment_after_pay_phone'] ?? '' }}
+            <hr>
+        @endif
+
         @foreach($order['dates'] ?? [] as $k => $date)
             @if(array_key_exists($k, $dateTranslations))
                 {{ $dateTranslations[$k] ?? '' }}: {{  isset($date) ? \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') : 'Brak' ?? '' }}
@@ -77,24 +101,6 @@
             </div>
         @endif
 
-        @php
-            $hasLabel276 = false;
-            $hasLabel279 = false;
-            if (!empty($order['labels'])) {
-                foreach ($order['labels'] as $label) {
-                    if ($label['id'] === 276 )
-                    {
-                        $hasLabel276 = true;
-                        break;
-                    }
-
-                    if ($label['id'] === 279) {
-                        $hasLabel279 = true;
-                        break;
-                    }
-                }
-            }
-        @endphp
 
         @if ($hasLabel276 || $hasLabel279)
             <div class="mt-4">
