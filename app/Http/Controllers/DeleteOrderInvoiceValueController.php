@@ -14,10 +14,11 @@ class DeleteOrderInvoiceValueController extends Controller
 {
     public function __invoke(int $id): RedirectResponse
     {
-        OrderInvoiceValue::findOrFail($id)->delete();
+        $value = OrderInvoiceValue::findOrFail($id);
+        $value->delete();
 
         CalculateSubjectInvoiceBilansLabels::handle(
-            Order::findOrFail(OrderInvoiceValue::findOrFail($id)->order_id),
+            Order::findOrFail($value->order_id),
         );
 
         return redirect()->back();
