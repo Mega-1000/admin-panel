@@ -63,12 +63,12 @@
         @endforeach
 
         @php
-            $date = '';
+            $date = false;
 
             try {
                 $date = \Carbon\Carbon::create('last_confirmation')->isToday();
             } catch (\Exception $e) {
-                $date = now()->subDays(4);
+                $date = false;
             }
         @endphp
 
