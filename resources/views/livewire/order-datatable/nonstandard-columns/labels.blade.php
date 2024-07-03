@@ -72,7 +72,7 @@
             }
         @endphp
 
-        @if($date)
+        @if($date->isToday())
             <div style="color: green">
                 Magazyn potwierdził, że nie zamówienie nie wyjedzie jutro
             </div>
