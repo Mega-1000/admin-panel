@@ -50,7 +50,7 @@ class SendSpeditionNotifications implements ShouldQueue
         foreach ($orders as $order) {
             $order = Order::find($order->order_id);
             $sendMails = $order->labels->contains('id', 53) &&
-                $order->warehouse?->warehouse_email;
+                $order->warehouse?->shipment_after_pay_email;
 
             if ($order->labels->contains('id', 179)) {
                 continue;
@@ -76,7 +76,7 @@ class SendSpeditionNotifications implements ShouldQueue
             if ($beforeFromDate->isToday() && !$order->start_of_spedition_period_sent) {
                 if ($sendMails) {
                     Mailer::create()
-                        ->to($order->warehouse->warehouse_email)
+                        ->to($order->warehouse->shipment_after_pay_email)
                         ->send(new ReminderAboutStartOfSpeditionPeriod($order));
                 }
 
@@ -99,7 +99,7 @@ class SendSpeditionNotifications implements ShouldQueue
                     ($toDate->isFuture() || $toDate->isToday()) &&
                     !Carbon::create($order->last_confirmation)->isToday() &&
                     !$order->special_data_filled &&
-                    $order?->warehouse?->warehouse_email &&
+                    $order?->warehouse?->shipment_after_pay_email &&
                     !$order->labels->contains('id', 244)
                 ) {
                     if ($currentHour === 11) {
@@ -115,7 +115,7 @@ class SendSpeditionNotifications implements ShouldQueue
                     if ($sendMails) {
                         try {
                             Mailer::create()
-                                ->to($order->warehouse->warehouse_email)
+                                ->to($order->warehouse->shipment_after_pay_email)
                                 ->send(new SpeditionDatesMonit($order));
                             $order->labels_log .= 'Wysłano email dotyczący prośby określenia daty wyjazdu ' . date('Y-m-d H:i:s') . ' przez ' . PHP_EOL;
                         } catch (\Exception $exception) {
@@ -129,7 +129,7 @@ class SendSpeditionNotifications implements ShouldQueue
             if ($beforeToDate->isToday() && !$order->near_end_of_spedition_period_sent) {
                 if ($sendMails) {
                     Mailer::create()
-                        ->to($order->warehouse->warehouse_email)
+                        ->to($order->warehouse->shipment_after_pay_email)
                         ->send(new ReminderAboutNearEndOfSpeditionPeriod($order));
                 }
 
@@ -142,7 +142,7 @@ class SendSpeditionNotifications implements ShouldQueue
 
             if ($sendMails && $toDate->isPast() && !$order->end_of_spedition_period_sent) {
                 Mailer::create()
-                    ->to($order->warehouse->warehouse_email)
+                    ->to($order->warehouse->shipment_after_pay_email)
                     ->send(new ReminderAfterSpeditionPeriodEnded($order));
 
                 $order->end_of_spedition_period_sent = true;

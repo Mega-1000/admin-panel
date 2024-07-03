@@ -50,6 +50,7 @@ class Warehouse extends Model implements Transformable
         'warehouse_email',
         'cordinates',
         'shipment_after_pay_email',
+        'shipment_after_pay_phone'
     ];
 
     /**
