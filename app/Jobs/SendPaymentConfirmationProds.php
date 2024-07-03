@@ -38,13 +38,18 @@ class SendPaymentConfirmationProds implements ShouldQueue
         })->get();
 
         foreach ($confirmations as $confirmation) {
-            Mailer::create()
-                ->to($confirmation->order->warehouse->warehouse_email)
-                ->send(new OrderPaymentConfirmationAttachedMail($confirmation, true));
+            try {
+                Mailer::create()
+                    ->to($confirmation->order->warehouse->warehouse_email)
+                    ->send(new OrderPaymentConfirmationAttachedMail($confirmation, true));
 
-            if (!$confirmation->order->labels->has(261)) {
-                $arr = [];
-                AddLabelService::addLabels($confirmation->order, [261], $arr, []);
+                if (!$confirmation->order->labels->has(261)) {
+                    $arr = [];
+                    AddLabelService::addLabels($confirmation->order, [261], $arr, []);
+                    $confirmation->order->labels()->detach(259);
+                }
+            } catch (Exception $e) {
+                echo 'okej';
             }
         }
     }
