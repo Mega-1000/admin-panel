@@ -130,6 +130,8 @@
                 {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->property->phone ?? '' }}
             @endif
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->created_at ?? '' }}
-            {{ strstr(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->warehouse_email ?? '', '@', true) }}@
+            @if(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->warehouse_email)
+                {{ strstr(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->warehouse_email ?? '', '@', true) }}@
+            @endif
     @endif
 </div>
