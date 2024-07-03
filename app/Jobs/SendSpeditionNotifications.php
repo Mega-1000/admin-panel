@@ -102,6 +102,7 @@ class SendSpeditionNotifications implements ShouldQueue
                     $order?->warehouse?->shipment_after_pay_email &&
                     $order->labels->contains('id', 244)
                 ) {
+                    dd($currentHour);
                     if ($currentHour === 10) {
                         $this->updateOrderLabels($order, [270]);
                     }
