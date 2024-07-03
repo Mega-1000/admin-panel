@@ -7,39 +7,47 @@
 @endsection
 
 @section('app-content')
-    <form action="{{ route('storeAvisation', $order->id) }}" method="POST">
-        @csrf
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-bordered">
+                <div class="panel-body">
+                    <form action="{{ route('storeAvisation', $order->id) }}" method="POST">
+                        @csrf
 
-        Kwota wpłaty
-        <input type="text" class="form-control" name="declared_sum">
-        <br>
-        <br>
+                        Kwota wpłaty
+                        <input type="text" class="form-control" name="declared_sum">
+                        <br>
+                        <br>
 
 
-        Magazyn do awizacji
+                        Magazyn do awizacji
 
-        <select class="form-control" name="warehouse-symbol">
-            @foreach($order->items->first()->product->firm->warehouses as $warehouse)
-                <option>{{ $warehouse->symbol }}</option>
-            @endforeach
-        </select>
-        <br>
-        <br>
+                        <select class="form-control" name="warehouse-symbol">
+                            @foreach($order->items->first()->product->firm->warehouses as $warehouse)
+                                <option>{{ $warehouse->symbol }}</option>
+                            @endforeach
+                        </select>
+                        <br>
+                        <br>
 
-        Rodzaj transportu
-        <select class="form-control">
-            <option value="1">
-                Transport Fabryczny
-            </option>
-            <option value="2">
-                Odbiór osobisty
-            </option>
-        </select>
-        <br>
+                        Rodzaj transportu
+                        <select class="form-control">
+                            <option value="1">
+                                Transport Fabryczny
+                            </option>
+                            <option value="2">
+                                Odbiór osobisty
+                            </option>
+                        </select>
+                        <br>
 
-        <button  class="form-control" class="btn btn-primary">
-            Zatwierdź
-        </button>
+                        <button  class="form-control" class="btn btn-primary">
+                            Zatwierdź
+                        </button>
 
-    </form>
+                    </form>
+            </div>
+        </div>
+    </div>
+    </div>
 @endsection
