@@ -92,7 +92,7 @@ class SendSpeditionNotifications implements ShouldQueue
             // jeśli fabryka nie wypełni danych specjalnych do godziny 14:00 to dodaję etykietę 270
             if (
                 ($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) ||
-                $currentHour >= 10
+                $currentHour >= 11
             ) {
                 if (
                     $fromDate->isPast() &&
@@ -103,7 +103,7 @@ class SendSpeditionNotifications implements ShouldQueue
                 ) {
                     $this->updateOrderLabels($order, [244]);
 
-                    if ($currentHour == 10) {
+                    if ($currentHour >= 11) {
                         $this->updateOrderLabels($order, [270]);
                     }
 
