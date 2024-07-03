@@ -146,6 +146,9 @@ class WarehousesController extends Controller
         $this->repository->update($request->all(), $warehouse->id);
         $this->repository->update(['warehouse_email' => $request->input('warehouse-email')], $warehouse->id);
 
+        $warehouse->shipment_after_pay_email = $request->input('shipment-after-pay-email');
+        $warehouse->save();
+
         $warehouseAddress = WarehouseAddress::find($id);
         if (!empty($warehouseAddress)) {
             $warehouseAddress->warehouse_id = $warehouse->id;
