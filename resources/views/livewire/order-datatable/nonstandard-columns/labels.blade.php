@@ -66,7 +66,7 @@
             $date = false;
 
             try {
-                $date = \Carbon\Carbon::create('last_confirmation')->isToday();
+                $date = \Carbon\Carbon::create($order['last_confirmation'])->isToday();
             } catch (\Exception $e) {
             }
         @endphp
