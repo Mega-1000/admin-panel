@@ -47,6 +47,6 @@ class OrderSpeditionDatesMonitController extends Controller
         $arr = [];
         AddLabelService::addLabels($order, [276], $arr, []);
 
-        return '<script>alert('Pomyślnie uściślono daty i zapisano numer do kierowcy!')</script>';
+        return `<script>alert('Pomyślnie uściślono daty i zapisano numer do kierowcy!')</script>`;
     }
 }
