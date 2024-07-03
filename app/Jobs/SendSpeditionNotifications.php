@@ -104,6 +104,9 @@ class SendSpeditionNotifications implements ShouldQueue
                 ) {
                     if ($currentHour == 10) {
                         $this->updateOrderLabels($order, [270]);
+                        if ($order->id = 	86053) {
+                            dd('test');
+                        }
                     }
 
                     $this->updateOrderLabels($order, [244]);
