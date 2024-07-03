@@ -94,6 +94,7 @@ class SendSpeditionNotifications implements ShouldQueue
                 ($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) ||
                 $currentHour >= 10
             ) {
+                dd('okej');
                 if (
                     $fromDate->isPast() &&
                     ($toDate->isFuture() || $toDate->isToday()) &&
