@@ -73,7 +73,7 @@
             }
         @endphp
 
-        @if()
+        @if($hasLabel)
             <hr>
                 Numer telefonu do działu spedycji: {{ $order['warehouse']['shipment_after_pay_phone'] ?? '' }}
             <hr>
