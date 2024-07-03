@@ -122,4 +122,8 @@
             @endforeach
         @endif
     </div>
+
+    @if($labelGroupName === 'fakury zakupu')
+            {{ OrderWarehouseNotification::where('order_id', $order['id'])->first()->created_at ?? '' }}
+    @endif
 </div>
