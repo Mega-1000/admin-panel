@@ -99,7 +99,7 @@ class SendSpeditionNotifications implements ShouldQueue
                     ($toDate->isFuture() || $toDate->isToday()) &&
                     !Carbon::create($order->last_confirmation)->isToday() &&
                     !$order->special_data_filled &&
-                    $order?->warehouse?->shipment_after_pay_email &&
+                    $order?->warehouse?->shipment_after_pay_email
                 ) {
                     $this->updateOrderLabels($order, [244]);
 
