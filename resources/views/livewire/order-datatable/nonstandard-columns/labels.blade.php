@@ -126,6 +126,7 @@
     @if($labelGroupName === 'produkcja')
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()->contact_person ?? '' }}
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()->contact_person_phone ?? '' }}
+            {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()->warehouse->property->phone ?? '' }}
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()->created_at ?? '' }}
             {{ strstr(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()->warehouse->warehouse_email ?? '', '@', true) }}@
     @endif
