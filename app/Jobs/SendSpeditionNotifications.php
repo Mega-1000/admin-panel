@@ -104,6 +104,7 @@ class SendSpeditionNotifications implements ShouldQueue
                 ) {
                     $this->updateOrderLabels($order, [244]);
 
+                    dd($sendMails);
                     if ($currentHour == 10) {
                         $this->updateOrderLabels($order, [270]);
                     }
@@ -111,7 +112,6 @@ class SendSpeditionNotifications implements ShouldQueue
                     if ($currentHour >= 14) {
                         $this->updateOrderLabels($order, [275]);
                     }
-                    dd($sendMails);
                     if ($sendMails) {
                         try {
                             Mailer::create()
