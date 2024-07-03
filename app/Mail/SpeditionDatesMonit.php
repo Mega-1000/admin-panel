@@ -46,7 +46,7 @@ class SpeditionDatesMonit extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'email.spedition-dates-monit',
+            view: 'emails.spedition-dates-monit',
             with: [
                 'order' => $this->order,
             ]
