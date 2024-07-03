@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('warehouse', function (Blueprint $table) {
+        Schema::table('warehouses', function (Blueprint $table) {
             $table->string('shipment_after_pay_phone')->nullable();
         });
     }
