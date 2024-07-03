@@ -19,6 +19,10 @@
                         <br>
                         <br>
 
+                        Data wpłaty
+                        <input type="datetime-local" class="form-control" name="declared_date">
+                        <br>
+                        <br>
 
                         Magazyn do awizacji
 

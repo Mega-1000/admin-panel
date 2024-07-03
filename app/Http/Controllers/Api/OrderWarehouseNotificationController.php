@@ -213,7 +213,7 @@ class OrderWarehouseNotificationController extends Controller
     {
         WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
         $type = $request->input('payment-type');
-        $promiseDate = now()->addDay();
+        $promiseDate = Carbon::create($request->get('declared_date'));
         $payer = $order->customer->login;
 
         if ($order->payments->sum('declared_sum') !== 0) {
