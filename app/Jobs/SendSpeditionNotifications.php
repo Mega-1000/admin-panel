@@ -96,7 +96,7 @@ class SendSpeditionNotifications implements ShouldQueue
             ) {
                 if (
                     $fromDate->isPast() &&
-                    $toDate->isFuture() &&
+                    ($toDate->isFuture() || $toDate->isToday()) &&
                     !Carbon::create($order->last_confirmation)->isToday() &&
                     !$order->special_data_filled &&
                     $order?->warehouse?->warehouse_email &&
@@ -112,12 +112,12 @@ class SendSpeditionNotifications implements ShouldQueue
                         $this->updateOrderLabels($order, [275]);
                     }
 
-
                     if ($sendMails) {
                         try {
                             Mailer::create()
                                 ->to($order->warehouse->warehouse_email)
                                 ->send(new SpeditionDatesMonit($order));
+                            $order->labels_log .= 'Wysłano email dotyczący prośby określenia daty wyjazdu ' . date('Y-m-d H:i:s') . ' przez ' . PHP_EOL;
                         } catch (\Exception $exception) {
 
                         }

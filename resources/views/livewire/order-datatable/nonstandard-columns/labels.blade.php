@@ -54,12 +54,19 @@
                 'warehouse_shipment_date_to' => 'ma do'
             ];
         @endphp
+
         @foreach($order['dates'] ?? [] as $k => $date)
             @if(array_key_exists($k, $dateTranslations))
                 {{ $dateTranslations[$k] ?? '' }}: {{  isset($date) ? \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') : 'Brak' ?? '' }}
                 <br>
             @endif
         @endforeach
+
+        @if(\Carbon\Carbon::create(['last_confirmation'])->isToday())
+            <div style="color: green">
+                Magazyn potwierdził, że nie zamówienie nie wyjedzie jutro
+            </div>
+        @endif
 
         @php
             $hasLabel276 = false;
