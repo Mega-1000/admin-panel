@@ -111,11 +111,7 @@ class SendSpeditionNotifications implements ShouldQueue
                     if ($currentHour >= 14) {
                         $this->updateOrderLabels($order, [275]);
                     }
-
-
-                    if ($order->id == 	86053) {
-                        dd($sendMails);
-                    }
+                    dd($sendMails);
                     if ($sendMails) {
                         try {
                             Mailer::create()
