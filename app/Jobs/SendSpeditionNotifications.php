@@ -102,24 +102,26 @@ class SendSpeditionNotifications implements ShouldQueue
                     $order?->warehouse?->shipment_after_pay_email &&
                     $order->labels->contains('id', 244)
                 ) {
+                    $this->updateOrderLabels($order, [244]);
+
                     if ($currentHour == 10) {
                         $this->updateOrderLabels($order, [270]);
-                        if ($order->id == 	86053) {
-                            dd('test');
-                        }
                     }
-
-                    $this->updateOrderLabels($order, [244]);
 
                     if ($currentHour >= 14) {
                         $this->updateOrderLabels($order, [275]);
                     }
 
+
+                    if ($order->id == 	86053) {
+                        dd($sendMails);
+                    }
                     if ($sendMails) {
                         try {
                             Mailer::create()
                                 ->to($order->warehouse->shipment_after_pay_email)
                                 ->send(new SpeditionDatesMonit($order));
+
                             $order->labels_log .= 'Wysłano email dotyczący prośby określenia daty wyjazdu ' . date('Y-m-d H:i:s') . ' przez ' . PHP_EOL;
                         } catch (\Exception $exception) {
 
