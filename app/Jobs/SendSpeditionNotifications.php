@@ -92,7 +92,8 @@ class SendSpeditionNotifications implements ShouldQueue
             // jeśli fabryka nie wypełni danych specjalnych do godziny 14:00 to dodaję etykietę 270
             if (
                 ($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) ||
-                $currentHour >= 11
+                $currentHour >= 11 &&
+                $order->payments()->where('declared_sum')->first()
             ) {
                 if (
                     $fromDate->isPast() &&
