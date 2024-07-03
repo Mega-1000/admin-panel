@@ -100,9 +100,8 @@ class SendSpeditionNotifications implements ShouldQueue
                     !Carbon::create($order->last_confirmation)->isToday() &&
                     !$order->special_data_filled &&
                     $order?->warehouse?->shipment_after_pay_email &&
-                    !$order->labels->contains('id', 244)
+                    $order->labels->contains('id', 244)
                 ) {
-                    dd('okej');
                     if ($currentHour === 10) {
                         $this->updateOrderLabels($order, [270]);
                     }
