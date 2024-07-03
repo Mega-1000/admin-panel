@@ -62,6 +62,11 @@
                                            value="{{ $warehouse->warehouse_email ?? '' }}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="shipment-after-pay-email">Email odziału zajmującego się logistyką po wpłacie</label>
+                                    <input type="email" class="form-control" id="shipment-after-pay-email" name="shipment-after-pay-email"
+                                           value="{{ $warehouse->shipment_after_pay_email ?? '' }}">
+                                </div>
+                                <div class="form-group">
                                     <label for="status">@lang('warehouses.form.status')</label>
                                     <select class="form-control text-uppercase" name="status">
                                         <option value="ACTIVE">@lang('warehouses.form.active')</option>
