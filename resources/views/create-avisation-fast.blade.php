@@ -11,14 +11,14 @@
         @csrf
 
         Kwota wpłaty
-        <input type="text" name="declared_sum">
+        <input type="text" class="form-control" name="declared_sum">
         <br>
         <br>
 
 
         Magazyn do awizacji
 
-        <select name="warehouse-symbol">
+        <select class="form-control" name="warehouse-symbol">
             @foreach($order->items->first()->product->firm->warehouses as $warehouse)
                 <option>{{ $warehouse->symbol }}</option>
             @endforeach
@@ -27,7 +27,7 @@
         <br>
 
         Rodzaj transportu
-        <select>
+        <select class="form-control">
             <option value="1">
                 Transport Fabryczny
             </option>
@@ -37,7 +37,7 @@
         </select>
         <br>
 
-        <button class="btn btn-primary">
+        <button  class="form-control" class="btn btn-primary">
             Zatwierdź
         </button>
 
