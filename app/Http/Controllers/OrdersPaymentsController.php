@@ -1227,7 +1227,7 @@ class OrdersPaymentsController extends Controller
     {
         $updateData = $request->validated();
 
-        WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT, $id);
+//        WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT, $id);
         $orderPayment = OrderPayment::findOrFail($id);
         $oldOrderId = $orderPayment->order_id;
 
