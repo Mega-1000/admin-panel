@@ -93,7 +93,7 @@ class SendSpeditionNotifications implements ShouldQueue
             if (
                 ($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) ||
                 $currentHour >= 11 &&
-                $order->payments()->where('declared_sum')->first()
+                $order->payments()->where('declared_sum')->where('status', '!=', 'Rozliczona deklarowana')->first()
             ) {
                 if (
                     $fromDate->isPast() &&
