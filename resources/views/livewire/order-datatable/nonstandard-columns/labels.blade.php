@@ -126,6 +126,8 @@
                 <br>
                 pod numer: {{ $order['driver_phone'] ?? '' }}
                 Wpisz datę następnego kontaktu:
+                <br>
+                <br>
                 <form action="{{ route('save-contact-to-driver', $order['id']) }}">
                     <input type="datetime-local" id="next_contact_date" name="next_contact_date">
 
