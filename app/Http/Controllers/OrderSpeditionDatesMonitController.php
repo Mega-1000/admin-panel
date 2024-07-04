@@ -15,6 +15,11 @@ class OrderSpeditionDatesMonitController extends Controller
         $order->last_confirmation = now();
         $order->save();
 
+        $order->labels()->detach(270);
+
+        $arr = [];
+        AddLabelService::addLabels($order, [244], $arr, []);
+
         return 'Dziękujemy za potwierdzenie, że zamówienie nie zostanie wysłane dziś';
     }
 
