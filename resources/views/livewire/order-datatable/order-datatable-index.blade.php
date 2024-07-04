@@ -32,10 +32,18 @@
             >
 
             <button class="btn btn-primary" wire:click="updateIsSortingByPreferredInvoiceDate">
-                Filtruj po preferowanych datach wystawienia faktury
+                @if (auth()->user()->grid_settings['is_sorting_by_preferred_invoice_date'] ?? false)
+                    Sortowanie po preferowanych datach wystawienia faktury jest włączone
+                @else
+                    Filtruj po preferowanych datach wystawienia faktury
+                @endif
             </button>
             <button class="btn btn-primary" wire:click="updateOnlyStyroFilter">
-                Tylko styropian
+                @if (auth()->user()->grid_settings['only_styro'] ?? false)
+                    Filtr tylko styropian jest włączony
+                @else
+                    Tylko styropian
+                @endif
             </button>
 
 
