@@ -36,6 +36,7 @@ class OrderPaymentObserver
         $this->orderPaymentLabelsService->calculateLabels($orderPayment->order);
 
         AllegroPaymentsReturnService::checkAllegroReturn($orderPayment->order);
+        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($orderPayment->order);
     }
 
     /**
