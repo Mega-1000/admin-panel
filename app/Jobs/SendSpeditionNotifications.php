@@ -86,6 +86,14 @@ class SendSpeditionNotifications implements ShouldQueue
             $currentHour = date('H');
             $currentMinute = date('i');
 
+            $haveToAskWarehouse = $order->payments()->where('declared_sum')->first();
+
+            foreach ($haveToAskWarehouse as $item) {
+                if ($item->status !== 'Rozliczona deklarowana') {
+                    $haveToAskWarehouse = true;
+                    break;
+                }
+            }
 
             // Jeśli datach wysyłki zamówienia zawiera się data obecna dodaję etykietę 244 i wysyłam prośbę o wypełnienie danych specjalnych do fabryki
             // o 11:00 zaczyna się wysyłanie maili do fabryki co 15 minut
@@ -93,7 +101,8 @@ class SendSpeditionNotifications implements ShouldQueue
             if (
                 ($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) ||
                 $currentHour >= 11 &&
-                $order->payments()->where('declared_sum')->where('status', '!=', 'Rozliczona deklarowana')->first()
+                $haveToAskWarehouse
+
             ) {
                 if (
                     $fromDate->isPast() &&
