@@ -57,6 +57,10 @@ class OrdersRecalculatorBasedOnPeriod
             ->get()
             ->sum('declared_sum');
 
+        if ($payments != 0) {
+            AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
+        }
+
         if (
             round(round($sumOfGrossValues, 2) + round($depositPaidData['returnedValue'], 2) - round($depositPaidData['balance'], 2) - round($depositPaidData['wtonValue'], 2) - round($depositPaidData['externalFirmValue'], 2) - round($payments, 2)) == 0.0 &&
             $order->payments->count() > 0
