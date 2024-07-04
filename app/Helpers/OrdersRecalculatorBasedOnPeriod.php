@@ -50,7 +50,6 @@ class OrdersRecalculatorBasedOnPeriod
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
 
-        dd(round(round($sumOfGrossValues, 2) + round($depositPaidData['returnedValue'], 2) - round($depositPaidData['balance'], 2) - round($depositPaidData['wtonValue'], 2) - round($depositPaidData['externalFirmValue'], 2)));
 
         $payments = $order->payments()->where('declared_sum', '!=', null)
             ->where('status', '!=', 'Rozliczona deklarowana')
