@@ -664,6 +664,11 @@ class OrdersController extends Controller
             }) && $noAuction;
 
             $order->isAuctionCreated = !$noAuction;
+
+            if ($order->isAuctionCreated) {
+                $order->auctionId = $order->chat->auctions->first()->id;
+            }
+
             $order->isThereUnansweredChat = $order->labels->contains(254);
 
             $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
