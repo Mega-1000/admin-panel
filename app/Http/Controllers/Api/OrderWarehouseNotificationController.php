@@ -211,6 +211,17 @@ class OrderWarehouseNotificationController extends Controller
 
     public function storeAvisation(Order $order, Request $request): RedirectResponse
     {
+        $shipmentDateTo = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
+
+        if ($shipmentDateTo->isPast()) {
+            $order->dates()->update([
+                'customer_shipment_date_from' => Carbon::now(),
+                'customer_shipment_date_to' => Carbon::now()->addBusinessDays(7),
+            ]);
+
+            $shipmentDateTo = Carbon::now()->addBusinessDays(7);
+        }
+
         WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
         $type = $request->input('payment-type');
         $promiseDate = Carbon::create($request->get('declared_date'));
@@ -245,7 +256,7 @@ class OrderWarehouseNotificationController extends Controller
         if ($order->payments->sum('declared_sum') !== $order->getValue()) {
             WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
             $type = $request->input('payment-type');
-            $promiseDate = Carbon::create($order->dates->warehouse_shipment_date_to ?? $order->dates->customer_shipment_date_to);
+            $promiseDate = Carbon::create($shipmentDateTo);
 
             $orderPayment = app(OrderPaymentService::class)->payOrder(
                 $order->id, $order->getValue() - $order->payments->sum('declared_sum'),
