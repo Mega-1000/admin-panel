@@ -51,8 +51,10 @@ class OrdersRecalculatorBasedOnPeriod
 
 
 
-        $payments = $order->payments()->where('declared_sum', '!=', null)
-            ->where('status', '!=', 'Rozliczona deklarowana')
+        $payments = $order
+            ->payments()
+            ->where('declared_sum', '!=', null)
+            ->where('status', null)
             ->where('promise_date', '>', now())
             ->get()
             ->sum('declared_sum');
