@@ -122,6 +122,9 @@
 
         @if ($hasLabel276 || $hasLabel279)
             <div class="mt-4">
+                ZADZWOŃ DO KIEROWCY
+                <br>
+                pod numer: {{ $order['driver_phone'] ?? '' }}
                 Wpisz datę następnego kontaktu:
                 <form action="{{ route('save-contact-to-driver', $order['id']) }}">
                     <input type="datetime-local" id="next_contact_date" name="next_contact_date">
