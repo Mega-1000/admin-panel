@@ -3,6 +3,8 @@
 namespace App\Observers\Entities;
 
 use App\Entities\OrderPayment;
+use App\Helpers\OrdersRecalculatorBasedOnPeriod;
+use App\Http\Controllers\RecalculateLabelsInOrdersBasedOnPeriod;
 use App\Jobs\SendSpeditionNotifications;
 use App\Repositories\Orders;
 use App\Services\AllegroPaymentsReturnService;
@@ -73,5 +75,7 @@ class OrderPaymentObserver
         $this->orderPaymentLabelsService->calculateLabels($orderPayment->order);
 
         $this->orderService->calculateInvoiceReturnsLabels($orderPayment->order);
+
+        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($orderPayment->order);
     }
 }
