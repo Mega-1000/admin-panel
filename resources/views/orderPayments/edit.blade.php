@@ -45,7 +45,7 @@
             @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2 || Auth::user()->role_id == 3)
             <div class="form-group">
                 <label for="promise_date">@lang('order_payments.form.promise_date')</label><br/>
-                <input type="text" id="promise_date" name="promise_date" value="{{ $orderPayment->promise_date }}" class="form-control default-date-picker-now">
+                <input type="text" id="promise_date" name="promise_date" value="{{ $orderPayment->promise_date }}" class="form-control default-date-time-picker-now">
             </div>
             @endif
             <div class="form-group">
