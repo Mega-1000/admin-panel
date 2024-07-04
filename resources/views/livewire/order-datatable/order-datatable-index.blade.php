@@ -38,6 +38,7 @@
                     Filtruj po preferowanych datach wystawienia faktury
                 @endif
             </button>
+            {{ auth()->user()->grid_settings}}
             <button class="btn btn-primary" wire:click="updateOnlyStyroFilter">
                 @if (auth()->user()->grid_settings['only_styro'] ?? false)
                     Filtr tylko styropian jest włączony
