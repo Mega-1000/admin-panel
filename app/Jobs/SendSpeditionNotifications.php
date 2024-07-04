@@ -86,10 +86,10 @@ class SendSpeditionNotifications implements ShouldQueue
             $currentHour = date('H');
             $currentMinute = date('i');
 
-            $haveToAskWarehouse = $order->payments()->where('declared_sum')->first();
+            $haveToAskWarehouse = $order->payments()->where('declared_sum')->get();
 
             foreach ($haveToAskWarehouse as $item) {
-                if ($item && $item?->status !== 'Rozliczona deklarowana') {
+                if ($item?->status !== 'Rozliczona deklarowana') {
                     $haveToAskWarehouse = true;
                     break;
                 }
