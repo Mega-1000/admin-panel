@@ -135,11 +135,11 @@
                         Kontakt udany
                     </button>
 
-                    @if($hasLabel279)
+{{--                    @if($hasLabel279)--}}
                         <button class="btn btn-danger" name="unsuccessed" value="true">
                             Kontakt nieudany
                         </button>
-                    @endif
+{{--                    @endif--}}
                 </form>
             </div>
         @endif
