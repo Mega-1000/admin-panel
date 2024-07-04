@@ -89,7 +89,7 @@ class SendSpeditionNotifications implements ShouldQueue
             $haveToAskWarehouse = $order->payments()->where('declared_sum')->first();
 
             foreach ($haveToAskWarehouse as $item) {
-                if ($item->status !== 'Rozliczona deklarowana') {
+                if ($item?->status !== 'Rozliczona deklarowana') {
                     $haveToAskWarehouse = true;
                     break;
                 }
