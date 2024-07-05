@@ -57,6 +57,17 @@ class Employee extends Model implements Transformable
         return $this->belongsTo(Firm::class);
     }
 
+    public function getZipCodesAttribute()
+    {
+        return array_filter([
+            $this->zip_code_1,
+            $this->zip_code_2,
+            $this->zip_code_3,
+            $this->zip_code_4,
+            $this->zip_code_5
+        ]);
+    }
+
     /**
      * @return BelongsToMany
      */
