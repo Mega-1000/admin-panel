@@ -25,8 +25,8 @@ class EmployeeCreateRequest extends FormRequest
     {
         return [
             'email' => 'required|email|min:5',
-            'firstname' => 'nullable|regex:/^[a-zA-Z]+$/u',
-            'lastname' => 'nullable|regex:/^[a-zA-Z]+$/u',
+            'firstname' => 'nullable',
+            'lastname' => 'nullable',
             'phone' => 'nullable|regex:/[0-9]{9}/',
             'job_position' => 'in:SECRETARIAT,CONSULTANT,STOREKEEPER,SALES',
             'radius' => 'nullable|numeric',
