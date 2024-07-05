@@ -24,17 +24,6 @@ class EmployeeUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|min:5',
-            'firstname' => 'nullable|regex:/^[a-zA-Z]+$/u',
-            'lastname' => 'nullable|regex:/^[a-zA-Z]+$/u',
-            'phone' => 'nullable|regex:/[0-9]{9}/',
-            'job_position' => 'in:SECRETARIAT,CONSULTANT,STOREKEEPER,SALES',
-            'radius' => 'nullable|numeric',
-            'status' => 'in:ACTIVE,PENDING',
-            'zip_code_2' => 'nullable',
-            'zip_code_3' => 'nullable',
-            'zip_code_4' => 'nullable',
-            'zip_code_5' => 'nullable',
         ];
     }
 }
