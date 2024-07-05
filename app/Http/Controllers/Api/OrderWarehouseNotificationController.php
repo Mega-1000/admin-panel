@@ -192,6 +192,7 @@ class OrderWarehouseNotificationController extends Controller
             foreach ($packages as $package) {
                 $package->update(['status' => 'SENDING']);
             }
+            $order->labels()->detach([244, 245, 74, 243, 256, 270]);
 
             dispatch(new DispatchLabelEventByNameJob($order, "all-shipments-went-out"));
 
