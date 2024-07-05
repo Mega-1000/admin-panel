@@ -3,7 +3,7 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-person"></i> @lang('employees.create')
-        <a style="margin-left:15px" href="{{ action('FirmsController@edit', ['firm' => $id]) }}"
+        <a style="margin-left:15px" href="{{ action('FirmsController@edit', ['firm' => $firm->id]) }}"
            class="btn btn-info install pull-right">
             <span>@lang('firms.back_to_edit')</span>
         </a>
