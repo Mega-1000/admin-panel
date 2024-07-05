@@ -39,7 +39,8 @@ readonly class AllegroPaymentsReturnService
         if (
             in_array(Label::RETURN_ALLEGRO_PAYMENTS, $orderLabels) &&
             !in_array(Label::ORDER_ITEMS_REDEEMED_LABEL, $orderLabels) &&
-            !self::checkIfOrderHasKwonPayment($order)
+            !self::checkIfOrderHasKwonPayment($order) &&
+            !$order->labels->contains('id', 42)
         ) {
             $order->payments()->create([
                 'amount' => $order->getValue(),
