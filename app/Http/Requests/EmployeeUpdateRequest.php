@@ -31,6 +31,10 @@ class EmployeeUpdateRequest extends FormRequest
             'job_position' => 'in:SECRETARIAT,CONSULTANT,STOREKEEPER,SALES',
             'radius' => 'nullable|numeric',
             'status' => 'in:ACTIVE,PENDING',
+            'zip_code_2' => 'nullable',
+            'zip_code_3' => 'nullable',
+            'zip_code_4' => 'nullable',
+            'zip_code_5' => 'nullable',
         ];
     }
 }

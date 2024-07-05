@@ -72,7 +72,7 @@ class EmployeesController extends Controller
         $employee->comments = $request->input('comments');
         $employee->additional_comments = $request->input('additional_comments');
         $employee->postal_code = $request->input('postal_code');
-        $employee->zip_code_2 = dd($request->input('zip_code_2'));
+        $employee->zip_code_2 = $request->input('zip_code_2');
         $employee->zip_code_3 = $request->input('zip_code_3');
         $employee->zip_code_4 = $request->input('zip_code_4');
         $employee->zip_code_5 = $request->input('zip_code_5');
@@ -166,6 +166,10 @@ class EmployeesController extends Controller
         $employee->additional_comments = $request->input('additional_comments');
         $employee->postal_code = $request->input('postal_code');
         $employee->status = $request->input('status');
+        $employee->zip_code_2 = $request->input('zip_code_2');
+        $employee->zip_code_3 = $request->input('zip_code_3');
+        $employee->zip_code_4 = $request->input('zip_code_4');
+        $employee->zip_code_5 = $request->input('zip_code_5');
         $employee->faq = $request->input('faq');
         if (!empty($postal)) {
             $employee->latitude = $postal->latitude;
