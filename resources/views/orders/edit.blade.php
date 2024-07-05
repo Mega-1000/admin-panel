@@ -1,12 +1,9 @@
-@php
-    $firm = \App\Entities\Firm::where('symbol', 'IZOTERM')->first();
-@endphp
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $firm->name }} - Employee Coverage Map</title>
+    <title>{{ $firm->name }} - Employee Coverage Map (Poland)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <style>
@@ -14,11 +11,11 @@
     </style>
 </head>
 <body>
-<h1>{{ $firm->name }} - Employee Coverage Map</h1>
+<h1>{{ $firm->name }} - Employee Coverage Map (Poland)</h1>
 <div id="map"></div>
 <script>
-    // Initialize the map
-    var map = L.map('map').setView([0, 0], 2);
+    // Initialize the map centered on Poland
+    var map = L.map('map').setView([52.0685, 19.0472], 6);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -79,9 +76,19 @@
         });
     });
 
-    // Fit the map to show all markers
-    var group = new L.featureGroup(map._layers);
-    map.fitBounds(group.getBounds());
+    // Add Poland border
+    fetch('https://raw.githubusercontent.com/konklone/json/master/data/poland.json')
+        .then(response => response.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: {
+                    color: "#ff7800",
+                    weight: 2,
+                    opacity: 0.65,
+                    fillOpacity: 0
+                }
+            }).addTo(map);
+        });
 </script>
 </body>
 </html>
