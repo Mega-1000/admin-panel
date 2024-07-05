@@ -74,34 +74,56 @@ class LocationHelper
 
     public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer)
     {
-        $coordinates1 = DB::table('postal_code_lat_lon')->where('postal_code', $customer->standardAddress()->postal_code)->first();
-        $coordinates2 = DB::table('postal_code_lat_lon')->where('postal_code', $employee->postal_code)->first();
+        $customerCoordinates = DB::table('postal_code_lat_lon')
+            ->where('postal_code', $customer->standardAddress()->postal_code)
+            ->first();
 
-        if (!$coordinates1 || !$coordinates2) {
-            return -112378198273; // or throw an exception, or handle as per your application's requirements
+        if (!$customerCoordinates) {
+            return -112378198273; // or handle the error as needed
         }
 
+        $minDistance = PHP_FLOAT_MAX;
         $radius = $employee->radius;
 
-        $raw = DB::selectOne(
-            'SELECT 6371 * 2 * ASIN(SQRT(
+        for ($i = 1; $i <= 5; $i++) {
+            $zipCodeField = "zip_code_" . $i;
+            if (empty($employee->$zipCodeField)) {
+                continue;
+            }
+
+            $employeeCoordinates = DB::table('postal_code_lat_lon')
+                ->where('postal_code', $employee->$zipCodeField)
+                ->first();
+
+            if (!$employeeCoordinates) {
+                continue;
+            }
+
+            $raw = DB::selectOne(
+                'SELECT 6371 * 2 * ASIN(SQRT(
                 POW(SIN((? - ?) * PI() / 360), 2) +
                 COS(? * PI() / 180) * COS(? * PI() / 180) *
                 POW(SIN((? - ?) * PI() / 360), 2)
             )) AS distance',
-            [
-                $coordinates1->latitude,
-                $coordinates2->latitude,
-                $coordinates1->latitude,
-                $coordinates2->latitude,
-                $coordinates1->longitude,
-                $coordinates2->longitude
-            ]
-        );
+                [
+                    $customerCoordinates->latitude,
+                    $employeeCoordinates->latitude,
+                    $customerCoordinates->latitude,
+                    $employeeCoordinates->latitude,
+                    $customerCoordinates->longitude,
+                    $employeeCoordinates->longitude
+                ]
+            );
 
-        $distance = $raw->distance;
+            $distance = $raw->distance;
+            $minDistance = min($minDistance, $distance);
+        }
 
-        return $radius - $distance;
+        if ($minDistance === PHP_FLOAT_MAX) {
+            return -112378198273; // No valid employee coordinates found
+        }
+
+        return $radius - $minDistance;
     }
 
     public static function nearestWarehouse(Customer $customer, Firm $firm): Warehouse
