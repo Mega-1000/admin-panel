@@ -139,6 +139,7 @@
                         <input type="hidden" id="magazinecount" name="magazinecount" value="{{$count-1}}">
                     @endif
                 </div>
+                !!Proszę o wykożysyanie nowego formatu wykożystującego ";" w jedynie w polach od 2 do 5 do włączenia nowego systemu wyznaczania regionów system będzie kożystyał jedynie z pierwszego kodu pocztowego i starego zakresu działania!!
                 <div class="form-group">
                     <label for="comments">@lang('employees.form.comments')</label>
                     <textarea rows="4" cols="50" class="form-control" id="comments"
