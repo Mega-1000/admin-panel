@@ -1,174 +1,645 @@
-@extends('layouts.app')
-
+@extends('layouts.datatable')
 @section('app-header')
     <h1 class="page-title">
-        <i class="voyager-person"></i> @lang('employees.create')
-        <a style="margin-left:15px" href="{{ action('FirmsController@edit', ['firm' => $firm->id]) }}"
+        <i class="voyager-company"></i> @lang('firms.edit')
+        <a style="margin-left: 15px;" href="{{ action('FirmsController@index') }}"
            class="btn btn-info install pull-right">
-            <span>@lang('firms.back_to_edit')</span>
+            <span>@lang('firms.list')</span>
         </a>
     </h1>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+        <style>
+            #map { height: 600px; }
+        </style>
+    </head>
 @endsection
 
-@section('app-content')
-    <div class="browse container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-bordered">
-                    @if($errors->any())
-                        <div class="alert alert-danger" role="alert">
-                            <ul>
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+
+@section('table')
+
+    <body>
+    <div id="map"></div>
+    <script>
+        // Initialize the map centered on Poland
+        var map = L.map('map').setView([52.0685, 19.0472], 6);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Function to generate a random color
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Employee data
+        var employees = [
+                @foreach($firm->employees as $employee)
+            {
+                id: {{ $employee->id }},
+                name: "{{ $employee->name }}",
+                zipCodes: [
+                        @foreach(['zip_code_1', 'zip_code_2', 'zip_code_3', 'zip_code_4', 'zip_code_5'] as $zipCodeField)
+                        @if($employee->$zipCodeField)
+                        @php
+                            $zipCodeParts = explode(';', $employee->$zipCodeField);
+                            $zipCode = $zipCodeParts[0];
+                            $radius = isset($zipCodeParts[1]) ? floatval($zipCodeParts[1]) : 0;
+                            $latLon = \App\Entities\PostalCodeLatLon::where('postal_code', $zipCode)->first();
+                        @endphp
+                        @if($latLon)
+                    {
+                        code: "{{ $zipCode }}",
+                        lat: {{ $latLon->latitude }},
+                        lng: {{ $latLon->longitude }},
+                        radius: {{ $radius }}
+                    },
                     @endif
-                    <div class="panel-body">
-                        <form action="{{ action('EmployeesController@store', ['firm_id' => $firm->id]) }}" method="POST">
-                            {{ csrf_field() }}
-                            <div class="employees-general" id="general">
-                                <div class="form-group">
-                                    <label for="firm_visibility">@lang('employees.form.firm_visibilty')</label>
-                                    <input type="checkbox" id="firm_visibility" name="firm_visibility">
-                                </div>
-                                <div class="form-group">
-                                    <label for="firstname">@lang('employees.form.firstname')</label>
-                                    <input type="text" class="form-control" id="firstname" name="firstname"
-                                           value="{{ old('firstname') }}">
-                                    <label for="firstname_visibility">@lang('employees.form.visibility')</label>
-                                    <input type="checkbox" id="firstname_visibility" name="firstname_visibility">
-                                </div>
-                                <div class="form-group">
-                                    <label for="lastname">@lang('employees.form.lastname')</label>
-                                    <input type="text" class="form-control" id="lastname" name="lastname"
-                                           value="{{ old('lastname') }}">
-                                    <label for="lastname_visibility">@lang('employees.form.visibility')</label>
-                                    <input type="checkbox" id="lastname_visibility" name="lastname_visibility">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">@lang('employees.form.email')</label>
-                                    <input type="email" class="form-control" id="email" name="email"
-                                           value="{{ old('email') }}">
-                                    <label for="email_visibility">@lang('employees.form.visibility')</label>
-                                    <input type="checkbox" id="email_visibility" name="email_visibility">
-                                </div>
-                                <div class="form-group">
-                                    <label for="phone">@lang('employees.form.phone')</label>
-                                    <input type="text" class="form-control" id="phone" name="phone"
-                                           value="{{ old('phone') }}">
-                                    <label for="phone_visibility">@lang('employees.form.visibility')</label>
-                                    <input type="checkbox" id="phone_visibility" name="phone_visibility">
-                                </div>
-                                <div class="form-group">
-                                    <label for="job_position">@lang('employees.form.job_position')</label>
-                                    @if(!empty($roles))
-                                        @php
-                                            $count=1;
-                                        @endphp
-                                        @foreach($roles as $role)
-                                            <div>
-                                                <label>{{$role->name}}</label>
-                                                <input type="checkbox" id="role{{$count}}" name="role{{$count}}"
-                                                       value="{{$role->id}}">
-                                            </div>
-                                            @php
-                                                $count++;
-                                            @endphp
-                                        @endforeach
-                                        <input type="hidden" id="rolecount" name="rolecount" value="{{$count-1}}">
-                                    @endif
-                                </div>
-                                <div class="form-group">
-                                    <label for="person_number">@lang('employees.form.numer')</label>
-                                    <input type="number" class="form-control" id="person_number" name="person_number"
-                                           value="{{ old('person_number') }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="job_position">@lang('employees.form.magazines')</label>
-                                    @if(!empty($warehouses))
-                                        @php
-                                            $count=1;
-                                        @endphp
-                                        @foreach($warehouses as $warehouse)
-                                            <div>
-                                                <label>{{$warehouse->symbol}}</label>
-                                                <input type="checkbox" id="magazine{{$count}}" name="magazine{{$count}}"
-                                                       value="{{$warehouse->id}}">
-                                            </div>
-                                            @php
-                                                $count++;
-                                            @endphp
-                                        @endforeach
-                                        <input type="hidden" id="magazinecount" name="magazinecount"
-                                               value="{{$count-1}}">
-                                    @endif
-                                </div>
-                                <div class="form-group">
-                                    <label for="comments">@lang('employees.form.comments')</label>
-                                    <textarea rows="4" cols="50" class="form-control" id="comments"
-                                              name="comments">{{ old('comments')}}</textarea>
-                                    <label for="comments_visibility">@lang('employees.form.visibility')</label>
-                                    <input type="checkbox" id="comments_visibility" name="comments_visibility">
-                                </div>
-                                <div class="form-group">
-                                    <label for="additional_comments">@lang('employees.form.additional_comments')</label>
-                                    <textarea rows="4" cols="50" class="form-control" id="additional_comments"
-                                              name="additional_comments">{{ old('additional_comments')}}</textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="faq">@lang('employees.form.faq')</label>
-                                    <textarea rows="4" cols="50" class="form-control" id="faq"
-                                              name="faq">{{ old('faq')}}</textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="postal_code">@lang('employees.form.postal_code')</label>
-                                    <input type="text" class="form-control" id="postal_code" name="postal_code"
-                                           value="{{ old('postal_code') }}">
-                                    <label for="postal_code_visibility">@lang('employees.form.visibility')</label>
-                                    <input type="checkbox" id="postal_code_visibility" name="postal_code_visibility">
-                                </div>
-                                <div class="form-group">
-                                    <label for="latitude">@lang('firms.form.address.latitude')</label>
-                                    <input type="text" class="form-control disabled" id="latitude" name="latitude"
-                                           value="{{ old('latitude') }}" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label for="longitude">@lang('firms.form.address.longitude')</label>
-                                    <input type="text" class="form-control" id="longitude" name="longitude"
-                                           value="{{ old('longitude') }}" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label for="radius">@lang('employees.form.radius')</label>
-                                    <input type="text" class="form-control" id="radius" name="radius"
-                                           value="{{ old('radius') }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="status">@lang('employees.form.status')</label>
-                                    <select class="form-control text-uppercase" name="status">
-                                        <option value="ACTIVE">@lang('employees.form.active')</option>
-                                        <option value="PENDING">@lang('employees.form.pending')</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
-                        </form>
-                    </div>
-                </div>
+                    @endif
+                    @endforeach
+                ]
+            },
+            @endforeach
+        ];
+
+        // Create the map
+        employees.forEach(function(employee) {
+            var color = getRandomColor();
+            employee.zipCodes.forEach(function(zipCode) {
+                L.circle([zipCode.lat, zipCode.lng], {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.2,
+                    radius: zipCode.radius * 1000 // Convert km to meters
+                }).addTo(map).bindPopup(`${employee.name}<br>Imie pracownika: ${employee.name}<br>Kod pocztowy: ${zipCode.code}<br>Promień: ${zipCode.radius} km`);
+            });
+        });
+
+        // Add Poland border
+        fetch('https://raw.githubusercontent.com/konklone/json/master/data/poland.json')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: {
+                        color: "#ff7800",
+                        weight: 2,
+                        opacity: 0.65,
+                        fillOpacity: 0
+                    }
+                }).addTo(map);
+            });
+    </script>
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    <div style="margin-bottom: 15px;" class="tab">
+        <button class="btn btn-primary active"
+                name="change-button-form" id="button-general"
+                value="general">@lang('firms.form.buttons.general')</button>
+        <button class="btn btn-primary"
+                name="change-button-form" id="button-address"
+                value="address">@lang('firms.form.buttons.address')</button>
+        <button class="btn btn-primary"
+                name="change-button-form" id="button-warehouses"
+                value="warehouses">@lang('firms.form.buttons.warehouses')</button>
+        <button class="btn btn-primary"
+                name="change-button-form" id="button-employees"
+                value="employees">@lang('firms.form.buttons.employees')</button>
+        <a id="create-button-warehouse" style="float:right;margin-right: 15px;"
+           href="{{route('warehouses.create', ['firm_id' => $firm->id]) }}" class="btn btn-success install pull-right">
+            <i class="voyager-plus"></i> <span>@lang('warehouses.create')</span>
+        </a>
+        <a id="create-button-employee" style="float:right;margin-right: 15px;"
+           href="{{route('employees.create', ['firm_id' => $firm->id]) }}" class="btn btn-success install pull-right">
+            <i class="voyager-plus"></i> <span>@lang('employees.create')</span>
+        </a>
+    </div>
+
+    <form method="post" action="{{ route('auction.notification-firm-panel', $firm->id) }}" class="btn btn-primary" >
+        @csrf
+        <button class="btn btn-primary">
+            Wyślij powiadomienie na temat dostępności panelu przetargów
+        </button>
+    </form>
+
+    <form id="firms" action="{{ action('FirmsController@update', ['id' => $firm->id])}}"
+          method="POST">
+        {{ csrf_field() }}
+        {{ method_field('put') }}
+        <div class="firms-general" id="general">
+            <input type="hidden" value="{{Session::get('uri')}}" id="uri">
+            <div class="form-group">
+                <label for="name">@lang('firms.form.name')</label>
+                <input type="text" class="form-control" id="name" name="name"
+                       value="{{ $firm->name }}">
+            </div>
+            <div class="form-group">
+                <label for="short_name">@lang('firms.form.short_name')</label>
+                <input class="form-control" id="short_name"
+                       name="short_name" maxlength="50"
+                       value="{{ $firm->short_name }}">
+            </div>
+            <div class="form-group">
+                <label for="symbol">@lang('firms.form.symbol')</label>
+                <input class="form-control" id="symbol"
+                       name="symbol"
+                       value="{{ $firm->symbol }}">
+            </div>
+            <div class="form-group">
+                <label for="firm_type">@lang('firms.form.firm_type')</label>
+                <select class="form-control text-uppercase" name="firm_type">
+                    <option {{ $firm->firm_type === 'PRODUCTION' ? 'selected="selected"' : ''}} value="PRODUCTION">@lang('firms.form.production')</option>
+                    <option {{ $firm->firm_type === 'DELIVERY' ? 'selected="selected"' : ''}} value="DELIVERY">@lang('firms.form.delivery')</option>
+                    <option {{ $firm->firm_type === 'OTHER' ? 'selected="selected"' : ''}} value="OTHER">@lang('firms.form.other')</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="delivery_warehouse">@lang('firms.form.delivery_warehouse')</label>
+                <input type="text" class="form-control" id="delivery_warehouse" name="delivery_warehouse"
+                       value="{{ $firm->delivery_warehouse }}">
+            </div>
+            <div class="form-group">
+                <label for="firm_source">@lang('firms.form.firm_source')</label>
+
+                <select class="form-control text-uppercase" name="firm_source[]" multiple>
+                    @foreach ($orderSources as $orderSource)
+                    <option {{$firm->firmSources->firstWhere('order_source_id', $orderSource->id) ? 'selected' : ''}} value="{{$orderSource->id}}">{{$orderSource->name}} ({{$orderSource->short_name}})</option>
+                    @endforeach
+                </select>
+            </div>
+            <a href="/admin/firms/{{$firm->id}}/sendRequestToUpdateFirmData" class="btn btn-success">
+                <span class="hidden-xs hidden-sm">Wyślij prośbę o aktualizację danych</span>
+            </a>
+            <div class="form-group">
+                <label for="email">@lang('firms.form.email')</label>
+                <input type="email" class="form-control" id="email" name="email"
+                       value="{{ $firm->email }}">
+            </div>
+            <div class="form-group">
+                <label for="secondary_email">@lang('firms.form.secondary_email')</label>
+                <input type="email" class="form-control" id="secondary_email" name="secondary_email"
+                       value="{{ $firm->secondary_email }}">
+            </div>
+            <div class="form-group">
+                <label for="complaint_email">@lang('firms.form.complaint_email')</label>
+                <input type="email" class="form-control" id="complaint_email" name="complaint_email"
+                       value="{{ $firm->complaint_email }}">
+            </div>
+            <div class="form-group">
+                <label for="nip">@lang('firms.form.nip')</label>
+                <input type="text" class="form-control" id="nip" name="nip"
+                       value="{{ $firm->nip }}">
+            </div>
+            <div class="form-group">
+                <label for="account_number">@lang('firms.form.account_number')</label>
+                <input type="text" class="form-control" id="account_number" name="account_number"
+                       value="{{ $firm->account_number }}">
+            </div>
+            <div class="form-group">
+                <label for="status">@lang('firms.form.status')</label>
+                <select class="form-control text-uppercase" name="status">
+                    <option value="ACTIVE">@lang('firms.form.active')</option>
+                    <option value="PENDING">@lang('firms.form.pending')</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phone">@lang('firms.form.phone')</label>
+                <input type="text" class="form-control" id="phone" name="phone"
+                       value="{{ $firm->phone }}">
+            </div>
+            <div class="form-group">
+                <label for="secondary_phone">@lang('firms.form.secondary_phone')</label>
+                <input type="text" class="form-control" id="secondary_phone" name="secondary_phone"
+                       value="{{ $firm->secondary_phone }}">
+            </div>
+            <div class="form-group">
+                <label for="notices">@lang('firms.form.notices')</label>
+                <textarea cols="40" rows="5" type="text" class="form-control" id="notices" name="notices"
+                       >{{ $firm->notices }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="secondary_notices">@lang('firms.form.secondary_notices')</label>
+                <textarea cols="40" rows="5" type="text" class="form-control" id="secondary_notices" name="secondary_notices"
+                          >{{ $firm->secondary_notices }}</textarea>
             </div>
         </div>
+        <div class="firms-address" id="address">
+            <div class="form-group">
+                <label for="postal_code">@lang('firms.form.address.postal_code')</label>
+                <input type="text" class="form-control" id="postal_code" name="postal_code"
+                       value="{{ $firmAddress->first->id->postal_code }}">
+            </div>
+            <div class="form-group">
+                <label for="city">@lang('firms.form.address.city')</label>
+                <input type="text" class="form-control" id="city" name="city"
+                       value="{{ $firmAddress->first->id->city }}">
+            </div>
+            <div class="form-group">
+                <label for="latitude">@lang('firms.form.address.latitude')</label>
+                <input type="text" class="form-control" id="latitude" name="latitude"
+                       value="{{ $firmAddress->first->id->latitude }}">
+            </div>
+            <div class="form-group">
+                <label for="longitude">@lang('firms.form.address.longitude')</label>
+                <input type="text" class="form-control" id="longitude" name="longitude"
+                       value="{{ $firmAddress->first->id->longitude }}">
+            </div>
+            <div class="form-group">
+                <label for="address">@lang('firms.form.address.address')</label>
+                <input type="text" class="form-control" id="address" name="address"
+                       value="{{ $firmAddress->first->id->address }}">
+            </div>
+            <div class="form-group">
+                <label for="flat_number">@lang('firms.form.address.flat_number')</label>
+                <input type="text" class="form-control" id="flat_number" name="flat_number"
+                       value="{{ $firmAddress->first->id->flat_number }}">
+            </div>
+            <div class="form-group">
+                <label for="address2">@lang('firms.form.address.address2')</label>
+                <input type="text" class="form-control" id="address2" name="address2"
+                       value="{{ $firmAddress->first->id->address2 }}">
+            </div>
+        </div>
+    </form>
+    <div class="firms-warehouses" id="warehouses">
+        @if(!empty($uri))
+            <input id="uri" type="hidden" value="{{$uri}}">
+        @endif
+        <table style="width: 100%" id="dataTableWarehouses" class="table table-hover">
+            <thead>
+            <tr>
+                <th></th>
+                <th>ID</th>
+                <th>@lang('warehouses.table.symbol')</th>
+                <th>@lang('warehouses.table.warehouse_email')</th>
+                <th>@lang('warehouses.table.address')</th>
+                <th>@lang('warehouses.table.warehouse_number')</th>
+                <th>@lang('warehouses.table.postal_code')</th>
+                <th>@lang('warehouses.table.city')</th>
+                <th>@lang('warehouses.table.status')</th>
+                <th>@lang('warehouses.table.created_at')</th>
+                <th>@lang('voyager.generic.actions')</th>
+            </tr>
+            </thead>
+        </table>
     </div>
-@endsection
+    <div class="firms-employees" id="employees">
+        <table style="width: 100%" id="dataTableEmployees" class="table table-hover">
+            <thead>
+            <tr>
+                <th></th>
+                <th>ID</th>
+                <th>@lang('employees.table.firstname')</th>
+                <th>@lang('employees.table.lastname')</th>
+                <th>@lang('employees.table.phone')</th>
+                <th>@lang('employees.table.email')</th>
+                <th>@lang('employees.table.job_position')</th>
+                <th>@lang('employees.table.comments')</th>
+                <th>@lang('employees.table.additional_comments')</th>
+                <th>@lang('employees.table.postal_code')</th>
+                <th>@lang('employees.table.status')</th>
+                <th>@lang('employees.table.created_at')</th>
+                <th>@lang('voyager.generic.actions')</th>
+            </tr>
+            </thead>
+            @foreach ($employees as $employee)
+            <tbody>
+                <tr>
+                <td></td>
+                <td>{{$employee->id}}</td>
+                <td>{{$employee->firstname}}</td>
+                <td>{{$employee->lastname}}</td>
+                <td>{{$employee->phone}}</td>
+                <td>{{$employee->email}}</td>
+                <td>{{$employee->role}}</td>
+                <td>{{$employee->comments}}</td>
+                <td>{{$employee->additional_comments}}</td>
+                <td>{{$employee->postal_code}}</td>
+                <td>{{$employee->status}}</td>
+                <td>{{$employee->created_at}}</td>
+                <td>
+                    <a href="/admin/employees/{{$employee->id}}/edit" class="btn btn-sm btn-primary edit">
+                        <i class="voyager-edit"></i>
+                        <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
+                    </a>
+                    <form action="{{ action('EmployeesController@destroy', $employee->id) }}" method="POST" >
+                        {{ method_field('DELETE')}}
+                        {{ csrf_field() }}
+                        <button type="submit"  class="btn btn-sm btn-danger edit">
+                            <i class="voyager-edit"></i>
+                            <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
+                        </button>
+                    </form>
+                    <form action="{{ route('employees.request-new-prices', $employee->id) }}" method="POST">
+                        {{ csrf_field() }}
+                        wiadomość dodatkowa do proźby o wysłanie cennika
+                        <input class="form-control" name="message" placeholder="wiadomość dodatkowa do proźby o wysłanie cennika">
 
-@section('javascript')
+                        <button class="btn btn-primary">
+                            Poproś o wysłanie aktualnego cennika
+                        </button>
+                    </form>
+                </td>
+                </tr>
+
+            </tbody>
+            @endforeach
+        </table>
+    </div>
+    <button type="submit" form="firms"
+            class="btn btn-primary">@lang('voyager.generic.save')</button>
+
+@endsection
+@section('datatable-scripts')
     <script>
         $(document).ready(function () {
-            var breadcrumb = $('.breadcrumb:nth-child(2)');
+            const general = $('#general').show();
+            const address = $('#address').hide();
+            const warehouses = $('#warehouses').hide();
+            const employees = $('#employees').hide();
+            const pageTitle = $('.page-title').children('i');
+            const createButtonWarehouse = $('#create-button-warehouse').hide();
+            const createButtonEmployee = $('#create-button-employee').hide();
+            const uri = $('#uri').val();
+            let value;
+            const referrer = document.referrer;
+            const breadcrumb = $('.breadcrumb');
+            const item = '{{old('tab')}}';
+
             breadcrumb.children().remove();
             breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
             breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit'>Firmy</a></li>");
-            breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit#employees'>Pracownicy</a></li>");
-            breadcrumb.append("<li class='disable'><a href='javascript:void()'>Dodaj</a></li>");
-        })
+            breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
+            if (referrer.search('warehouses') !== -1 || uri.search('warehouses') !== -1 || item === 'warehouses') {
+                $('#button-general').removeClass('active');
+                $('#button-address').removeClass('active');
+                $('#button-warehouses').addClass('active');
+                $('#button-employees').removeClass('active');
+                general.hide();
+                address.hide();
+                warehouses.show();
+                employees.hide();
+                createButtonWarehouse.show();
+                createButtonEmployee.hide();
+                pageTitle.removeClass();
+                pageTitle.addClass('voyager-paint-bucket');
+                breadcrumb.children().last().remove();
+                breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit#warehouses'>Magazyny</a></li>");
+
+            } else if (referrer.search('employees') !== -1 || uri.search('employees') !== -1 || item === 'employees') {
+                $('#button-general').removeClass('active');
+                $('#button-address').removeClass('active');
+                $('#button-warehouses').removeClass('active');
+                $('#button-employees').addClass('active');
+                general.hide();
+                address.hide();
+                warehouses.hide();
+                employees.show();
+                createButtonWarehouse.hide();
+                createButtonEmployee.show();
+                pageTitle.removeClass();
+                pageTitle.addClass('voyager-people');
+
+                breadcrumb.children().last().remove();
+                breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit#employees'>Pracownicy</a></li>");
+
+            }
+            $('[name="change-button-form"]').on('click', function () {
+                value = this.value;
+                $('#' + value).show();
+                if (value === 'general') {
+                    $('#button-general').addClass('active');
+                    $('#button-address').removeClass('active');
+                    $('#button-warehouses').removeClass('active');
+                    $('#button-employees').removeClass('active');
+                    address.hide();
+                    warehouses.hide();
+                    employees.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-company');
+                    createButtonWarehouse.hide();
+                    createButtonEmployee.hide();
+                    breadcrumb.children().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
+                    breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit'>Firmy</a></li>");
+                    breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
+                } else if (value === 'address') {
+                    $('#button-general').removeClass('active');
+                    $('#button-address').addClass('active');
+                    $('#button-warehouses').removeClass('active');
+                    $('#button-employees').removeClass('active');
+                    general.hide();
+                    warehouses.hide();
+                    employees.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-home');
+                    createButtonWarehouse.hide();
+                    createButtonEmployee.hide();
+                    breadcrumb.children().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
+                    breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit'>Firmy</a></li>");
+                    breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
+                } else if (value === 'warehouses') {
+                    $('#button-general').removeClass('active');
+                    $('#button-address').removeClass('active');
+                    $('#button-warehouses').addClass('active');
+                    $('#button-employees').removeClass('active');
+                    general.hide();
+                    address.hide();
+                    employees.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-paint-bucket');
+                    createButtonWarehouse.show();
+                    createButtonEmployee.hide();
+
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit#warehouses'>Magazyny</a></li>");
+
+                } else if (value === 'employees') {
+                    $('#button-general').removeClass('active');
+                    $('#button-address').removeClass('active');
+                    $('#button-warehouses').removeClass('active');
+                    $('#button-employees').addClass('active');
+                    general.hide();
+                    address.hide();
+                    warehouses.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-people');
+                    createButtonWarehouse.hide();
+                    createButtonEmployee.show();
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit#employees'>Pracownicy</a></li>");
+
+                }
+            });
+
+        });
+
     </script>
+    <script>
+        const deleteRecordWarehouses = (id) =>{
+            $('#delete_form')[0].action = "/admin/warehouses/" + id;
+            $('#delete_modal').modal('show');
+        };
+        $.fn.dataTable.ext.errMode = 'throw';
+        // DataTable
+        let tableWarehouses = $('#dataTableWarehouses').DataTable({
+            language: {!! json_encode( __('voyager.datatable'), true) !!},
+            processing: true,
+            serverSide: true,
+            columnDefs: [
+                {className: "dt-center", targets: "_all"}
+            ],
+            order: [[0, "asc"]],
+            ajax: '{!! route('warehouses.datatable', ['id' => $firm->id]) !!}',
+            dom: 'Bfrtip',
+            buttons: [
+                {extend: 'colvis', text : 'Widzialność kolumn'}
+            ],
+            columns: [
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id) {
+                        return '<input type="checkbox">';
+                    }
+                },
+                {
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'symbol',
+                    name: 'symbol'
+                },
+                {
+                    data: 'warehouse_email',
+                    name: 'warehouse_email',
+                    defaultContent: '',
+                },
+                {
+                    data: 'address.address',
+                    name: 'address.address',
+                    defaultContent: ''
+                },
+                {
+                    data: 'address.warehouse_number',
+                    name: 'address.warehouse_number',
+                    defaultContent: ''
+                },
+                {
+                    data: 'address.postal_code',
+                    name: 'address.postal_code',
+                    defaultContent: ''
+                },
+                {
+                    data: 'address.city',
+                    name: 'address.city',
+                    defaultContent: ''
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    render: function (status) {
+                        if (status === 'ACTIVE') {
+                            return '<span style="color: green;">' + {!! json_encode(__('employees.table.active'), true) !!} +'</span>';
+                        } else {
+                            return '<span style="color: red;">' + {!! json_encode(__('employees.table.pending'), true) !!} +'</span>';
+                        }
+                    }
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id) {
+                        let html = '<form action="/admin/warehouses/' + id + '/change-status" method="POST" style="display: inline;">';
+                        html += '{{ method_field('put') }}';
+                        html += '{{ csrf_field() }}';
+                        html += '<button type="submit" href="/admin/warehouses/' + id + '/change-status" class="btn btn-sm btn-primary delete">';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('employees.table.change_status')</span>';
+                        html += '</button>';
+                        html += '</form>';
+
+                        html += '<a href="/admin/warehouses/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                        html += '<i class="voyager-edit"></i>';
+                        html += '<span class="hidden-xs hidden-sm">@lang('voyager.generic.edit')</span>';
+                        html += '</a>';
+
+                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordWarehouses(' + id + ')">';
+                        html += '<i class="voyager-trash"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
+                        html += '</button>';
+                        return html;
+                    }
+                }
+            ]
+        });
+        @foreach($visibilitiesWarehouse as $key =>$row)
+
+        let {{'show'.$row->name}}  =;
+        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function(x){
+            // if (typeof table.column(x+':name').index() === "number")
+            return tableWarehouses.column(x+':name').index();
+        });
+        {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
+            return el != null;
+        });
+
+        let {{'hidden'.$row->name}} =;
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function(x){
+            // if (typeof table.column(x+':name').index() === "number")
+            return tableWarehouses.column(x+':name').index();
+        });
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
+            return el != null;
+        });
+        tableWarehouses.button().add({{1+$key}},{
+            extend: 'colvisGroup',
+            text: '{{$row->display_name}}',
+            show: {{'show'.$row->name}},
+            hide: {{'hidden'.$row->name}}
+        });
+        @endforeach
+
+        $('#dataTableWarehouses thead tr th').each(function (i) {
+            const title = $(this).text();
+            if (title !== '' && title !== 'Akcje') {
+                $(this).html('<div><span>'+title+'</span></div><div><input type="text" placeholder="Szukaj '+ title +'" id="columnSearch' + i + '"/></div>');
+            } else if(title === 'Akcje') {
+                $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
+            }
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+
+        $('#dataTableWarehouses > thead > tr:nth-child(2) > th:nth-child(10)')[0].innerText = '';
+        </script>
 @endsection
