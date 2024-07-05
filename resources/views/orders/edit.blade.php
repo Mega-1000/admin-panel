@@ -50,7 +50,7 @@
                     @endphp
                     @if($latLon)
                 {
-                    code: "{{ $employee->$zipCodeField }}",
+                    code: "{{ $employee->name }}",
                     lat: {{ $latLon->latitude }},
                     lng: {{ $latLon->longitude }}
                 },
@@ -72,7 +72,7 @@
                 fillColor: color,
                 fillOpacity: 0.2,
                 radius: employee.radius * 1000 // Convert km to meters
-            }).addTo(map).bindPopup(`${employee.name}<br>Zip Code: ${zipCode.code}`);
+            }).addTo(map).bindPopup(`${employee.name}<br>Imie pracownika: ${zipCode.code}`);
         });
     });
 
