@@ -72,6 +72,25 @@ class LocationHelper
         return $raw?->distance;
     }
 
+    public static function getNearestEmployeeOfFirm(Customer $customer, Firm $firm): Employee
+    {
+        $employees = $firm->employees;
+        $nearestEmployee = null;
+        $shortestDistance = PHP_FLOAT_MAX;
+
+        foreach ($employees as $employee) {
+            $distance = self::getDistanceOfClientToEmployee($employee, $customer);
+
+            // Check if the customer is within the employee's radius
+            if ($distance >= 0 && $distance < $shortestDistance) {
+                $nearestEmployee = $employee;
+                $shortestDistance = $distance;
+            }
+        }
+
+        return $nearestEmployee;
+    }
+
     public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer)
     {
         $customerCoordinates = DB::table('postal_code_lat_lon')

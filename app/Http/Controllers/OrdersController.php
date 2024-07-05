@@ -33,6 +33,7 @@ use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\LabelsHelper;
+use App\Helpers\LocationHelper;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
@@ -596,7 +597,7 @@ class OrdersController extends Controller
                     'different' => $diff,
                     'radius' => $radius,
                     'product_name_supplier' => $prod->product_name_supplier,
-                    'phone' => $firm->first->id->phone,
+                    'phone' => LocationHelper::getNearestEmployeeOfFirm($order->customer, $firm->first->id)->phone,
                     'review' => $prod->review,
                     'quality' => $prod->quality,
                     'quality_to_price' => $prod->quality_to_price,
