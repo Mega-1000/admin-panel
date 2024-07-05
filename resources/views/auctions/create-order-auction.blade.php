@@ -48,8 +48,8 @@
                                         @endif
                                         <span class="product-text cursor-pointer" data-product-id="{{ $product->id }}" data-quantity="{{$product->quantity}}">
                                 Nazwa produktu: {{ $product->name }} <br>
-                                Ilość m3: {{ round($product->quantity, 2) }} <br>
-                                Cena brutto: {{ $productPrice }}
+                                Ilość paczek: {{ round($product->quantity, 2) }} <br>
+                                Cena brutto paczki w zamówieniu: {{ $productPrice }}
                             </span>
                                         <button class="ml-2 remove-product-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded" data-product-id="{{ $product->id }}">Usuń</button>
                                     </div>
