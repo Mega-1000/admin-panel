@@ -25,7 +25,7 @@ class Employee extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'firm_id', 'warehouse_id', 'email', 'firstname', 'lastname', 'phone', 'job_position', 'comments', 'additional_comments', 'postal_code', 'status', 'zip_code_2', 'zip_code_2', 'zip_code_3', 'zip_code_4', 'zip_code_5'
+        'firm_id', 'warehouse_id', 'email', 'firstname', 'lastname', 'phone', 'job_position', 'comments', 'additional_comments', 'postal_code', 'status', 'zip_code_2', 'zip_code_3', 'zip_code_4', 'zip_code_5'
     ];
 
     public array $customColumnsVisibilities = [
