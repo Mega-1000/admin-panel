@@ -1,7 +1,7 @@
 @php
     $firm = \App\Entities\Firm::where('symbol', 'IZOTERM')->first();
 @endphp
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,20 +39,23 @@
     var employees = [
             @foreach($firm->employees as $employee)
         {
-            id: {{  explode($employee->$zipCodeField, ';') }},
+            id: {{ $employee->id }},
             name: "{{ $employee->name }}",
-            radius: {{ $employee->radius }},
             zipCodes: [
                     @foreach(['zip_code_1', 'zip_code_2', 'zip_code_3', 'zip_code_4', 'zip_code_5'] as $zipCodeField)
                     @if($employee->$zipCodeField)
                     @php
-                        $latLon = App\Entities\PostalCodeLatLon::where('postal_code', explode($employee->$zipCodeField, ';'))->first();
+                        $zipCodeParts = explode(';', $employee->$zipCodeField);
+                        $zipCode = $zipCodeParts[0];
+                        $radius = isset($zipCodeParts[1]) ? floatval($zipCodeParts[1]) : 0;
+                        $latLon = \App\Entities\PostalCodeLatLon::where('postal_code', $zipCode)->first();
                     @endphp
                     @if($latLon)
                 {
-                    code: "{{ $employee->firstname }}",
+                    code: "{{ $zipCode }}",
                     lat: {{ $latLon->latitude }},
-                    lng: {{ $latLon->longitude }}
+                    lng: {{ $latLon->longitude }},
+                    radius: {{ $radius }}
                 },
                 @endif
                 @endif
@@ -71,8 +74,8 @@
                 color: color,
                 fillColor: color,
                 fillOpacity: 0.2,
-                radius: employee.radius * 1000 // Convert km to meters
-            }).addTo(map).bindPopup(`${employee.name}<br>Imie pracownika: ${zipCode.code}`);
+                radius: zipCode.radius * 1000 // Convert km to meters
+            }).addTo(map).bindPopup(`${employee.name}<br>Imie pracownika: ${employee.name}<br>Kod pocztowy: ${zipCode.code}<br>Promień: ${zipCode.radius} km`);
         });
     });
 
