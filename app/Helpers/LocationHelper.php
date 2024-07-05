@@ -88,7 +88,7 @@ class LocationHelper
             }
         }
 
-        return $nearestEmployee ?? Firm::employees()->first();
+        return $nearestEmployee ?? $firm->employees()->first();
     }
 
     public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer)
