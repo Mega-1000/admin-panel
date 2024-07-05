@@ -18,7 +18,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 
-class SendSpeditionNotifications implements ShouldQueue
+class endSpeditionNotifications implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -106,7 +106,7 @@ class SendSpeditionNotifications implements ShouldQueue
             ) {
                 if (
                     $fromDate->isPast() &&
-                    ($toDate->isFuture() || $toDate->isToday()) &&
+                    ($toDate->isFuture()) &&
                     !Carbon::create($order->last_confirmation)->isToday() &&
                     !$order->special_data_filled &&
                     $order?->warehouse?->shipment_after_pay_email
