@@ -238,7 +238,7 @@ class OrderWarehouseNotificationController extends Controller
             $orderPayment->save();
 
             $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
-            $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
+            $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - (float)$orderPaymentAmount;
 
             app(OrderPaymentLogService::class)->create(
                 $order->id,
@@ -270,7 +270,7 @@ class OrderWarehouseNotificationController extends Controller
             $orderPayment->save();
 
             $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
-            $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
+            $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - (float)$orderPaymentAmount;
 
             app(OrderPaymentLogService::class)->create(
                 $order->id,
