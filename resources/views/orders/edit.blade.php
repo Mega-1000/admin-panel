@@ -50,7 +50,7 @@
                     @endphp
                     @if($latLon)
                 {
-                    code: "{{ $employee->name }}",
+                    code: "{{ $employee->firstname }}",
                     lat: {{ $latLon->latitude }},
                     lng: {{ $latLon->longitude }}
                 },
