@@ -155,7 +155,7 @@ class SendSpeditionNotifications implements ShouldQueue
 //                $order->save();
             }
 
-            if ($toDate->isPast() && !$order->labels->contains('id', 243)) {
+            if ($toDate->isPast()) {
                 $this->updateOrderLabels($order, [243]);
             }
         }
