@@ -166,8 +166,8 @@
             var breadcrumb = $('.breadcrumb:nth-child(2)');
             breadcrumb.children().remove();
             breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
-            breadcrumb.append("<li class='active'><a href='/admin/firms/{{$id}}/edit'>Firmy</a></li>");
-            breadcrumb.append("<li class='active'><a href='/admin/firms/{{$id}}/edit#employees'>Pracownicy</a></li>");
+            breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit'>Firmy</a></li>");
+            breadcrumb.append("<li class='active'><a href='/admin/firms/{{$firm->id}}/edit#employees'>Pracownicy</a></li>");
             breadcrumb.append("<li class='disable'><a href='javascript:void()'>Dodaj</a></li>");
         })
     </script>
