@@ -25,7 +25,7 @@
                         </div>
                     @endif
                     <div class="panel-body">
-                        <form action="{{ action('EmployeesController@store', ['firm_id' => $id]) }}" method="POST">
+                        <form action="{{ action('EmployeesController@store', ['firm_id' => $firm->id]) }}" method="POST">
                             {{ csrf_field() }}
                             <div class="employees-general" id="general">
                                 <div class="form-group">
