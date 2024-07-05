@@ -11,7 +11,6 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ $firm->name }} - Employee Coverage Map (Poland)</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
         <style>
@@ -24,7 +23,6 @@
 @section('table')
 
     <body>
-    <h1>{{ $firm->name }} - Employee Coverage Map (Poland)</h1>
     <div id="map"></div>
     <script>
         // Initialize the map centered on Poland
