@@ -46,7 +46,7 @@
                     @foreach(['zip_code_1', 'zip_code_2', 'zip_code_3', 'zip_code_4', 'zip_code_5'] as $zipCodeField)
                     @if($employee->$zipCodeField)
                     @php
-                        $latLon = App\Models\PostalCodeLatLon::where('postal_code', $employee->$zipCodeField)->first();
+                        $latLon = App\Entities\PostalCodeLatLon::where('postal_code', $employee->$zipCodeField)->first();
                     @endphp
                     @if($latLon)
                 {
