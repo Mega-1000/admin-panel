@@ -1,3 +1,6 @@
+@php
+    $firm = \App\Entities\Firm::where('symbol', 'IZOTERM')->first();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
