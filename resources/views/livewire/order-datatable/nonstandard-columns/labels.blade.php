@@ -100,6 +100,8 @@
             <hr>
         @endif
 
+        Numer telefonu do działu spedyji{{ $order['warehouse']['shipment_after_pay_phone'] ?? '' }}
+
 
             @php
             $hasLabel276 = false;
@@ -122,10 +124,10 @@
 
         @if ($hasLabel276 || $hasLabel279)
             <div class="mt-4">
+                <hr>
                 ZADZWOŃ DO KIEROWCY
                 <br>
                 pod numer: {{ $order['driver_phone'] ?? '' }}
-                <br>
                 <br>
                 Wpisz datę następnego kontaktu:
                 <form action="{{ route('save-contact-to-driver', $order['id']) }}">
@@ -141,6 +143,7 @@
                         </button>
 {{--                    @endif--}}
                 </form>
+                <hr>
             </div>
         @endif
     @endif
