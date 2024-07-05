@@ -166,7 +166,11 @@
                     <label for="postal_code">@lang('employees.form.postal_code') 1</label>
                     <input type="text" class="form-control" id="postal_code" name="postal_code"
                            value="{{ $employee->postal_code }}">
-
+                    <div class="form-group">
+                        <label for="radius">@lang('employees.form.radius')</label>
+                        <input type="text" class="form-control" id="radius" name="radius"
+                               value="{{ $employee->radius }}">
+                    </div>
                     <div class="mt-2">
                         <label for="zip_code_2">@lang('employees.form.postal_code') 2</label>
                         <input type="text" class="form-control" id="zip_code_2" name="zip_code_2"
@@ -204,11 +208,6 @@
                     <label for="longitude">@lang('firms.form.address.longitude')</label>
                     <input type="text" class="form-control" id="longitude" name="longitude"
                            value="{{ $employee->longitude }}" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="radius">@lang('employees.form.radius')</label>
-                    <input type="text" class="form-control" id="radius" name="radius"
-                           value="{{ $employee->radius }}">
                 </div>
                 <div class="form-group">
                     <label for="status">@lang('employees.form.status')</label>
