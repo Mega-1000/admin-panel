@@ -111,7 +111,7 @@ class LocationHelper
             }
 
             $employeeCoordinates = DB::table('postal_code_lat_lon')
-                ->where('postal_code', $employee->$zipCodeField)
+                ->where('postal_code', explode($employee->$zipCodeField, ';')[0])
                 ->first();
 
             if (!$employeeCoordinates) {
@@ -135,6 +135,10 @@ class LocationHelper
             );
 
             $distance = $raw->distance;
+            if ($minDistance > $distance) {
+                $radius = explode($employee->$zipCodeField, ';')[1];
+            }
+
             $minDistance = min($minDistance, $distance);
         }
 
