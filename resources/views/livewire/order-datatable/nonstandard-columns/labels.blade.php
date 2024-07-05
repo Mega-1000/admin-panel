@@ -69,6 +69,10 @@
                             $hasLabel = true;
                             break;
                         }
+                         if ($label['id'] === 243) {
+                            $hasLabel = true;
+                            break;
+                        }
                     }
                 }
             @endphp
@@ -99,8 +103,6 @@
             Numer telefonu do działu spedycji: {{ $order['warehouse']['shipment_after_pay_phone'] ?? '' }}
             <hr>
         @endif
-
-        Numer telefonu do działu spedyji{{ $order['warehouse']['shipment_after_pay_phone'] ?? '' }}
 
 
             @php
