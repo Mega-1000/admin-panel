@@ -238,20 +238,20 @@ class OrderWarehouseNotificationController extends Controller
 
             $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
             $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
-        }
 
-        app(OrderPaymentLogService::class)->create(
-            $order->id,
-            $orderPayment->id,
-            $orderPayment->order->customer_id,
-            $orderPaymentsSum,
-            $orderPaymentAmount,
-            $request->input('created_at') ?: Carbon::now(),
-            $request->input('notices') ?: '',
-            $request->input('declared_sum', '0') ?? '0',
-            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
-            true,
-        );
+            app(OrderPaymentLogService::class)->create(
+                $order->id,
+                $orderPayment->id,
+                $orderPayment->order->customer_id,
+                $orderPaymentsSum,
+                $orderPaymentAmount,
+                $request->input('created_at') ?: Carbon::now(),
+                $request->input('notices') ?: '',
+                $request->input('declared_sum', '0') ?? '0',
+                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                true,
+            );
+        }
 
         if ($order->payments->sum('declared_sum') !== $order->getValue()) {
             WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
