@@ -22,27 +22,32 @@ class SendSpeditionNotifications implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
     public function __construct() {}
 
-    public function updateOrderLabels ($order, $newLabels): void
+    public function updateOrderLabels($order, $newLabels): void
     {
-        $allLabels = [244, 245, 74, 243, 256, 270]; // Define all your specific labels here
+        $allLabels = [244, 245, 74, 243, 256, 270];
         $order->labels()->detach($allLabels);
         $arr = [];
         AddLabelService::addLabels($order, $newLabels, $arr, []);
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     * @throws Exception
-     */
+    private function nextBusinessDay(Carbon $date): Carbon
+    {
+        do {
+            $date->addDay();
+        } while (!$date->isWeekday());
+        return $date;
+    }
+
+    private function previousBusinessDay(Carbon $date): Carbon
+    {
+        do {
+            $date->subDay();
+        } while (!$date->isWeekday());
+        return $date;
+    }
+
     public function handle(): void
     {
         $orders = DB::table('order_labels')->where('label_id', 53)->whereDate('created_at', '>=', Carbon::now()->subMonths(3))->get();
@@ -67,12 +72,11 @@ class SendSpeditionNotifications implements ShouldQueue
                 continue;
             }
 
-            if ($fromDate->isFuture()) {
+            if ($fromDate->isFuture() && $fromDate->isWeekday()) {
                 $this->updateOrderLabels($order, [245]);
             }
 
-
-            $beforeFromDate = Carbon::create($fromDate)->subDay();
+            $beforeFromDate = $this->previousBusinessDay(Carbon::create($fromDate));
             if ($beforeFromDate->isToday() && !$order->start_of_spedition_period_sent) {
                 if ($sendMails) {
                     Mailer::create()
@@ -95,14 +99,11 @@ class SendSpeditionNotifications implements ShouldQueue
                 }
             }
 
-            // Jeśli datach wysyłki zamówienia zawiera się data obecna dodaję etykietę 244 i wysyłam prośbę o wypełnienie danych specjalnych do fabryki
-            // o 11:00 zaczyna się wysyłanie maili do fabryki co 15 minut
-            // jeśli fabryka nie wypełni danych specjalnych do godziny 14:00 to dodaję etykietę 270
             if (
                 ($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) ||
                 $currentHour >= 11 &&
-                $haveToAskWarehouse
-
+                $haveToAskWarehouse &&
+                Carbon::now()->isWeekday()
             ) {
                 if (
                     $fromDate->isPast() &&
@@ -126,12 +127,11 @@ class SendSpeditionNotifications implements ShouldQueue
                             ->send(new SpeditionDatesMonit($order));
 
                         $order->labels_log .= 'Wysłano email dotyczący prośby określenia daty wyjazdu ' . date('Y-m-d H:i:s') . ' przez ' . PHP_EOL;
-
                     }
                 }
             }
 
-            $beforeToDate = Carbon::create($toDate)->subDay();
+            $beforeToDate = $this->previousBusinessDay(Carbon::create($toDate));
             if ($beforeToDate->isToday() && !$order->near_end_of_spedition_period_sent) {
                 if ($sendMails) {
                     Mailer::create()
@@ -142,7 +142,7 @@ class SendSpeditionNotifications implements ShouldQueue
                 $order->update(['near_end_of_spedition_period_sent' => true]);
             }
 
-            if ($toDate->isToday()) {
+            if ($toDate->isToday() && $toDate->isWeekday()) {
                 $this->updateOrderLabels($order, [256]);
             }
 
@@ -150,12 +150,9 @@ class SendSpeditionNotifications implements ShouldQueue
                 Mailer::create()
                     ->to($order->warehouse->shipment_after_pay_email)
                     ->send(new ReminderAfterSpeditionPeriodEnded($order));
-
-//                $order->end_of_spedition_period_sent = true;
-//                $order->save();
             }
 
-            if ($toDate->isPast()) {
+            if ($toDate->isPast() && Carbon::now()->isWeekday()) {
                 $this->updateOrderLabels($order, [243]);
             }
         }
