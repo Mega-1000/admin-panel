@@ -104,7 +104,7 @@ class LocationHelper
         $minDistance = 213123123123;
         $radius = $employee->radius;
 
-        for ($i = 2; $i <= 5; $i++) {
+        for ($i = 1; $i <= 5; $i++) {
             $zipCodeField = "zip_code_" . $i;
             if (empty($employee->$zipCodeField)) {
                 continue;
@@ -117,7 +117,6 @@ class LocationHelper
             if (!$employeeCoordinates) {
                 continue;
             }
-
             $raw = DB::selectOne(
                 'SELECT 6371 * 2 * ASIN(SQRT(
                 POW(SIN((? - ?) * PI() / 360), 2) +
