@@ -211,7 +211,7 @@
     @endforeach
 
     @if ($chat_auction_firm->firm->products->where('date_of_price_change', '<', now())->count() > 0)
-        <div style="color: red; font-weight: bold; text-align: center">
+        <div style="color: red; font-weight: bold; text-align: center; margin: 20px 0;">
             !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
             <br>
             <a class="btn btn-success" target="_blank" href="https://new.mega1000.pl/magazyn/aktualizacja-cen/{{ $chat_auction_firm->firm->id }}/zaktualizuj?isByFirm=true">Aktualizuj cenniki firmy reprezentowanej przez siebie</a>
