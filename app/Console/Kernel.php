@@ -86,6 +86,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckForFinishedAuctions::class)->everyTwoHours()->between('7:00', '18:00');
         $schedule->job(Jobs\SearchForInactiveStyroOffers::class)->everyTwoHours();
         $schedule->job(Jobs\OrdersRecalculatorBasedOnPeriodJob::class)->everyTenMinutes();
+        $schedule->job(Jobs\CheckForAuctionsNotRespondedByFirms::class)->dailyAt('16:00');
         $schedule->job(Jobs\SendNextRermndersAboutAuctionEnded::class)->dailyAt('19:00');
     }
 

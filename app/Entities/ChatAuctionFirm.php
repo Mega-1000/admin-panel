@@ -30,6 +30,11 @@ class ChatAuctionFirm extends Model
         return $this->belongsTo(ChatAuction::class);
     }
 
+    public function offers(): HasMany
+    {
+        return $this->hasMany(ChatAuctionOffer::class, 'firm_id', 'firm_id');
+    }
+
     public function firm(): BelongsTo
     {
         return $this->belongsTo(Firm::class);
