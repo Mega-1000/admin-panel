@@ -587,7 +587,7 @@ class OrdersController extends Controller
                     $diff = number_format((($product->gross_selling_price_commercial_unit * $product->quantity) - number_format($unitData, 2, '.', '')), 2, '.', '');
                 }
                 try {
-                    $phone = LocationHelper::getNearestEmployeeOfFirm($order->customer, $firm->first->id)->phone
+                    $phone = LocationHelper::getNearestEmployeeOfFirm($order->customer, $firm->first->id)->phone;
                 } catch (ModelNotFoundException $e) {
                     $phone = 'Nie można znaleźć pracownika firmy';
                 }
@@ -613,6 +613,7 @@ class OrdersController extends Controller
                 ];
                 $productsVariation[$product->product->id][] = $array;
             }
+
             foreach ($productsVariation as $variation) {
                 if (isset($productsVariation[$product->product->id])) {
                     $productsVariation[$product->product->id] = collect($variation)->sortBy('different', 1, true);
