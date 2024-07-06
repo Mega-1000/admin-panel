@@ -338,7 +338,7 @@ class AuctionsController extends Controller
 
                 $item->lowestPriceAtThisMoment  = min(
                     $lowestPriceAtThisMoment,
-                    collect(app(ProductService::class)->getVariations($auction->chat->order))->min('gross_selling_price_basic_unit'),
+                    Product::where('product_group', $item->product_group)->first()->price->net_purchase_price_basic_unit
                 );
             }
         }
