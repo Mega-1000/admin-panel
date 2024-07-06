@@ -235,7 +235,7 @@
                                     Odległość: {{ round($sortedFirm['firm']->distance) }} KM
                                     <br>
                                     @php
-                                        $employee = \App\Entities\Employee::where('email', $sortedFirm['firm']->email_of_employee)->first();
+                                        $employee = \App\Helpers\LocationHelper::getDistanceOfClientToEmployee($order->getDeliveryAddress()->postal_code, $sortedFirm['firm']->firm);
                                     @endphp
                                     @if($employee && $employee->phone && auth()->id())
                                         tel przedstawiciela: <br> +48 {{ $employee->phone }}
