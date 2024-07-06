@@ -115,6 +115,7 @@ class LocationHelper
                 ->first();
 
             if (!$employeeCoordinates) {
+                dd(explode($employee->$zipCodeField, ';')[0]);
                 continue;
             }
 
