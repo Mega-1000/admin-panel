@@ -81,7 +81,6 @@ class LocationHelper
         foreach ($employees as $employee) {
             $distance = self::getDistanceOfClientToEmployee($employee, $customer);
 
-            echo $distance;
             // Check if the customer is within the employee's radius
             if ($distance >= 0 && $distance < $shortestDistance) {
                 $nearestEmployee = $employee;
@@ -97,11 +96,6 @@ class LocationHelper
         $customerCoordinates = DB::table('postal_code_lat_lon')
             ->where('postal_code', $customer->standardAddress()->postal_code)
             ->first();
-
-        if (!$customerCoordinates) {
-            return -112378198273; // or handle the error as needed
-        }
-
         $minDistance = PHP_FLOAT_MAX;
         $radius = $employee->radius;
 
