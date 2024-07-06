@@ -597,7 +597,7 @@ class OrdersController extends Controller
                     'different' => $diff,
                     'radius' => $radius,
                     'product_name_supplier' => $prod->product_name_supplier,
-                    'phone' => LocationHelper::getNearestEmployeeOfFirm($order->customer, $firm->first->id)->phone,
+                    'phone' => 123123123,
                     'review' => $prod->review,
                     'quality' => $prod->quality,
                     'quality_to_price' => $prod->quality_to_price,
