@@ -586,6 +586,11 @@ class OrdersController extends Controller
                 } else {
                     $diff = number_format((($product->gross_selling_price_commercial_unit * $product->quantity) - number_format($unitData, 2, '.', '')), 2, '.', '');
                 }
+                try {
+                    $phone = LocationHelper::getNearestEmployeeOfFirm($order->customer, $firm->first->id)->phone
+                } catch (ModelNotFoundException $e) {
+                    $phone = 'Nie można znaleźć pracownika firmy';
+                }
 
                 $array = [
                     'id' => $prod->id,
