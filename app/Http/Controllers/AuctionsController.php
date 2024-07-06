@@ -329,7 +329,7 @@ class AuctionsController extends Controller
         foreach ($auctions as $auction) {
             $auction->date_of_delivery = 'Od: ' . $auction->chat?->order->dates->customer_delivery_date_from . ' Do: ' . $auction->chat?->order->dates->customer_delivery_date_to;
 
-            foreach ($auction?->chat?->order->items as $item) {
+            foreach ($auction?->chat?->order->items ?? [] as $item) {
                 $item = $item->product;
 
                 $lowestPriceAtThisMoment = ChatAuctionOffer::where('chat_auction_id', $auction->id)
