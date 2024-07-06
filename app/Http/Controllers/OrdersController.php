@@ -92,6 +92,7 @@ use App\Services\WorkingEventsService;
 use App\User;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
+use ErrorException;
 use Exception;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Foundation\Application;
