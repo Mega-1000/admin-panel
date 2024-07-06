@@ -215,7 +215,7 @@
                                         \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                             ->whereHas('product', function ($q) use ($product) {
                                                 $q->where('product_group', $product->product_group);
-                                            })->first()?->quantity) * $product?->packing->numbers_of_basic_commercial_units_in_pack;
+                                            })->first()?->quantity) * $product?->packing?->numbers_of_basic_commercial_units_in_pack;
                                 @endphp
                             @endforeach
 
