@@ -115,7 +115,6 @@ class LocationHelper
                 ->first();
 
             if (!$employeeCoordinates) {
-                dd(explode(';', $employee->$zipCodeField)[0], $employee->$zipCodeField);
                 continue;
             }
 
@@ -139,8 +138,6 @@ class LocationHelper
             if ($minDistance > $distance) {
                 $radius = explode($employee->$zipCodeField, ';')[1];
             }
-
-            dd($distance, $minDistance, min($minDistance, $distance));
 
             $minDistance = min($minDistance, $distance);
         }
