@@ -666,7 +666,7 @@ class OrdersController extends Controller
             $order->isAuctionCreated = !$noAuction;
 
             if ($order->isAuctionCreated) {
-                $order->auctionId = $order->chat->auctions->first()->id;
+                $order->auctionId = $order->chat?->auctions?->first()?->id;
             }
 
             $order->isThereUnansweredChat = $order->labels->contains(254);
