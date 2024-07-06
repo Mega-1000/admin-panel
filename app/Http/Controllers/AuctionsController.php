@@ -338,7 +338,7 @@ class AuctionsController extends Controller
 
                 $item->lowestPriceAtThisMoment  = min(
                     $lowestPriceAtThisMoment,
-                    Product::where('product_group', $i->product_group)->min('price->net_purchase_price_basic_unit')
+                    Product::where('product_group', $i->product_group)->with('price')->min('price->net_purchase_price_basic_unit')
                 );
             }
         }
