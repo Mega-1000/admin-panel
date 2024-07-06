@@ -588,7 +588,7 @@ class OrdersController extends Controller
                 }
                 try {
                     $phone = LocationHelper::getNearestEmployeeOfFirm($order->customer, $firm->first->id)->phone;
-                } catch (ModelNotFoundException $e) {
+                } catch (ErrorException $e) {
                     $phone = 'Nie można znaleźć pracownika firmy';
                 }
 
