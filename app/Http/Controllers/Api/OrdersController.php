@@ -247,12 +247,13 @@ class OrdersController extends Controller
                     'message' => Status::find(18)->message,
                 ]);
 
-                Mailer::create()
-                    ->to($customer->login)
-                    ->send(new NewStyroOfferMade(
-                        $order,
-                    ));
-//            }
+                if (!empty($order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->first())) {
+                    Mailer::create()
+                        ->to($customer->login)
+                        ->send(new NewStyroOfferMade(
+                            $order,
+                        ));
+                }
 
             if ($order->created_at->format('Y-m-d H:i:s') === $order->updated_at->format('Y-m-d H:i:s')) {
                 dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
