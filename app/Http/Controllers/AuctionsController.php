@@ -21,6 +21,7 @@ use App\Helpers\Exceptions\ChatException;
 use App\Helpers\LocationHelper;
 use App\Helpers\MessagesHelper;
 use App\Helpers\SMSHelper;
+use App\Http\Controllers\Api\ProductsController;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
 use App\Http\Requests\UpdateChatAuctionRequest;
@@ -327,6 +328,19 @@ class AuctionsController extends Controller
 
         foreach ($auctions as $auction) {
             $auction->date_of_delivery = 'Od: ' . $auction->chat?->order->dates->customer_delivery_date_from . ' Do: ' . $auction->chat?->order->dates->customer_delivery_date_to;
+
+            foreach ($auction->chat->order->items as $item) {
+                $item = $item->product;
+
+                $lowestPriceAtThisMoment = ChatAuctionOffer::where('chat_auction_id', $auction->id)
+                    ->where('product_id', $item->id)
+                    ->min('commercial_price_net');
+
+                $item->lowestPriceAtThisMoment  = min(
+                    $lowestPriceAtThisMoment,
+                    collect(app(ProductService::class)->getVariations($auction->chat->order))->min('gross_selling_price_basic_unit'),
+                );
+            }
         }
 
         return response()->json(
