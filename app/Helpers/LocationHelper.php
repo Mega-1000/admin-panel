@@ -96,7 +96,12 @@ class LocationHelper
         $customerCoordinates = DB::table('postal_code_lat_lon')
             ->where('postal_code', $customer->standardAddress()->postal_code)
             ->first();
-        $minDistance = PHP_FLOAT_MAX;
+
+        if (!$customerCoordinates) {
+            return -112378198273; // or handle the error as needed
+        }
+
+        $minDistance = 213123123123;
         $radius = $employee->radius;
 
         for ($i = 1; $i <= 5; $i++) {
