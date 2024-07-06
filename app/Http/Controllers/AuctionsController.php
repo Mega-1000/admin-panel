@@ -334,11 +334,11 @@ class AuctionsController extends Controller
 
                 $lowestPriceAtThisMoment = ChatAuctionOffer::where('chat_auction_id', $auction->id)
                     ->where('product_id', $i->id)
-                    ->min('commercial_price_net');
+                    ->min('basic_price_net');
 
                 $item->lowestPriceAtThisMoment  = min(
                     $lowestPriceAtThisMoment,
-                    Product::where('product_group', $i->product_group)->first()->price->net_purchase_price_basic_unit
+                    Product::where('product_group', $i->product_group)->first()?->price->net_purchase_price_basic_unit ?? 100000
                 );
             }
         }
