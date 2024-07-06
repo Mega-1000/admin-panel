@@ -135,10 +135,9 @@ class LocationHelper
 
             $distance = $raw->distance;
             if ($minDistance > $distance) {
-                $radius = explode($employee->$zipCodeField, ';')[1];
+                $radius = explode(';', $employee->$zipCodeField)[1];
             }
 
-            dd($distance, $minDistance, min($minDistance, $distance));
 
             $minDistance = min($minDistance, $distance);
         }
