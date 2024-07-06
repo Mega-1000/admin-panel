@@ -111,11 +111,10 @@ class LocationHelper
             }
 
             $employeeCoordinates = DB::table('postal_code_lat_lon')
-                ->where('postal_code', explode($employee->$zipCodeField, ';')[0])
+                ->where('postal_code', explode(';', $employee->$zipCodeField)[0])
                 ->first();
 
             if (!$employeeCoordinates) {
-                dd(explode($employee->$zipCodeField, ';')[0]);
                 continue;
             }
             $raw = DB::selectOne(
