@@ -38,7 +38,7 @@ class AuctionNotResponded extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Nie odpowiedziałeś na ' . $this->amountOfAuctions . ' aukcji',
+            subject: 'Nie odpowiedziałeś na ' . $this->amountOfAuctions . ' zapytań ofertowych',
         );
     }
 
