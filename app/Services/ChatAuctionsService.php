@@ -129,7 +129,7 @@ readonly class ChatAuctionsService
      * @param Firm $firm
      * @return Collection
      */
-    public function getAuctions(Firm $firm): LengthAwarePaginator
+    public function getAuctions(Firm $firm): array
     {
         return ChatAuction::whereHas('firms', function ($query) use ($firm) {
             $query->where('firm_id', $firm->id);
