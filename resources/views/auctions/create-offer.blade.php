@@ -282,7 +282,7 @@
                 if (data.length > 0) {
                     return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
                 } else {
-                    throw new Error('Could not find coordinates for zip code: ' + zipCode);
+                    throw new Error('Could not find coordinat for zip code: ' + zipCode);
                 }
             });
     }
@@ -299,8 +299,8 @@
         console.log('Setting up map...');
         Promise.all([getCoordinates(originZipCode), getCoordinates(destZipCode)])
             .then(function([origin, destination]) {
-                console.log('Origin:', origin);
-                console.log('Destination:', destination);
+                console.log('Magazyn fabryki', origin);
+                console.log('Lokalizacja dostawy', destination);
 
                 // Add markers
                 L.marker(origin).addTo(map)
@@ -333,9 +333,9 @@
                         return this._div;
                     };
                     info.update = function (distance, time) {
-                        this._div.innerHTML = '<h4>Estimated Travel</h4>' +
-                            'Distance: ' + distance + ' km<br>' +
-                            'Time: ' + time + ' hours';
+                        this._div.innerHTML = '<h4>Przewidywana dostawa</h4>' +
+                            'Dystans: ' + distance + ' km<br>' +
+                            'Czas: ' + time + ' godzin';
                     };
                     info.addTo(map);
 
