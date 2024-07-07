@@ -461,6 +461,8 @@ document.getElementById('sendSmsAboutAuction').onclick = (event) => {
     const message = prompt('Podaj treść wiadomości', defaultValue);
     const url = `https://admin.mega1000.pl/sms/send/` + element.classList[0] + `?message=${message}`;
     fetch(url);
+
+    swal.fire('Wiadomość została wysłana', '', 'success');
 };
 
 const tableBody = table.querySelector('tbody');
