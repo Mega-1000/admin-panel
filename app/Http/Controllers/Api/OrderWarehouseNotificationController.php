@@ -130,7 +130,7 @@ class OrderWarehouseNotificationController extends Controller
             $order = Order::findOrFail($data['order_id']);
             dispatch(new DispatchLabelEventByNameJob($order, "warehouse-notification-accepted"));
 
-//            $messagesHelper->sendAvizationAcceptation($order->chat);
+            $messagesHelper->sendAvizationAcceptation($order->chat);
 
             return $this->okResponse();
         } catch (Exception $e) {
