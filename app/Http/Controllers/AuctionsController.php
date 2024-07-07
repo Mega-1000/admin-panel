@@ -326,24 +326,15 @@ class AuctionsController extends Controller
             $firm,
         );
 
-        foreach ($auctions as $auction) {
-            $auction->date_of_delivery = 'Od: ' . $auction->chat?->order->dates->customer_delivery_date_from . ' Do: ' . $auction->chat?->order->dates->customer_delivery_date_to;
+        foreach ($auctions['data'] as $auction) {
+            $auction->date_of_delivery = 'Od: ' . $auction->chat?->order->dates->customer_delivery_date_from . ' Do: ' .
+            $auction->chat?->order->dates->customer_delivery_date_to;
 
-//            foreach ($auction?->chat?->order->items ?? [] as $item) {
-//                $i = $item->product;
-//
-////                $lowestPriceAtThisMoment = ChatAuctionOffer::where('chat_auction_id', $auction->id)
-////                    ->where('product_id', $i->id)
-////                    ->min('basic_price_net');
-////
-////                $item->lowestPriceAtThisMoment  = min(
-////                    $lowestPriceAtThisMoment,
-////                    Product::where('product_group', $i->product_group)
-////                        ->whereHas('price')
-////                        ->withMin('price as min_price', 'net_purchase_price_basic_unit')
-////                        ->value('min_price')
-////                );
-//            }
+            $auction->editPricesLink = route('auctions.offer.create', ['token' => ChatAuctionFirm::where('chat_auction_id', $auction->id)
+                ->where('firm_id', $firm->id)
+                ->first()
+                ->token
+            ]);
         }
 
         return response()->json(

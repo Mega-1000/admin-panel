@@ -18,6 +18,7 @@ use App\Services\Label\RemoveLabelService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 readonly class ChatAuctionsService
 {
@@ -128,20 +129,13 @@ readonly class ChatAuctionsService
      * @param Firm $firm
      * @return Collection
      */
-    public function getAuctions(Firm $firm): Collection
+    public function getAuctions(Firm $firm): LengthAwarePaginator
     {
         return ChatAuction::whereHas('firms', function ($query) use ($firm) {
             $query->where('firm_id', $firm->id);
         })
         ->with(['offers', 'offers.firm', 'chat.order.customer.addresses', 'chat.order.items.product.packing'])
         ->orderBy('updated_at', 'desc')
-        ->paginate(20)
-        ->each(function (ChatAuction $auction) use ($firm) {
-            $auction->editPricesLink = route('auctions.offer.create', ['token' => ChatAuctionFirm::where('chat_auction_id', $auction->id)
-                ->where('firm_id', $firm->id)
-                ->first()
-                ->token
-            ]);
-        });
+        ->paginate(20)->toArray();
     }
 }
