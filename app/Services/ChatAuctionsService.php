@@ -134,7 +134,7 @@ readonly class ChatAuctionsService
         return ChatAuction::whereHas('firms', function ($query) use ($firm) {
             $query->where('firm_id', $firm->id);
         })
-        ->with(['offers', 'offers.firm', 'chat.order.customer.addresses', 'chat.order.items.product.packing'])
+        ->with(['offers', 'offers.firm','chat.order.dates', 'chat.order.customer.addresses', 'chat.order.items.product.packing'])
         ->orderBy('updated_at', 'desc')
         ->paginate(20)
             ->toArray();
