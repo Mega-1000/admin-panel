@@ -459,7 +459,7 @@ rows.sort((a, b) => {
     return aTotalValue - bTotalValue;
 });
 
-document.querySelector('sendSmsAboutAuction').forEach((element) => {
+document.querySelector('#sendSmsAboutAuction').forEach((element) => {
     element.onclick = (event) => {
         const element = event.target;
         const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[0] + '&orderId=' + element.classList[1];
