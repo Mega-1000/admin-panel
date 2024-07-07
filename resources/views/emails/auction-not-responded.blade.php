@@ -1,7 +1,7 @@
 Dzień dobry,
 <br>
 <br>
-W ostatnim czasie nie odpowiedziałeś na {{ $amountOfAuctions }} zapytań ofertowych w serwisie Elektroniczna Platforma Handlowa.
+W ostatnim czasie nie odpowiedziałeś na {{ $amountOfAuctions }} zapytań ofertowych w serwisie EPH Polska.
 <br>
 <br>
 Zachęcamy do odpowiedzi na zapytania ofertowe, aby nie stracić potencjalnych klientów.
