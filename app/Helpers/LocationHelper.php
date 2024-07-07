@@ -153,6 +153,10 @@ class LocationHelper
     {
         $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customer->addresses->first()->postal_code)->get()->first();
 
+        if (!$coordinatesOfUser) {
+            return Warehouse::find($firm->warehouses()->first()->id);
+        }
+
         $raw = DB::selectOne(
             'SELECT w.id,
             1.609344 * SQRT(
