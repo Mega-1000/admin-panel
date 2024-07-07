@@ -304,7 +304,7 @@
                                     </a>
 
                                     @if(auth()->id())
-                                        <button class="{{ $sortedFirm['firm']?->firm->token }} btn btn-primary" id="sendSmsAboutAuction">
+                                        <button class="{{ $sortedFirm['firm']?->firm->access_token }} btn btn-primary" id="sendSmsAboutAuction">
                                             Wyślij smsa do przedstawiciela w sprawie przetargu
                                         </button>
 
