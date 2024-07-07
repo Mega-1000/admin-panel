@@ -270,7 +270,7 @@
     }).addTo(map);
 
     // Origin zip code
-    var originZipCode = "66-400";
+    var originZipCode = "{{ \App\Helpers\LocationHelper::nearestWarehouse($chat_auction_firm->chatAuction->chat->order->customer, $chat_auction_firm->firm)->zip_code }}";
 
     // Destination zip code (from the existing data)
     var destZipCode = "{{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}";
