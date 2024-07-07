@@ -53,6 +53,7 @@ use App\Http\Controllers\ProductStocksController;
 use App\Http\Controllers\RecalculateLabelsInOrdersBasedOnPeriod;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
+use App\Http\Controllers\SmsController;
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
 use App\Http\Middleware\FilterOrderInvoiceValue;
 use App\Jobs\DispatchLabelEventByNameJob;
@@ -884,6 +885,7 @@ Route::get('styroLeads/get-tracking-img/{id}', [\App\Http\Controllers\StyroLeadC
 Route::post('styroLeads/import-csv', [\App\Http\Controllers\StyroLeadController::class, 'importCSV'])->name('styro-lead.load-csv');
 Route::get('goto-website/{id}', [\App\Http\Controllers\StyroLeadController::class, 'visitWebsite'])->name('visit-website');
 Route::get('dates-order-dates/{orderId}', [OrdersController::class, 'orderView']);
+Route::get('sms/send/{token}', [SmsController::class, 'sendSms']);
 
 Route::get('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'createAvisation'])->name('createAvisation');
 Route::post('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'storeAvisation'])->name('storeAvisation');
