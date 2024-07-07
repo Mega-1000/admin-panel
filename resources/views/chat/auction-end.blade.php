@@ -444,6 +444,7 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 const table = document.querySelector('table');
 const rows = Array.from(table.querySelectorAll('tbody tr'));
@@ -462,7 +463,7 @@ document.getElementById('sendSmsAboutAuction').onclick = (event) => {
     const url = `https://admin.mega1000.pl/sms/send/` + element.classList[0] + `?message=${message}`;
     fetch(url);
 
-    swal.fire('Wiadomość została wysłana', '', 'success');
+    Swal.fire('Wiadomość została wysłana', '', 'success');
 };
 
 const tableBody = table.querySelector('tbody');
