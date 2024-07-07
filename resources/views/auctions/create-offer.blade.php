@@ -268,8 +268,7 @@
             onPriceChange(priceInput)
         });
     }, 1000);
-    // Initialize Leaflet map
-    var map = L.map('map').setView([51.919438, 19.145136], 5);
+    var map = L.map('map').setView([51.919438, 19.145136], 6);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -284,66 +283,72 @@
 
     // Function to get coordinates from zip code
     function getCoordinates(zipCode) {
-        return $.getJSON('https://nominatim.openstreetmap.org/search?format=json&postalcode=' + zipCode + '&country=pl');
-    }
-
-    // Function to calculate route and travel time
-    function calculateRoute(origin, destination) {
-        var url = `https://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${destination[1]},${destination[0]}?overview=full&geometries=polyline`;
-
-        return $.getJSON(url).then(function(data) {
-            var route = L.Polyline.fromEncoded(data.routes[0].geometry).getLatLngs();
-            var durationMinutes = Math.round(data.routes[0].duration / 60);
-
-            return { route: route, duration: durationMinutes };
-        });
-    }
-
-    // Main function to set up the map
-    function setupMap() {
-        Promise.all([getCoordinates(originZipCode), getCoordinates(destZipCode)])
-            .then(function([originData, destData]) {
-                if (originData.length > 0 && destData.length > 0) {
-                    var origin = [originData[0].lat, originData[0].lon];
-                    var destination = [destData[0].lat, destData[0].lon];
-
-                    calculateRoute(origin, destination).then(function(routeData) {
-                        // Draw the route
-                        L.polyline(routeData.route, {color: 'blue'}).addTo(map);
-
-                        // Add markers
-                        L.marker(origin).addTo(map)
-                            .bindPopup('Start: ' + originZipCode)
-                            .openPopup();
-                        L.marker(destination).addTo(map)
-                            .bindPopup('Destination: ' + destZipCode)
-                            .openPopup();
-
-                        // Fit the map to the route
-                        map.fitBounds(L.polyline(routeData.route).getBounds());
-
-                        // Add a text overlay with travel time
-                        var info = L.control();
-                        info.onAdd = function () {
-                            this._div = L.DomUtil.create('div', 'info');
-                            this.update(routeData.duration);
-                            return this._div;
-                        };
-                        info.update = function (duration) {
-                            this._div.innerHTML = '<h4>Estimated Travel Time</h4>' +
-                                (duration ? duration + ' minutes by car' : 'Error calculating travel time');
-                        };
-                        info.addTo(map);
-                    });
+        return $.getJSON('https://nominatim.openstreetmap.org/search?format=json&postalcode=' + zipCode + '&country=pl')
+            .then(function(data) {
+                if (data.length > 0) {
+                    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
                 } else {
-                    console.log('Could not find one or both zip codes');
+                    throw new Error('Could not find coordinates for zip code: ' + zipCode);
                 }
             });
     }
 
-    // Call the setup function when the document is ready
-    $(document).ready(setupMap);
+    // Main function to set up the map
+    function setupMap() {
+        console.log('Setting up map...');
+        Promise.all([getCoordinates(originZipCode), getCoordinates(destZipCode)])
+            .then(function([origin, destination]) {
+                console.log('Origin:', origin);
+                console.log('Destination:', destination);
 
+                // Add markers
+                L.marker(origin).addTo(map)
+                    .bindPopup('Start: ' + originZipCode)
+                    .openPopup();
+                L.marker(destination).addTo(map)
+                    .bindPopup('Destination: ' + destZipCode)
+                    .openPopup();
+
+                // Create a line between the two points
+                var polyline = L.polyline([origin, destination], {color: 'blue'}).addTo(map);
+
+                // Fit the map to show both markers
+                map.fitBounds(polyline.getBounds());
+
+                // Calculate straight-line distance
+                var distance = map.distance(origin, destination);
+                var distanceKm = (distance / 1000).toFixed(2);
+
+                // Estimate travel time (assuming average speed of 60 km/h)
+                var estimatedTimeHours = (distance / 1000 / 60).toFixed(2);
+
+                // Add info control
+                var info = L.control();
+                info.onAdd = function () {
+                    this._div = L.DomUtil.create('div', 'info');
+                    this.update(distanceKm, estimatedTimeHours);
+                    return this._div;
+                };
+                info.update = function (distance, time) {
+                    this._div.innerHTML = '<h4>Estimated Travel</h4>' +
+                        'Distance: ' + distance + ' km<br>' +
+                        'Time: ' + time + ' hours';
+                };
+                info.addTo(map);
+
+                console.log('Map setup complete');
+            })
+            .catch(function(error) {
+                console.error('Error setting up map:', error);
+                alert('Error setting up map: ' + error.message);
+            });
+    }
+
+    // Call the setup function when the document is ready
+    $(document).ready(function() {
+        console.log('Document ready, calling setupMap');
+        setupMap();
+    });
 
 </script>
 </body>
