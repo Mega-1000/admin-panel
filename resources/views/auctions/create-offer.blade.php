@@ -262,12 +262,6 @@
         });
     @endif
 
-    setTimeout(() => {
-        const priceInputs = document.getElementsByName('basic_price_net');
-        priceInputs.forEach((priceInput) => {
-            onPriceChange(priceInput)
-        });
-    }, 1000);
     var map = L.map('map').setView([51.919438, 19.145136], 6);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -293,6 +287,13 @@
             });
     }
 
+    // Function to get route from OSRM
+    function getRoute(origin, destination) {
+        var url = `http://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${destination[1]},${destination[0]}?overview=full&geometries=geojson`;
+
+        return $.getJSON(url);
+    }
+
     // Main function to set up the map
     function setupMap() {
         console.log('Setting up map...');
@@ -309,34 +310,37 @@
                     .bindPopup('Destination: ' + destZipCode)
                     .openPopup();
 
-                // Create a line between the two points
-                var polyline = L.polyline([origin, destination], {color: 'blue'}).addTo(map);
+                // Get and display the route
+                return getRoute(origin, destination).then(function(data) {
+                    var coordinates = data.routes[0].geometry.coordinates.map(function(coord) {
+                        return [coord[1], coord[0]];
+                    });
 
-                // Fit the map to show both markers
-                map.fitBounds(polyline.getBounds());
+                    var polyline = L.polyline(coordinates, {color: 'blue'}).addTo(map);
 
-                // Calculate straight-line distance
-                var distance = map.distance(origin, destination);
-                var distanceKm = (distance / 1000).toFixed(2);
+                    // Fit the map to show the entire route
+                    map.fitBounds(polyline.getBounds());
 
-                // Estimate travel time (assuming average speed of 60 km/h)
-                var estimatedTimeHours = (distance / 1000 / 60).toFixed(2);
+                    // Calculate distance and time
+                    var distanceKm = (data.routes[0].distance / 1000).toFixed(2);
+                    var estimatedTimeHours = (data.routes[0].duration / 3600).toFixed(2);
 
-                // Add info control
-                var info = L.control();
-                info.onAdd = function () {
-                    this._div = L.DomUtil.create('div', 'info');
-                    this.update(distanceKm, estimatedTimeHours);
-                    return this._div;
-                };
-                info.update = function (distance, time) {
-                    this._div.innerHTML = '<h4>Estimated Travel</h4>' +
-                        'Distance: ' + distance + ' km<br>' +
-                        'Time: ' + time + ' hours';
-                };
-                info.addTo(map);
+                    // Add info control
+                    var info = L.control();
+                    info.onAdd = function () {
+                        this._div = L.DomUtil.create('div', 'info');
+                        this.update(distanceKm, estimatedTimeHours);
+                        return this._div;
+                    };
+                    info.update = function (distance, time) {
+                        this._div.innerHTML = '<h4>Estimated Travel</h4>' +
+                            'Distance: ' + distance + ' km<br>' +
+                            'Time: ' + time + ' hours';
+                    };
+                    info.addTo(map);
 
-                console.log('Map setup complete');
+                    console.log('Map setup complete');
+                });
             })
             .catch(function(error) {
                 console.error('Error setting up map:', error);
@@ -348,6 +352,7 @@
     $(document).ready(function() {
         console.log('Document ready, calling setupMap');
         setupMap();
+
     });
 
 </script>
