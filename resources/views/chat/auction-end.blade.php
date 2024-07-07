@@ -459,16 +459,18 @@ rows.sort((a, b) => {
     return aTotalValue - bTotalValue;
 });
 
-document.getElementById('sendSmsAboutAuction').onclick = (event) => {
-    const element = event.target;
-    const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[0] + '&orderId=' + element.classList[1];
-    // get data-id;
-    const message = prompt('Podaj treść wiadomości', defaultValue);
-    const url = `https://admin.mega1000.pl/sms/send/` + element.classList[0] + `?message=${message}`;
-    fetch(url);
+document.querySelector('sendSmsAboutAuction').forEach((element) => {
+    element.onclick = (event) => {
+        const element = event.target;
+        const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[0] + '&orderId=' + element.classList[1];
+        // get data-id;
+        const message = prompt('Podaj treść wiadomości', defaultValue);
+        const url = `https://admin.mega1000.pl/sms/send/` + element.classList[0] + `?message=${message}`;
+        fetch(url);
 
-    Swal.fire('Wiadomość została wysłana', '', 'success');
-};
+        Swal.fire('Wiadomość została wysłana', '', 'success');
+    };
+})
 
 const tableBody = table.querySelector('tbody');
 tableBody.innerHTML = '';
