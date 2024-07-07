@@ -237,38 +237,42 @@
         $auctions['data'] = array_filter($auctions['data'], function ($auction) use (&$zipCodes) {
             $address = $auction['chat']['order']['addresses'][0];
             $zipCodes[] = $address['postal_code'];
-            return $address['latitude'] && $address['longitude'];
         });
     @endphp
 
     <div id="map" style="height: 100vh;"></div>
 
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-providers@1.13.0/leaflet-providers.js"></script>
+
     <script>
-        var auctions = @json($auctions['data']);
+        var map = L.map('map').setView([52.2297, 21.0122], 6); // Set initial view to Poland
+
+        L.tileLayer.provider('OpenStreetMap.Mapnik').addTo(map);
+
         var zipCodes = @json($zipCodes);
-        var firm = @json($firm);
 
-        var map = L.map('map').setView([52.22977, 21.01178], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-        }).addTo(map);
+        function addMarkers(zipCodes) {
+            zipCodes.forEach(function(zipCode) {
+                fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=Poland&format=json`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            var lat = parseFloat(data[0].lat);
+                            var lon = parseFloat(data[0].lon);
+                            L.marker([lat, lon]).addTo(map)
+                                .bindPopup(`Zip Code: ${zipCode}`);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        }
 
-        var markers = [];
-        auctions.forEach(function (auction) {
-            var address = auction.chat.order.customer.addresses[0];
-            var marker = L.marker([address.latitude, address.longitude]).addTo(map);
-            marker.bindPopup(`
-            <b>${firm.name}</b><br>
-            ${address.street} ${address.building_number}<br>
-            ${address.zip_code} ${address.city}<br>
-            <a href="/chat/${auction.chat.id}">Zobacz aukcję</a>
-        `);
-            markers.push(marker);
-        });
-
-        var group = new L.featureGroup(markers);
-        map.fitBounds(group.getBounds());
+        addMarkers(zipCodes);
     </script>
+
     @if ($chat_auction_firm->firm->products->where('date_of_price_change', '<', now())->count() > 0)
         <div style="color: red; font-weight: bold; text-align: center; margin: 20px 0;">
             !! UWAGA !! Zauważyliśmy, że cenniki firmy którą reprezentujesz w naszym systemie mogą być nieaktualne. Prosimy o zaaktualizowanie ich lub zmianę daty ponownego powiadomienia w panelu pod linkiem poniżej:
