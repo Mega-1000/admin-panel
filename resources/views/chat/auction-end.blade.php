@@ -468,7 +468,7 @@ document.querySelectorAll('#sendSmsAboutAuction').forEach((element) => {
         const message = prompt('Podaj treść wiadomości', defaultValue);
 
         if (message !== null) { // Check if prompt was not canceled
-            const url = `https://admin.mega1000.pl/sms/send/${targetElement.classList[0]}?message=${encodeURIComponent(message)}`;
+            const url = `https://admin.mega1000.pl/sms/send/${targetElement.classList[0]}?message=${encodeURIComponent(message)}&orderId=${targetElement.classList[1]}`;
 
             // Send fetch request
             fetch(url)
