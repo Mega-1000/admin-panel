@@ -338,7 +338,7 @@ class AuctionsController extends Controller
                 $auction['chat']['order']['dates']['customer_delivery_date_to'];
             } catch (Exception $e) {
                 $auction['date_of_delivery'] = 'Brak daty dostawy';
-
+            }
         }
 
         return response()->json(
