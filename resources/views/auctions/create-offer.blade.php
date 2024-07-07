@@ -235,8 +235,8 @@
 
         $zipCodes = [];
         $auctions['data'] = array_filter($auctions['data'], function ($auction) use (&$zipCodes) {
-            $address = $auction['chat']['order']['customer']['addresses'][0];
-            $zipCodes[] = $address['zip_code'];
+            $address = $auction['chat']['order']['addresses'][0];
+            $zipCodes[] = $address['postal_code'];
             return $address['latitude'] && $address['longitude'];
         });
     @endphp
