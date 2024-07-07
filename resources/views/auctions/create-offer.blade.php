@@ -230,7 +230,7 @@
             })
             ->with(['offers', 'offers.firm','chat.order.dates', 'chat.order.addresses', 'chat.order.items.product.packing'])
             ->orderBy('updated_at', 'desc')
-            ->paginate(20);
+            ->paginate(50);
         $zipCodes = [];
         foreach ($auctions->items() as $auction) {
             $customer = $auction->chat?->order?->customer;
