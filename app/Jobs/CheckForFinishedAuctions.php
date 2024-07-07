@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\ChatAuction;
 use App\Facades\Mailer;
+use App\Helpers\SMSHelper;
 use App\Mail\AuctionFinishedNotification;
 use App\Services\Label\AddLabelService;
 use Illuminate\Bus\Queueable;
@@ -38,7 +39,6 @@ class CheckForFinishedAuctions implements ShouldQueue
 
         foreach ($auctions as $auction) {
             try {
-
                 if ($auction?->chat->order) {
                     $auction->end_info_sent = true;
                     $auction->save();
@@ -51,6 +51,12 @@ class CheckForFinishedAuctions implements ShouldQueue
                         ->send(new AuctionFinishedNotification(
                             $auction,
                         ));
+
+                    SMSHelper::sendSms(
+                        576205389,
+                        'EPH Polska',
+                        'Przetarg na twoim koncie zostal zakonczony zobacz tabele wycen pod: https://admin.mega1000.pl/auctions/' . $auction->id . '/end'
+                    );
                 }
             } catch (\Exception $exception) {
 
