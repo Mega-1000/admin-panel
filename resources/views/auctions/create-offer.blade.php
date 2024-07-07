@@ -233,7 +233,7 @@
             ->paginate(20);
         $zipCodes = [];
         foreach ($auctions->items() as $auction) {
-            $customer = dd($auction);
+            $customer = App\Entities\Chat::find($auction->chat_id)->order->customer;
             $address = $customer->addresses->first();
             $zipCodes[] = $address->postal_code;
         }
