@@ -235,7 +235,7 @@
         foreach ($auctions->items() as $auction) {
             $customer = $auction->chat?->order?->customer;
             $address = $customer?->addresses?->first();
-            if ($address->postal_code) {
+            if ($address?->postal_code) {
                 $zipCodes[] = $address->postal_code;
             }
         }
