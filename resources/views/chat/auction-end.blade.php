@@ -456,10 +456,10 @@ rows.sort((a, b) => {
 
 document.getElementById('sendSmsAboutAuction').onclick = (event) => {
     const element = event.target;
-    const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[1];
+    const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[0];
     // get data-id;
     const message = prompt('Podaj treść wiadomości', defaultValue);
-    const url = `https://admin.mega1000.pl/sms/send/` + element.classList[1] + `?message=${message}`;
+    const url = `https://admin.mega1000.pl/sms/send/` + element.classList[0] + `?message=${message}`;
     fetch(url);
 };
 
