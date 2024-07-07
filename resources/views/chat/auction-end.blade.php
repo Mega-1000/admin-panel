@@ -459,18 +459,33 @@ rows.sort((a, b) => {
     return aTotalValue - bTotalValue;
 });
 
-document.querySelector('#sendSmsAboutAuction').forEach((element) => {
+document.querySelectorAll('#sendSmsAboutAuction').forEach((element) => {
     element.onclick = (event) => {
-        const element = event.target;
-        const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[0] + '&orderId=' + element.classList[1];
-        // get data-id;
-        const message = prompt('Podaj treść wiadomości', defaultValue);
-        const url = `https://admin.mega1000.pl/sms/send/` + element.classList[0] + `?message=${message}`;
-        fetch(url);
+        const targetElement = event.target;
+        const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + targetElement.classList[0] + '&orderId=' + targetElement.classList[1];
 
-        Swal.fire('Wiadomość została wysłana', '', 'success');
+        // Prompt user for message input
+        const message = prompt('Podaj treść wiadomości', defaultValue);
+
+        if (message !== null) { // Check if prompt was not canceled
+            const url = `https://admin.mega1000.pl/sms/send/${targetElement.classList[0]}?message=${encodeURIComponent(message)}`;
+
+            // Send fetch request
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire('Wiadomość została wysłana', '', 'success');
+                    } else {
+                        Swal.fire('Błąd podczas wysyłania wiadomości', '', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending SMS:', error);
+                    Swal.fire('Błąd podczas wysyłania wiadomości', '', 'error');
+                });
+        }
     };
-})
+});
 
 const tableBody = table.querySelector('tbody');
 tableBody.innerHTML = '';
