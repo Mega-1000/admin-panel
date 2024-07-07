@@ -304,10 +304,10 @@
 
                 // Add markers
                 L.marker(origin).addTo(map)
-                    .bindPopup('Start: ' + originZipCode)
+                    .bindPopup('Magazyn fabryki' + originZipCode)
                     .openPopup();
                 L.marker(destination).addTo(map)
-                    .bindPopup('Destination: ' + destZipCode)
+                    .bindPopup('Lokalizacja dostawy ' + destZipCode)
                     .openPopup();
 
                 // Get and display the route
