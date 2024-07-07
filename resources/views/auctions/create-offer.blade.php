@@ -233,7 +233,7 @@
             ->paginate(20);
         $zipCodes = [];
         foreach ($auctions->items() as $auction) {
-            $customer = $auction->chat->order->customer;
+            $customer = dd($auction);
             $address = $customer->addresses->first();
             $zipCodes[] = $address->postal_code;
         }
