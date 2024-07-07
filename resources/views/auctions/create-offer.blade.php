@@ -292,6 +292,82 @@
             element.parentNode.removeChild(element);
         }
     });
+
+    // Initialize Leaflet map
+    var map = L.map('map').setView([51.919438, 19.145136], 5);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Origin zip code
+    var originZipCode = "66-400";
+
+    // Destination zip code (from the existing data)
+    var destZipCode = "{{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}";
+
+    // Function to get coordinates from zip code
+    function getCoordinates(zipCode) {
+        return $.getJSON('https://nominatim.openstreetmap.org/search?format=json&postalcode=' + zipCode + '&country=pl');
+    }
+
+    // Function to calculate route and travel time
+    function calculateRoute(origin, destination) {
+        var url = `https://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${destination[1]},${destination[0]}?overview=full&geometries=polyline`;
+
+        return $.getJSON(url).then(function(data) {
+            var route = L.Polyline.fromEncoded(data.routes[0].geometry).getLatLngs();
+            var durationMinutes = Math.round(data.routes[0].duration / 60);
+
+            return { route: route, duration: durationMinutes };
+        });
+    }
+
+    // Main function to set up the map
+    function setupMap() {
+        Promise.all([getCoordinates(originZipCode), getCoordinates(destZipCode)])
+            .then(function([originData, destData]) {
+                if (originData.length > 0 && destData.length > 0) {
+                    var origin = [originData[0].lat, originData[0].lon];
+                    var destination = [destData[0].lat, destData[0].lon];
+
+                    calculateRoute(origin, destination).then(function(routeData) {
+                        // Draw the route
+                        L.polyline(routeData.route, {color: 'blue'}).addTo(map);
+
+                        // Add markers
+                        L.marker(origin).addTo(map)
+                            .bindPopup('Start: ' + originZipCode)
+                            .openPopup();
+                        L.marker(destination).addTo(map)
+                            .bindPopup('Destination: ' + destZipCode)
+                            .openPopup();
+
+                        // Fit the map to the route
+                        map.fitBounds(L.polyline(routeData.route).getBounds());
+
+                        // Add a text overlay with travel time
+                        var info = L.control();
+                        info.onAdd = function () {
+                            this._div = L.DomUtil.create('div', 'info');
+                            this.update(routeData.duration);
+                            return this._div;
+                        };
+                        info.update = function (duration) {
+                            this._div.innerHTML = '<h4>Estimated Travel Time</h4>' +
+                                (duration ? duration + ' minutes by car' : 'Error calculating travel time');
+                        };
+                        info.addTo(map);
+                    });
+                } else {
+                    console.log('Could not find one or both zip codes');
+                }
+            });
+    }
+
+    // Call the setup function when the document is ready
+    $(document).ready(setupMap);
 </script>
 </body>
 </html>
