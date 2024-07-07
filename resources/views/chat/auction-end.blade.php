@@ -304,6 +304,10 @@
                                     </a>
 
                                     @if(auth()->id())
+                                        <button class="{{ $sortedFirm['firm']?->firm->token }} btn btn-primary" id="sendSmsAboutAuction">
+                                            Wyślij smsa do przedstawiciela w sprawie przetargu
+                                        </button>
+
                                         <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $sortedFirm['firm']->token }}">
                                             Dodaj cenę jako ta firma
                                         </a>
@@ -445,10 +449,18 @@ const table = document.querySelector('table');
 const rows = Array.from(table.querySelectorAll('tbody tr'));
 
 rows.sort((a, b) => {
-const aTotalValue = parseFloat(a.querySelector('td:last-child').textContent.trim());
-const bTotalValue = parseFloat(b.querySelector('td:last-child').textContent.trim());
-return aTotalValue - bTotalValue;
+    const aTotalValue = parseFloat(a.querySelector('td:last-child').textContent.trim());
+    const bTotalValue = parseFloat(b.querySelector('td:last-child').textContent.trim());
+    return aTotalValue - bTotalValue;
 });
+
+document.getElementById('sendSmsAboutAuction').onclick = (element) => {
+    const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[1];
+    // get data-id;
+    const message = prompt('Podaj treść wiadomości', defaultValue);
+    const url = `https://admin.mega1000.pl/sms/send/` + element.classList[1] + `?message=${message}`;
+    fetch(url);
+};
 
 const tableBody = table.querySelector('tbody');
 tableBody.innerHTML = '';
