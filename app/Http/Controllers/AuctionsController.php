@@ -327,11 +327,7 @@ class AuctionsController extends Controller
         );
 
         foreach ($auctions['data'] as $auction) {
-            $auction['editPricesLink'] = route('auctions.offer.create', ['token' => ChatAuctionFirm::where('chat_auction_id', $auction['id'])
-                ->where('firm_id', $firm->id)
-                ->first()
-                ->token
-            ]);
+            $auction['editPricesLink'] = 'adasdas';
 
             try {
                 $auction['date_of_delivery'] = 'Od: ' . $auction['chat']['order']['dates']['customer_delivery_date_from'] . ' Do: ' .
