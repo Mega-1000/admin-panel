@@ -253,46 +253,6 @@
             onPriceChange(priceInput)
         });
     }, 1000);
-
-    // Initialize Leaflet map
-    var map = L.map('map').setView([51.919438, 19.145136], 5);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
-    // Get the zip code from the data
-    var zipCode = "{{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}";
-
-    // Use an external API to get the latitude and longitude from the zip code
-    $.getJSON('https://nominatim.openstreetmap.org/search?format=json&postalcode=' + zipCode + '&country=pl', function(data) {
-        if (data.length > 0) {
-            var lat = data[0].lat;
-            var lon = data[0].lon;
-
-            // Add a marker at the location
-            L.marker([lat, lon]).addTo(map)
-                .bindPopup('Przybliżona lokalizacja dostawy <br> Kod pocztowy: ' + zipCode)
-                .openPopup();
-
-            // Center the map on the location
-            map.setView([lat, lon], 12);
-        } else {
-            console.log('Nie znaleziono kodu pocztowego');
-        }
-    });
-    // Get all elements with the specified structure
-    // Get all elements with the specified structure
-    const elementsToCheck = document.querySelectorAll('div[style="border: 4px red solid; border-radius: 10px"]');
-
-    // Loop through the elements and remove the empty ones
-    elementsToCheck.forEach(element => {
-        if (element.childNodes.length === 0) {
-            element.parentNode.removeChild(element);
-        }
-    });
-
     // Initialize Leaflet map
     var map = L.map('map').setView([51.919438, 19.145136], 5);
 
@@ -368,6 +328,8 @@
 
     // Call the setup function when the document is ready
     $(document).ready(setupMap);
+
+
 </script>
 </body>
 </html>

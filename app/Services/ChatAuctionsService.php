@@ -137,6 +137,6 @@ readonly class ChatAuctionsService
         ->with(['offers', 'offers.firm','chat.order.dates', 'chat.order.customer.addresses', 'chat.order.items.product.packing'])
         ->orderBy('updated_at', 'desc')
         ->paginate(20)
-            ->toArray();
+        ->toArray();
     }
 }
