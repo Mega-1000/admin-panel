@@ -454,7 +454,8 @@ rows.sort((a, b) => {
     return aTotalValue - bTotalValue;
 });
 
-document.getElementById('sendSmsAboutAuction').onclick = (element) => {
+document.getElementById('sendSmsAboutAuction').onclick = (event) => {
+    const element = event.target;
     const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[1];
     // get data-id;
     const message = prompt('Podaj treść wiadomości', defaultValue);
