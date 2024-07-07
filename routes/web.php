@@ -940,3 +940,7 @@ Route::get('/styro-chatrs', function () {
 
     return view('charts', compact('dayLabels', 'dayData', 'weekLabels', 'weekData', 'monthLabels', 'monthData'));
 });
+
+Route::get('all-auctions-map', function (Request $request) {
+    return view('all-auctions-map');
+})->name('all-auctions-map');

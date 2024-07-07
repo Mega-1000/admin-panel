@@ -4,44 +4,48 @@
     $auctions = \App\Entities\ChatAuction::whereHas('firms', function ($query) use ($firm) {
             $query->where('firm_id', $firm->id);
         })
-        ->with(['offers', 'offers.firm','chat.order.dates', 'chat.order.customer.addresses', 'chat.order.items.product.packing'])
+        ->with(['offers', 'offers.firm','chat.order.dates', 'chat.order.addresses', 'chat.order.items.product.packing'])
         ->orderBy('updated_at', 'desc')
-        ->paginate(20)
-        ->toArray();
-
+        ->paginate(50);
     $zipCodes = [];
-    $auctions['data'] = array_filter($auctions['data'], function ($auction) use (&$zipCodes) {
-        $address = $auction['chat']['order']['customer']['addresses'][0];
-        $zipCodes[] = $address['zip_code'];
-        return $address['latitude'] && $address['longitude'];
-    });
+    foreach ($auctions->items() as $auction) {
+        $customer = $auction->chat?->order?->customer;
+        $address = $customer?->addresses?->first();
+        if ($address?->postal_code) {
+            $zipCodes[] = $address->postal_code;
+        }
+    }
 @endphp
 
 <div id="map" style="height: 100vh;"></div>
 
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-providers@1.13.0/leaflet-providers.js"></script>
+
 <script>
-    var auctions = @json($auctions['data']);
+    var map = L.map('map').setView([52.2297, 21.0122], 6); // Set initial view to Poland
+
+    L.tileLayer.provider('OpenStreetMap.Mapnik').addTo(map);
+
     var zipCodes = @json($zipCodes);
-    var firm = @json($firm);
 
-    var map = L.map('map').setView([52.22977, 21.01178], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-    }).addTo(map);
+    function addMarkers(zipCodes) {
+        zipCodes.forEach(function(zipCode) {
+            fetch(`https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=Poland&format=json`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        L.marker([lat, lon]).addTo(map)
+                            .bindPopup(`Zip Code: ${zipCode}`);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    }
 
-    var markers = [];
-    auctions.forEach(function (auction) {
-        var address = auction.chat.order.customer.addresses[0];
-        var marker = L.marker([address.latitude, address.longitude]).addTo(map);
-        marker.bindPopup(`
-            <b>${firm.name}</b><br>
-            ${address.street} ${address.building_number}<br>
-            ${address.zip_code} ${address.city}<br>
-            <a href="/chat/${auction.chat.id}">Zobacz aukcję</a>
-        `);
-        markers.push(marker);
-    });
-
-    var group = new L.featureGroup(markers);
-    map.fitBounds(group.getBounds());
+    addMarkers(zipCodes);
 </script>
