@@ -327,10 +327,10 @@ class AuctionsController extends Controller
         );
 
         foreach ($auctions['data'] as $auction) {
-            $auction->date_of_delivery = 'Od: ' . $auction->chat?->order->dates->customer_delivery_date_from . ' Do: ' .
-            $auction->chat?->order->dates->customer_delivery_date_to;
+            $auction['date_of_delivery'] = 'Od: ' . $auction['chat']['order']['dates']['customer_delivery_date_from'] . ' Do: ' .
+            $auction['chat']['order']['dates']['customer_delivery_date_to'];
 
-            $auction->editPricesLink = route('auctions.offer.create', ['token' => ChatAuctionFirm::where('chat_auction_id', $auction->id)
+            $auction['editPricesLink'] = route('auctions.offer.create', ['token' => ChatAuctionFirm::where('chat_auction_id', $auction['id'])
                 ->where('firm_id', $firm->id)
                 ->first()
                 ->token
