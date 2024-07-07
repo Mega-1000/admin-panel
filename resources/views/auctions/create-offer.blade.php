@@ -232,7 +232,7 @@
             ->orderBy('updated_at', 'desc')
             ->paginate(20);
         $zipCodes = [];
-        foreach ($auctions->data as $auction) {
+        foreach ($auctions->items() as $auction) {
             $customer = $auction->chat->order->customer;
             $address = $customer->addresses->first();
             $zipCodes[] = $address->postal_code;
