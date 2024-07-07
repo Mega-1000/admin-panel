@@ -304,7 +304,7 @@
                                     </a>
 
                                     @if(auth()->id())
-                                        <button class="{{ $sortedFirm['firm']?->firm->access_token }} btn btn-primary" id="sendSmsAboutAuction">
+                                        <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} btn btn-primary" id="sendSmsAboutAuction">
                                             Wyślij smsa do przedstawiciela w sprawie przetargu
                                         </button>
 
@@ -456,7 +456,7 @@ rows.sort((a, b) => {
 
 document.getElementById('sendSmsAboutAuction').onclick = (event) => {
     const element = event.target;
-    const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[0];
+    const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + element.classList[0] + '&orderId=' + element.classList[1];
     // get data-id;
     const message = prompt('Podaj treść wiadomości', defaultValue);
     const url = `https://admin.mega1000.pl/sms/send/` + element.classList[0] + `?message=${message}`;
