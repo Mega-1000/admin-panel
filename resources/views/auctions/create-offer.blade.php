@@ -234,10 +234,10 @@
             ->toArray();
 
         $zipCodes = [];
-        $auctions['data'] = array_filter($auctions['data'], function ($auction) use (&$zipCodes) {
+        foreach ($auctions['data'] as $auction) {
             $address = $auction['chat']['order']['addresses'][0];
             $zipCodes[] = $address['postal_code'];
-        });
+        }
     @endphp
 
     <div id="map" style="height: 100vh;"></div>
