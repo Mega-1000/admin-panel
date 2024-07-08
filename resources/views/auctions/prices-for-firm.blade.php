@@ -274,10 +274,7 @@
                                     @if(!empty($offers))
                                         @foreach($offers as $offer)
                                             {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
-                                            {{ round($offer->basic_price_net * 1.23, 2) }}
-                                            @if(auth()->id())
-                                                ({{ $offer->basic_price_net }})
-                                            @endif
+                                            {{ $offer->basic_price_net }}
                                             <br>
                                         @endforeach
                                         <span style="color: green">- Cena specjalna</span>
@@ -373,10 +370,7 @@
                                         <td>
                                             @foreach($price as $p)
                                                 {{ $p->price->product->additional_info1 }}:
-                                                {{ round($p?->price->gross_selling_price_basic_unit, 2) }}
-                                                @if(auth()->id())
-                                                    ({{ round($p?->price->gross_selling_price_basic_unit / 1.23, 2) }})
-                                                @endif
+                                                {{ round($p?->price->gross_selling_price_basic_unit / 1.23, 2) }}
                                                 <br>
                                             @endforeach
                                         </td>
