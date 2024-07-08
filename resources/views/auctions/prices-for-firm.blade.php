@@ -229,9 +229,13 @@
 
                     @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
                         <tr>
-                            <td>
-                                {{ $sortedFirm['firm']?->firm?->symbol ?? $sortedFirm['firm']->symbol ?? '' }}
-                            </td>
+                            @if($sortedFirm['firm']->firm->id == request()->query('firmId'))
+                                <span style="color: red; font-weight: bold">
+                                       {{ $sortedFirm['firm']->firm->name }}
+                                   </span>
+                            @else
+                                Firma ukryta
+                            @endif
 
                             @php
                                 $totalCost = 0;
@@ -323,7 +327,13 @@
                         @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                             <tr>
                                 <td>
-                                    {{ $symbol }}
+                                    <span style="color: red; font-weight: bold">
+                                       {{ $symbol }}
+                                    </span>
+
+                                    @else
+                                        Firma ukryta
+                                    @endif
                                 </td>
 
                                 @php
