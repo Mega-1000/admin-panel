@@ -123,20 +123,6 @@
 
     <div class="container" id="flex-container">
         <div id="chat-container">
-            <div>
-                Oglądasz tabele zapytania: {{ $order->id }}
-            </div>
-
-            <div class="alert-success alert">
-                Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
-                <br>
-                Wystarczy podać numer telefonu!
-                <br>
-                <br>
-                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
-                    Zobacz więcej na temat promocji
-                </a>
-            </div>
 
             @if($firms->count() == 0)
                 <div class="text-center">
@@ -144,27 +130,6 @@
                 </div>
             @else
                 <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                <h5 style="text-align: right">Ceny brutto za m3</h5>
-                            </th>
-                            @php $iteration = 2; @endphp
-                            @foreach($products as $product)
-                                <th>
-                                    @php
-                                        $name = $product->product->name;
-                                        $words = explode(' ', $name);
-                                        array_shift($words);
-                                        $name = implode(' ', $words);
-                                    @endphp
-                                    {{ $name }}
-                                </th>
-                                @php $iteration++; @endphp
-                            @endforeach
-                            <th>Wartość oferty w przypadku wybrania najtańszych opcji</th>
-                        </tr>
-                    </thead>
                     <tbody>
                     @php
                         $sortedFirms = collect();
