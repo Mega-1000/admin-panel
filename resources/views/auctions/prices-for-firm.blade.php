@@ -231,15 +231,6 @@
                         <tr>
                             <td>
                                 {{ $sortedFirm['firm']?->firm?->symbol ?? $sortedFirm['firm']->symbol ?? '' }}
-                                <br>
-                                Odległość: {{ round($sortedFirm['firm']->distance) }} KM
-                                <br>
-                                @php
-                                    $employee = \App\Helpers\LocationHelper::getNearestEmployeeOfFirm($order->customer, $sortedFirm['firm']->firm);
-                                @endphp
-                                @if($employee && $employee->phone && auth()->id())
-                                    tel przedstawiciela: <br> +48 {{ $employee->phone }}
-                                @endif
                             </td>
 
                             @php
@@ -278,7 +269,7 @@
                                         })->first();
 
                                         $totalCost += ($minOfferPrice * ($orderItem?->quantity ?? 0)) * $product?->packing?->numbers_of_basic_commercial_units_in_pack ?? 0.33333;
-                                    @endphp
+//                                    @endphp
 
                                     @if(!empty($offers))
                                         @foreach($offers as $offer)
@@ -289,7 +280,7 @@
                                             @endif
                                             <br>
                                         @endforeach
-                                        <span style="color: green">- specjalnie dla ciebie</span>
+                                        <span style="color: green">- Cena specjalna</span>
                                     @else
                                         No offer
                                     @endif
@@ -302,16 +293,6 @@
                                 <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
                                     Wyślij zamówienie na tego producenta
                                 </a>
-
-                                @if(auth()->id())
-                                    <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $sortedFirm['firm']?->firm?->symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} btn btn-primary" id="sendSmsAboutAuction">
-                                        Wyślij smsa do przedstawiciela w sprawie przetargu
-                                    </button>
-
-                                    <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $sortedFirm['firm']->token }}">
-                                        Dodaj cenę jako ta firma
-                                    </a>
-                                @endif
                             </td>
                         </tr>
                     @endforeach
