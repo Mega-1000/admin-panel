@@ -327,15 +327,6 @@
                             <tr>
                                 <td>
                                     {{ $symbol }}
-                                    <br>
-                                    Odległość: {{ $distance ?? 'N/A' }} KM
-                                    <br>
-                                    @php
-                                        $employee = \App\Entities\Employee::where('email', $firm->email_of_employee)->first();
-                                    @endphp
-                                    @if($employee && $employee->phone && auth()->id())
-                                        tel przedstawiciela: <br> +48 {{ $employee->phone }}
-                                    @endif
                                 </td>
 
                                 @php
