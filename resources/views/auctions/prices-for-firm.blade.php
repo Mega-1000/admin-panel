@@ -231,11 +231,12 @@
                         <tr>
                             @if($sortedFirm['firm']->firm->id == request()->query('firmId'))
                                 <span style="color: red; font-weight: bold">
-                                       {{ $sortedFirm['firm']->firm->name }}
-                                   </span>
+                                   {{ $sortedFirm['firm']->firm->name }}
+                               </span>
                             @else
                                 Firma ukryta
                             @endif
+                            sdads
 
                             @php
                                 $totalCost = 0;
@@ -328,10 +329,9 @@
                             <tr>
                                 <td>
                                     @if(\App\Entities\Firm::where('symbol', $symbol)->first()->id == request()->query('firmId'))
-                                    <span style="color: red; font-weight: bold">
-                                       {{ $symbol }}
-                                    </span>
-
+                                        <span style="color: red; font-weight: bold">
+                                           {{ $symbol }}
+                                        </span>
                                     @else
                                         Firma ukryta
                                     @endif
