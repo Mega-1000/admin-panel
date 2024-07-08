@@ -110,7 +110,7 @@
            };
        })();
    </script>
-
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
@@ -166,282 +166,302 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $sortedFirms = collect();
-                            $firmsWithMissingData = collect();
-                            $displayedFirmSymbols = [];
-                        @endphp
+                    @php
+                        $sortedFirms = collect();
+                        $displayedFirmSymbols = [];
+                    @endphp
 
-                        @foreach($firms as $firm)
-                            @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
-                                @continue
-                            @endif
+                    <div class="container mx-auto px-4 py-8">
+                        @if(session()->get('success'))
+                            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                                <p>Pomyślnie stworzono zamówienie i dodano przedstawicieli do chatu</p>
+                            </div>
+                        @endif
 
-                            @php
-                                $displayedFirmSymbols[] = $firm?->firm?->symbol ?? $firm->symbol ?? '';
-                                $totalCost = 0;
-                                $missingData = false;
-                            @endphp
+                        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                                <h2 class="text-lg font-semibold text-gray-800">Oglądasz tabele zapytania: {{ $order->id }}</h2>
+                            </div>
 
-                            @foreach($products as $product)
-                                @php
-                                    $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)
-                                        ->where('product_group', $product->product->product_group)
-                                        ->get();
+                            <div class="p-6 bg-blue-50 border-b border-blue-200">
+                                <p class="text-blue-700 mb-4">Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!</p>
+                                <p class="text-blue-700 mb-4">Wystarczy podać numer telefonu!</p>
+                                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition duration-300">
+                                    Zobacz więcej na temat promocji
+                                </a>
+                            </div>
 
-                                    $offers = [];
-                                    $pcOffers = [];
-                                    foreach ($allProductsToBeDisplayed as $product) {
-                                        if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
-                                            $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                                ->where('chat_auction_id', $auction->id)
-                                                ->orderBy('basic_price_net', 'asc')
-                                                ->first();
-                                        }
+                            @if($firms->count() == 0)
+                                <div class="text-center py-8">
+                                    <h1 class="text-2xl font-bold text-gray-700">Tu za niedługo zaczną wyświetlać się wyniki twojego przetargu.</h1>
+                                </div>
+                            @else
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Ceny brutto za m3
+                                        </th>
+                                        @foreach($products as $product)
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                @php
+                                                    $name = $product->product->name;
+                                                    $words = explode(' ', $name);
+                                                    array_shift($words);
+                                                    $name = implode(' ', $words);
+                                                @endphp
+                                                {{ $name }}
+                                            </th>
+                                        @endforeach
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Wartość oferty w przypadku wybrania najtańszych opcji
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($firms as $firm)
+                                        @if(isset($auction) && $auction->offers->where('firm_id', $firm->firm->id)->count() === 0 || in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
+                                            @continue
+                                        @endif
 
-                                        $pcOffers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                            ->where('chat_auction_id', $auction->id)
-                                            ->orderBy('basic_price_net', 'asc')
-                                            ->first();
-                                    }
-
-                                    usort($offers, function($a, $b) {
-                                        return $a->basic_price_net <=> $b->basic_price_net;
-                                    });
-
-                                    $minOffer = collect($pcOffers)->min('basic_price_net');
-
-                                    $totalCost += (round(($minOffer * 1.23), 2) *
-                                        \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
-                                            ->whereHas('product', function ($q) use ($product) {
-                                                $q->where('product_group', $product->product_group);
-                                            })->first()?->quantity) * $product?->packing?->numbers_of_basic_commercial_units_in_pack;
-                                @endphp
-                            @endforeach
-
-                            @php
-                                $sortedFirms->push([
-                                    'firm' => $firm,
-                                    'totalCost' => round($totalCost, 2)
-                                ]);
-                            @endphp
-                        @endforeach
-
-                        @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
-                            <tr>
-                                <td>
-                                    {{ $sortedFirm['firm']?->firm?->symbol ?? $sortedFirm['firm']->symbol ?? '' }}
-                                    <br>
-                                    Odległość: {{ round($sortedFirm['firm']->distance) }} KM
-                                    <br>
-                                    @php
-                                        $employee = \App\Helpers\LocationHelper::getNearestEmployeeOfFirm($order->customer, $sortedFirm['firm']->firm);
-                                    @endphp
-                                    @if($employee && $employee->phone && auth()->id())
-                                        tel przedstawiciela: <br> +48 {{ $employee->phone }}
-                                    @endif
-                                </td>
-
-                                @php
-                                    $totalCost = 0;
-                                @endphp
-
-                                @foreach($products as $product)
-                                    <td>
                                         @php
-                                            $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $sortedFirm['firm']->firm->symbol)
-                                                ->where('product_group', $product->product->product_group)
-                                                ->get();
-
-                                            $offers = [];
-                                            foreach ($allProductsToBeDisplayed as $product) {
-                                                if ($auction->offers()->where('firm_id', $sortedFirm['firm']->firm->id)->whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})->first()) {
-                                                    $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
-                                                        ->where('chat_auction_id', $auction->id)
-                                                        ->orderBy('basic_price_net', 'asc')
-                                                        ->where('firm_id', $sortedFirm['firm']->firm->id)
-                                                        ->first();
-                                                }
-                                            }
-
-                                            usort($offers, function($a, $b) {
-                                                return $a->basic_price_net <=> $b->basic_price_net;
-                                            });
-
-                                            $minOffer = collect($offers)->min('basic_price_net');
-                                            $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
-                                            $minPurchasePrice = $allProductsToBeDisplayed->min('price.net_selling_price_basic_unit') * 1.23;
-
-                                            $orderItem = \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
-                                            ->whereHas('product', function ($q) use ($product) {
-                                                $q->where('product_group', $product->product_group);
-                                            })->first();
-
-                                            $totalCost += ($minOfferPrice * ($orderItem?->quantity ?? 0)) * $product?->packing?->numbers_of_basic_commercial_units_in_pack ?? 0.33333;
+                                            $displayedFirmSymbols[] = $firm?->firm?->symbol ?? $firm->symbol ?? '';
+                                            $totalCost = 0;
+                                            $missingData = false;
                                         @endphp
 
-                                        @if(!empty($offers))
-                                            @foreach($offers as $offer)
-                                                {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
-                                                {{ round($offer->basic_price_net * 1.23, 2) }}
-                                                @if(auth()->id())
-                                                    ({{ $offer->basic_price_net }})
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $firm?->firm?->symbol ?? $firm->symbol ?? '' }}
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    Odległość: {{ round($firm->distance) }} KM
+                                                </div>
+                                                @php
+                                                    $employee = \App\Helpers\LocationHelper::getNearestEmployeeOfFirm($order->customer, $firm->firm);
+                                                @endphp
+                                                @if($employee && $employee->phone && auth()->id())
+                                                    <div class="text-sm text-gray-500">
+                                                        Tel przedstawiciela: +48 {{ $employee->phone }}
+                                                    </div>
                                                 @endif
-                                                <br>
+                                            </td>
+
+                                            @foreach($products as $product)
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    @php
+                                                        $allProductsToBeDisplayed = \App\Entities\Product::where('product_name_supplier', $firm->firm->symbol)
+                                                            ->where('product_group', $product->product->product_group)
+                                                            ->get();
+
+                                                        $offers = [];
+                                                        $pcOffers = [];
+                                                        foreach ($allProductsToBeDisplayed as $product) {
+                                                            if ($auction->offers->where('firm_id', $firm->firm->id)->where('product_id', $product->id)->first()) {
+                                                                $offers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                                                    ->where('chat_auction_id', $auction->id)
+                                                                    ->orderBy('basic_price_net', 'asc')
+                                                                    ->first();
+                                                            }
+
+                                                            $pcOffers[] = \App\Entities\ChatAuctionOffer::whereHas('product', function ($q) use ($product) {$q->where('parent_id', $product->parent_id);})
+                                                                ->where('chat_auction_id', $auction->id)
+                                                                ->orderBy('basic_price_net', 'asc')
+                                                                ->first();
+                                                        }
+
+                                                        usort($offers, function($a, $b) {
+                                                            return $a->basic_price_net <=> $b->basic_price_net;
+                                                        });
+
+                                                        $minOffer = collect($pcOffers)->min('basic_price_net');
+
+                                                        $totalCost += (round(($minOffer * 1.23), 2) *
+                                                            \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
+                                                                ->whereHas('product', function ($q) use ($product) {
+                                                                    $q->where('product_group', $product->product_group);
+                                                                })->first()?->quantity) * $product?->packing?->numbers_of_basic_commercial_units_in_pack;
+                                                    @endphp
+
+                                                    @if(!empty($offers))
+                                                        @foreach($offers as $offer)
+                                                            <div class="text-sm text-gray-900">
+                                                                {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
+                                                                {{ round($offer->basic_price_net * 1.23, 2) }}
+                                                                @if(auth()->id())
+                                                                    <span class="text-gray-500">({{ $offer->basic_price_net }})</span>
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                        <div class="text-sm text-green-600 mt-1">- specjalnie dla ciebie</div>
+                                                    @else
+                                                        <div class="text-sm text-gray-500">No offer</div>
+                                                    @endif
+                                                </td>
                                             @endforeach
-                                            <span style="color: green">- specjalnie dla ciebie</span>
-                                        @else
-                                            No offer
+
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ round($totalCost, 2) }}
+                                                </div>
+                                                <a href="https://admin.mega1000.pl/make-order/{{ $firm?->firm?->symbol }}/{{ $order->id }}" class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                    Wyślij zamówienie
+                                                </a>
+
+                                                @if(auth()->id())
+                                                    <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $firm?->firm?->symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" id="sendSmsAboutAuction">
+                                                        Wyślij SMS
+                                                    </button>
+
+                                                    <a href="https://admin.mega1000.pl/auctions/offer/create/{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $firm?->firm?->symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }}" class="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                        Dodaj cenę
+                                                    </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+
+                                    @foreach($firms as $firm)
+                                        @if(in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
+                                            @continue
                                         @endif
-                                    </td>
-                                @endforeach
 
-                                <td>
-                                    {{ round($totalCost, 2) }}
-                                    <br>
-                                    <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
-                                        Wyślij zamówienie na tego producenta
-                                    </a>
+                                        @php
+                                            $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? '';
+                                            $coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
 
-                                    @if(auth()->id())
-                                        <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $sortedFirm['firm']?->firm?->symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} btn btn-primary" id="sendSmsAboutAuction">
-                                            Wyślij smsa do przedstawiciela w sprawie przetargu
-                                        </button>
+                                            if ($coordinatesOfUser) {
+                                                $raw = \DB::selectOne(
+                                                    'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                                                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                                                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                                                    FROM postal_code_lat_lon pc
+                                                    JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                                                    JOIN warehouses w on wa.warehouse_id = w.id
+                                                    WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                                                    ORDER BY distance
+                                                    limit 1',
+                                                    [
+                                                        'latitude' => $coordinatesOfUser->latitude,
+                                                        'longitude' => $coordinatesOfUser->longitude,
+                                                        'firmId' => $firm->firm->id
+                                                    ]
+                                                );
 
-                                        <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $sortedFirm['firm']->token }}">
-                                            Dodaj cenę jako ta firma
-                                        </a>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-@foreach($firms as $firm)
-    @if(in_array($firm?->firm?->symbol ?? $firm?->symbol ?? [], $displayedFirmSymbols) || !isset($auction))
-        @continue
-    @endif
+                                                $distance = round($raw?->distance, 2);
+                                            }
+                                        @endphp
 
-    @php
-        $symbol = $firm?->firm?->symbol ?? $firm->symbol ?? '';
-        $coordinatesOfUser = \DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
+                                        @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        {{ $symbol }}
+                                                    </div>
+                                                    <div class="text-sm text-gray-500">
+                                                        Odległość: {{ $distance ?? 'N/A' }} KM
+                                                    </div>
+                                                    @php
+                                                        $employee = \App\Entities\Employee::where('email', $firm->email_of_employee)->first();
+                                                    @endphp
+                                                    @if($employee && $employee->phone && auth()->id())
+                                                        <div class="text-sm text-gray-500">
+                                                            Tel przedstawiciela: +48 {{ $employee->phone }}
+                                                        </div>
+                                                    @endif
+                                                </td>
 
-        if ($coordinatesOfUser) {
-            $raw = \DB::selectOne(
-                'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
-                    POW(69.1 * (pc.latitude - :latitude), 2) +
-                    POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
-                FROM postal_code_lat_lon pc
-                JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
-                JOIN warehouses w on wa.warehouse_id = w.id
-                WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
-                ORDER BY distance
-                limit 1',
-                [
-                    'latitude' => $coordinatesOfUser->latitude,
-                    'longitude' => $coordinatesOfUser->longitude,
-                    'firmId' => $firm->firm->id
-                ]
-            );
+                                                @php
+                                                    $prices = [];
+                                                    $items = isset($auction) ? $auction?->chat?->order?->items : $order?->items;
+                                                    $totalCost = 0;
+                                                    $missingData = false;
 
-            $distance = round($raw?->distance, 2);
-        }
-    @endphp
+                                                    foreach ($items as $item) {
+                                                        $variations = App\Entities\Product::where('product_group', $item->product->product_group)
+                                                            ->where('product_name_supplier', $symbol)
+                                                            ->get();
 
-    @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
-        <tr>
-            <td>
-                {{ $symbol }}
-                <br>
-                Odległość: {{ $distance ?? 'N/A' }} KM
-                <br>
-                @php
-                    $employee = \App\Entities\Employee::where('email', $firm->email_of_employee)->first();
-                @endphp
-                @if($employee && $employee->phone && auth()->id())
-                    tel przedstawiciela: <br> +48 {{ $employee->phone }}
-                @endif
-            </td>
+                                                        $variations = $variations->sortBy(function($product) {
+                                                            return $product->price->gross_purchase_price_basic_unit_after_discounts;
+                                                        });
 
-            @php
-                $prices = [];
-                $items = isset($auction) ? $auction?->chat?->order?->items : $order?->items;
-                $totalCost = 0;
-                $missingData = false;
+                                                        if ($variations->isEmpty() || $variations->min('price.net_special_price_basic_unit') === 0) {
+                                                            $missingData = true;
+                                                            break;
+                                                        }
 
-                foreach ($items as $item) {
-                    $variations = App\Entities\Product::where('product_group', $item->product->product_group)
-                        ->where('product_name_supplier', $symbol)
-                        ->get();
+                                                        $prices[] = $variations;
 
-                    $variations = $variations->sortBy(function($product) {
-                        return $product->price->gross_purchase_price_basic_unit_after_discounts;
-                    });
+                                                        $validPrices = $variations->filter(function($variation) {
+                                                            return !($variation->price->net_special_price_basic_unit == 0 || empty($variation->price->net_special_price_basic_unit));
+                                                        });
 
-                    if ($variations->isEmpty() || $variations->min('price.net_special_price_basic_unit') === 0) {
-                        $missingData = true;
-                        break;
-                    }
+                                                        $minPrice = $validPrices->min('price.net_selling_price_basic_unit') * 1.23;
 
-                    $prices[] = $variations;
+                                                        if (empty($minPrice)) {
+                                                            $totalCost += 100000000;
+                                                        }
+                                                        $totalCost += ($minPrice * $item->quantity) * $item->product->packing->numbers_of_basic_commercial_units_in_pack;
+                                                    }
+                                                @endphp
 
-                    $validPrices = $variations->filter(function($variation) {
-                        return !($variation->price->net_special_price_basic_unit == 0 || empty($variation->price->net_special_price_basic_unit));
-                    });
+                                                @if($missingData)
+                                                    @foreach($products as $product)
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="text-sm text-gray-500">No offer</div>
+                                                        </td>
+                                                    @endforeach
+                                                @else
+                                                    @foreach($prices as $price)
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            @foreach($price as $p)
+                                                                <div class="text-sm text-gray-900">
+                                                                    {{ $p->price->product->additional_info1 }}:
+                                                                    {{ round($p?->price->gross_selling_price_basic_unit, 2) }}
+                                                                    @if(auth()->id())
+                                                                        <span class="text-gray-500">({{ round($p?->price->gross_selling_price_basic_unit / 1.23, 2) }})</span>
+                                                                    @endif
+                                                                </div>
+                                                            @endforeach
+                                                        </td>
+                                                    @endforeach
+                                                @endif
 
-                    $minPrice = $validPrices->min('price.net_selling_price_basic_unit') * 1.23;
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    @if($missingData)
+                                                        <div class="text-sm text-gray-500">Missing data</div>
+                                                    @else
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{ round($totalCost, 2) }}
+                                                        </div>
+                                                        <a href="https://admin.mega1000.pl/make-order/{{ $symbol }}/{{ $order->id }}" class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                            Wyślij zamówienie
+                                                        </a>
 
-                    if (empty($minPrice)) {
-                        $totalCost += 100000000;
-                    }
-                    $totalCost += ($minPrice * $item->quantity) * $item->product->packing->numbers_of_basic_commercial_units_in_pack;
-                }
-            @endphp
+                                                        @if(auth()->id())
+                                                            <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" id="sendSmsAboutAuction">
+                                                                Wyślij SMS
+                                                            </button>
 
-            @if($missingData)
-                @foreach($products as $product)
-                    <td>No offer</td>
-                @endforeach
-            @else
-                @foreach($prices as $price)
-                    <td>
-                        @foreach($price as $p)
-                            {{ $p->price->product->additional_info1 }}:
-                            {{ round($p?->price->gross_selling_price_basic_unit, 2) }}
-                            @if(auth()->id())
-                                ({{ round($p?->price->gross_selling_price_basic_unit / 1.23, 2) }})
+                                                            <a href="https://admin.mega1000.pl/auctions/offer/create/{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }}" class="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                                Dodaj cenę
+                                                            </a>
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @php
+                                                $displayedFirmSymbols[] = $symbol;
+                                            @endphp
+                                        @endif
+                                    @endforeach
+                                    </tbody>
+                                </table>
                             @endif
-                            <br>
-                        @endforeach
-                    </td>
-                @endforeach
-            @endif
-
-            <td>
-                @if($missingData)
-                    Missing data
-                @else
-                    {{ round($totalCost, 2) }}
-                    <br>
-                    <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $symbol }}/{{ $order->id }}">
-                        Wyślij zamówienie na tego producenta
-                    </a>
-
-                    @if(auth()->id())
-                        <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $sortedFirm['firm']?->firm?->symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} btn btn-primary" id="sendSmsAboutAuction">
-                            Wyślij smsa do przedstawiciela w sprawie przetargu
-                        </button>
-
-                        <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }}">
-                            Dodaj cenę jako ta firma
-                        </a>
-                    @endif
-                @endif
-            </td>
-        </tr>
-        @php
-            $displayedFirmSymbols[] = $symbol;
-        @endphp
-    @endif
-@endforeach
+                        </div>
+                    </div>
                     </tbody>
                 </table>
             @endif
