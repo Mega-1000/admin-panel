@@ -110,12 +110,10 @@
             };
         })();
     </script>
-
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-@php
-$firmCounter = 0;
-@endphp
+<body>
 <div>
     @if(session()->get('success'))
         <div class="alert alert-success">
@@ -129,6 +127,16 @@ $firmCounter = 0;
                 Oglądasz tabele zapytania: {{ $order->id }}
             </div>
 
+            <div class="alert-success alert">
+                Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
+                <br>
+                Wystarczy podać numer telefonu!
+                <br>
+                <br>
+                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
+                    Zobacz więcej na temat promocji
+                </a>
+            </div>
 
             @if($firms->count() == 0)
                 <div class="text-center">
@@ -214,7 +222,7 @@ $firmCounter = 0;
                         @php
                             $sortedFirms->push([
                                 'firm' => $firm,
-                                'totalCost' => round($totalCost / 3.33, 2)
+                                'totalCost' => round($totalCost, 2)
                             ]);
                         @endphp
                     @endforeach
@@ -222,14 +230,16 @@ $firmCounter = 0;
                     @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
                         <tr>
                             <td>
-                                @if($sortedFirm['firm']->firm->id == request()->query('firmId'))
-                                    <span style="color: red; font-weight: bold">
-                                       {{ $sortedFirm['firm']->firm->name }}
-                                   </span>
-                                @else
-                                    Firma {{ $firmCounter++ }}
-                                @endif
+                                {{ $sortedFirm['firm']?->firm?->symbol ?? $sortedFirm['firm']->symbol ?? '' }}
                                 <br>
+                                Odległość: {{ round($sortedFirm['firm']->distance) }} KM
+                                <br>
+                                @php
+                                    $employee = \App\Helpers\LocationHelper::getNearestEmployeeOfFirm($order->customer, $sortedFirm['firm']->firm);
+                                @endphp
+                                @if($employee && $employee->phone && auth()->id())
+                                    tel przedstawiciela: <br> +48 {{ $employee->phone }}
+                                @endif
                             </td>
 
                             @php
@@ -273,10 +283,13 @@ $firmCounter = 0;
                                     @if(!empty($offers))
                                         @foreach($offers as $offer)
                                             {{ \App\Entities\Product::find($offer->product_id)->additional_info1 }}:
-                                            {{ $offer->basic_price_net }}
+                                            {{ round($offer->basic_price_net * 1.23, 2) }}
+                                            @if(auth()->id())
+                                                ({{ $offer->basic_price_net }})
+                                            @endif
                                             <br>
                                         @endforeach
-                                        <span style="color: green">- Specjalnie w przetargu</span>
+                                        <span style="color: green">- specjalnie dla ciebie</span>
                                     @else
                                         No offer
                                     @endif
@@ -284,8 +297,21 @@ $firmCounter = 0;
                             @endforeach
 
                             <td>
-                                {{ round($totalCost / 3.33, 2) }}
+                                {{ round($totalCost, 2) }}
                                 <br>
+                                <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
+                                    Wyślij zamówienie na tego producenta
+                                </a>
+
+                                @if(auth()->id())
+                                    <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $sortedFirm['firm']?->firm?->symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} btn btn-primary" id="sendSmsAboutAuction">
+                                        Wyślij smsa do przedstawiciela w sprawie przetargu
+                                    </button>
+
+                                    <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ $sortedFirm['firm']->token }}">
+                                        Dodaj cenę jako ta firma
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -323,14 +349,16 @@ $firmCounter = 0;
                         @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                             <tr>
                                 <td>
-                                    @if(\App\Entities\Firm::where('symbol', $symbol)->first()->id == request()->query('firmId'))
-                                        <span style="color: red; font-weight: bold">
-                                       {{ $symbol }}
-                                   </span>
-                                    @else
-                                        Firma {{ $firmCounter++ }}
-                                    @endif
+                                    {{ $symbol }}
                                     <br>
+                                    Odległość: {{ $distance ?? 'N/A' }} KM
+                                    <br>
+                                    @php
+                                        $employee = \App\Entities\Employee::where('email', $firm->email_of_employee)->first();
+                                    @endphp
+                                    @if($employee && $employee->phone && auth()->id())
+                                        tel przedstawiciela: <br> +48 {{ $employee->phone }}
+                                    @endif
                                 </td>
 
                                 @php
@@ -377,7 +405,10 @@ $firmCounter = 0;
                                         <td>
                                             @foreach($price as $p)
                                                 {{ $p->price->product->additional_info1 }}:
-                                                {{ round($p?->price->net_purchase_price_basic_unit_after_discounts, 2) }}
+                                                {{ round($p?->price->gross_selling_price_basic_unit, 2) }}
+                                                @if(auth()->id())
+                                                    ({{ round($p?->price->gross_selling_price_basic_unit / 1.23, 2) }})
+                                                @endif
                                                 <br>
                                             @endforeach
                                         </td>
@@ -388,7 +419,21 @@ $firmCounter = 0;
                                     @if($missingData)
                                         Missing data
                                     @else
-                                        {{ round($totalCost / 3.33, 2) }}
+                                        {{ round($totalCost, 2) }}
+                                        <br>
+                                        <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $symbol }}/{{ $order->id }}">
+                                            Wyślij zamówienie na tego producenta
+                                        </a>
+
+                                        @if(auth()->id())
+                                            <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $sortedFirm['firm']?->firm?->symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} btn btn-primary" id="sendSmsAboutAuction">
+                                                Wyślij smsa do przedstawiciela w sprawie przetargu
+                                            </button>
+
+                                            <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }}">
+                                                Dodaj cenę jako ta firma
+                                            </a>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>
@@ -403,7 +448,7 @@ $firmCounter = 0;
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const table = document.querySelector('table');
     const rows = Array.from(table.querySelectorAll('tbody tr'));
@@ -412,6 +457,34 @@ $firmCounter = 0;
         const aTotalValue = parseFloat(a.querySelector('td:last-child').textContent.trim());
         const bTotalValue = parseFloat(b.querySelector('td:last-child').textContent.trim());
         return aTotalValue - bTotalValue;
+    });
+
+    document.querySelectorAll('#sendSmsAboutAuction').forEach((element) => {
+        element.onclick = (event) => {
+            const targetElement = event.target;
+            const defaultValue = 'Dzień dobry, czy chcesz przebić najniższą ofertę w przetargu? Kliknij w link, aby zobaczyć szczegóły: https://mega1000.pl/firms/przetargi?firmToken=' + targetElement.classList[0] + '&orderId=' + targetElement.classList[1];
+
+            // Prompt user for message input
+            const message = prompt('Podaj treść wiadomości', defaultValue);
+
+            if (message !== null) { // Check if prompt was not canceled
+                const url = `https://admin.mega1000.pl/sms/send/${targetElement.classList[0]}?message=${encodeURIComponent(message)}&orderId=${targetElement.classList[1]}`;
+
+                // Send fetch request
+                fetch(url)
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire('Wiadomość została wysłana', '', 'success');
+                        } else {
+                            Swal.fire('Błąd podczas wysyłania wiadomości', '', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending SMS:', error);
+                        Swal.fire('Błąd podczas wysyłania wiadomości', '', 'error');
+                    });
+            }
+        };
     });
 
     const tableBody = table.querySelector('tbody');
