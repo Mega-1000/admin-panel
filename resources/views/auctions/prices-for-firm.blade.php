@@ -327,6 +327,7 @@
                         @if((isset($auction) && $auction?->offers->where('firm_id', $firm?->firm?->id ?? $firm->id ?? '')->count() ?? 1 === 0 && !in_array($symbol, $displayedFirmSymbols)) || (!in_array($symbol, $displayedFirmSymbols) && true))
                             <tr>
                                 <td>
+                                    @if(\App\Entities\Firm::where('symbol', $symbol)->first()->id == request()->query('firmId'))
                                     <span style="color: red; font-weight: bold">
                                        {{ $symbol }}
                                     </span>
@@ -398,6 +399,7 @@
                             @php
                                 $displayedFirmSymbols[] = $symbol;
                             @endphp
+                        @endif
                     @endforeach
                     </tbody>
                 </table>
