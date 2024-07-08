@@ -398,7 +398,6 @@
                             @php
                                 $displayedFirmSymbols[] = $symbol;
                             @endphp
-                        @endif
                     @endforeach
                     </tbody>
                 </table>
