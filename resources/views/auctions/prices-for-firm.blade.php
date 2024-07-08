@@ -229,14 +229,15 @@
 
                     @foreach($sortedFirms->sortBy('totalCost') as $sortedFirm)
                         <tr>
-                            @if($sortedFirm['firm']->firm->id == request()->query('firmId'))
-                                <span style="color: red; font-weight: bold">
-                                   {{ $sortedFirm['firm']->firm->name }}
-                               </span>
-                            @else
-                                Firma ukryta
-                            @endif
-                            sdads
+                            <td>
+                                @if($sortedFirm['firm']->firm->id == request()->query('firmId'))
+                                    <span style="color: red; font-weight: bold">
+                                       {{ $sortedFirm['firm']->firm->name }}
+                                   </span>
+                                @else
+                                    Firma ukryta
+                                @endif
+                            </td>
 
                             @php
                                 $totalCost = 0;
