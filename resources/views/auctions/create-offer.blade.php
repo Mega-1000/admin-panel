@@ -138,7 +138,7 @@
                                             ->sort()
                                             ->values(); // Sort prices and re-index array
 
-                                        $secondMinPrice = $orderItemMinPrices->count() > 1 ? $orderItemMinPrices[1] : INF;
+                                        $secondMinPrice = $orderItemMinPrices->count() > 1 ? $orderItemMinPrices[0] : INF;
 
                                         $minPrice = min($chatAuctionMinPrice ?? INF, $secondMinPrice);
 
