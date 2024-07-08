@@ -164,11 +164,11 @@
                                 <table class="min-w-full divide-y divide-gray-200 ">
                                     <thead class="bg-gray-50 text-white" style="color: white">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                             Ceny brutto za m3
                                         </th>
                                         @foreach($products as $product)
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                 @php
                                                     $name = $product->product->name;
                                                     $words = explode(' ', $name);
@@ -178,7 +178,7 @@
                                                 {{ $name }}
                                             </th>
                                         @endforeach
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                             Wartość oferty w przypadku wybrania najtańszych opcji
                                         </th>
                                     </tr>
