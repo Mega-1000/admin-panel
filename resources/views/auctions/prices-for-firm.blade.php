@@ -203,11 +203,11 @@ $firmCounter = 0;
 
                                 $minOffer = collect($pcOffers)->min('basic_price_net');
 
-                                $totalCost += round(($minOffer * 1.23), 2) *
+                                $totalCost += (round(($minOffer * 1.23), 2) *
                                     \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                         ->whereHas('product', function ($q) use ($product) {
                                             $q->where('product_group', $product->product_group);
-                                        })->first()?->quantity;
+                                        })->first()?->quantity) * $product?->packing?->numbers_of_basic_commercial_units_in_pack;
                             @endphp
                         @endforeach
 
@@ -260,14 +260,14 @@ $firmCounter = 0;
 
                                         $minOffer = collect($offers)->min('basic_price_net');
                                         $minOfferPrice = $minOffer ? round($minOffer * 1.23, 2) : null;
-                                        $minPurchasePrice = $allProductsToBeDisplayed->min('price.gross_purchase_price_basic_unit_after_discounts');
+                                        $minPurchasePrice = $allProductsToBeDisplayed->min('price.net_selling_price_basic_unit') * 1.23;
 
                                         $orderItem = \App\Entities\OrderItem::where('order_id', $auction->chat->order->id)
                                         ->whereHas('product', function ($q) use ($product) {
                                             $q->where('product_group', $product->product_group);
                                         })->first();
 
-                                        $totalCost += ($minOfferPrice ?? $minPurchasePrice) * ($orderItem?->quantity ?? 0);
+                                        $totalCost += ($minOfferPrice * ($orderItem?->quantity ?? 0)) * $product?->packing?->numbers_of_basic_commercial_units_in_pack ?? 0.33333;
                                     @endphp
 
                                     @if(!empty($offers))
@@ -359,10 +359,12 @@ $firmCounter = 0;
                                             return !($variation->price->net_special_price_basic_unit == 0 || empty($variation->price->net_special_price_basic_unit));
                                         });
 
-                                        $minPrice = $validPrices->min('price.net_special_price_basic_unit');
+                                        $minPrice = $validPrices->min('price.net_selling_price_basic_unit') * 1.23;
 
-                                        // Update the total cost with the minimum valid price times the item quantity
-                                        $totalCost += $minPrice * $item->quantity;
+                                        if (empty($minPrice)) {
+                                            $totalCost += 100000000;
+                                        }
+                                        $totalCost += ($minPrice * $item->quantity) * $item->product->packing->numbers_of_basic_commercial_units_in_pack;
                                     }
                                 @endphp
 
