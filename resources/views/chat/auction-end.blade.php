@@ -161,8 +161,8 @@
                                     <h1 class="text-2xl font-bold text-gray-700">Tu za niedługo zaczną wyświetlać się wyniki twojego przetargu.</h1>
                                 </div>
                             @else
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
+                                <table class="min-w-full divide-y divide-gray-200 ">
+                                    <thead class="bg-gray-50 text-white">
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Ceny brutto za m3
