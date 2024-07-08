@@ -121,9 +121,6 @@
         </div>
     @endif
 
-    <div class="container" id="flex-container">
-        <div id="chat-container">
-
             @if($firms->count() == 0)
                 <div class="text-center">
                     <h1>Tu za nie długo zaczną wyświetlać się wyniki twojego przetargu.</h1>
@@ -430,8 +427,6 @@
                     </tbody>
                 </table>
             @endif
-        </div>
-    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
