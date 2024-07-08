@@ -289,10 +289,6 @@
 
                             <td>
                                 {{ round($totalCost, 2) }}
-                                <br>
-                                <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $sortedFirm['firm']?->firm?->symbol }}/{{ $order->id }}">
-                                    Wyślij zamówienie na tego producenta
-                                </a>
                             </td>
                         </tr>
                     @endforeach
