@@ -401,20 +401,6 @@
                                         Missing data
                                     @else
                                         {{ round($totalCost, 2) }}
-                                        <br>
-                                        <a class="btn btn-primary" href="https://admin.mega1000.pl/make-order/{{ $symbol }}/{{ $order->id }}">
-                                            Wyślij zamówienie na tego producenta
-                                        </a>
-
-                                        @if(auth()->id())
-                                            <button class="{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $sortedFirm['firm']?->firm?->symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }} {{ $order->id }} btn btn-primary" id="sendSmsAboutAuction">
-                                                Wyślij smsa do przedstawiciela w sprawie przetargu
-                                            </button>
-
-                                            <a class="btn btn-secondary" href="https://admin.mega1000.pl/auctions/offer/create/{{ App\Entities\ChatAuctionFirm::where('firm_id', App\Entities\Firm::where('symbol', $symbol)->first()->id)->where('chat_auction_id', $order->chat->auctions->first()->id)->first()?->token }}">
-                                                Dodaj cenę jako ta firma
-                                            </a>
-                                        @endif
                                     @endif
                                 </td>
                             </tr>
