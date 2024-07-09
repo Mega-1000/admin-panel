@@ -28,6 +28,7 @@
                 @endphp
 
                 @foreach($paymentConfirmations as $paymentConfirmation)
+                    <hr>
                     <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
 
                     <br>
@@ -37,6 +38,7 @@
                     email: {{ Order::find($order['id'])->warehouse->warehouse_email }}
                     <br>
                     numer telefonu: {{ Order::find($order['id'])->warehouse->phone }}
+                    <hr>
                 @endforeach
 
             </h5>
