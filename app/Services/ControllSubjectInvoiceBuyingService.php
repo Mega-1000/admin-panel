@@ -62,11 +62,9 @@ if (!$order) {
             return;
         }
 
-        dd((int)str_replace(',', '.', str_replace(' ', '', $orderNotes->gross)));
-
         $buyingInvooice = new BuyingInvoice();
         $buyingInvooice->order_id = $order->id;
-        $buyingInvooice->value = $orderNotes->gross;
+        $buyingInvooice->value = (float)str_replace(',', '.', str_replace(' ', '', $orderNotes->gross));
         $buyingInvooice->invoice_number = $orderNotes->number;
         $buyingInvooice->save();
 
