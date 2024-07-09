@@ -28,6 +28,7 @@ class ControllSubjectInvoiceBuyingService
             });
 
             $totalGross = BuyingInvoice::where('order_id', $order->id)->sum('value');
+            $arr = [];
 
             if ($order->labels->contains('id', 65) && $totalGross == $totalItemsCost) {
                 AddLabelService::addLabels($order, [264], $arr, []);
