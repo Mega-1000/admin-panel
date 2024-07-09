@@ -15,10 +15,8 @@ class ControllSubjectInvoiceBuyingService
      */
     public function handle(array $data): void
     {
-        $groupedData = $this->groupDataByOrder($data);
-
-        foreach ($groupedData as $orderNotes => $invoices) {
-            $this->handleSingle($orderNotes, $invoices);
+        foreach ($data as $orderNotes) {
+            $this->handleSingle($orderNotes);
         }
     }
 
@@ -32,8 +30,16 @@ class ControllSubjectInvoiceBuyingService
         return $grouped;
     }
 
-    private function handleSingle(string $orderNotes, array $invoices): void
+    private function handleSingle(array $orderNotes): void
     {
+        dd($orderNotes);
+        $buyingInvooice = new BuyingInvoice();
+        $buyingInvooice->order_id = $orderNotes;
+        $buyingInvooice->value = $orderNotes;
+        $buyingInvooice->invoice_number = $orderNotes->gross;
+        $buyingInvooice->save();
+
+
         $order = Order::find($orderNotes);
         $arr = [];
 
