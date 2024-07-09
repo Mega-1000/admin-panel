@@ -150,28 +150,28 @@
         @endif
     @endif
 
-    <div class="label-container">
-        @if(!empty($order))
-            @foreach(
-                !empty($order['labels']) &&
-                count($order['labels']) > 0
-                    ? array_filter($order['labels'], function ($label) use($labelGroupName) { return !empty($label['label_group']) ? $label['label_group']['name'] === $labelGroupName : null; })
-                    : [] as $label
-            )
-                <span
-                    onclick="
-                    removeLabel({{ $order['id']}}, {{ $label['id'] }}, {{ $label['manual_label_selection_to_add_after_removal'] }}, 'null', {{$label['timed']}})"
-                    class="label-wrapper"
-                    style="cursor: pointer"
-                    onmouseover="showLabelName(this, '{{ $label['name'] }}')"
-                    onmouseout="hideLabelName(this)"
-                >
-                    <i class="{{ $label['icon_name'] }}" style="font-size: 30px; background-color: {{ $label['color'] }}; color: #ffffff; padding: 10px;"></i>
-                    <div class="label-popup">{{ $label['name'] }}</div>
-                </span>
-            @endforeach
-        @endif
-    </div>
+        <div class="label-container">
+            @if(!empty($order))
+                @foreach(
+                    !empty($order['labels']) &&
+                    count($order['labels']) > 0
+                        ? array_filter($order['labels'], function ($label) use($labelGroupName) { return !empty($label['label_group']) ? $label['label_group']['name'] === $labelGroupName : null; })
+                        : [] as $label
+                )
+                    <span
+                        onclick="
+                removeLabel({{ $order['id']}}, {{ $label['id'] }}, {{ $label['manual_label_selection_to_add_after_removal'] }}, 'null', {{$label['timed']}})"
+                        class="label-wrapper"
+                        style="cursor: pointer"
+                        onmouseover="showLabelName(this, '{{ $label['name'] }}', '{{ $label['created_at'] }}')"
+                        onmouseout="hideLabelName(this)"
+                    >
+                <i class="{{ $label['icon_name'] }}" style="font-size: 30px; background-color: {{ $label['color'] }}; color: #ffffff; padding: 10px;"></i>
+                <div class="label-popup"></div>
+            </span>
+                @endforeach
+            @endif
+        </div>
 
     @if($labelGroupName === 'produkcja')
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->contact_person ?? '' }}
