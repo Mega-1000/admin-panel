@@ -40,8 +40,12 @@
                     numer telefonu: {{ Order::find($order['id'])->warehouse->property->phone }}
                     <hr>
                 @endforeach
-
             </h5>
+            <hr>
+            @foreach(\App\Entities\BuyingInvoice::where('order_id', $order->id)->get())
+                Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
+                <hr>
+            @endforeach
         </div>
         <h6>Załącz potwierdzenie przelewu</h6>
         <form action="{{ route('store-payment-confirmation', $order['id']) }}" method="post" enctype="multipart/form-data">

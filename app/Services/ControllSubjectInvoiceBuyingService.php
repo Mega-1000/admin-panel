@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\DTO\ControllSubjectInvoice\ControllSubjectInvoiceDTO;
+use App\Entities\BuyingInvoice;
 use App\Entities\Order;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 
 class ControllSubjectInvoiceBuyingService
 {
+    public array $orders = [];
+
     /**
      * @param array<ControllSubjectInvoiceDTO> $data
      * @return void
@@ -17,6 +20,22 @@ class ControllSubjectInvoiceBuyingService
     {
         foreach ($data as $orderNotes) {
             $this->handleSingle($orderNotes);
+        }
+
+        foreach ($this->orders as $order) {
+            $totalItemsCost = $order->items->sum(function ($item) {
+                return $item->quantity * $item->net_purchase_price_commercial_unit_after_discounts;
+            });
+
+            $totalGross = BuyingInvoice::where('order_id', $order->id)->sum('value');
+
+            if ($order->labels->contains('id', 65) && $totalGross == $totalItemsCost) {
+                AddLabelService::addLabels($order, [264], $arr, []);
+                RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
+            } else {
+                AddLabelService::addLabels($order, [263], $arr, []);
+                RemoveLabelService::removeLabels($order, [264], $arr , [], auth()->id());
+            }
         }
     }
 
@@ -30,44 +49,21 @@ class ControllSubjectInvoiceBuyingService
         return $grouped;
     }
 
-    private function handleSingle(array $orderNotes): void
+    private function handleSingle(ControllSubjectInvoiceDTO $orderNotes): void
     {
-        dd($orderNotes);
-        $buyingInvooice = new BuyingInvoice();
-        $buyingInvooice->order_id = $orderNotes;
-        $buyingInvooice->value = $orderNotes;
-        $buyingInvooice->invoice_number = $orderNotes->gross;
-        $buyingInvooice->save();
-
-
         $order = Order::find($orderNotes);
-        $arr = [];
 
-        if (!$order) {
+        if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('value', $orderNotes->number)->exists()) {
             return;
         }
 
-        $sumOfPurchase = 0;
-        $items = $order->items;
+        $buyingInvooice = new BuyingInvoice();
+        $buyingInvooice->order_id = $order->id;
+        $buyingInvooice->value = $orderNotes->gross;
+        $buyingInvooice->invoice_number = $orderNotes->number;
+        $buyingInvooice->save();
 
-        foreach ($items as $item) {
-            $pricePurchase = $item['net_purchase_price_commercial_unit_after_discounts'] ?? 0;
-            $quantity = $item['quantity'] ?? 0;
-            $sumOfPurchase += floatval($pricePurchase) * intval($quantity);
-        }
-        $totalItemsCost = round($sumOfPurchase * 1.23, 2) + $order->shipment_price_for_us;
 
-        $totalGross = 0;
-        foreach ($invoices as $invoice) {
-            $totalGross += (float)str_replace(' ', '', $invoice->gross);
-        }
-
-        if ($order->labels->contains('id', 65) && $totalGross == $totalItemsCost) {
-            AddLabelService::addLabels($order, [264], $arr, []);
-            RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
-        } else {
-            AddLabelService::addLabels($order, [263], $arr, []);
-            RemoveLabelService::removeLabels($order, [264], $arr , [], auth()->id());
-        }
+        $this->orders[] = $order;
     }
 }
