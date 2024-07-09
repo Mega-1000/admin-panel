@@ -163,7 +163,7 @@
                 removeLabel({{ $order['id']}}, {{ $label['id'] }}, {{ $label['manual_label_selection_to_add_after_removal'] }}, 'null', {{$label['timed']}})"
                         class="label-wrapper"
                         style="cursor: pointer"
-                        onmouseover="showLabelName(this, '{{ $label['name'] }} {{ $label['created_at'] }}', '{{ $label['created_at'] }}')"
+                        onmouseover="showLabelName(this, '{{ $label['name'] }}, '{{ $label['created_at'] }}')"
                         onmouseout="hideLabelName(this)"
                     >
                 <i class="{{ $label['icon_name'] }}" style="font-size: 30px; background-color: {{ $label['color'] }}; color: #ffffff; padding: 10px;"></i>
