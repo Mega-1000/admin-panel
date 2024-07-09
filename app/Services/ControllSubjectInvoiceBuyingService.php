@@ -62,7 +62,7 @@ if (!$order) {
             return;
         }
 
-        dd((int)$orderNotes->gross);
+        dd($orderNotes->gross);
 
         $buyingInvooice = new BuyingInvoice();
         $buyingInvooice->order_id = $order->id;
