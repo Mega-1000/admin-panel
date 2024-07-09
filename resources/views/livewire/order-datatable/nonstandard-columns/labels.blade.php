@@ -31,7 +31,9 @@
                     <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
 
                     Dane osoby obsługującej:
+                    <br>
                     email: {{ Order::find($orderId)->warehouse->warehouse_email }}
+                    <br>
                     numer telefonu: {{ Order::find($orderId)->warehouse->warehouse_email }}
                 @endforeach
 
