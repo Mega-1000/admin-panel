@@ -32,9 +32,9 @@
 
                     Dane osoby obsługującej:
                     <br>
-                    email: {{ Order::find($orderId)->warehouse->warehouse_email }}
+                    email: {{ Order::find($order['id'])->warehouse->warehouse_email }}
                     <br>
-                    numer telefonu: {{ Order::find($orderId)->warehouse->warehouse_email }}
+                    numer telefonu: {{ Order::find($order['id'])->warehouse->warehouse_email }}
                 @endforeach
 
             </h5>
