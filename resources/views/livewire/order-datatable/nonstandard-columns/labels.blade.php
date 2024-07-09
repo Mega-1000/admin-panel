@@ -42,7 +42,7 @@
                 @endforeach
             </h5>
             <hr>
-            @foreach(\App\Entities\BuyingInvoice::where('order_id', $order->id)->get() as $invoice)
+            @foreach(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->get() as $invoice)
                 Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
                 <hr>
             @endforeach
