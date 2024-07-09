@@ -37,7 +37,7 @@
                     <br>
                     email: {{ Order::find($order['id'])->warehouse->warehouse_email }}
                     <br>
-                    numer telefonu: {{ Order::find($order['id'])->warehouse->phone }}
+                    numer telefonu: {{ Order::find($order['id'])->warehouse->property->phone }}
                     <hr>
                 @endforeach
 
