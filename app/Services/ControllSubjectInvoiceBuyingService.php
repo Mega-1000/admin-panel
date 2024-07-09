@@ -53,6 +53,10 @@ class ControllSubjectInvoiceBuyingService
     {
         $order = Order::find(preg_replace('/\D/', '', $orderNotes->notes ));
 
+if (!$order) {
+            return;
+        }
+
         if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('value', $orderNotes->number)->exists()) {
             return;
         }
