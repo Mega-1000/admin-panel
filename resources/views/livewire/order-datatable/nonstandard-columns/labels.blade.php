@@ -29,6 +29,10 @@
 
                 @foreach($paymentConfirmations as $paymentConfirmation)
                     <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
+
+                    Dane osoby obsługującej:
+                    email: {{ Order::find($orderId)->warehouse->warehouse_email }}
+                    numer telefonu: {{ Order::find($orderId)->warehouse->warehouse_email }}
                 @endforeach
 
             </h5>
