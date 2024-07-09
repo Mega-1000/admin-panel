@@ -2,7 +2,9 @@
 
 namespace App\Entities;
 
-class BuyingInvoice
+use Illuminate\Database\Eloquent\Model;
+
+class BuyingInvoice extends Model
 {
 
 }
