@@ -22,18 +22,26 @@ class ControllSubjectInvoiceBuyingService
             $this->handleSingle($orderNotes);
         }
 
-        $orders = Order::whereHas('labels', function ($query) {
-            $query->where('labels.id', 263);
-        })->get();
+        $orders = Order::whereHas('labels', function ($query) {$query->where('labels.id', 263);})->get();
+
 
         foreach ($orders as $order) {
-            $totalItemsCost = $order->items->sum(function ($item) {
-                return $item->quantity * $item->net_purchase_price_commercial_unit_after_discounts;
-            });
+
+            $sumOfPurchase = 0;
+
+            foreach ($order->items as $item) {
+                $pricePurchase = $item['net_purchase_price_commercial_unit_after_discounts'] ?? 0;
+                $quantity = $item['quantity'] ?? 0;
+                $sumOfPurchase += floatval($pricePurchase) * intval($quantity);
+            }
+
+            $totalItemsCost = $sumOfPurchase * 1.23;
+            $transportCost = $order->shipment_price_for_us;
+
+            $totalItemsCost += $transportCost;
 
             $totalGross = BuyingInvoice::where('order_id', $order->id)->sum('value');
             $arr = [];
-
 
             if ($order->labels->contains('id', 65) && $totalGross == $totalItemsCost) {
                 AddLabelService::addLabels($order, [264], $arr, []);
