@@ -578,22 +578,22 @@ class AuctionsController extends Controller
                 [
                     $product->toArray() + [
                         'amount' => $quantity,
-                        'gross_selling_price_commercial_unit' => dd($offer?->basic_price_gross ?? $product->gross_selling_price_commercial_unit)
+                        'gross_selling_price_commercial_unit' => dd($offer?->basic_price_gross ?? $product->price->gross_selling_price_commercial_unit)
                     ],
                 ],
                 false
             );
 
             $item = $order->items()->where('order_id', $order->id)->where('product_id', $product->id)->first();
-            $item->gross_selling_price_commercial_unit = ($offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_basic_unit) * $product->packing->numbers_of_basic_commercial_units_in_pack;
-            $item->net_selling_price_basic_unit = $offer?->basic_price_net ?? $product->gross_selling_price_basic_unit / 1.23;
-            $item->gross_selling_price_basic_unit = $offer?->basic_price_net * 1.23 ?? $product->gross_selling_price_basic_unit;
-            $item->net_selling_price_commercial_unit = ($offer?->basic_price_net ?? $product->gross_selling_price_basic_unit / 1.23) * $product->packing->numbers_of_basic_commercial_units_in_pack;
+            $item->gross_selling_price_commercial_unit = ($offer?->basic_price_net * 1.23 ?? $product->price->gross_selling_price_basic_unit) * $product->packing->numbers_of_basic_commercial_units_in_pack;
+            $item->net_selling_price_basic_unit = $offer?->basic_price_net ?? $product->price->gross_selling_price_basic_unit / 1.23;
+            $item->gross_selling_price_basic_unit = $offer?->basic_price_net * 1.23 ?? $product->price->gross_selling_price_basic_unit;
+            $item->net_selling_price_commercial_unit = ($offer?->basic_price_net ?? $product->price->gross_selling_price_basic_unit / 1.23) * $product->packing->numbers_of_basic_commercial_units_in_pack;
 
-            $base_price_net = ($offer?->basic_price_net ?? $product->gross_selling_price_basic_unit / 1.23) - 1;
+            $base_price_net = ($offer?->basic_price_net ?? $product->price->gross_selling_price_basic_unit / 1.23) - 1;
 
             $item->net_purchase_price_basic_unit = $base_price_net;
-            $item->net_purchase_price_commercial_unit = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
+            $item->net_purchase_price_commercial_unit = $base_price_net * $product->price->packing->numbers_of_basic_commercial_units_in_pack;
             $item->net_purchase_price_commercial_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
             $item->net_purchase_price_basic_unit_after_discounts = $base_price_net;
             $item->net_purchase_price_calculated_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
