@@ -27,7 +27,7 @@
 @endphp
 
 @if(!is_array($order) && $order->chat->auctions->count() > 0)
-    <a href="/admin/auction/{{ $order->chat->auctions->first()->id }}" class="btn btn-sm btn-primary">
+    <a href="/auctions/{{ $order->chat->auctions->first()->id }}/end" class="btn btn-sm btn-primary">
         <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>
     </a>
 @endif
