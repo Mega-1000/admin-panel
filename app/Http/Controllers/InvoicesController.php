@@ -89,6 +89,7 @@ class InvoicesController extends Controller
 
     public function deleteBuying(BuyingInvoice $invoice): RedirectResponse
     {
+        dd($invoice);
         $invoice->delete();
 
         return redirect()->back();
