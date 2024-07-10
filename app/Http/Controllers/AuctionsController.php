@@ -639,6 +639,10 @@ class AuctionsController extends Controller
             "Dzień dobry, rozpocząłeś realizacje zamówienia na platformie eph polska. Prosimy o opłacenie faktury proformy pod następującym linkiem: https://mega1000.pl/payment?token=$order->token&total={$order->getValue()}&credentials={$order->customer->login}:{$order->customer->phone}",
         );
 
+        if ($order->getValue() !== $request->get('totalPrice') + 50) {
+            AddLabelService::addLabels($order, [269], $arr, [], null);
+        }
+
 
         Mailer::create()
             ->to($order->customer->login)
