@@ -64,7 +64,7 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
 
 @foreach(\App\Entities\BuyingInvoice::where('order_id', $id)->get() as $invoice)
     Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
-    <a class="btn btn-danger" href="/delete-buying-invoice/{{ $invoice->id }}">
+    <a class="btn btn-danger" href="/admin/delete-buying-invoice/{{ $invoice->id }}">
         Usuń fakturę
     </a>
     <hr>
