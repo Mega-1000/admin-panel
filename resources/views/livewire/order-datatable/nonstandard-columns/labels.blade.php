@@ -41,19 +41,6 @@
                     <hr>
                 @endforeach
             </h5>
-            <hr>
-            @if(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->first())
-                Faktury zakupu:
-                <br>
-            @endif
-
-            @foreach(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->get() as $invoice)
-                Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
-                <a class="btn btn-danger" href="/delete-buying-invoice/{{ $invoice->id }}">
-                    Usuń fakturę
-                </a>
-                <hr>
-            @endforeach
         </div>
         <h6>Załącz potwierdzenie przelewu</h6>
         <form action="{{ route('store-payment-confirmation', $order['id']) }}" method="post" enctype="multipart/form-data">

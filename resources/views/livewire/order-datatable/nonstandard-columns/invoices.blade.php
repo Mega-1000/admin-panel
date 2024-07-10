@@ -50,6 +50,21 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
     @endphp
 
 @endif
+<hr>
+<hr>
+@if(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->first())
+    Faktury zakupu:
+    <br>
+@endif
+
+@foreach(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->get() as $invoice)
+    Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
+    <a class="btn btn-danger" href="/delete-buying-invoice/{{ $invoice->id }}">
+        Usuń fakturę
+    </a>
+    <hr>
+@endforeach
+<hr>
 
 @php
     if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
