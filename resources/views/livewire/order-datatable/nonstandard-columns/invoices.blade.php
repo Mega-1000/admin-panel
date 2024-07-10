@@ -65,4 +65,4 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
 @endforeach
 <hr>
 
-<a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $id }}/wyslij-fakture">Dodaj</a>
+<a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $id }}/wyslij-fakture" target="_blank">Dodaj</a>
