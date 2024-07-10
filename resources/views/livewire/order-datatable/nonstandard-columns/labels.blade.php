@@ -42,8 +42,15 @@
                 @endforeach
             </h5>
             <hr>
+            @if(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->first())
+                Faktury zakupu:
+                <br>
+            @endif
             @foreach(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->get() as $invoice)
                 Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
+                <button class="btn btn-danger">
+                    Usuń fakturę
+                </button>
                 <hr>
             @endforeach
         </div>

@@ -54,11 +54,11 @@ class ControllSubjectInvoiceBuyingService
     {
         $order = Order::find(preg_replace('/\D/', '', $orderNotes->notes ));
 
-if (!$order) {
+        if (!$order) {
             return;
         }
 
-        if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('value', $orderNotes->number)->exists()) {
+        if (BuyingInvoice::where('invoice_number', $orderNotes->number)) {
             return;
         }
 
@@ -67,6 +67,8 @@ if (!$order) {
         $buyingInvooice->value = (float)str_replace(',', '.', str_replace(' ', '', $orderNotes->gross));
         $buyingInvooice->invoice_number = $orderNotes->number;
         $buyingInvooice->save();
+
+        echo $order->id;
 
 
         $this->orders[] = $order;
