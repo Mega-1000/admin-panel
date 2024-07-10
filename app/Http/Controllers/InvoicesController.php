@@ -87,7 +87,7 @@ class InvoicesController extends Controller
         return redirect()->back();
     }
 
-    public function deleteBuyingInvoice(): RedirectResponse
+    public function deleteBuying(): RedirectResponse
     {
         BuyingInvoice::find(request()->query('id'))->delete();
 
