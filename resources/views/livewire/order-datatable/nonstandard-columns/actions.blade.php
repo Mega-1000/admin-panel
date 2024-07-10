@@ -24,9 +24,9 @@
 
 @php
     if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
-          $id = $matches[1];
-      }
-    $order = Order::find($id);
+        $id = $matches[1];
+        $order = App\Entities\Order::find($id);
+    }
 @endphp
 
 @if($order->chat->auctions->count() > 0)
