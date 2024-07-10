@@ -58,7 +58,6 @@ class InvoicesController extends Controller
             $arr = [];
             AddLabelService::addLabels($order, [263], $arr, []);
 
-
             return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
         } catch (\Exception $exception) {
             error_log(print_r($exception->getMessage(), 1));
