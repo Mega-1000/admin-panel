@@ -746,7 +746,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/create-package-product-order/{order}', [PackageProductOrderController::class, 'store'])
         ->name('storePackageProductOrder');
 
-    Route::get('/delete-buying-invoice/{buyingInvoice}', [InvoicesController::class, 'deleteBuying'])
+    Route::get('/delete-buying-invoice/{id}', [InvoicesController::class, 'deleteBuying'])
         ->name('deleteBuyingInvoice');
 
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
