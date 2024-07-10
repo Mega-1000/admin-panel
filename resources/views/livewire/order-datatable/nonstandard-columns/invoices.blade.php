@@ -50,14 +50,19 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
     @endphp
 
 @endif
-<hr>
-<hr>
 @if(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->first())
+    <hr>
     Faktury zakupu:
     <br>
 @endif
 
-@foreach(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->get() as $invoice)
+@php
+    if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
+          $id = $matches[1];
+      }
+@endphp
+
+@foreach(\App\Entities\BuyingInvoice::where('order_id', $id)->get() as $invoice)
     Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
     <a class="btn btn-danger" href="/delete-buying-invoice/{{ $invoice->id }}">
         Usuń fakturę
@@ -65,11 +70,5 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
     <hr>
 @endforeach
 <hr>
-
-@php
-    if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
-          $id = $matches[1];
-      }
-@endphp
 
 <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $id }}/wyslij-fakture">Dodaj</a>
