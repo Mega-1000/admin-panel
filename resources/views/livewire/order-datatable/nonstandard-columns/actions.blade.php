@@ -26,7 +26,7 @@
     $order = App\Entities\Order::find($order['id']);
 @endphp
 
-@if(!is_array($order) && $order->chat->auctions->count() > 0)
+@if(!is_array($order) && $order?->chat?->auctions?->count() > 0)
     <a target="__blank" href="/auctions/{{ $order->chat->auctions->first()->id }}/end" class="btn btn-sm btn-success">
         <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>
     </a>
