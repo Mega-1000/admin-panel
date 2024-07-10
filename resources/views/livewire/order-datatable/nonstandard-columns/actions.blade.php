@@ -20,7 +20,14 @@
     <i class="glyphicon glyphicon-share-alt"></i>
     <span class="hidden-xs hidden-sm">Zwrot</span>
 </a>
-<br></br>
+<br>
+
+@if($order['chat']['auctions'][0])
+    <a href="/admin/auction/{{ $order['chat']['auctions'][0]['id'] }}" class="btn btn-sm btn-primary">
+        <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>
+    </a>
+@endif
+
 @php
     $messagesHelper = new App\Helpers\MessagesHelper();
     $order['id'] = $order['id'] ?? 0;
