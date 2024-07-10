@@ -22,14 +22,15 @@
 </a>
 <br>
 
+{{ dd($order['id']) }}
 @php
     if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
-        $id = $matches[1];
+        $id = $matches[0];
         $order = App\Entities\Order::find($id);
     }
 @endphp
 
-@if($order->chat->auctions->count() > 0)
+@if(!is_array($order) && $order->chat->auctions->count() > 0)
     <a href="/admin/auction/{{ $order->chat->auctions->first()->id }}" class="btn btn-sm btn-primary">
         <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>
     </a>
