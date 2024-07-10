@@ -22,12 +22,8 @@
 </a>
 <br>
 
-{{ dd($order['id']) }}
 @php
-    if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
-        $id = $matches[0];
-        $order = App\Entities\Order::find($id);
-    }
+    $order = App\Entities\Order::find($order['id']);
 @endphp
 
 @if(!is_array($order) && $order->chat->auctions->count() > 0)
