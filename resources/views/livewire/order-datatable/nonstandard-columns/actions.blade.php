@@ -22,7 +22,7 @@
 </a>
 <br>
 
-@if($order['chat']['auctions'][0])
+@if($order['chat']['auctions'])
     <a href="/admin/auction/{{ $order['chat']['auctions'][0]['id'] }}" class="btn btn-sm btn-primary">
         <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>
     </a>
