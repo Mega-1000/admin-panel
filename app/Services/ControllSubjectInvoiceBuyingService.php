@@ -58,7 +58,7 @@ class ControllSubjectInvoiceBuyingService
             return;
         }
 
-        if (BuyingInvoice::where('invoice_number', $orderNotes->number)) {
+        if (BuyingInvoice::where('invoice_number', $orderNotes->number)->exists()) {
             return;
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\BuyingInvoice;
 use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\SubiektInvoices;
@@ -82,6 +83,13 @@ class InvoicesController extends Controller
     public function delete(): RedirectResponse
     {
         OrderInvoice::find(request()->query('id'))->delete();
+
+        return redirect()->back();
+    }
+
+    public function deleteBuyingInvoice(): RedirectResponse
+    {
+        BuyingInvoice::find(request()->query('id'))->delete();
 
         return redirect()->back();
     }

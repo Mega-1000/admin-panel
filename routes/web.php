@@ -16,6 +16,7 @@ use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\FirmRepresentController;
+use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\OrderDatatableColumnsManagementController;
 use App\Entities\OrderPackage;
 use App\Http\Controllers\AddLabelsCSVController;
@@ -744,6 +745,9 @@ Route::group(['prefix' => 'admin'], function () {
         ->name('createPackageProductOrder');
     Route::post('/create-package-product-order/{order}', [PackageProductOrderController::class, 'store'])
         ->name('storePackageProductOrder');
+
+    Route::get('/delete-buying-invoice/{buyingInvoice}', [InvoicesController::class, 'deleteBuying'])
+        ->name('deleteBuyingInvoice');
 
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
