@@ -1,4 +1,4 @@
-{{--<button wire:click="setOrderToMove({{ $order['id'] }})" class="btn btn-secondary w-100">--}}
+<button wire:click="setOrderToMove({{ $order['id'] }})" class="btn btn-secondary w-100">
     Rozpocznij przenoszenie
 </button>
 
