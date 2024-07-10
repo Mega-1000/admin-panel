@@ -1,4 +1,4 @@
-<button wire:click="setOrderToMove({{ $order['id'] }})" class="btn btn-secondary w-100">
+{{--<button wire:click="setOrderToMove({{ $order['id'] }})" class="btn btn-secondary w-100">--}}
     Rozpocznij przenoszenie
 </button>
 
@@ -22,11 +22,11 @@
 </a>
 <br>
 
-@if($order['chat']['auctions'])
-    <a href="/admin/auction/{{ $order['chat']['auctions'][0]['id'] }}" class="btn btn-sm btn-primary">
-        <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>
-    </a>
-@endif
+{{--@if($order['chat']['auctions'][0])--}}
+{{--    <a href="/admin/auction/{{ $order['chat']['auctions'][0]['id'] }}" class="btn btn-sm btn-primary">--}}
+{{--        <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>--}}
+{{--    </a>--}}
+{{--@endif--}}
 
 @php
     $messagesHelper = new App\Helpers\MessagesHelper();
