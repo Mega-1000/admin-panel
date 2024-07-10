@@ -26,7 +26,6 @@ class ControllSubjectInvoiceBuyingService
 
 
         foreach ($orders as $order) {
-
             $sumOfPurchase = 0;
 
             foreach ($order->items as $item) {
@@ -43,7 +42,7 @@ class ControllSubjectInvoiceBuyingService
             $totalGross = BuyingInvoice::where('order_id', $order->id)->sum('value');
             $arr = [];
 
-            if ($order->labels->contains('id', 65) && $totalGross == $totalItemsCost) {
+            if ($order->labels->contains('id', 65) && $totalGross == round($totalItemsCost, 2)) {
                 AddLabelService::addLabels($order, [264], $arr, []);
                 RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
             } else {
