@@ -50,17 +50,11 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
     @endphp
 
 @endif
-@if(\App\Entities\BuyingInvoice::where('order_id', $order['id'])->first())
+@if(\App\Entities\BuyingInvoice::where('order_id', $id)->first())
     <hr>
     Faktury zakupu:
     <br>
 @endif
-
-@php
-    if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
-          $id = $matches[1];
-      }
-@endphp
 
 @foreach(\App\Entities\BuyingInvoice::where('order_id', $id)->get() as $invoice)
     Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN

@@ -22,11 +22,18 @@
 </a>
 <br>
 
-{{--@if($order['chat']['auctions'][0])--}}
-{{--    <a href="/admin/auction/{{ $order['chat']['auctions'][0]['id'] }}" class="btn btn-sm btn-primary">--}}
-{{--        <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>--}}
-{{--    </a>--}}
-{{--@endif--}}
+@php
+    if (preg_match('/taskOrder-(\d+)/', $order['id'], $matches)) {
+          $id = $matches[1];
+      }
+    $order = Order::find($id);
+@endphp
+
+@if($order->chat->auctions->count() > 0)
+    <a href="/admin/auction/{{ $order->chat->auctions->first()->id }}" class="btn btn-sm btn-primary">
+        <span class="hidden-xs hidden-sm">Zobacz tabelę aukcji</span>
+    </a>
+@endif
 
 @php
     $messagesHelper = new App\Helpers\MessagesHelper();
