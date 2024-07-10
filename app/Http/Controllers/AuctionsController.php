@@ -593,7 +593,7 @@ class AuctionsController extends Controller
             $base_price_net = ($offer?->basic_price_net ?? $product->price->gross_selling_price_basic_unit / 1.23) - 1;
 
             $item->net_purchase_price_basic_unit = $base_price_net;
-            $item->net_purchase_price_commercial_unit = $base_price_net * $product->price->packing->numbers_of_basic_commercial_units_in_pack;
+            $item->net_purchase_price_commercial_unit = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
             $item->net_purchase_price_commercial_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
             $item->net_purchase_price_basic_unit_after_discounts = $base_price_net;
             $item->net_purchase_price_calculated_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
