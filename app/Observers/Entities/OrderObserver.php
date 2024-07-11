@@ -14,9 +14,11 @@ use App\Jobs\calculateLabelsForOrder;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\FireProductPacketJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
+use App\Repositories\OrderRepository;
 use App\Repositories\StatusRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
+use App\Services\LabelService;
 use App\Services\OrderPaymentLabelsService;
 use App\Services\OrderService;
 use Carbon\Carbon;
@@ -33,6 +35,8 @@ readonly class OrderObserver
         protected OrderService                 $orderService,
         protected OrderPackagesCalculator      $orderPackagesCalculator,
         protected OrderDepositPaidCalculator   $orderDepositPaidCalculator,
+        protected LabelService                 $labelService,
+        protected OrderRepository              $orderRepository,
     ) {}
 
     /**
@@ -48,12 +52,6 @@ readonly class OrderObserver
         $orderReturnGoods = round($this->orderRepository->getOrderReturnGoods($order), 2);
 
         $arr = [];
-
-        if ($calculateRelated) {
-            foreach ($this->orderRepository->getAllRelatedOrders($order) as $relatedOrder) {
-                $this->calculateLabels($relatedOrder, false);
-            }
-        }
 
         $relatedPaymentsValue -= $orderReturnGoods;
 
@@ -73,12 +71,6 @@ readonly class OrderObserver
 
 
         $labels = $order->labels()->get()->pluck('id')->toArray();
-
-        $labelsToCheck = [52, 53, 54, 114, 47, 48, 96, 149, 49, 50, 195, 121];
-
-        $labelsToCheck = array_diff($labelsToCheck, $labels);
-
-
         $order->token = Str::random(32);
         $order->save();
 
