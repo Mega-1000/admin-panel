@@ -82,7 +82,7 @@ class OrdersRecalculatorBasedOnPeriod
             if ($orderItemsValueWithTransport !== $totalPaymentsBuying) {
                 AddLabelService::addLabels($order, [258], $arr, []);
             } else {
-                RemoveLabelService::removeLabels($order, [258],  $arr, [], []);
+                RemoveLabelService::removeLabels($order, [258],  $arr, [], Auth::user()?->id);
             }
         }
     }
