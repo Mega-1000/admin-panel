@@ -7,11 +7,14 @@ use App\DTO\PayInImport\BankPayInDTO;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
+use App\Entities\WorkingEvents;
+use App\Enums\OrderPaymentLogTypeEnum;
 use App\Enums\OrderPaymentsEnum;
 use App\Enums\OrderTransactionEnum;
 use App\Factory\BankPayInDTOFactory;
 use App\Factory\PayInDTOFactory;
 use App\Helpers\Exceptions\ChatException;
+use App\Helpers\PriceHelper;
 use App\Http\Controllers\CreateTWSOOrdersDTO;
 use App\Repositories\FileInvoiceRepository;
 use App\Repositories\OrderPayments;
@@ -20,8 +23,10 @@ use App\Services\FindOrCreatePaymentForPackageService;
 use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
 use App\Services\OrderPaymentLabelsService;
+use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use App\Services\OrderService;
+use App\Services\WorkingEventsService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -291,6 +296,7 @@ class ImportBankPayIn implements ShouldQueue
      * @param false $declaredSum
      * @param string $operationType
      * @return Model
+     * @throws Exception
      */
     private function saveOrderPayment(Order $order, float $paymentAmount, BankPayInDTO $payIn, $declaredSum = false, string $operationType): Model
     {
@@ -322,6 +328,26 @@ class ImportBankPayIn implements ShouldQueue
                 'operation_type' => $operationType,
                 'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]) : $payment;
+
+        if (!empty($order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->first())) {
+            if ($order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum'))) {
+                $declaredDay = $order->dates->warehouse_delivery_date_to ?? $order->dates->customer_delivery_date_to ?? now()->addDay();
+
+                $payment = $order->payments()->create([
+                    'amount' => $order->getValue() - ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')),
+                    'type' => 'CLIENT',
+                    'payer' => $payer,
+                    'promise' => true,
+                    'promise_date' => $declaredDay,
+                    'operation_date' => $payIn->data_ksiegowania,
+                    'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
+                    'comments' => 'Deklaracja wpłaty na styropian stworzona automatycznie',
+                    'operation_type' => $operationType,
+                    'status' => 'Deklaracja wpłaty',
+                ]);
+            }
+        }
+
 
         if ($order->preferred_invoice_date) {
             $order->preferred_invoice_date = $payIn->data_ksiegowania;
