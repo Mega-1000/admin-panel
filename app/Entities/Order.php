@@ -751,6 +751,17 @@ class Order extends Model implements Transformable
         return round($totalOfProductsPrices, 2);
     }
 
+    public function getItemsGrossValueForUs(): float
+    {
+        $totalOfProductsPrices = 0;
+
+        foreach ($this->items as $item) {
+            $totalOfProductsPrices += $item->gross_buying_price_commercial_unit * intval($item->quantity);
+        }
+
+        return round($totalOfProductsPrices, 2);
+    }
+
     public function getOrderProfit(): float
     {
         $orderProfit = 0;
