@@ -114,7 +114,7 @@ readonly class OrderObserver
         $totalGross = BuyingInvoice::where('order_id', $order->id)->sum('value');
         $arr = [];
 
-        if ($order->labels->contains('id', 65) && $totalGross == round($totalItemsCost, 2)) {
+        if ($totalGross == round($totalItemsCost, 2)) {
             AddLabelService::addLabels($order, [264], $arr, []);
             RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
         } else {
