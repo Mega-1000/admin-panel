@@ -756,7 +756,7 @@ class Order extends Model implements Transformable
         $totalOfProductsPrices = 0;
 
         foreach ($this->items as $item) {
-            $totalOfProductsPrices += $item->net_purchase_price_basic_unit * intval($item->quantity);
+            $totalOfProductsPrices += (float)$item->net_purchase_price_basic_unit * intval($item->quantity);
         }
 
         return round($totalOfProductsPrices, 2);
