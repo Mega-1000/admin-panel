@@ -327,7 +327,7 @@ class OrderService
 
         $arr = [];
 
-        AddLabelService::addLabels($order, [236], $arr, [], Auth::user()?->id);
+//        AddLabelService::addLabels($order, [236], $arr, [], Auth::user()?->id);
     }
 
     public function handleReferral(?int $idOfParrentUser, ?string $newCustomerWitchWasRefferedLogin): void
