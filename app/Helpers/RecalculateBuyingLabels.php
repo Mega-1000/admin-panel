@@ -11,7 +11,7 @@ class RecalculateBuyingLabels
 {
     public static function recalculate(Order $order): void
     {
-        if (empty($order->invoices->first())) {
+        if (empty(BuyingInvoice::where('order_id', $order->id)->first())) {
             return;
         }
 
@@ -31,7 +31,6 @@ class RecalculateBuyingLabels
         $totalGross = BuyingInvoice::where('order_id', $order->id)->sum('value');
         $arr = [];
 
-        dd($totalGross, round($totalItemsCost, 2));
         if ($totalGross == round($totalItemsCost, 2)) {
             AddLabelService::addLabels($order, [264], $arr, []);
             RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
