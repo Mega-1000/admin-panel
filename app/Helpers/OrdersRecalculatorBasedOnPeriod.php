@@ -79,7 +79,7 @@ class OrdersRecalculatorBasedOnPeriod
 
         if ($order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->first()) {
             $arr = [];
-            if (dd($orderItemsValueWithTransport != $totalPaymentsBuying, $orderItemsValueWithTransport, $totalPaymentsBuying)) {
+            if (round($orderItemsValueWithTransport, 2) != round($totalPaymentsBuying, 2)) {
                 AddLabelService::addLabels($order, [258], $arr, []);
             } else {
                 RemoveLabelService::removeLabels($order, [258],  $arr, [], Auth::user()?->id);
