@@ -11,6 +11,7 @@ use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderLabelHelper;
 use App\Helpers\PriceHelper;
+use App\Helpers\RecalculateBuyingLabels;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 use App\Http\Requests\Api\OrderWarehouseNotification\DenyShipmentRequest;
@@ -156,6 +157,8 @@ class OrderWarehouseNotificationController extends Controller
                     'invoice_name' => $filename,
                     'is_visible_for_client' => (boolean)$request->isVisibleForClient,
                 ]);
+
+                RecalculateBuyingLabels::recalculate($order);
 
 
                 $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
