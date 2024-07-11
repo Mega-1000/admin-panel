@@ -231,63 +231,68 @@ class OrderWarehouseNotificationController extends Controller
         $promiseDate = Carbon::create($request->get('declared_date'));
         $payer = $order->customer->login;
 
-        if ($order->payments->sum('declared_sum') !== 0) {
-            $orderPayment = app(OrderPaymentService::class)->payOrder($order->id, $request->input('declared_sum', '0'), $payer,
-                null, true,
-                false, $promiseDate,
-                $type, false,
-            );
-            $orderPayment->deletable = true;
-            $orderPayment->save();
 
-            $orderPaymentAmount = (float)PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
-            $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
+        if ($order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum'))) {
+            if ($order->payments->sum('declared_sum') !== 0) {
+                $orderPayment = app(OrderPaymentService::class)->payOrder($order->id, $request->input('declared_sum', '0'), $payer,
+                    null, true,
+                    false, $promiseDate,
+                    $type, false,
+                );
+                $orderPayment->deletable = true;
+                $orderPayment->save();
 
-            app(OrderPaymentLogService::class)->create(
-                $order->id,
-                $orderPayment->id,
-                $orderPayment->order->customer_id,
-                $orderPaymentsSum,
-                $orderPaymentAmount,
-                $request->input('created_at') ?: Carbon::now(),
-                $request->input('notices') ?: '',
-                $request->input('declared_sum', '0') ?? '0',
-                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
-                true,
-            );
+                $orderPaymentAmount = (float)PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
+                $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
+
+                app(OrderPaymentLogService::class)->create(
+                    $order->id,
+                    $orderPayment->id,
+                    $orderPayment->order->customer_id,
+                    $orderPaymentsSum,
+                    $orderPaymentAmount,
+                    $request->input('created_at') ?: Carbon::now(),
+                    $request->input('notices') ?: '',
+                    $request->input('declared_sum', '0') ?? '0',
+                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                    true,
+                );
+            }
+
+            if ($order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum'))) {
+                WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
+                $type = $request->input('payment-type');
+                $promiseDate = Carbon::create($shipmentDateTo);
+
+                $orderPayment = app(OrderPaymentService::class)->payOrder(
+                    $order->id, $order->getValue() - $order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')),
+                    $payer,
+                    null, true,
+                    false, $promiseDate,
+                    $type, false,
+                );
+                $orderPayment->deletable = true;
+                $orderPayment->save();
+
+                $orderPaymentAmount = (float)PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
+                $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
+
+                app(OrderPaymentLogService::class)->create(
+                    $order->id,
+                    $orderPayment->id,
+                    $orderPayment->order->customer_id,
+                    $orderPaymentsSum,
+                    $orderPaymentAmount,
+                    $request->input('created_at') ?: Carbon::now(),
+                    $request->input('notices') ?: '',
+                    $request->input('declared_sum', '0') ?? '0',
+                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                    true,
+                );
+            }
         }
 
-        if ($order->payments->sum('declared_sum') !== $order->getValue()) {
-            WorkingEventsService::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order->id);
-            $type = $request->input('payment-type');
-            $promiseDate = Carbon::create($shipmentDateTo);
 
-            $orderPayment = app(OrderPaymentService::class)->payOrder(
-                $order->id, $order->getValue() - $order->payments->sum('declared_sum'),
-                $payer,
-                null, true,
-                false, $promiseDate,
-                $type, false,
-            );
-            $orderPayment->deletable = true;
-            $orderPayment->save();
-
-            $orderPaymentAmount = (float)PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
-            $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
-
-            app(OrderPaymentLogService::class)->create(
-                $order->id,
-                $orderPayment->id,
-                $orderPayment->order->customer_id,
-                $orderPaymentsSum,
-                $orderPaymentAmount,
-                $request->input('created_at') ?: Carbon::now(),
-                $request->input('notices') ?: '',
-                $request->input('declared_sum', '0') ?? '0',
-                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
-                true,
-            );
-        }
         $order->warehouse_id = Warehouse::where('symbol', $request->input('warehouse-symbol'))->first()->id;
         $order->save();
 
