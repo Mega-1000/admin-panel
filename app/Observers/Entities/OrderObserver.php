@@ -123,6 +123,7 @@ readonly class OrderObserver
 
     public function updated(Order $order): void
     {
+        dd('okej');
         OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
 
         if (empty($order->invoices->first())) {
