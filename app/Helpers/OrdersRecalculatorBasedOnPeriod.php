@@ -77,7 +77,7 @@ class OrdersRecalculatorBasedOnPeriod
         $orderItemsValueWithTransport = $order->getItemsGrossValueForUs() + $order->shipment_price_for_us;
         $totalPaymentsBuying = $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount');
 
-        dd($orderItemsValueWithTransport != $totalPaymentsBuying, $orderItemsValueWithTransport, $totalPaymentsBuying);
+        dd(round($orderItemsValueWithTransport, 2) != round($totalPaymentsBuying, 2), $orderItemsValueWithTransport, $totalPaymentsBuying);
         if ($order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->first()) {
             $arr = [];
             if ($orderItemsValueWithTransport !== $totalPaymentsBuying) {
