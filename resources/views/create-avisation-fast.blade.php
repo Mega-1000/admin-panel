@@ -14,7 +14,7 @@
                     <form action="{{ route('storeAvisation', $order->id) }}" method="POST">
                         @csrf
 
-                        Kwota wpłaty
+                        Podaj kwotę wpłaty deklarowanej lub zaksięgowanej
                         <input type="text" class="form-control" name="declared_sum">
                         <br>
                         <br>
