@@ -62,10 +62,10 @@ readonly class OrderPaymentLabelsService
 
         $labelsToCheck = array_diff($labelsToCheck, $labels);
 
-//        if (count($labelsToCheck) === 12) {
-//            AddLabelService::addLabels($order, [
-//                45, 68
-//            ], $arr, [], Auth::user()?->id);
-//        }
+        if (count($labelsToCheck) === 12) {
+            AddLabelService::addLabels($order, [
+                45, 68
+            ], $arr, [], Auth::user()?->id);
+        }
     }
 }
