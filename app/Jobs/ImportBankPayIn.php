@@ -313,7 +313,7 @@ class ImportBankPayIn implements ShouldQueue
 
 
         if ($order->payments()->count() === 0) {
-            $order->labels()->attach(45, 68);
+            $order->labels()->attach([45, 68]);
         }
 
         $payment = !isset($payment)
