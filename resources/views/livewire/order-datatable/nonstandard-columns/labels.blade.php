@@ -103,7 +103,7 @@
 
         @if($date)
             <div style="color: green">
-                Magazyn potwierdził, że nie zamówienie nie wyjedzie jutro
+                Magazyn potwierdził, że zamówienie nie wyjedzie jutro
             </div>
         @endif
 
