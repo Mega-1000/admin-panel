@@ -9,6 +9,7 @@ use App\Services\Label\RemoveLabelService;
 
 class RecalculateBuyingLabels
 {
+
     public static function recalculate(Order $order): void
     {
         if (empty(BuyingInvoice::where('order_id', $order->id)->first())) {
