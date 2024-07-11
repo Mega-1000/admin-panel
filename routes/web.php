@@ -894,6 +894,8 @@ Route::get('sms/send/{token}', [SmsController::class, 'sendSms']);
 Route::get('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'createAvisation'])->name('createAvisation');
 Route::post('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'storeAvisation'])->name('storeAvisation');
 
+Route::get('recalculate-order', ``)->name('recalculateOrder');
+
 Route::get('/styro-chatrs', function () {
     $orders = Order::whereHas('items', function ($query) {
         $query->whereHas('product', function ($subQuery) {
