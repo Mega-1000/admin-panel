@@ -305,6 +305,11 @@ class ImportBankPayIn implements ShouldQueue
 
         $order->preferred_invoice_date = $payIn->data_ksiegowania;
 
+
+        if ($order->payments()->count() === 0) {
+            $order->labels()->attach(45);
+        }
+
         $payment = !isset($payment)
             ? $order->payments()->create([
                 'amount' => $paymentAmount,
@@ -324,10 +329,6 @@ class ImportBankPayIn implements ShouldQueue
 
             $arr = [];
             AddLabelService::addLabels($order, [195, 41], $arr, [], Auth::user()?->id);
-        }
-
-        if ($order->payments()->count() === 1) {
-            $order->labels()->attach(45);
         }
 
         $this->orderPaymentLabelsService->calculateLabels($payment->order);
