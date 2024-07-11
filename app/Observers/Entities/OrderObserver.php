@@ -122,13 +122,4 @@ readonly class OrderObserver
             RemoveLabelService::removeLabels($order, [264], $arr , [], auth()->id());
         }
     }
-
-    public function labelsAttached(Order $order): void
-    {
-        dd('okej');
-        if ($order->labels->contains(50)) {
-            dd('parabole ja pierdole');
-        }
-    }
-
 }
