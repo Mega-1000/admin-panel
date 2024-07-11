@@ -31,7 +31,7 @@ class RecalculateBuyingLabels
         $totalGross = BuyingInvoice::where('order_id', $order->id)->sum('value');
         $arr = [];
 
-        if (round($totalGross) == round($totalItemsCost, 2)) {
+        if (round($totalGross, 2) == round($totalItemsCost, 2)) {
             AddLabelService::addLabels($order, [264], $arr, []);
             RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
         } else {
