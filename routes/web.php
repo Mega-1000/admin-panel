@@ -10,6 +10,7 @@ use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPackagesCalculator;
 use App\Helpers\OrderPriceCalculator;
+use App\Helpers\RecalculateBuyingLabels;
 use App\Helpers\TransportSumCalculator;
 use App\Http\Controllers\Api\OrderWarehouseNotificationController;
 use App\Http\Controllers\AuctionsController;
@@ -895,8 +896,14 @@ Route::get('avizate-order/{order}', [OrderWarehouseNotificationController::class
 Route::post('avizate-order/{order}', [OrderWarehouseNotificationController::class, 'storeAvisation'])->name('storeAvisation');
 
 Route::get('recalculate-order', function () {
+    $orders = Order::whereHas('labels', function ($q) {
+        $q->where('labels.id', 263);
+    })->get();
 
-})->name('recalculateOrder');
+    foreach ($orders as $order) {
+        RecalculateBuyingLabels::recalculate($order);
+    }
+});
 
 Route::get('/styro-chatrs', function () {
     $orders = Order::whereHas('items', function ($query) {
