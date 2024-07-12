@@ -46,7 +46,7 @@ Potrzebujesz przełożyć daty zamówienia? Skontaktuj się z klientem po czym z
         'e',
     );
 @endphp
-<a href="https://amdin.mega1000.pl/chat/{{ $token }}">Zmień daty dostawy</a>
+<a href="https://admin.mega1000.pl/chat/{{ $token }}">Zmień daty dostawy</a>
 
 <br>
 <br>
