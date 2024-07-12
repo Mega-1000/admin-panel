@@ -195,6 +195,18 @@ class Order extends Model implements Transformable
             . ': ' . $message;
     }
 
+    public static function getAllRelatedOrdersValue(Order $order): float
+    {
+        $orders = self::getAllRelatedOrders($order);
+
+        $ordersValue = 0;
+        foreach ($orders as $order) {
+            $ordersValue += $order->getValue() ?? $order->declared_sum ?? 0;
+        }
+
+        return $ordersValue;
+    }
+
     public static function getAllRelatedOrderPayments(Order $order): array
     {
         $orders = self::getAllRelatedOrders($order);
