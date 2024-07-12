@@ -206,6 +206,20 @@ class Order extends Model implements Transformable
 
         return $ordersValue;
     }
+    public static function getOrderReturnGoods(Order $order): float
+    {
+        $payments = self::getAllRelatedOrderPayments($order);
+
+        $paymentsValue = 0;
+        foreach ($payments as $payment) {
+            if ($payment->operation_type == "Zwrot towaru") {
+                $paymentsValue += $payment->amount ?? 0;
+            }
+        }
+
+        return $paymentsValue;
+    }
+
 
     public static function getAllRelatedOrderPayments(Order $order): array
     {
