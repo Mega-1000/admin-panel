@@ -30,7 +30,7 @@ class OrderPaymentUpdateRequest extends FormRequest
             'operation_date' => 'nullable|date',
             'tracking_number' => 'nullable|string',
             'operation_id' => 'nullable|string',
-            'declared_sum' => 'nullable|regex',
+            'declared_sum' => 'nullable',
             'posting_date' => 'nullable|date',
             'operation_type' => 'nullable|string',
             'comments' => 'nullable|string',
