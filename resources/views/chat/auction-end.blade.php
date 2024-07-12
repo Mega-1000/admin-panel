@@ -238,7 +238,7 @@
                                         $employee = \App\Helpers\LocationHelper::getNearestEmployeeOfFirm($order->customer, $sortedFirm['firm']->firm);
                                     @endphp
                                     @if($employee && $employee->phone && auth()->id())
-                                        tel przedstawiciela: <br> +48 {{ $employee->phone }}
+                                        tel przedstawiciela: <br> +48 {{ $employee->phone }} {{ $employee->firstname }}
                                     @endif
                                 </td>
 
@@ -357,7 +357,7 @@
                     $employee = \App\Entities\Employee::where('email', $firm->email_of_employee)->first();
                 @endphp
                 @if($employee && $employee->phone && auth()->id())
-                    tel przedstawiciela: <br> +48 {{ $employee->phone }}
+                    tel przedstawiciela: <br> +48 {{ $employee->phone }} {{ $employee->firstname }}
                 @endif
             </td>
 
