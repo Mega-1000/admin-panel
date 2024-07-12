@@ -139,7 +139,7 @@
             )
              || $userType == MessagesHelper::TYPE_EMPLOYEE
             )
-                <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}" class="mb-4">
+                <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()?->id]) }}" class="mb-4">
                     @csrf
                     <button class="btn btn-success bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                         Rozpocznij przetarg
