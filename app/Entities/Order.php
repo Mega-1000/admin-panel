@@ -195,6 +195,21 @@ class Order extends Model implements Transformable
             . ': ' . $message;
     }
 
+    public static function getAllRelatedOrderPayments(Order $order): array
+    {
+        $orders = self::getAllRelatedOrders($order);
+        $orderPayments = [];
+        foreach ($orders as $order) {
+            foreach ($order->payments as $payment) {
+                if ($payment->status !== 'Rozliczona deklarowana' && $payment->operation_type !== 'Wpłata/wypłata bankowa - związana z fakturą zakupową' || $order->login == 'info@ephpolska.pl') {
+                    $orderPayments[] = $payment;
+                }
+            }
+        }
+
+        return $orderPayments;
+    }
+
     public function orderOffer(): HasOne
     {
         return $this->hasOne(OrderOffer::class);
