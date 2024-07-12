@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Entities\Customer;
 use App\Entities\Employee;
 use App\Entities\Firm;
+use App\Entities\Order;
 use App\Entities\Product;
 use App\Entities\Warehouse;
 use Illuminate\Support\Facades\DB;
@@ -150,9 +151,9 @@ class LocationHelper
         return $radius - $minDistance;
     }
 
-    public static function nearestWarehouse(Customer $customer, Firm $firm): Warehouse
+    public static function nearestWarehouse(Order $order, Firm $firm): Warehouse
     {
-        $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customer->addresses->first()->postal_code)->get()->first();
+        $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->first()->postal_code)->get()->first();
 
         if (!$coordinatesOfUser) {
             return Warehouse::find($firm->warehouses()->first()->id);
