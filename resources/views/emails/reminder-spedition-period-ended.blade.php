@@ -38,8 +38,15 @@ Potrzebujesz przełożyć daty zamówienia? Skontaktuj się z klientem po czym z
     }
 
     App\Services\MessageService::createNewCustomerOrEmployee($order->chat, new Illuminate\Http\Request(['type' => 'Employee']), $closestEmployee);
+
+
+    $token = app(\App\Helpers\MessagesHelper::class)->getChatToken(
+        $order->id,
+        $closestEmployee->id,
+        'e',
+    );
 @endphp
-<a href="{{ rtrim(config('app.front_nuxt_url'), '/') . "/zamowienia/{$order->id}/edytuj" }}">Edytuj zamówienie</a>
+<a href="https://amdin.mega1000.pl/chat/{{ $token }}">Zmień daty dostawy</a>
 
 <br>
 <br>
