@@ -762,6 +762,20 @@ class Order extends Model implements Transformable
         return round($totalOfProductsPrices, 2);
     }
 
+
+    public static function getAllRelatedOrderPaymentsValue(Order $order): float
+    {
+        $payments = self::getAllRelatedOrderPayments($order);
+        $paymentsValue = 0;
+        foreach ($payments as $order) {
+            if ($order->operation_type != "Zwrot towaru") {
+                $paymentsValue += $order->amount ?? $order->declared_sum ?? 0;
+            }
+        }
+
+        return $paymentsValue;
+    }
+
     public function getOrderProfit(): float
     {
         $orderProfit = 0;
