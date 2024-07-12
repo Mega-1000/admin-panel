@@ -35,7 +35,7 @@ class Chat extends Model
         return $this->belongsToMany(Customer::class, 'chat_user')->withTimestamps();
     }
 
-    public function employees():HasMany
+    public function employees(): BelongsToMany
     {
         return $this->belongsToMany(Employee::class, 'chat_user')->withTimestamps();
     }
