@@ -210,6 +210,11 @@ class Order extends Model implements Transformable
         return $orderPayments;
     }
 
+    public static function getAllRelatedOrders(Order $order): Collection
+    {
+        return Order::where('master_order_id', '=', $order->id)->orWhere('id', '=', $order->id)->get();
+    }
+
     public function orderOffer(): HasOne
     {
         return $this->hasOne(OrderOffer::class);
