@@ -147,6 +147,7 @@ class SendSpeditionNotifications implements ShouldQueue
             }
 
             if ($sendMails && $toDate->isPast() && !$order->labels->contains('id', 66)) {
+                dd('kkkkee');
                 Mailer::create()
                     ->to($order->warehouse->shipment_after_pay_email)
                     ->send(new ReminderAfterSpeditionPeriodEnded($order));
