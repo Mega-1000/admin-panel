@@ -21,6 +21,28 @@ Jeśli zamówienie juź wyjechało, prosimy o potwierdzenie tego faktu klikając
 
 <br>
 <br>
+Potrzebujesz przełożyć daty zamówienia? Skontaktuj się z klientem po czym zaaktualizuj daty pod tym linkiem:
+
+@php
+    $lowestDistance = PHP_INT_MAX;
+    $company = $order->warehouse->firm;
+    $closestEmployee = null;
+
+    foreach ($company->employees as $employee) {
+    $employee->distance = App\Helpers\LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer);
+
+    if ($employee->distance < $lowestDistance) {
+        $lowestDistance = $employee->distance;
+            $closestEmployee = $employee;
+        }
+    }
+
+    App\Services\MessageService::createNewCustomerOrEmployee($order->chat, new Illuminate\Http\Request(['type' => 'Employee']), $closestEmployee);
+@endphp
+<a href="{{ rtrim(config('app.front_nuxt_url'), '/') . "/zamowienia/{$order->id}/edytuj" }}">Edytuj zamówienie</a>
+
+<br>
+<br>
 
 Z pozdrowieniami, <br>
 Zespół EPH Polska

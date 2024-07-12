@@ -610,8 +610,6 @@ class AuctionsController extends Controller
             if (in_array($company->id, $companies)) {
                 continue;
             }
-
-            $lowestDistance = PHP_INT_MAX;
             $closestEmployee = null;
 
             foreach ($company->employees as $employee) {
@@ -622,9 +620,13 @@ class AuctionsController extends Controller
                     $closestEmployee = $employee;
                 }
             }
+            ;
 
-            MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $closestEmployee);
-
+            $token = app(\App\Helpers\MessagesHelper::class)->getChatToken(
+                $chat,
+                $closestEmployee->id,
+                'e',
+            );
             $companies[] = $company->id;
         }
 
