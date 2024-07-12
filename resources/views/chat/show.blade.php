@@ -138,6 +138,7 @@
                 && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0
             )
              || $userType == MessagesHelper::TYPE_EMPLOYEE
+             && $chat->auctions->first()?->id
             )
                 <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()?->id]) }}" class="mb-4">
                     @csrf
