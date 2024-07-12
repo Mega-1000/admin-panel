@@ -46,11 +46,11 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckNotificationsMailbox::class)->cron('*/15 7-19 * * 1-6');
 
         // monday to saturday between 6 - 24
-        $schedule->job(Jobs\AllegroSaveUnreadedChatThreads::class)->everyThreeMinutes();
-        $schedule->job(Jobs\AllegroUnlockInactiveThreads::class)->everyTenMinutes();
+//        $schedule->job(Jobs\AllegroSaveUnreadedChatThreads::class)->everyThreeMinutes();
+//        $schedule->job(Jobs\AllegroUnlockInactiveThreads::class)->everyTenMinutes();
 
-        $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFiveMinutes();
-        $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFiveMinutes();
+//        $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFiveMinutes();
+//        $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFiveMinutes();
 
         // i am changing it from everyMinute to everyThirtyMinutes as rewriting would take some time, this should solve
         // queue overload issues
@@ -62,10 +62,10 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->everyFifteenMinutes();
 
         $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
-        $schedule->command('import:allegro')->everyTwoMinutes()->between('8:00', '18:00');
-        $schedule->command('import:allegro')->everyTenMinutes()->between('18:00', '8:00');
+//        $schedule->command('import:allegro')->everyTwoMinutes()->between('8:00', '18:00');
+//        $schedule->command('import:allegro')->everyTenMinutes()->between('18:00', '8:00');
 
-        $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->hourly();
+//        $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->hourly();
         $schedule->job(Jobs\PreferredInvoiceDateFillJob::class)->monthlyOn();
 
         $schedule->command('send:emails')->everyTwoMinutes()->between('8:00', '18:00');
