@@ -16,11 +16,11 @@
     <button class="btn btn-danger btn-sm" id="deleteBtn">Usuń</button>
 </form>
 
-<a href="/admin/orderReturn/{{ $order['id'] }}" class="btn btn-sm btn-danger">
-    <i class="glyphicon glyphicon-share-alt"></i>
-    <span class="hidden-xs hidden-sm">Zwrot</span>
-</a>
-<br>
+{{--<a href="/admin/orderReturn/{{ $order['id'] }}" class="btn btn-sm btn-danger">--}}
+{{--    <i class="glyphicon glyphicon-share-alt"></i>--}}
+{{--    <span class="hidden-xs hidden-sm">Zwrot</span>--}}
+{{--</a>--}}
+{{--<br>--}}
 
 @php
     $order = App\Entities\Order::find($order['id']);
@@ -38,6 +38,7 @@
     $messagesHelper->chatId = \App\Entities\Order::find($order['id'])?->chat?->id;
     $token = $messagesHelper->getChatToken($order['id'], auth()->id());
 @endphp
+<br>
 <a href="/chat/{{ $token }}" target="_blank" class="btn btn-sm btn-primary">
     <span class="hidden-xs hidden-sm">Chat</span>
 </a>
@@ -46,6 +47,10 @@
     <span class="hidden-xs hidden-sm">
         Szybka awizacja
     </span>
+</a>
+
+<a href="https://admin.mega1000.pl/order/{{ $order->id }}/getMails" class="btn btn-primary">
+    Raport wiadomości
 </a>
 
 <a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>
