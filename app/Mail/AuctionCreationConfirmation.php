@@ -34,7 +34,7 @@ class AuctionCreationConfirmation extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Przetarg na styropian został stworzony na twoim koncie!',
+            subject: 'Przetarg o numerze : ' . $this->auction->chat->order->id . ' na styropian został stworzony na twoim koncie!',
         );
     }
 
