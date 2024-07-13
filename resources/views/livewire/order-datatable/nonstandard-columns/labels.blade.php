@@ -35,7 +35,7 @@
         @if ($hasLabel224)
             <hr>
                 <div style="color: green">
-                    Przetarg na styropian aktywny! Kon
+                    Przetarg na styropian aktywny! Wysłano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->firms->count() }} Zapytań
                 </div>
             <hr>
         @endif
