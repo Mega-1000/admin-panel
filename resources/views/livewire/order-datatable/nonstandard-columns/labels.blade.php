@@ -207,7 +207,7 @@
                 {{ strstr(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->warehouse_email ?? '', '@', true) }}@
                 @php($amountOfMonits =  App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $order['id'] . '%')->count())
 
-                @if($amountOfMonits > 0)
+                @if($amountOfMonits > 0 && $hasLabel77)
                     <div style="color: red; margin-top: 20px">
                         Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
                     </div>
