@@ -115,7 +115,7 @@
         @endif
 
 
-            @php
+        @php
             $hasLabel276 = false;
             $hasLabel279 = false;
             if (!empty($order['labels'])) {
@@ -182,6 +182,19 @@
                 @endforeach
             @endif
         </div>
+
+        @php
+            $hasLabel77 = false;
+            if (!empty($order['labels'])) {
+                foreach ($order['labels'] as $label) {
+                    if ($label['id'] === 77 )
+                    {
+                        $hasLabel77 = true;
+                        break;
+                    }
+                }
+            }
+        @endphp
 
     @if($labelGroupName === 'produkcja')
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->contact_person ?? '' }}
