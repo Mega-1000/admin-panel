@@ -51,7 +51,7 @@
         Szybka awizacja
     </span>
 </a>
-
+<br>
 <a href="https://admin.mega1000.pl/order/{{ $order->id }}/getMails" class="btn btn-primary" target="__blank">
     Raport wiadomości
 </a>
