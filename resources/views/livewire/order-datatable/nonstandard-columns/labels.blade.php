@@ -195,7 +195,7 @@
                 @php($amountOfMonits =  App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $order['id'] . '%')->count())
 
                 @if($amountOfMonits > 0)
-                    <div style="color: red">
+                    <div style="color: red; margin-top: 20px">
                         Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
                     </div>
                 @endif
