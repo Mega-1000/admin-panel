@@ -192,7 +192,14 @@
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->created_at ?? '' }}
             @if(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->warehouse_email)
                 {{ strstr(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->warehouse_email ?? '', '@', true) }}@
-                Wysłano {{ App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%86214%')->count() }} ponagleń
+                @php($amountOfMonits =  App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%86214%')->count())
+
+                @if($amountOfMonits > 0)
+                    <div style="color: red">
+                        Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
+                    </div>
+                @endif
+
             @endif
 
     @endif
