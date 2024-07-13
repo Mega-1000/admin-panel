@@ -31,11 +31,31 @@
                     }
                 }
             }
+
+            // label 265
+            $hasLabel265 = false;
+            if (!empty($order['labels'])) {
+                foreach ($order['labels'] as $label) {
+                    if ($label['id'] === 265 )
+                    {
+                        $hasLabel265 = true;
+                        break;
+                    }
+                }
+            }
         @endphp
         @if ($hasLabel224)
             <hr>
                 <a style="color: green"  href="/auctions/{{ $order['chat']['auctions'][0]['id'] }}/end" target="_blank">
                     Przetarg na styropian aktywny! Wysłano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->firms->count() }} Zapytań - otrzymano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->offers->unique('firm')->count() }} ofert
+                </a>
+            <hr>
+        @endif
+
+        @if ($hasLabel265)
+            <hr>
+                <a style="color: red"  href="/auctions/{{ $order['chat']['auctions'][0]['id'] }}/end" target="_blank">
+                    Zadzwoń do klienta i poinformuj go o zakończonym przetargu na styropian!
                 </a>
             <hr>
         @endif
