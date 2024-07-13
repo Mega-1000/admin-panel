@@ -48,7 +48,7 @@
                     {{ $operation->subject }}
                 </td>
                 <td>
-                    {!! e($operation->body) !!}
+                    {!! quoted_printable_decode($operation->body) !!}
                 </td>
                 <td>
                     {{ $operation->created_at }}
