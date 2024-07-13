@@ -49,7 +49,7 @@
     </span>
 </a>
 
-<a href="https://admin.mega1000.pl/order/{{ $order->id }}/getMails" class="btn btn-primary">
+<a href="https://admin.mega1000.pl/order/{{ $order->id }}/getMails" class="btn btn-primary" target="__blank">
     Raport wiadomości
 </a>
 
