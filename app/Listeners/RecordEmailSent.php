@@ -26,10 +26,12 @@ class RecordEmailSent
             return $receiver->getAddress();
         }, $event->message->getTo());
 
-        MailReport::create([
-            'email' => implode(",", $receivers),
-            'subject' => $event->message->getSubject(),
-            'body' => $event->message->getBody()->bodyToString(),
-        ]);
+        if (!in_array(implode(",", $receivers), ['info@mega1000.pl', '005@mega1000.pl', '002@mega1000.pl'])) {
+            MailReport::create([
+                'email' => implode(",", $receivers),
+                'subject' => $event->message->getSubject(),
+                'body' => $event->message->getBody()->bodyToString(),
+            ]);
+        }
     }
 }
