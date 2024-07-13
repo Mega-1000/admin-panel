@@ -2,9 +2,13 @@
     Rozpocznij przenoszenie
 </button>
 
+<br>
+
 <button wire:click="moveDataToOrder({{ $order['id'] }})" class="btn btn-primary w-100" id="finalize-order-moving">
     Zakończ przenoszenie
 </button>
+
+<br>
 
 <a class="btn btn-sm btn-primary" href="{{ route('orders.edit', $order['id']) }}?page={{ request()->query('page') }}">
     Edytuj
@@ -38,11 +42,10 @@
     $messagesHelper->chatId = \App\Entities\Order::find($order['id'])?->chat?->id;
     $token = $messagesHelper->getChatToken($order['id'], auth()->id());
 @endphp
-<br>
 <a href="/chat/{{ $token }}" target="_blank" class="btn btn-sm btn-primary">
     <span class="hidden-xs hidden-sm">Chat</span>
 </a>
-
+<br>
 <a href="{{ route('createAvisation', $order['id'])}}" class="btn btn-sm btn-primary">
     <span class="hidden-xs hidden-sm">
         Szybka awizacja
