@@ -20,7 +20,7 @@ class MailReportController extends Controller
     public function getMailsByOrder($order_id)
     {
         return view('mail-reports.index', [
-            'mailReports' => MailReport::where('body', 'like', '%' . $order_id . '%')->get(),
+            'mailReports' => MailReport::where('body', 'like', '%' . $order_id . '%')->paginate(100),
         ]);
     }
 }
