@@ -48,7 +48,7 @@
                     {{ $operation->subject }}
                 </td>
                 <td>
-                    {{ $operation->body }}
+                    {!! $operation->body !!}
                 </td>
                 <td>
                     {{ $operation->created_at }}
