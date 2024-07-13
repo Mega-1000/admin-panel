@@ -48,7 +48,7 @@
                     {{ $operation->subject }}
                 </td>
                 <td>
-                    {!! nl2br(quoted_printable_decode(e($operation->body))) !!}
+                    {!! quoted_printable_decode(e($operation->body)) !!}
                 </td>
                 <td>
                     {{ $operation->created_at }}
