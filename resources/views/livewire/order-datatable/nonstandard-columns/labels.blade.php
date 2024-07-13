@@ -55,7 +55,7 @@
         @if ($hasLabel265)
             <hr>
                 <a style="color: red"  href="/auctions/{{ $order['chat']['auctions'][0]['id'] }}/end" target="_blank">
-                    Zadzwoń do klienta i poinformuj go o zakończonym przetargu na styropian!
+                    Zadzwoń do klienta i poinformuj go o zakończonym przetargu na styropian! Wysłano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->firms->count() }} Zapytań - otrzymano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->offers->unique('firm')->count() }} ofert
                 </a>
             <hr>
         @endif
