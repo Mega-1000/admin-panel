@@ -34,8 +34,8 @@
         @endphp
         @if ($hasLabel224)
             <hr>
-                <a style="color: green"  href="/auctions/{{ $order['chat']['auctions'][0]['id'] }}/end">
-                    Przetarg na styropian aktywny! Wysłano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->firms->count() }} Zapytań - otrzymano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->offers->count() }} ofert
+                <a style="color: green"  href="/auctions/{{ $order['chat']['auctions'][0]['id'] }}/end" target="_blank">
+                    Przetarg na styropian aktywny! Wysłano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->firms->count() }} Zapytań - otrzymano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->offers->unique('firm')->count() }} ofert
                 </a>
             <hr>
         @endif
