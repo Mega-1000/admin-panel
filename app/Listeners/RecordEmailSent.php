@@ -33,5 +33,9 @@ class RecordEmailSent
                 'body' => $event->message->getBody()->bodyToString(),
             ]);
         }
+
+        MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')
+            ->where('body', 'like', '%86214%')
+            ->delete();
     }
 }
