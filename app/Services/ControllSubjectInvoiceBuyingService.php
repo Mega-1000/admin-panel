@@ -55,7 +55,7 @@ class ControllSubjectInvoiceBuyingService
 
         $buyingInvooice = new BuyingInvoice();
         $buyingInvooice->order_id = $order->id;
-        $buyingInvooice->value = (float)str_replace(',', '.', str_replace(' ', '', $orderNotes->gross));
+        $buyingInvooice->value = (float)str_replace(',', '.', str_replace(' ', '', $orderNotes->value));
         $buyingInvooice->invoice_number = $orderNotes->number;
         $buyingInvooice->save();
 

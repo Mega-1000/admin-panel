@@ -19,6 +19,27 @@
                 Usuń
             </button>
         @endforeach
+
+        @php
+            $hasLabel224 = false;
+            if (!empty($order['labels'])) {
+                foreach ($order['labels'] as $label) {
+                    if ($label['id'] === 224 )
+                    {
+                        $hasLabel224 = true;
+                        break;
+                    }
+                }
+            }
+        @endphp
+        @if ($hasLabel224)
+            <hr>
+                <div style="color: green">
+                    Przetarg na styropian aktywny! Kon
+                </div>
+            <hr>
+        @endif
+
     @endif
     @if($labelGroupName === 'fakury zakupu')
         <div style="margin-top: 30px">
@@ -212,8 +233,8 @@
                         Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
                     </div>
                 @endif
-
             @endif
+
 
     @endif
 </div>
