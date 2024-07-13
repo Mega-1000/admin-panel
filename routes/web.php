@@ -905,6 +905,8 @@ Route::get('recalculate-order', function () {
     }
 });
 
+Route::get('/order/{order}/getMails', [MailReportController::class, 'getMailsForOrder'])->name('order.getMails');
+
 Route::get('/styro-chatrs', function () {
     $orders = Order::whereHas('items', function ($query) {
         $query->whereHas('product', function ($subQuery) {

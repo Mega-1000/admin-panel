@@ -16,4 +16,11 @@ class MailReportController extends Controller
             'mailReports' => MailReport::paginate(30),
         ]);
     }
+
+    public function getMailsByOrder($order_id)
+    {
+        return view('mail-reports.index', [
+            'mailReports' => MailReport::where('body', 'like', '%' . $order_id . '%')->get(),
+        ]);
+    }
 }
