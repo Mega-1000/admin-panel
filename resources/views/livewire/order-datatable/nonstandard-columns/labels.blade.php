@@ -243,6 +243,17 @@
         @endphp
 
     @if($labelGroupName === 'produkcja')
+        @php
+            $order = App\Entities\Order::find($order['id']);
+            $warehouse = $order->warehouse;
+            if ($order->orderWarehouseNotification->employee_id && $order->orderWarehouseNotification->employee->is_performing_avization) {
+                $warehouseMail = $order->orderWarehouseNotification->employee->email;
+            }
+
+            if ($warehouse && $warehouse->firm) {
+                $warehouseMail = $warehouse->firm->email;
+            }
+        @endphp
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->contact_person ?? '' }}
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->contact_person_phone ?? '' }}
             @if(!App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->contact_person_phone)
@@ -250,7 +261,7 @@
             @endif
             {{ App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->created_at ?? '' }}
             @if(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->warehouse_email)
-                {{ strstr(App\Entities\OrderWarehouseNotification::where('order_id', $order['id'])->orderBy('created_at', 'desc')->first()?->warehouse->warehouse_email ?? '', '@', true) }}@
+                {{ strstr($warehouseMail ?? '', '@', true) }}@
                 @php($amountOfMonits =  App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $order['id'] . '%')->count())
 
                 @if($amountOfMonits > 0 && $hasLabel77)
