@@ -1032,7 +1032,7 @@ Provide only xml text nbo other additional info because it is used in systsem di
 ];
 $data = [
 "model" => "claude-3-5-sonnet-20240620",
-"max_tokens" => 1024,
+"max_tokens" => 2048,
 "messages" => $prompt,
 ];
 
