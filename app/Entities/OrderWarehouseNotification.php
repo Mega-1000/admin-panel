@@ -42,4 +42,9 @@ class OrderWarehouseNotification extends Model implements Transformable
     {
         return $this->belongsTo(Warehouse::class);
     }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'contact_person');
+    }
 }

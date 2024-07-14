@@ -68,10 +68,12 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
             Log::error($exception->getMessage(), ['line' => $exception->getLine(), 'file' => $exception->getFile(), 'comment' => 'Nie znaleziono zamówienia o numerze: ' . $this->orderId . ' podczas wysyłania awizacji.']);
             return;
         }
+
         $warehouse = $order->warehouse;
         if ($warehouse && $warehouse->firm) {
             $warehouseMail = $warehouse->firm->email;
         }
+
         if (empty($warehouseMail)) {
             Log::notice('Brak adresu mailowego w firmie, lub magazyn nie istnieje', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
             return;
