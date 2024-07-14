@@ -1050,9 +1050,10 @@ Provide only xml text nbo other additional info because it is used in systsem di
             ],
             [
                 'type' => 'image',
-                'image' => [
-                    'data' => $base64Pdf,
-                    'mime_type' => 'application/pdf'
+                'source' => [
+                    'type' => 'base64',
+                    'media_type' => 'application/pdf',
+                    'data' => $base64Pdf
                 ]
             ]
         ],
