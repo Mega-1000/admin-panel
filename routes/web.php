@@ -936,6 +936,16 @@ $anthropicVersion = "2023-06-01";
         // Encode the PDF content to base64
         $base64Pdf = base64_encode($invoiceContent);
 
+
+        $imagick = new \Imagick();
+        $imagick->readImage('https://admin.mega1000.pl/invoices/' . $invoice->invoice_name . '[0]'); // Read only the first page
+        $imagick->setImageFormat('png');
+
+        // Get the PNG data
+        $pngData = $imagick->getImageBlob();
+
+        // Encode the PNG data to base64
+        $base64Pdf = base64_encode($pngData);
     } catch (\Exception $e) {
         // Handle the error appropriately
         dd('Error: ' . $e->getMessage());
@@ -1049,7 +1059,7 @@ Provide only xml text nbo other additional info because it is used in systsem di
 ',
             ],
             [
-                'type' => 'pdf',
+                'type' => 'image',
                 'source' => [
                     'type' => 'base64',
                     'media_type' => 'application/pdf',
