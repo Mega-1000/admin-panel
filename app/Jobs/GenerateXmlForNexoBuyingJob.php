@@ -181,9 +181,9 @@ class GenerateXmlForNexoBuyingJob implements ShouldQueue
         if (count($fileNames) > 0) {
             $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
             $zip = new ZipArchive();
-            $zip->open(storage_path('app/public' . config('nexo.xml_path') . $zipName), ZipArchive::CREATE);
+            $zip->open(storage_path('app/public/nexo-buying' . $zipName), ZipArchive::CREATE);
             foreach ($fileNames as $fileName) {
-                $zip->addFile(storage_path('app/public' . config('nexo.xml_path') . $fileName), $fileName);
+                $zip->addFile(storage_path('app/public/nexo-buying' . $fileName), $fileName);
             }
             $zip->close();
 
