@@ -14,6 +14,18 @@
                     <form action="{{ route('storeAvisation', $order->id) }}" method="POST">
                         @csrf
 
+                        @if($order->payments->sum('amount') > 0)
+                            Suma płatności zaksięgowanych: {{ $order->payments->sum('amount') }}
+                        @endif
+                        <br>
+                        <br>
+                        potwierdzenie przelewu
+                        @if($order->paymentConfirmation)
+                            <a href="{{ route('downloadPaymentConfirmation', $order->paymentConfirmation->id) }}">
+                                Pobierz
+                            </a>
+                        @endif
+
                         Wartość wszystkich wpłat zaksięgowanych i deklarowanych które klient wykonał na ten moment
                         <input type="text" class="form-control" name="declared_sum">
                         <br>
