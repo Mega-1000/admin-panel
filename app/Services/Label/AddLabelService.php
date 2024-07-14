@@ -45,6 +45,10 @@ class AddLabelService
                 return;
             }
 
+            if ($labelId == 39 && $order->labels->contains('id', 240)) {
+                return;
+            }
+
             if ($labelId === 66) {
                 if ($order->preferred_invoice_date === null) {
                     $order->preferred_invoice_date = Carbon::now();
