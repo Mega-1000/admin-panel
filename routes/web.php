@@ -916,9 +916,30 @@ $apiUrl = "https://api.anthropic.com/v1/messages";
 $apiKey = "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";
 $anthropicVersion = "2023-06-01";
 
+use Illuminate\Support\Facades\Storage;
 
-dd(Storage::get('invoices/' . $order->invoices()->first()->invoice_name), $order->invoices()->first()->invoice_name);
+    try {
+        $order = Order::findOrFail($orderId); // Assume $orderId is provided
 
+        $invoice = $order->invoices()->first();
+
+        if (!$invoice) {
+            throw new \Exception('No invoice found for this order.');
+        }
+
+        $invoicePath = 'invoices/' . $invoice->invoice_name;
+
+        if (!Storage::exists($invoicePath)) {
+            throw new \Exception('Invoice file not found in storage.');
+        }
+
+        $invoiceContent = Storage::get($invoicePath);
+
+        dd($invoiceContent, $invoice->invoice_name);
+    } catch (\Exception $e) {
+        // Handle the error appropriately
+        dd('Error: ' . $e->getMessage());
+    }
 $prompt = [
     [
         "role" => "user",
