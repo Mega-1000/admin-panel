@@ -16,9 +16,9 @@
 
                         @if($order->payments->sum('amount') > 0)
                             Suma płatności zaksięgowanych: {{ $order->payments->sum('amount') }}
+                            <br>
+                            <br>
                         @endif
-                        <br>
-                        <br>
                         potwierdzenie przelewu
                         @foreach($order['files'] as $file)
                             <a href="{{ route('orders.getFile', ['id' => $order['id'], 'file_id' => $file['hash']]) }}" target="_blank">
