@@ -28,7 +28,6 @@
                         <select class="form-control" name="warehouse-symbol">
                             @foreach($order->items->first()->product->firm->warehouses as $warehouse)
                                 <option
-
                                     @if(\App\Helpers\LocationHelper::nearestWarehouse($order, $order->items->first()->product->firm)->symbol == $warehouse->symbol)
                                         selected="selected"
                                      @endif
@@ -44,7 +43,13 @@
                         Pracownik odpowiedzialny za awizację
                         <select class="form-control" name="warehouse-symbol">
                             @foreach($order->items->first()->product->firm->employees as $employee)
-                                <option>{{ $employee->email }}</option>
+                                <option
+                                    @if(\App\Helpers\LocationHelper::getNearestEmployeeOfFirm($order->customer, $order->items->first()->product->firm)->id == $warehouse->id)
+                                        selected="selected"
+                                    @endif
+                                >
+                                    {{ $employee->email }}
+                                </option>
                             @endforeach
                         </select>
 
