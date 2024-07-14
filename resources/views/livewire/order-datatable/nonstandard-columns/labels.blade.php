@@ -104,7 +104,7 @@
             </h5>
         </div>
         @if($order['invoice_buying_warehouse_file'])
-                <a href="{{ $order['invoice_buying_warehouse_file'] }}" target="_blank"> Faktura zakupu gotowa </a>
+                <a href="{{ $order['invoice_buying_warehouse_file'] }}" target="_blank" style="color: green"> XML Faktury zakupu gotowy! </a>
         @else
             <a href="/styro-chatrs/{{ $order['id'] }}">
                 Generuj fakturę zakupu
