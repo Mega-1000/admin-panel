@@ -1047,15 +1047,15 @@ Invoice is buying and use "szt" not "szt."
 
 Provide only xml text nbo other additional info because it is used in systsem directly
 ',
+            ],
+            [
+                'type' => 'image',
+                'image' => [
+                    'data' => $base64Pdf,
+                    'mime_type' => 'application/pdf'
+                ]
             ]
         ],
-        [
-            'type' => 'image',
-            'image' => [
-                'data' => $base64Pdf,
-                'mime_type' => 'application/pdf'
-            ]
-        ]
     ]
 ];
 $data = [
