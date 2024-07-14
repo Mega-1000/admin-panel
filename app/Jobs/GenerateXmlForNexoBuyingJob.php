@@ -165,6 +165,7 @@ class GenerateXmlForNexoBuyingJob implements ShouldQueue
 
                 AddLabelService::addLabels($order, [Label::XML_INVOICE_GENERATED], $preventionArray, [], Auth::user()?->id);
             } catch (Throwable $ex) {
+                dd($ex->getMessage());
                 Log::error($ex->getMessage(), [
                     'productId' => (isset($item)) ? $item->product->id : null,
                     'orderItemId' => (isset($item)) ? $item->id : null,
