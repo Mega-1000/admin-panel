@@ -910,21 +910,17 @@ Route::get('recalculate-order', function () {
 Route::get('/order/{order}/getMails', [MailReportController::class, 'getMailsByOrder'])->name('order.getMails');
 
 Route::get('/styro-chatrs/{order}', function (Order $order) {
+    $apiUrl = "https://api.anthropic.com/v1/messages";
+    $apiKey = "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";
+    $anthropicVersion = "2023-06-01";
 
+    $order = Order::findOrFail($order->id); // Assume $orderId is provided
 
-$apiUrl = "https://api.anthropic.com/v1/messages";
-$apiKey = "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";
-$anthropicVersion = "2023-06-01";
+    $invoices = $order->invoices()->get();
 
-    try {
-        $order = Order::findOrFail($order->id); // Assume $orderId is provided
+    $text = '';
 
-        $invoice = $order->invoices()->first();
-
-        if (!$invoice) {
-            throw new \Exception('No invoice found for this order.');
-        }
-
+    foreach ($invoices as $invoice) {
         $invoicePath = 'public/invoices/' . $invoice->invoice_name;
 
         if (!Storage::exists($invoicePath)) {
@@ -935,11 +931,7 @@ $anthropicVersion = "2023-06-01";
 
         $parser = new \Smalot\PdfParser\Parser();
         $pdf = $parser->parseContent($invoiceContent);
-        $text = $pdf->getText();
-
-    } catch (\Exception $e) {
-        // Handle the error appropriately
-        dd('Error: ' . $e->getMessage());
+        $text .= '--------------------------' $pdf->getText();
     }
 $prompt = [
     [
@@ -948,7 +940,9 @@ $prompt = [
             [
                 'type' => 'text',
                 'text' => $text . '
-    i pasted my pdf content with i got from db convert it to xml format for invoice program so it will look like this
+    i pasted my pdf content of all invoices attached to this order with i got from db convert it to xml format for invoice program so it will look like this
+
+    Warning take data of ivoice witch doesnt have proforma name and is vat invoice
 
 <?xml version="1.0"?>
 <PreDokument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
