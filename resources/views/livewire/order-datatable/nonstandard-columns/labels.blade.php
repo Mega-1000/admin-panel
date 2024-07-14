@@ -69,10 +69,9 @@
             <br>
 
             <form action="">
-                <input type="text" name="notices" class="form-control">
+                <input type="text" name="notices" class="form-control" placeholder="Dodatkowe informacje">
                 <input type="submit" value="Zapisz" class="btn btn-primary">
             </form>
-            </a>
             <hr>
         @endif
 
