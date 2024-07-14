@@ -67,6 +67,7 @@ use App\Services\ProductService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use TCG\Voyager\Facades\Voyager;
 
 use Illuminate\Http\Request;
@@ -1052,8 +1053,11 @@ $response = curl_exec($ch);
 
 $response = json_decode($response)->content[0]->text;
 
+    Storage::put('public/buyinginvoices/' . 212 . '.xml' , $response);
 
-return response()->json($response);
+    return response()->json($response);
+
+
 });
 
 Route::get('all-auctions-map', function (Request $request) {
