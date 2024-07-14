@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Entities\Firm;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
@@ -78,7 +77,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
         foreach ($orders as $order) {
             try {
-                $address = $order->warehouse->firm->address;
+                $address = $order->getInvoiceAddress();
                 $preAddress = new PreAdres();
                 $preAddress
                     ->setUlica($address->address . ' ' . $address->flat_number)
@@ -109,8 +108,8 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     ->setUwagi($order->id . ((empty($order->allegro_payment_id)) ? '' : ' ' . $order->allegro_payment_id))
                     ->setRodzajPlatnosci('Przelew')
                     ->setWaluta('PLN')
-                    ->setTypDokumentu('FZ')
-                    ->setKategoria('Zakup')
+                    ->setTypDokumentu(ETypDokumentu_HandloMag::FS)
+                    ->setKategoria('Sprzedaż')
                     ->setUslugaTransportuCenaBrutto(0)
                     ->setUslugaTransportuCenaNetto(0)
                     ->setDataDostawy($this->getOrderInvoiceDate($order))
@@ -143,21 +142,24 @@ class GenerateXmlForNexoJob implements ShouldQueue
                         ->setTowar($towar)
                         ->setIlosc($item->quantity)
                         ->setRabatProcent(0)
-                        ->setVat(23)
+                        ->setVat($item->product->price->vat ?? 23)
                         ->setCenaNettoPrzedRabatem(0)
                         ->setCenaNettoPoRabacie(0)
                         ->setCenaBruttoPrzedRabatem(0)
-                        ->setCenaBruttoPoRabacie($item->net_purchase_price_commercial_unit * 1.23)
+                        ->setCenaBruttoPoRabacie($item->gross_selling_price_commercial_unit)
                         ->setWartoscCalejPozycjiNetto(0)
                         ->setWartoscCalejPozycjiBrutto(0)
                         ->setWartoscCalejPozycjiNettoZRabatem(0)
-                        ->setWartoscCalejPozycjiBruttoZRabatem($item->net_purchase_price_commercial_unit * 1.23 * $item->quantity);
+                        ->setWartoscCalejPozycjiBruttoZRabatem($item->gross_selling_price_commercial_unit * $item->quantity);
 
                     $preDokument
                         ->setProdukty(array_merge($preDokument->getProdukty(), [$prePozycja]));
                 }
 
                 $preDokument->setProdukty(array_filter(array_merge($preDokument->getProdukty(), [
+                    ($order->additional_service_cost > 0) ? $this->getDKOPosition($order) : null,
+                    ($order->additional_cash_on_delivery_cost > 0) ? $this->getDKPPosition($order) : null,
+                    ($order->shipment_price_for_client > 0) ? $this->getUTPosition($order) : null
                 ])));
 
                 $xml = self::generateValidXmlFromObj($preDokument);
