@@ -916,7 +916,7 @@ Route::get('/styro-chatrs/{order}', function (Order $order) {
 
     $order = Order::findOrFail($order->id); // Assume $orderId is provided
 
-    $invoices = $order->invoices()->get();
+    $invoices = $order->invoices;
 
     $text = '';
 
@@ -931,7 +931,7 @@ Route::get('/styro-chatrs/{order}', function (Order $order) {
 
         $parser = new \Smalot\PdfParser\Parser();
         $pdf = $parser->parseContent($invoiceContent);
-        $text .= '--------------------------' $pdf->getText();
+        $text .= '--------------------------' .  $pdf->getText();
     }
 $prompt = [
     [
