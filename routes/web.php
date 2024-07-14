@@ -1049,7 +1049,7 @@ Provide only xml text nbo other additional info because it is used in systsem di
 ',
             ],
             [
-                'type' => 'image',
+                'type' => 'pdf',
                 'source' => [
                     'type' => 'base64',
                     'media_type' => 'application/pdf',
