@@ -106,7 +106,7 @@
         @if($order['invoice_buying_warehouse_file'])
                 <a href="{{ $order['invoice_buying_warehouse_file'] }}" target="_blank"> Faktura zakupu gotowa </a>
         @else
-            <a href="styro-chatrs/{{ $order['id'] }}">
+            <a href="/styro-chatrs/{{ $order['id'] }}">
                 Generuj fakturę zakupu
             </a>
         @endif
