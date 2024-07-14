@@ -170,43 +170,25 @@ class GenerateXmlForNexoBuyingJob implements ShouldQueue
                 continue;
             }
         }
+
+
+
         if (count($fileNames) > 0) {
             $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
-            $zipPath = 'nexo-buying/' . $zipName;
-            $fullZipPath = storage_path('app/public/' . $zipPath);
-
-            // Ensure the directory exists
-            $dirPath = dirname($fullZipPath);
-            if (!file_exists($dirPath)) {
-                mkdir($dirPath, 0755, true);
-            }
-
             $zip = new ZipArchive();
-            if ($zip->open($fullZipPath, ZipArchive::CREATE) === TRUE) {
-                foreach ($fileNames as $fileName) {
-                    $filePath = storage_path('app/public/nexo-buying/' . $fileName);
-                    if (file_exists($filePath)) {
-                        $zip->addFile($filePath, $fileName);
-                    } else {
-                        // Log or handle missing file
-                        \Log::warning("File not found: {$filePath}");
-                    }
-                }
-                $zip->close();
-
-                // Delete original files after successful zip creation
-                foreach ($fileNames as $fileName) {
-                    Storage::disk('xmlForNexoDisk')->delete($fileName);
-                }
-
-                // Send email
-                Mailer::create()
-                    ->to('ksiegowosc@ephpolska.pl')
-                    ->send(new XmlForNexoMail($zipName));
-            } else {
-                // Handle zip creation failure
-                \Log::error("Failed to create zip file: {$fullZipPath}");
+            $zip->open(storage_path('app/public' . config('nexo.xml_path') . $zipName), ZipArchive::CREATE);
+            foreach ($fileNames as $fileName) {
+                $zip->addFile(storage_path('app/public' . config('nexo.xml_path') . $fileName), $fileName);
             }
+            $zip->close();
+
+            foreach ($fileNames as $fileName) {
+                Storage::disk('xmlForNexoDisk')->delete($fileName);
+            }
+
+            Mailer::create()
+                ->to('ksiegowosc@ephpolska.pl')
+                ->send(new XmlForNexoMail($zipName));
         }
     }
 
