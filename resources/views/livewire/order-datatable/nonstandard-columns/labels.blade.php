@@ -72,7 +72,11 @@
                 @csrf
                 Dodatkowe informacje
                 <input type="text" name="notices" class="form-control">
-
+                <br>
+                <br>
+                Następny kontakt
+                <input type="datetime-local" name="next_contact_date" class="form-control">
+                <br>
                 <input type="submit" value="Zapisz" class="btn btn-primary">
             </form>
             <hr>
