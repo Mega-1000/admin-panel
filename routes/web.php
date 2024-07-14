@@ -917,6 +917,8 @@ $apiKey = "sk-ant-api03-dHLEzfMBVu3VqW2Y7ocFU_o55QHCkjYoPOumwmD1ZhLDiM30fqyOFsvG
 $anthropicVersion = "2023-06-01";
 
 
+dd($order->invoices()->first());
+
 $prompt = [
     [
         "role" => "user",
