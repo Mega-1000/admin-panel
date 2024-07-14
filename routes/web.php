@@ -1032,7 +1032,7 @@ Provide only xml text nbo other additional info because it is used in systsem di
 ];
 $data = [
 "model" => "claude-3-5-sonnet-20240620",
-"max_tokens" => 100000,
+"max_tokens" => 4096,
 "messages" => $prompt,
 ];
 
@@ -1051,7 +1051,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
 $response = curl_exec($ch);
 
-$response = dd(json_decode($response))->content[0]->text;
+$response = json_decode($response)->content[0]->text;
 
     Storage::put('public/buyinginvoices/' . $order->id . '.xml' , $response);
 
