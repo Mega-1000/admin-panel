@@ -1050,7 +1050,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
 $response = curl_exec($ch);
 
-$response = json_decode(json_decode($response)->content[0]->text);
+$response = json_decode(json_decode($response)->content[0]);
 
 
 return response()->json($response);
