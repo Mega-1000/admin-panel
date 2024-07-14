@@ -508,7 +508,7 @@ class MessagesHelper
         $blankChatUser = $this->createOrGetBlankUser($chat);
         $this->chatId = $chat->id;
 
-//        $this->addMessage($content, 4, null, $blankChatUser);
+        $this->addMessage($content, 4, null, $blankChatUser);
     }
     public function sendAvisationDeny(Chat $chat, string $notices): void
     {

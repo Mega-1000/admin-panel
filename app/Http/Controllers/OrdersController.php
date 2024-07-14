@@ -3198,8 +3198,8 @@ class OrdersController extends Controller
         $order = Order::find($id);
         $messagesHelper->sendNotice($order->chat, request()->get('notices'));
 
-        $arr = [];
-        RemoveLabelService::removeLabels($order, [265], $arr, [], Auth::user()->id);
+//        $arr = [];
+//        RemoveLabelService::removeLabels($order, [265], $arr, [], Auth::user()->id);
 
         return redirect()->back();
     }
