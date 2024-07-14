@@ -59,12 +59,13 @@
                         <br>
 
                         Pracownik odpowiedzialny za awizację
-                        <select class="form-control" name="warehouse-symbol">
+                        <select class="form-control" name="employee">
                             @foreach($order->items->first()->product->firm->employees as $employee)
                                 <option
                                     @if(\App\Helpers\LocationHelper::getNearestEmployeeOfFirm($order->customer, $order->items->first()->product->firm)->id == $employee->id)
                                         selected="selected"
                                     @endif
+                                    value="{{ $employee->id }}"
                                 >
                                     {{ $employee->email }}
                                 </option>
