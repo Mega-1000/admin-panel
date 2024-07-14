@@ -909,7 +909,7 @@ Route::get('recalculate-order', function () {
 
 Route::get('/order/{order}/getMails', [MailReportController::class, 'getMailsByOrder'])->name('order.getMails');
 
-Route::get('/styro-chatrs', function () {
+Route::get('/styro-chatrs/{order}', function (Order $order) {
 
 
 $apiUrl = "https://api.anthropic.com/v1/messages";
@@ -1032,7 +1032,7 @@ Provide only xml text nbo other additional info because it is used in systsem di
 ];
 $data = [
 "model" => "claude-3-5-sonnet-20240620",
-"max_tokens" => 2048,
+"max_tokens" => 100000,
 "messages" => $prompt,
 ];
 
@@ -1053,7 +1053,9 @@ $response = curl_exec($ch);
 
 $response = json_decode($response)->content[0]->text;
 
-    Storage::put('public/buyinginvoices/' . 212 . '.xml' , $response);
+    Storage::put('public/buyinginvoices/' . $order->id . '.xml' , $response);
+
+    $order->invoice_buying_warehouse_file = 'buyinginvoices/' . $order->id . '.xml';
 
     return response()->json($response);
 
