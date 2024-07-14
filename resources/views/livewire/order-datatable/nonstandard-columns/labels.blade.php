@@ -48,6 +48,10 @@
             <hr>
                 <a style="color: green"  href="/auctions/{{ $order['chat']['auctions'][0]['id'] }}/end" target="_blank">
                     Przetarg na styropian aktywny! Wysłano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->firms->count() }} Zapytań - otrzymano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->offers->unique('firm')->count() }} ofert
+
+                    <br>
+
+                    Koniec przetargu: {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->end_of_auction }}
                 </a>
             <hr>
         @endif
@@ -56,6 +60,10 @@
             <hr>
                 <a style="color: red"  href="/auctions/{{ $order['chat']['auctions'][0]['id'] }}/end" target="_blank">
                     Zadzwoń do klienta i poinformuj go o zakończonym przetargu na styropian! Wysłano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->firms->count() }} Zapytań - otrzymano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->offers->unique('firm')->count() }} ofert
+
+                    <br>
+
+                     Przetarg został zakończony: {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->end_of_auction }}
 
                     <form action="">
                         <input type="datetime-local" name="notices">
