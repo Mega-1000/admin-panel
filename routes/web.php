@@ -920,7 +920,6 @@ Route::get('/styro-chatrs/{order}', function (Order $order) {
 
     $text = '';
 
-    dd($invoices);
     foreach ($invoices as $invoice) {
         $invoicePath = 'public/invoices/' . $invoice->invoice_name;
 
