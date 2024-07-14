@@ -217,6 +217,10 @@
                     </select>
                 </div>
             </div>
+
+            <input type="checkbox" name="is_performing_avization" value="{{ $employee->is_performing_avization }}">
+            Ten pracownik sam obsługuje awizacje
+
             <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
 
