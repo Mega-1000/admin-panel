@@ -1058,7 +1058,7 @@ $response = json_decode($response)->content[0]->text;
     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $order->id . '.xml';
     $order->save();
 
-    return response()->json($response);
+    return redirect()->back();
 
 
 });
