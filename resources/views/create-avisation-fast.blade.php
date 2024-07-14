@@ -25,12 +25,12 @@
                         <br>
 
                         Magazyn do awizacji
-
                         <select class="form-control" name="warehouse-symbol">
                             @foreach($order->items->first()->product->firm->warehouses as $warehouse)
-                                <option>{{ $warehouse->symbol }}</option>
+                                <option {{ \App\Helpers\LocationHelper::nearestWarehouse($order, $firm)->symbol == $warehouse->symbol ? 'checked' : '' }}>{{ $warehouse->symbol }}</option>
                             @endforeach
                         </select>
+
                         <br>
                         <br>
 
