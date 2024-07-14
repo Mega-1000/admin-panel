@@ -56,6 +56,11 @@
             <hr>
                 <a style="color: red"  href="/auctions/{{ $order['chat']['auctions'][0]['id'] }}/end" target="_blank">
                     Zadzwoń do klienta i poinformuj go o zakończonym przetargu na styropian! Wysłano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->firms->count() }} Zapytań - otrzymano {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->offers->unique('firm')->count() }} ofert
+
+                    <form action="">
+                        <input type="datetime-local" name="notices">
+                        <input type="submit" value="Zapisz">
+                    </form>
                 </a>
             <hr>
         @endif
