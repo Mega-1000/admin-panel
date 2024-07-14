@@ -72,7 +72,6 @@ class GenerateXmlForNexoBuyingJob implements ShouldQueue
         }
 
         foreach ($orders as $order) {
-            dd($order);
             try {
                 $address = $order->warehouse->firm->address;
                 $preAddress = new PreAdres();
@@ -175,6 +174,7 @@ class GenerateXmlForNexoBuyingJob implements ShouldQueue
             }
         }
 
+        dd($fileNames);
         if (count($fileNames) > 0) {
             $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
             $zip = new ZipArchive();
