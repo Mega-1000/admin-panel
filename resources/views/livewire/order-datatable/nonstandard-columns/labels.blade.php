@@ -246,7 +246,7 @@
         @php
             $order = App\Entities\Order::find($order['id']);
             $warehouse = $order->warehouse;
-            if ($order->orderWarehouseNotification->employee_id && $order->orderWarehouseNotification->employee->is_performing_avization) {
+            if ($order->orderWarehouseNotification?->employee_id && $order->orderWarehouseNotification->employee->is_performing_avization) {
                 $warehouseMail = $order->orderWarehouseNotification->employee->email;
             }
 
