@@ -72,6 +72,7 @@ class GenerateXmlForNexoBuyingJob implements ShouldQueue
         }
 
         foreach ($orders as $order) {
+            dd($order);
             try {
                 $address = $order->warehouse->firm->address;
                 $preAddress = new PreAdres();
