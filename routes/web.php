@@ -931,7 +931,7 @@ Route::get('/styro-chatrs/{order}', function (Order $order) {
 
         $parser = new \Smalot\PdfParser\Parser();
         $pdf = $parser->parseContent($invoiceContent);
-        $text .= '--------------------------' .  $pdf->getText();
+        $text .= '--------------------------' . $pdf->getText();
     }
 $prompt = [
     [
