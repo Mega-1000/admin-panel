@@ -382,6 +382,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('packingTypes/{id}/delete', 'PackingTypesController@destroy')->name('packing_type.destroy');
 
         Route::get('generate-fs', 'OrdersController@generateFS')->name('orders.fs');
+        Route::post('/add-additional-info/{id}', 'OrdersController@addAdditionalInfo')->name('orders.addAdditionalInfo');
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 

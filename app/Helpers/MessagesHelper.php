@@ -502,6 +502,14 @@ class MessagesHelper
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
 
+    public function sendNotice(Chat $chat, string $notices): void
+    {
+        $content = $notices;
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+        $this->chatId = $chat->id;
+
+        $this->addMessage($content, 4, null, $blankChatUser);
+    }
     public function sendAvisationDeny(Chat $chat, string $notices): void
     {
         $content = "Informujemy, że awizacja została odrzudona przez magazyn wydający. Z powodu: " . $notices;

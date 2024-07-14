@@ -3192,4 +3192,15 @@ class OrdersController extends Controller
 
         return redirect()->back();
     }
+
+    public function addAdditionalInfo($id, MessagesHelper $messagesHelper): RedirectResponse
+    {
+        $order = Order::find($id);
+        $messagesHelper->sendNotice($order->chat, request()->get('notices'));
+
+        $arr = [];
+        RemoveLabelService::removeLabels($order, [265], $arr, [], Auth::user()->id);
+
+        return redirect()->back();
+    }
 }
