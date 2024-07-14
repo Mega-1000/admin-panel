@@ -28,11 +28,10 @@
                         <select class="form-control" name="warehouse-symbol">
                             @foreach($order->items->first()->product->firm->warehouses as $warehouse)
                                 <option
-                                    selected="
-                                     {{
-                                        \App\Helpers\LocationHelper::nearestWarehouse($order, $order->items->first()->product->firm)->symbol == $warehouse->symbol
-                                     }}
-                                    "
+
+                                    @if(\App\Helpers\LocationHelper::nearestWarehouse($order, $order->items->first()->product->firm)->symbol == $warehouse->symbol)
+                                        selected="selected"
+                                     @endif
                                 >
                                     {{ $warehouse->symbol }}
                                 </option>
