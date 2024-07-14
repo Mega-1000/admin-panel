@@ -20,12 +20,18 @@
                         <br>
                         <br>
                         potwierdzenie przelewu
-                        @if($order->paymentConfirmation)
-                            <a href="{{ route('downloadPaymentConfirmation', $order->paymentConfirmation->id) }}">
-                                Pobierz
-                            </a>
-                        @endif
+                        @foreach($order['files'] as $file)
+                            <a href="{{ route('orders.getFile', ['id' => $order['id'], 'file_id' => $file['hash']]) }}" target="_blank">
+                                @php
+                                    $fileName = $file['file_name'];
+                                    $chunks = str_split($fileName, 8);
+                                @endphp
 
+                                {{ $chunks[0] }}
+                            </a>
+                        @endforeach
+                        <br>
+                        <br>
                         Wartość wszystkich wpłat zaksięgowanych i deklarowanych które klient wykonał na ten moment
                         <input type="text" class="form-control" name="declared_sum">
                         <br>
