@@ -917,7 +917,7 @@ $apiKey = "sk-ant-api03-dHLEzfMBVu3VqW2Y7ocFU_o55QHCkjYoPOumwmD1ZhLDiM30fqyOFsvG
 $anthropicVersion = "2023-06-01";
 
     try {
-        $order = Order::findOrFail($orderId); // Assume $orderId is provided
+        $order = Order::findOrFail($order->id); // Assume $orderId is provided
 
         $invoice = $order->invoices()->first();
 
