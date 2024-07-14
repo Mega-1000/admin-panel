@@ -925,7 +925,7 @@ $anthropicVersion = "2023-06-01";
             throw new \Exception('No invoice found for this order.');
         }
 
-        $invoicePath = dd('invoices/' . $invoice->invoice_name);
+        $invoicePath = dd('public/invoices/' . $invoice->invoice_name);
 
         if (!Storage::exists($invoicePath)) {
             throw new \Exception('Invoice file not found in storage.');
