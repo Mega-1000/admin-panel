@@ -937,7 +937,6 @@ $anthropicVersion = "2023-06-01";
         $pdf = $parser->parseContent($invoiceContent);
         $text = $pdf->getText();
 
-        dd($text);
     } catch (\Exception $e) {
         // Handle the error appropriately
         dd('Error: ' . $e->getMessage());
@@ -948,8 +947,8 @@ $prompt = [
         "content" =>  [
             [
                 'type' => 'text',
-                'text' => json_encode(Order::orderBy('created_at', 'desc')->limit(10)->with(['labels.labelGroup', 'invoiceValues', 'payments', 'items', 'allegroGeneralExpenses', 'otherPackages', 'customer.addresses', 'files', 'packages.realCostsForCompany', 'warehouse', 'chat.messages', 'task.user', 'task.taskTime', 'addresses', 'invoices', 'dates', 'chat.auctions',])->get()->toArray()) . '
-    i pasted my order from db convert it to xml format for invoice program so it will look like this
+                'text' => $text . '
+    i pasted my pdf content with i got from db convert it to xml format for invoice program so it will look like this
 
 <?xml version="1.0"?>
 <PreDokument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -1050,14 +1049,6 @@ Invoice is buying and use "szt" not "szt."
 Provide only xml text nbo other additional info because it is used in systsem directly
 ',
             ],
-            [
-                'type' => 'image',
-                'source' => [
-                    'type' => 'base64',
-                    'media_type' => 'application/pdf',
-                    'data' => $base64Pdf
-                ]
-            ]
         ],
     ]
 ];
