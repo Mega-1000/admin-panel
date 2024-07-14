@@ -64,15 +64,15 @@
                     <br>
 
                      Przetarg został zakończony: {{ \App\Entities\ChatAuction::find($order['chat']['auctions'][0]['id'])->end_of_auction }}
-
-                    <br>
-                    <br>
-
-                    <form action="">
-                        <input type="text" name="notices" class="form-control">
-                        <input type="submit" value="Zapisz" class="btn btn-primary">
-                    </form>
                 </a>
+            <br>
+            <br>
+
+            <form action="">
+                <input type="text" name="notices" class="form-control">
+                <input type="submit" value="Zapisz" class="btn btn-primary">
+            </form>
+            </a>
             <hr>
         @endif
 
