@@ -27,7 +27,7 @@
                         Magazyn do awizacji
                         <select class="form-control" name="warehouse-symbol">
                             @foreach($order->items->first()->product->firm->warehouses as $warehouse)
-                                <option selected="{{ \App\Helpers\LocationHelper::nearestWarehouse($order, $order->items->first()->product->firm)->symbol == $warehouse->symbol ? 'true' : '' }}">{{ $warehouse->symbol }}</option>
+                                <option selected="{{ \App\Helpers\LocationHelper::nearestWarehouse($order, $order->items->first()->product->firm)->symbol == $warehouse->symbol ? 'true' : 'false' }}">{{ $warehouse->symbol }}</option>
                             @endforeach
                         </select>
 
