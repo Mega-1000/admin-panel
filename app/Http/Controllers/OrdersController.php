@@ -3198,9 +3198,19 @@ class OrdersController extends Controller
         $order = Order::find($id);
         $messagesHelper->sendNotice($order->chat, request()->get('notices'));
 
-//        $arr = [];
-//        RemoveLabelService::removeLabels($order, [265], $arr, [], Auth::user()->id);
+        $arr = [];
+        RemoveLabelService::removeLabels($order, [265], $arr, [], Auth::user()->id);
 
+        if (Carbon::create(request()->get('next_contact_date'))) {
+            OrderLabelScheduler::query()->create([
+                'order_id' => $order->id,
+                'label_id' => 5,
+                'label_id_to_handle' => 265,
+                'type' => 'C',
+                'action' => 'to_add_type_c',
+                'trigger_time' => Carbon::create(request()->get('next_contact_date')),
+            ]);
+        }
         return redirect()->back();
     }
 }
