@@ -91,7 +91,6 @@ class GenerateXmlForNexoBuyingJob implements ShouldQueue
                     ->setNazwaPelna((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
                     ->setNIP($address->nip)
                     ->setEmail($address->firm->email)
-                    ->setTelefon($address->phone)
                     ->setRodzajNaDok(EPreKlientRodzajNaDok::NABYWCA)
                     ->setAdresGlowny($preAddress)
                     ->setChceFV('true');
