@@ -89,8 +89,6 @@ class GenerateXmlForNexoBuyingJob implements ShouldQueue
                     ->setSymbol((empty($address->nip)) ? strtoupper(PdfCharactersHelper::changePolishCharactersToNonAccented($address->lastname . $address->firstname . $postalCodeWithOnlyNumbers)) : $address->nip)
                     ->setNazwa((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
                     ->setNazwaPelna((empty($address->firmname)) ? $address->firstname . ' ' . $address->lastname : $address->firmname)
-                    ->setOsobaImie($address->firstname)
-                    ->setOsobaNazwisko($address->lastname)
                     ->setNIP($address->nip)
                     ->setEmail($address->getAllegroEmailAddress())
                     ->setTelefon($address->phone)
