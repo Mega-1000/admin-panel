@@ -2,6 +2,7 @@
     onmouseover="showPhoneInformations('{{ $wholeOrder['created_at'] }}')"
     onmouseout="hidePhoneInformations('{{ $wholeOrder['created_at'] }}')"
 >
+    Ten użytkownik ma {{ Order::where('customer_id', $wholeOrder['customer']['id'])->count() }} zapytań na swoim koncie.
     <a class="btn btn-primary" href="?{{ $column['label'] }}={{ $data }}">
         NO
     </a>
