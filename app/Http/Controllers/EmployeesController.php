@@ -184,6 +184,7 @@ class EmployeesController extends Controller
         $employee->phone_visibility = $request->input('phone_visibility') ?? 1;
         $employee->comments_visibility = $request->input('comments_visibility') ?? 1;
         $employee->postal_code_visibility = $request->input('postal_code_visibility') ?? 1;
+        $employee->is_performing_avization = $request->input('is_performing_avization') ?? 0;
         $employee->save();
         $employee->employeeRoles()->detach();
         for ($i = $request->input('rolecount'); $i > 0; $i--) {

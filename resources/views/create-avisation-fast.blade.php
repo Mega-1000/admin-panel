@@ -34,6 +34,16 @@
                         <br>
                         <br>
 
+                        Pracownik odpowiedzialny za awizację
+                        <select class="form-control" name="warehouse-symbol">
+                            @foreach($order->items->first()->product->firm->employees as $employee)
+                                <option>{{ $employee->email }}</option>
+                            @endforeach
+                        </select>
+
+                        <br>
+                        <br>
+
                         Rodzaj transportu
                         <select class="form-control">
                             <option value="1">
