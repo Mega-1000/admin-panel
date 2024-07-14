@@ -1022,6 +1022,8 @@ $prompt = [
 This format
 
 Invoice is buying and use "szt" not "szt."
+
+Provide only xml text nbo other additional info because it is used in systsem directly
 ',
             ]
         ]
@@ -1047,6 +1049,8 @@ curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
 $response = curl_exec($ch);
+
+$response = json_decode(json_decode($response)->content[0]->text);
 
 
 return response()->json($response);
