@@ -1051,7 +1051,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
 $response = curl_exec($ch);
 
-$response = json_decode($response)->content[0]->text;
+$response = dd(json_decode($response))->content[0]->text;
 
     Storage::put('public/buyinginvoices/' . $order->id . '.xml' , $response);
 
