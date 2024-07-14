@@ -62,7 +62,14 @@ class OrdersRecalculatorBasedOnPeriod
         }
 
         if (
-            round(round($sumOfGrossValues, 2) + round($depositPaidData['returnedValue'], 2) - round($depositPaidData['balance'], 2) - round($depositPaidData['wtonValue'], 2) - round($depositPaidData['externalFirmValue'], 2) - round($payments, 2)) == 0.0 &&
+            round(
+                round($sumOfGrossValues, 2) +
+                round($depositPaidData['returnedValue'], 2) -
+                round($depositPaidData['balance'], 2) -
+                round($depositPaidData['wtonValue'], 2) -
+                round($depositPaidData['externalFirmValue'], 2) -
+                round($payments, 2)
+            ) == 0.0 &&
             $order->payments->count() > 0
         ) {
             $order = Order::find($order->id);
@@ -79,7 +86,10 @@ class OrdersRecalculatorBasedOnPeriod
 
         if ($order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->first()) {
             $arr = [];
-            if (round($orderItemsValueWithTransport, 2) != round($totalPaymentsBuying, 2) && !$order->labels->contains(257)) {
+            if (
+                round($orderItemsValueWithTransport, 2) != round($totalPaymentsBuying, 2) &&
+                !$order->labels->contains(257)
+            ) {
                 AddLabelService::addLabels($order, [258], $arr, []);
             } else {
                 RemoveLabelService::removeLabels($order, [258],  $arr, [], Auth::user()?->id);
