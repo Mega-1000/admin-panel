@@ -934,18 +934,8 @@ $anthropicVersion = "2023-06-01";
         $invoiceContent = Storage::get($invoicePath);
 
         // Encode the PDF content to base64
-        $base64Pdf = base64_encode($invoiceContent);
+        $base64Pdf = dd(base64_encode($invoiceContent));
 
-
-        $imagick = new \Imagick();
-        $imagick->readImage('https://admin.mega1000.pl/invoices/' . $invoice->invoice_name . '[0]'); // Read only the first page
-        $imagick->setImageFormat('png');
-
-        // Get the PNG data
-        $pngData = $imagick->getImageBlob();
-
-        // Encode the PNG data to base64
-        $base64Pdf = base64_encode($pngData);
     } catch (\Exception $e) {
         // Handle the error appropriately
         dd('Error: ' . $e->getMessage());

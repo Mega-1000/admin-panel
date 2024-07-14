@@ -46,8 +46,7 @@
         "twilio/sdk": "^8.0",
         "vaibhavpandeyvpz/phemail": "^1.0",
         "viison/address-splitter": "^0.3.4",
-        "yajra/laravel-datatables-oracle": "v10.2.3",
-      "ext-imagick": "*"
+        "yajra/laravel-datatables-oracle": "v10.2.3"
     },
     "require-dev": {
         "ext-dom": "*",
