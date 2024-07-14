@@ -917,7 +917,7 @@ $apiKey = "sk-ant-api03-dHLEzfMBVu3VqW2Y7ocFU_o55QHCkjYoPOumwmD1ZhLDiM30fqyOFsvG
 $anthropicVersion = "2023-06-01";
 
 
-dd(Storage::get('invoices' . $order->invoices()->first()->invoice_name));
+dd(Storage::get('invoices/' . $order->invoices()->first()->invoice_name));
 
 $prompt = [
     [
