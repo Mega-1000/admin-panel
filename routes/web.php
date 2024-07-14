@@ -933,8 +933,33 @@ $anthropicVersion = "2023-06-01";
 
         $invoiceContent = Storage::get($invoicePath);
 
-        // Encode the PDF content to base64
-        $base64Pdf = dd(base64_encode($invoiceContent));
+        $invoice = $order->invoices()->first();
+
+        if (!$invoice) {
+            throw new \Exception('No invoice found for this order.');
+        }
+
+        $invoicePath = 'public/invoices/' . $invoice->invoice_name;
+
+        if (!Storage::exists($invoicePath)) {
+            throw new \Exception('Invoice file not found in storage.');
+        }
+
+        $invoiceContent = Storage::get($invoicePath);
+
+        $tempPdfPath = tempnam(sys_get_temp_dir(), 'invoice_');
+        file_put_contents($tempPdfPath, $invoiceContent);
+
+        $tempTextPath = tempnam(sys_get_temp_dir(), 'invoice_text_');
+        exec("pdftotext {$tempPdfPath} {$tempTextPath}");
+
+        $text = file_get_contents($tempTextPath);
+
+        dd($text);
+
+        unlink($tempPdfPath);
+        unlink($tempTextPath);
+
 
     } catch (\Exception $e) {
         // Handle the error appropriately
