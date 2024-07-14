@@ -103,8 +103,8 @@
                 @endforeach
             </h5>
         </div>
-        @if($order->invoice_buying_warehouse_file)
-            Faktura zakupu gotowa: {{ $order->invoice_buying_warehouse_file }}
+        @if($order['invoice_buying_warehouse_file'])
+            Faktura zakupu gotowa: {{ $order['invoice_buying_warehouse_file'] }}
         @endif
 
         <h6>Załącz potwierdzenie przelewu</h6>
