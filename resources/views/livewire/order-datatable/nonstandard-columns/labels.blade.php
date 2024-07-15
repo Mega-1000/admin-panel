@@ -229,9 +229,9 @@
         @endif
 
         @php
-            $hasLabel206 = false;
             if (!empty($order['labels'])) {
                 $hasLabel206 = false;
+
                 foreach ($order['labels'] as $label) {
                     if ($label['id'] === 206 )
                     {
