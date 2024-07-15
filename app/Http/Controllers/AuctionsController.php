@@ -543,6 +543,9 @@ class AuctionsController extends Controller
         $requestData = $request->all();
         $products = $requestData['productData'];
 
+        $order->approved_at = now();
+        $order->save();
+
         $arr = [];
         AddLabelService::addLabels($order, [206], $arr, []);
 
