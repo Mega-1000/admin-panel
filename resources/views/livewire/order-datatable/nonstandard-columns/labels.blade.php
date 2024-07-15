@@ -80,6 +80,29 @@
             <hr>
         @endif
 
+
+        @php
+            $hasLabel206 = false;
+            if (!empty($order['labels'])) {
+
+                foreach ($order['labels'] as $label) {
+                    if ($label['id'] === 206)
+                    {
+                        $hasLabel206 = true;
+                        break;
+                    }
+                }
+            }
+        @endphp
+
+        @if ($hasLabel206)
+            <div class="mt-4">
+                <hr>
+                Zamówienie zostało zatwierdzone! Data zatwierdzenia: {{ $order['approved_at'] }}
+                <hr>
+            </div>
+        @endif
+
     @endif
     @if($labelGroupName === 'fakury zakupu')
         <div style="margin-top: 30px">
@@ -224,28 +247,6 @@
                         </button>
 {{--                    @endif--}}
                 </form>
-                <hr>
-            </div>
-        @endif
-
-        @php
-            if (!empty($order['labels'])) {
-                $hasLabel206 = false;
-
-                foreach ($order['labels'] as $label) {
-                    if ($label['id'] === 206 )
-                    {
-                        $hasLabel206 = true;
-                        break;
-                    }
-                }
-            }
-        @endphp
-
-        @if ($hasLabel206)
-            <div class="mt-4">
-                <hr>
-                    Zamówienie zostało zatwierdzone! Data zatwierdzenia: {{ $order['approved_at'] }}
                 <hr>
             </div>
         @endif
