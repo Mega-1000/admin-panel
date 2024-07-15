@@ -58,9 +58,11 @@
 
 <br>
 
-<a href="https://admin.mega1000.pl/order-proform-pdf/{{ $order->orderOffers->first()->id }}" class="btn btn-primary" target="__blank">
-    Faktura proforma
-</a>
+@if($order->orderOffers?->first()?->id)
+    <a href="https://admin.mega1000.pl/order-proform-pdf/{{ $order->orderOffers->first()->id }}" class="btn btn-primary" target="__blank">
+        Faktura proforma
+    </a>
+@endif
 
 <br>
 
