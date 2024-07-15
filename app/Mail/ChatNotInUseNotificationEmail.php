@@ -42,7 +42,7 @@ class ChatNotInUseNotificationEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Czy dialog został zakończony? Brak odpowiedzi na wiadomość na chacie od 2 dni',
+            subject: 'Czy dialog do zapyania:' . $this->chat->order->id . ' został zakończony? Brak odpowiedzi na wiadomość na chacie od 2 dni',
         );
     }
 

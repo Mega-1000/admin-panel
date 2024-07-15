@@ -74,6 +74,10 @@ https://admin.mega1000.pl/chat/$token",
                 $chat->information_about_chat_inactiveness_sent = true;
                 $chat->save();
             }
+
+            if (Carbon::create($lastMessageSentTime)->addDays(4) < now() && $chat->order->labels->contains(56)) {
+                $chat->order->labels()->detach(56);
+            }
         }
     }
 }

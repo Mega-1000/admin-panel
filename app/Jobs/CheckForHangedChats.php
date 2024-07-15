@@ -44,6 +44,7 @@ class CheckForHangedChats implements ShouldQueue
             ->with(['messages' => function ($q) {
                 $q->with('chatUser');
             }])->get();
+
         $chats->map(function ($chat) use ($redLabelTime, $yellowLabelTime) {
             $lastMessage = $chat->getLastMessage();
             if (!$this->validate($lastMessage)) {

@@ -12,7 +12,6 @@ Chcielibyśmy zapytać czy temat dyskusji został rozwiązany. Prosimy wybrać j
 
 <a href="{{ $chatUrl }}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #6c757d; text-align: center; text-decoration: none; border-radius: 5px; transition: background-color 0.3s ease;">Przejdź do chata</a>
 
-
 <br>
 <br>
 Z Pozdrowieniami, <br>
