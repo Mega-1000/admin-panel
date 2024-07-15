@@ -56,7 +56,19 @@
     Raport wiadomości
 </a>
 
-<a target="_blank" class="btn btn-sm btn-primary" href="/admin/create-package-product-order/${id}">Stwórz produkt pakowy</a>
+<br>
+
+<a href="https://amdin.mega1000.pl/order-proform-pdf/{{ $order->id }}" class="btn btn-primary" target="__blank">
+    Faktura proforma
+</a>
+
+<br>
+
+<a target="_blank" class="btn btn-primary header-button"
+   href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
+   for="add-item">
+    Edytuj zamówienie w koszyku
+</a>
 
 {{--@if ($order['is_buying_admin_side'])--}}
     <a class="btn btn-primary" href="/admin/accept-products/{{ $order['id'] }}" target="__blank">Przyjmij na stany magazynowe</a>
