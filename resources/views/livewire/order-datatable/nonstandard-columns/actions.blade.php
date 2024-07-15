@@ -58,7 +58,7 @@
 
 <br>
 
-<a href="https://amdin.mega1000.pl/order-proform-pdf/{{ $order->id }}" class="btn btn-primary" target="__blank">
+<a href="https://admin.mega1000.pl/order-proform-pdf/{{ $order->id }}" class="btn btn-primary" target="__blank">
     Faktura proforma
 </a>
 
