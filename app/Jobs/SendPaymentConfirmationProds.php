@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Entities\Order;
 use App\Entities\OrderPaymentConfirmation;
+use App\Entities\Warehouse;
 use App\Facades\Mailer;
 use App\Mail\OrderPaymentConfirmationAttachedMail;
 use App\Services\Label\AddLabelService;
@@ -39,7 +41,7 @@ class SendPaymentConfirmationProds implements ShouldQueue
 
         foreach ($confirmations as $confirmation) {
             try {
-                dd($confirmation->order);
+                dd(Warehouse::find($confirmation->order->warehouse_id)->warehouse_email);
                 Mailer::create()
                     ->to($confirmation->order?->warehouse?->warehouse_email)
                     ->send(new OrderPaymentConfirmationAttachedMail($confirmation, true));
