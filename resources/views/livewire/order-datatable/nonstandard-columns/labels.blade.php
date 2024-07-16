@@ -1,6 +1,5 @@
-
 @php
-    $or = App\Entities\Order::with(['labels', 'files', 'chat.auctions', 'warehouse.property'])->find($order['id']);
+    $or = App\Entities\Order::with(['labels.label_group', 'files', 'chat.auctions', 'warehouse.property'])->find($order['id']);
     $labels = collect($or->labels);
     $hasLabel224 = $labels->contains('id', 224);
     $hasLabel265 = $labels->contains('id', 265);
@@ -9,7 +8,11 @@
     $hasLabel276 = $labels->contains('id', 276);
     $hasLabel279 = $labels->contains('id', 279);
     $hasLabel77 = $labels->contains('id', 77);
+    $hasLabel270 = $labels->contains('id', 270);
+    $hasLabel275 = $labels->contains('id', 275);
+    $hasLabel243 = $labels->contains('id', 243);
 @endphp
+
 
 @if($labelGroupName === 'info dodatkowe')
     <button onclick="uploadFile({{ $or->id }})">Dodaj</button>
