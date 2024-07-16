@@ -162,9 +162,11 @@
 @endif
 
 <div class="label-container">
-    @foreach($labels->filter(function ($label) use($labelGroupName) { return $label->label_group->name === $labelGroupName; }) as $label)
+    @foreach($labels->filter(function ($label) use($labelGroupName) {
+        return $label->label_group && $label->label_group->name === $labelGroupName;
+    }) as $label)
         <span
-            onclick="removeLabel({{ $or->id}}, {{ $label->id }}, {{ $label->manual_label_selection_to_add_after_removal }}, 'null', {{$label->timed}})"
+            onclick="removeLabel({{ $or->id}}, {{ $label->id }}, {{ $label->manual_label_selection_to_add_after_removal ?? 'null' }}, 'null', {{$label->timed ? 'true' : 'false'}})"
             class="label-wrapper"
             style="cursor: pointer"
             onmouseover="showLabelName(this, '{{ $label->name }}', '{{ $label->created_at }}')"
