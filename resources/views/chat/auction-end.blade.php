@@ -125,6 +125,16 @@
         <div id="chat-container">
             <div>
                 Oglądasz tabele zapytania: {{ $order->id }}
+                @if(auth()->user())
+                    <br>
+                        Użytkownik: {{ $order->customer->login }} Numer telefonu: {{ $order->customer->phone }}
+                        <a target="_blank" class="btn btn-primary header-button"
+                           href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
+                           for="add-item">
+                            Edytuj zamówienie w koszyku
+                        </a>
+                    <br>
+                @endif
             </div>
 
             <div class="alert-success alert">
