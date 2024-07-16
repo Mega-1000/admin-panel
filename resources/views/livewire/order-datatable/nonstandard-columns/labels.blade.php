@@ -1,5 +1,8 @@
 <div>
 
+    @php
+        $or = App\Entities\Order::find($order['id']);
+    @endphp
 @if($labelGroupName === 'info dodatkowe')
     <button onclick="uploadFile({{ $order['id'] }})">
         Dodaj
@@ -105,9 +108,6 @@
         @endif
 
 
-        @php
-            $or = App\Entities\Order::find($order['id']);
-        @endphp
         @php
             $hasLabel95 = false;
             if (!empty($order['labels'])) {
