@@ -51,7 +51,7 @@ class OrderDatatableIndex extends Component
         $this->user = User::find(auth()->id());
 
         $this->orders = (new OrderDatatableRetrievingService())->getOrders(
-            $this->getPageLengthProperty(), dd($this->user->grid_settings) ?? '[]'
+            $this->getPageLengthProperty(), $this->user->grid_settings ?? '[]'
         );
 
         $redirectInstance = $this->reRenderFilters();
