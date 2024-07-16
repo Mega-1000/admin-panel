@@ -128,7 +128,7 @@
                     <br>
                     <div>
                         @php
-                            $variation = app(\App\Http\Controllers\OrdersController::class)->getNearestVariation($order['id']);
+                            $variation = app(\App\Http\Controllers\OrdersController::class)->getNearestVariation($or);
                         @endphp
                         Najbliższa wariacja to: {{ $variation['product_name_supplier'] }} w odległości {{ $variation['distance'] }} km
                     </div>
