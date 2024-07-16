@@ -127,7 +127,7 @@
                 Oglądasz tabele zapytania: {{ $order->id }}
                 @if(auth()->user())
                     <br>
-                        Użytkownik: {{ $order->customer->login }} Numer telefonu: {{ $order->customer->phone }}
+                        Użytkownik: {{ $order->customer->login }} Numer telefonu: {{ $order->addresses()->first()->phone }}
                         <a target="_blank" class="btn btn-primary header-button"
                            href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
                            for="add-item">
