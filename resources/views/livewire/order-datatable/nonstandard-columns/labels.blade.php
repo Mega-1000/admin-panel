@@ -25,7 +25,7 @@
     ];
 
     $chatAuction = $or->chat->auctions->first();
-    $warehouseNotification = $or->orderWarehouseNotification;
+    $warehouseNotification = $or->orderWarehouseNotifications->first();
 @endphp
 
 <div>
