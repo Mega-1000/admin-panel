@@ -134,6 +134,7 @@
                             Edytuj zamówienie w koszyku
                         </a>
                     <br>
+                    <br>
                 @endif
             </div>
 
