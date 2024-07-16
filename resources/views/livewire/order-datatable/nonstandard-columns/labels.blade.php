@@ -4,7 +4,7 @@
         'labels',
         'files',
         'warehouse.property',
-        'orderWarehouseNotification.employee',
+        'orderWarehouseNotifications.employee',
         'warehouse.firm',
         'chat.auctions.firms',
         'chat.auctions.offers',
