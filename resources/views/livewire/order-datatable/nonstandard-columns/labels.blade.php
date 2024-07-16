@@ -1,5 +1,6 @@
+
 @php
-    $or = App\Entities\Order::with(['labels', 'files', 'chat.auctions', 'warehouse.property', 'orderWarehouseNotification.employee', 'orderWarehouseNotification.warehouse.property'])->find($order['id']);
+    $or = App\Entities\Order::with(['labels', 'files', 'chat.auctions', 'warehouse.property'])->find($order['id']);
     $labels = collect($or->labels);
     $hasLabel224 = $labels->contains('id', 224);
     $hasLabel265 = $labels->contains('id', 265);
@@ -20,7 +21,7 @@
         <button onclick="getFilesList({{ $or->id }})">Usuń</button>
     @endforeach
 
-    @if ($hasLabel224)
+    @if ($hasLabel224 && $or->chat && $or->chat->auctions->isNotEmpty())
         <hr>
         @php
             $auction = $or->chat->auctions->first();
@@ -33,7 +34,7 @@
         <hr>
     @endif
 
-    @if ($hasLabel265)
+    @if ($hasLabel265 && $or->chat && $or->chat->auctions->isNotEmpty())
         <hr>
         @php
             $auction = $or->chat->auctions->first();
@@ -91,9 +92,9 @@
                 <br><br>
                 Dane osoby obsługującej:
                 <br>
-                email: {{ $or->warehouse->warehouse_email }}
+                email: {{ $or->warehouse->warehouse_email ?? '' }}
                 <br>
-                numer telefonu: {{ $or->warehouse->property->phone }}
+                numer telefonu: {{ $or->warehouse->property->phone ?? '' }}
                 <hr>
             @endforeach
         </h5>
@@ -131,7 +132,7 @@
         @endif
     @endforeach
 
-    @if(\Carbon\Carbon::parse($or->last_confirmation)->isToday())
+    @if($or->last_confirmation && \Carbon\Carbon::parse($or->last_confirmation)->isToday())
         <div style="color: green">Magazyn potwierdził, że zamówienie nie wyjedzie jutro</div>
     @endif
 
@@ -177,7 +178,7 @@
 
 @if($labelGroupName === 'produkcja')
     @php
-        $notification = $or->orderWarehouseNotification;
+        $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
         $warehouse = $or->warehouse;
         $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
             ? $notification->employee->email
