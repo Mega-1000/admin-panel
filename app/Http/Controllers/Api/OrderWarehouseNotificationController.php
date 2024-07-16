@@ -233,7 +233,7 @@ class OrderWarehouseNotificationController extends Controller
 
 
         if (
-            $order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')) &&
+            $order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum'))
         ) {
             if ($order->payments->sum('declared_sum') !== 0 && !empty($request->input('declared_sum', '0'))) {
                 $orderPayment = app(OrderPaymentService::class)->payOrder($order->id, $request->input('declared_sum', '0'), $payer,
