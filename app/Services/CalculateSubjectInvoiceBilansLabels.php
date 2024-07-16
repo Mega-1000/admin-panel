@@ -17,6 +17,8 @@ class CalculateSubjectInvoiceBilansLabels {
         $orderInvoiceValuesSum = OrderInvoiceValues::getSumOfInvoiceValuesByOrder($order);
         $orderValue = $order->getValue() + Orders::getOrderReturnGoods($order) - Orders::getSumOfWTONPayments($order);
         $arr = [];
+
+        dd(round($orderInvoiceValuesSum, 2) != round($orderValue, 2));
         if (round($orderInvoiceValuesSum, 2) != round($orderValue, 2) && !$order->labels->contains(124)) {
             AddLabelService::addLabels($order, [231],$arr, []);
 
