@@ -234,7 +234,7 @@ class OrderWarehouseNotificationController extends Controller
 
         if ($order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum'))) {
             if ($order->payments->sum('declared_sum') !== 0) {
-                $orderPayment = app(OrderPaymentService::class)->payOrder($order->id, $request->input('declared_sum', '0'), $payer,
+                $orderPayment = app(OrderPaymentService::class)->payOrder(dd($order->id, $request->input('declared_sum', '0')), $payer,
                     null, true,
                     false, $promiseDate,
                     $type, false,
@@ -245,7 +245,6 @@ class OrderWarehouseNotificationController extends Controller
                 $orderPaymentAmount = (float)PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
                 $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
 
-                dd($orderPaymentAmount);
                 app(OrderPaymentLogService::class)->create(
                     $order->id,
                     $orderPayment->id,
@@ -266,7 +265,7 @@ class OrderWarehouseNotificationController extends Controller
                 $promiseDate = Carbon::create($shipmentDateTo);
 
                 $orderPayment = app(OrderPaymentService::class)->payOrder(
-                    $order->id, $order->getValue() - $order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')),
+                    dd($order->id, $order->getValue() - $order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum'))),
                     $payer,
                     null, true,
                     false, $promiseDate,
