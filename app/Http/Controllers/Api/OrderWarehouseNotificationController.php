@@ -267,7 +267,7 @@ class OrderWarehouseNotificationController extends Controller
                 $promiseDate = Carbon::create($shipmentDateTo);
 
                 $orderPayment = app(OrderPaymentService::class)->payOrder(
-                    dd($order->id, $order->getValue() - $order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum'))),
+                    $order->id, $order->getValue() - ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')),
                     $payer,
                     null, true,
                     false, $promiseDate,
