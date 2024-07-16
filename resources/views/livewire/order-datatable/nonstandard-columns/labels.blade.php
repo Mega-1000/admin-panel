@@ -130,7 +130,7 @@
                         @php
                             $variation = app(\App\Http\Controllers\OrdersController::class)->getNearestVariation($or);
                         @endphp
-                        Najbliższa wariacja to: {{ $variation['product_name_supplier'] }} w odległości {{ $variation['distance'] }} km
+                        Najbliższa wariacja to: {{ $variation['product_name_supplier'] }} w odległości {{ round($variation['distance'], 2) }} km
                     </div>
                 </div>
             @endif
