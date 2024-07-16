@@ -124,7 +124,7 @@
         @if($hasLabel95)
             @if($or->getValue() < 3000)
                 <div style="color: red">
-                    To zamówienie zawiera małą ilość styropianu. Nie możliwa będzie dostawa do klienta bezpłatnie. Należy obsłużyć klienta ręcznie.
+                    Zamówienie zawiera mało styropianu. Dostawa nie będzie bezpłatna. Obsłuż klienta ręcznie.
                     <br>
                     <div>
                         @php
