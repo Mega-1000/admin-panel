@@ -32,7 +32,7 @@ class SendPaymentConfirmationProds implements ShouldQueue
      * @throws Exception
      */
     public function handle(): void
-    {O
+    {
         $confirmations = OrderPaymentConfirmation::where('confirmed', false)->where('created_at', '<', now()->subMinutes(30))->whereDoesntHave('order.labels', function ($q) {
             $q->where('labels.id', 260);
         })->get();
