@@ -1,7 +1,5 @@
 <div>
-    @php
-        $order = App\Entities\Order::find($order['id']);
-    @endphp
+
 @if($labelGroupName === 'info dodatkowe')
     <button onclick="uploadFile({{ $order['id'] }})">
         Dodaj
@@ -106,6 +104,10 @@
             </div>
         @endif
 
+
+        @php
+            $or = App\Entities\Order::find($order['id']);
+        @endphp
         @php
             $hasLabel95 = false;
             if (!empty($order['labels'])) {
@@ -120,7 +122,7 @@
         @endphp
 
         @if($hasLabel95)
-            @if($order->getValue() < 3000)
+            @if($or->getValue() < 3000)
                 <div style="color: red">
                     To zamówienie zawiera małą ilość styropianu. Nie możliwa będzie dostawa do klienta bezpłatnie. Należy obsłużyć klienta ręcznie.
                 </div>
@@ -313,9 +315,9 @@
 
     @if($labelGroupName === 'produkcja')
         @php
-            $warehouse = $order->warehouse;
-            if ($order->orderWarehouseNotification?->employee_id && $order->orderWarehouseNotification->employee->is_performing_avization) {
-                $warehouseMail = $order->orderWarehouseNotification->employee->email;
+            $warehouse = $or->warehouse;
+            if ($or->orderWarehouseNotification?->employee_id && $or->orderWarehouseNotification->employee->is_performing_avization) {
+                $warehouseMail = $or->orderWarehouseNotification->employee->email;
             }
 
             if ($warehouse && $warehouse->firm) {
