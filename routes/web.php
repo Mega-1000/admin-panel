@@ -1075,8 +1075,6 @@ $response = json_decode($response)->content[0]->text;
     $order->save();
 
     return redirect()->back();
-
-
 });
 
 Route::get('all-auctions-map', function (Request $request) {

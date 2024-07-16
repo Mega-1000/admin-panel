@@ -103,6 +103,26 @@
             </div>
         @endif
 
+        @php
+            $hasLabel95 = false;
+            if (!empty($order['labels'])) {
+                foreach ($order['labels'] as $label) {
+                    if ($label['id'] === 95)
+                    {
+                        $hasLabel95 = true;
+                        break;
+                    }
+                }
+            }
+        @endphp
+
+        @if($hasLabel95)
+            @if($order->getValue() < 3000)
+                <div style="color: red">
+                    To zamówienie zawiera małą ilość styropianu. Nie możliwa będzie dostawa do klienta bezpłatnie. Należy obsłużyć klienta ręcznie.
+                </div>
+            @endif
+        @endif
     @endif
     @if($labelGroupName === 'fakury zakupu')
         <div style="margin-top: 30px">
