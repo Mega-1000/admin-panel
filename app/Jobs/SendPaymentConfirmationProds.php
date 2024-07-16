@@ -39,8 +39,9 @@ class SendPaymentConfirmationProds implements ShouldQueue
 
         foreach ($confirmations as $confirmation) {
             try {
+                dd($confirmation->order?->warehouse);
                 Mailer::create()
-                    ->to($confirmation->order->warehouse->warehouse_email)
+                    ->to($confirmation->order?->warehouse?->warehouse_email)
                     ->send(new OrderPaymentConfirmationAttachedMail($confirmation, true));
 
                 if (!$confirmation->order->labels->has(261)) {
