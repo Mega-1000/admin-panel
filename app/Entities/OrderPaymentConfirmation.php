@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderPaymentConfirmation extends Model
 {
-    use HasFactory;
-
     public $fillable = [
-        'file_url',
         'confirmed',
+        'file_url',
         'order_id',
     ];
+
+    use HasFactory;
 
     public function order(): BelongsTo
     {
