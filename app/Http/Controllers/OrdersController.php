@@ -495,6 +495,80 @@ class OrdersController extends Controller
         );
     }
 
+    public function getNearestVariation($order)
+    {
+        $nearestVariation = null;
+        $minDistance = PHP_FLOAT_MAX;
+
+        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
+            "order_id" => $order->id,
+            'type' => 'DELIVERY_ADDRESS',
+        ])->first();
+
+        if (empty($orderDeliveryAddress)) {
+            return null;
+        }
+
+        $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->first();
+        if ($deliveryAddressLatLon === null) {
+            Session::flash('message', 'Nie znaleziono kodu pocztowego w bazie!');
+            return null;
+        }
+
+        foreach ($order->items as $product) {
+            if ($product->product->product_group == null) {
+                continue;
+            }
+
+            $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
+
+            foreach ($productVar as $prod) {
+                $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier)->first();
+
+                if (!$firm || $firm->warehouses->isEmpty()) {
+                    continue;
+                }
+
+                $raw = DB::selectOne(
+                    'SELECT w.id, 1.609344 * SQRT(
+                POW(69.1 * (pc.latitude - :latitude), 2) +
+                POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                FROM postal_code_lat_lon pc
+                     JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                     JOIN warehouses w on wa.warehouse_id = w.id
+                WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                ORDER BY distance
+                LIMIT 1',
+                    [
+                        'latitude' => $deliveryAddressLatLon->latitude,
+                        'longitude' => $deliveryAddressLatLon->longitude,
+                        'firmId' => $firm->id
+                    ]
+                );
+
+                if (empty($raw)) {
+                    continue;
+                }
+
+                $warehouse = $this->warehouseRepository->find($raw->id);
+
+                if ($raw->distance <= $warehouse->radius && $raw->distance < $minDistance) {
+                    $minDistance = $raw->distance;
+                    $nearestVariation = [
+                        'id' => $prod->id,
+                        'name' => $prod->name,
+                        'product_name_supplier' => $prod->product_name_supplier,
+                        'distance' => $raw->distance,
+                        'warehouse_id' => $raw->id,
+                        'warehouse_property' => $warehouse->property->comments
+                    ];
+                }
+            }
+        }
+
+        return $nearestVariation;
+    }
+
     public function getVariations($order): array
     {
         $productsVariation = [];

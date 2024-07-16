@@ -125,6 +125,13 @@
             @if($or->getValue() < 3000)
                 <div style="color: red">
                     To zamówienie zawiera małą ilość styropianu. Nie możliwa będzie dostawa do klienta bezpłatnie. Należy obsłużyć klienta ręcznie.
+                    <br>
+                    <div>
+                        @php
+                            $variation = app(\App\Http\Controllers\OrdersController::class)->getNearestVariation($order['id']);
+                        @endphp
+                        Najbliższa wariacja to: {{ $variation['product_name_supplier'] }} w odległości {{ $variation['distance'] }} km
+                    </div>
                 </div>
             @endif
         @endif
