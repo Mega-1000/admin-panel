@@ -8,7 +8,7 @@
         'warehouse.firm',
         'chat.auctions.firms',
         'chat.auctions.offers',
-        'paymentConfirmations'
+        'paymentConfirmation'
     ])->findOrFail($order['id']);
 
     // Pre-compute label checks
@@ -103,18 +103,16 @@
     @if($labelGroupName === 'fakury zakupu')
         <div style="margin-top: 30px">
             <h5>
-                @foreach($or->paymentConfirmations as $paymentConfirmation)
-                    <hr>
-                    <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
-                    <br>
-                    <br>
-                    Dane osoby obsługującej:
-                    <br>
-                    email: {{ $or->warehouse->warehouse_email }}
-                    <br>
-                    numer telefonu: {{ $or->warehouse->property->phone }}
-                    <hr>
-                @endforeach
+                <hr>
+                <a href="{{ $or->paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
+                <br>
+                <br>
+                Dane osoby obsługującej:
+                <br>
+                email: {{ $or->warehouse->warehouse_email }}
+                <br>
+                numer telefonu: {{ $or->warehouse->property->phone }}
+                <hr>
             </h5>
         </div>
         @if($or->invoice_buying_warehouse_file)
