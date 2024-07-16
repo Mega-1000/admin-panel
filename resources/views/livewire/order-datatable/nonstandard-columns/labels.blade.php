@@ -1,14 +1,17 @@
 <div>
-    @if($labelGroupName === 'info dodatkowe')
-        <button onclick="uploadFile({{ $order['id'] }})">
-            Dodaj
-        </button>
+    @php
+        $order = App\Entities\Order::find($order['id']);
+    @endphp
+@if($labelGroupName === 'info dodatkowe')
+    <button onclick="uploadFile({{ $order['id'] }})">
+        Dodaj
+    </button>
 
-        @foreach($order['files'] as $file)
-            <a href="{{ route('orders.getFile', ['id' => $order['id'], 'file_id' => $file['hash']]) }}" target="_blank">
-                @php
-                    $fileName = $file['file_name'];
-                    $chunks = str_split($fileName, 8);
+    @foreach($order['files'] as $file)
+        <a href="{{ route('orders.getFile', ['id' => $order['id'], 'file_id' => $file['hash']]) }}" target="_blank">
+            @php
+                $fileName = $file['file_name'];
+                $chunks = str_split($fileName, 8);
                 @endphp
 
                 {{ $chunks[0] }}
@@ -310,7 +313,6 @@
 
     @if($labelGroupName === 'produkcja')
         @php
-            $order = App\Entities\Order::find($order['id']);
             $warehouse = $order->warehouse;
             if ($order->orderWarehouseNotification?->employee_id && $order->orderWarehouseNotification->employee->is_performing_avization) {
                 $warehouseMail = $order->orderWarehouseNotification->employee->email;
