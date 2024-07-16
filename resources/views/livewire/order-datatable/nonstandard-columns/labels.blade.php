@@ -1,5 +1,5 @@
 @php
-    $or = App\Entities\Order::with(['labels.label_group', 'files', 'chat.auctions', 'warehouse.property'])->find($order['id']);
+    $or = App\Entities\Order::with(['labels.labelGroup', 'files', 'chat.auctions', 'warehouse.property'])->find($order['id']);
     $labels = collect($or->labels);
     $hasLabel224 = $labels->contains('id', 224);
     $hasLabel265 = $labels->contains('id', 265);
@@ -166,7 +166,7 @@
 
 <div class="label-container">
     @foreach($labels->filter(function ($label) use($labelGroupName) {
-        return $label->label_group && $label->labelGroup->name === $labelGroupName;
+        return $label->labelGroup && $label->labelGroup->name === $labelGroupName;
     }) as $label)
         <span
             onclick="removeLabel({{ $or->id}}, {{ $label->id }}, {{ $label->manual_label_selection_to_add_after_removal ?? 'null' }}, 'null', {{$label->timed ? 'true' : 'false'}})"
