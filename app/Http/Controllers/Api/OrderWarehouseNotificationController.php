@@ -131,7 +131,7 @@ class OrderWarehouseNotificationController extends Controller
 
             $order = $notification->order;
 
-            $messagesHelper->sendDateChangeMessage($order, 'magazyn');
+            $messagesHelper->sendDateChangeMessageAvization($order->chat, 'magazyn');
             $order->date_accepted = false;
             $order->save();
 
