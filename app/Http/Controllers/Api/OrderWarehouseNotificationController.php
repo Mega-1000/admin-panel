@@ -128,6 +128,13 @@ class OrderWarehouseNotificationController extends Controller
                 'warehouse_acceptance' => true,
                 'message' => 'Magazyn <strong>wprowadził</strong> daty dotyczące przesyłki.'
             ]);
+
+            $order = $notification->order;
+
+            $messagesHelper->sendDateChangeMessage($order, 'magazyn');
+            $order->date_accepted = false;
+            $order->save();
+
             /** @var Order $order */
             $order = Order::findOrFail($data['order_id']);
             dispatch(new DispatchLabelEventByNameJob($order, "warehouse-notification-accepted"));
