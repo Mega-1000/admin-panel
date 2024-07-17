@@ -505,7 +505,7 @@ class MessagesHelper
     public function sendAvizationAcceptation(Chat $chat): void
     {
         $order = $chat->order;
-        $content = "Informujemy, że awizacja została zaakceptowana przez magazyn wydający. W razie jakichkolwiek pytań w związku z zamówieniem na dalszym etapie prosimy o kontakt " . $order->orderWarehouseNotifications->contact_person . " Tel: " . $order->orderWarehouseNotifications->first()->contact_person_phone;
+        $content = "Informujemy, że awizacja została zaakceptowana przez magazyn wydający. W razie jakichkolwiek pytań w związku z zamówieniem na dalszym etapie prosimy o kontakt " . $order->orderWarehouseNotifications->first()->contact_person . " Tel: " . $order->orderWarehouseNotifications->first()->contact_person_phone;
         $blankChatUser = $this->createOrGetBlankUser($chat);
         $this->chatId = $chat->id;
 
