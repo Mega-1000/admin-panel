@@ -465,6 +465,16 @@ class MessagesHelper
 
         $this->addMessage($content, UserRole::Main, null, $blankChatUser);
     }
+    public function sendDateChangeMessageAvization(Chat $chat, string $type): void
+    {
+        $content = "Zmieniono daty dostawy, zmieniający: " . $type . ". Prosimy o zapoznanie się z nowymi terminami i zatwierdzenie." . "Jeśli podane daty nie spełniają twoich wymagań" . " prosimy o kontakt z magazynem wydającym pod numerem: " . $chat->order->orderWarehouseNotifications->first()->contact_person_phone . 'UWAGA! Daty te nie będą wiążące jeśli nie zostaną wpisane na platformie przez Ciebie.';
+
+        $blankChatUser = $this->createOrGetBlankUser($chat);
+        $this->chatId = $chat->id;
+
+        $this->addMessage($content, UserRole::Main, null, $blankChatUser);
+    }
+
 
     /**
      * @throws ChatException
