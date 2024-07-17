@@ -72,9 +72,6 @@ class ProductPacketService
                         $productToAddArray['gross_selling_price_commercial_unit'] = $dataArray['price'];
                     } else {
                         $productToAddArray['gross_selling_price_commercial_unit'] = 0;
-
-                        Log::notice($dataArray);
-
                         $product = Product::where('symbol', explode('(', $dataArray['price'])[0])->first();
 
                         $productToAddArray['gross_selling_price_commercial_unit'] = $product?->price?->allegro_gross_selling_price_after_all_additional_costs ?? 0;
@@ -97,7 +94,7 @@ class ProductPacketService
                     $dataArray['quantity'] * $dataArray['quantity_of_packet_in_order'],
                     $dataArray['max_quantity_in_order']
                 );
-                Log::notice($productToAddArray['gross_selling_price_commercial_unit']);
+                Log::notice('twoja stara 331' . $productToAddArray['gross_selling_price_commercial_unit']);
 
                 if ($productToAddArray['amount'] <= $dataArray['min_quantity_in_order']) {
                     return;

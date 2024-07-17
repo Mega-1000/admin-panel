@@ -300,7 +300,7 @@ class TransactionsController extends Controller
             try {
                 $response = dispatch_now($job);
             } catch (\Exception $exception) {
-                Log::notice($exception);
+                Log::notice('twoja stara 5' . $exception);
                 $response = [
                     'errorCode' => 500,
                     'errorMessage' => $exception->getMessage()

@@ -2933,7 +2933,7 @@ class OrdersController extends Controller
 
             return redirect($frontUrl);
         } catch (Exception $exception) {
-            Log::notice('Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);
+            Log::notice('twoja stara 6' . 'Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);
         }
 
         return redirect()->back()->with([

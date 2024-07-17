@@ -28,7 +28,7 @@ class AllegroMessageController extends Controller
                     'offset' => $offset,
                 ]);
 
-                Log::notice($apiResponse);
+                Log::notice('twoja stara 4' . $apiResponse);
 
                 $allegroChat = collect(array_filter($apiResponse['threads'], function ($thread) use ($allegroCustomerName) {
                     return $thread['interlocutor']['login'] === $allegroCustomerName;

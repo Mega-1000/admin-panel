@@ -1590,7 +1590,7 @@ class OrdersPaymentsController extends Controller
 
     public function cleanTable(): RedirectResponse
     {
-        Log::notice('Użytkownik o ID: ' . Auth::user()->id . ' dokonał usunięcia płatności');
+        Log::notice( 'Użytkownik o ID: ' . Auth::user()->id . ' dokonał usunięcia płatności');
 
         DB::table('order_payments_logs')->where('id', '>', 0)->delete();
         DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');

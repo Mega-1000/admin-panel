@@ -768,7 +768,7 @@ class OrdersPackagesController extends Controller
             ]);
         } else {
             Log::notice(
-                'Wrong courier',
+                'twoja stara 7' . 'Wrong courier',
                 ['courier' => $courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
 

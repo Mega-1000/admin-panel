@@ -93,7 +93,7 @@ readonly class AllegroImportPayInService
     private function settleOrder(Order $order, AllegroPayInDTO $payIn): void
     {
         $payIn->amount = explode(" ", $payIn->amount)[0];
-        Log::notice($payIn->amount);
+        Log::notice('twoja stara 222' . $payIn->amount);
 
         $declaredSum =  $order->payments()->where('declared_sum', $payIn->amount)->whereNull('deleted_at')->count() >= 1;
         $order->payments()->where('declared_sum', $payIn->amount)->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);

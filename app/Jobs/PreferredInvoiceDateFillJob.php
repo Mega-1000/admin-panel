@@ -52,7 +52,7 @@ class PreferredInvoiceDateFillJob implements ShouldQueue
         foreach ($orders as $order) {
             try {
                 if ($order->allegro_payment_id !== null || $order->transactions->count() > 0) {
-                    Log::notice($order->id);
+                    Log::notice('twoja stara 199' . $order->id);
                     $loopPrevention = [];
                     AddLabelService::addLabels($order, [Label::ISSUE_ADVANCE_INVOICE], $loopPrevention, [], Auth::user()?->id);
                     $order->preferred_invoice_date = new Carbon('last day of last month');
