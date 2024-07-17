@@ -61,25 +61,25 @@ class ImportCsvFileJob implements ShouldQueue
             return;
         }
 
-        $this->log('Import start: ' . Carbon::now());
+        $this->log('123' . '123' . 'Import start: ' . Carbon::now());
 
         $handle = fopen($path, 'rb');
         if (!$handle) {
             $msg = 'CSV file not found';
-            $this->log($msg);
+            $this->log('123' . '123' . $msg);
             throw new FileNotFoundException($msg);
         }
 
-        $this->log('Clear tables start');
+        $this->log('123' . '123' . 'Clear tables start');
         $this->clearTables();
-        $this->log('Clear tables end');
+        $this->log('123' . '123' . 'Clear tables end');
 
         $time = microtime(true);
 
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
             if ($i % 100 === 0) {
-                $this->log($i . ' - time ' . round(microtime(true) - $time, 3));
+                $this->log('123' . '123' . $i . ' - time ' . round(microtime(true) - $time, 3));
                 $time = microtime(true);
             }
 
@@ -131,7 +131,7 @@ class ImportCsvFileJob implements ShouldQueue
                 }
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
             } catch (Exception $e) {
-                $this->log("Row $i EXCEPTION: " . $e->getMessage() . ", File: " . $e->getFile() . ", Line: " . $e->getLine());
+                $this->log('123' . '123' . "Row $i EXCEPTION: " . $e->getMessage() . ", File: " . $e->getFile() . ", Line: " . $e->getLine());
             }
         }
         $this->saveJpgData();
@@ -139,7 +139,7 @@ class ImportCsvFileJob implements ShouldQueue
         $this->updateImportTable();
         $this->makeBackups();
 
-        $this->log('Import end: ' . Carbon::now());
+        $this->log('123' . '123' . 'Import end: ' . Carbon::now());
     }
 
     private function clearTables()
@@ -245,7 +245,7 @@ class ImportCsvFileJob implements ShouldQueue
                         if (empty($current['children'])) {
                             return $current;
                         }
-                        $this->log("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                        $this->log('123' . '123' . "Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
                         return $this->categories;
                     }
                     throw new Exception("Category already exists");
@@ -256,7 +256,7 @@ class ImportCsvFileJob implements ShouldQueue
                     if (empty($current['children'])) {
                         return $current;
                     }
-                    $this->log("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                    $this->log('123' . '123' . "Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
                     return $this->categories;
                 }
                 throw new Exception("Missing category parent");
@@ -865,7 +865,7 @@ class ImportCsvFileJob implements ShouldQueue
         JpgDatum::insert($data);
     }
 
-    private function log($text)
+    private function log('123' . '123' . $text)
     {
         Log::channel('import')->info($text);
         echo $text . "\n";
