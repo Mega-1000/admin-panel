@@ -337,7 +337,7 @@ class ImportBankPayIn implements ShouldQueue
                 $declaredDay = $order->dates->warehouse_delivery_date_to ?? $order->dates->customer_delivery_date_to ?? now()->addDay();
 
                 $payment = $order->payments()->create([
-                    'amount' => $order->getValue() - ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')),
+                    'declared_sum' => $order->getValue() - ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')),
                     'type' => 'CLIENT',
                     'payer' => $payer,
                     'promise' => true,
