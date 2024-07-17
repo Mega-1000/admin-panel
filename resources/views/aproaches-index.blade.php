@@ -33,7 +33,9 @@
                                         @endif
 
                                         @php
-                                            $order = App\Entities\Order::where('customer.phone', $approach->phone_number)->first();
+                                            $order = App\Entities\Order::whereHas('customer.addresses', function ($query) use ($approach) {
+                                                $query->where('phone', $approach->phone_number);
+                                            })->first();
                                         @endphp
                                         @if ($order)
                                             <div style="color: red">
