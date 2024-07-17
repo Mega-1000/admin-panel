@@ -314,6 +314,9 @@ class ImportBankPayIn implements ShouldQueue
 
         if ($order->payments()->count() === 0) {
             $order->labels()->attach([45, 68]);
+            if (empty($order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->first())) {
+                $order->labels()->detach([68]);
+            }
         }
 
         $payment = !isset($payment)
