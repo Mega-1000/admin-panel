@@ -131,6 +131,7 @@
         ];
     @endphp
 
+    {{ dd( $or->dates()->first())}}
     @foreach($or->dates()->first() ?? [] as $k => $date)
         @if(array_key_exists($k, $dateTranslations))
             {{ $dateTranslations[$k] ?? '' }}: {{ isset($date) ? \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') : 'Brak' }}
