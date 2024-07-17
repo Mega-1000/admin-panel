@@ -9,8 +9,8 @@ class OrderLabelHelper {
 
     public static function setRedLabel(Chat $chat): void
     {
-        $hasRed = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_RED_LABEL_ID)->count() > 0;
-        $hasYellow = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_YELLOW_LABEL_ID)->count() > 0;
+        $hasRed = $chat->order?->labels()?->where('label_id', MessagesHelper::MESSAGE_RED_LABEL_ID)->count() > 0;
+        $hasYellow = $chat->order?->labels()->where('label_id', MessagesHelper::MESSAGE_YELLOW_LABEL_ID)->count() > 0;
         if ($hasRed) {
             return;
         }
