@@ -83,7 +83,7 @@ class LocationHelper
             $distance = self::getDistanceOfClientToEmployee($employee, $customer);
 
             // Check if the customer is within the employee's radius
-            if ($distance < $shortestDistance) {
+            if ($distance > $shortestDistance) {
                 $nearestEmployee = $employee;
                 $shortestDistance = $distance;
             }
