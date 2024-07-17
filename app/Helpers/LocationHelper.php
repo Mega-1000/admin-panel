@@ -73,7 +73,7 @@ class LocationHelper
         return $raw?->distance;
     }
 
-    public static function getNearestEmployeeOfFirm(Customer $customer, Firm $firm): Employee
+    public static function getNearestEmployeeOfFirm(Customer $customer, Firm $firm): ?Employee
     {
         $employees = $firm->employees;
         $nearestEmployee = null;
@@ -82,8 +82,7 @@ class LocationHelper
         foreach ($employees as $employee) {
             $distance = self::getDistanceOfClientToEmployee($employee, $customer);
 
-            // Check if the customer is within the employee's radius
-            if ($distance < $shortestDistance) {
+            if ($distance >= 0 && $distance < $shortestDistance) {
                 $nearestEmployee = $employee;
                 $shortestDistance = $distance;
             }
@@ -92,65 +91,78 @@ class LocationHelper
         return $nearestEmployee ?? $firm->employees()->first();
     }
 
-    public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer)
+    public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer): float
     {
-        $customerCoordinates = DB::table('postal_code_lat_lon')
-            ->where('postal_code', $customer->standardAddress()->postal_code)
-            ->first();
+        $customerCoordinates = self::getCoordinates($customer->standardAddress()->postal_code);
 
         if (!$customerCoordinates) {
-            return -112378198273; // or handle the error as needed
+            return PHP_FLOAT_MAX; // Return max float value instead of a magic number
         }
 
-        $minDistance = 213123123123;
-        $radius = $employee->radius;
+        $minDistance = PHP_FLOAT_MAX;
+        $employeeRadius = $employee->radius;
 
         for ($i = 1; $i <= 5; $i++) {
-            $zipCodeField = "zip_code_" . $i;
+            $zipCodeField = "zip_code_$i";
             if (empty($employee->$zipCodeField)) {
                 continue;
             }
 
-            $employeeCoordinates = DB::table('postal_code_lat_lon')
-                ->where('postal_code', explode(';', $employee->$zipCodeField)[0])
-                ->first();
+            $zipCodeParts = explode(';', $employee->$zipCodeField);
+            $employeeZipCode = $zipCodeParts[0];
+            $employeeRadius = $zipCodeParts[1] ?? $employeeRadius; // Use the radius from zip code if available
+
+            $employeeCoordinates = self::getCoordinates($employeeZipCode);
 
             if (!$employeeCoordinates) {
                 continue;
             }
-            $raw = DB::selectOne(
-                'SELECT 6371 * 2 * ASIN(SQRT(
-                POW(SIN((? - ?) * PI() / 360), 2) +
-                COS(? * PI() / 180) * COS(? * PI() / 180) *
-                POW(SIN((? - ?) * PI() / 360), 2)
-            )) AS distance',
-                [
-                    $customerCoordinates->latitude,
-                    $employeeCoordinates->latitude,
-                    $customerCoordinates->latitude,
-                    $employeeCoordinates->latitude,
-                    $customerCoordinates->longitude,
-                    $employeeCoordinates->longitude
-                ]
+
+            $distance = self::calculateHaversineDistance(
+                $customerCoordinates->latitude,
+                $customerCoordinates->longitude,
+                $employeeCoordinates->latitude,
+                $employeeCoordinates->longitude
             );
-
-            $distance = $raw->distance;
-            if ($minDistance > $distance) {
-                $radius = 1;
-//                $radius = explode(';', $employee->$zipCodeField)[1];
-            }
-
 
             $minDistance = min($minDistance, $distance);
         }
 
         if ($minDistance === PHP_FLOAT_MAX) {
-            return -112378198273; // No valid employee coordinates found
+            return PHP_FLOAT_MAX; // No valid employee coordinates found
         }
 
-        return $radius - $minDistance;
+        return $employeeRadius - $minDistance;
     }
 
+    private static function getCoordinates(string $postalCode): ?object
+    {
+        return DB::table('postal_code_lat_lon')
+            ->where('postal_code', $postalCode)
+            ->first();
+    }
+
+    private static function calculateHaversineDistance(
+        float $lat1,
+        float $lon1,
+        float $lat2,
+        float $lon2
+    ): float {
+        $earthRadius = 6371; // km
+
+        $lat1 = deg2rad($lat1);
+        $lon1 = deg2rad($lon1);
+        $lat2 = deg2rad($lat2);
+        $lon2 = deg2rad($lon2);
+
+        $latDelta = $lat2 - $lat1;
+        $lonDelta = $lon2 - $lon1;
+
+        $a = sin($latDelta / 2) ** 2 + cos($lat1) * cos($lat2) * sin($lonDelta / 2) ** 2;
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
+    }
     public static function nearestWarehouse(Order $order, Firm $firm): Warehouse
     {
         $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $order->getDeliveryAddress()->postal_code)->get()->first();
