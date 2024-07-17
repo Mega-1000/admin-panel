@@ -1065,10 +1065,9 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
-$response = curl_exec($ch);
+    $response = curl_exec($ch);
 
-$response = json_decode($response)->content[0]->text;
-
+    $response = json_decode($response)->content[0]->text;
     Storage::put('public/buyinginvoices/' . $order->id . '.xml' , $response);
 
     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $order->id . '.xml';
@@ -1076,6 +1075,62 @@ $response = json_decode($response)->content[0]->text;
 
     return redirect()->back();
 });
+
+Route::get('recalculate-order', function () {
+
+})->name('recalculateOrder');
+
+Route::get('/styro-chatrs', function () {
+    $orders = Order::whereHas('items', function ($query) {
+        $query->whereHas('product', function ($subQuery) {
+            $subQuery->where('variation_group', 'styropiany');
+        });
+    })->select(
+        DB::raw('DATE(created_at) as date'),
+        DB::raw('COUNT(*) as total')
+    )
+        ->groupBy('date')
+        ->orderBy('date');
+
+    $ordersGroupedByDay = $orders->where('created_at', '>', now()->subDays(30))->get()->groupBy(function ($order) {
+        return Carbon::parse($order->date)->format('Y-m-d');
+    });
+
+    $ordersGroupedByWeek = $orders->where('created_at', '>', now()->subDays(60))->get()->groupBy(function ($order) {
+        return Carbon::parse($order->date)->format('Y-W');
+    });
+
+    $ordersGroupedByMonth = $orders->where('created_at', '>', now()->subDays(120))->get()->groupBy(function ($order) {
+        return Carbon::parse($order->date)->format('Y-m');
+    });
+
+    $dayLabels = [];
+    $dayData = [];
+
+    foreach ($ordersGroupedByDay as $day => $dayOrders) {
+        $dayLabels[] = Carbon::parse($day)->format('M d, Y');
+        $dayData[] = $dayOrders->sum('total');
+    }
+
+    $weekLabels = [];
+    $weekData = [];
+
+    foreach ($ordersGroupedByWeek as $weekNumber => $weekOrders) {
+        $weekLabels[] = 'Week ' . $weekNumber;
+        $weekData[] = $weekOrders->sum('total');
+    }
+
+    $monthLabels = [];
+    $monthData = [];
+
+    foreach ($ordersGroupedByMonth as $month => $monthOrders) {
+        $monthLabels[] = Carbon::parse($month)->format('M Y');
+        $monthData[] = $monthOrders->sum('total');
+    }
+
+    return view('charts', compact('dayLabels', 'dayData', 'weekLabels', 'weekData', 'monthLabels', 'monthData'));
+});
+
 
 Route::get('all-auctions-map', function (Request $request) {
     return view('all-auctions-map');
