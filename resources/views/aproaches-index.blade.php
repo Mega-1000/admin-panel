@@ -33,7 +33,7 @@
                                         @endif
 
                                         @php
-                                            $order = App\Entities\Order::where('customer.addresses.0.phone', $approach->phone_number)->first();
+                                            $order = App\Entities\Order::where('customer.phone', $approach->phone_number)->first();
                                         @endphp
                                         @if ($order)
                                             <div style="color: red">
