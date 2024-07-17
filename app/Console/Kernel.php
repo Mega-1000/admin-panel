@@ -54,12 +54,12 @@ class Kernel extends ConsoleKernel
 
         // i am changing it from everyMinute to everyThirtyMinutes as rewriting would take some time, this should solve
         // queue overload issues
-        $schedule->job(Jobs\ValidateSubiekt::class)->everyFiveMinutes();
+        $schedule->job(Jobs\ValidateSubiekt::class)->everyFifteenMinutes();
         $schedule->job(Jobs\ImportCsvFileJob::class)->everyFiveMinutes();
         $schedule->job(Jobs\UpdatePackageRealCostJob::class)->dailyAt("00:30");
         $schedule->job(Jobs\CheckForHangedChats::class)->cron('0,15,30,45 7-17 * * 1-5');
         $schedule->job(Jobs\ConfirmSentPackagesJob::class)->dailyAt("23:34");
-        $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->everyFifteenMinutes();
+        $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->hourly();
 
         $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
 //        $schedule->command('import:allegro')->everyTwoMinutes()->between('8:00', '18:00');
