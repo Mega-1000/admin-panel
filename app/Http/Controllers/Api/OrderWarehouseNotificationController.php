@@ -104,10 +104,10 @@ class OrderWarehouseNotificationController extends Controller
         OrderLabelHelper::setYellowLabel($helper->getChat());
     }
 
-    public function accept(AcceptShipmentRequest $request, $notificationId, MessagesHelper $messagesHelper): JsonResponse
+    public function accept(Request $request, $notificationId, MessagesHelper $messagesHelper): JsonResponse
     {
         try {
-            $data = $request->validated();
+            $data = $request->all();
             $data['waiting_for_response'] = false;
 
             $data['realization_date'] = $data['realization_date_from'];
