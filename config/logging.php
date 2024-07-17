@@ -37,12 +37,14 @@ return [
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily'],
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
 
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => 'debug',
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
 
         'daily' => [
@@ -50,18 +52,21 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => 'debug',
             'days' => 14,
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
         'import' => [
             'driver' => 'daily',
             'path' => storage_path('logs/import.log'),
             'level' => 'debug',
             'days' => 14,
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
         'allegro_chat' => [
             'driver' => 'daily',
             'path' => storage_path('logs/allegro_chat.log'),
             'level' => 'debug',
             'days' => 3,
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
         'slack' => [
             'driver' => 'slack',
@@ -69,6 +74,7 @@ return [
             'username' => 'Laravel Log',
             'emoji' => ':boom:',
             'level' => 'critical',
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
 
         'papertrail' => [
@@ -79,6 +85,7 @@ return [
                 'host' => env('PAPERTRAIL_URL'),
                 'port' => env('PAPERTRAIL_PORT'),
             ],
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
 
         'stderr' => [
@@ -87,16 +94,19 @@ return [
             'with' => [
                 'stream' => 'php://stderr',
             ],
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
 
         'syslog' => [
             'driver' => 'syslog',
             'level' => 'debug',
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
 
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => 'debug',
+            'tap' => [App\Logging\CustomLogFormatter::class]
         ],
     ],
 
