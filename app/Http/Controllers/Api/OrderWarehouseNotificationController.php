@@ -309,7 +309,7 @@ class OrderWarehouseNotificationController extends Controller
         AddLabelService::addLabels($order, [52], $prev, [], Auth::user()->id);
         AddLabelService::addLabels($order, [73], $prev, [], Auth::user()->id);
 
-        $order->labels()->detach([44, 224, 68]);
+        $order->labels()->detach([44, 224, 68, 206]);
 
         return redirect()->route('orders.index');
     }
