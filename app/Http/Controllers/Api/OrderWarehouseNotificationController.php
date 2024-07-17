@@ -104,15 +104,15 @@ class OrderWarehouseNotificationController extends Controller
         OrderLabelHelper::setYellowLabel($helper->getChat());
     }
 
-    public function accept(Request $request, $notificationId, MessagesHelper $messagesHelper): JsonResponse
+    public function accept(AcceptShipmentRequest $request, $notificationId, MessagesHelper $messagesHelper): JsonResponse
     {
         try {
-            $data = $request->all();
+            $data = $request->validated();
             $data['waiting_for_response'] = false;
 
             $data['realization_date'] = $data['realization_date_from'];
             $data['possible_delay_days'] = Carbon::parse($data['realization_date_from'])->diffInDays(Carbon::parse($data['realization_date_to']));
-            $notification = $this->orderWarehouseNotificationRepository->update($data, $notificationId);
+            $notification = OrderWarehouseNotification::find($notificationId)->update($dat)a;
 
             if (!empty($data['customer_notices'])) {
                 $this->sendMessage($data);
