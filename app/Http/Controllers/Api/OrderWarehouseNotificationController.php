@@ -112,7 +112,7 @@ class OrderWarehouseNotificationController extends Controller
 
             $data['realization_date'] = $data['realization_date_from'];
             $data['possible_delay_days'] = Carbon::parse($data['realization_date_from'])->diffInDays(Carbon::parse($data['realization_date_to']));
-            $notification = OrderWarehouseNotification::find($notificationId)->update($dat)a;
+            $notification = OrderWarehouseNotification::find($notificationId)->update($dat);
 
             if (!empty($data['customer_notices'])) {
                 $this->sendMessage($data);
