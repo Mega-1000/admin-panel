@@ -80,16 +80,16 @@ class LocationHelper
         $shortestDistance = PHP_FLOAT_MAX;
 
         foreach ($employees as $employee) {
-            $distance = dd(self::getDistanceOfClientToEmployee($employee, $customer));
+            $distance = self::getDistanceOfClientToEmployee($employee, $customer);
 
             // Check if the customer is within the employee's radius
-            if ($distance >= 0 && $distance < $shortestDistance) {
+            if ($distance < $shortestDistance) {
                 $nearestEmployee = $employee;
                 $shortestDistance = $distance;
             }
         }
 
-        return $nearestEmployee ?? dd($firm->employees()->first());
+        return $nearestEmployee ?? $firm->employees()->first();
     }
 
     public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer)
