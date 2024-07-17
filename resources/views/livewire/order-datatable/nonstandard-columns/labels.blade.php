@@ -1,3 +1,4 @@
+
 @php
     $or = App\Entities\Order::with(['labels.labelGroup', 'files', 'chat.auctions', 'warehouse.property'])->find($order['id']);
     $labels = collect($or->labels);
@@ -130,7 +131,7 @@
         ];
     @endphp
 
-    @foreach($or->dates ?? [] as $k => $date)
+    @foreach($or->dates()->get() ?? [] as $k => $date)
         @if(array_key_exists($k, $dateTranslations))
             {{ $dateTranslations[$k] ?? '' }}: {{ isset($date) ? \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') : 'Brak' }}
             <br>
