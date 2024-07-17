@@ -51,6 +51,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Matrix\Builder;
+use phpDocumentor\Reflection\Types\Mixed_;
 
 class AuctionsController extends Controller
 {
@@ -388,7 +389,7 @@ class AuctionsController extends Controller
         ]);
     }
 
-    public function displayPricesTable(): View
+    public function displayPricesTable(): Mixed
     {
         $customersZipCode = request()->query('zip-code');
 
