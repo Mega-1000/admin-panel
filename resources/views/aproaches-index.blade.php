@@ -31,6 +31,15 @@
                                         @else
                                             -
                                         @endif
+
+                                        @php
+                                            $order = App\Entities\Order::where('customer.addresses.0.phone', $approach->phone_number)->first();
+                                        @endphp
+                                        @if ($order)
+                                            <div style="color: red">
+                                                Ten użytkmownik ma już zapytanie na swoim koncie
+                                            </div>
+                                        @endif
                                     </td>
                                     <td>
                                         {{ $approach->prospect_email }}
