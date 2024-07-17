@@ -24,8 +24,8 @@ class WarehouseDispatchPendingReminderJob extends Job implements ShouldQueue
 
             if (!empty($warehousesToRemind)) {
                 foreach ($warehousesToRemind as $warehouseNotification) {
-                    dd($warehouseNotification);
                     if ($this->shouldNotifyWithEmail($warehouseNotification, $now)) {
+                        dd($warehouseNotification);
                         Log::notice('Wysyłka powiadomienie dla zamówienia: ' . $warehouseNotification->order_id , ['line' => __LINE__, 'file' => __FILE__]);
                         dispatch_now(new OrderStatusChangedToDispatchNotificationJob($warehouseNotification->order_id));
                     }
