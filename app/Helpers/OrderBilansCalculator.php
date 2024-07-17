@@ -61,9 +61,12 @@ class OrderBilansCalculator
             }
         }
 
+        // sum of declared payments with empty operation type
+        $totalOfDeclaredPayments = $order->payments()->where('operation_type', null)->sum('declared_sum');
+
         $bilans = $totalOfPayments - $totalOfReturns + $totalOfDeclaredPayments;
 
-        return $order->getSumOfGrossValues() - $bilans + $returnedValue - $WPFZ - $kwonPayments;
+        return $order->getSumOfGrossValues() - $bilans + $returnedValue - $WPFZ - $kwonPayments + $totalOfPayments;
     }
 
 }
