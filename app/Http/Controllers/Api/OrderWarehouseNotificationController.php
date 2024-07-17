@@ -298,18 +298,18 @@ class OrderWarehouseNotificationController extends Controller
         $order->warehouse_id = Warehouse::where('symbol', $request->input('warehouse-symbol'))->first()->id;
         $order->save();
 
-//        OrderWarehouseNotification::create([
-//            'order_id' => $order->id,
-//            'warehouse_id' => $order->warehouse_id,
-//            'employee_id' => $request->get('employee'),
-//            'waiting_for_response' => true,
-//        ]);
+        OrderWarehouseNotification::create([
+            'order_id' => $order->id,
+            'warehouse_id' => $order->warehouse_id,
+            'employee_id' => $request->get('employee'),
+            'waiting_for_response' => true,
+        ]);
 
-//        $prev = [];
-//        AddLabelService::addLabels($order, [52], $prev, [], Auth::user()->id);
-//        AddLabelService::addLabels($order, [73], $prev, [], Auth::user()->id);
-//
-//        $order->labels()->detach([44, 224, 68]);
+        $prev = [];
+        AddLabelService::addLabels($order, [52], $prev, [], Auth::user()->id);
+        AddLabelService::addLabels($order, [73], $prev, [], Auth::user()->id);
+
+        $order->labels()->detach([44, 224, 68]);
 
         return redirect()->route('orders.index');
     }
