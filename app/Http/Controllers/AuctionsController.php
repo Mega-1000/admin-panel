@@ -393,10 +393,10 @@ class AuctionsController extends Controller
         $customersZipCode = request()->query('zip-code');
 
         // Generate a unique cache key based on the zip code
-        $cacheKey = "prices_table_{$customersZipCode}";
+        $cacheKey = "prices_table_html_{$customersZipCode}";
 
-        // Attempt to retrieve cached data or compute if not found
-        $viewData = Cache::remember($cacheKey, 50 * 60, function () use ($customersZipCode) {
+        // Attempt to retrieve cached HTML or compute and render if not found
+        $html = Cache::remember($cacheKey, 50 * 60, function () use ($customersZipCode) {
             $products = Product::where('variation_group', 'styropiany')
                 ->whereHas('children')
                 ->get();
@@ -448,13 +448,15 @@ class AuctionsController extends Controller
                 }
             }
 
-            return [
+            // Render the view and return the HTML
+            return view('auctions.pre-data-prices-table', [
                 'products' => $filteredProducts,
                 'firms' => $firms,
-            ];
+            ])->render();
         });
 
-        return view('auctions.pre-data-prices-table', $viewData);
+        // Return a new view instance with the cached HTML
+        return response($html);
     }
 
     public function getStyrofoamTypes(): JsonResponse
