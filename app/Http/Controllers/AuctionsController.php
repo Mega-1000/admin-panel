@@ -389,33 +389,39 @@ class AuctionsController extends Controller
 
     public function displayPricesTable(): View
     {
-        $products = Product::where('variation_group', 'styropiany')
-            ->whereHas('children')
-            ->get();
-
-        $productGroups = [];
-        $filteredProducts = collect(); // Initialize an empty collection for filtered products
-
-        foreach ($products as $product) {
-            $group = AuctionsHelper::getTrimmedProductGroupName($product);
-
-            if (!in_array($group, $productGroups)) {
-                $productGroups[] = $group;
-                $filteredProducts->push($product); // Add product to the filtered collection
-            }
-        }
-
         $customersZipCode = request()->query('zip-code');
-        $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customersZipCode)->get()->first();
 
-        $firms = Firm::whereHas('products', function ($q) {
-            $q->where('variation_group', 'styropiany');
-        })->get();
+        // Generate a unique cache key based on the zip code
+        $cacheKey = "prices_table_{$customersZipCode}";
 
-        if ($coordinatesOfUser) {
-            foreach ($firms as $key => $firm) {
-                $raw = DB::selectOne(
-                    'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+        // Attempt to retrieve cached data or compute if not found
+        $viewData = Cache::remember($cacheKey, 50 * 60, function () use ($customersZipCode) {
+            $products = Product::where('variation_group', 'styropiany')
+                ->whereHas('children')
+                ->get();
+
+            $productGroups = [];
+            $filteredProducts = collect();
+
+            foreach ($products as $product) {
+                $group = AuctionsHelper::getTrimmedProductGroupName($product);
+
+                if (!in_array($group, $productGroups)) {
+                    $productGroups[] = $group;
+                    $filteredProducts->push($product);
+                }
+            }
+
+            $coordinatesOfUser = DB::table('postal_code_lat_lon')->where('postal_code', $customersZipCode)->first();
+
+            $firms = Firm::whereHas('products', function ($q) {
+                $q->where('variation_group', 'styropiany');
+            })->get();
+
+            if ($coordinatesOfUser) {
+                foreach ($firms as $key => $firm) {
+                    $raw = DB::selectOne(
+                        'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
                         POW(69.1 * (pc.latitude - :latitude), 2) +
                         POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
                         FROM postal_code_lat_lon pc
@@ -424,28 +430,30 @@ class AuctionsController extends Controller
                         WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
                         ORDER BY distance
                     limit 1',
-                    [
-                        'latitude' => $coordinatesOfUser->latitude,
-                        'longitude' => $coordinatesOfUser->longitude,
-                        'firmId' => $firm->id
-                    ]
-                );
+                        [
+                            'latitude' => $coordinatesOfUser->latitude,
+                            'longitude' => $coordinatesOfUser->longitude,
+                            'firmId' => $firm->id
+                        ]
+                    );
 
-                $radius = $raw?->distance;
+                    $radius = $raw?->distance;
 
-                $firm->distance = $raw?->distance;
+                    $firm->distance = $raw?->distance;
 
-                if ($radius && $radius > $firm->warehouses()->first()->radius) {
-                    $firms->forget($key);
+                    if ($radius && $radius > $firm->warehouses()->first()->radius) {
+                        $firms->forget($key);
+                    }
                 }
             }
-        }
 
+            return [
+                'products' => $filteredProducts,
+                'firms' => $firms,
+            ];
+        });
 
-        return view('auctions.pre-data-prices-table', [
-            'products' => $filteredProducts,
-            'firms' => $firms,
-        ]);
+        return view('auctions.pre-data-prices-table', $viewData);
     }
 
     public function getStyrofoamTypes(): JsonResponse
