@@ -389,7 +389,7 @@ class AuctionsController extends Controller
         ]);
     }
 
-    public function displayPricesTable(): Mixed
+    public function displayPricesTable(): mixed
     {
         $customersZipCode = request()->query('zip-code');
 
