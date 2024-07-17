@@ -132,8 +132,8 @@
     @endphp
 
     @foreach($or->dates()->first() ?? [] as $k => $date)
+        {{ dd('okej') }}
         @if(array_key_exists($k, $dateTranslations))
-            {{ dd('okej') }}
             {{ $dateTranslations[$k] ?? '' }}: {{ isset($date) ? \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') : 'Brak' }}
             <br>
         @endif
