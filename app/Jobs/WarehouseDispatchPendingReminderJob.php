@@ -38,7 +38,7 @@ class WarehouseDispatchPendingReminderJob extends Job implements ShouldQueue
 
     protected function shouldNotifyWithEmail($orderWarehouseNotification, $now): bool
     {
-        return $orderWarehouseNotification->created_at->diff($now)->h >= 2; //only schedules that wait longer then 2h
+        return $orderWarehouseNotification->created_at->diffInHours($now) >= 2;
     }
 
     protected function canNotifyNow($now): bool
