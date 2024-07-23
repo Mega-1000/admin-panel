@@ -62,7 +62,7 @@
             <br>
             <input type="submit" value="Klient porzebuje jeszcze czasu" class="btn btn-primary">
             <input type="submit" value="Nie odebrano telefonu" class="btn btn-danger">
-            <input type="submit" value="Klient zdecydowany" class="btn btn-danger">
+            <input type="submit" value="Klient zdecydowany" class="btn btn-success">
         </form>
         <hr>
     @endif
