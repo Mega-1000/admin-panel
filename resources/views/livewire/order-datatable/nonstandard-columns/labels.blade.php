@@ -57,8 +57,8 @@
             Następny kontakt
             <input type="datetime-local" name="next_contact_date" class="form-control">
             <br>
+            <input type="checkbox" name="email" class="form-control">
             Wyślij informacje na e-mail
-            <input type="email" name="email" class="form-control">
             <br>
             <input type="submit" value="Klient porzebuje jeszcze czasu" class="btn btn-primary">
             <input type="submit" value="Nie odebrano telefonu" class="btn btn-danger">
