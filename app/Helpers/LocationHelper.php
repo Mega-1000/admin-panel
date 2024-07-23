@@ -135,8 +135,12 @@ class LocationHelper
         return $employeeRadius - $minDistance;
     }
 
-    private static function getCoordinates(string $postalCode): ?object
+    private static function getCoordinates(?string $postalCode): ?object
     {
+         if (!$postalCode) {
+             return null;
+         }
+
         return DB::table('postal_code_lat_lon')
             ->where('postal_code', $postalCode)
             ->first();
