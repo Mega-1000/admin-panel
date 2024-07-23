@@ -3272,7 +3272,7 @@ class OrdersController extends Controller
     {
         $order = Order::find($id);
         if (request()->get('notAnswered')) {
-            $messagesHelper->sendNotice($order->chat, 'Klient nie odebrał telefonu - Kolejna próba kontaktu za 2 godziny');
+            $messagesHelper->sendNotice($order->chat, 'Klient nie odebrał telefonu - Kolejna próba kontaktu ustawiona automatycznie za 2 godziny');
         } else {
             $messagesHelper->sendNotice($order->chat, request()->get('notices'));
         }
