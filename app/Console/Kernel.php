@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Console\Commands\AllegroBillingImportRestApiCommand;
 use App\Console\Commands\CheckGlsPackageStatusCommand;
 use App\Jobs;
+use App\Jobs\SendNextRermindersAboutAuctionEnded;
 use App\Jobs\SendPaymentConfirmationProds;
 use App\Jobs\SendSpeditionNotifications;
 use Illuminate\Console\Scheduling\Schedule;
@@ -80,6 +81,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('import:transactions')->dailyAt('02:30');
         $schedule->job(Jobs\SendMonitoryNotesEmails::class)->everyThirtyMinutes()->between('7:00', '18:00');
 //        $schedule->job(Jobs\CheckDeliveryDatesJob::class)->everyThirtyMinutes()->between('7:00', '18:00');
+        $schedule->job(SendNextRermindersAboutAuctionEnded::class)->dailyAt('17:00');
         $schedule->job(SendSpeditionNotifications::class)->everyFifteenMinutes()->between('7:00', '18:00');
         $schedule->job(SendPaymentConfirmationProds::class)->everyFifteenMinutes()->between('7:00', '18:00');
         $schedule->job(Jobs\CheckChatsForNotInUse::class)->everyFifteenMinutes()->between('7:00', '18:00');
