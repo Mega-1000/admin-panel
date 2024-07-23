@@ -56,7 +56,13 @@
             <br>
             Następny kontakt
             <input type="datetime-local" name="next_contact_date" class="form-control">
-            <input type="submit" value="Zapisz" class="btn btn-primary">
+            <br>
+            Wyślij informacje na e-mail
+            <input type="email" name="email" class="form-control">
+            <br>
+            <input type="submit" value="Klient porzebuje jeszcze czasu" class="btn btn-primary">
+            <input type="submit" value="Nie odebrano telefonu" class="btn btn-danger">
+            <input type="submit" value="Klient zdecydowany" class="btn btn-danger">
         </form>
         <hr>
     @endif
