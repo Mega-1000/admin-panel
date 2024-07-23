@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Entities\Order;
 use App\Helpers\MessagesHelper;
 use App\Services\Label\AddLabelService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -30,7 +31,7 @@ class OrderSpeditionDatesMonitController extends Controller
 
     public function shippingTodayStore(Order $order, Request $request, MessagesHelper $messagesHelper)
     {
-        $currentDate = date('Y-m-d')->();
+        $currentDate = Carbon::create(date('Y-m-d'))->addDays(1);
 
         $timeFrom = $request->input('time_from');
         $timeTo = $request->input('time_to');
