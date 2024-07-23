@@ -3214,7 +3214,7 @@ class OrdersController extends Controller
 
     public function saveContactToDriver(Order $order): RedirectResponse
     {
-        $contactDate = request()->query('next-contact-date');
+        $contactDate = request()->query('next_contact_date');
         $arr = [];
         $motherLabel = $order->labels->contains('id', 276) ? 276 : 279;
 
