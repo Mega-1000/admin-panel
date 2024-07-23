@@ -30,7 +30,7 @@ class OrderSpeditionDatesMonitController extends Controller
 
     public function shippingTodayStore(Order $order, Request $request, MessagesHelper $messagesHelper)
     {
-        $currentDate = date('Y-m-d');
+        $currentDate = date('Y-m-d')->();
 
         $timeFrom = $request->input('time_from');
         $timeTo = $request->input('time_to');
