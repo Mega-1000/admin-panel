@@ -3218,6 +3218,7 @@ class OrdersController extends Controller
         $arr = [];
         $motherLabel = $order->labels->contains('id', 276) ? 276 : 279;
 
+        dd($contactDate);
         RemoveLabelService::removeLabels($order, [$motherLabel], $arr, [], Auth::user()->id);
 
         if ($motherLabel === 279) {
