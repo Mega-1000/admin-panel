@@ -54,6 +54,7 @@ use App\Jobs\RemoveFileLockJob;
 use App\Jobs\SendRequestForCancelledPackageJob;
 use App\Jobs\UpdatePackageRealCostJob;
 use App\Mail\SendOfferToCustomerMail;
+use App\Mail\UserHasBeenNotifiedAboutEndOfAuction;
 use App\Repositories\Chats;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
@@ -3270,7 +3271,11 @@ class OrdersController extends Controller
     public function addAdditionalInfo($id, MessagesHelper $messagesHelper): RedirectResponse
     {
         $order = Order::find($id);
-        $messagesHelper->sendNotice($order->chat, request()->get('notices'));
+        if (request()->get('notAnswered')) {
+            $messagesHelper->sendNotice($order->chat, 'Klient nie odebrał telefonu - Kolejna próba kontaktu za 2 godziny');
+        } else {
+            $messagesHelper->sendNotice($order->chat, request()->get('notices'));
+        }
 
         $arr = [];
         RemoveLabelService::removeLabels($order, [265], $arr, [], Auth::user()->id);
@@ -3282,9 +3287,22 @@ class OrdersController extends Controller
                 'label_id_to_handle' => 265,
                 'type' => 'C',
                 'action' => 'to_add_type_c',
-                'trigger_time' => Carbon::create(request()->get('next_contact_date')),
+                'trigger_time' => Carbon::create(request()->get('next_contact_date') ?? now()->addHours(2)),
             ]);
         }
+
+//        if (request()->get('clientClosed')) {
+//
+//        }
+
+        if (request()->get('sendEmail')) {
+            Mailer::create()
+                ->to($order->customer->login)
+                ->send(new UserHasBeenNotifiedAboutEndOfAuction(
+                    $order->chat->auction
+                ));
+        }
+
         return redirect()->back();
     }
 }

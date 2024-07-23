@@ -57,12 +57,12 @@
             Następny kontakt
             <input type="datetime-local" name="next_contact_date" class="form-control">
             <br>
-            <input type="checkbox" name="email">
+            <input type="checkbox" name="sendEmail">
             Wyślij informacje na e-mail
             <br>
-            <input type="submit" value="Klient porzebuje jeszcze czasu" class="btn btn-primary">
-            <input type="submit" value="Nie odebrano telefonu" class="btn btn-danger">
-            <input type="submit" value="Klient zdecydowany" class="btn btn-success">
+            <input type="submit" name="normal" value="Klient porzebuje jeszcze czasu" class="btn btn-primary">
+            <input type="submit" name="notAnswered" value="Nie odebrano telefonu" class="btn btn-danger">
+            <input type="submit" name="clientClosed" value="Klient zdecydowany" class="btn btn-success">
         </form>
         <hr>
     @endif
