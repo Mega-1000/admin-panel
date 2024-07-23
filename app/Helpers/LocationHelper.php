@@ -93,7 +93,7 @@ class LocationHelper
 
     public static function getDistanceOfClientToEmployee(Employee $employee, Customer $customer): float
     {
-        $customerCoordinates = self::getCoordinates($customer->standardAddress()->postal_code);
+        $customerCoordinates = self::getCoordinates($customer->standardAddress()?->postal_code);
 
         if (!$customerCoordinates) {
             return PHP_FLOAT_MAX; // Return max float value instead of a magic number
