@@ -3278,7 +3278,7 @@ class OrdersController extends Controller
         }
 
         $arr = [];
-        $order->label()->detach(265);
+        $order->labels()->detach(265);
 
         if (Carbon::create(request()->get('next_contact_date'))) {
             OrderLabelScheduler::query()->create([
