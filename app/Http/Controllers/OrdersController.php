@@ -3299,7 +3299,7 @@ class OrdersController extends Controller
             Mailer::create()
                 ->to($order->customer->login)
                 ->send(new UserHasBeenNotifiedAboutEndOfAuction(
-                    $order->chat->auction
+                    $order->chat->auction()->first()
                 ));
         }
 
