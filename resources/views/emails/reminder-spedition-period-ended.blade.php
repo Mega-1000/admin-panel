@@ -32,9 +32,13 @@ Potrzebujesz przełożyć daty zamówienia? Skontaktuj się z klientem po czym z
     $employee->distance = App\Helpers\LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer);
 
     if ($employee->distance < $lowestDistance) {
-        $lowestDistance = $employee->distance;
+            $lowestDistance = $employee->distance;
             $closestEmployee = $employee;
         }
+    }
+
+    if (!$closestEmployee) {
+        $closestEmployee = $company->employees->first();
     }
 
     App\Services\MessageService::createNewCustomerOrEmployee($order->chat, new Illuminate\Http\Request(['type' => 'Employee']), $closestEmployee);
