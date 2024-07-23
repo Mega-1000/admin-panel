@@ -28,7 +28,7 @@ class OrderSpeditionDatesMonitController extends Controller
         return view('monits.shipping-today-form', compact('order'));
     }
 
-    public function shippingTodayStore(Order $order, Request $request, MessagesHelper $messagesHelper): View
+    public function shippingTodayStore(Order $order, Request $request, MessagesHelper $messagesHelper)
     {
         $currentDate = date('Y-m-d');
 
