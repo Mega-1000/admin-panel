@@ -3272,15 +3272,15 @@ class OrdersController extends Controller
     {
         $order = Order::find($id);
         $labelId = 0;
-        if ($order->labels()->where('id', 55)->first()) {
+        if ($order->labels()->where('labels.id', 55)->first()) {
             $labelId = 55;
         }
 
-        if ($order->labels()->where('id', 265)->first()) {
+        if ($order->labels()->where('labels.id', 265)->first()) {
             $labelId = 265;
         }
 
-        if ($order->labels()->where('id', 95)->first()) {
+        if ($order->labels()->where('labels.id', 95)->first()) {
             $labelId = 95;
         }
 
