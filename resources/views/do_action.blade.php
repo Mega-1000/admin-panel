@@ -3,35 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive iframes</title>
+    <title>Responsive iframes with Fullscreen</title>
     <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
         .iframe-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px;
+            height: 100vh;
+            box-sizing: border-box;
         }
         .iframe-wrapper {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 aspect ratio */
-            height: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #ccc;
+            transition: all 0.3s ease;
             overflow: hidden;
         }
-        .iframe-wrapper iframe {
+        .iframe-wrapper::before {
+            content: 'Double-click to expand';
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 5px;
+            z-index: 10;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+        .iframe-wrapper iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
-        .expanded {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .iframe-wrapper:fullscreen {
+            padding: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 1000;
+        }
+        .iframe-wrapper:fullscreen::before {
+            content: 'Press Esc to exit fullscreen';
         }
     </style>
 </head>
@@ -58,9 +77,33 @@
 </div>
 
 <script>
-    document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
-        wrapper.addEventListener('dblclick', () => {
-            wrapper.classList.toggle('expanded');
+    document.addEventListener('DOMContentLoaded', () => {
+        const iframeWrappers = document.querySelectorAll('.iframe-wrapper');
+
+        iframeWrappers.forEach((wrapper) => {
+            wrapper.addEventListener('dblclick', () => {
+                if (!document.fullscreenElement) {
+                    if (wrapper.requestFullscreen) {
+                        wrapper.requestFullscreen();
+                    } else if (wrapper.mozRequestFullScreen) { // Firefox
+                        wrapper.mozRequestFullScreen();
+                    } else if (wrapper.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                        wrapper.webkitRequestFullscreen();
+                    } else if (wrapper.msRequestFullscreen) { // IE/Edge
+                        wrapper.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) { // Firefox
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) { // IE/Edge
+                        document.msExitFullscreen();
+                    }
+                }
+            });
         });
     });
 </script>
