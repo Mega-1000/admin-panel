@@ -393,11 +393,14 @@ Route::group(['prefix' => 'admin'], function () {
             })->orWhereHas('labels', function ($q) {
                 $q->where('label_id', 55);
             })
-            ->orWhereHas('labels', function ($q) {
-                $q->where('label_id', 95);
-            })
-                ->whereRaw('FIND_IN_SET(?, not_able_to_handle_users) = 0', [auth()->user()->id])
-            ->first();
+                ->orWhereHas('labels', function ($q) {
+                    $q->where('label_id', 95);
+                })
+                ->where(function ($query) {
+                    $query->where('not_able_to_handle_users', 'not like', '%' . auth()->user()->id . '%')
+                        ->orWhereNull('not_able_to_handle_users');
+                })
+                ->first();
 
             return view('do_action', compact('order'));
         })->name('orders.do_action');
