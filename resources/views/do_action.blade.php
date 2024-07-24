@@ -23,6 +23,8 @@
             position: relative;
             width: 100%;
             height: 100%;
+            border: 1px solid #ccc;
+            transition: all 0.3s ease;
         }
         .iframe-wrapper iframe {
             position: absolute;
@@ -36,8 +38,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100vw !important;
+            height: 100vh !important;
             z-index: 1000;
         }
     </style>
@@ -65,17 +67,30 @@
 </div>
 
 <script>
-    document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
-        wrapper.addEventListener('dblclick', () => {
-            document.querySelectorAll('.iframe-wrapper').forEach(w => w.classList.remove('expanded'));
-            wrapper.classList.add('expanded');
-        });
-    });
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM fully loaded and parsed');
 
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            document.querySelectorAll('.iframe-wrapper').forEach(w => w.classList.remove('expanded'));
-        }
+        const iframeWrappers = document.querySelectorAll('.iframe-wrapper');
+        console.log('Found ' + iframeWrappers.length + ' iframe wrappers');
+
+        iframeWrappers.forEach((wrapper, index) => {
+            wrapper.addEventListener('dblclick', (event) => {
+                console.log('Double-click detected on iframe ' + (index + 1));
+                event.preventDefault();
+
+                iframeWrappers.forEach(w => w.classList.remove('expanded'));
+                wrapper.classList.add('expanded');
+                console.log('Expanded class added to iframe ' + (index + 1));
+            });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                console.log('Escape key pressed');
+                iframeWrappers.forEach(w => w.classList.remove('expanded'));
+                console.log('Expanded class removed from all iframes');
+            }
+        });
     });
 </script>
 </body>
