@@ -395,7 +395,10 @@ Route::group(['prefix' => 'admin'], function () {
             })
             ->orWhereHas('labels', function ($q) {
                 $q->where('label_id', 95);
-            })->where('')->first();
+            })
+            // where noot like auth()->user()->id $order->not_able_to_handle_users
+            ->where('not_able_to_handle_users', 'not like', '%' . auth()->user()->id . '%')
+            ->first();
 
             return view('do_action', compact('order'));
         })->name('orders.do_action');
