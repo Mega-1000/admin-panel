@@ -86,15 +86,15 @@
     </div>
 
     <div>
-        @foreach($order->customer->orders as $order)
+        @foreach($order->customer->orders as $o)
             <div>
-                <a href="{{ route('orders.edit', $order->id) }}">{{ $order->id }}</a>
+                <a href="{{ route('orders.edit', $o->id) }}">{{ $o->id }}</a>
             </div>
         @endforeach
     </div>
 
     <div style="font-size: larger">
-        Wykonaj telefon do klienta na numer: {{ $order->customer->phone }}
+        Wykonaj telefon do klienta na numer: {{ $order->customer->login }}
         <br>
         <form action="/admin/add-additional-info/{{ $order->id }}" method="POST">
             @csrf
