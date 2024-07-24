@@ -12,6 +12,7 @@
     $hasLabel270 = $labels->contains('id', 270);
     $hasLabel275 = $labels->contains('id', 275);
     $hasLabel243 = $labels->contains('id', 243);
+    $hasLabel281 = $labels->contains('id', 281);
 @endphp
 
 
@@ -153,6 +154,14 @@
         Numer telefonu do działu spedycji: {{ $or->warehouse->shipment_after_pay_phone ?? '' }}
         Email do działu spedycji: {{ $or->warehouse->shipment_after_pay_email ?? '' }}
         <hr>
+    @endif
+
+    @if($hasLabel281)
+        <hr>
+        ZADZWOŃ DO KIEROWCY
+        <br>
+        pod numer: {{ $or->driver_phone ?? '' }}
+        <br>
     @endif
 
     @if ($hasLabel276 || $hasLabel279)
