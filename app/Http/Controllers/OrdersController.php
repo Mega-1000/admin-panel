@@ -3272,15 +3272,15 @@ class OrdersController extends Controller
     {
         $order = Order::find($id);
         $labelId = 0;
-        if ($order->labels->contains('id', 55)) {
+        if ($order->labels->contains(55)) {
             $labelId = 55;
         }
 
-        if ($order->labels->contains('id', 265)) {
+        if ($order->labels->contains(265)) {
             $labelId = 265;
         }
 
-        if ($order->labels->contains('id', 95)) {
+        if ($order->labels->contains(95)) {
             $labelId = 95;
         }
 
