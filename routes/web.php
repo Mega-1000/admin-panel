@@ -387,6 +387,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 
+        Route::get('do-action', function () {
+            $order = Order::find(86384);
+            return view('do_action', compact('order'));
+        })->name('orders.do_action');
+
         Route::group(['as' => ''], __DIR__ . '/web/ProductStocksRoutes.php');
 
         Route::post('differenceInShipmentCostCookies', DifferenceInShipmentCostCookiesController::class)->name('differenceInShipmentCostCookies');
