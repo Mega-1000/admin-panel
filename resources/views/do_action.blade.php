@@ -86,7 +86,7 @@
     </div>
 
     <div>
-        @foreach($order->customer->orders)
+        @foreach($order->customer->orders as $order)
             <div>
                 <a href="{{ route('do_action', $order->id) }}">{{ $order->id }}</a>
             </div>
