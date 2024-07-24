@@ -3270,6 +3270,8 @@ class OrdersController extends Controller
 
     public function addAdditionalInfo($id, MessagesHelper $messagesHelper): RedirectResponse
     {
+        $order = Order::find($id);
+
         if (request()->get('notAbleToProcess')) {
             $not_able_to_handle_users = json_decode($order->not_able_to_handle_users);
             $not_able_to_handle_users[] = Auth::user()->id;
@@ -3280,7 +3282,6 @@ class OrdersController extends Controller
             return redirect()->back();
         }
 
-        $order = Order::find($id);
         if (request()->get('notAnswered')) {
             $messagesHelper->sendNotice($order->chat, 'Klient nie odebrał telefonu - Kolejna próba kontaktu ustawiona automatycznie za 2 godziny');
         } else {

@@ -395,7 +395,7 @@ Route::group(['prefix' => 'admin'], function () {
             })
             ->orWhereHas('labels', function ($q) {
                 $q->where('label_id', 95);
-            })->first();
+            })->where('')->first();
 
             return view('do_action', compact('order'));
         })->name('orders.do_action');
