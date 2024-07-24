@@ -62,26 +62,6 @@
 </head>
 <body>
 
-<div style="font-size: larger">
-    Wykonaj telefon do klienta na numer: {{ $order->customer->phone }}
-    <br>
-    <form action="/admin/add-additional-info/{{ $order->id }}" method="POST">
-        @csrf
-        Dodatkowe informacje
-        <input type="text" name="notices" class="form-control">
-        <br>
-        Następny kontakt
-        <input type="datetime-local" name="next_contact_date" class="form-control">
-        <br>
-        <input type="checkbox" name="sendEmail">
-        Wyślij informacje na e-mail
-        <br>
-        <input type="submit" name="normal" value="Klient porzebuje jeszcze czasu" class="btn btn-primary">
-        <input type="submit" name="notAnswered" value="Nie odebrano telefonu" class="btn btn-danger">
-        <input type="submit" name="clientClosed" value="Klient zdecydowany" class="btn btn-success">
-    </form>
-    <hr>
-</div>
 
 <div class="iframe-container">
     <div class="iframe-wrapper">
@@ -102,6 +82,27 @@
     <div class="iframe-wrapper">
         <iframe src="/chat/{{ $token }}"></iframe>
     </div>
+</div>
+
+<div style="font-size: larger">
+    Wykonaj telefon do klienta na numer: {{ $order->customer->phone }}
+    <br>
+    <form action="/admin/add-additional-info/{{ $order->id }}" method="POST">
+        @csrf
+        Dodatkowe informacje
+        <input type="text" name="notices" class="form-control">
+        <br>
+        Następny kontakt
+        <input type="datetime-local" name="next_contact_date" class="form-control">
+        <br>
+        <input type="checkbox" name="sendEmail">
+        Wyślij informacje na e-mail
+        <br>
+        <input type="submit" name="normal" value="Klient porzebuje jeszcze czasu" class="btn btn-primary">
+        <input type="submit" name="notAnswered" value="Nie odebrano telefonu" class="btn btn-danger">
+        <input type="submit" name="clientClosed" value="Klient zdecydowany" class="btn btn-success">
+    </form>
+    <hr>
 </div>
 
 <script>
