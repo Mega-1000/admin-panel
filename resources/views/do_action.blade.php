@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive iframes with Fullscreen</title>
+    <title>Responsive iframes</title>
     <style>
         body, html {
             margin: 0;
@@ -23,34 +23,24 @@
             position: relative;
             width: 100%;
             height: 100%;
-            border: 2px solid #ccc;
+            border: 1px solid #ccc;
             transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        .iframe-wrapper::before {
-            content: 'Double-click to expand';
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            padding: 5px;
-            z-index: 10;
-            font-family: Arial, sans-serif;
-            font-size: 12px;
         }
         .iframe-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             border: none;
         }
-        .iframe-wrapper:fullscreen {
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-        }
-        .iframe-wrapper:fullscreen::before {
-            content: 'Press Esc to exit fullscreen';
+        .expanded {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -78,32 +68,28 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const iframeWrappers = document.querySelectorAll('.iframe-wrapper');
+        console.log('DOM fully loaded and parsed');
 
-        iframeWrappers.forEach((wrapper) => {
-            wrapper.addEventListener('dblclick', () => {
-                if (!document.fullscreenElement) {
-                    if (wrapper.requestFullscreen) {
-                        wrapper.requestFullscreen();
-                    } else if (wrapper.mozRequestFullScreen) { // Firefox
-                        wrapper.mozRequestFullScreen();
-                    } else if (wrapper.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                        wrapper.webkitRequestFullscreen();
-                    } else if (wrapper.msRequestFullscreen) { // IE/Edge
-                        wrapper.msRequestFullscreen();
-                    }
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.mozCancelFullScreen) { // Firefox
-                        document.mozCancelFullScreen();
-                    } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
-                        document.webkitExitFullscreen();
-                    } else if (document.msExitFullscreen) { // IE/Edge
-                        document.msExitFullscreen();
-                    }
-                }
+        const iframeWrappers = document.querySelectorAll('.iframe-wrapper');
+        console.log('Found ' + iframeWrappers.length + ' iframe wrappers');
+
+        iframeWrappers.forEach((wrapper, index) => {
+            wrapper.addEventListener('dblclick', (event) => {
+                console.log('Double-click detected on iframe ' + (index + 1));
+                event.preventDefault();
+
+                iframeWrappers.forEach(w => w.classList.remove('expanded'));
+                wrapper.classList.add('expanded');
+                console.log('Expanded class added to iframe ' + (index + 1));
             });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                console.log('Escape key pressed');
+                iframeWrappers.forEach(w => w.classList.remove('expanded'));
+                console.log('Expanded class removed from all iframes');
+            }
         });
     });
 </script>
