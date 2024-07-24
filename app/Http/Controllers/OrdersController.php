@@ -3284,7 +3284,7 @@ class OrdersController extends Controller
             $labelId = 95;
         }
 
-        dd($labelId, $order->labels->contains(265));
+        dd($labelId, $order->labels->has(265));
 
 
         if (request()->get('notAbleToProcess')) {
