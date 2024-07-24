@@ -3272,19 +3272,21 @@ class OrdersController extends Controller
     {
         $order = Order::find($id);
         $labelId = 0;
-        if ($order->labels->contains(55)) {
+        if ($order->labels()->where('id', 55)->first()) {
             $labelId = 55;
         }
 
-        if ($order->labels->contains(265)) {
+        if ($order->labels()->where('id', 265)->first()) {
             $labelId = 265;
         }
 
-        if ($order->labels->contains(95)) {
+        if ($order->labels()->where('id', 95)->first()) {
             $labelId = 95;
         }
 
-        dd($labelId, $order->labels->has(265));
+        dd($labelId, $order->labels()->where('id', 265)->first());
+
+
 
 
         if (request()->get('notAbleToProcess')) {
