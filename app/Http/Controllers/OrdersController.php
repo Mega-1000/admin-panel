@@ -3271,7 +3271,7 @@ class OrdersController extends Controller
     public function addAdditionalInfo($id, MessagesHelper $messagesHelper): RedirectResponse
     {
         $order = Order::find($id);
-        $labelWitchTriggered = $order->labels()->whereIn('label.id', [265, 55, 95])->first();
+        $labelWitchTriggered = $order->labels()->whereIn('labels.id', [265, 55, 95])->first();
 
         if (request()->get('notAbleToProcess')) {
             $not_able_to_handle_users = json_decode($order->not_able_to_handle_users);
