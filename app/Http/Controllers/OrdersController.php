@@ -3272,15 +3272,15 @@ class OrdersController extends Controller
     {
         $order = Order::find($id);
         $labelId = 0;
-        if ($order->labels->where('id',55)) {
+        if ($order->labels->where('id',55)->first()) {
             $labelId = 55;
         }
 
-        if ($order->labels->where('id', 265)) {
+        if ($order->labels->where('id', 265)->first()) {
             $labelId = 265;
         }
 
-        if ($order->labels->where('id',95)) {
+        if ($order->labels->where('id',95)->first()) {
             $labelId = 95;
         }
 
@@ -3295,7 +3295,6 @@ class OrdersController extends Controller
             return redirect()->back();
         }
 
-        dd($labelId, request()->get('notAnswered'));
         if (request()->get('notAnswered')) {
             $messagesHelper->sendNotice($order->chat, 'Klient nie odebrał telefonu - Kolejna próba kontaktu ustawiona automatycznie za 2 godziny');
         } else {
