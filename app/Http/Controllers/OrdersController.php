@@ -3271,6 +3271,7 @@ class OrdersController extends Controller
     public function addAdditionalInfo($id, MessagesHelper $messagesHelper): RedirectResponse
     {
         $order = Order::find($id);
+        $labelWitchTriggered = $order->labels()->whereIn('labels.id', [265, 55, 95])->first();
 
         if (request()->get('notAbleToProcess')) {
             $not_able_to_handle_users = json_decode($order->not_able_to_handle_users);
@@ -3289,13 +3290,13 @@ class OrdersController extends Controller
         }
 
         $arr = [];
-        $order->labels()->detach(265);
+        $order->labels()->detach($labelWitchTriggered->id);
 
         if (Carbon::create(request()->get('next_contact_date'))) {
             OrderLabelScheduler::query()->create([
                 'order_id' => $order->id,
                 'label_id' => 5,
-                'label_id_to_handle' => 265,
+                'label_id_to_handle' => $labelWitchTriggered->id,
                 'type' => 'C',
                 'action' => 'to_add_type_c',
                 'trigger_time' => Carbon::create(request()->get('next_contact_date') ?? now()->addHours(2)),
