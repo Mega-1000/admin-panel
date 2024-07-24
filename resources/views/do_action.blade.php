@@ -5,24 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive iframes</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
         .iframe-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            padding: 10px;
-            height: 100vh;
-            box-sizing: border-box;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
         }
         .iframe-wrapper {
             position: relative;
-            width: 100%;
-            height: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
         }
         .iframe-wrapper iframe {
             position: absolute;
@@ -67,15 +60,8 @@
 <script>
     document.querySelectorAll('.iframe-wrapper').forEach(wrapper => {
         wrapper.addEventListener('dblclick', () => {
-            document.querySelectorAll('.iframe-wrapper').forEach(w => w.classList.remove('expanded'));
-            wrapper.classList.add('expanded');
+            wrapper.classList.toggle('expanded');
         });
-    });
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            document.querySelectorAll('.iframe-wrapper').forEach(w => w.classList.remove('expanded'));
-        }
     });
 </script>
 </body>
