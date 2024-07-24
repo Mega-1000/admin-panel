@@ -388,7 +388,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 
         Route::get('do-action', function () {
-            $order = Order::find(86384);
+            $order = Order::whereHas('labels', function ($q) {
+
+            });
+
             return view('do_action', compact('order'));
         })->name('orders.do_action');
 
