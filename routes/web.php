@@ -396,7 +396,7 @@ Route::group(['prefix' => 'admin'], function () {
             ->orWhereHas('labels', function ($q) {
                 $q->where('label_id', 95);
             })
-            ->where('not_able_to_handle_users', 'not like', '%' . auth()->user()->id . '%')
+                ->whereRaw('FIND_IN_SET(?, not_able_to_handle_users) = 0', [auth()->user()->id])
             ->first();
 
             return view('do_action', compact('order'));
