@@ -56,11 +56,13 @@
 </head>
 <body>
 
-Wykonaj telefon do klienta na numer: {{ $order->customer->phone }}
-<br>
-<a href="" class="btn btn-success">
-    Wykonano telefon i wszystkie potrzebne akcje
-</a>
+<div style="font-size: larger">
+    Wykonaj telefon do klienta na numer: {{ $order->customer->phone }}
+    <br>
+    <a href="" class="btn btn-success">
+        Wykonano telefon i wszystkie potrzebne akcje
+    </a>
+</div>
 
 <div class="iframe-container">
     <div class="iframe-wrapper">
