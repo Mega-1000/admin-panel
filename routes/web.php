@@ -389,8 +389,8 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('do-action', function () {
             $order = Order::whereHas('labels', function ($q) {
-
-            });
+                $q->where('label_id', 265);
+            })->get();
 
             return view('do_action', compact('order'));
         })->name('orders.do_action');
