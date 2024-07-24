@@ -102,6 +102,7 @@
             <input type="submit" name="normal" value="Klient porzebuje jeszcze czasu" class="btn btn-primary">
             <input type="submit" name="notAnswered" value="Nie odebrano telefonu" class="btn btn-danger">
             <input type="submit" name="clientClosed" value="Klient zdecydowany" class="btn btn-success">
+            <input type="submit" name="notAbleToProcess" value="Nie jestem w stanie obsłużyć tego zamówienia" class="btn btn-danger">
         </form>
         <hr>
     </div>
