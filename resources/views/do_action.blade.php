@@ -85,6 +85,14 @@
         <iframe src="/chat/{{ $token }}"></iframe>
     </div>
 
+    <div>
+        @foreach($order->customer->orders)
+            <div>
+                <a href="{{ route('do_action', $order->id) }}">{{ $order->id }}</a>
+            </div>
+        @endforeach
+    </div>
+
     <div style="font-size: larger">
         Wykonaj telefon do klienta na numer: {{ $order->customer->phone }}
         <br>
