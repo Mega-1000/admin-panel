@@ -390,6 +390,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('do-action', function () {
             $order = Order::whereHas('labels', function ($q) {
                 $q->where('label_id', 265);
+            })->orWhereHas('labels', function ($q) {
+                $q->where('label_id', 55);
+            })
+            ->orWhereHas('labels', function ($q) {
+                $q->where('label_id', 95);
             })->first();
 
             return view('do_action', compact('order'));
