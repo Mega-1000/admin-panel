@@ -55,6 +55,13 @@
     </style>
 </head>
 <body>
+
+Wykonaj telefon do klienta na numer: {{ $order->customer->phone }}
+<br>
+<a href="" class="btn btn-success">
+    Wykonano telefon i wszystkie potrzebne akcje
+</a>
+
 <div class="iframe-container">
     <div class="iframe-wrapper">
         <iframe src="{{ route('orders.edit', $order->id) }}"></iframe>
