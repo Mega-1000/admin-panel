@@ -81,7 +81,7 @@
         const iframeWrappers = document.querySelectorAll('.iframe-wrapper');
 
         iframeWrappers.forEach((wrapper) => {
-            wrapper.addEventListener('dblclick', () => {
+            wrapper.addEventListener('click', () => {
                 if (!document.fullscreenElement) {
                     if (wrapper.requestFullscreen) {
                         wrapper.requestFullscreen();
