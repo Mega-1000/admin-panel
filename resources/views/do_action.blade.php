@@ -59,7 +59,7 @@
 <div style="font-size: larger">
     Wykonaj telefon do klienta na numer: {{ $order->customer->phone }}
     <br>
-    <form action="/admin/add-additional-info/{{ $or->id }}" method="POST">
+    <form action="/admin/add-additional-info/{{ $order->id }}" method="POST">
         @csrf
         Dodatkowe informacje
         <input type="text" name="notices" class="form-control">
