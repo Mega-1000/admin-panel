@@ -67,9 +67,11 @@
     <div class="iframe-wrapper">
         <iframe src="{{ route('orders.edit', $order->id) }}"></iframe>
     </div>
-    <div class="iframe-wrapper">
-        <iframe src="/auctions/{{ $order->chat->auctions()->first()->id }}/end"></iframe>
-    </div>
+    @if($order->chat->auctions()->first())
+        <div class="iframe-wrapper">
+            <iframe src="/auctions/{{ $order->chat->auctions()->first()->id }}/end"></iframe>
+        </div>
+    @endif
     <div class="iframe-wrapper">
         <iframe src="/admin/orders/{{ $order->id }}/get-basket"></iframe>
     </div>
