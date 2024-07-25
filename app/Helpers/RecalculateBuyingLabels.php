@@ -18,6 +18,10 @@ class RecalculateBuyingLabels
             ->whereHas('order', function ($q) {$q->whereHas('items.product', function ($q) {$q->where('variation_group', 'styropiany');});})->where('operation_type', 'Wpłata/wypłata bankowa')->get()->unique('order')->pluck('order.id');
 
         if (empty(BuyingInvoice::where('order_id', $order->id)->first()) && !$order->labels->contains('id', 65)) {
+            $arr = [];
+
+            RemoveLabelService::removeLabels($order, [263], $arr , [], auth()->id());
+            RemoveLabelService::removeLabels($order, [264], $arr , [], auth()->id());
             return;
         }
 
