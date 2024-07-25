@@ -17,8 +17,7 @@ class RecalculateBuyingLabels
         OrderPayment::where('created_at' , '>=', now()->firstOfMonth())
             ->whereHas('order', function ($q) {$q->whereHas('items.product', function ($q) {$q->where('variation_group', 'styropiany');});})->where('operation_type', 'Wpłata/wypłata bankowa')->get()->unique('order')->pluck('order.id');
 
-        // first day of month
-        if (empty(BuyingInvoice::where('order_id', $order->id)->first()) && $order->labels->contains('id', 65)) {
+        if (empty(BuyingInvoice::where('order_id', $order->id)->first()) && !$order->labels->contains('id', 65)) {
             return;
         }
 
