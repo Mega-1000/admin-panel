@@ -24,7 +24,7 @@ class OrderWarehouseNotification extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'order_id', 'warehouse_id', 'realization_date', 'possible_delay_days', 'file', 'contact_person', 'contact_person_phone', 'driver_contact', 'waiting_for_response'
+        'order_id', 'warehouse_id', 'realization_date', 'possible_delay_days', 'file', 'contact_person', 'contact_person_phone', 'driver_contact', 'waiting_for_response', 'employee_id'
     ];
 
     /**
