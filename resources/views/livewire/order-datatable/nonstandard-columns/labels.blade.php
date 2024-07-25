@@ -211,7 +211,7 @@
     {{ $notification?->contact_person_phone ?? $notification?->warehouse?->property?->phone ?? '' }}
     {{ $notification?->created_at ?? '' }}
     @if($warehouse?->warehouse_email)
-        {{ strstr($warehouseMail ?? '', '@', true) }}@
+        {{ strstr($warehouse?->warehouse_email ?? '', '@', true) }}@
         @php($amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count())
         @if($amountOfMonits > 0 && $hasLabel77)
             <div style="color: red; margin-top: 20px">
