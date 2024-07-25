@@ -71,6 +71,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
 
         $warehouse = $order->warehouse;
         if ($order->orderWarehouseNotifications->first()->employee_id && $order->orderWarehouseNotifications->first()->employee->is_performing_avization) {
+            dd('okej');
             $warehouseMail = $order->orderWarehouseNotifications->first()->employee->email;
         }
 
