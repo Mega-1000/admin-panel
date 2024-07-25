@@ -156,28 +156,10 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
 <p>
     Od<br>
 
-    @if ($order->warehouse->firm->symbol !== 'NEOTHERM')
         ELEKTRONICZNA PLATFORMA HANDLOWA EU SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
         ul. NORWIDA 31<br/>
         55-200 Oława<br/>
-        NIP: 9121945342<br/>
-    @else
-        {!! implode('<br>', $order->getInvoiceAddress()->only([
-    'firstname',
-    'lastname',
-    'firmname',
-    'nip',
-    'phone_code',
-    'phone',
-    'address',
-    'flat_number',
-    'city',
-    'postal_code',
-    'email'
-])) !!}
-
-    @endif
-</p>
+        NIP: 9121945342<br/></p>
 <p>
     Dane do dostawy: <br/>
     {{$order->addresses->first->id->firstname}} {{$order->addresses->first->id->lastname}}<br>
