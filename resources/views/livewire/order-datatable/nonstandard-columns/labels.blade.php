@@ -203,7 +203,7 @@
     @php
         $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
         $warehouse = $or->warehouse;
-        $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
+        $warehouseMail = dd($notification, $notification->employee_id, $notification->employee->is_performing_avization)
             ? $notification->employee->email
             : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
     @endphp
