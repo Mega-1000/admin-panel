@@ -203,15 +203,15 @@
     @php
         $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
         $warehouse = $or->warehouse;
-        $warehouseMail = dd($notification, $notification->employee_id, $notification->employee->is_performing_avization)
+        $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
             ? $notification->employee->email
             : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
     @endphp
     {{ $notification?->contact_person ?? '' }}
     {{ $notification?->contact_person_phone ?? $notification?->warehouse?->property?->phone ?? '' }}
     {{ $notification?->created_at ?? '' }}
-    @if($warehouse?->warehouse_email)
-        {{ strstr($warehouse?->warehouse_email ?? '', '@', true) }}@
+    @if($warehouseMail)
+        {{ strstr($warehouseMail ?? '', '@', true) }}@
         @php($amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count())
         @if($amountOfMonits > 0 && $hasLabel77)
             <div style="color: red; margin-top: 20px">
