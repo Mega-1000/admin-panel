@@ -91,7 +91,7 @@
         <hr>
         @foreach($order->customer->orders as $o)
             <div style="display: flex; gap: 10px">
-                <a href="{{ route('orders.edit', $o->id) }}" style="font: larger">{{ $o->id }}</a>
+                <a href="{{ route('orders.edit', $o->id) }}" style="font-size: larger">{{ $o->id }}</a>
 
                 @foreach($o->labels as $label)
                     <span
