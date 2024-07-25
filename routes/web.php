@@ -1,5 +1,6 @@
 <?php
 
+use App\Entities\ContactApproach;
 use App\Entities\Customer;
 use App\Entities\FirmSource;
 use App\Entities\Status;
@@ -401,6 +402,16 @@ Route::group(['prefix' => 'admin'], function () {
                         ->orWhereNull('not_able_to_handle_users');
                 })
                 ->first();
+
+            if (!$order) {
+                return view('aproaches-index', [
+                    'items' => ContactApproach::where(function($query) {
+                        $query->where('from_date', '>', now())
+                            ->orWhereNull('from_date');
+                    })->where('done', false)->get()
+                    ]
+                );
+            }
 
             return view('do_action', compact('order'));
         })->name('orders.do_action');
