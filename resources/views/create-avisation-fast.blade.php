@@ -32,7 +32,7 @@
                         @endforeach
                         <br>
                         <br>
-                        Wartość wszystkich wpłat zaksięgowanych i deklarowanych które klient wykonał na ten moment
+                        Wartość wszystkich wpłat zaksięgowanych, dklarowanych udokumenmtowanych oraz deklarowanych które wpłaci kupujący na naszą odpowiedzialność
                         <input type="text" class="form-control" name="declared_sum">
                         <br>
                         <br>
