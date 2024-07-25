@@ -218,7 +218,7 @@
                 </div>
             </div>
 
-            <input type="checkbox" name="is_performing_avization" checked="{{ $employee->is_performing_avization }}">
+            <input type="checkbox" name="is_performing_avization" {{ $employee->is_performing_avization ? 'checked' : '' }}>
             Ten pracownik sam obsługuje awizacje
 
             <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
