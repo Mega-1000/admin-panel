@@ -90,7 +90,7 @@
     <div>
         <hr>
         @foreach($order->customer->orders as $o)
-            <div style="display: flex">
+            <div style="display: flex; gap: 10px">
                 <a href="{{ route('orders.edit', $o->id) }}">{{ $o->id }}</a>
 
                 @foreach($o->labels as $label)
