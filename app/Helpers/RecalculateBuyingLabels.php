@@ -12,7 +12,7 @@ class RecalculateBuyingLabels
 
     public static function recalculate(Order $order): void
     {
-        if (empty(BuyingInvoice::where('order_id', $order->id)->first())) {
+        if (empty(BuyingInvoice::where('order_id', $order->id)->first()) && $order->labels->contains('id', 65)) {
             return;
         }
 
