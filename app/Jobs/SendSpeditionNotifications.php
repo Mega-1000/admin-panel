@@ -100,10 +100,10 @@ class SendSpeditionNotifications implements ShouldQueue
             }
 
             if (
-                ($currentHour == 7 && $currentMinute >= 0 && $currentMinute <= 30) ||
-                $currentHour >= 11 &&
+                ($currentHour == 7 && $currentMinute == 0) ||
+                ($currentHour >= 11 &&
                 $haveToAskWarehouse &&
-                Carbon::now()->isWeekday()
+                Carbon::now()->isWeekday())
             ) {
                 if (
                     $fromDate->isPast() &&
