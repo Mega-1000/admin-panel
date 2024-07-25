@@ -205,7 +205,7 @@
         $warehouse = $or->warehouse;
         $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
             ? $notification->employee->email
-            : ($warehouse && $warehouse->firm ? $warehouse->email : null);
+            : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
     @endphp
     {{ $notification?->contact_person ?? '' }}
     {{ $notification?->contact_person_phone ?? $notification?->warehouse?->property?->phone ?? '' }}
