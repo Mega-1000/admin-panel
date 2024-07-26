@@ -211,7 +211,7 @@
             ? $notification->employee->phone
             : ($warehouse && $warehouse->property ? $warehouse->property->phone : null);
     @endphp
-    {{ $notification?->contact_person ?? '' }}
+
     {{ $warehousePhone }}
     {{ $notification?->created_at ?? '' }}
     @if($warehouseMail)
@@ -223,4 +223,10 @@
             </div>
         @endif
     @endif
+    ->
+    Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
+    ->
+    Podano osobę kontaktową: {{ $notification?->contact_person ?? '' }}
+    telefon: {{ $notification?->contact_person_phone ?? '' }}
+
 @endif
