@@ -201,6 +201,10 @@
 
 @if($labelGroupName === 'produkcja' && $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first())
     <div style="text-align: center">
+        &#8595;
+        <br>
+        Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
+        <br>
         Awizacja została wysłana:
         @php
             $warehouse = $or->warehouse;
@@ -224,10 +228,6 @@
                 </div>
             @endif
         @endif
-        <br>
-        &#8595;
-        <br>
-        Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
         <br>
         &#8595;
         <br>
