@@ -212,7 +212,7 @@
             : ($warehouse && $warehouse->property ? $warehouse->property->phone : null);
     @endphp
     {{ $notification?->contact_person ?? '' }}
-    {{ $notification?->contact_person_phone ?? $notification?->warehouse?->property?->phone ?? '' }}
+    {{ $warehousePhone }}
     {{ $notification?->created_at ?? '' }}
     @if($warehouseMail)
         {{ strstr($warehouseMail ?? '', '@', true) }}@
