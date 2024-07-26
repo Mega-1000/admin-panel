@@ -200,38 +200,40 @@
 </div>
 
 @if($labelGroupName === 'produkcja')
-    Awizacja została wysłana:
-    @php
-        $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
-        $warehouse = $or->warehouse;
-        $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
-            ? $notification->employee->email
-            : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
+    <div style="text-align: center">
+        Awizacja została wysłana:
+        @php
+            $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
+            $warehouse = $or->warehouse;
+            $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
+                ? $notification->employee->email
+                : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
 
-        $warehousePhone = $notification && $notification->employee_id && $notification->employee->is_performing_avization
-            ? $notification->employee->phone
-            : ($warehouse && $warehouse->property ? $warehouse->property->phone : null);
-    @endphp
+            $warehousePhone = $notification && $notification->employee_id && $notification->employee->is_performing_avization
+                ? $notification->employee->phone
+                : ($warehouse && $warehouse->property ? $warehouse->property->phone : null);
+        @endphp
 
-    {{ $warehousePhone }}
-    {{ $notification?->created_at ?? '' }}
-    @if($warehouseMail)
-        {{ strstr($warehouseMail ?? '', '@', true) }}@
-        @php($amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count())
-        @if($amountOfMonits > 0 && $hasLabel77)
-            <div style="color: red; margin-top: 20px">
-                Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
-            </div>
+        {{ $warehousePhone }}
+        {{ $notification?->created_at ?? '' }}
+        @if($warehouseMail)
+            {{ strstr($warehouseMail ?? '', '@', true) }}@
+            @php($amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count())
+            @if($amountOfMonits > 0 && $hasLabel77)
+                <div style="color: red; margin-top: 20px">
+                    Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
+                </div>
+            @endif
         @endif
-    @endif
-    <br>
-    &#8595;
-    <br>
-    Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
-    <br>
-    &#8595;
-    <br>
-    @php($notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->where('contact_person', '!=', null)->first())
-    Podano osobę kontaktową: {{ $notification->contact_person ?? '' }}
-    telefon: {{ $notification?->contact_person_phone ?? '' }}
+        <br>
+        &#8595;
+        <br>
+        Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
+        <br>
+        &#8595;
+        <br>
+        @php($notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->where('contact_person', '!=', null)->first())
+        Podano osobę kontaktową: {{ $notification->contact_person ?? '' }}
+        telefon: {{ $notification?->contact_person_phone ?? '' }}
+    </div>
 @endif
