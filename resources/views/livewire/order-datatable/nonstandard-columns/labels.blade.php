@@ -203,9 +203,9 @@
     <div style="text-align: center">
         Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
         <br>
-        Awizacja została wysłana:
         &#8595;
         <br>
+        Awizacja została wysłana:
         @php
             $warehouse = $or->warehouse;
             $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
