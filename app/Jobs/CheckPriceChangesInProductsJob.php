@@ -74,10 +74,10 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
                     'Warehouse not found',
                     ['supplier' => $supplier, 'class' => get_class($this), 'line' => __LINE__]
                 );
-                Mailer::create()
-                    // TODO Change to configuration
-                    ->to('info@' . config('app.domain_name'))
-                    ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
+//                Mailer::create()
+//                     TODO Change to configuration
+//                    ->to('info@' . config('app.domain_name'))
+//                    ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
             }
         }
     }
