@@ -208,7 +208,13 @@
             : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
     @endphp
     {{ $notification?->contact_person ?? '' }}
-    {{ $notification?->contact_person_phone ?? $notification?->warehouse?->property?->phone ?? '' }}
+
+    {{ $notification?->contact_person_phone ?? $notification && $notification->employee_id &&
+        $notification->employee->is_performing_avization
+            ? $notification->employee->phone
+            : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null) ?? ''
+    }}
+
     {{ $notification?->created_at ?? '' }}
     @if($warehouseMail)
         {{ strstr($warehouseMail ?? '', '@', true) }}@
