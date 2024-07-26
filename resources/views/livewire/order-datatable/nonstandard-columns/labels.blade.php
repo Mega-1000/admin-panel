@@ -212,7 +212,7 @@
     {{ $notification?->contact_person_phone ?? $notification && $notification->employee_id &&
         $notification->employee->is_performing_avization
             ? $notification->employee->phone
-            : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null) ?? ''
+            : ($warehouse && $warehouse->firm ? $warehouse->property->phone : null) ?? ''
     }}
 
     {{ $notification?->created_at ?? '' }}
