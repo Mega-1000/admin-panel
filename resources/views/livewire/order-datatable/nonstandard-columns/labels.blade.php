@@ -200,140 +200,34 @@
 </div>
 
 @if($labelGroupName === 'produkcja')
-    <style>
-        .historia-container {
-            max-width: 600px;
-            margin: 2rem auto;
-            font-family: Arial, sans-serif;
-        }
-        .historia-tytul {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 2rem;
-        }
-        .linia-czasu {
-            position: relative;
-            padding: 0 0 0 2rem;
-        }
-        .linia-czasu::before {
-            content: '';
-            position: absolute;
-            left: 7px;
-            top: 0;
-            height: 100%;
-            width: 2px;
-            background: #3498db;
-        }
-        .wydarzenie {
-            position: relative;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .wydarzenie::before {
-            content: '';
-            position: absolute;
-            left: -2rem;
-            top: 1.5rem;
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid #3498db;
-            border-radius: 50%;
-            background: #fff;
-        }
-        .wydarzenie::after {
-            content: '';
-            position: absolute;
-            left: -1.5rem;
-            top: 1.75rem;
-            width: 0;
-            height: 0;
-            border-top: 0.5rem solid transparent;
-            border-bottom: 0.5rem solid transparent;
-            border-right: 0.5rem solid #fff;
-        }
-        .wydarzenie-tytul {
-            margin: 0 0 0.5rem;
-            color: #2c3e50;
-        }
-        .wydarzenie-tresc {
-            margin: 0;
-            color: #34495e;
-        }
-        .alert {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-    </style>
+    @php
+        $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
+        $warehouse = $or->warehouse;
+        $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
+            ? $notification->employee->email
+            : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
 
-    <div class="historia-container">
-        <h2 class="historia-tytul">Historia Powiadomień Zamówienia</h2>
+        $warehousePhone = $notification && $notification->employee_id && $notification->employee->is_performing_avization
+            ? $notification->employee->phone
+            : ($warehouse && $warehouse->property ? $warehouse->property->phone : null);
+    @endphp
 
-        @php
-            $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
-            $warehouse = $or->warehouse;
-            $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
-                ? $notification->employee->email
-                : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
-
-            $warehousePhone = $notification && $notification->employee_id && $notification->employee->is_performing_avization
-                ? $notification->employee->phone
-                : ($warehouse && $warehouse->property ? $warehouse->property->phone : null);
-
-            $amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count();
-
-            $contactNotification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->where('contact_person', '!=', null)->first();
-        @endphp
-
-        <div class="linia-czasu">
-            <div class="wydarzenie">
-                <h3 class="wydarzenie-tytul">Telefon Magazynu</h3>
-                <p class="wydarzenie-tresc">{{ $warehousePhone ?? 'Nie podano' }}</p>
+    {{ $warehousePhone }}
+    {{ $notification?->created_at ?? '' }}
+    @if($warehouseMail)
+        {{ strstr($warehouseMail ?? '', '@', true) }}@
+        @php($amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count())
+        @if($amountOfMonits > 0 && $hasLabel77)
+            <div style="color: red; margin-top: 20px">
+                Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
             </div>
+        @endif
+    @endif
+    ->
+    Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
+    ->
+    @php($notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->where('contact_person', '!=', null)->first())
+    Podano osobę kontaktową: {{ $notification->contact_person ?? '' }}
+    telefon: {{ $notification?->contact_person_phone ?? '' }}
 
-            <div class="wydarzenie">
-                <h3 class="wydarzenie-tytul">Data Utworzenia Powiadomienia</h3>
-                <p class="wydarzenie-tresc">{{ $notification?->created_at ?? 'Brak danych' }}</p>
-            </div>
-
-            @if($warehouseMail)
-                <div class="wydarzenie">
-                    <h3 class="wydarzenie-tytul">Email Magazynu</h3>
-                    <p class="wydarzenie-tresc">{{ strstr($warehouseMail, '@', true) }}@</p>
-                </div>
-
-                @if($amountOfMonits > 0 && $hasLabel77)
-                    <div class="wydarzenie">
-                        <h3 class="wydarzenie-tytul">Wysłane Przypomnienia</h3>
-                        <p class="wydarzenie-tresc alert">
-                            Wysłano {{ $amountOfMonits }} {{ trans_choice('przypomnienie|przypomnienia|przypomnień', $amountOfMonits) }} w sprawie awizacji
-                        </p>
-                    </div>
-                @endif
-            @endif
-
-            <div class="wydarzenie">
-                <h3 class="wydarzenie-tytul">Powiadomienie Obsługiwane Przez</h3>
-                <p class="wydarzenie-tresc">
-                    {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownika' : 'Magazyn' }}
-                </p>
-            </div>
-
-            @if($contactNotification)
-                <div class="wydarzenie">
-                    <h3 class="wydarzenie-tytul">Osoba Kontaktowa</h3>
-                    <p class="wydarzenie-tresc">{{ $contactNotification->contact_person }}</p>
-                </div>
-
-                @if($contactNotification->contact_person_phone)
-                    <div class="wydarzenie">
-                        <h3 class="wydarzenie-tytul">Telefon Osoby Kontaktowej</h3>
-                        <p class="wydarzenie-tresc">{{ $contactNotification->contact_person_phone }}</p>
-                    </div>
-                @endif
-            @endif
-        </div>
-    </div>
 @endif
