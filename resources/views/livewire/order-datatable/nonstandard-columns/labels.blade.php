@@ -200,6 +200,7 @@
 </div>
 
 @if($labelGroupName === 'produkcja')
+    Awizacja została wysłana:
     @php
         $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
         $warehouse = $or->warehouse;
