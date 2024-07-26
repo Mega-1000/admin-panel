@@ -229,10 +229,12 @@
             @endif
         @endif
         <br>
-        &#8595;
-        <br>
         @php($notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->where('contact_person', '!=', null)->first())
-        Podano osobę kontaktową: {{ $notification->contact_person ?? '' }}
-        telefon: {{ $notification?->contact_person_phone ?? '' }}
+        @if ($notification)
+            &#8595;
+            <br>
+            Podano osobę kontaktową: {{ $notification->contact_person ?? '' }}
+            telefon: {{ $notification?->contact_person_phone ?? '' }}
+        @endif
     </div>
 @endif
