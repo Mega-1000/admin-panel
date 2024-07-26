@@ -225,14 +225,13 @@
         @endif
     @endif
     <br>
-    ->
+    &#8595;
     <br>
     Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
     <br>
-    ->
+    &#8595;
     <br>
     @php($notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->where('contact_person', '!=', null)->first())
     Podano osobę kontaktową: {{ $notification->contact_person ?? '' }}
     telefon: {{ $notification?->contact_person_phone ?? '' }}
-
 @endif
