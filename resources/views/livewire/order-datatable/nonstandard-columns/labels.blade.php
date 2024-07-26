@@ -199,11 +199,10 @@
     @endforeach
 </div>
 
-@if($labelGroupName === 'produkcja')
+@if($labelGroupName === 'produkcja' && $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first())
     <div style="text-align: center">
         Awizacja została wysłana:
         @php
-            $notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->latest()->first();
             $warehouse = $or->warehouse;
             $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
                 ? $notification->employee->email
