@@ -226,7 +226,7 @@
     ->
     Awizacje obsługuje {{ $notification && $notification->employee_id && $notification->employee->is_performing_avization ? 'Pracownik' : 'Magazyn' }}
     ->
-    Podano osobę kontaktową: {{ dd($notification ?? '') }}
+    Podano osobę kontaktową: {{ $notification ?? '' }}
     telefon: {{ $notification?->contact_person_phone ?? '' }}
 
 @endif
