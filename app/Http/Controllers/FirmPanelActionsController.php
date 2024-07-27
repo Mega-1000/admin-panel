@@ -13,7 +13,7 @@ class FirmPanelActionsController extends Controller
     {
         $orders = Order::whereHas('items', function ($query) use ($firm) {
             $query->whereHas('product', function ($q) use ($firm) {
-                $q->where('firm_id', $firm->id);
+                $q->where('manufacturer', $firm->symbol);
             });
         })->get();
 
