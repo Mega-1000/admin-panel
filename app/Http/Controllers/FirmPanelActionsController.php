@@ -15,7 +15,12 @@ class FirmPanelActionsController extends Controller
             $query->whereHas('product', function ($q) use ($firm) {
                 $q->where('manufacturer', $firm->symbol);
             });
-        })->orderBy('created_at', 'desc')->get();
+        })
+        ->orderBy('created_at', 'desc')
+        ->whereHas('status', function ($q) {
+            $q->where('id', 5);
+        })
+        ->get();
 
         return view('firms.panel', compact('firm', 'orders'));
     }
