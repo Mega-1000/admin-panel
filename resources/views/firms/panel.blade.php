@@ -73,7 +73,7 @@
                                         <p class="font-bold">
                                             PRZELEW ZOSTAŁ WYKONANY - prosimy o potwierdzenie otrzymujesz powiadomienia co 15 minut. kliknij
                                             <br>
-                                            <a href="{{ route('store-payment-confirmation-confirm', $order->id) }}">TUTAJ</a>
+                                            <a href="{{ route('store-payment-confirmation-confirm', $order->id) }}" class="btn btn-primary">TUTAJ</a>
                                         </p>
                                     </div>
                                 @endif
@@ -85,15 +85,7 @@
                                             <br>
                                             Jeśli zamówienie juź wyjechało, prosimy o potwierdzenie tego faktu klikając w przycisk poniżej:
                                             <a href="{{ rtrim(config('app.front_nuxt_url'), '/') . "/magazyn/awizacja/{$order->orderWarehouseNotifications->first()->id}/{$order->warehouse_id}/{$order->id}/wyslij-fakture" }}">
-                                                <button style="background-color: #4CAF50; /* Green */
-                                            border: none;
-                                            color: white;
-                                            text-align: center;
-                                            text-decoration: none;
-                                            display: inline-block;
-                                            font-size: 16px;
-                                            margin: 4px 2px;
-                                            cursor: pointer;">Towar został wydany</button>
+                                                <button class="btn btn-success">Towar został wydany</button>
                                             </a>
 
                                             <br>
@@ -127,7 +119,7 @@
                                                     'e',
                                                 );
                                             @endphp
-                                            <a href="https://admin.mega1000.pl/chat/{{ $token }}">Zmień daty dostawy</a>
+                                            <a href="https://admin.mega1000.pl/chat/{{ $token }}" class="btn btn-primary">Zmień daty dostawy</a>
                                         </p>
                                     </div>
                                 @endif
@@ -137,10 +129,10 @@
                                         <p class="font-bold">
                                             NIE OTRZYMALIŚMY INFORMACJI CZY ZAMÓWIENIE WYJEDZIE JUTRO - Prosimy o informacje czy zlecenie zostanie wydane jutro aktualnie otrzymujesz powiadomienia co 15 minut
                                             <br>
-                                            Jeśli zamówienie zostanie wysłane jutro prosimy o wypełnienie formularza pod linkiem: <a href="https://admin.mega1000.pl/orders/set-order-as-shipping-today/{{$order->id}}">{{ route('shippingToday', $order->id) }}</a>
+                                            Jeśli zamówienie zostanie wysłane jutro prosimy o wypełnienie formularza po kliknięciu: <a href="https://admin.mega1000.pl/orders/set-order-as-shipping-today/{{$order->id}}" class="btn btn-primary">Tutaj</a>
                                             <br>
                                             <br>
-                                            Jeśli zamówienie nie zostanie wysłane jutro kliknij na ten link: <a href="https://admin.mega1000.pl/orders/set-order-as-not-shipping-today/{{$order->id}}">{{ route('notShippingToday', $order->id) }}</a>
+                                            Jeśli zamówienie nie zostanie wysłane jutro kliknij <a href="https://admin.mega1000.pl/orders/set-order-as-not-shipping-today/{{$order->id}}">Tutaj</a>
                                         </p>
                                     </div>
                                 @endif
