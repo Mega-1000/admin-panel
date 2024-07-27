@@ -47,7 +47,7 @@
                     <dt class="text-sm font-medium text-gray-500">Status</dt>
                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                {{ $order->status_id }}
+                                {{ $order->status->name }}
                             </span>
                     </dd>
                 </div>
