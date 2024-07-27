@@ -65,6 +65,18 @@
                                         <p class="font-bold">
                                             PRZELEW ZOSTAŁ WYKONANY
                                         </p>
+
+                                        @foreach($paymentConfirmations as $paymentConfirmation)
+                                            <hr>
+                                            <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
+                                            <br><br>
+                                            Dane osoby obsługującej:
+                                            <br>
+                                            email: {{ $or->warehouse->warehouse_email ?? '' }}
+                                            <br>
+                                            numer telefonu: {{ $or->warehouse->property->phone ?? '' }}
+                                            <hr>
+                                        @endforeach
                                     </div>
                                 @endif
 
