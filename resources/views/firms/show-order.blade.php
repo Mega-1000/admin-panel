@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-polylinedecorator/1.6.0/leaflet.polylineDecorator.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <style>
-        #map { height: 400px; width: 100%; }
+        #map { height: 400px; width: 400px; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -40,9 +40,6 @@
 <div class="bg-white shadow-md rounded-lg p-6">
     <h2 class="text-2xl font-bold mb-4">Zamówienie #{{ $order->id }}</h2>
 
-    <div class="col-md-6">
-        <div id="map"></div>
-    </div>
 
     <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
@@ -56,6 +53,10 @@
             <h3 class="font-semibold">Dane Dostawy</h3>
             <p>{!! implode('<br>', $order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->toArray()) !!}</p>
         </div>
+    </div>
+
+    <div class="col-md-6">
+        <div id="map"></div>
     </div>
 
     <h3 class="font-semibold mb-2">Produkty w Zamówieniu</h3>
