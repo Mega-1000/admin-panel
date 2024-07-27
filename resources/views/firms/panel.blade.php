@@ -67,9 +67,10 @@
                                         </p>
 
                                         <hr>
-                                        <a href="{{ $order->paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
+                                        <a href="{{ $order->paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane
                                         <br><br>
-                                        {{ explode('/', $order->paymentConfirmation->file_url)[4] }}
+                                        {{ substr(explode('/', $order->paymentConfirmation->file_url)[4], -15) }}
+                                        </a>
                                         <br>
                                         <br>
                                         Dane osoby obsługującej:
