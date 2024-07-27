@@ -1,3 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+<nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex">
+                <div class="flex-shrink-0 flex items-center">
+                    <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" alt="Workflow">
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <a href="#" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Zamówienia
+                    </a>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <a href="" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Przetargi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
 <div class="bg-white shadow-md rounded-lg p-6">
     <h2 class="text-2xl font-bold mb-4">Zamówienie #{{ $order->id }}</h2>
 
@@ -48,3 +79,13 @@
     </div>
 
 </div>
+
+<footer class="bg-white mt-12">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-gray-500 text-sm">
+            © 2024 EPH Polska. Wszystkie prawa zastrzezone.
+        </p>
+    </div>
+</footer>
+</body>
+</html>
