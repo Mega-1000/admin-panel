@@ -44,7 +44,13 @@
                                         <p class="font-bold">
                                             NIE POTWIERDZONO AWIZACJI!
                                             <br>
-                                            Otrzymujesz powiadomienia co 15 minut. kliknij <a href="{{ rtrim(config('app.front_nuxt_url'), "/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id} }}">tutaj</a> aby potwierdzić awizację.
+                                            Otrzymujesz powiadomienia co 15 minut. kliknij
+                                            <a href="
+                                                {{ rtrim(config('app.front_nuxt_url'), "/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id} }}
+                                            ">
+                                                tutaj
+                                            </a>
+                                            aby potwierdzić awizację.
                                         </p>
                                     </div>
                                 @endif
