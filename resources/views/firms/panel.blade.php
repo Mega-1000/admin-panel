@@ -41,7 +41,11 @@
                                 <h2 class="text-xl font-semibold text-gray-800 mb-2">Zamówienie #{{ $order->id }}</h2>
                                 @if($order->labels->contains('id', 77))
                                     <div class="bg-red-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
-                                        <p class="font-bold">NIE POTWIERDZONO AWIZACJI!</p>
+                                        <p class="font-bold">
+                                            NIE POTWIERDZONO AWIZACJI!
+                                            <br>
+                                            Otrzymujesz powiadomienia co 15 minut. kliknij <a href="{{ rtrim(config('app.front_nuxt_url'), "/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id} }}">tutaj</a> aby potwierdzić awizację.
+                                        </p>
                                     </div>
                                 @endif
 

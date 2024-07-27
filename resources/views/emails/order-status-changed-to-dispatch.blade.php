@@ -193,9 +193,9 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
         {{$item->product->supplier_product_symbol ? 'Symbol producenta: ' . $item->product->supplier_product_symbol : null}}
     </p>
     @include('emails.item-price-table', [
-    'item' => $item,
-    'bw' => $item->product->packing->number_of_sale_units_in_the_pack,
-    'bx' => $item->product->packing->number_of_trade_items_in_the_largest_unit,
+        'item' => $item,
+        'bw' => $item->product->packing->number_of_sale_units_in_the_pack,
+        'bx' => $item->product->packing->number_of_trade_items_in_the_largest_unit,
     ])
     <br/>
 @endforeach
