@@ -48,6 +48,9 @@
             <p>Data utworzenia: {{ $order->created_at->format('d.m.Y H:i') }}</p>
             <p>Data aktualizacji: {{ $order->updated_at->format('d.m.Y H:i') }}</p>
             <p>Całkowita cena: {{ number_format($order->total_price, 2, ',', ' ') }} zł</p>
+            <div class="col-md-6">
+                <div id="map"></div>
+            </div>
         </div>
         <div>
             <h3 class="font-semibold">Dane Dostawy</h3>
@@ -55,9 +58,6 @@
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div id="map"></div>
-    </div>
 
     <h3 class="font-semibold mb-2">Produkty w Zamówieniu</h3>
     <table class="w-full border-collapse border border-gray-300">
