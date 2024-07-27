@@ -17,9 +17,7 @@ class FirmPanelActionsController extends Controller
             });
         })
         ->orderBy('created_at', 'desc')
-        ->whereHas('status', function ($q) {
-            $q->where('id', 5);
-        })
+        ->whereHas('orderWarehouseNotifications')
         ->get();
 
         return view('firms.panel', compact('firm', 'orders'));
