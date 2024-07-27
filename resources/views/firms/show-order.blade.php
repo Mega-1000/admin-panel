@@ -31,6 +31,9 @@
 
 <div class="bg-white shadow-md rounded-lg p-6">
     <h2 class="text-2xl font-bold mb-4">Zamówienie #{{ $order->id }}</h2>
+    <div class="col-md-6">
+        <div id="map"></div>
+    </div>
 
     <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
@@ -85,5 +88,101 @@
         </p>
     </div>
 </footer>
+
+<script>
+
+    var map = L.map('map').setView([51.919438, 19.145136], 6);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Origin zip code
+    var originZipCode = "{{ \App\Helpers\LocationHelper::nearestWarehouse($chat_auction_firm->chatAuction->chat->order, $chat_auction_firm->firm)->address->postal_code }}";
+
+    // Destination zip code (from the existing data)
+    var destZipCode = "{{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}";
+
+    // Function to get coordinates from zip code
+    function getCoordinates(zipCode) {
+        return $.getJSON('https://nominatim.openstreetmap.org/search?format=json&postalcode=' + zipCode + '&country=pl')
+            .then(function(data) {
+                if (data.length > 0) {
+                    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                } else {
+                    throw new Error('Could not find coordinat for zip code: ' + zipCode);
+                }
+            });
+    }
+
+    // Function to get route from OSRM
+    function getRoute(origin, destination) {
+        var url = `http://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${destination[1]},${destination[0]}?overview=full&geometries=geojson`;
+
+        return $.getJSON(url);
+    }
+
+    // Main function to set up the map
+    function setupMap() {
+        console.log('Setting up map...');
+        Promise.all([getCoordinates(originZipCode), getCoordinates(destZipCode)])
+            .then(function([origin, destination]) {
+                console.log('Magazyn fabryki', origin);
+                console.log('Lokalizacja dostawy', destination);
+
+                // Add markers
+                L.marker(origin).addTo(map)
+                    .bindPopup('Magazyn fabryki' + originZipCode)
+                    .openPopup();
+                L.marker(destination).addTo(map)
+                    .bindPopup('Lokalizacja dostawy ' + destZipCode)
+                    .openPopup();
+
+                // Get and display the route
+                return getRoute(origin, destination).then(function(data) {
+                    var coordinates = data.routes[0].geometry.coordinates.map(function(coord) {
+                        return [coord[1], coord[0]];
+                    });
+
+                    var polyline = L.polyline(coordinates, {color: 'blue'}).addTo(map);
+
+                    // Fit the map to show the entire route
+                    map.fitBounds(polyline.getBounds());
+
+                    // Calculate distance and time
+                    var distanceKm = (data.routes[0].distance / 1000).toFixed(2);
+                    var estimatedTimeHours = (data.routes[0].duration / 3600).toFixed(2);
+
+                    // Add info control
+                    var info = L.control();
+                    info.onAdd = function () {
+                        this._div = L.DomUtil.create('div', 'info');
+                        this.update(distanceKm, estimatedTimeHours);
+                        return this._div;
+                    };
+                    info.update = function (distance, time) {
+                        this._div.innerHTML = '<h4>Przewidywana dostawa</h4>' +
+                            'Dystans: ' + distance + ' km<br>' +
+                            'Czas: ' + time + ' godzin';
+                    };
+                    info.addTo(map);
+
+                    console.log('Map setup complete');
+                });
+            })
+            .catch(function(error) {
+                console.error('Error setting up map:', error);
+                alert('Error setting up map: ' + error.message);
+            });
+    }
+
+    // Call the setup function when the document is ready
+    $(document).ready(function() {
+        console.log('Document ready, calling setupMap');
+        setupMap();
+
+    });
+</script>
 </body>
 </html>
