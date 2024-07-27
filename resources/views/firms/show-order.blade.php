@@ -22,7 +22,7 @@
                 <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-white.svg" alt="Workflow">
                 <div class="ml-10 flex items-baseline space-x-4">
                     <a href="#" class="bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium">Zamówienia</a>
-                    <a href="#" class="text-indigo-200 hover:bg-indigo-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Przetargi</a>
+                    <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}" class="text-indigo-200 hover:bg-indigo-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Przetargi</a>
                 </div>
             </div>
         </div>
