@@ -57,6 +57,13 @@
                                     </div>
                                 @endif
 
+                                @if($order->labels->contains('id', 260))
+                                    <div class="bg-green-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
+                                        <p class="font-bold">
+                                            PRZELEW ZOSTAŁ WYKONANY
+                                        </p>
+                                    </div>
+
                                 @if($order->labels->contains('id', 66))
                                     <div class="bg-green-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
                                         <p class="font-bold">
