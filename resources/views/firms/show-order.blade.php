@@ -27,7 +27,6 @@
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-medium text-gray-500">{{ $metric['title'] }}</h3>
                     <span class="text-gray-400">
-                        @include('components.icons.' . $metric['icon'])
                     </span>
                 </div>
                 <p class="text-2xl font-semibold">{{ $metric['value'] }}</p>
