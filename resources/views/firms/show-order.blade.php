@@ -100,7 +100,7 @@
     }).addTo(map);
 
     // Origin zip code
-    var originZipCode = "{{ \App\Helpers\LocationHelper::nearestWarehouse($order, $order->items->first()->product->manufacturer)->address->postal_code }}";
+    var originZipCode = "{{ \App\Helpers\LocationHelper::nearestWarehouse($order, $order->items->first()->product->firm)->address->postal_code }}";
 
     // Destination zip code (from the existing data)
     var destZipCode = "{{ $order->addresses->first()->postal_code }}";
