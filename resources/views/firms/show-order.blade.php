@@ -36,6 +36,11 @@
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Szczegóły i status zamówienia</p>
         </div>
 
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Mapa Dostawy</h3>
+            <div id="map" class="mt-4 rounded-lg shadow-md"></div>
+        </div>
+
         <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
             <dl class="sm:divide-y sm:divide-gray-200">
                 <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -139,10 +144,6 @@
             </dl>
         </div>
 
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Mapa Dostawy</h3>
-            <div id="map" class="mt-4 rounded-lg shadow-md"></div>
-        </div>
     </div>
 </main>
 
