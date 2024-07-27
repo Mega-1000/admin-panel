@@ -52,7 +52,7 @@
     <table class="w-full border-collapse border border-gray-300">
         <thead>
         <tr class="bg-gray-100">
-            <th class="border p-2">ID Produktu</th>
+            <th class="border p-2">Nazwa produktu</th>
             <th class="border p-2">Ilość</th>
             <th class="border p-2">Cena</th>
             <th class="border p-2">Suma</th>
@@ -61,7 +61,7 @@
         <tbody>
         @foreach ($order->items as $item)
             <tr>
-                <td class="border p-2">{{ $item->product_id }}</td>
+                <td class="border p-2">{{ $item->product->name }}</td>
                 <td class="border p-2">{{ $item->quantity }}</td>
                 <td class="border p-2">{{ number_format($item->price / $item->quantity, 2, ',', ' ') }} zł</td>
                 <td class="border p-2">{{ number_format($item->price, 2, ',', ' ') }} zł</td>
