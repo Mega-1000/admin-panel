@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\OrderWarehouseNotificationController;
 use App\Http\Controllers\AuctionsController;
 use App\Http\Controllers\ContactApproachController;
 use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\FirmPanelActionsController;
 use App\Http\Controllers\FirmRepresentController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\OrderDatatableColumnsManagementController;
@@ -465,6 +466,7 @@ Route::group(['prefix' => 'admin'], function () {
         ])->name('orders.updateSelf');
         Route::get('orders/{token}/print', 'OrdersController@print')->name('orders.print');
         Route::get('orders/invoice-value-delete/{id}', DeleteOrderInvoiceValueController::class)->name('orders.invoice-value');
+
 
         Route::get('orderReturn/{order_id}', 'OrderReturnController@index')->name('order_return.index');
         Route::put('orderReturn/{id}/store', ['uses' => 'OrderReturnController@store'])->name('order_return.store');
@@ -1160,7 +1162,7 @@ Route::get('/styro-chatrs', function () {
     return view('charts', compact('dayLabels', 'dayData', 'weekLabels', 'weekData', 'monthLabels', 'monthData'));
 });
 
-
+Route::get('/firm-panel-actions/{firm}', FirmPanelActionsController::class);
 Route::get('all-auctions-map', function (Request $request) {
     return view('all-auctions-map');
 })->name('all-auctions-map');
