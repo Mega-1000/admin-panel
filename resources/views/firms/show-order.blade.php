@@ -30,7 +30,8 @@
 </nav>
 
 <div class="bg-white shadow-md rounded-lg p-6">
-    <h2 class="text-2xl font-bold mb-4">Zamówienie #{{ $order->id }}</h2>
+    <h2 class="text-2xl font-bold mb-4">Zamówienie #{{ $order->id }}</h2>\
+
     <div class="col-md-6">
         <div id="map"></div>
     </div>
@@ -99,10 +100,10 @@
     }).addTo(map);
 
     // Origin zip code
-    var originZipCode = "{{ \App\Helpers\LocationHelper::nearestWarehouse($chat_auction_firm->chatAuction->chat->order, $chat_auction_firm->firm)->address->postal_code }}";
+    var originZipCode = "{{ \App\Helpers\LocationHelper::nearestWarehouse($order, $order->items->first()->product->manufacturer)->address->postal_code }}";
 
     // Destination zip code (from the existing data)
-    var destZipCode = "{{ $chat_auction_firm->chatAuction->chat->order->addresses->first()->postal_code }}";
+    var destZipCode = "{{ $order->addresses->first()->postal_code }}";
 
     // Function to get coordinates from zip code
     function getCoordinates(zipCode) {
