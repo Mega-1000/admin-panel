@@ -69,6 +69,9 @@
                                         <hr>
                                         <a href="{{ $order->paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
                                         <br><br>
+                                        {{ $order->paymentConfirmation->file_url }}
+                                        <br>
+                                        <br>
                                         Dane osoby obsługującej:
                                         <br>
                                         email: {{ $order->warehouse->warehouse_email ?? '' }}
