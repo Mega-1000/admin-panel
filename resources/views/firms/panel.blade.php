@@ -45,6 +45,14 @@
                                     </div>
                                 @endif
 
+                                @if($order->labels->contains('id', 66))
+                                    <div class="bg-green-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
+                                        <p class="font-bold">
+                                            Towar został wydany!
+                                        </p>
+                                    </div>
+                                @endif
+
                                 <div class="text-sm text-gray-600">
                                     <p><strong>Data stworzenia:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
                                     <p><strong>Status:</strong> {{ $order->status->name }}</p>
