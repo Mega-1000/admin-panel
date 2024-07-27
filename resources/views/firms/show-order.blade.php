@@ -54,7 +54,7 @@
         </div>
         <div>
             <h3 class="font-semibold">Dane Dostawy</h3>
-            <p>{!!         {!! implode('<br>', $order->getInvoiceAddress()->only([
+            <p>{!! implode('<br>', $order->getInvoiceAddress()->only([
     'firstname',
     'lastname',
     'firmname',
@@ -66,7 +66,7 @@
     'city',
     'postal_code',
     'email'
-])) !!} !!}</p>
+])) !!} </p>
         </div>
     </div>
 
