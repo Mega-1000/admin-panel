@@ -22,4 +22,9 @@ class FirmPanelActionsController extends Controller
 
         return view('firms.panel', compact('firm', 'orders'));
     }
+
+    public function show(Order $order): View
+    {
+        return view('firms.show-order', compact('order'));
+    }
 }

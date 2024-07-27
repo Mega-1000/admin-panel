@@ -1163,6 +1163,8 @@ Route::get('/styro-chatrs', function () {
 });
 
 Route::get('/firm-panel-actions/{firm}', FirmPanelActionsController::class);
+Route::get('/firm-panel-actions/{order}', [FirmPanelActionsController::class, 'show']);
+
 Route::get('all-auctions-map', function (Request $request) {
     return view('all-auctions-map');
 })->name('all-auctions-map');
