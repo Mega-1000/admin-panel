@@ -66,7 +66,7 @@
                                             PRZELEW ZOSTAŁ WYKONANY
                                         </p>
 
-                                        @foreach($paymentConfirmations as $paymentConfirmation)
+                                        @foreach($order->paymentConfirmations as $paymentConfirmation)
                                             <hr>
                                             <a href="{{ $paymentConfirmation->file_url }}" target="_blank">Potwierdzenie przelewu zostało wysłane</a>
                                             <br><br>
