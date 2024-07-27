@@ -41,10 +41,8 @@
             <p>Całkowita cena: {{ number_format($order->total_price, 2, ',', ' ') }} zł</p>
         </div>
         <div>
-            <h3 class="font-semibold">Dane Klienta</h3>
-            <p>ID Klienta: {{ $order->customer_id }}</p>
-            <p>ID Magazynu: {{ $order->warehouse_id }}</p>
-            <p>ID Pracownika: {{ $order->employee_id }}</p>
+            <h3 class="font-semibold">Dane Dostawy</h3>
+            <p>{!! implode($order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->toArray(), '<br>') !!}</p>
         </div>
     </div>
 
