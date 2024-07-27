@@ -9,103 +9,147 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-polylinedecorator/1.6.0/leaflet.polylineDecorator.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
     <style>
-        #map { height: 400px; width: 400px; }
+        #map { height: 300px; width: 100%; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-<nav class="bg-white shadow-md">
+<body class="bg-gray-100 min-h-screen font-sans">
+<nav class="bg-indigo-600 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
-                <div class="flex-shrink-0 flex items-center">
-                    <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" alt="Workflow">
-                </div>
-                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    <a href="#" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                        Zamówienia
-                    </a>
-                </div>
-                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    <a href="" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                        Przetargi
-                    </a>
+            <div class="flex items-center">
+                <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-white.svg" alt="Workflow">
+                <div class="ml-10 flex items-baseline space-x-4">
+                    <a href="#" class="bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium">Zamówienia</a>
+                    <a href="#" class="text-indigo-200 hover:bg-indigo-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Przetargi</a>
                 </div>
             </div>
         </div>
     </div>
 </nav>
 
-<div class="bg-white shadow-md rounded-lg p-6">
-    <h2 class="text-2xl font-bold mb-4">Zamówienie #{{ $order->id }}</h2>
-
-
-    <div class="grid grid-cols-2 gap-4 mb-6">
-        <div>
-            <h3 class="font-semibold">Szczegóły Zamówienia</h3>
-            <p>Status: {{ $order->status_id }}</p>
-            <p>Data utworzenia: {{ $order->created_at->format('d.m.Y H:i') }}</p>
-            <p>Data aktualizacji: {{ $order->updated_at->format('d.m.Y H:i') }}</p>
-            <p>Całkowita cena: {{ number_format($order->total_price, 2, ',', ' ') }} zł</p>
-            <div class="col-md-6">
-                <div id="map"></div>
-            </div>
+<main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 bg-gray-50">
+            <h2 class="text-2xl font-bold text-gray-900">Zamówienie #{{ $order->id }}</h2>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">Szczegóły i status zamówienia</p>
         </div>
-        <div>
-            <h3 class="font-semibold">Dane Dostawy</h3>{!! implode('<br>', $order->getInvoiceAddress()->only([
-    'firstname',
-    'lastname',
-    'firmname',
-    'nip',
-    'phone_code',
-    'phone',
-    'address',
-    'flat_number',
-    'city',
-    'postal_code',
-    'email'
-])) !!}
+
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+            <dl class="sm:divide-y sm:divide-gray-200">
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Status</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                {{ $order->status_id }}
+                            </span>
+                    </dd>
+                </div>
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Data utworzenia</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $order->created_at->format('d.m.Y H:i') }}</dd>
+                </div>
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Data aktualizacji</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $order->updated_at->format('d.m.Y H:i') }}</dd>
+                </div>
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Całkowita cena</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        <span class="font-semibold text-lg text-indigo-600">{{ number_format($order->total_price, 2, ',', ' ') }} zł</span>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Dane Dostawy</h3>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+            <dl class="sm:divide-y sm:divide-gray-200">
+                @foreach($order->getInvoiceAddress()->only([
+                    'firstname',
+                    'lastname',
+                    'firmname',
+                    'nip',
+                    'phone_code',
+                    'phone',
+                    'address',
+                    'flat_number',
+                    'city',
+                    'postal_code',
+                    'email'
+                ]) as $key => $value)
+                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">{{ ucfirst($key) }}</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $value }}</dd>
+                    </div>
+                @endforeach
+            </dl>
+        </div>
+
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Produkty w Zamówieniu</h3>
+        </div>
+        <div class="px-4 sm:px-6">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nazwa produktu</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ilość</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cena</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suma</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                @foreach ($order->items as $item)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->product->name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->quantity }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->price / $item->quantity, 2, ',', ' ') }} zł</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->price, 2, ',', ' ') }} zł</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Dodatkowe Informacje</h3>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+            <dl class="sm:divide-y sm:divide-gray-200">
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Koszt wysyłki</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ number_format($order->shipment_price_for_client, 2, ',', ' ') }} zł</dd>
+                </div>
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Płatność za pobraniem</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $order->cash_on_delivery_amount ? number_format($order->cash_on_delivery_amount, 2, ',', ' ') . ' zł' : 'Nie dotyczy' }}</dd>
+                </div>
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Proponowana płatność</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ number_format($order->proposed_payment, 2, ',', ' ') }} zł</dd>
+                </div>
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Wysyłka za granicę</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $order->shipping_abroad ? 'Tak' : 'Nie' }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Mapa Dostawy</h3>
+            <div id="map" class="mt-4 rounded-lg shadow-md"></div>
         </div>
     </div>
+</main>
 
-
-    <h3 class="font-semibold mb-2">Produkty w Zamówieniu</h3>
-    <table class="w-full border-collapse border border-gray-300">
-        <thead>
-        <tr class="bg-gray-100">
-            <th class="border p-2">Nazwa produktu</th>
-            <th class="border p-2">Ilość</th>
-            <th class="border p-2">Cena</th>
-            <th class="border p-2">Suma</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach ($order->items as $item)
-            <tr>
-                <td class="border p-2">{{ $item->product->name }}</td>
-                <td class="border p-2">{{ $item->quantity }}</td>
-                <td class="border p-2">{{ number_format($item->price / $item->quantity, 2, ',', ' ') }} zł</td>
-                <td class="border p-2">{{ number_format($item->price, 2, ',', ' ') }} zł</td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
-
-    <div class="mt-6">
-        <h3 class="font-semibold mb-2">Dodatkowe Informacje</h3>
-        <p>Koszt wysyłki: {{ number_format($order->shipment_price_for_client, 2, ',', ' ') }} zł</p>
-        <p>Płatność za pobraniem: {{ $order->cash_on_delivery_amount ? number_format($order->cash_on_delivery_amount, 2, ',', ' ') . ' zł' : 'Nie dotyczy' }}</p>
-        <p>Proponowana płatność: {{ number_format($order->proposed_payment, 2, ',', ' ') }} zł</p>
-        <p>Wysyłka za granicę: {{ $order->shipping_abroad ? 'Tak' : 'Nie' }}</p>
-    </div>
-
-</div>
-
-<footer class="bg-white mt-12">
+<footer class="bg-gray-800 mt-12">
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <p class="text-center text-gray-500 text-sm">
-            © 2024 EPH Polska. Wszystkie prawa zastrzezone.
+        <p class="text-center text-gray-300 text-sm">
+            © 2024 EPH Polska. Wszystkie prawa zastrzeżone.
         </p>
     </div>
 </footer>
