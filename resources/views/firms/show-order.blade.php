@@ -123,7 +123,7 @@
 
     // Function to get route from OSRM
     function getRoute(origin, destination) {
-        var url = `http://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${destination[1]},${destination[0]}?overview=full&geometries=geojson`;
+        var url = `https://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${destination[1]},${destination[0]}?overview=full&geometries=geojson`;
 
         return $.getJSON(url);
     }
