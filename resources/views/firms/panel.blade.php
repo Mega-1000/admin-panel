@@ -16,7 +16,12 @@
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                     <a href="#" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                        Dashboard
+                        Zamówienia
+                    </a>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <a href="" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Przetargi
                     </a>
                 </div>
             </div>
@@ -26,7 +31,7 @@
 
 <main class="py-10">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-6">Order Dashboard</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Zamówienia</h1>
         <div class="bg-white shadow-xl rounded-lg overflow-hidden">
             <div class="p-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -35,18 +40,19 @@
                             <div class="p-4">
                                 <h2 class="text-xl font-semibold text-gray-800 mb-2">Zamówienie #{{ $order->id }}</h2>
                                 @if($order->labels->contains('id', 77))
-                                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
-                                        <p class="font-bold">Awizacja nie potwierdzona</p>
+                                    <div class="bg-red-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
+                                        <p class="font-bold">NIE POTWIERDZONO AWIZACJI!</p>
                                     </div>
                                 @endif
+
                                 <div class="text-sm text-gray-600">
-                                    <p><strong>Date:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
+                                    <p><strong>Data stworzenia:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
                                     <p><strong>Status:</strong> {{ $order->status->name }}</p>
                                     <p><strong></strong></p>
                                     <p><strong>Wartość:</strong> {{ number_format($order->getValue(), 2) }}zł</p>
                                 </div>
                                 <div class="mt-4">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">View Details</a>
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">Szczegóły</a>
                                 </div>
                             </div>
                         </div>
