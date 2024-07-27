@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
 </head>
 <body class="bg-gray-100 min-h-screen">
 <nav class="bg-white shadow-md">
@@ -30,7 +31,7 @@
 </nav>
 
 <div class="bg-white shadow-md rounded-lg p-6">
-    <h2 class="text-2xl font-bold mb-4">Zamówienie #{{ $order->id }}</h2>\
+    <h2 class="text-2xl font-bold mb-4">Zamówienie #{{ $order->id }}</h2>
 
     <div class="col-md-6">
         <div id="map"></div>
@@ -91,7 +92,6 @@
 </footer>
 
 <script>
-
     var map = L.map('map').setView([51.919438, 19.145136], 6);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
