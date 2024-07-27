@@ -47,7 +47,7 @@
                                             Otrzymujesz powiadomienia co 15 minut. kliknij
 
                                             <a href="
-
+{{ rtrim(config('app.front_nuxt_url'), "/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}" }}
                                             ">
                                                 tutaj
                                             </a>
