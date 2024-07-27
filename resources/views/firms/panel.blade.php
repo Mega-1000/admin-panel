@@ -21,7 +21,9 @@
                     </a>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}" class="text-indigo-200 hover:bg-indigo-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Przetargi</a>
+                    <a href="https://mega1000.pl/firms/przetargi?firmToken={{ $firm->access_token }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Przetargi
+                    </a>
                 </div>
             </div>
         </div>
