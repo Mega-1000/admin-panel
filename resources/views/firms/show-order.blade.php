@@ -54,7 +54,19 @@
         </div>
         <div>
             <h3 class="font-semibold">Dane Dostawy</h3>
-            <p>{!! implode('<br>', $order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->toArray()) !!}</p>
+            <p>{!!         {!! implode('<br>', $order->getInvoiceAddress()->only([
+    'firstname',
+    'lastname',
+    'firmname',
+    'nip',
+    'phone_code',
+    'phone',
+    'address',
+    'flat_number',
+    'city',
+    'postal_code',
+    'email'
+])) !!} !!}</p>
         </div>
     </div>
 
