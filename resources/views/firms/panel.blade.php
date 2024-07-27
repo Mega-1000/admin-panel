@@ -68,7 +68,23 @@
                                 @if($order->labels->contains('id', 261))
                                     <div class="bg-red-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
                                         <p class="font-bold">
-                                            PRZELEW ZOSTAŁ WYKONANY - prosimy o potwierdzenie
+                                            PRZELEW ZOSTAŁ WYKONANY - prosimy o potwierdzenie otrzymujesz powiadomienia co 15 minut. kliknij
+                                        </p>
+                                    </div>
+                                @endif
+
+                                @if($order->labels->contains('id', 243))
+                                    <div class="bg-red-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
+                                        <p class="font-bold">
+                                            DATY SPEDYCJI ZOSTAŁY ZAKOŃCZONE - Prosimy o informacje czy zlecenie zostało wydane aktualnie otrzymujesz powiadomienia co 15 minut
+                                        </p>
+                                    </div>
+                                @endif
+
+                                @if($order->labels->contains('id', 270))
+                                    <div class="bg-red-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
+                                        <p class="font-bold">
+                                            NIE OTRZYMALIŚMY INFORMACJI CZY ZAMÓWIENIE WYJEDZIE JUTRO - Prosimy o informacje czy zlecenie zostanie wydane jutro aktualnie otrzymujesz powiadomienia co 15 minut
                                         </p>
                                     </div>
                                 @endif
