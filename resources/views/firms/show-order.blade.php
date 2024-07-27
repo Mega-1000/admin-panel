@@ -42,7 +42,7 @@
         </div>
         <div>
             <h3 class="font-semibold">Dane Dostawy</h3>
-            <p>{!! implode($order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->toArray(), '<br>') !!}</p>
+            <p>{!! implode('<br>', $order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->toArray()) !!}</p>
         </div>
     </div>
 
