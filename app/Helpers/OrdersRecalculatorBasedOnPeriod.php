@@ -54,6 +54,8 @@ class OrdersRecalculatorBasedOnPeriod
 
         if ($payments != 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
+        } else {
+            RemoveLabelService::removeLabels($order, [240], $arr, [], Auth::user()?->id);
         }
 
         if (
