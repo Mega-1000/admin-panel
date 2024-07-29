@@ -1,5 +1,8 @@
 Dzień dobry,
 <br>
+@php
+$order = \App\Entities\Order::find($confirmation->order_id);
+@endphp
 <p>
     UWAGA !!<br>
         Jeśli chcesz udostępnić ten moduł do innego działu twojej firmy to skopiuj link i wyślij do odpowiedniej osoby
