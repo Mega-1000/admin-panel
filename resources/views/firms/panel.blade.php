@@ -48,7 +48,7 @@
                                             Otrzymujesz powiadomienia co 15 minut. kliknij
 
                                             <a
-                                                href="https://new.mega1000.pl/magazyn/awizacja/34655/{{ $order->orderWarehouseNotifications()->first()->id }}/{{ $order->id }}"
+                                                href="https://new.mega1000.pl/magazyn/awizacja/{{ $order->chat->id }}/{{ $order->orderWarehouseNotifications->first()->id }}/{{ $order->id }}"
                                                 target="__blank"
                                                 class="btn btn-primary"
                                             >
