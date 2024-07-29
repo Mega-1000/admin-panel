@@ -131,6 +131,11 @@ class OrderWarehouseNotificationController extends Controller
 
             $order = $notification->order;
 
+            $order->labels()->detach([77]);
+
+            $arr = [];
+            AddLabelService::addLabels($order, [53], $arr, []);
+
             $messagesHelper->sendDateChangeMessageAvization($order->chat, 'magazyn');
             $order->date_accepted = false;
             $order->save();
