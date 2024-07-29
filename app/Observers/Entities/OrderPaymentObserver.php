@@ -9,6 +9,7 @@ use App\Jobs\SendSpeditionNotifications;
 use App\Repositories\Orders;
 use App\Services\AllegroPaymentsReturnService;
 use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\LabelService;
 use App\Services\OrderAddressService;
 use App\Services\OrderPaymentLabelsService;
@@ -37,6 +38,18 @@ class OrderPaymentObserver
 
         AllegroPaymentsReturnService::checkAllegroReturn($orderPayment->order);
         OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($orderPayment->order);
+
+        $sumOfPayments = $orderPayment->order->payments->where('operation_type', 'Wpłata/wypłata bankowa')->sum('amount');
+
+        if ($sumOfPayments == $orderPayment->order->getValue()) {
+            $arr = [];
+            AddLabelService::addLabels($orderPayment->order, [41], $arr, [], Auth::user()?->id);
+            RemoveLabelService::removeLabels($orderPayment->order, [288], $arr, [], Auth::user()?->id);
+        } else {
+            $arr = [];
+            AddLabelService::addLabels($orderPayment->order, [288], $arr, [], Auth::user()?->id);
+            RemoveLabelService::removeLabels($orderPayment->order, [41], $arr, [], Auth::user()?->id);
+        }
     }
 
     /**
