@@ -53,6 +53,7 @@ class OrdersRecalculatorBasedOnPeriod
             ->payments()
             ->where('declared_sum', '!=', null)
             ->where('status', null)
+            ->orWhere('status', 'Deklaracja wpłaty')
             ->where('promise_date', '>', now())
             ->get()
             ->sum('declared_sum');
