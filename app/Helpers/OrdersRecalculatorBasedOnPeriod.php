@@ -51,7 +51,7 @@ class OrdersRecalculatorBasedOnPeriod
 
         $payments = $order->payments()->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '>', now())->get()->sum('declared_sum');
 
-        dd($payments, $order->payments()->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '>', now())->get());
+        dd($payments, $order->payments()->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '>', now())->get(),$order->id);
         if ($payments != 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
         }
