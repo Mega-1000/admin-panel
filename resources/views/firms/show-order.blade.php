@@ -31,7 +31,7 @@
 <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="bg-white shadow-xl rounded-lg overflow-hidden">
         <div class="px-4 py-5 sm:px-6 bg-gray-50">
-            <h2 class="text-2xl font-bold text-gray-900">Zamówienie #{{ $order->id }}</h2>
+{{--            <h2 class="text-2xl font-bold text-gray-900">Zamówienie #{{ $order->id }}</h2>--}}
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Szczegóły i status zamówienia</p>
         </div>
 
@@ -58,12 +58,12 @@
                     <dt class="text-sm font-medium text-gray-500">Data aktualizacji</dt>
                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $order->updated_at->format('d.m.Y H:i') }}</dd>
                 </div>
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Całkowita cena</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        <span class="font-semibold text-lg text-indigo-600">{{ number_format($order->total_price, 2, ',', ' ') }} zł</span>
-                    </dd>
-                </div>
+{{--                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">--}}
+{{--                    <dt class="text-sm font-medium text-gray-500">Całkowita cena</dt>--}}
+{{--                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">--}}
+{{--                        <span class="font-semibold text-lg text-indigo-600">{{ number_format($o, 2, ',', ' ') }} zł</span>--}}
+{{--                    </dd>--}}
+{{--                </div>--}}
             </dl>
         </div>
 
