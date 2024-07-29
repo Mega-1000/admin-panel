@@ -111,8 +111,8 @@
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->product->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->quantity }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->net_purchase_price_commercial_unit_after_discount, 2, ',', ' ') }} zł</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->net_purchase_price_commercial_unit_after_discount * $item->quantity, 2, ',', ' ') }} zł</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->net_purchase_price_commercial_unit_after_discounts, 2, ',', ' ') }} zł</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity, 2, ',', ' ') }} zł</td>
                     </tr>
                 @endforeach
                 </tbody>
