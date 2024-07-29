@@ -49,14 +49,7 @@ class OrdersRecalculatorBasedOnPeriod
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
-        $payments = $order
-            ->payments()
-            ->where('declared_sum', '!=', null)
-            ->where('status', null)
-            ->orWhere('status', 'Deklaracja wpłaty')
-            ->where('promise_date', '>', now())
-            ->get()
-            ->sum('declared_sum');
+        $payments = $order->payments()->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '>', now())->get()->sum('declared_sum');
 
         if ($payments != 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
