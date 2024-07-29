@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Entities\Order;
+use App\Entities\OrderPayment;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
@@ -49,9 +50,8 @@ class OrdersRecalculatorBasedOnPeriod
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
-        $payments = $order->payments()->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '>', now())->get()->sum('declared_sum');
+        $payments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '>', now())->get();
 
-        dd($payments, $order->payments()->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '>', now())->get(),$order->id);
         if ($payments != 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
         }
