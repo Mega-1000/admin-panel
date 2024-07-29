@@ -2,6 +2,27 @@
 @if($path !== null)
     <strong>W załączniku przesyłamy protokół nadania paczki.</strong>
 @endif
+
+<p>
+    UWAGA !!<br>
+    Od dnia 29.07.2024 dostęny jest panel wszystkich zamówień wraz z możliwością wypełnienia wszystkich potrzebnych nam danych
+    <br>
+    <a
+        href="https://admin.mega1000.pl/firm-panel-actions/{{ \App\Entities\Firm::where('symbol', $order->items->first()->product->manufacturer)->first()->id }}"
+        style="background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 12px;
+        padding: 10px 24px;"
+    >PANEL WSZYSTKICH ZAMÓWIEN DO WASZEJ FIRMY</a>
+</p>
+
 <p>
     Wyglada na to iż powiniście w dniu dzisiejszym rozpoczać nadawanie przesyłki o numerze {{$packageNumber}} prosimy w
     przypadku wydania w dniu dzisieszym prosimy o potwierdzenie wydania towaru a jeżeli termin rozpoczęcia bedzie
