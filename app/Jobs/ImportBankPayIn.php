@@ -306,9 +306,10 @@ class ImportBankPayIn implements ShouldQueue
         $payIn->wholeDataArray['kwota'] = str_replace(',', '.', $payIn->kwota);
 
         if (
-            $payIn->contains('ZEWNĘTRZNY PRZYCHODZĽCY') &&
+            $payIn->contains('ZEWNďż˝TRZNY WYCHODZďż') &&
             $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE
         ) {
+            dd('ookej');
             $payIn->wholeDataArray['kwota'] = $payIn->wholeDataArray['kwota'] * -1;
         }
 
