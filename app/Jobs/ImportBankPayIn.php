@@ -353,6 +353,7 @@ class ImportBankPayIn implements ShouldQueue
                     'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
                     'comments' => 'Deklaracja wpłaty na styropian stworzona automatycznie',
                     'operation_type' => $operationType,
+                    'status' => 'Deklaracja wpłaty',
                 ]);
             }
         }
