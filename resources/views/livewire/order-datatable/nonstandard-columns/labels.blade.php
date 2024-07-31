@@ -151,7 +151,7 @@
 
     @if($hasLabel270 || $hasLabel275 || $hasLabel243)
         <hr>
-        @if($or->warehouse->shipment_after_pay_email)
+        @if(!$or->warehouse->shipment_after_pay_email)
             <div style="color: red">
                 !! Uwaga email do logistyki po wpłacie pieniędzy nie jest dostępny !! <br>
                 Wpisz email do logistyki po wpłacie pieniędzy magazunu <a href="https://admin.mega1000.pl/admin/warehouses/{{  $or->warehouse->id }}/edit">{{ $or->warehouse->symbol }}</a>
