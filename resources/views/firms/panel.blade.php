@@ -166,7 +166,7 @@
                                     <p><strong>Wartość:</strong> {{ number_format($order->getValue(), 2) }}zł</p>
                                 </div>
                                 <div class="mt-4">
-                                    <a href="/firm-panel-actions/order/{{ $order->id }}" class="text-indigo-600 hover:text-indigo-800 font-medium">Szczegóły</a>
+                                    <a href="/firm-panel-actions/order/{{ $order->id }}" class="text-white bg-blue-500 py-2 px-4 rounded font-medium ">Szczegóły zamówienia</a>
                                 </div>
                             </div>
                         </div>
