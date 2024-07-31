@@ -55,8 +55,10 @@ class AddLabelService
 
             if ($labelId === 66) {
                 if ($order->preferred_invoice_date === null) {
-                    $order->preferred_invoice_date = Carbon::now();
+                    $order->preferred_invoice_date = now();
                     $order->save();
+
+                    $order->labels()->attach(41);
                 }
 
                 if (!$order->labels()->where('label_id', 42)->exists()) {

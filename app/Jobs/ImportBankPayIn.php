@@ -316,9 +316,6 @@ class ImportBankPayIn implements ShouldQueue
         $payment = OrderPayment::where('comments', $payIn->stringify())->first();
         $payer = $operationType === OrderPaymentsEnum::INVOICE_BUYING_OPERATION_TYPE ? 'info@ephpolska.pl' : (string)$order->customer()->first()->login;
 
-        $order->preferred_invoice_date = $payIn->data_ksiegowania;
-
-
         if ($order->payments()->count() === 0) {
             $order->labels()->attach([45, 68]);
             if (empty($order->items()->whereHas('product', function ($q) {$q->where('variation_group', 'styropiany');})->first())) {
@@ -360,11 +357,8 @@ class ImportBankPayIn implements ShouldQueue
 
 
         if ($order->preferred_invoice_date) {
-            $order->preferred_invoice_date = $payIn->data_ksiegowania;
-            $order->save();
-
             $arr = [];
-            AddLabelService::addLabels($order, [195, 41], $arr, [], Auth::user()?->id);
+            AddLabelService::addLabels($order, [195], $arr, [], Auth::user()?->id);
         }
 
         $this->orderPaymentLabelsService->calculateLabels($payment->order);
