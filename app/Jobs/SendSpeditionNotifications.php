@@ -74,6 +74,7 @@ class SendSpeditionNotifications implements ShouldQueue
 
             if ($fromDate->isFuture() && $fromDate->isWeekday()) {
                 $this->updateOrderLabels($order, [245]);
+                continue;
             }
 
             $beforeFromDate = $this->previousBusinessDay(Carbon::create($fromDate));
