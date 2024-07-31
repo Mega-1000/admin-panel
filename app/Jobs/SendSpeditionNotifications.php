@@ -100,7 +100,7 @@ class SendSpeditionNotifications implements ShouldQueue
             }
 
             if (
-                ($currentHour == 7 && $currentMinute == 0) ||
+                ($currentHour == 7 && $currentMinute < 10) ||
                 ($currentHour >= 11 &&
                 $haveToAskWarehouse &&
                 Carbon::now()->isWeekday())
@@ -121,6 +121,7 @@ class SendSpeditionNotifications implements ShouldQueue
                     if ($currentHour >= 15) {
                         $this->updateOrderLabels($order, [275]);
                     }
+
                     if ($sendMails) {
                         Mailer::create()
                             ->to($order->warehouse->shipment_after_pay_email)
