@@ -50,8 +50,10 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
     @endphp
 @endif
 
+@php
+    $order = Order::find($id);
+@endphp
 {{
-        $order = Order::find($id);
     $order->getItemsGrossValueForUs() + $order->shipment_price_for_us -
     $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount')
 }}
