@@ -50,7 +50,7 @@ class OrdersRecalculatorBasedOnPeriod
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
-        $payments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '>', now())->get()->sum('amount');
+        $payments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '<', now())->get()->sum('declared_sum');
 
         if ($payments != 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
@@ -58,7 +58,7 @@ class OrdersRecalculatorBasedOnPeriod
             RemoveLabelService::removeLabels($order, [240], $arr, [], Auth::user()?->id);
         }
 
-        if (OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where('status', null)->orWhere('status', 'Deklaracja wpłaty')->where('promise_date', '<', now())->get()->sum('amount') == 0) {
+        if (OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '>', now())->get()->sum('declared_sum') == 0) {
             $order = Order::find($order->id);
             $LpArray = [];
             RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()?->id);
