@@ -41,6 +41,9 @@ class AddLabelService
         }
 
         foreach ($labelIdsToAdd as $labelId) {
+            if ($order->labels->contains('id', $labelId)) {
+                continue;
+            }
 
             if ($labelId === 39 && $order->payments->count() === 0) {
                 return;
