@@ -73,6 +73,7 @@ class SendSpeditionNotifications implements ShouldQueue
             }
 
             if ($fromDate->isFuture() && $fromDate->isWeekday()) {
+                dd('okej');
                 $this->updateOrderLabels($order, [245]);
                 continue;
             }
