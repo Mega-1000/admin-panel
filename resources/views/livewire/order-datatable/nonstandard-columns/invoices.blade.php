@@ -48,8 +48,13 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
               $id = $matches[1];
           }
     @endphp
-
 @endif
+
+{{
+    $order->getItemsGrossValueForUs() + $order->shipment_price_for_us -
+    $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount')
+}}
+
 @if(\App\Entities\BuyingInvoice::where('order_id', $id)->first())
     <hr>
     Faktury zakupu:
