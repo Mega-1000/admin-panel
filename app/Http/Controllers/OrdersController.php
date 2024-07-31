@@ -46,6 +46,7 @@ use App\Http\Requests\NoticesRequest;
 use App\Http\Requests\OrdersFindPackageRequest;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AllegroTrackingNumberUpdater;
+use App\Jobs\GenerateAdvancedXmlForNexoJob;
 use App\Jobs\GenerateXmlForNexoJob;
 use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\ChangeOrderStatusJob;
@@ -2818,6 +2819,16 @@ class OrdersController extends Controller
     public function generateFs(): RedirectResponse
     {
         dispatch_now(new GenerateXmlForNexoJob());
+
+        return redirect()->route('orders.index')->with([
+            'message' => 'Rozpoczęto generowanie faktur sprzedaży',
+            'alert-type' => 'success',
+        ]);
+    }
+
+    public function generateAdvanced(): RedirectResponse
+    {
+        dispatch_now(new \App\Jobs\GenerateAdvancedXmlForNexoJob());
 
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto generowanie faktur sprzedaży',

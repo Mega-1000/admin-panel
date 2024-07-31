@@ -33,7 +33,7 @@ class XmlForNexoMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'faktury sprzedazy z voyagera',
+            subject: 'faktury z voyagera',
         );
     }
 

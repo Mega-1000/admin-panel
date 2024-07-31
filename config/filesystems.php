@@ -67,6 +67,12 @@ return [
             'visibility' => 'public',
         ],
 
+        'xmlAdvanccedDisk' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS_ADVANCED/')),
+            'visibility' => 'public',
+        ],
+
         'transactionsDisk' => [
             'driver' => 'local',
             'root' => storage_path('app/public' . env('BANK_TRANSACTION_WITHOUT_ORDER_PATH', '/transaction/')),

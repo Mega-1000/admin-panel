@@ -58,6 +58,10 @@
                 <label for="fs_generator">Generator faktur sprzedaży </label>
                 <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
             </div>
+            <div class="form-group">
+                <label for="fs_generator">Generator faktur zaliczkowych </label>
+                <a name="fs_generator" class="btn btn-success" href="/admin/generate-advanced-invoices">Generuj</a>
+            </div>
         </div>
 
         <div wire:ignore>
