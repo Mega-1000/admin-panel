@@ -1238,7 +1238,6 @@
                 <th>@lang('order_payments.table.operation_type')</th>
                 <th>@lang('order_payments.table.amount')</th>
                 <th>@lang('order_payments.table.declared_sum')</th>
-                <th>@lang('order_payments.table.promise')</th>
                 <th>@lang('order_payments.table.promise_date')</th>
                 <th>@lang('order_payments.table.operation_date')</th>
                 <th>@lang('order_payments.table.external_payment_id')</th>
@@ -3192,18 +3191,6 @@
                 {
                     data: 'declared_sum',
                     name: 'declared_sum',
-                },
-                {
-                    data: 'promise',
-                    name: 'promise',
-                    render: function (promise) {
-                        if (promise == '1') {
-                            return '<span>Tak</span>';
-                        } else {
-                            return '<span>Nie</span>';
-                        }
-                    }
-
                 },
                 {
                     data: 'promise_date',
