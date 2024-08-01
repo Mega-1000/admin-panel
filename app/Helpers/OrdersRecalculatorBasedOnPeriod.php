@@ -14,6 +14,9 @@ class OrdersRecalculatorBasedOnPeriod
 {
     public static function recalculateOrdersBasedOnPeriod($order): void
     {
+        $order->labels()->detach(240);
+        $order->labels()->detach(39);
+
         if (count($order->payments)) {
             if ($order->isPaymentRegulated()) {
                 dispatch(new DispatchLabelEventByNameJob($order, "payment-equal-to-order-value"));
