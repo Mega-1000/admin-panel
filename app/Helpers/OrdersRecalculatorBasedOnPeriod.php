@@ -59,7 +59,6 @@ class OrdersRecalculatorBasedOnPeriod
         }
 
         if (OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '>', now())->get()->sum('declared_sum') == 0) {
-            dd('koej');
             $order->labels()->detach(240);
         } else {
             if (!$order->labels->contains('id', 240)) {
