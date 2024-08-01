@@ -55,7 +55,7 @@ class OrdersRecalculatorBasedOnPeriod
         if ($payments != 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
         } else {
-            RemoveLabelService::removeLabels($order, [240], $arr, [], Auth::user()?->id);
+            $order->labels()->detach(240);
         }
 
         if (OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '>', now())->get()->sum('declared_sum') == 0)
@@ -66,7 +66,6 @@ class OrdersRecalculatorBasedOnPeriod
                 AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
             }
         }
-
         $orderItemsValueWithTransport = $order->getItemsGrossValueForUs() + $order->shipment_price_for_us;
         $totalPaymentsBuying = $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount');
 
