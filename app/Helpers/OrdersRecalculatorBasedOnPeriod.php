@@ -55,19 +55,33 @@ class OrdersRecalculatorBasedOnPeriod
 
         $payments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where('status', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '<', now())->get()->sum('declared_sum');
 
-        $orderItemsValueWithTransport = $order->getItemsGrossValueForUs() + $order->shipment_price_for_us;
-        $totalPaymentsBuying = $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount');
+        if ($payments != 0) {
+            AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
+        } else {
+            $order->labels()->detach(240);
+        }
 
-        if ($order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->first()) {
-            $arr = [];
-            if (
-                round($orderItemsValueWithTransport, 2) != round($totalPaymentsBuying, 2) &&
-                !$order->labels->contains(257)
-            ) {
-                AddLabelService::addLabels($order, [258], $arr, []);
-            } else {
-                RemoveLabelService::removeLabels($order, [258],  $arr, [], Auth::user()?->id);
+        if (OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '>', now())->get()->sum('declared_sum') == 0)
+        {
+            $order->labels()->detach(39);
+        } else {
+            if (!$order->labels->contains('id', 240)) {
+                AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
             }
         }
+//        $orderItemsValueWithTransport = $order->getItemsGrossValueForUs() + $order->shipment_price_for_us;
+//        $totalPaymentsBuying = $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount');
+//
+//        if ($order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->first()) {
+//            $arr = [];
+//            if (
+//                round($orderItemsValueWithTransport, 2) != round($totalPaymentsBuying, 2) &&
+//                !$order->labels->contains(257)
+//            ) {
+//                AddLabelService::addLabels($order, [258], $arr, []);
+//            } else {
+//                RemoveLabelService::removeLabels($order, [258],  $arr, [], Auth::user()?->id);
+//            }
+//        }
     }
 }
