@@ -56,14 +56,20 @@ class OrdersRecalculatorBasedOnPeriod
         // Calculate payments with future promise dates
         $futurePayments = OrderPayment::where('order_id', $order->id)
             ->where('declared_sum', '!=', null)
-            ->whereIn('status', [null, 'Deklaracja wpłaty'])
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', 'Deklaracja wpłaty');
+            })
             ->where('promise_date', '>', now())
             ->sum('declared_sum');
 
 // Calculate payments with past promise dates
         $pastPayments = OrderPayment::where('order_id', $order->id)
             ->where('declared_sum', '!=', null)
-            ->whereIn('status', [null, 'Deklaracja wpłaty'])
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', 'Deklaracja wpłaty');
+            })
             ->where('promise_date', '<', now())
             ->sum('declared_sum');
 
