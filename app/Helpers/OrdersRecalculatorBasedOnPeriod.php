@@ -57,12 +57,8 @@ class OrdersRecalculatorBasedOnPeriod
         } else {
             RemoveLabelService::removeLabels($order, [240], $arr, [], Auth::user()?->id);
         }
-        dd(OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '>', now())->get()->sum('declared_sum'));
-
         if (OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '>', now())->get()->sum('declared_sum') == 0) {
-            $order = Order::find($order->id);
-            $LpArray = [];
-            RemoveLabelService::removeLabels($order, [39], $LpArray, [], Auth::user()?->id);
+            $order->labels()->detach(240);
         } else {
             if (!$order->labels->contains('id', 240)) {
                 AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
