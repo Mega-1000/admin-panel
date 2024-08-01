@@ -45,7 +45,8 @@ class AddLabelService
                 continue;
             }
 
-            if ($labelId === 39 && $order->payments->count() === 0) {
+            if ($labelId === 39) {
+                throw new Exception('Nie można dodać etykiety 39');
                 return;
             }
 
