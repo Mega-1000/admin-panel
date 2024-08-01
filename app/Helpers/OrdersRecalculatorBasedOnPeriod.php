@@ -63,7 +63,7 @@ class OrdersRecalculatorBasedOnPeriod
             return;
         } else {
             if (!$order->labels->contains('id', 240)) {
-                AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
+//                AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
             }
         }
 
