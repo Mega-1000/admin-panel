@@ -53,23 +53,36 @@ class OrdersRecalculatorBasedOnPeriod
 
         $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
 
-        $payments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '>', now())->get()->sum('declared_sum');
+        // Calculate payments with future promise dates
+        $futurePayments = OrderPayment::where('order_id', $order->id)
+            ->where('declared_sum', '!=', null)
+            ->whereIn('status', [null, 'Deklaracja wpłaty'])
+            ->where('promise_date', '>', now())
+            ->sum('declared_sum');
 
-        if ($payments != 0) {
-            dd('okej');
+// Calculate payments with past promise dates
+        $pastPayments = OrderPayment::where('order_id', $order->id)
+            ->where('declared_sum', '!=', null)
+            ->whereIn('status', [null, 'Deklaracja wpłaty'])
+            ->where('promise_date', '<', now())
+            ->sum('declared_sum');
+
+// Handle future payments (Label 240)
+        if ($futurePayments > 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
         } else {
             $order->labels()->detach(240);
         }
 
-        if (OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '<', now())->get()->sum('declared_sum') == 0)
-        {
+// Handle past payments (Label 39)
+        if ($pastPayments == 0) {
             $order->labels()->detach(39);
         } else {
             if (!$order->labels->contains('id', 240)) {
                 AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
             }
         }
+
 //        $orderItemsValueWithTransport = $order->getItemsGrossValueForUs() + $order->shipment_price_for_us;
 //        $totalPaymentsBuying = $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount');
 //
