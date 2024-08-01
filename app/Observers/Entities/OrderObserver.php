@@ -119,11 +119,12 @@ readonly class OrderObserver
                 }
             }
         }
+
+        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
     }
 
     public function updated(Order $order): void
     {
-        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
         RecalculateBuyingLabels::recalculate($order);
     }
 }
