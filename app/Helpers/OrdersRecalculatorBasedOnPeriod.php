@@ -14,6 +14,7 @@ class OrdersRecalculatorBasedOnPeriod
 {
     public static function recalculateOrdersBasedOnPeriod($order): void
     {
+        dd('okej');
         $order->labels()->detach(240);
         $order->labels()->detach(39);
     }
