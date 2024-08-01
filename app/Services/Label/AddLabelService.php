@@ -41,6 +41,7 @@ class AddLabelService
         }
 
         foreach ($labelIdsToAdd as $labelId) {
+            dd($labelId);
             if ($order->labels->contains('id', $labelId)) {
                 continue;
             }
