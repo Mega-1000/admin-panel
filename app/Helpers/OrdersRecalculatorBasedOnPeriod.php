@@ -64,6 +64,7 @@ class OrdersRecalculatorBasedOnPeriod
         if (OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->whereIn('status', [null, 'Deklaracja wpłaty'])->where('promise_date', '<', now())->get()->sum('declared_sum') == 0)
         {
             $order->labels()->detach(39);
+            dd('detached');
         } else {
             if (!$order->labels->contains('id', 240)) {
                 AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
