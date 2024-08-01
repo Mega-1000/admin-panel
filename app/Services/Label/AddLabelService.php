@@ -42,6 +42,10 @@ class AddLabelService
 
         foreach ($labelIdsToAdd as $labelId) {
 
+            if ($labelId == 39) {
+                dd($labelId);
+            }
+
             if ($order->labels->contains('id', $labelId)) {
                 continue;
             }
@@ -50,9 +54,6 @@ class AddLabelService
                 return;
             }
 
-            if ($labelId == 39) {
-                dd($labelId);
-            }
 
             if ($labelId === 66) {
                 if ($order->preferred_invoice_date === null) {
