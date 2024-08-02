@@ -51,14 +51,14 @@ class AddLabelService
 
 
             if ($labelId === 66) {
+                $order->shipped_at = now();
+                $order->save();
+
                 if ($order->preferred_invoice_date === null) {
                     $order->preferred_invoice_date = now();
                     $order->save();
 
                     $order->labels()->attach(41);
-
-                    $order->shipped_at = now();
-                    $order->save();
                 }
 
                 if (!$order->labels()->where('label_id', 42)->exists()) {
