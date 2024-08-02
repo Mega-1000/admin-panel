@@ -76,13 +76,18 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
                 ->get();
 
             foreach ($orders as $order) {
+                if ($order->labels->includes(231)) {
+                    $arr = [];
+                    AddLabelService::addLabels($order, [289], $arr, []);
+                }
+
                  if ($order->labels->includes(263)) {
                      $arr = [];
                      AddLabelService::addLabels($order, [290], $arr, []);
-
-                        $order->calculated_shipping_invoices = true;
-                        $order->save();
                  }
+
+                $order->calculated_shipping_invoices = true;
+                $order->save();
             }
         }
     }
