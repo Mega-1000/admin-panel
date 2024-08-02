@@ -1100,10 +1100,20 @@ curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
     $response = curl_exec($ch);
-
     $response = json_decode($response)->content[0]->text;
+
+    $xmlStart = strpos($response, '<?xml');
+
+    if ($xmlStart !== false) {
+        // Cut everything before the XML starts
+        $xmlContent = substr($response, $xmlStart);
+    } else {
+        // If no XML tag is found, use the entire response
+        $xmlContent = $response;
+    }
+
     $name = Str::random(32);
-    Storage::put('public/buyinginvoices/' . $name . '.xml' , $response);
+    Storage::put('public/buyinginvoices/' . $name . '.xml', $xmlContent);
 
     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $name . '.xml';
     $order->save();
