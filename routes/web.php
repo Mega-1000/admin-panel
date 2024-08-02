@@ -1102,7 +1102,6 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
     $response = curl_exec($ch);
 
     $response = json_decode($response)->content[0]->text;
-    dd($response);
     Storage::put('public/buyinginvoices/' . Str::random(32) . '.xml' , $response);
 
     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $order->id . '.xml';
