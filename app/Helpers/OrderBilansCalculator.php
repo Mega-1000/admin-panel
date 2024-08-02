@@ -39,7 +39,7 @@ class OrderBilansCalculator
                 continue;
             }
 
-            if ($payment->operation_type === 'KWON_STATUS') { // Replace with the actual value
+            if ($payment->operation_type === 'wartość towaru oferty niewyjechanej') { // Replace with the actual value
                 $kwonPayments += $parsedAmount;
             }
 
@@ -63,7 +63,7 @@ class OrderBilansCalculator
         $totalOfDeclaredPayments = $order->payments()->where('operation_type', null)->sum('declared_sum');
 
 
-        return $order->getSumOfGrossValues() - $bilans - $returnedValue - $WPFZ - $kwonPayments + $totalOfDeclaredPayments;
+        return $order->getSumOfGrossValues() - $bilans + $returnedValue - $WPFZ - $kwonPayments + $totalOfDeclaredPayments;
     }
 
 }
