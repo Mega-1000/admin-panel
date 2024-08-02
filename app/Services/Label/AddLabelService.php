@@ -41,11 +41,6 @@ class AddLabelService
         }
 
         foreach ($labelIdsToAdd as $labelId) {
-
-            if ($labelId == 39) {
-                dd($labelId);
-            }
-
             if ($order->labels->contains('id', $labelId)) {
                 continue;
             }
