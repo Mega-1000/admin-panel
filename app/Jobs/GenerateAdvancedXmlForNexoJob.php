@@ -55,15 +55,14 @@ class GenerateAdvancedXmlForNexoJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = $this->orderRepository->whereHas('labels', function ($query) {
+        $orders = Order::whereHas('labels', function ($query) {
             $query->where('label_id', 288);
         })->whereHas('labels', function ($query) {
             $query->where('label_id', 195);
-        })
-        ->whereDoesntHave('labels', function ($query) {
+        })->whereDoesntHave('labels', function ($query) {
             $query->where('label_id', 121);
-        })
-            ->get();
+        })->get();
+
         $fileNames = [];
 
         $files = Storage::disk('xmlAdvanccedDisk')->files();
