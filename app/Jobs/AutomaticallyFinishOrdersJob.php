@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Enums\PackageStatus;
+use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -66,5 +67,23 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
 //            $preventionArray = [];
 //            RemoveLabelService::removeLabels($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, [Label::ORDER_ITEMS_REDEEMED_LABEL], Auth::user()?->id);
         });
+
+
+        // if now is working day
+        if (now()->isWeekday()) {
+            $orders = Order::where('shipped_at', '>=', now()->subDays(5))
+                ->where('calculated_shipping_invoices', false)
+                ->get();
+
+            foreach ($orders as $order) {
+                 if ($order->labels->includes(263)) {
+                     $arr = [];
+                     AddLabelService::addLabels($order, [290], $arr, []);
+
+                        $order->calculated_shipping_invoices = true;
+                        $order->save();
+                 }
+            }
+        }
     }
 }

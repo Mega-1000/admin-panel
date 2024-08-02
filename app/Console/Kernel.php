@@ -90,11 +90,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\OrdersRecalculatorBasedOnPeriodJob::class)->daily('0:00');
         $schedule->job(Jobs\CheckForAuctionsNotRespondedByFirms::class)->dailyAt('16:00');
         $schedule->job(Jobs\SendNextRermndersAboutAuctionEnded::class)->dailyAt('19:00');
-
-        $schedule->job(Jobs\CheckAdvandedInvoiceNeed::class)
-            ->monthly()
-            ->lastDayOfMonth()
-            ->at('23:50');
+        $schedule->job(Jobs\CheckAdvandedInvoiceNeed::class)->monthly()->lastDayOfMonth()->at('23:50');
     }
 
     /**

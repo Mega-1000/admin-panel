@@ -56,6 +56,9 @@ class AddLabelService
                     $order->save();
 
                     $order->labels()->attach(41);
+
+                    $order->shipped_at = now();
+                    $order->save();
                 }
 
                 if (!$order->labels()->where('label_id', 42)->exists()) {
