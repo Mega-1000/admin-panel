@@ -1514,6 +1514,8 @@ class OrdersController extends Controller
             dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
         }
 
+        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
+
         if ($request->submit == 'updateAndStay') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
                 'message' => __('orders.message.update'),
@@ -1521,7 +1523,6 @@ class OrdersController extends Controller
             ]);
         }
 
-        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
 
         return redirect()->route('orders.index', [
             'order_id' => $order->id,
