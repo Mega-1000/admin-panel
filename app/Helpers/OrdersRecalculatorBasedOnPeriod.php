@@ -76,7 +76,6 @@ class OrdersRecalculatorBasedOnPeriod
         if ($pastPayments > 0 && !$order->labels->contains('id', 240)) {
             AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         } else {
-            dd('dupa');
             $order->labels()->detach(39);
         }
 
