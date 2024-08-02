@@ -115,6 +115,7 @@
     @if($or->invoice_buying_warehouse_file)
         <a href="{{ $or->invoice_buying_warehouse_file }}" target="_blank" style="color: green"> XML Faktury zakupu gotowy! </a>
     @endif
+    <br>
     <a href="/styro-chatrs/{{ $or->id }}">Generuj fakturę zakupu</a>
 
     <h6>Załącz potwierdzenie przelewu</h6>
