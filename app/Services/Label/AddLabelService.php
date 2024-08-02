@@ -61,6 +61,8 @@ class AddLabelService
                     $order->labels()->attach(41);
                 }
 
+                $order->labels()->detach(288);
+
                 if (!$order->labels()->where('label_id', 42)->exists()) {
                     !$order->labels()->where('label_id', 41)->exists() ? $order->labels()->attach(41) : null;
                     !$order->labels()->where('label_id', 195)->exists() ? $order->labels()->attach(195) : null;
