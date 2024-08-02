@@ -340,18 +340,20 @@ class ImportBankPayIn implements ShouldQueue
             if ($order->getValue() > ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum'))) {
                 $declaredDay = $order->dates->warehouse_delivery_date_to ?? $order->dates->customer_delivery_date_to ?? now()->addDay();
 
-                $payment = $order->payments()->create([
-                    'declared_sum' => $order->getValue() - ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')),
-                    'type' => 'CLIENT',
-                    'payer' => $payer,
-                    'promise' => true,
-                    'promise_date' => $declaredDay,
-                    'operation_date' => $payIn->data_ksiegowania,
-                    'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
-                    'comments' => 'Deklaracja wpłaty na styropian stworzona automatycznie',
-                    'operation_type' => $operationType,
-                    'status' => 'Deklaracja wpłaty',
-                ]);
+                if ($paymentAmount > 0) {
+                    $payment = $order->payments()->create([
+                        'declared_sum' => $order->getValue() - ($order->payments()->sum('amount') + $order->payments()->sum('declared_sum')),
+                        'type' => 'CLIENT',
+                        'payer' => $payer,
+                        'promise' => true,
+                        'promise_date' => $declaredDay,
+                        'operation_date' => $payIn->data_ksiegowania,
+                        'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
+                        'comments' => 'Deklaracja wpłaty na styropian stworzona automatycznie',
+                        'operation_type' => $operationType,
+                        'status' => 'Deklaracja wpłaty',
+                    ]);
+                }
             }
         }
 
