@@ -39,6 +39,7 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\OrdersHelper;
+use App\Helpers\OrdersRecalculatorBasedOnPeriod;
 use App\Helpers\TaskHelper;
 use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\CreatePaymentsRequest;
@@ -1519,6 +1520,8 @@ class OrdersController extends Controller
                 'alert-type' => 'success',
             ]);
         }
+
+        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
 
         return redirect()->route('orders.index', [
             'order_id' => $order->id,
