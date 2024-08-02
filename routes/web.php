@@ -70,6 +70,7 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use TCG\Voyager\Facades\Voyager;
 
 use Illuminate\Http\Request;
@@ -1101,7 +1102,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
     $response = curl_exec($ch);
 
     $response = json_decode($response)->content[0]->text;
-    Storage::put('public/buyinginvoices/' . $order->id . '.xml' , $response);
+    Storage::put('public/buyinginvoices/' . Str::random(32) . '.xml' , $response);
 
     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $order->id . '.xml';
     $order->save();
