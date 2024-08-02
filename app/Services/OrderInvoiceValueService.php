@@ -22,6 +22,12 @@ final class OrderInvoiceValueService
             return OrderInvoiceValue::where('invoice_number', $dto->number)->first();
         }
 
+        if (str_contains($dto->number, 'FL')) {
+            $order->labels()->detach(288);
+            $order->labels()->detach(291);
+            $order->labels()->detach(292);
+        }
+
         return OrderInvoiceValue::create([
             'order_id' => $order->id,
             'value' => $dto->value,
