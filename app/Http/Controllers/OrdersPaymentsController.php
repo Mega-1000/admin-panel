@@ -428,21 +428,21 @@ class OrdersPaymentsController extends Controller
                 return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
             }
 
-            if ($hasGroupPromisePayment === true) {
-                $orderGroupPromisePaymentSum = 0;
-                foreach ($connectedOrders as $connectedOrder) {
-                    $orderGroupPromisePaymentSum += $connectedOrder->promisePaymentsSum();
-                }
-                $orderGroupPromisePaymentSum += $order->promisePaymentsSum();
-                if ((float)$amount < (float)$orderGroupPromisePaymentSum) {
-                    foreach ($connectedOrders as $connectedOrder) {
-                        if ($connectedOrder->hasPromisePayments() > 0) {
-                            $prev = [];
-                            AddLabelService::addLabels($order, [128], $prev, [], Auth::user()->id);
-                        }
-                    }
-                }
-            }
+//            if ($hasGroupPromisePayment === true) {
+//                $orderGroupPromisePaymentSum = 0;
+//                foreach ($connectedOrders as $connectedOrder) {
+//                    $orderGroupPromisePaymentSum += $connectedOrder->promisePaymentsSum();
+//                }
+//                $orderGroupPromisePaymentSum += $order->promisePaymentsSum();
+//                if ((float)$amount < (float)$orderGroupPromisePaymentSum) {
+//                    foreach ($connectedOrders as $connectedOrder) {
+//                        if ($connectedOrder->hasPromisePayments() > 0) {
+//                            $prev = [];
+//                            AddLabelService::addLabels($order, [128], $prev, [], Auth::user()->id);
+//                        }
+//                    }
+//                }
+//            }
 
             if ($hasGroupPromisePayment === true) {
                 $orderGroupPromisePaymentSum = 0;
