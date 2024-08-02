@@ -65,7 +65,6 @@ class OrdersRecalculatorBasedOnPeriod
 
         $pastPayments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where(function ($query) {$query->whereNull('status')->orWhere('status', 'Deklaracja wpłaty');})->where('promise_date', '<', now())->sum('declared_sum');
 
-        dd($futurePayments, $pastPayments);
 
         if ($futurePayments > 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
@@ -74,12 +73,11 @@ class OrdersRecalculatorBasedOnPeriod
             $order->labels()->detach(240);
         }
 
-        if ($pastPayments == 0) {
-            $order->labels()->detach(39);
+        if ($pastPayments > 0 && !$order->labels->contains('id', 240)) {
+            AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
         } else {
-            if (!$order->labels->contains('id', 240)) {
-                AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
-            }
+            dd('dupa');
+            $order->labels()->detach(39);
         }
 
 //        $orderItemsValueWithTransport = $order->getItemsGrossValueForUs() + $order->shipment_price_for_us;
