@@ -63,10 +63,10 @@ class OrdersRecalculatorBasedOnPeriod
             ->where('promise_date', '>', now())
             ->sum('declared_sum');
 
-// Calculate payments with past promise dates
         $pastPayments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where(function ($query) {$query->whereNull('status')->orWhere('status', 'Deklaracja wpłaty');})->where('promise_date', '<', now())->sum('declared_sum');
 
-// Handle future payments (Label 240)
+        dd($futurePayments, $pastPayments);
+
         if ($futurePayments > 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
             $order->labels()->detach(39);
@@ -74,7 +74,6 @@ class OrdersRecalculatorBasedOnPeriod
             $order->labels()->detach(240);
         }
 
-// Handle past payments (Label 39)
         if ($pastPayments == 0) {
             $order->labels()->detach(39);
         } else {
