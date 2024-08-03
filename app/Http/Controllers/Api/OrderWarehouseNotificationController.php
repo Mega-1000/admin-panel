@@ -246,11 +246,11 @@ class OrderWarehouseNotificationController extends Controller
                 preg_match('/2\.\s*(.+)/', $content, $nameMatches);
                 preg_match('/3\.\s*(.+)/', $content, $valueMatches);
 
-                return [
+                return response()->json([
                     'invoice_type' => $typeMatches[1] ?? 'Unknown',
                     'invoice_name' => $nameMatches[1] ?? null,
                     'invoice_value' => $typeMatches[1] === 'VAT' ? ($valueMatches[1] ?? null) : null,
-                ];
+                ]);
             } else {
                 Log::error('Claude AI API request failed', [
                     'status' => $response->status(),
