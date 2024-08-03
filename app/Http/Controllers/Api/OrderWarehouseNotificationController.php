@@ -166,7 +166,7 @@ class OrderWarehouseNotificationController extends Controller
                 $filename = $file->getClientOriginalName();
                 $filePath = Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
 
-                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($filePath);
+                $invoiceInfo = return response$this->analyzeInvoiceWithClaudeAI($filePath);
 
                 $order->invoices()->create([
                     'invoice_type' => 'buy',
@@ -201,19 +201,26 @@ class OrderWarehouseNotificationController extends Controller
             throw $e;
         }
     }
-
     private function analyzeInvoiceWithClaudeAI($filePath): array
     {
         try {
+            // Get the full path to the file
+            $fullPath = Storage::path($filePath);
+
+            // Check if file exists
+            if (!file_exists($fullPath)) {
+                throw new Exception("File not found: $fullPath");
+            }
+
             // Read the PDF file
-            $pdfContent = base64_encode(file_get_contents($filePath));
+            $pdfContent = base64_encode(file_get_contents($fullPath));
 
             // Prepare the request to Claude AI API
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                'Authorization' => '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',
+                'Authorization' => 'Bearer ' . config('services.claude_ai.api_key'),
             ])->post('https://api.anthropic.com/v1/messages', [
-                'model' => 'claude-3-5-sonnet-20240620',
+                'model' => 'claude-3-opus-20240229',
                 'messages' => [
                     [
                         'role' => 'user',
