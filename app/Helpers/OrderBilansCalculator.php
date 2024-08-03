@@ -66,7 +66,7 @@ class OrderBilansCalculator
         $totalOfDeclaredPayments = $order->payments()->where('status', null)->sum('declared_sum');
 
 
-        return dd($order->getSumOfGrossValues(), $bilans, $returnedValue, $WPFZ ,$kwonPayments, $totalOfDeclaredPayments);
+        return $order->getSumOfGrossValues() - $bilans + $returnedValue - $WPFZ - $kwonPayments - $totalOfDeclaredPayments;
     }
 
 }
