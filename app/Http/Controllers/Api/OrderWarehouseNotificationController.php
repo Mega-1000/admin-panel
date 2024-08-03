@@ -157,6 +157,58 @@ class OrderWarehouseNotificationController extends Controller
         }
     }
 
+    public function sendInvoice(Request $request): JsonResponse
+    {
+        try {
+            $order = Order::findOrFail($request->orderId);
+
+            $file = $request->file('file');
+            if ($file !== null) {
+                $filename = $file->getClientOriginalName();
+                $path = Storage::disk('public')->putFileAs('invoices', $file, $filename);
+
+                if (!$path) {
+                    throw new Exception("Failed to store the file");
+                }
+
+                Log::info('File stored successfully', ['path' => $path]);
+
+                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path);
+
+                $order->invoices()->create([
+                    'invoice_type' => 'buy',
+                    'invoice_name' => $invoiceInfo['invoice_name'] ?? $filename,
+                    'is_visible_for_client' => (boolean)$request->isVisibleForClient,
+                    'invoice_category' => $invoiceInfo['invoice_type'],
+                    'invoice_value' => $invoiceInfo['invoice_value'],
+                ]);
+
+                RecalculateBuyingLabels::recalculate($order);
+
+                $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
+
+                $invoiceRequest = $order->invoiceRequests()->first();
+
+                if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
+                    $invoiceRequest->update(['status' => 'SENT']);
+                }
+
+                dispatch(new DispatchLabelEventByNameJob($order, "new-file-added-to-order"));
+
+                return $this->okResponse();
+            }
+            Log::error('Problem with send invoice.',
+                ['exception' => 'No file in request', 'class' => get_class($this), 'line' => __LINE__]
+            );
+            throw new Exception('No file in request');
+        } catch (Exception $e) {
+            Log::error('Problem with send invoice.',
+                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
+            );
+            throw $e;
+        }
+    }
+
     private function analyzeInvoiceWithClaudeAI($filePath): array
     {
         try {
