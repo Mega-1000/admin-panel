@@ -76,7 +76,7 @@
         </div>
     @endif
 
-    @if($hasLabel95 && $or->getValue() < 3000 && Order::where('id', $or->id)->whereHas('items', function ($query) {    $query->whereHas('product', function ($subQuery) {        $subQuery->where('variation_group', 'styropiany');});}))
+    @if($hasLabel95 && $or->getValue() < 3000 && Order::where('id', $or->id)->whereHas('items', function ($query) {$query->whereHas('product', function ($subQuery) {$subQuery->where('variation_group', 'styropiany');});})->first())
         <div style="color: red">
             Zamówienie zawiera mało styropianu. Dostawa nie będzie bezpłatna. Obsłuż klienta ręcznie.
             <br>
