@@ -60,6 +60,17 @@
                                     </div>
                                 @endif
 
+                                @if($order->labels->contains('id', 290))
+                                    <div class="bg-red-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
+                                        <p class="font-bold">
+                                            Nie dostaliśmy faktury do tego zamówienia. Aby podpiąć fakturę kliknij tutaj:
+                                            <a href="{{ rtrim(config('app.front_nuxt_url'), "/") . "/magazyn/awizacja/{$order->orderWarehouseNotifications->first()->id}/{$order->warehouse_id}/{$order->id}/wyslij-fakture" }}" class="btn btn-primary" style="color: #fff; text-decoration: none; padding: 10px 20px; background-color: #007bff; border-radius: 5px; display: inline-block; margin-top: 20px;">
+                                                Podpięcie faktury do zamówienia
+                                            </a>
+                                        </p>
+                                    </div>
+                                @endif
+
                                 @if($order->labels->contains('id', 260))
                                     <div class="bg-green-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4">
                                         <p class="font-bold">

@@ -292,7 +292,6 @@ class OrderWarehouseNotificationController extends Controller
                     RecalculateBuyingLabels::recalculate($order);
                     $order->labels()->detach(290);
                 } else {
-
 //                    $buyingInvoice->value = $parsedResponse['invoice_value'] ?? null;
                 }
 
