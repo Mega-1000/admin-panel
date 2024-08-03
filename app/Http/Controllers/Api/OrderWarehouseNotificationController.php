@@ -288,7 +288,10 @@ class OrderWarehouseNotificationController extends Controller
                     $buyingInvoice->invoice_number = $parsedResponse['invoice_name'] ?? null;
                     $buyingInvoice->value = $parsedResponse['invoice_value'] ?? null;
                     $buyingInvoice->save();
+
+                    RecalculateBuyingLabels::recalculate($order);
                 }
+
 
                 // Validate and sanitize the parsed response
                 return [
