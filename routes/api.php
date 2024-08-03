@@ -138,7 +138,7 @@ Route::get('orders/getByToken/{token}', 'Api\OrdersController@getByToken');
 
 Route::post('order-warehouse-notification/deny/{notificationId}', 'Api\OrderWarehouseNotificationController@deny')
     ->name('api.order-warehouse-notification.deny');
-Route::post('order-warehouse-notification/accept/{notificationId}', 'Api\OrderWarehouseNotificationController@accept')
+Route::post('order-warehouse-notification/accept/{notificationId}', 'Api\OrderWarehouseNotificationController@se')
     ->name('api.order-warehouse-notification.accept');
 Route::get('order-warehouse-notification/{notificationId}', 'Api\OrderWarehouseNotificationController@getNotification')
     ->name('api.order-warehouse-notification.get');

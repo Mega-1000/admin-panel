@@ -31,6 +31,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -162,17 +163,20 @@ class OrderWarehouseNotificationController extends Controller
 
             $file = $request->file('file');
             if ($file !== null) {
-                $filename = $file?->getClientOriginalName();
+                $filename = $file->getClientOriginalName();
+                $filePath = Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
 
-                Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
+                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($filePath);
+
                 $order->invoices()->create([
                     'invoice_type' => 'buy',
-                    'invoice_name' => $filename,
+                    'invoice_name' => $invoiceInfo['invoice_name'] ?? $filename,
                     'is_visible_for_client' => (boolean)$request->isVisibleForClient,
+                    'invoice_category' => $invoiceInfo['invoice_type'],
+                    'invoice_value' => $invoiceInfo['invoice_value'],
                 ]);
 
                 RecalculateBuyingLabels::recalculate($order);
-
 
                 $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
 
@@ -189,12 +193,75 @@ class OrderWarehouseNotificationController extends Controller
             Log::error('Problem with send invoice.',
                 ['exception' => 'No file in request', 'class' => get_class($this), 'line' => __LINE__]
             );
-            die();
+            throw new Exception('No file in request');
         } catch (Exception $e) {
             Log::error('Problem with send invoice.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
-            die();
+            throw $e;
+        }
+    }
+
+    private function analyzeInvoiceWithClaudeAI($filePath): array
+    {
+        try {
+            // Read the PDF file
+            $pdfContent = base64_encode(file_get_contents($filePath));
+
+            // Prepare the request to Claude AI API
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => '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',
+            ])->post('https://api.anthropic.com/v1/messages', [
+                'model' => 'claude-3-5-sonnet-20240620',
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => [
+                            ['type' => 'text', 'text' => "Please analyze this invoice PDF and tell me:
+                            1. Is this a VAT invoice or a proforma invoice?
+                            2. What is the invoice number or name?
+                            3. If it's a VAT invoice, what is the total invoice value including VAT?
+                            Provide the answers in a structured format."],
+                            ['type' => 'image', 'source' => ['type' => 'base64', 'media_type' => 'application/pdf', 'data' => $pdfContent]],
+                        ],
+                    ],
+                ],
+                'max_tokens' => 1000,
+            ]);
+
+            if ($response->successful()) {
+                $result = $response->json();
+                $content = $result['content'][0]['text'];
+
+                // Parse the Claude AI response
+                preg_match('/1\.\s*(VAT|proforma)/i', $content, $typeMatches);
+                preg_match('/2\.\s*(.+)/', $content, $nameMatches);
+                preg_match('/3\.\s*(.+)/', $content, $valueMatches);
+
+                return [
+                    'invoice_type' => $typeMatches[1] ?? 'Unknown',
+                    'invoice_name' => $nameMatches[1] ?? null,
+                    'invoice_value' => $typeMatches[1] === 'VAT' ? ($valueMatches[1] ?? null) : null,
+                ];
+            } else {
+                Log::error('Claude AI API request failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                throw new Exception('Failed to analyze invoice with Claude AI');
+            }
+        } catch (Exception $e) {
+            Log::error('Error analyzing invoice with Claude AI', [
+                'exception' => $e->getMessage(),
+                'class' => get_class($this),
+                'line' => __LINE__
+            ]);
+            return [
+                'invoice_type' => 'Unknown',
+                'invoice_name' => null,
+                'invoice_value' => null,
+            ];
         }
     }
 
@@ -203,11 +270,7 @@ class OrderWarehouseNotificationController extends Controller
         try {
             $orderId = $request->orderId;
             $order = Order::findOrFail($orderId);
-//            $packages = $order->packages()->where('statsu', 'NEW')->get();
-//
-//            foreach ($packages as $package) {
-//                $package->update(['status' => 'SENDING']);
-//            }
+
             $order->labels()->detach([244, 245, 74, 243, 256, 270]);
 
             dispatch(new DispatchLabelEventByNameJob($order, "all-shipments-went-out"));

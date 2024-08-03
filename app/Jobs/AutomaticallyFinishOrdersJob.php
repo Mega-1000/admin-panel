@@ -97,9 +97,17 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
             $q->where('labels.id', 290);
         })->get();
 
+
         foreach ($orders as $order) {
+            $warehouse = $order->warehouse;
+            $notification = $order->orderWarehouseNotifications->first();
+
+            $warehouseMail = $notification && $notification->employee_id && $notification->employee->is_performing_avization
+                ? $notification->employee->email
+                : ($warehouse && $warehouse->firm ? $warehouse->warehouse_email : null);
+
             Mailer::create()
-                ->to()
+                ->to($warehouseMail)
                 ->send(new RemindAboutInvoice($order));
         }
     }
