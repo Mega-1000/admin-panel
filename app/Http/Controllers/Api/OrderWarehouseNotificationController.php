@@ -166,7 +166,7 @@ class OrderWarehouseNotificationController extends Controller
                 $filename = $file->getClientOriginalName();
                 $filePath = Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
 
-                $invoiceInfo = return response$this->analyzeInvoiceWithClaudeAI($filePath);
+                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($filePath);
 
                 $order->invoices()->create([
                     'invoice_type' => 'buy',
@@ -264,6 +264,7 @@ class OrderWarehouseNotificationController extends Controller
                 'class' => get_class($this),
                 'line' => __LINE__
             ]);
+
             return [
                 'invoice_type' => 'Unknown',
                 'invoice_name' => null,
