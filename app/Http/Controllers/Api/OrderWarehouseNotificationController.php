@@ -256,17 +256,24 @@ class OrderWarehouseNotificationController extends Controller
 
             if ($response->successful()) {
                 $result = $response->json();
+
+                // Check if the expected structure exists
+                if (!isset($result['content'][0]['text'])) {
+                    Log::error('Unexpected response structure from Claude AI', ['result' => $result]);
+                    throw new Exception('Unexpected response structure from Claude AI');
+                }
+
                 $content = $result['content'][0]['text'];
 
                 // Parse the Claude AI response
-                preg_match('/1\.\s*(VAT|proforma)/i', $content, $typeMatches);
-                preg_match('/2\.\s*(.+)/', $content, $nameMatches);
-                preg_match('/3\.\s*(.+)/', $content, $valueMatches);
+                $invoiceType = $this->extractInvoiceType($content);
+                $invoiceName = $this->extractInvoiceName($content);
+                $invoiceValue = $this->extractInvoiceValue($content, $invoiceType);
 
                 return [
-                    'invoice_type' => $typeMatches[1] ?? 'Unknown',
-                    'invoice_name' => $nameMatches[1] ?? null,
-                    'invoice_value' => $typeMatches[1] === 'VAT' ? ($valueMatches[1] ?? null) : null,
+                    'invoice_type' => $invoiceType,
+                    'invoice_name' => $invoiceName,
+                    'invoice_value' => $invoiceValue,
                 ];
             } else {
                 Log::error('Claude AI API request failed', [
@@ -287,6 +294,30 @@ class OrderWarehouseNotificationController extends Controller
                 'invoice_value' => null,
             ];
         }
+    }
+
+    private function extractInvoiceType(string $content): string
+    {
+        if (preg_match('/1\.\s*(VAT|proforma)/i', $content, $matches)) {
+            return $matches[1];
+        }
+        return 'Unknown';
+    }
+
+    private function extractInvoiceName(string $content): ?string
+    {
+        if (preg_match('/2\.\s*(.+)/', $content, $matches)) {
+            return trim($matches[1]);
+        }
+        return null;
+    }
+
+    private function extractInvoiceValue(string $content, string $invoiceType): ?string
+    {
+        if ($invoiceType === 'VAT' && preg_match('/3\.\s*(.+)/', $content, $matches)) {
+            return trim($matches[1]);
+        }
+        return null;
     }
 
     private function cleanText($text): string
