@@ -55,7 +55,7 @@ class Kernel extends ConsoleKernel
 
         // i am changing it from everyMinute to everyThirtyMinutes as rewriting would take some time, this should solve
         // queue overload issues
-        $schedule->job(Jobs\ValidateSubiekt::class)->everyFifteenMinutes();
+//        $schedule->job(Jobs\ValidateSubiekt::class)->everyFifteenMinutes();
         $schedule->job(Jobs\ImportCsvFileJob::class)->everyFiveMinutes();
         $schedule->job(Jobs\UpdatePackageRealCostJob::class)->dailyAt("00:30");
         $schedule->job(Jobs\CheckForHangedChats::class)->cron('0,15,30,45 7-17 * * 1-5');
