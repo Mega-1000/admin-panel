@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Enums\PackageStatus;
+use App\Facades\Mailer;
+use App\Mail\RemindAboutInvoice;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Bus\Queueable;
@@ -89,6 +91,16 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
                 $order->calculated_shipping_invoices = true;
                 $order->save();
             }
+        }
+
+        $orders = Order::whereHas('labels', function ($q) {
+            $q->where('labels.id', 290);
+        })->get();
+
+        foreach ($orders as $order) {
+            Mailer::create()
+                ->to()
+                ->send(new RemindAboutInvoice($order));
         }
     }
 }
