@@ -16,6 +16,7 @@ use App\Jobs\FireProductPacketJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\OrderRepository;
 use App\Repositories\StatusRepository;
+use App\Services\CalculateSubjectInvoiceBilansLabels;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\LabelService;
@@ -124,5 +125,6 @@ readonly class OrderObserver
     public function updated(Order $order): void
     {
         RecalculateBuyingLabels::recalculate($order);
+        CalculateSubjectInvoiceBilansLabels::handle($order);
     }
 }
