@@ -158,6 +158,7 @@ class OrderWarehouseNotificationController extends Controller
 
     public function sendInvoice(Request $request): JsonResponse
     {
+        dd('okej');
         try {
             $order = Order::findOrFail($request->orderId);
 
