@@ -225,8 +225,6 @@ class OrderWarehouseNotificationController extends Controller
             $parser = new \Smalot\PdfParser\Parser();
             $pdf = $parser->parseFile($fullPath);
             $text = $pdf->getText();
-
-            // Clean and encode the text
             $text = $this->cleanText($text);
 
             // Prepare the request to Claude AI API
@@ -240,11 +238,14 @@ class OrderWarehouseNotificationController extends Controller
                     [
                         'role' => 'user',
                         'content' => [
-                            ['type' => 'text', 'text' => "Please analyze this invoice text and tell me:
-                        1. Is this a VAT invoice or a proforma invoice?
-                        2. What is the invoice number or name?
-                        3. If it's a VAT invoice, what is the total invoice value including VAT?
-                        Provide the answers in a structured format.
+                            ['type' => 'text', 'text' => "Analyze the following invoice text and provide a JSON response with the following structure:
+                        {
+                            \"invoice_type\": \"VAT\" or \"proforma\" or \"Unknown\",
+                            \"invoice_name\": \"The invoice number or name, or null if not found\",
+                            \"invoice_value\": \"The total invoice value including VAT if it's a VAT invoice, or null for proforma or if not found\"
+                        }
+
+                        Only provide the JSON response, no additional text.
 
                         Invoice text:
                         $text"],
@@ -257,7 +258,6 @@ class OrderWarehouseNotificationController extends Controller
             if ($response->successful()) {
                 $result = $response->json();
 
-                // Check if the expected structure exists
                 if (!isset($result['content'][0]['text'])) {
                     Log::error('Unexpected response structure from Claude AI', ['result' => $result]);
                     throw new Exception('Unexpected response structure from Claude AI');
@@ -265,20 +265,27 @@ class OrderWarehouseNotificationController extends Controller
 
                 $content = $result['content'][0]['text'];
 
-                // Parse the Claude AI response
-                $invoiceType = $this->extractInvoiceType($content);
-                $invoiceName = $this->extractInvoiceName($content);
-                $invoiceValue = $this->extractInvoiceValue($content, $invoiceType);
+                // Parse the JSON response
+                $parsedResponse = json_decode($content, true);
+
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    Log::error('Failed to parse JSON response from Claude AI', [
+                        'content' => $content,
+                        'error' => json_last_error_msg()
+                    ]);
+                    throw new Exception('Failed to parse JSON response from Claude AI');
+                }
                 Log::info([
-                    'invoice_type' => $invoiceType,
-                    'invoice_name' => $invoiceName,
-                    'invoice_value' => $invoiceValue,
+                    'invoice_type' => $this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown'),
+                    'invoice_name' => $parsedResponse['invoice_name'] ?? null,
+                    'invoice_value' => $parsedResponse['invoice_value'] ?? null,
                 ]);
 
+                // Validate and sanitize the parsed response
                 return [
-                    'invoice_type' => $invoiceType,
-                    'invoice_name' => $invoiceName,
-                    'invoice_value' => $invoiceValue,
+                    'invoice_type' => $this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown'),
+                    'invoice_name' => $parsedResponse['invoice_name'] ?? null,
+                    'invoice_value' => $parsedResponse['invoice_value'] ?? null,
                 ];
             } else {
                 Log::error('Claude AI API request failed', [
@@ -299,6 +306,12 @@ class OrderWarehouseNotificationController extends Controller
                 'invoice_value' => null,
             ];
         }
+    }
+
+    private function sanitizeInvoiceType(string $type): string
+    {
+        $type = strtolower($type);
+        return in_array($type, ['vat', 'proforma']) ? ucfirst($type) : 'Unknown';
     }
 
     private function extractInvoiceType(string $content): string
