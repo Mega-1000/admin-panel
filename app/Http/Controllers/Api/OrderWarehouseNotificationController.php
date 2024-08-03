@@ -269,6 +269,11 @@ class OrderWarehouseNotificationController extends Controller
                 $invoiceType = $this->extractInvoiceType($content);
                 $invoiceName = $this->extractInvoiceName($content);
                 $invoiceValue = $this->extractInvoiceValue($content, $invoiceType);
+                Log::info([
+                    'invoice_type' => $invoiceType,
+                    'invoice_name' => $invoiceName,
+                    'invoice_value' => $invoiceValue,
+                ]);
 
                 return [
                     'invoice_type' => $invoiceType,
