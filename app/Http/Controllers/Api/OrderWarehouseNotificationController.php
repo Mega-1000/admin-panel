@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
+
 class OrderWarehouseNotificationController extends Controller
 {
     use ApiResponsesTrait;
@@ -155,9 +156,6 @@ class OrderWarehouseNotificationController extends Controller
             die();
         }
     }
-
-    use Illuminate\Support\Facades\Http;
-    use Illuminate\Support\Facades\Storage;
 
     public function sendInvoice(Request $request): JsonResponse
     {
