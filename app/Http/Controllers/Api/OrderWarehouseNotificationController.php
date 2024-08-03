@@ -233,6 +233,7 @@ class OrderWarehouseNotificationController extends Controller
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'x-api-key' => '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',
+                'anthropic-version' => '2023-06-01',
             ])->post('https://api.anthropic.com/v1/messages', [
                 'model' => 'claude-3-5-sonnet-20240620',
                 'messages' => [
