@@ -157,77 +157,22 @@ class OrderWarehouseNotificationController extends Controller
         }
     }
 
-    public function sendInvoice(Request $request): JsonResponse
-    {
-        try {
-            $order = Order::findOrFail($request->orderId);
-
-            $file = $request->file('file');
-            if ($file !== null) {
-                $filename = $file->getClientOriginalName();
-                $path = Storage::disk('public')->putFileAs('invoices', $file, $filename);
-
-                if (!$path) {
-                    throw new Exception("Failed to store the file");
-                }
-
-                Log::info('File stored successfully', ['path' => $path]);
-
-                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path);
-
-                $order->invoices()->create([
-                    'invoice_type' => 'buy',
-                    'invoice_name' => $invoiceInfo['invoice_name'] ?? $filename,
-                    'is_visible_for_client' => (boolean)$request->isVisibleForClient,
-                    'invoice_category' => $invoiceInfo['invoice_type'],
-                    'invoice_value' => $invoiceInfo['invoice_value'],
-                ]);
-
-                RecalculateBuyingLabels::recalculate($order);
-
-                $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
-
-                $invoiceRequest = $order->invoiceRequests()->first();
-
-                if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
-                    $invoiceRequest->update(['status' => 'SENT']);
-                }
-
-                dispatch(new DispatchLabelEventByNameJob($order, "new-file-added-to-order"));
-
-                return $this->okResponse();
-            }
-            Log::error('Problem with send invoice.',
-                ['exception' => 'No file in request', 'class' => get_class($this), 'line' => __LINE__]
-            );
-            throw new Exception('No file in request');
-        } catch (Exception $e) {
-            Log::error('Problem with send invoice.',
-                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
-            );
-            throw $e;
-        }
-    }
-
     private function analyzeInvoiceWithClaudeAI($filePath): array
     {
         try {
-            // Log the received file path
             Log::info('Analyzing invoice with Claude AI', ['filePath' => $filePath]);
 
-            // Get the full path to the file
             $fullPath = Storage::disk('public')->path($filePath);
-
-            // Log the full path
             Log::info('Full file path', ['fullPath' => $fullPath]);
 
-            // Check if file exists
             if (!Storage::disk('public')->exists($filePath)) {
                 throw new Exception("File not found: $fullPath");
             }
 
-            // Read the PDF file
-            $pdfContent = base64_encode(Storage::disk('public')->get($filePath));
+            // Extract text from PDF
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf = $parser->parseFile($fullPath);
+            $text = $pdf->getText();
 
             // Prepare the request to Claude AI API
             $response = Http::withHeaders([
@@ -240,12 +185,14 @@ class OrderWarehouseNotificationController extends Controller
                     [
                         'role' => 'user',
                         'content' => [
-                            ['type' => 'text', 'text' => "Please analyze this invoice PDF and tell me:
-                            1. Is this a VAT invoice or a proforma invoice?
-                            2. What is the invoice number or name?
-                            3. If it's a VAT invoice, what is the total invoice value including VAT?
-                            Provide the answers in a structured format."],
-                            ['type' => 'image', 'source' => ['type' => 'base64', 'media_type' => 'application/pdf', 'data' => $pdfContent]],
+                            ['type' => 'text', 'text' => "Please analyze this invoice text and tell me:
+                        1. Is this a VAT invoice or a proforma invoice?
+                        2. What is the invoice number or name?
+                        3. If it's a VAT invoice, what is the total invoice value including VAT?
+                        Provide the answers in a structured format.
+
+                        Invoice text:
+                        $text"],
                         ],
                     ],
                 ],
