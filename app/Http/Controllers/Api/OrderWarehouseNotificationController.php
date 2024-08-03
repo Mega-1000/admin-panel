@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\BuyingInvoice;
 use App\Entities\Order;
 use App\Entities\OrderWarehouseNotification;
 use App\Entities\Warehouse;
@@ -173,7 +174,7 @@ class OrderWarehouseNotificationController extends Controller
 
                 Log::info('File stored successfully', ['path' => $path]);
 
-                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path);
+                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path, $order);
 
                 $order->invoices()->create([
                     'invoice_type' => 'buy',
@@ -209,7 +210,7 @@ class OrderWarehouseNotificationController extends Controller
         }
     }
 
-    private function analyzeInvoiceWithClaudeAI($filePath): array
+    private function analyzeInvoiceWithClaudeAI($filePath, $order): array
     {
         try {
             Log::info('Analyzing invoice with Claude AI', ['filePath' => $filePath]);
@@ -280,6 +281,14 @@ class OrderWarehouseNotificationController extends Controller
                     'invoice_name' => $parsedResponse['invoice_name'] ?? null,
                     'invoice_value' => $parsedResponse['invoice_value'] ?? null,
                 ]);
+
+                if ($this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown') == 'Vat') {
+                    $buyingInvoice = new BuyingInvoice();
+                    $buyingInvoice->order_id = $order->id;
+                    $buyingInvoice->invoice_number = $parsedResponse['invoice_name'] ?? null;
+                    $buyingInvoice->value = $parsedResponse['invoice_value'] ?? null;
+                    $buyingInvoice->save();
+                }
 
                 // Validate and sanitize the parsed response
                 return [
