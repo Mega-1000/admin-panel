@@ -156,6 +156,9 @@ class OrderWarehouseNotificationController extends Controller
         }
     }
 
+    use Illuminate\Support\Facades\Http;
+    use Illuminate\Support\Facades\Storage;
+
     public function sendInvoice(Request $request): JsonResponse
     {
         try {
@@ -164,9 +167,15 @@ class OrderWarehouseNotificationController extends Controller
             $file = $request->file('file');
             if ($file !== null) {
                 $filename = $file->getClientOriginalName();
-                $filePath = Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
+                $path = Storage::disk('public')->putFileAs('invoices', $file, $filename);
 
-                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($filePath);
+                if (!$path) {
+                    throw new Exception("Failed to store the file");
+                }
+
+                Log::info('File stored successfully', ['path' => $path]);
+
+                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path);
 
                 $order->invoices()->create([
                     'invoice_type' => 'buy',
@@ -201,19 +210,26 @@ class OrderWarehouseNotificationController extends Controller
             throw $e;
         }
     }
+
     private function analyzeInvoiceWithClaudeAI($filePath): array
     {
         try {
+            // Log the received file path
+            Log::info('Analyzing invoice with Claude AI', ['filePath' => $filePath]);
+
             // Get the full path to the file
-            $fullPath = Storage::path($filePath);
+            $fullPath = Storage::disk('public')->path($filePath);
+
+            // Log the full path
+            Log::info('Full file path', ['fullPath' => $fullPath]);
 
             // Check if file exists
-            if (!file_exists($fullPath)) {
+            if (!Storage::disk('public')->exists($filePath)) {
                 throw new Exception("File not found: $fullPath");
             }
 
             // Read the PDF file
-            $pdfContent = base64_encode(file_get_contents($fullPath));
+            $pdfContent = base64_encode(Storage::disk('public')->get($filePath));
 
             // Prepare the request to Claude AI API
             $response = Http::withHeaders([
@@ -246,11 +262,11 @@ class OrderWarehouseNotificationController extends Controller
                 preg_match('/2\.\s*(.+)/', $content, $nameMatches);
                 preg_match('/3\.\s*(.+)/', $content, $valueMatches);
 
-                return response()->json([
+                return [
                     'invoice_type' => $typeMatches[1] ?? 'Unknown',
                     'invoice_name' => $nameMatches[1] ?? null,
                     'invoice_value' => $typeMatches[1] === 'VAT' ? ($valueMatches[1] ?? null) : null,
-                ]);
+                ];
             } else {
                 Log::error('Claude AI API request failed', [
                     'status' => $response->status(),
@@ -264,7 +280,6 @@ class OrderWarehouseNotificationController extends Controller
                 'class' => get_class($this),
                 'line' => __LINE__
             ]);
-
             return [
                 'invoice_type' => 'Unknown',
                 'invoice_name' => null,
