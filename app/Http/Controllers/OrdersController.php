@@ -1582,7 +1582,6 @@ class OrdersController extends Controller
             $order->labels()->detach(39);
         }
 
-
         if ($request->submit == 'updateAndStay') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
                 'message' => __('orders.message.update'),
