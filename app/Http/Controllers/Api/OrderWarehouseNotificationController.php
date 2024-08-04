@@ -184,8 +184,6 @@ class OrderWarehouseNotificationController extends Controller
                     'invoice_value' => $invoiceInfo['invoice_value'],
                 ]);
 
-                RecalculateBuyingLabels::recalculate($order);
-
                 $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
 
                 $invoiceRequest = $order->invoiceRequests()->first();
@@ -208,6 +206,28 @@ class OrderWarehouseNotificationController extends Controller
             );
             throw $e;
         }
+    }
+
+    public function calculateTotalCost(Order $order): float
+    {
+        $sumOfPurchase = 0;
+        $items = $order->items;
+
+        foreach ($items as $item) {
+            $pricePurchase = $item->net_purchase_price_commercial_unit_after_discounts ?? 0;
+            $quantity = $item->quantity ?? 0;
+
+            $sumOfPurchase += floatval($pricePurchase) * $quantity;
+        }
+
+        $totalItemsCost = $sumOfPurchase * 1.23;
+        $transportCost = 0;
+
+        if ($order->shipment_price_for_us) {
+            $transportCost = floatval($order->shipment_price_for_us);
+        }
+
+        return $totalItemsCost + $transportCost;
     }
 
     private function analyzeInvoiceWithClaudeAI($filePath, $order): array
@@ -292,7 +312,11 @@ class OrderWarehouseNotificationController extends Controller
                     RecalculateBuyingLabels::recalculate($order);
                     $order->labels()->detach(290);
                 } else {
-//                    $buyingInvoice->value = $parsedResponse['invoice_value'] ?? null;
+                    if ($this->calculateTotalCost($order) == $parsedResponse['invoice_value']) {
+                        $order->labels()->detach(64);
+                    } else {
+                        $order->labels()->attach(63);
+                    }
                 }
 
 
