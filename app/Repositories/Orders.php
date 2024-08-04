@@ -88,7 +88,7 @@ class Orders
         $orderPayments = [];
         foreach ($orders as $order) {
             foreach ($order->payments as $payment) {
-                if ($payment->status !== 'Rozliczona deklarowana' && $payment->operation_type !== 'Wpłata/wypłata bankowa - związana z fakturą zakupową' || $order->login == 'info@ephpolska.pl' || str_contains($order->operation_type, 'przeksiegowanie z innej oferty')) {
+                if ($payment->status !== 'Rozliczona deklarowana' && $payment->operation_type !== 'Wpłata/wypłata bankowa - związana z fakturą zakupową' || $order->login == 'info@ephpolska.pl' || str_contains($payment->operation_type, 'przeksiegowanie z innej oferty')) {
                     $orderPayments[] = $payment;
                 }
             }
