@@ -68,15 +68,23 @@ Bilans rozliczeń z fabryką:
 @foreach(\App\Entities\BuyingInvoice::where('order_id', $id)->get() as $invoice)
     Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
     @if($invoice->analized_by_claute)
+        <br>
+
         <a href="{{ $invoice->file_url }}">
             Analiza AI
         </a>
 
+        <br>
+
         @if(!$invoice->validated_by_nexo)
-            Nie zweryfikowana przez Nexo
+            <div style="color: red">
+                Nie zweryfikowana przez Nexo
+            </div>
         @endif
         @if($invoice->validated_by_nexo)
-            Zweryfikowana przez Nexo
+            <div style="color: green">
+                Zweryfikowana przez Nexo
+            </div>
         @endif
     @else
         <a href="{{ $invoice->file_url }}">

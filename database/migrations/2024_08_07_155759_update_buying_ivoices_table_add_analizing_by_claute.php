@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('buying_invoices', function (Blueprint $table) {
-            $table->boolean('file_url')->default(false);
+            $table->string('file_url')->default(false);
         });
     }
 
