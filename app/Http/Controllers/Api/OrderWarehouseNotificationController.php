@@ -315,6 +315,180 @@ class OrderWarehouseNotificationController extends Controller
 
                     RecalculateBuyingLabels::recalculate($order);
                     $order->labels()->detach(290);
+
+                    $apiUrl = "https://api.anthropic.com/v1/messages";
+                    $apiKey = "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";
+                    $anthropicVersion = "2023-06-01";
+
+                    $order = Order::findOrFail($order->id); // Assume $orderId is provided
+
+                    $invoices = $order->invoices;
+
+                    $text = '';
+
+                    foreach ($invoices as $invoice) {
+                        $invoicePath = 'public/invoices/' . $invoice->invoice_name;
+
+                        if (!Storage::exists($invoicePath)) {
+                            throw new \Exception('Invoice file not found in storage.');
+                        }
+
+                        $invoiceContent = Storage::get($invoicePath);
+
+                        $parser = new \Smalot\PdfParser\Parser();
+                        $pdf = $parser->parseContent($invoiceContent);
+                        $text .= '--------------------------' . $pdf->getText();
+                    }
+                    $prompt = [
+                        [
+                            "role" => "user",
+                            "content" =>  [
+                                [
+                                    'type' => 'text',
+                                    'text' => $text . '
+    i pasted my pdf content of all invoices attached to this order with i got from db convert it to xml format for invoice program so it will look like this
+
+    Warning take data of ivoice witch doesnt have proforma name and is vat invoice
+
+<?xml version="1.0"?>
+<PreDokument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <Klient>
+        <Typ>Firma</Typ>
+        <Symbol>ARTUR</Symbol>
+        <Nazwa>Kiosk ARTUR</Nazwa>
+        <NazwaPelna>Kiosk ARTUR</NazwaPelna>
+        <OsobaImie />
+        <OsobaNazwisko />
+        <NIP>836-84-63-635</NIP>
+        <NIPUE />
+        <Email>info@artur.insert.pl</Email>
+        <Telefon>333-53-64</Telefon>
+        <RodzajNaDok>Nabywca</RodzajNaDok>
+        <NrRachunku>10202502-56648889798787878556</NrRachunku>
+        <ChceFV>true</ChceFV>
+        <AdresGlowny>
+            <Nazwa>Kiosk ARTUR</Nazwa>
+            <Ulica>Legnicka 57/2</Ulica>
+            <Miasto>Lublin</Miasto>
+            <Kod>96-534</Kod>
+            <Panstwo>Polska</Panstwo>
+        </AdresGlowny>
+    </Klient>
+    <UslugaTransportu />
+    <UslugaTransportuCenaNetto>0</UslugaTransportuCenaNetto>
+    <UslugaTransportuCenaBrutto>0</UslugaTransportuCenaBrutto>
+    <Numer>2</Numer>
+    <NumerPelny>ZK 2/SF/MAG/2017</NumerPelny>
+    <NumerZewnetrzny />
+    <NumerZewnetrzny2 />
+    <DataUtworzenia>2017-02-15T00:00:00</DataUtworzenia>
+    <DataDostawy xsi:nil="true" />
+    <TerminPlatnosci>2017-02-15T00:00:00</TerminPlatnosci>
+    <Produkty>
+        <PrePozycja>
+            <Towar>
+                <Rodzaj>Towar</Rodzaj>
+                <Symbol>PESO20</Symbol>
+                <SymbolDostawcy />
+                <NazwaDostawcy />
+                <SymbolProducenta />
+                <NazwaProducenta />
+                <Nazwa>So perfumy 20ml</Nazwa>
+                <CenaKartotekowaNetto>150</CenaKartotekowaNetto>
+                <CenaNetto>300</CenaNetto>
+                <JM>szt.</JM>
+                <KodKreskowy>5902812179392</KodKreskowy>
+                <Vat>8</Vat>
+                <PKWiU />
+                <Opis>Perfumy o mocnym i długotrwałym zapachu</Opis>
+                <OpisPelny />
+                <Uwagi />
+                <AdresWWW />
+                <SymboleSkladnikow />
+                <IloscSkladnikow />
+                <Zdjecia />
+                <Wysokosc>0</Wysokosc>
+                <Dlugosc>0</Dlugosc>
+                <Szerokosc>0</Szerokosc>
+                <Waga>0</Waga>
+                <PoleWlasne />
+            </Towar>
+            <RabatProcent>0.0000</RabatProcent>
+            <CenaNettoPrzedRabatem>270</CenaNettoPrzedRabatem>
+            <CenaNettoPoRabacie>270</CenaNettoPoRabacie>
+            <CenaBruttoPrzedRabatem>291.6</CenaBruttoPrzedRabatem>
+            <CenaBruttoPoRabacie>291.6</CenaBruttoPoRabacie>
+            <Ilosc>3</Ilosc>
+            <Vat>8</Vat>
+            <OpisPozycji />
+            <KodDostawy />
+            <WartoscCalejPozycjiNettoZRabatem>810</WartoscCalejPozycjiNettoZRabatem>
+            <WartoscCalejPozycjiBruttoZRabatem>874.8</WartoscCalejPozycjiBruttoZRabatem>
+            <WartoscCalejPozycjiNetto>810</WartoscCalejPozycjiNetto>
+            <WartoscCalejPozycjiBrutto>874.8</WartoscCalejPozycjiBrutto>
+        </PrePozycja>
+    </Produkty>
+    <Uwagi />
+    <RodzajPlatnosci>Gotówka</RodzajPlatnosci>
+    <Waluta>PLN</Waluta>
+    <WartoscPoRabacieNetto>810</WartoscPoRabacieNetto>
+    <WartoscPoRabacieBrutto>874.8</WartoscPoRabacieBrutto>
+    <WartoscNetto>0</WartoscNetto>
+    <WartoscBrutto>0</WartoscBrutto>
+    <WartoscWplacona>0.0</WartoscWplacona>
+    <TypDokumentu>ZK</TypDokumentu>
+    <StatusDokumentuWERP />
+    <Kategoria>Sprzedaż</Kategoria>
+    <Magazyn>MAG</Magazyn>
+    <MagazynDo />
+</PreDokument>
+This format
+
+Invoice is buying and use "szt" not "szt."
+
+Provide only xml text nbo other additional info because it is used in systsem directly
+',
+                                ],
+                            ],
+                        ]
+                    ];
+                    $data = [
+                        "model" => "claude-3-5-sonnet-20240620",
+                        "max_tokens" => 4096,
+                        "messages" => $prompt,
+                    ];
+
+                    $payload = json_encode($data);
+
+
+                    $ch = curl_init($apiUrl);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        "x-api-key: $apiKey",
+                        "anthropic-version: $anthropicVersion",
+                        "Content-Type: application/json"
+                    ]);
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+
+                    $response = curl_exec($ch);
+                    $response = json_decode($response)->content[0]->text;
+
+                    $xmlStart = strpos($response, '<?xml');
+
+                    if ($xmlStart !== false) {
+                        // Cut everything before the XML starts
+                        $xmlContent = substr($response, $xmlStart);
+                    } else {
+                        // If no XML tag is found, use the entire response
+                        $xmlContent = $response;
+                    }
+
+                    $name = \Illuminate\Support\Str::random(32);
+                    Storage::put('public/buyinginvoices/' . $name . '.xml', $xmlContent);
+
+                    $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $name . '.xml';
+                    $order->save();
                 } else {
                     if ($this->calculateTotalCost($order) == $parsedResponse['invoice_value']) {
                         $order->labels()->detach(64);
