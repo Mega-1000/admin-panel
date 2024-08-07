@@ -310,7 +310,7 @@ class OrderWarehouseNotificationController extends Controller
                     $buyingInvoice->value = $parsedResponse['invoice_value'] ?? null;
                     $buyingInvoice->analized_by_claute = true;
                     $buyingInvoice->validated_by_nexo = false;
-                    $buyingInvoice->file_url = '/storage/invoices' . $filePath;
+                    $buyingInvoice->file_url = '/storage/' . $filePath;
                     $buyingInvoice->save();
 
                     RecalculateBuyingLabels::recalculate($order);
