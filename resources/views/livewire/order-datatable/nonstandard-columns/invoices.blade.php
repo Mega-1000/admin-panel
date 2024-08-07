@@ -67,6 +67,15 @@ Bilans rozliczeń z fabryką:
 
 @foreach(\App\Entities\BuyingInvoice::where('order_id', $id)->get() as $invoice)
     Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
+    @if($invoice->analized_by_claute)
+        Analiza AI
+
+        @if($invoice->validated_by_nexo)
+            Zweryfikowana przez Nexo
+        @endif
+    @else
+        Orginał
+    @endif
     <a class="btn btn-danger" href="/admin/delete-buying-invoice/{{ $invoice->id }}">
         Usuń fakturę
     </a>
