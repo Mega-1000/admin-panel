@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::table('buying_invoices', function (Blueprint $table) {
             $table->boolean('analized_by_claute')->default(false);
+            $table->boolean('validated_by_nexo')->default(false);
         });
     }
 
