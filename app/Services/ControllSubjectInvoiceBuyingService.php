@@ -62,6 +62,9 @@ class ControllSubjectInvoiceBuyingService
         $buyingInvooice->order_id = $order->id;
         $buyingInvooice->value = (float)str_replace(',', '.', str_replace(' ', '', $orderNotes->value));
         $buyingInvooice->invoice_number = $orderNotes->number;
+        if ($analizedInvoice?->file_url) {
+            $buyingInvooice->file_url = $analizedInvoice->file_url;
+        }
         $buyingInvooice->save();
 
         echo $order->id;
