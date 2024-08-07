@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Psy\Util\Str;
 
 
 class OrderWarehouseNotificationController extends Controller
@@ -165,7 +166,7 @@ class OrderWarehouseNotificationController extends Controller
 
             $file = $request->file('file');
             if ($file !== null) {
-                $filename = $file->getClientOriginalName();
+                $filename = \Illuminate\Support\Str::random(32) . '.' . $file->getClientOriginalExtension();
                 $path = Storage::disk('public')->putFileAs('invoices', $file, $filename);
 
                 if (!$path) {
@@ -178,7 +179,7 @@ class OrderWarehouseNotificationController extends Controller
 
                 $order->invoices()->create([
                     'invoice_type' => 'buy',
-                    'invoice_name' => $invoiceInfo['invoice_name'] ?? $filename,
+                    'invoice_name' => $filename,
                     'is_visible_for_client' => (boolean)$request->isVisibleForClient,
                     'invoice_category' => $invoiceInfo['invoice_type'],
                     'invoice_value' => $invoiceInfo['invoice_value'],
