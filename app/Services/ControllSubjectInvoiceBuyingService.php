@@ -49,8 +49,13 @@ class ControllSubjectInvoiceBuyingService
             return;
         }
 
-        if (BuyingInvoice::where('invoice_number', $orderNotes->number)->exists()) {
+        if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('analized_by_claute', false)->exists()) {
             return;
+        }
+
+        if ($analizedInvoice = BuyingInvoice::where('invoice_number', $orderNotes->number)->where('analized_by_claute', true)->exists()) {
+            $analizedInvoice->validated_by_nexo = true;
+            $analizedInvoice->save();
         }
 
         $buyingInvooice = new BuyingInvoice();

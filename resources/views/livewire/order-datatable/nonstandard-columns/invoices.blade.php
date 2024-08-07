@@ -69,7 +69,9 @@ Bilans rozliczeń z fabryką:
     Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
     @if($invoice->analized_by_claute)
         Analiza AI
-
+        @if($invoice->validated_by_nexo)
+            Nie zweryfikowana przez Nexo
+        @endif
         @if($invoice->validated_by_nexo)
             Zweryfikowana przez Nexo
         @endif
