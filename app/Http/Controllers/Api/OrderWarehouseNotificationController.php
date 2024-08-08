@@ -177,13 +177,15 @@ class OrderWarehouseNotificationController extends Controller
 
                 $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path, $order);
 
-                $order->invoices()->create([
-                    'invoice_type' => 'buy',
-                    'invoice_name' => $filename,
-                    'is_visible_for_client' => (boolean)$request->isVisibleForClient,
-                    'invoice_category' => $invoiceInfo['invoice_type'],
-                    'invoice_value' => $invoiceInfo['invoice_value'],
-                ]);
+                if ($invoiceInfo) {
+                    $order->invoices()->create([
+                        'invoice_type' => 'buy',
+                        'invoice_name' => $filename,
+                        'is_visible_for_client' => (boolean)$request->isVisibleForClient,
+                        'invoice_category' => $invoiceInfo['invoice_type'],
+                        'invoice_value' => $invoiceInfo['invoice_value'],
+                    ]);
+                }
 
                 $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
 
