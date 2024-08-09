@@ -28,7 +28,9 @@ class SendSpeditionNotifications implements ShouldQueue
     {
         $allLabels = [244, 245, 74, 243, 256, 270];
         $order->labels()->detach($allLabels);
-        $order->labels()->attach($newLabels);
+
+        $arr = [];
+        AddLabelService::addLabels($order, [$newLabels], $arr, []);
     }
 
     private function nextBusinessDay(Carbon $date): Carbon
