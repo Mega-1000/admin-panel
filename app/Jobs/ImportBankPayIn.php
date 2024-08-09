@@ -243,7 +243,7 @@ class ImportBankPayIn implements ShouldQueue
                 $payment->delete();
             } else {
                 $preventionArray = [];
-                AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()?->id);
+//                AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()?->id);
             }
         }
     }

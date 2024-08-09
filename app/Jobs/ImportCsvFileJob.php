@@ -865,9 +865,10 @@ class ImportCsvFileJob implements ShouldQueue
         JpgDatum::insert($data);
     }
 
-    private function log('123' . '123' . $text)
+    private function log($text)
     {
         Log::channel('import')->info($text);
+
         echo $text . "\n";
     }
 
