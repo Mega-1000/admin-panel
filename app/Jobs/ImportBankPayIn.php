@@ -242,7 +242,7 @@ class ImportBankPayIn implements ShouldQueue
             if ($payIn->kwota === (float)$payment->amount) {
                 $payment->delete();
             } else {
-                $preventionArray = [];
+//                $preventionArray = [];
 //                AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()?->id);
             }
         }

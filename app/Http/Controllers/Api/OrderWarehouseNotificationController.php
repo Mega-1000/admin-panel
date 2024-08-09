@@ -449,6 +449,9 @@ This format
 Invoice is buying and use "szt" not "szt."
 
 Provide only xml text nbo other additional info because it is used in systsem directly
+
+Make sure invoice is proper xml because it is used in api comunication
+make sure Document type is ZK!
 ',
                                 ],
                             ],
