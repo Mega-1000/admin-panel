@@ -232,7 +232,7 @@ class OrderBuilder
 
         $data['update_email'] = false;
         if (empty($data['order_items'])) {
-            $data['order_items'] = [['id' => Product::where('symbol', 'TWSU')->first()->id, 'amount' => 1]];
+            $data['order_items'] = OrderBuilder::getDefaultProduct();
             $data['update_email'] = true;
         }
     }
@@ -242,9 +242,9 @@ class OrderBuilder
      */
     private static function getDefaultProduct(): array
     {
-        $product = Product::where('symbol', 'TWSU')->first();
+        $product = Product::getDefaultProduct();
 
-        return [['id' => Product::where('symbol', 'TWSU')->first()->id, 'amount' => 1]];
+        return [['id' => $product->id, 'amount' => 1]];
     }
 
     private static function assignEmployeeToOrder($order, $customer): void
