@@ -195,7 +195,7 @@ final class ImportAllegroPayInJob implements ShouldQueue
             }
 
             $preventionArray = [];
-            AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()?->id);
+//            AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()?->id);
         }
     }
 
