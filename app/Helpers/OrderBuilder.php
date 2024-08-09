@@ -243,6 +243,7 @@ class OrderBuilder
     private static function getDefaultProduct(): array
     {
         $product = Product::where('symbol', 'TWSU')->first();
+        dd($product);
 
         return [['id' => $product->id, 'amount' => 1]];
     }
