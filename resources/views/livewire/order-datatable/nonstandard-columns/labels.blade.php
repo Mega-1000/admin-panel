@@ -140,7 +140,7 @@
 
     @foreach($or->dates()?->first()?->toArray() ?? [] as $k => $date)
         @if(array_key_exists($k, $dateTranslations))
-            <div style="width: 200px">
+            <div style="width: 150px">
                 {{ $dateTranslations[$k] ?? '' }}: {{ isset($date) ? \Carbon\Carbon::parse($date)->timezone('Europe/Warsaw')->format('m-d H:i') : 'Brak' }}
                 <br>
             </div>
