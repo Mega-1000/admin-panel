@@ -20,6 +20,7 @@ class ControllSubjectInvoiceDTOFactory
         'Nabywca' => 'buyer',
         'Netto' => 'net',
         'Wartość VAT' => 'vatValue',
+        'Oryginał' => 'original',
         'Nabywca - E-mail' => 'buyerEmail',
         'S' => 's',
         'T' => 't',

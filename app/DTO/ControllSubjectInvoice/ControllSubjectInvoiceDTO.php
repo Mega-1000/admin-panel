@@ -32,6 +32,7 @@ final class ControllSubjectInvoiceDTO
     public ?string $orders;
     public ?string $flagComment;
     public ?string $toNonExistent;
+    public ?string $original;
 
     public function __construct(array $data)
     {
@@ -63,5 +64,6 @@ final class ControllSubjectInvoiceDTO
         $this->orders = $data['orders'];
         $this->flagComment = $data['flagComment'];
         $this->toNonExistent = $data['toNonExistent'];
+        $this->original = $data['original'];
     }
 }
