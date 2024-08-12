@@ -49,7 +49,7 @@ class ControllSubjectInvoiceBuyingService
             return;
         }
 
-        if (BuyingInvoice::where('invoice_number', $orderNotes->orginal)->where('analized_by_claute', false)->exists()) {
+        if (BuyingInvoice::where('invoice_number', $orderNotes->original)->where('analized_by_claute', false)->exists()) {
             return;
         }
 
