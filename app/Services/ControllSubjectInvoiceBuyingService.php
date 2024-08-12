@@ -43,13 +43,14 @@ class ControllSubjectInvoiceBuyingService
 
     private function handleSingle(ControllSubjectInvoiceDTO $orderNotes): void
     {
+        dd($orderNotes->originalOrders);
         $order = Order::find(preg_replace('/\D/', '', $orderNotes->notes ));
 
         if (!$order) {
             return;
         }
 
-        if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('analized_by_claute', false)->exists()) {
+        if (BuyingInvoice::where('invoice_number', $orderNotes->)->where('analized_by_claute', false)->exists()) {
             return;
         }
 
