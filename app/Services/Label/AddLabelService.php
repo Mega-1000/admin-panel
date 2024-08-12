@@ -100,8 +100,7 @@ class AddLabelService
 
             $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
-            $label = Label::query()->find($labelId);
-            if ($label->id === 50) {
+            if ($labelId === 50) {
                 EmailSetting::find(36)?->sendEmail($order->customer->login, $order);
             }
 
