@@ -1314,11 +1314,6 @@ class OrdersController extends Controller
                     $package->save();
                 }
             });
-//            $order->labels->map(function ($label) use ($order) {
-//                if (!in_array($label->pivot->label_id, Label::DIALOG_TYPE_LABELS_IDS)) {
-//                    $order->labels()->detach($label);
-//                }
-//            });
         }
         $orderItems = $order->items;
         $itemsArray = [];
@@ -1515,71 +1510,6 @@ class OrdersController extends Controller
 
         if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
             dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
-        }
-
-        $order->labels()->detach(240);
-        $order->labels()->detach(39);
-
-        if (count($order->payments)) {
-            if ($order->isPaymentRegulated()) {
-                dispatch(new DispatchLabelEventByNameJob($order, "payment-equal-to-order-value"));
-            } else {
-                if (!$order->labels->contains('id', 240)) {
-                    dispatch(new DispatchLabelEventByNameJob($order, "required-payment-before-unloading"));
-                }
-            }
-        }
-
-        $hasMissingDeliveryAddressLabel = $order->labels()->where('label_id', 75)->get();
-
-        if (count($hasMissingDeliveryAddressLabel) > 0) {
-            if ($order->isDeliveryDataComplete()) {
-                dispatch(new DispatchLabelEventByNameJob($order, "added-delivery-address"));
-            }
-        }
-
-        app(orderPaymentLabelsService::class)->calculateLabels($order);
-        $arr = [];
-
-        $additional_service = $order->additional_service_cost ?? 0;
-        $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
-        $shipment_price_client = $order->shipment_price_for_client ?? 0;
-        $totalProductPrice = 0;
-
-        foreach ($order->items as $item) {
-            $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
-            $quantity = $item->quantity ?? 0;
-            $totalProductPrice += $price * $quantity;
-        }
-
-        $depositPaidData = app(OrderDepositPaidCalculator::class)->calculateDepositPaidOrderData($order);
-
-        $sumOfGrossValues = $totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client;
-
-        // Calculate payments with future promise dates
-        $futurePayments = OrderPayment::where('order_id', $order->id)
-            ->where('declared_sum', '!=', null)
-            ->where(function ($query) {
-                $query->whereNull('status')
-                    ->orWhere('status', 'Deklaracja wpłaty');
-            })
-            ->where('promise_date', '>', now())
-            ->sum('declared_sum');
-
-        $pastPayments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where(function ($query) {$query->whereNull('status')->orWhere('status', 'Deklaracja wpłaty');})->where('promise_date', '<', now())->sum('declared_sum');
-
-
-        if ($futurePayments > 0) {
-            AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
-            $order->labels()->detach(39);
-        } else {
-            $order->labels()->detach(240);
-        }
-
-        if ($pastPayments > 0 && !$order->labels->contains('id', 240)) {
-            AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
-        } else {
-            $order->labels()->detach(39);
         }
 
         if ($request->submit == 'updateAndStay') {
