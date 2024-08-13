@@ -48,20 +48,6 @@
             $totalItemsCost = $sumOfPurchase * 1.23;
             $transportCost = 0;
         @endphp
-
-        wartość towaru: <br />
-        {{ number_format($totalItemsCost, 2) }}<br/>
-
-        @if ($order->shipment_price_for_us)
-            Koszt tran.: <br/>
-            {{ $order->shipment_price_for_us }}<br />
-            @php $transportCost = floatval($order->shipment_price_for_us); @endphp
-        @endif
-
-        @php $totalCost = $totalItemsCost + $transportCost; @endphp
-        Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
-
-        <hr>
         @if (isset($order->invoices))
             @foreach ($order->invoices as $invoice)
                 @if ($invoice->invoice_type === 'buy')
@@ -132,7 +118,7 @@
         @endforeach
         <hr>
 
-        <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $order->id }}/wyslij-fakture" target="_blank">Dodaj</a>
+        <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary">Dodaj Fakturę proformę</a>
 
 
         <div class="px-4 py-5 sm:px-6">
