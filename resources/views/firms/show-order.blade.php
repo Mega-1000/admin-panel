@@ -158,6 +158,16 @@
         </div>
 
         <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Dane do faktury</h3>
+        </div>
+        <br>
+
+        ELEKTRONICZNA PLATFORMA HANDLOWA EU SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br/>
+        ul. Norwida 31<br/>
+        55-200 Oława<br/>
+        NIP: 9121945342<br/>
+
+        <div class="px-4 py-5 sm:px-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Produkty w Zamówieniu</h3>
         </div>
         <div class="px-4 sm:px-6">
