@@ -48,7 +48,7 @@ class OrderPaymentObserver
         } else {
             $arr = [];
             AddLabelService::addLabels($orderPayment->order, [288], $arr, [], Auth::user()?->id);
-            RemoveLabelService::removeLabels($orderPayment->order, [41], $arr, [], Auth::user()?->id);
+            $orderPayment->order->labels()->detach(41);
         }
     }
 
@@ -101,7 +101,7 @@ class OrderPaymentObserver
         } else {
             $arr = [];
             AddLabelService::addLabels($orderPayment->order, [288], $arr, [], Auth::user()?->id);
-            RemoveLabelService::removeLabels($orderPayment->order, [41], $arr, [], Auth::user()?->id);
+            $orderPayment->order->labels()->detach(41);
         }
     }
 }
