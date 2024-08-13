@@ -85,40 +85,21 @@
             <br>
         @endif
 
-        @foreach(\App\Entities\BuyingInvoice::where('order_id', $order->id)->get() as $invoice)
+        <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $order->id }}/wyslij-fakture" target="_blank" class="text-white bg-blue-500 py-2 px-4 rounded font-medium">Dodaj Fakturę proformę</a>
+
+        @foreach(\App\Entities\BuyingInvoice::where('order_id', $order->id)->where('analized_by_claute', true)->get() as $invoice)
             Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
-            @if($invoice->analized_by_claute)
                 <br>
 
                 <a href="{{ $invoice->file_url }}">
                     Analiza AI
                 </a>
-
-                <br>
-
-                @if(!$invoice->validated_by_nexo)
-                    <div style="color: red">
-                        Nie zweryfikowana przez Nexo
-                    </div>
-                @endif
-                @if($invoice->validated_by_nexo)
-                    <div style="color: green">
-                        Zweryfikowana przez Nexo
-                    </div>
-                @endif
-            @else
-                <a href="{{ $invoice->file_url }}">
-                    Orginał
-                </a>
-            @endif
             <a class="btn btn-danger" href="/admin/delete-buying-invoice/{{ $invoice->id }}">
                 Usuń fakturę
             </a>
             <hr>
         @endforeach
         <hr>
-
-        <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $order->id }}/wyslij-fakture" target="_blank" class="btn btn-primary">Dodaj Fakturę proformę</a>
 
 
         <div class="px-4 py-5 sm:px-6">
