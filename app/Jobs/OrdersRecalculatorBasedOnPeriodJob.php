@@ -31,7 +31,7 @@ class OrdersRecalculatorBasedOnPeriodJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $orders = Order::whereHas('labels', function ($q) {$q->where('labels.id', 39);})->orWhereHas('labels', function ($q) {$q->where('labels.id', 240);})->get()->count();
+        $orders = Order::whereHas('labels', function ($q) {$q->where('labels.id', 39);})->orWhereHas('labels', function ($q) {$q->where('labels.id', 240);})->get();
 
         foreach ($orders as $order) {
             OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
