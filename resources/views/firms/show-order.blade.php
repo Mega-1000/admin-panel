@@ -79,7 +79,11 @@
             <br>
         @endif
 
-        <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $order->id }}/wyslij-fakture" target="_blank" class="text-white bg-blue-500 py-2 px-4 rounded font-medium">Dodaj Fakturę proformę</a>
+        <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $order->id }}/wyslij-fakture" target="_blank" class="text-white bg-blue-500 py-2 px-4 rounded font-medium">
+            Dodaj Fakturę proformę
+        </a>
+
+        <br>
 
         @foreach(\App\Entities\BuyingInvoice::where('order_id', $order->id)->where('analized_by_claute', true)->get() as $invoice)
             Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
@@ -93,7 +97,6 @@
             </a>
             <hr>
         @endforeach
-        <hr>
 
 
         <div class="px-4 py-5 sm:px-6">
