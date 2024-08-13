@@ -132,7 +132,7 @@
         @endforeach
         <hr>
 
-        <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $id }}/wyslij-fakture" target="_blank">Dodaj</a>
+        <a href="{{ rtrim(config('app.front_nuxt_url'), '/') }}/magazyn/awizacja/0/0/{{ $order->id }}/wyslij-fakture" target="_blank">Dodaj</a>
 
 
         <div class="px-4 py-5 sm:px-6">
