@@ -17,9 +17,7 @@ class OrdersRecalculatorBasedOnPeriod
         $order->labels()->detach(240);
         $order->labels()->detach(39);
 
-        app(orderPaymentLabelsService::class)->calculateLabels($order);
         $arr = [];
-
         $futurePayments = OrderPayment::where('order_id', $order->id)
             ->where('declared_sum', '!=', null)
             ->where(function ($query) {
