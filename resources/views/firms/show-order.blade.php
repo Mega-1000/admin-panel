@@ -73,12 +73,6 @@
             @endphp
         @endif
 
-        Bilans rozliczeń z fabryką:
-        {{
-            $order->getItemsGrossValueForUs() + $order->shipment_price_for_us -
-            $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount')
-        }}
-
         @if(\App\Entities\BuyingInvoice::where('order_id', $order->id)->first())
             <hr>
             Faktury zakupu:
