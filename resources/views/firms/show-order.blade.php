@@ -93,13 +93,13 @@
             $order->payments->where('operation_type', 'Wpłata/wypłata bankowa - związana z fakturą zakupową')->sum('amount')
         }}
 
-        @if(\App\Entities\BuyingInvoice::where('order_id', $id)->first())
+        @if(\App\Entities\BuyingInvoice::where('order_id', $order->id)->first())
             <hr>
             Faktury zakupu:
             <br>
         @endif
 
-        @foreach(\App\Entities\BuyingInvoice::where('order_id', $id)->get() as $invoice)
+        @foreach(\App\Entities\BuyingInvoice::where('order_id', $order->id)->get() as $invoice)
             Faktura numer: {{ $invoice->invoice_number }} Warość: {{ $invoice->value }} PLN
             @if($invoice->analized_by_claute)
                 <br>
