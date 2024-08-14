@@ -70,6 +70,10 @@ class OrderDatatableRetrievingHelper
             });});
         }
 
+        if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'only_styro') && $data->only_styro) {
+            $q->whereHas('payments');
+        }
+
         return $q;
     }
 
