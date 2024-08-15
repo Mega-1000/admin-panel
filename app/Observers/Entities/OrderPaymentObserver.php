@@ -38,18 +38,6 @@ class OrderPaymentObserver
 
         AllegroPaymentsReturnService::checkAllegroReturn($orderPayment->order);
         OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($orderPayment->order);
-
-        $sumOfPayments = $orderPayment->order->payments->where('operation_type', 'Wpłata/wypłata bankowa')->sum('amount');
-
-        if ($sumOfPayments == $orderPayment->order->getValue()) {
-            $arr = [];
-            AddLabelService::addLabels($orderPayment->order, [41], $arr, [], Auth::user()?->id);
-            RemoveLabelService::removeLabels($orderPayment->order, [288], $arr, [], Auth::user()?->id);
-        } else {
-            $arr = [];
-            AddLabelService::addLabels($orderPayment->order, [288], $arr, [], Auth::user()?->id);
-            $orderPayment->order->labels()->detach(41);
-        }
     }
 
     /**
@@ -91,17 +79,5 @@ class OrderPaymentObserver
         $this->orderService->calculateInvoiceReturnsLabels($orderPayment->order);
 
         OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($orderPayment->order);
-
-        $sumOfPayments = $orderPayment->order->payments->where('operation_type', 'Wpłata/wypłata bankowa')->sum('amount');
-
-        if ($sumOfPayments == $orderPayment->order->getValue()) {
-            $arr = [];
-            AddLabelService::addLabels($orderPayment->order, [41], $arr, [], Auth::user()?->id);
-            RemoveLabelService::removeLabels($orderPayment->order, [288], $arr, [], Auth::user()?->id);
-        } else {
-            $arr = [];
-            AddLabelService::addLabels($orderPayment->order, [288], $arr, [], Auth::user()?->id);
-            $orderPayment->order->labels()->detach(41);
-        }
     }
 }
