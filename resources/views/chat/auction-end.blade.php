@@ -251,12 +251,6 @@
                 </a>
             </div>
 
-            <div class="lowest-price-certificate">
-                <h2>Certyfikat Najniższej Ceny</h2>
-                <p>Gwarantujemy, że nasze ceny są najniższe na rynku. Jeśli znajdziesz niższą cenę, zwrócimy Ci różnicę!</p>
-                <img src="/path-to-certificate-icon.png" alt="Certyfikat Najniższej Ceny" width="100">
-            </div>
-
             @if($firms->count() == 0)
                 <div class="text-center">
                     <h1>Tu za nie długo zaczną wyświetlać się wyniki twojego przetargu.</h1>
