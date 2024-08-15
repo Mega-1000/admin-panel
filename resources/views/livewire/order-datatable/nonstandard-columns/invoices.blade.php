@@ -30,6 +30,7 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
         @if ($invoice['invoice_type'] === 'buy')
             <a target="_blank" href="/storage/invoices/{{ $invoice['invoice_name'] }}" style="margin-top: 5px;">Faktura</a>
 
+            {{ $invoice->ai_analysis }}
 {{--            @if ($invoice['is_visible_for_client'])--}}
 {{--                <p class="invoice__visible">Widoczna</p>--}}
 {{--            @else--}}
@@ -74,7 +75,6 @@ Bilans rozliczeń z fabryką:
             Analiza AI
         </a>
 
-        {{ $invoice }}
 
         <br>
 
