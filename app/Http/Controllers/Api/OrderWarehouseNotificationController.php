@@ -233,7 +233,7 @@ class OrderWarehouseNotificationController extends Controller
         return $totalItemsCost + $transportCost;
     }
 
-    private function analyzeInvoiceWithClaudeAI($filePath, $order): array
+    private function analyzeInvoiceWithClaudeAI($filePath, $order)
     {
         try {
             Log::info('Analyzing invoice with Claude AI', ['filePath' => $filePath]);
@@ -495,11 +495,7 @@ make sure Document type is ZK!
                     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $name . '.xml';
                     $order->save();
                 } else {
-                    if (dd($this->calculateTotalCost($order), $parsedResponse['invoice_value'])) {
-                        $order->labels()->detach(64);
-                    } else {
-                        $order->labels()->attach(63);
-                    }
+                    return response()->json($this->calculateTotalCost($order), $parsedResponse['invoice_value'])
                 }
 
 
