@@ -25,6 +25,7 @@ class OrderInvoice extends Model implements Transformable
         'invoice_type',
         'invoice_name',
         'is_visible_for_client',
+        'ai_analysis',
     ];
 
 

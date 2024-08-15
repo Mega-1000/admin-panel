@@ -183,6 +183,7 @@ class OrderWarehouseNotificationController extends Controller
                         'is_visible_for_client' => (boolean)$request->isVisibleForClient,
                         'invoice_category' => $invoiceInfo['invoice_type'],
                         'invoice_value' => $invoiceInfo['invoice_value'],
+                        'ai_analysis' => $invoiceInfo['analysis'],
                     ]);
                 }
 
@@ -264,6 +265,7 @@ class OrderWarehouseNotificationController extends Controller
                             \"invoice_type\": \"VAT\" or \"proforma\" or \"Unknown\",
                             \"invoice_name\": \"The invoice number or name, or null if not found\",
                             \"invoice_value\": \"The total invoice value including VAT in format '111111.11' no other thinks than this format\"
+                            \"analysis\": \"Short analysis in polish language with will be relevant to consultant handling this order\"
                         }
 
                         Only provide the JSON response, no additional text.
