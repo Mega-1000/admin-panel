@@ -500,7 +500,7 @@ make sure Document type is ZK!
                         round($this->calculateTotalCost($order), 2) ==
                         round((float)$parsedResponse['invoice_value'], 2)
                     ) {
-                        $order->labels()->attach(64);
+                        $order->labels()->attach(282);
                     } else {
                         $order->labels()->attach(63);
                     }
