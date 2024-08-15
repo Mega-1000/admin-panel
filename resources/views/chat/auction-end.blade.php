@@ -270,16 +270,16 @@
                 <p class="text-lg text-white">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 576 205 389</p>
             </div>
 
-            <div class="alert-success alert">
-                Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!
-                <br>
-                Wystarczy podać numer telefonu!
-                <br>
-                <br>
-                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">
-                    Zobacz więcej na temat promocji
-                </a>
-            </div>
+{{--            <div class="alert-success alert">--}}
+{{--                Poleć naszą platformę znajomym, a my zaoferujemy Ci 30zł zniżki za każdego nowego użytkownika!--}}
+{{--                <br>--}}
+{{--                Wystarczy podać numer telefonu!--}}
+{{--                <br>--}}
+{{--                <br>--}}
+{{--                <a href="https://mega1000.pl/polec-znajomego" target="_blank" class="btn btn-primary">--}}
+{{--                    Zobacz więcej na temat promocji--}}
+{{--                </a>--}}
+{{--            </div>--}}
 
             @if($firms->count() == 0)
                 <div class="text-center">
