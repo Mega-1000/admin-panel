@@ -298,11 +298,6 @@ class OrderWarehouseNotificationController extends Controller
                     ]);
                     throw new Exception('Failed to parse JSON response from Claude AI');
                 }
-                Log::info([
-                    'invoice_type' => $this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown'),
-                    'invoice_name' => $parsedResponse['invoice_name'] ?? null,
-                    'invoice_value' => $parsedResponse['invoice_value'] ?? null,
-                ]);
 
                 if ($this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown') == 'Vat') {
                     $buyingInvoice = new BuyingInvoice();
@@ -512,6 +507,7 @@ make sure Document type is ZK!
                     'invoice_type' => $this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown'),
                     'invoice_name' => $parsedResponse['invoice_name'] ?? null,
                     'invoice_value' => $parsedResponse['invoice_value'] ?? null,
+                    'analysis' => $parsedResponse['analysis'] ?? null,
                 ];
             } else {
                 Log::error('Claude AI API request failed', [
