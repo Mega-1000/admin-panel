@@ -74,7 +74,7 @@ Bilans rozliczeń z fabryką:
             Analiza AI
         </a>
 
-        {{ $invoice->ai_analysis }}
+        {{ $invoice }}
 
         <br>
 
