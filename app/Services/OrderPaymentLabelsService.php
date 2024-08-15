@@ -46,7 +46,7 @@ readonly class OrderPaymentLabelsService
             return;
         }
 
-        if (round($relatedOrdersValue, 2) === round($relatedPaymentsValue, 2)) {
+        if (dd(round($relatedOrdersValue, 2), round($relatedPaymentsValue, 2))) {
             $this->labelService->removeLabel($order->id, [134]);
             AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
 
@@ -60,7 +60,5 @@ readonly class OrderPaymentLabelsService
         $labels = $order->labels()->get()->pluck('id')->toArray();
 
         $labelsToCheck = [52, 53, 54, 114, 47, 48, 96, 149, 49, 50, 195, 121];
-
-        $labelsToCheck = array_diff($labelsToCheck, $labels);
     }
 }
