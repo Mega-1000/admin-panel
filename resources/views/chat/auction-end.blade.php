@@ -177,29 +177,6 @@
             margin: 0 0 0.5rem 0;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        p {
-            color: #e0e7ff;
-            font-size: 1rem;
-            margin: 0 0 1.5rem 0;
-            line-height: 1.4;
-        }
-        .cta-button {
-            background-color: #ffffff;
-            color: #4c51bf;
-            border: none;
-            border-radius: 50px;
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-            background-color: #f0f4ff;
-        }
     </style>
 
    <script>
@@ -290,7 +267,7 @@
                     <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 11.99H19C18.47 16.11 15.72 19.78 12 20.93V12H5V6.3L12 3.19V11.99Z" fill="#FFD700"/>
                 </svg>
                 <h2 class="h2 text-white">Gwarancja najniższej ceny!</h2>
-                <p class="text-lg">We're so confident in our prices, we'll beat any competitor's offer by 10%!</p>
+                <p class="text-lg">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 576 205 389</p>
             </div>
 
             <div class="alert-success alert">
