@@ -266,7 +266,7 @@ class OrderWarehouseNotificationController extends Controller
                         {
                             \"invoice_type\": \"VAT\" or \"proforma\" or \"Unknown\",
                             \"invoice_name\": \"The invoice number or name, or null if not found\",
-                            \"invoice_value\": \"The total invoice value including VAT if it's a VAT invoice\"
+                            \"invoice_value\": \"The total invoice value including VAT\"
                         }
 
                         Only provide the JSON response, no additional text.
