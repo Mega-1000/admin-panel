@@ -495,7 +495,7 @@ make sure Document type is ZK!
                     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $name . '.xml';
                     $order->save();
                 } else {
-                    return response()->json($this->calculateTotalCost($order), $parsedResponse['invoice_value']);
+                    return response()->json([$this->calculateTotalCost($order), $parsedResponse['invoice_value']]);
                 }
 
 
