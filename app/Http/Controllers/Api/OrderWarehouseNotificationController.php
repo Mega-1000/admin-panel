@@ -495,8 +495,10 @@ make sure Document type is ZK!
                     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $name . '.xml';
                     $order->save();
                 } else {
-                    Log::notice([(float)$this->calculateTotalCost($order), (float)$parsedResponse['invoice_value']]);
-                    if ((float)$this->calculateTotalCost($order) == (float)$parsedResponse['invoice_value']) {
+                    if (
+                        round($this->calculateTotalCost($order), 2) ==
+                        round((float)$parsedResponse['invoice_value'], 2)
+                    ) {
                         $order->labels()->detach(64);
                     } else {
                         $order->labels()->attach(63);
