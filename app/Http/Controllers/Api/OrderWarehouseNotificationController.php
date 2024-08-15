@@ -97,7 +97,6 @@ class OrderWarehouseNotificationController extends Controller
         if (empty($employees)) {
             $employees = $warehouse->firm->employees;
         }
-        Log::notice('twoja stara 1' . $employees->toArray(), $warehouse->toArray());
 
         $helper = new MessagesHelper();
         $helper->orderId = $data['order_id'];
@@ -194,8 +193,6 @@ class OrderWarehouseNotificationController extends Controller
                 if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
                     $invoiceRequest->update(['status' => 'SENT']);
                 }
-
-                dispatch(new DispatchLabelEventByNameJob($order, "new-file-added-to-order"));
 
                 return $this->okResponse();
             }
@@ -494,6 +491,8 @@ make sure Document type is ZK!
 
                     $order->invoice_buying_warehouse_file = 'https://admin.mega1000.pl/storage/buyinginvoices/' . $name . '.xml';
                     $order->save();
+
+                    $order->labels()->attach(63);
                 } else {
                     if (
                         round($this->calculateTotalCost($order), 2) ==
