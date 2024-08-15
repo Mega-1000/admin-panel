@@ -12,127 +12,140 @@
     <title>{{ config('app.chat_name') }}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-
     <style>
         :root {
-            --primary-color: #4A90E2;
-            --secondary-color: #50E3C2;
-            --background-color: #F8F9FA;
+            --primary-green: #2ecc71;
+            --secondary-green: #27ae60;
+            --accent-green: #1abc9c;
+            --dark-green: #145a32;
+            --light-green: #e8f8f5;
             --text-color: #333;
-            --accent-color: #FF6B6B;
+            --background-color: #f9f9f9;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
-            line-height: 1.6;
+            line-height: 1.8;
         }
 
         .container {
             max-width: 1200px;
             margin: auto;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
-        .card {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+        #chat-container {
+            background-color: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.1);
+        }
+
+        h2 {
+            color: var(--dark-green);
+            font-weight: 700;
             margin-bottom: 20px;
-            transition: transform 0.3s ease;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
+        .btn-primary {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+            padding: 12px 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-green);
+            border-color: var(--secondary-green);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .alert {
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: none;
+        }
+
+        .alert-success {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+
+        .promotion-alert {
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            box-shadow: 0 10px 20px rgba(26, 188, 156, 0.2);
+        }
+
+        .promotion-alert h3 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .lowest-price-certificate {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(241, 196, 15, 0.2);
+        }
+
+        .lowest-price-certificate h2 {
+            color: white;
+            margin-bottom: 15px;
         }
 
         table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 10px;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border: none;
-        }
-
-        th {
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        tr {
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: #3A7BD5;
-        }
-
-        .alert {
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .alert-success {
-            background-color: var(--secondary-color);
-            color: #fff;
-        }
-
-        #chat-container {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-top: 50px;
-        }
-
-        .header-button {
-            margin-top: 10px;
-        }
-
-        .lowest-price-certificate {
-            background-color: var(--accent-color);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
+            border-spacing: 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             margin-top: 30px;
         }
 
-        .lowest-price-certificate h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
+        th, td {
+            padding: 20px;
+            text-align: left;
         }
 
-        .lowest-price-certificate p {
-            font-size: 16px;
+        th {
+            background-color: var(--primary-green);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--light-green);
+        }
+
+        tr:hover {
+            background-color: rgba(46, 204, 113, 0.1);
         }
 
         @media screen and (max-width: 768px) {
             .container {
-                width: 95%;
-                padding: 10px;
+                padding: 20px 10px;
+            }
+
+            #chat-container {
+                padding: 20px;
             }
 
             table {
@@ -140,7 +153,7 @@
             }
 
             th, td {
-                padding: 10px;
+                padding: 15px 10px;
             }
         }
     </style>
