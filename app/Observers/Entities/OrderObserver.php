@@ -149,5 +149,6 @@ readonly class OrderObserver
     {
         RecalculateBuyingLabels::recalculate($order);
         CalculateSubjectInvoiceBilansLabels::handle($order);
+        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
     }
 }
