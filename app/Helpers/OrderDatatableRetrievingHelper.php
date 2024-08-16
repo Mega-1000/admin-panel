@@ -70,7 +70,7 @@ class OrderDatatableRetrievingHelper
             });});
         }
 
-        if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'only_styro') && $data->only_styro) {
+        if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'only_paid_offers') && $data->only_styro) {
             $q->whereHas('payments');
         }
 
