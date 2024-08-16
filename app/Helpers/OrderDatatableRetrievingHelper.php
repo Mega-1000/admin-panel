@@ -71,7 +71,7 @@ class OrderDatatableRetrievingHelper
         }
 
         if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'only_paid_offers') && $data->only_styro) {
-            $q->whereHas('payments');
+//            $q->whereHas('payments');
         }
 
         return $q;
