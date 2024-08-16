@@ -31,13 +31,6 @@ Wartość towaru z transportem: <br /><b>{{ number_format($totalCost, 2) }}</b>
             <a target="_blank" href="/storage/invoices/{{ $invoice['invoice_name'] }}" style="margin-top: 5px;">Faktura</a>
 
             {{ $invoice['ai_analysis'] }}
-{{--            @if ($invoice['is_visible_for_client'])--}}
-{{--                <p class="invoice__visible">Widoczna</p>--}}
-{{--            @else--}}
-{{--                <p class="invoice__invisible">Niewidoczna</p>--}}
-{{--            @endif--}}
-
-{{--            <a href="#" class="change__invoice--visibility" onclick="changeInvoiceVisibility({{ $invoice['id'] }})">Zmieńwidoczność</a>--}}
 
             <a class="remove__invoices" href="/delete-invoice?id={{ $invoice['id'] }}">Usuń</a>
             <hr>

@@ -29,6 +29,7 @@ class OrdersRecalculatorBasedOnPeriod
 
         $pastPayments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where(function ($query) {$query->whereNull('status')->orWhere('status', 'Deklaracja wpłaty');})->where('promise_date', '<', now())->sum('declared_sum');
 
+        dd($pastPayments);
 
         if ($futurePayments > 0) {
             AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);

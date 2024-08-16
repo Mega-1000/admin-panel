@@ -55,7 +55,7 @@
 
             <button
                 class="btn btn-primary" wire:click="updateOnlyPaidOffersFilter"
-                style="background-color: {{ json_decode(auth()->user()->grid_settings)->only_styro ?? false ? 'green' : 'blue' }}"
+                style="background-color: {{ json_decode(auth()->user()->grid_settings)->only_paid_offers ?? false ? 'green' : 'blue' }}"
             >
                 @if (json_decode(auth()->user()->grid_settings)->only_paid_offers ?? false)
                     Filtr tylko opłacone oferty jest włączony
