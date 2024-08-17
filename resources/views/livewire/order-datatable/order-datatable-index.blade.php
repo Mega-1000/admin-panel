@@ -9,11 +9,11 @@
 
             <a href="https://admin.mega1000.pl/polecenia" class="btn btn-primary">
                 @if(\App\Entities\ContactApproach::where('done', false)->where('from_date', '>',now())->count() > 0)
-                    <div style="color: red">
+                    <div style="color: red;font-weight: bolder">
                         Zobacz listę poleceń i WYKONAJ TELEFONY
                     </div>
                 @else
-                    <div style="color: green">
+                    <div style="color: green; font-weight: bolder">
                         Lista poleceń jest pusta
                     </div>
                 @endif
