@@ -70,8 +70,8 @@ class OrderDatatableRetrievingHelper
             });});
         }
 
-        if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'only_paid_offers') && $data->only_styro) {
-//            $q->whereHas('payments');
+        if ($decodedGridSettings !== null && is_object($data) && property_exists($data, 'only_paid_offers') && $data->only_paid_offers) {
+            $q->whereHas('payments');
         }
 
         return $q;

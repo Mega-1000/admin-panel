@@ -8,7 +8,15 @@
             </div>
 
             <a href="https://admin.mega1000.pl/polecenia" class="btn btn-primary">
-                Zobacz listę poleceń i WYKONAJ TELEFONY
+                @if(\App\Entities\ContactApproach::where('done', false)->count() > 0)
+                    <div style="color: red">
+                        Zobacz listę poleceń i WYKONAJ TELEFONY
+                    </div>
+                @else
+                    <div style="color: green">
+                        Lista poleceń jest pusta
+                    </div>
+                @endif
             </a>
 
             <a href="{{route('represents.index')}}">Lista reprezentantów wpisanych przez fabryki</a>
