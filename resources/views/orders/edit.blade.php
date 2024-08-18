@@ -1177,6 +1177,7 @@
                         <th>Różnica wartości do wskazanego producenta w zamówieniu</th>
                         <th>Odległość od magazynu</th>
                         <th>Numer telefonu do przedstawiciela fabryki</th>
+                        <th>Akcje</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -1193,6 +1194,12 @@
                             </td>
                             <td>{{(int)$productSupplier['radius']}} km</td>
                             <td>{{$productSupplier['phone']}}</td>
+                            <td>
+<a href="{{route('orders.edit', ['id' => $order->id, 'supplier_id' => $productSupplier['supplier_id']])}}"
+                                   class="btn btn-success">
+    Zmień produkty w tym zamówieniu na produkty od tego dostawcy
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>

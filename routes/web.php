@@ -1,13 +1,17 @@
 <?php
 
+use App\Entities\ChatAuctionOffer;
 use App\Entities\ContactApproach;
 use App\Entities\Customer;
 use App\Entities\FirmSource;
+use App\Entities\Product;
 use App\Entities\Status;
 use App\Facades\Mailer;
+use App\Factory\OrderBuilderFactory;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\GetCustomerForAdminEdit;
 use App\Helpers\GetCustomerForNewOrder;
+use App\Helpers\LocationHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPackagesCalculator;
 use App\Helpers\OrderPriceCalculator;
@@ -64,6 +68,7 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\ReferFriendNotificationJob;
 use App\Mail\NewStyroOfferMade;
+use App\Services\MessageService;
 use App\Services\OrderAddressesService;
 use App\Services\ProductService;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -1182,3 +1187,80 @@ Route::get('/firm-panel-actions/order/{order}', [FirmPanelActionsController::cla
 Route::get('all-auctions-map', function (Request $request) {
     return view('all-auctions-map');
 })->name('all-auctions-map');
+
+Route::post('/change-products-variations/{order}/{manufacturer}', function (Order $order, string $manufacturer) {
+    $orderBuilder = OrderBuilderFactory::create();
+    $order->items()->delete();
+    $companies = [];
+
+    foreach ($order->items as $product) {
+        $product = Product::where('product_group', $product->product->product_group)->where('manufacturer', $manufacturer)->first();
+
+        $productId = $product->id;
+        $quantity = $product['quantity'];
+
+        $product = Product::find($productId);
+        $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
+            ->whereHas('product', function ($q) use ($product) {
+                $q->where('product_group', $product->product_group)
+                    ->where('additional_info1', $product->additional_info1);
+            })
+            ->first();
+
+        $orderBuilder->assignItemsToOrder(
+            $order,
+            [
+                $product->toArray() + [
+                    'amount' => $quantity,
+                    'gross_selling_price_commercial_unit' => $offer?->basic_price_gross ?? $product->price->gross_selling_price_commercial_unit
+                ],
+            ],
+            false
+        );
+
+        $item = $order->items()->where('order_id', $order->id)->where('product_id', $product->id)->first();
+        $item->gross_selling_price_commercial_unit = ($offer?->basic_price_net * 1.23 ?? $product->price->gross_selling_price_basic_unit) * $product->packing->numbers_of_basic_commercial_units_in_pack;
+        $item->net_selling_price_basic_unit = $offer?->basic_price_net ?? $product->price->gross_selling_price_basic_unit / 1.23;
+        $item->gross_selling_price_basic_unit = $offer?->basic_price_net * 1.23 ?? $product->price->gross_selling_price_basic_unit;
+        $item->net_selling_price_commercial_unit = ($offer?->basic_price_net ?? $product->price->gross_selling_price_basic_unit / 1.23) * $product->packing->numbers_of_basic_commercial_units_in_pack;
+
+        $base_price_net = ($offer?->basic_price_net ?? $product->price->gross_selling_price_basic_unit / 1.23) - 1;
+
+        $item->net_purchase_price_basic_unit = $base_price_net;
+        $item->net_purchase_price_commercial_unit = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
+        $item->net_purchase_price_commercial_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
+        $item->net_purchase_price_basic_unit_after_discounts = $base_price_net;
+        $item->net_purchase_price_calculated_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
+        $item->net_purchase_price_aggregate_unit_after_discounts = $base_price_net * $product->packing->numbers_of_basic_commercial_units_in_pack;
+
+        $item->save();
+
+
+        $company = $order->items()->first()->product->firm;
+
+
+        $chat = $order->chat;
+
+        if (in_array($company->id, $companies)) {
+            continue;
+        }
+
+        $lowestDistance = PHP_INT_MAX;
+        $closestEmployee = null;
+
+        foreach ($company->employees as $employee) {
+            $employee->distance = LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer);
+
+            if ($employee->distance < $lowestDistance) {
+                $lowestDistance = $employee->distance;
+                $closestEmployee = $employee;
+            }
+        }
+
+        MessageService::createNewCustomerOrEmployee($chat, new Request(['type' => 'Employee']), $closestEmployee);
+
+        $companies[] = $company->id;
+    }
+
+    $order->warehouse_id = LocationHelper::nearestWarehouse($order->customer, $order->items()->first()->product->firm)->id;
+});
