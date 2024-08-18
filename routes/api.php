@@ -1,6 +1,8 @@
 <?php
 
+use App\DTO\ChatAuctions\CreateChatAuctionDTO;
 use App\Entities\Category;
+use App\Entities\Chat;
 use App\Entities\Customer;
 use App\Entities\FirmSource;
 use App\Entities\Order;
@@ -9,6 +11,7 @@ use App\Entities\Status;
 use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\GetCustomerForNewOrder;
+use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\TransportSumCalculator;
@@ -25,6 +28,7 @@ use App\Http\Controllers\ShipmentPayInReportByInvoiceNumber;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\ReferFriendNotificationJob;
+use App\Mail\AuctionCreationConfirmation;
 use App\Mail\NewStyroOfferMade;
 use App\Services\Label\AddLabelService;
 use App\Services\OrderAddressesService;
@@ -405,7 +409,6 @@ Route::post('auctions/save', function (Request $request) {
             $productR = $productR->toArray();
         }
 
-
         $productR['amount'] = $product['quantity'];
         $products[] = $productR;
     }
@@ -486,6 +489,23 @@ Route::post('auctions/save', function (Request $request) {
 
     $arr = [];
     AddLabelService::addLabels($order, [271], $arr, []);
+
+    $auction = $this->chatAuctionsService->createAuction(
+        CreateChatAuctionDTO::fromRequest($order->chat, [
+            'end_of_auction' => now()->addDays(3)->toString(),
+            'price' => 50,
+            'quality' => 50,
+            'notes' => '',
+        ])
+    );
+
+    Mailer::create()
+        ->to($order->customer->login)
+        ->send(new AuctionCreationConfirmation(
+            $auction
+        ));
+
+    $this->chatAuctionsService->confirmAuction($auction);
 
     return response()->json($builderData + [
         'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
