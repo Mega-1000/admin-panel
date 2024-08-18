@@ -1197,7 +1197,7 @@ Route::get('/change-products-variations/{order}/{manufacturer}', function (Order
         $product = Product::where('product_group', $product->product->product_group)->where('manufacturer', $manufacturer)->first();
 
         $productId = $product->id;
-        $quantity = $product->amount;
+        $quantity = $product->quantity;
 
         $product = Product::find($productId);
         $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
