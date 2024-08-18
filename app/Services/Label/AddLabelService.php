@@ -133,6 +133,10 @@ class AddLabelService
                     LabelNotificationService::addLabelSentNotification($order, $label);
                 }
 
+                if ($label->id == 206) {
+                    $order->labels->detach(265);
+                }
+
                 if ($label->id == 52) {  //wyslana do awizacji
                     LabelNotificationService::orderStatusChangeToDispatchNotification($order, $order->customer->id == 4128);
                     $now = now();
