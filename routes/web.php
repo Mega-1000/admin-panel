@@ -1263,4 +1263,6 @@ Route::get('/change-products-variations/{order}/{manufacturer}', function (Order
 
         $companies[] = $company->id;
     }
+
+    return redirect()->back();
 })->name('change-products-variations');
