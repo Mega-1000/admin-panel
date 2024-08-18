@@ -1193,11 +1193,11 @@ Route::get('/change-products-variations/{order}/{manufacturer}', function (Order
 //    $order->items()->delete();
     $companies = [];
 
-    foreach ($order->items as $product) {
-        $product = Product::where('product_group', $product->product->product_group)->where('manufacturer', $manufacturer)->first();
+    foreach ($order->items as $item) {
+        $product = Product::where('product_group', $item->product->product_group)->where('manufacturer', $manufacturer)->first();
 
         $productId = $product->id;
-        $quantity = dd($product->quantity);
+        $quantity = $item->quantity;
 
         $product = Product::find($productId);
         $offer = ChatAuctionOffer::where('firm_id', $product->firm->id)
