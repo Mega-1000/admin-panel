@@ -1195,7 +1195,7 @@
                             <td>{{(int)$productSupplier['radius']}} km</td>
                             <td>{{$productSupplier['phone']}}</td>
                             <td>
-<a href="{{route('orders.edit', ['order' => $order->id, 'manufacturer' => $productSupplier['product_name_supplier'])}}"
+<a href="{{route('orders.edit', ['order' => $order->id, 'manufacturer' => $productSupplier['product_name_supplier']])}}"
                                    class="btn btn-success">
     Zmień produkty w tym zamówieniu na produkty od tego dostawcy
                                 </a>
