@@ -1218,6 +1218,8 @@ Route::get('/change-products-variations/{order}/{manufacturer}', function (Order
             false
         );
 
+        $item->delete();
+
         $item = $order->items()->where('order_id', $order->id)->where('product_id', $product->id)->first();
         $item->gross_selling_price_commercial_unit = ($offer?->basic_price_net * 1.23 ?? $product->price->gross_selling_price_basic_unit) * $product->packing->numbers_of_basic_commercial_units_in_pack;
         $item->net_selling_price_basic_unit = $offer?->basic_price_net ?? $product->price->gross_selling_price_basic_unit / 1.23;
