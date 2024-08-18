@@ -1190,7 +1190,7 @@ Route::get('all-auctions-map', function (Request $request) {
 
 Route::get('/change-products-variations/{order}/{manufacturer}', function (Order $order, string $manufacturer) {
     $orderBuilder = OrderBuilderFactory::create();
-    $order->items()->delete();
+//    $order->items()->delete();
     $companies = [];
 
     foreach ($order->items as $product) {
@@ -1261,6 +1261,4 @@ Route::get('/change-products-variations/{order}/{manufacturer}', function (Order
 
         $companies[] = $company->id;
     }
-
-    $order->warehouse_id = LocationHelper::nearestWarehouse($order->customer, $order->items()->first()->product->firm)->id;
 })->name('change-products-variations');
