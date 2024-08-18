@@ -30,6 +30,7 @@ use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\ReferFriendNotificationJob;
 use App\Mail\AuctionCreationConfirmation;
 use App\Mail\NewStyroOfferMade;
+use App\Services\ChatAuctionsService;
 use App\Services\Label\AddLabelService;
 use App\Services\OrderAddressesService;
 use App\Services\ProductService;
@@ -505,7 +506,7 @@ Route::post('auctions/save', function (Request $request) {
             $auction
         ));
 
-    $this->chatAuctionsService->confirmAuction($auction);
+    app(ChatAuctionsService::class)->confirmAuction($auction);
 
     return response()->json($builderData + [
         'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
