@@ -1263,4 +1263,4 @@ Route::post('/change-products-variations/{order}/{manufacturer}', function (Orde
     }
 
     $order->warehouse_id = LocationHelper::nearestWarehouse($order->customer, $order->items()->first()->product->firm)->id;
-});
+})->name('change-products-variations');
