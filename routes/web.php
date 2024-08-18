@@ -1188,7 +1188,7 @@ Route::get('all-auctions-map', function (Request $request) {
     return view('all-auctions-map');
 })->name('all-auctions-map');
 
-Route::post('/change-products-variations/{order}/{manufacturer}', function (Order $order, string $manufacturer) {
+Route::get('/change-products-variations/{order}/{manufacturer}', function (Order $order, string $manufacturer) {
     $orderBuilder = OrderBuilderFactory::create();
     $order->items()->delete();
     $companies = [];
