@@ -508,7 +508,8 @@ Route::post('auctions/save', function (Request $request) {
 
     app(ChatAuctionsService::class)->confirmAuction($auction);
 
-    return response()->json($builderData + [
+    return response()->json([
+        'id' => $order->chat->auctions()->first()->id,
         'newAccount' => $customer->created_at->format('Y-m-d H:i:s') === $customer->updated_at->format('Y-m-d H:i:s'),
         'access_token' => $customer->createToken('Api code')->accessToken,
         'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE
