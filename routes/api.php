@@ -491,7 +491,7 @@ Route::post('auctions/save', function (Request $request) {
     $arr = [];
     AddLabelService::addLabels($order, [271], $arr, []);
 
-    $auction = $this->chatAuctionsService->createAuction(
+    $auction = app(ChatAuctionsService::class)->createAuction(
         CreateChatAuctionDTO::fromRequest($order->chat, [
             'end_of_auction' => now()->addDays(3)->toString(),
             'price' => 50,
