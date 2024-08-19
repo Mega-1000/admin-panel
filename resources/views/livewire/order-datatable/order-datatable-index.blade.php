@@ -8,7 +8,10 @@
             </div>
 
             <a href="https://admin.mega1000.pl/polecenia" class="btn btn-primary">
-                @if(\App\Entities\ContactApproach::where('done', false)->where('from_date', '>',now())->count() > 0)
+                @if(\App\Entities\ContactApproach::where(function($query) {
+                $query->where('from_date', '>', now())
+                    ->orWhereNull('from_date');
+            })->where('done', false)->count() > 0)
                     <div style="color: red;font-weight: bolder">
                         Zobacz listę poleceń i WYKONAJ TELEFONY
                     </div>
