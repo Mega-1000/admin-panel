@@ -157,8 +157,8 @@ class ImportBankPayIn implements ShouldQueue
         $fileLine = $payIn->stringify();
 
         $patterns = [
-            '/[qQ][qQ](\d{3,5})[qQ][qQ]/',
             '/[zZ][zZ](\d{3,5})[zZ][zZ]/',
+            '/[qQ][qQ](\d{3,5})[qQ][qQ]/',
             '/[yY][yY](\d{3,5})[yY][yY]/',
         ];
 
