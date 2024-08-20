@@ -266,7 +266,7 @@
                 <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 11.99H19C18.47 16.11 15.72 19.78 12 20.93V12H5V6.3L12 3.19V11.99Z" fill="#FFD700"/>
                 </svg>
-                <img src="https://mega1000.pl/logo.webp" alt="">
+                <img src="https://mega1000.pl/logo.webp" alt="" style="width: 40px">
                 <h2 class="h2 text-white">Gwarancja najniższej ceny!</h2>
                 <p class="text-lg text-white">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 576 205 389</p>
             </div>
