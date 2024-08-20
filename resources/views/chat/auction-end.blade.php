@@ -262,12 +262,13 @@
             </div>
 
 
-            <div class="price-guarantee mb-4" style="width: 100%;">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="price-guarantee mb-4" style="width: 100%; background-color: #f0f0f0; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 48px; height: 48px; margin-bottom: 16px;">
                     <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 11.99H19C18.47 16.11 15.72 19.78 12 20.93V12H5V6.3L12 3.19V11.99Z" fill="#FFD700"/>
                 </svg>
-                <h2 class="h2 text-white">Gwarancja najniższej ceny!</h2>
-                <p class="text-lg text-white">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 576 205 389</p>
+                <img src="https://mega1000.pl/logo.webp" alt="Mega1000 Logo" style="max-width: 200px; height: auto; margin-bottom: 16px;">
+                <h2 class="h2" style="color: #333; margin-bottom: 12px;">Gwarancja najniższej ceny!</h2>
+                <p class="text-lg" style="color: #555; max-width: 600px; margin: 0 auto;">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 576 205 389</p>
             </div>
 
 {{--            <div class="alert-success alert">--}}
