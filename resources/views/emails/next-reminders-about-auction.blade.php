@@ -14,7 +14,7 @@ Jeśli chcą Państwo złożyć zamówienie na jedną z ofertę prosimy o klikni
 <br>
 <br>
 
-Jeśli znaleźli Państwo lepszą ofertę niż nasza prosimy o kontakt pod numerem 507 925 963 a my nie tylko zrównamy się z nią a także wynagrodzimy Państwa dodatkową zniżką w wysokości 100 zł.
+Jeśli znaleźli Państwo lepszą ofertę niż nasza prosimy o kontakt pod numerem 576 205 389 a my nie tylko zrównamy się z nią a także wynagrodzimy Państwa dodatkową zniżką w wysokości 100 zł.
 
 <br>
 <br>

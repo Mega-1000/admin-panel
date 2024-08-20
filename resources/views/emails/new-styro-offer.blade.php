@@ -21,7 +21,7 @@
 
     <p style="margin-bottom: 20px;">
         W przypadku wszelkich pytań jesteśmy do Państwa dyspozycji pod numerem:
-        <strong style="color: #0073e6;">507 925 963</strong>, 7 dni w tygodniu od 7 do 23.
+        <strong style="color: #0073e6;">576 205 389</strong>, 7 dni w tygodniu od 7 do 23.
     </p>
 
     <p style="margin-bottom: 20px;">

@@ -31,7 +31,7 @@ Zachęcamy do zapoznania się z naszym przewodnikiem użytkownika oraz często z
 <br>
 <br>
 
-W przypadku jakichkolwiek pytań lub potrzeby wsparcia, nasz zespół wsparcia klienta jest do Twojej dyspozycji. Możesz się z nami skontaktować, wysyłając e-mail na adres: styropian@ephpolska.pl lub dzwoniąc pod numer: +48 507 925 963.
+W przypadku jakichkolwiek pytań lub potrzeby wsparcia, nasz zespół wsparcia klienta jest do Twojej dyspozycji. Możesz się z nami skontaktować, wysyłając e-mail na adres: styropian@ephpolska.pl lub dzwoniąc pod numer: +48 576 205 389.
 <br>
 <br>
 Cieszymy się na współpracę i jesteśmy przekonani, że nasz system przetargowy znacząco przyczyni się do rozwoju Twojego biznesu.
