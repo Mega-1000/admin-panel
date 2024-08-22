@@ -41,11 +41,11 @@ readonly class AllegroPaymentsReturnService
             !in_array(Label::ORDER_ITEMS_REDEEMED_LABEL, $orderLabels) &&
             !self::checkIfOrderHasKwonPayment($order)
         ) {
-            $order->payments()->create([
-                'amount' => $order->getValue(),
-                'operation_type' => OrderPaymentsEnum::KWON_STATUS,
-                'payer' => $order->customer->login,
-            ]);
+//            $order->payments()->create([
+//                'amount' => $order->getValue(),
+//                'operation_type' => OrderPaymentsEnum::KWON_STATUS,
+//                'payer' => $order->customer->login,
+//            ]);
         }
     }
 
