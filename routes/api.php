@@ -493,7 +493,7 @@ Route::post('auctions/save', function (Request $request) {
 
     $auction = app(ChatAuctionsService::class)->createAuction(
         CreateChatAuctionDTO::fromRequest($order->chat, [
-            'end_of_auction' => now()->addDays(3)->toString(),
+            'end_of_auction' => now()->addDays(3)->format('Y-m-d H:i:s'),
             'price' => 50,
             'quality' => 50,
             'notes' => '',
