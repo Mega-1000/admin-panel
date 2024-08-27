@@ -262,7 +262,7 @@ class OrderWarehouseNotificationController extends Controller
                         'content' => [
                             ['type' => 'text', 'text' => "Analyze the following invoice text and provide a JSON response with the following structure:
                         {
-                            \"invoice_type\": \"VAT\" or \"proforma\" or \"Unknown\",
+                            \"invoice_type\": \"VAT\" or \"proforma\" if it is \"order\" or somethink like this clasify it as ptoforma if you are not sure if it is vat just make it proforma,
                             \"invoice_name\": \"The invoice number or name, or null if not found\",
                             \"invoice_value\": \"The total invoice value including VAT in format '111111.11' no other thinks than this format\"
                             \"analysis\": \"Short analysis in polish language with will be relevant to consultant handling this order\"
@@ -300,14 +300,21 @@ class OrderWarehouseNotificationController extends Controller
                 }
 
                 if ($this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown') == 'Vat') {
-                    $buyingInvoice = new BuyingInvoice();
-                    $buyingInvoice->order_id = $order->id;
-                    $buyingInvoice->invoice_number = $parsedResponse['invoice_name'] ?? null;
-                    $buyingInvoice->value = $parsedResponse['invoice_value'] ?? null;
-                    $buyingInvoice->analized_by_claute = true;
-                    $buyingInvoice->validated_by_nexo = false;
-                    $buyingInvoice->file_url = '/storage/' . $filePath;
-                    $buyingInvoice->save();
+
+                    if (
+                        !BuyingInvoice::where('invoice_number', $parsedResponse['invoice_name'] ?? null)
+                            ->where('analized_by_claute', true)->where('value', $parsedResponse['invoice_value'] ?? null)
+                            ->exists()
+                    ) {
+                        $buyingInvoice = new BuyingInvoice();
+                        $buyingInvoice->order_id = $order->id;
+                        $buyingInvoice->invoice_number = $parsedResponse['invoice_name'] ?? null;
+                        $buyingInvoice->value = $parsedResponse['invoice_value'] ?? null;
+                        $buyingInvoice->analized_by_claute = true;
+                        $buyingInvoice->validated_by_nexo = false;
+                        $buyingInvoice->file_url = '/storage/' . $filePath;
+                        $buyingInvoice->save();
+                    }
 
                     RecalculateBuyingLabels::recalculate($order);
                     $order->labels()->detach(290);
