@@ -103,7 +103,7 @@ class OrderDatatableRetrievingHelper
      */
     private static function applyNestedFilter(Builder $q, mixed $column): Builder
     {
-
+        OrderDatatableColumn::query()->update(['filter' => '']);
 
         $labelParts = explode('.', $column->label);
 
