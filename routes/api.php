@@ -501,7 +501,7 @@ Route::post('auctions/save', function (Request $request) {
     );
 
     Mailer::create()
-        ->to($order->customer->login)
+            ->to($order->customer->login)
         ->send(new AuctionCreationConfirmation(
             $auction
         ));

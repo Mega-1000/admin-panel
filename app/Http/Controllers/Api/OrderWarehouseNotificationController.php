@@ -451,6 +451,11 @@ make sure Document type is ZK!
                             ],
                         ]
                     ];
+
+                    $order->labels()->detach(243);
+                    $arr = [];
+                    AddLabelService::addLabels($order, [66], $arr, []);
+
                     $data = [
                         "model" => "claude-3-5-sonnet-20240620",
                         "max_tokens" => 4096,
