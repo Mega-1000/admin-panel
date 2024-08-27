@@ -103,10 +103,7 @@ class OrderDatatableRetrievingHelper
      */
     private static function applyNestedFilter(Builder $q, mixed $column): Builder
     {
-        // remove all other filters
-        $q->getQuery()->wheres = collect($q->getQuery()->wheres)->filter(function ($where) {
-            return !array_key_exists('column', $where);
-        })->toArray();
+
 
         $labelParts = explode('.', $column->label);
 
