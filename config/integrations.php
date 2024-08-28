@@ -20,9 +20,9 @@ return [
         'org_id' => env('INPOST_ORG_ID'),
     ],
     'dpd' => [
-        'fid' => '393841',
-        'username' => '39384101',
-        'password' => 'qVTaMBibTdwaFgTq',
+        'fid' => '402544',
+        'username' => '40254401',
+        'password' => '1ktlJBtF1Td6A1Z5',
         'wsdl' => 'https://dpdservices.dpd.com.pl/DPDPackageObjServicesService/DPDPackageObjServices?WSDL',
         'lang_code' => 'PL',
         'api_version' => 4,
