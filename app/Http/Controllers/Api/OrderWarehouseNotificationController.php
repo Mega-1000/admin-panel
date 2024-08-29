@@ -176,7 +176,7 @@ class OrderWarehouseNotificationController extends Controller
 
                 $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path, $order);
 
-                if ($invoiceInfo) {
+                if (!empty($invoiceInfo)) {
                     $order->invoices()->create([
                         'invoice_type' => 'buy',
                         'invoice_name' => $filename,
