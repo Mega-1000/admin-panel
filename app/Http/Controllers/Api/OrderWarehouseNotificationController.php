@@ -181,9 +181,9 @@ class OrderWarehouseNotificationController extends Controller
                         'invoice_type' => 'buy',
                         'invoice_name' => $filename,
                         'is_visible_for_client' => (boolean)$request->isVisibleForClient,
-                        'invoice_category' => $invoiceInfo['invoice_type'],
-                        'invoice_value' => $invoiceInfo['invoice_value'],
-                        'ai_analysis' => $invoiceInfo['analysis'],
+                        'invoice_category' => $invoiceInfo['invoice_type'] ?? null,
+                        'invoice_value' => $invoiceInfo['invoice_value'] ?? null,
+                        'ai_analysis' => $invoiceInfo['analysis'] ?? null,
                     ]);
                 } catch (Exception $e) {
 
