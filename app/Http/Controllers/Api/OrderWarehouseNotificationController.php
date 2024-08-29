@@ -176,7 +176,7 @@ class OrderWarehouseNotificationController extends Controller
 
                 $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path, $order);
 
-                if (!empty($invoiceInfo)) {
+                try {
                     $order->invoices()->create([
                         'invoice_type' => 'buy',
                         'invoice_name' => $filename,
@@ -185,6 +185,8 @@ class OrderWarehouseNotificationController extends Controller
                         'invoice_value' => $invoiceInfo['invoice_value'],
                         'ai_analysis' => $invoiceInfo['analysis'],
                     ]);
+                } catch (Exception $e) {
+
                 }
 
                 $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
