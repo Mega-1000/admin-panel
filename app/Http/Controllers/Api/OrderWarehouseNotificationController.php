@@ -231,7 +231,7 @@ class OrderWarehouseNotificationController extends Controller
         return $totalItemsCost + $transportCost;
     }
 
-    private function analyzeInvoiceWithClaudeAI($filePath, $order): array
+    private function analyzeInvoiceWithClaudeAI($filePath, $order)
     {
         try {
             Log::info('Analyzing invoice with Claude AI', ['filePath' => $filePath]);
@@ -514,13 +514,16 @@ make sure Document type is ZK!
                 }
 
 
-                // Validate and sanitize the parsed response
-                return [
-                    'invoice_type' => $this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown'),
-                    'invoice_name' => $parsedResponse['invoice_name'] ?? null,
-                    'invoice_value' => $parsedResponse['invoice_value'] ?? null,
-                    'analysis' => $parsedResponse['analysis'] ?? null,
-                ];
+                if (!empty($parsedResponse)) {
+                    return [
+                        'invoice_type' => $this->sanitizeInvoiceType($parsedResponse['invoice_type'] ?? 'Unknown'),
+                        'invoice_name' => $parsedResponse['invoice_name'] ?? null,
+                        'invoice_value' => $parsedResponse['invoice_value'] ?? null,
+                        'analysis' => $parsedResponse['analysis'] ?? null,
+                    ];
+                } else {
+                    return null;
+                }
             } else {
                 Log::error('Claude AI API request failed', [
                     'status' => $response->status(),
