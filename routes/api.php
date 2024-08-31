@@ -403,6 +403,29 @@ Route::post('styro-help', function (Request $request) {
 
 Route::post('auctions/save', function (Request $request) {
     $products = [];
+
+    $customer = Customer::where('login', $request->userInfo['email'])->first();
+
+    $previousVariationGroups = $customer?->orders()?->whereHas('items.product') ->with('items.product') ->get() ->pluck('items.*.product.product_group') ->flatten() ->unique();
+
+    $duplicateOrders = $customer?->orders()
+        ->whereHas('items', function ($q) use ($previousVariationGroups) {
+            $q->whereHas('product', function ($q) use ($previousVariationGroups) {
+                $q->whereIn('product_group', $previousVariationGroups);
+            });
+        })
+        ->where('created_at', '>', now()->subDays(2))
+        ->whereHas('chat', function ($q) {
+            $q->whereHas('auctions');
+        })
+        ->first();
+
+    if ($duplicateOrders) {
+        return response()->json([
+            'error' => 'You have already made an order with similar products in the last 2 days. Please wait for the auction to finish.',
+        ], 400);
+    }
+
     foreach ($request->auctionData as $product) {
         $productR = \App\Entities\Product::where('name', 'like', '%' . $product['styrofoamType'] . '%')->where('name', 'like', '%' . $product['thickness'] . '%')->whereDoesntHave('children')->first();
 
@@ -414,8 +437,6 @@ Route::post('auctions/save', function (Request $request) {
         $products[] = $productR;
     }
 
-
-    $customer = Customer::where('login', $request->userInfo['email'])->first();
 
     if (!$customer) {
         $customer = Customer::create([
