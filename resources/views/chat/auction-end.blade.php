@@ -177,6 +177,35 @@
             margin: 0 0 0.5rem 0;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+
+    </style>
+    <style>
+        .payment-options {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .payment-options h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .payment-options p, .payment-options ul {
+            color: #666;
+        }
+
+        .payment-options ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .payment-options li {
+            margin-bottom: 5px;
+        }
     </style>
 
    <script>
