@@ -276,14 +276,15 @@
 
             <div class="price-guarantee mb-4" style="width: 100%;">
                 <h3 class="h3 text-white">Opcje płatności</h3>
-                <p class="text-lg text-white">Oferujemy wygodną opcję płatności przy odbiorze:</p>
-                <ul class="text-white">
-                    <li>Możliwość zapłaty gotówką lub kartą przy dostawie</li>
-                    <li>Brak dodatkowych opłat za płatność przy odbiorze</li>
-                    <li>Sprawdzenie towaru przed zapłatą</li>
-                    <li>Idealne rozwiązanie dla klientów preferujących tradycyjne metody płatności</li>
-                </ul>
-                <p class="text-lg text-white">Wybierając płatność przy odbiorze, masz pewność i kontrolę nad transakcją. Pamiętaj, że ta opcja jest dostępna dla wszystkich zamówień w naszym sklepie.</p>
+                <p class="text-lg text-white">
+                    Dbamy o Państwa wygodę i bezpieczeństwo, dlatego oferujemy dwie opcje płatności:
+                    <br><br>
+                    1. Przedpłata: Zapłać z góry, a my natychmiast przystąpimy do realizacji zamówienia.
+                    <br><br>
+                    2. Płatność przy odbiorze: Po przyjeździe kuriera, prosimy o wykonanie szybkiego przelewu online. Gdy tylko otrzymamy potwierdzenie, kurier rozładuje towar.
+                    <br><br>
+                    Obie metody gwarantują bezpieczeństwo transakcji zarówno dla Państwa, jak i dla nas.
+                </p>
             </div>
 
 {{--            <div class="alert-success alert">--}}
