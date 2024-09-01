@@ -281,7 +281,7 @@
                     <br>
                     1. Przedpłata: Zapłać z góry, a my natychmiast przystąpimy do realizacji zamówienia.
                     <br>
-                    2. Płatność przy odbiorze: Po przyjeździe kuriera, prosimy o wykonanie szybkiego przelewu online. Gdy tylko otrzymamy potwierdzenie, kurier rozładuje towar.
+                    2. Płatność przy odbiorze: Po przyjeździe kuriera, prosimy o wykonanie szybkiego przelewu online. Gdy tylko otrzymamy potwierdzenie, kurier rozładuje towar (wymagane jest 10% przedpłaty)
                     <br>
                     Obie metody gwarantują bezpieczeństwo transakcji zarówno dla Państwa, jak i dla nas.
                 </p>
