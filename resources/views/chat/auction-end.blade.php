@@ -250,17 +250,16 @@
                 Oglądasz tabele zapytania: {{ $order->id }}
                 @if(auth()->user())
                     <br>
-                        Użytkownik: {{ $order->customer->login }} Numer telefonu: {{ $order->addresses()->first()->phone }}
-                        <a target="_blank" class="btn btn-primary header-button"
-                           href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
-                           for="add-item">
-                            Edytuj zamówienie w koszyku
-                        </a>
+                    Użytkownik: {{ $order->customer->login }} Numer telefonu: {{ $order->addresses()->first()->phone }}
+                    <a target="_blank" class="btn btn-primary header-button"
+                       href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
+                       for="add-item">
+                        Edytuj zamówienie w koszyku
+                    </a>
                     <br>
                     <br>
                 @endif
             </div>
-
 
             <div class="price-guarantee mb-4" style="width: 100%;">
                 <div style="display: flex; gap: 10px">
@@ -271,6 +270,18 @@
                 </div>
                 <h2 class="h2 text-white">Gwarancja najniższej ceny!</h2>
                 <p class="text-lg text-white">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 576 205 389</p>
+            </div>
+
+            <div class="payment-options mb-4" style="width: 100%;">
+                <h3 class="h3 text-white">Opcje płatności</h3>
+                <p class="text-lg text-white">Oferujemy wygodną opcję płatności przy odbiorze:</p>
+                <ul class="text-white">
+                    <li>Możliwość zapłaty gotówką lub kartą przy dostawie</li>
+                    <li>Brak dodatkowych opłat za płatność przy odbiorze</li>
+                    <li>Sprawdzenie towaru przed zapłatą</li>
+                    <li>Idealne rozwiązanie dla klientów preferujących tradycyjne metody płatności</li>
+                </ul>
+                <p class="text-lg text-white">Wybierając płatność przy odbiorze, masz pewność i kontrolę nad transakcją. Pamiętaj, że ta opcja jest dostępna dla wszystkich zamówień w naszym sklepie.</p>
             </div>
 
 {{--            <div class="alert-success alert">--}}

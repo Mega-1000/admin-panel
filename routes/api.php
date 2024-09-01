@@ -422,7 +422,7 @@ Route::post('auctions/save', function (Request $request) {
 
     if ($duplicateOrders) {
         return response()->json([
-            'error' => 'You have already made an order with similar products in the last 2 days. Please wait for the auction to finish.',
+            'error' => 'https://admin.mega1000.pl/auctions/' . $duplicateOrders->chat->auctions()->first()->id . '/end',
         ], 400);
     }
 
