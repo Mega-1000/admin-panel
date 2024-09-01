@@ -278,11 +278,11 @@
                 <h3 class="h3 text-white">Opcje płatności</h3>
                 <p class="text-lg text-white">
                     Dbamy o Państwa wygodę i bezpieczeństwo, dlatego oferujemy dwie opcje płatności:
-                    <br><br>
+                    <br>
                     1. Przedpłata: Zapłać z góry, a my natychmiast przystąpimy do realizacji zamówienia.
-                    <br><br>
+                    <br>
                     2. Płatność przy odbiorze: Po przyjeździe kuriera, prosimy o wykonanie szybkiego przelewu online. Gdy tylko otrzymamy potwierdzenie, kurier rozładuje towar.
-                    <br><br>
+                    <br>
                     Obie metody gwarantują bezpieczeństwo transakcji zarówno dla Państwa, jak i dla nas.
                 </p>
             </div>
