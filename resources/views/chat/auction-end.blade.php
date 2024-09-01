@@ -180,33 +180,6 @@
 
 
     </style>
-    <style>
-        .payment-options {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .payment-options h3 {
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .payment-options p, .payment-options ul {
-            color: #666;
-        }
-
-        .payment-options ul {
-            padding-left: 20px;
-            margin-bottom: 15px;
-        }
-
-        .payment-options li {
-            margin-bottom: 5px;
-        }
-    </style>
 
    <script>
        (() => {
@@ -301,7 +274,7 @@
                 <p class="text-lg text-white">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 576 205 389</p>
             </div>
 
-            <div class="payment-options mb-4" style="width: 100%;">
+            <div class="price-guarantee mb-4" style="width: 100%;">
                 <h3 class="h3 text-white">Opcje płatności</h3>
                 <p class="text-lg text-white">Oferujemy wygodną opcję płatności przy odbiorze:</p>
                 <ul class="text-white">
