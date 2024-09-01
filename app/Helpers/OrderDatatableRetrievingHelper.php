@@ -86,6 +86,7 @@ class OrderDatatableRetrievingHelper
                     $column->filter = str_replace('-', '', $column->filter);
                 }
 
+                dd('okej');
                 $q->where($column->label, 'like', '%' . $column->filter . '%');
                 continue;
             }
