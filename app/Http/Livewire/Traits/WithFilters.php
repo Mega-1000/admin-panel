@@ -76,7 +76,6 @@ trait WithFilters
 
     protected function updateNestedFilters(string $parentKey, array $filters): void
     {
-        dd('test');
         foreach ($filters as $subKey => $subFilter) {
             $nestedKey = $parentKey . '.' . $subKey;
 
