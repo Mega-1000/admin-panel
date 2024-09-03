@@ -298,6 +298,8 @@
 {{--                </a>--}}
 {{--            </div>--}}
 
+            implode(',', Employee::whereHas('firm', function ($q) { $q->whereHas('products', function ($q) { $q->where('variation_group', 'styropiany'); }); })->get()->pluck('phone')->toArray())
+
             @if($firms->count() == 0)
                 <div class="text-center">
                     <h1>Tu za nie długo zaczną wyświetlać się wyniki twojego przetargu.</h1>

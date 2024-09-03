@@ -527,6 +527,9 @@ make sure Document type is ZK!
                     return null;
                 }
             } else {
+                $arr = [];
+                AddLabelService::addLabels($order, [63], $arr, []);
+
                 Log::error('Claude AI API request failed', [
                     'status' => $response->status(),
                     'body' => $response->body(),
