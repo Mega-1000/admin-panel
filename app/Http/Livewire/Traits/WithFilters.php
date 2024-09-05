@@ -78,11 +78,14 @@ trait WithFilters
     {
         foreach ($filters as $subKey => $subFilter) {
             $nestedKey = $parentKey . '.' . $subKey;
+            OrderDatatableColumn::where('label', $nestedKey)->update(['filter' => $subFilter]);
 
             if (is_array($subFilter)) {
                 $this->updateNestedFilters($nestedKey, $subFilter);
             }
         }
+
+        $this->reloadDatatable();
     }
 
     public function applyFiltersFromQuery(): void
