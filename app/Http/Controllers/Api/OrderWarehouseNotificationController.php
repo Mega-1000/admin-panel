@@ -27,6 +27,7 @@ use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use App\Services\WorkingEventsService;
 use Carbon\Carbon;
+use ErrorException;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -185,7 +186,7 @@ class OrderWarehouseNotificationController extends Controller
                         'invoice_value' => $invoiceInfo['invoice_value'] ?? null,
                         'ai_analysis' => $invoiceInfo['analysis'] ?? null,
                     ]);
-                } catch (Exception $e) {
+                } catch (ErrorException $e) {
 
                 }
 
