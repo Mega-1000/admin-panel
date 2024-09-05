@@ -86,8 +86,6 @@ class OrderDatatableRetrievingHelper
                     $column->filter = str_replace('-', '', $column->filter);
                 }
 
-                OrderDatatableColumn::query()->update(['filter' => '']);
-
                 $q->where($column->label, 'like', '%' . $column->filter . '%');
                 continue;
             }
@@ -105,8 +103,6 @@ class OrderDatatableRetrievingHelper
      */
     private static function applyNestedFilter(Builder $q, mixed $column): Builder
     {
-        OrderDatatableColumn::query()->update(['filter' => '']);
-
         $labelParts = explode('.', $column->label);
 
         return array_key_exists(2, $labelParts) && is_numeric($labelParts[2]) ?
