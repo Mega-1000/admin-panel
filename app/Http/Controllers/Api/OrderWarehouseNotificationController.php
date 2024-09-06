@@ -190,8 +190,6 @@ class OrderWarehouseNotificationController extends Controller
 
                 }
 
-//                $orders = Order::whereHas('invoices')->where('id', '>', '20000')->get()->count();
-
                 $invoiceRequest = $order->invoiceRequests()->first();
 
                 if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
