@@ -22,6 +22,7 @@ class MailReportController extends Controller
         return view('mail-reports.index', [
             'mailReports' => MailReport::where('body', 'like', '% ' . $order_id . '%')
                 ->orWhere('subject', 'like', '% ' . $order_id . '%')
+                ->orderBy('created_at', 'desc')
                 ->paginate(100),
         ]);
     }
