@@ -948,6 +948,12 @@ Route::get('recalculate-order', function () {
 
 Route::get('/order/{order}/getMails', [MailReportController::class, 'getMailsByOrder'])->name('order.getMails');
 
+Route::get('/avization-viewed/{order}', function (Request $request, Order $order) {
+    $orderWarehouseNotification = $order->orderWarehouseNotifications()->first();
+    $orderWarehouseNotification->delayed_to = now()->addHours(24);
+    $order->save();
+});
+
 Route::get('/styro-chatrs/{order}', function (Order $order) {
     $apiUrl = "https://api.anthropic.com/v1/messages";
     $apiKey = "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";
