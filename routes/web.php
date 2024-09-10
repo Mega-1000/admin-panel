@@ -951,7 +951,9 @@ Route::get('/order/{order}/getMails', [MailReportController::class, 'getMailsByO
 Route::get('/avization-viewed/{order}', function (Request $request, Order $order) {
     $orderWarehouseNotification = $order->orderWarehouseNotifications()->first();
     $orderWarehouseNotification->delayed_to = now()->addHours(24);
-    $order->save();
+    $orderWarehouseNotification->save();
+
+    return 'Awizacja została zaznaczona jako wyświetlona! Prosimy o akceptacje lub anullację i podpięcie faktury proformy do 24 godzin. W przeciwnym wypadku będziemy zmuszeni wysyłać tę wiadomość co 15 minut.';
 });
 
 Route::get('/styro-chatrs/{order}', function (Order $order) {

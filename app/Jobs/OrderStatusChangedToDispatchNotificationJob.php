@@ -91,7 +91,13 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
             'waiting_for_response' => true,
         ];
 
-        $notification = OrderWarehouseNotification::where($dataArray)->first();
+        $notification = OrderWarehouseNotification::where($dataArray)
+            ->where(function ($query) {
+                $query->where('delayed_to', '<', now()->format('Y-m-d H:i:s'))
+                    ->orWhereNull('delayed_to');
+            })
+            ->first();
+
         if (!empty($notification) && (!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL))) {
             $notification->update([
                 'order_id' => $this->orderId,
