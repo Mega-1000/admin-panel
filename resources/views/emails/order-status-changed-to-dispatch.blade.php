@@ -19,10 +19,10 @@
 
 <p>Prosimy o zatwierdzenie lub odrzucenie awizacji:</p>
 
-<a href="#" class="button">FORMULARZ POTWIERDZANIA AWIZACJI</a><br>
-<a href="#" class="button">TOWAR ZOSTAŁ WYDANY</a><br>
-<a href="#" class="button">ZAŁĄCZ FAKTURĘ</a><br>
-<a href="#" class="button">LINK DO CHATU</a>
+<a href="{{ $formLink }}" class="button">FORMULARZ POTWIERDZANIA AWIZACJI</a><br>
+<a href="{{$sendFormInvoice}}" class="button">TOWAR ZOSTAŁ WYDANY</a><br>
+<a href="{{$sendFormInvoice}}" class="button">ZAŁĄCZ FAKTURĘ</a><br>
+<a href="{{ $chatLink }}" class="button">LINK DO CHATU</a>
 
 <div class="info">
     <h2>Fakturę prosimy wystawić na:</h2>
