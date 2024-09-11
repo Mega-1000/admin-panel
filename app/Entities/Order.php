@@ -500,7 +500,7 @@ class Order extends Model implements Transformable
     public function bookedPaymentsSum()
     {
         $sum = 0;
-        $promisePayments = $this->payments()->where('promise', 'like', '')->get();
+        $promisePayments = $this->payments()->where('operation_type', 'bookedPaymentsSum')->get();
 
         foreach ($promisePayments as $promisePayment) {
             $sum += $promisePayment->amount;
