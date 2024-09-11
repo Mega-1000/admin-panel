@@ -79,6 +79,9 @@ class OrderDatatableRetrievingHelper
 
     public static function applyNestedFilters(Collection $columns, Builder $q): Builder
     {
+
+        dd('okej');
+
         foreach ($columns as $column) {
             if (!self::isNestedFilter($column)) {
                 if ($column->label === 'customer.addresses.0.phone') {

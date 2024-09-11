@@ -56,17 +56,17 @@
             <th>Ilość</th>
             <th>Cena brutto</th>
             <th>Cena netto</th>
-        </tr>
-        @foreach($order->items as $item)
-            <tr>
-                <td>{{$item->product->name}}</td>
-                <td>{{$item->product->symbol}}</td>
-                <td>{{$item->quantity}}</td>
-                <td>{{number_format($item->gross_selling_price_commercial_unit, 2)}} zł</td>
-                <td>{{number_format($item->gross_selling_price_commercial_unit, 2) / 1.23}} zł</td>
-
             </tr>
-        @endforeach
+            @foreach($order->items as $item)
+                <tr>
+                    <td>{{$item->product->name}}</td>
+                    <td>{{$item->product->symbol}}</td>
+                    <td>{{$item->quantity}}</td>
+                    <td>{{number_format($item->gross_selling_price_commercial_unit, 2)}} zł</td>
+                    <td>{{number_format($item->gross_selling_price_commercial_unit, 2) / 1.23}} zł</td>
+
+                </tr>
+            @endforeach
     </table>
 </div>
 
