@@ -30,7 +30,7 @@ class OrderDatatableRetrievingService
         $query = OrderDatatableRetrievingHelper::getOrderQueryWithRelations();
         $columns = OrderDatatableColumns::getAllStandardColumns();
 
-//        $query = OrderDatatableRetrievingHelper::applyNestedFilters($columns, $query);
+        $query = OrderDatatableRetrievingHelper::applyNestedFilters($columns, $query);
 
         $query = OrderDatatableNonstandardFiltersHelper::applyNonstandardFilters($query);
         $query = OrderDatatableRetrievingHelper::applyGeneralFilters($query, $authenticatedUserGridSettings);
