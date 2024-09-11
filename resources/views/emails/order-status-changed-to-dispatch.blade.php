@@ -19,7 +19,7 @@
 
 <p>Prosimy o zatwierdzenie lub odrzucenie awizacji:</p>
 
-<a href="/admin/avization-viewed/{{ $order->id }}" class="button">OZNACZ TĄ AWIZACJĘ JAKO WYŚWIETLONĄ</a>
+<a href="/avization-viewed/{{ $order->id }}" class="button">OZNACZ TĄ AWIZACJĘ JAKO WYŚWIETLONĄ</a>
 <a href="{{ $formLink }}" class="button">FORMULARZ POTWIERDZANIA AWIZACJI</a><br>
 <a href="{{$sendFormInvoice}}" class="button">TOWAR ZOSTAŁ WYDANY</a><br>
 <a href="{{$sendFormInvoice}}" class="button">ZAŁĄCZ FAKTURĘ</a><br>
