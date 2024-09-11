@@ -235,6 +235,12 @@
                     Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
                 </div>
             @endif
+
+            @if($notification->delayed_to && $notification->delayed_to < now())
+                <div style="color: green; margin-top: 20px">
+                    Magazyn wydający oznaczył awizację jako wyświetloną. Do {{ $notification->delayed_to }} wysyłanie powiadomień co 15 minut jest wyłączone.
+                </div>
+            @endif
         @endif
         <br>
         @php($notification = \App\Entities\OrderWarehouseNotification::where('order_id', $or->id)->where('contact_person', '!=', null)->first())
