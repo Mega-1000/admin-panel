@@ -62,8 +62,8 @@
                     <td>{{$item->product->name}}</td>
                     <td>{{$item->product->symbol}}</td>
                     <td>{{$item->quantity}}</td>
-                    <td>{{number_format($item->net_purchase_price_commercial_unit * 1.23, 2)}} zł</td>
-                    <td>{{round(number_format($item->net_purchase_price_commercial_unit, 2), 2)}} zł</td>
+                    <td>{{number_format($item->net_purchase_price_commercial_unit_after_discounts * 1.23, 2)}} zł</td>
+                    <td>{{round(number_format($item->net_purchase_price_commercial_unit_after_discounts, 2), 2)}} zł</td>
 
                 </tr>
             @endforeach
