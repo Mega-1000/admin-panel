@@ -62,8 +62,8 @@
                     <td>{{$item->product->name}}</td>
                     <td>{{$item->product->symbol}}</td>
                     <td>{{$item->quantity}}</td>
-                    <td>{{number_format($item->gross_selling_price_commercial_unit, 2)}} zł</td>
-                    <td>{{number_format($item->gross_selling_price_commercial_unit, 2) / 1.23}} zł</td>
+                    <td>{{number_format($item->gross_buying_price_commercial_unit, 2)}} zł</td>
+                    <td>{{round(number_format($item->gross_buying_price_commercial_unit, 2) / 1.23, 2)}} zł</td>
 
                 </tr>
             @endforeach
