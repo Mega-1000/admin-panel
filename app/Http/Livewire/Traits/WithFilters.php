@@ -47,7 +47,6 @@ trait WithFilters
     public function updateFilters(bool $applyFromQuery = true): void
     {
         foreach ($this->filters as $key => $filter) {
-            dd($this->filters);
             $this->updateColumnFilter($key, $filter, $applyFromQuery);
         }
     }
@@ -79,7 +78,7 @@ trait WithFilters
     {
         foreach ($filters as $subKey => $subFilter) {
             $nestedKey = $parentKey . '.' . $subKey;
-            OrderDatatableColumn::where('label', $nestedKey)->update(['filter' => $subFilter]);
+            auth()->user()->orderDatatableColumns()->where('label', $nestedKey)->update(['filter' => $subFilter]);
 
             if (is_array($subFilter)) {
                 $this->updateNestedFilters($nestedKey, $subFilter);
@@ -104,7 +103,7 @@ trait WithFilters
     public function resetFilters(): void
     {
         $willAnyFilterBeReset = false;
-        foreach (OrderDatatableColumn::all() as $column) {
+        foreach (auth()->user()->orderDatatableColumns as $column) {
             if ($column->filter !== '') {
                 $willAnyFilterBeReset = true;
                 break;
@@ -116,6 +115,6 @@ trait WithFilters
             return;
         }
 
-        OrderDatatableColumn::query()->update(['filter' => '']);
+        auth()->user()->orderDatatableColumns->update(['filter' => '']);
     }
 }
