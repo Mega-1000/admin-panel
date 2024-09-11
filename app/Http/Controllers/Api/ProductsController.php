@@ -146,12 +146,12 @@ class ProductsController extends Controller
                     'gross_purchase_price_basic_unit_after_discounts' => $array['value_of_price_change_data_first'] * 1.23,
                     'net_selling_price_basic_unit' => $array['value_of_price_change_data_first'],
 
-                    'gross_purchase_price_aggregate_unit_after_discounts' => $array['value_of_price_change_data_first'] / $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_purchase_price_commercial_unit_after_discounts' => $array['value_of_price_change_data_first'] / $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_purchase_price_the_largest_unit_after_discounts' => $array['value_of_price_change_data_first'] / $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_selling_price_aggregate_unit' => $array['value_of_price_change_data_first'] / $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_selling_price_commercial_unit' => $array['value_of_price_change_data_first'] / $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_selling_price_the_largest_unit' =>  $array['value_of_price_change_data_first'] / $product->packing->numbers_of_basic_commercial_units_in_pack,
+                    'gross_purchase_price_aggregate_unit_after_discounts' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
+                    'gross_purchase_price_commercial_unit_after_discounts' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
+                    'gross_purchase_price_the_largest_unit_after_discounts' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
+                    'gross_selling_price_aggregate_unit' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
+                    'gross_selling_price_commercial_unit' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
+                    'gross_selling_price_the_largest_unit' =>  $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
                 ]);
 
                 Product::whereIn('id', $productsRelatedIds)->update($array);
