@@ -246,7 +246,7 @@
             telefon: {{ $notification?->contact_person_phone ?? '' }}
         @endif
 
-        @if($notification->delayed_to && $notification->delayed_to > now())
+        @if($notification?->delayed_to && $notification?->delayed_to > now())
             <hr />
             <div style="color: green; margin-top: 20px">
                 Magazyn wydający oznaczył awizację jako wyświetloną. Do {{ $notification->delayed_to }} wysyłanie powiadomień co 15 minut jest wyłączone.
