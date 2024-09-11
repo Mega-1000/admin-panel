@@ -57,6 +57,7 @@ trait WithFilters
 
         if ($column && $column->resetFilters && $filter !== $column->filter) {
             auth()->user()->orderDatatableColumns()->update(['filter' => '']);
+            dd($column);
             $column->update(['filter' => $filter]);
             return;
         }
