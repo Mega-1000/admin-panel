@@ -103,7 +103,7 @@ trait WithFilters
     public function resetFilters(): void
     {
         $willAnyFilterBeReset = false;
-        foreach (auth()->user()->orderDatatableColumns as $column) {
+        foreach (auth()->user()->orderDatatableColumns()->get() as $column) {
             if ($column->filter !== '') {
                 $willAnyFilterBeReset = true;
                 break;
@@ -115,6 +115,6 @@ trait WithFilters
             return;
         }
 
-        auth()->user()->orderDatatableColumns->update(['filter' => '']);
+        auth()->user()->orderDatatableColumns()->update(['filter' => '']);
     }
 }
