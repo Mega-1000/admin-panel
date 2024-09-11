@@ -157,7 +157,7 @@ class ProductsController extends Controller
                 Product::whereIn('id', $productsRelatedIds)->update($array);
             }
 
-            dispatch_now(new \App\Jobs\CheckDateOfProductNewPriceJob());
+//            dispatch_now(new \App\Jobs\CheckDateOfProductNewPriceJob());
 
             return $this->createdResponse();
         } catch (Exception $e) {
