@@ -231,12 +231,14 @@
             {{ strstr($warehouseMail ?? '', '@', true) }}@
             @php($amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count())
             @if($amountOfMonits > 0 && $hasLabel77)
+                <hr />
                 <div style="color: red; margin-top: 20px">
                     Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
                 </div>
             @endif
 
-            @if($notification->delayed_to && $notification->delayed_to < now())
+            @if($notification->delayed_to && $notification->delayed_to > now())
+                <hr />
                 <div style="color: green; margin-top: 20px">
                     Magazyn wydający oznaczył awizację jako wyświetloną. Do {{ $notification->delayed_to }} wysyłanie powiadomień co 15 minut jest wyłączone.
                 </div>
