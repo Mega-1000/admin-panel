@@ -43,5 +43,17 @@ class AvisationAcceptanceCheck implements ShouldQueue
             AddLabelService::addLabels($this->order, [77], $arr, []);
             $this->order->labels()->detach(53);
         }
+
+        $notification = $this->order->orderWarehouseNotifications()->latest()->first();
+
+        if (
+            $notification?->delayed_to &&
+            $notification?->delayed_to > now()
+        ) {
+            $this->order->labels()->detach(77);
+            $this->order->labels()->attach(52);
+
+            self::dispatch($this->order)->delay($notification->delayed_to);
+        }
     }
 }
