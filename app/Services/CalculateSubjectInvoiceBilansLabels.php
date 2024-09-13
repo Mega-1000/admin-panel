@@ -18,18 +18,21 @@ class CalculateSubjectInvoiceBilansLabels {
             return;
         }
 
-        $orderInvoiceValuesSum = OrderInvoiceValues::getSumOfInvoiceValuesByOrder($order);
-        $orderValue = $order->getValue() + Orders::getOrderReturnGoods($order) - Orders::getSumOfWTONPayments($order);
-        $arr = [];
 
-        if (round($orderInvoiceValuesSum, 2) != round($orderValue, 2) && !$order->labels->contains(124)) {
-            AddLabelService::addLabels($order, [231],$arr, []);
+        if ($order->labels->contains(66)) {
+            $orderInvoiceValuesSum = OrderInvoiceValues::getSumOfInvoiceValuesByOrder($order);
+            $orderValue = $order->getValue() + Orders::getOrderReturnGoods($order) - Orders::getSumOfWTONPayments($order);
+            $arr = [];
 
-            $order->labels()->detach(232);
-            return;
+            if (round($orderInvoiceValuesSum, 2) != round($orderValue, 2) && !$order->labels->contains(124)) {
+                AddLabelService::addLabels($order, [231], $arr, []);
+
+                $order->labels()->detach(232);
+                return;
+            }
+
+            AddLabelService::addLabels($order, [232], $arr, []);
+            $order->labels()->detach(231);
         }
-
-        AddLabelService::addLabels($order, [232],$arr, []);
-        $order->labels()->detach(231);
     }
 }
