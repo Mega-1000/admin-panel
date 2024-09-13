@@ -49,6 +49,10 @@ class AddLabelService
                 return;
             }
 
+            if ($labelId === 134 && $order->labels->contains(295)) {
+                return;
+            }
+
 
             if ($labelId === 66) {
                 $order->shipped_at = now();
