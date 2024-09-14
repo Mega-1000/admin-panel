@@ -43,7 +43,7 @@ class SendPaymentConfirmationProds implements ShouldQueue
                     ->to($confirmation->order?->warehouse?->warehouse_email)
                     ->send(new OrderPaymentConfirmationAttachedMail($confirmation, true));
 
-                if (!$confirmation->order->labels->has(261)) {
+                if (!$confirmation->order->labels->has(261) && !$confirmation->order->labels->has(296)) {
                     $arr = [];
                     AddLabelService::addLabels($confirmation->order, [261], $arr, []);
                     $confirmation->order->labels()->detach(259);
