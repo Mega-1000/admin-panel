@@ -820,6 +820,8 @@ class Order extends Model implements Transformable
             }
         }
 
+        dd($payments, $paymentsValue);
+
         return $paymentsValue;
     }
 

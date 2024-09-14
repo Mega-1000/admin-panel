@@ -75,8 +75,6 @@ class Orders
             }
         }
 
-        dd($payments, $paymentsValue);
-
 
         return $paymentsValue;
     }
