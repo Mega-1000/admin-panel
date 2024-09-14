@@ -809,7 +809,8 @@ class Order extends Model implements Transformable
     }
 
 
-    public static function getAllRelatedOrderPaymentsValue(Order $order): float
+    public static function
+    getAllRelatedOrderPaymentsValue(Order $order): float
     {
         $payments = self::getAllRelatedOrderPayments($order);
         $paymentsValue = 0;
