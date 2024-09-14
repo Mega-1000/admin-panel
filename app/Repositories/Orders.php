@@ -68,11 +68,14 @@ class Orders
     {
         $payments = self::getAllRelatedOrderPayments($order);
         $paymentsValue = 0;
+
         foreach ($payments as $order) {
             if ($order->operation_type != "Zwrot towaru") {
                 $paymentsValue += $order->amount ?? $order->declared_sum ?? 0;
             }
         }
+
+        dd($payments, $paymentsValue);
 
         return $paymentsValue;
     }
@@ -93,9 +96,6 @@ class Orders
                 }
             }
         }
-
-        dd($orderPayments);
-
         return $orderPayments;
     }
 
