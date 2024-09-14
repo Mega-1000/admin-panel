@@ -61,7 +61,6 @@ readonly class OrderObserver
             return;
         }
 
-        dd(round($relatedOrdersValue, 2) === round($relatedPaymentsValue, 2));
 
         if (round($relatedOrdersValue, 2) === round($relatedPaymentsValue, 2)) {
             $this->labelService->removeLabel($order->id, [134]);
@@ -131,6 +130,8 @@ readonly class OrderObserver
         $arr = [];
 
         $relatedPaymentsValue -= $orderReturnGoods;
+
+        dd(round($relatedOrdersValue, 2) === round($relatedPaymentsValue, 2));
 
         if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
             $this->labelService->removeLabel($order->id, [134]);
