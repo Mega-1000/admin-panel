@@ -88,7 +88,7 @@ readonly class ChatAuctionsService
         ]);
 
         $arr = [];
-        RemoveLabelService::removeLabels($order, [266, 95], $arr, [], null);
+        RemoveLabelService::removeLabels($order, [266, 95, 296], $arr, [], null);
 
         AddLabelService::addLabels(
             $order,
