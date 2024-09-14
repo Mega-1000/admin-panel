@@ -83,7 +83,7 @@ class Kernel extends ConsoleKernel
 //        $schedule->job(Jobs\CheckDeliveryDatesJob::class)->everyThirtyMinutes()->between('7:00', '18:00');
         $schedule->job(SendNextRermindersAboutAuctionEnded::class)->dailyAt('17:00');
         $schedule->job(SendSpeditionNotifications::class)->everyFifteenMinutes()->between('7:00', '18:00');
-        $schedule->job(SendPaymentConfirmationProds::class)->everyFifteenMinutes()->between('7:00', '18:00');
+        $schedule->job(SendPaymentConfirmationProds::class)->everyFifteenMinutes()->weekdays()->between('7:00', '18:00');
         $schedule->job(Jobs\CheckChatsForNotInUse::class)->everyFifteenMinutes()->between('7:00', '18:00');
         $schedule->job(Jobs\CheckForFinishedAuctions::class)->everyTwoHours()->between('7:00', '18:00');
         $schedule->job(Jobs\SearchForInactiveStyroOffers::class)->everyTwoHours();
