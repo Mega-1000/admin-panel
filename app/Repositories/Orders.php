@@ -90,11 +90,11 @@ class Orders
             foreach ($order->payments as $payment) {
                 if ($payment->status !== 'Rozliczona deklarowana' && $payment->operation_type !== 'Wpłata/wypłata bankowa - związana z fakturą zakupową' || $order->login == 'info@ephpolska.pl' || str_contains($payment->operation_type, 'przeksiegowanie')) {
                     $orderPayments[] = $payment;
-
-                    dd($orderPayments);
                 }
             }
         }
+
+        dd($orderPayments);
 
         return $orderPayments;
     }
