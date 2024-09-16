@@ -48,7 +48,7 @@ class OrderPaymentConfirmationController extends Controller
         $order = Order::find($orderId);
         $order->paymentConfirmation->update(['confirmed', 1]);
 
-        $order->labels()->detach([259, 261]);
+        $order->labels()->detach([259, 261, 296]);
         $arr = [];
         AddLabelService::addLabels($order, [260], $arr, []);
 
