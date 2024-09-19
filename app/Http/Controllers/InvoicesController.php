@@ -77,14 +77,14 @@ class InvoicesController extends Controller
             $fileName = $file->getClientOriginalName();
 
             $fileContent = file_get_contents($file);
-            // get uwagi: [text]
-            preg_match('/Uwagi:\[(.*?)\]/', $fileContent, $matches);
-
 
             $parser = new \Smalot\PdfParser\Parser();
             $pdf = $parser->parseFile($file);
             $text = $pdf->getText();
             $text = $this->cleanText($text);
+
+            preg_match('/Uwagi:\[(.*?)\]/', $text, $matches);
+
             $orderId = $matches[0];
 
             Storage::disk('invoicesDisk')->put($orderId . $fileName, file_get_contents($file));
