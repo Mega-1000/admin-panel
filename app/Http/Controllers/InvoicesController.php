@@ -12,6 +12,7 @@ use App\Services\Label\AddLabelService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Spatie\PdfToText\Pdf;
 
 class InvoicesController extends Controller
 {
@@ -79,6 +80,11 @@ class InvoicesController extends Controller
             // get uwagi: [text]
             preg_match('/Uwagi: \[(.*?)\]/', $fileContent, $matches);
 
+
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf = $parser->parseFile($file);
+            $text = $pdf->getText();
+            $text = $this->cleanText($text);
             dd($fileContent);
             $orderId = $matches[1];
 
