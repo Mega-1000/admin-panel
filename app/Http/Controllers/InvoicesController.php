@@ -85,7 +85,6 @@ class InvoicesController extends Controller
             $pdf = $parser->parseFile($file);
             $text = $pdf->getText();
             $text = $this->cleanText($text);
-            dd($text);
             $orderId = $matches[1];
 
             Storage::disk('invoicesDisk')->put($orderId . $fileName, file_get_contents($file));
