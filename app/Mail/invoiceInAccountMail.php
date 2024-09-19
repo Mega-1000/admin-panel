@@ -34,7 +34,7 @@ class invoiceInAccountMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Faktura do zamówienia: ' .  $this->order->id . 'jest dostępna w panelu klienta',
+            subject: 'Faktura do zamówienia: ' .  $this->order->id . ' jest dostępna w panelu klienta',
         );
     }
 
