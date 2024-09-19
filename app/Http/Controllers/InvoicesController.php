@@ -70,7 +70,7 @@ class InvoicesController extends Controller
         }
     }
 
-    public function uploadInvoice(UploadInvoiceRequest $request): RedirectResponse
+    public function uploadInvoice(UploadInvoiceRequest $request): mixed
     {
         $files = $request->file('files');
 
@@ -85,6 +85,10 @@ class InvoicesController extends Controller
             $text = $this->cleanText($text);
 
             preg_match('/Uwagi:(.{1,5})/u', $text, $matches);
+
+            if (empty($matches)) {
+                return response()->json('W jednej z faktur nie znaleziono numeru zamówienia' . ' lub nie znaleziono tekstu "Uwagi:" ogarnij to i wróć');
+            }
 
             $orderId = $matches[0];
 
