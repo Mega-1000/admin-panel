@@ -79,6 +79,7 @@ class InvoicesController extends Controller
             // get uwagi: [text]
             preg_match('/Uwagi: \[(.*?)\]/', $fileContent, $matches);
 
+            dd($fileContent);
             $orderId = $matches[1];
 
             Storage::disk('invoicesDisk')->put($orderId . $fileName, file_get_contents($file));
