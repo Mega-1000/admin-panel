@@ -94,6 +94,25 @@ class InvoicesController extends Controller
         return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
     }
 
+    private function cleanText($text): string
+    {
+        // Remove non-UTF8 characters
+        $text = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $text);
+
+        // Convert to UTF-8 if not already
+        if (!mb_check_encoding($text, 'UTF-8')) {
+            $text = mb_convert_encoding($text, 'UTF-8', 'ASCII,UTF-8,ISO-8859-1');
+        }
+
+        // Remove any remaining invalid UTF-8 sequences
+        $text = iconv('UTF-8', 'UTF-8//IGNORE', $text);
+
+        // Trim whitespace
+        $text = trim($text);
+
+        return $text;
+    }
+
     public function delete(): RedirectResponse
     {
         OrderInvoice::find(request()->query('id'))->delete();
