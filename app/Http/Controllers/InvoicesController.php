@@ -90,11 +90,11 @@ class InvoicesController extends Controller
                 return response()->json('W jednej z faktur nie znaleziono numeru zamówienia' . ' lub nie znaleziono tekstu "Uwagi:" ogarnij to i wróć');
             }
 
-            $orderId = $matches[0];
+            $orderId = $matches[1];
 
             Storage::disk('invoicesDisk')->put($orderId . $fileName, file_get_contents($file));
 
-            dd($orderId);
+            dd(intval($orderId));
             $order = Order::find($orderId);
 
             $arr = [];
