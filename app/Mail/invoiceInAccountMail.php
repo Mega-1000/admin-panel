@@ -47,6 +47,9 @@ class invoiceInAccountMail extends Mailable
     {
         return new Content(
             view: 'emails.invoice-in-account',
+            with: [
+                'order' => $this->order,
+            ],
         );
     }
 

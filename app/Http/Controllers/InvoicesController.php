@@ -97,7 +97,7 @@ class InvoicesController extends Controller
 
             Mailer::create()
                 ->to($order->customer->login)
-                ->send(new invoiceInAccountMail($order, $fileName));
+                ->send(new invoiceInAccountMail($order));
         }
 
         return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
