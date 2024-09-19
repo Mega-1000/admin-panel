@@ -84,7 +84,7 @@ class InvoicesController extends Controller
             $text = $pdf->getText();
             $text = $this->cleanText($text);
 
-            preg_match('/Uwagi:(.{1,5})/u', $text, $matches);
+            preg_match('/Uwagi:(\d+)/', $text, $matches);
 
             if (empty($matches)) {
                 return response()->json('W jednej z faktur nie znaleziono numeru zamówienia' . ' lub nie znaleziono tekstu "Uwagi:" ogarnij to i wróć');
