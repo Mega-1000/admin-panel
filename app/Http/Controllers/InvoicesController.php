@@ -71,9 +71,17 @@ class InvoicesController extends Controller
     {
         $files = $request->file('files');
 
+        // get file content to text it is pdf file
         foreach ($files as $file) {
             $fileName = $file->getClientOriginalName();
-            Storage::disk('invoicesDisk')->put($fileName, file_get_contents($file));
+
+            $fileContent = file_get_contents($file);
+            // get uwagi: [text]
+            preg_match('/Uwagi: \[(.*?)\]/', $fileContent, $matches);
+
+            $orderId = $matches[1];
+
+            Storage::disk('invoicesDisk')->put($orderId . $fileName, file_get_contents($file));
         }
 
         return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
