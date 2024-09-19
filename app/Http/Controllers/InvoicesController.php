@@ -75,16 +75,14 @@ class InvoicesController extends Controller
         // get file content to text it is pdf file
         foreach ($files as $file) {
             $fileName = $file->getClientOriginalName();
-
             $fileContent = file_get_contents($file);
 
             $parser = new \Smalot\PdfParser\Parser();
             $pdf = $parser->parseFile($file);
             $text = $pdf->getText();
             $text = $this->cleanText($text);
-            dd($text);
 
-            preg_match('/Uwagi:\[(.*?)\]/', $text, $matches);
+            preg_match('/Uwagi:(.*?)(?=\n\w+:|$)/s', $text, $matches);
 
             $orderId = $matches[0];
 
