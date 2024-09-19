@@ -82,6 +82,7 @@ class InvoicesController extends Controller
             $pdf = $parser->parseFile($file);
             $text = $pdf->getText();
             $text = $this->cleanText($text);
+            dd($text);
 
             preg_match('/Uwagi:\[(.*?)\]/', $text, $matches);
 
