@@ -82,7 +82,7 @@ class InvoicesController extends Controller
             $text = $pdf->getText();
             $text = $this->cleanText($text);
 
-            preg_match('/Uwagi:(.*?)(?=\n\w+:|$)/s', $text, $matches);
+            preg_match('/Uwagi:(.{1,5})/u', $text, $matches);
 
             $orderId = $matches[0];
 
