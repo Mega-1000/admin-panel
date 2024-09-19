@@ -94,6 +94,7 @@ class InvoicesController extends Controller
 
             Storage::disk('invoicesDisk')->put($orderId . $fileName, file_get_contents($file));
 
+            dd($orderId);
             $order = Order::find($orderId);
 
             $arr = [];
