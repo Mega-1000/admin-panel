@@ -6,8 +6,10 @@ use App\Entities\BuyingInvoice;
 use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\SubiektInvoices;
+use App\Facades\Mailer;
 use App\Http\Requests\AddInvoiceToOrder;
 use App\Http\Requests\UploadInvoiceRequest;
+use App\Mail\invoiceInAccountMail;
 use App\Services\Label\AddLabelService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
@@ -87,6 +89,15 @@ class InvoicesController extends Controller
             $orderId = $matches[0];
 
             Storage::disk('invoicesDisk')->put($orderId . $fileName, file_get_contents($file));
+
+            $order = Order::find($orderId);
+
+            $arr = [];
+            AddLabelService::addLabels($order, [193], $arr, []);
+
+            Mailer::create()
+                ->to($order->customer->login)
+                ->send(new invoiceInAccountMail($order, $fileName));
         }
 
         return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
