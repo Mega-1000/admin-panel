@@ -78,7 +78,7 @@ class InvoicesController extends Controller
 
             $fileContent = file_get_contents($file);
             // get uwagi: [text]
-            preg_match('/Uwagi: \[(.*?)\]/', $fileContent, $matches);
+            preg_match('/Uwagi:\[(.*?)\]/', $fileContent, $matches);
 
 
             $parser = new \Smalot\PdfParser\Parser();
