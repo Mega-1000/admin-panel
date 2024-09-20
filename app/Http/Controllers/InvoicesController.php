@@ -73,6 +73,7 @@ class InvoicesController extends Controller
     public function uploadInvoice(UploadInvoiceRequest $request): mixed
     {
         $files = $request->file('files');
+        $report = [];
 
         // get file content to text it is pdf file
         foreach ($files as $file) {
@@ -86,8 +87,9 @@ class InvoicesController extends Controller
 
             preg_match('/Uwagi:(\d+)/', $text, $matches);
 
+
             if (empty($matches)) {
-                return response()->json('W jednej z faktur nie znaleziono numeru zamówienia' . ' lub nie znaleziono tekstu "Uwagi:" ogarnij to i wróć');
+                $report[] = $fileName;
             }
 
             $orderId = $matches[1];
@@ -102,6 +104,10 @@ class InvoicesController extends Controller
             Mailer::create()
                 ->to($order->customer->login)
                 ->send(new invoiceInAccountMail($order));
+        }
+
+        if (!empty($report)) {
+            return 'Nieprawidłowe pliki: ' . implode(', ', $report);
         }
 
         return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
