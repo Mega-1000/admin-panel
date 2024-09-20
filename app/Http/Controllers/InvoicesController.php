@@ -101,9 +101,9 @@ class InvoicesController extends Controller
             $arr = [];
             AddLabelService::addLabels($order, [193], $arr, []);
 
-            Mailer::create()
-                ->to($order->customer->login)
-                ->send(new invoiceInAccountMail($order));
+//            Mailer::create()
+//                ->to($order->customer->login)
+//                ->send(new invoiceInAccountMail($order));
         }
 
         if (!empty($report)) {
