@@ -53,6 +53,11 @@ class AddLabelService
                 return;
             }
 
+            if ($labelId === 206 && $order->labels->contains(265))
+            {
+                $order->labels()->detach(265);
+            }
+
 
             if ($labelId === 66) {
                 $order->shipped_at = now();

@@ -39,7 +39,7 @@ class CheckForFinishedAuctions implements ShouldQueue
 
         foreach ($auctions as $auction) {
             try {
-                if ($auction?->chat->order) {
+                if ($auction?->chat->order && !$auction?->chat->order->labels->contains(206)) {
                     $auction->end_info_sent = true;
                     $auction->save();
 
