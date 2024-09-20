@@ -58,15 +58,12 @@ https://admin.mega1000.pl/chat/$token",
             }
         }
 
-        $chats = Chat::where('is_active', true)
-            ->where('information_about_chat_inactiveness_sent', false)
-            ->where('created_at', '>', Carbon::create('2024', '05', '20'))
-            ->get();
+        $chats = Chat::where('information_about_chat_inactiveness_sent', false)->where('created_at', '>', Carbon::create('2024', '05', '20'))->get();
 
         foreach ($chats as $chat) {
-            $lastMessageSentTime = $chat->messages->orderBy('created_at', 'desc')->first()->created_at;
+            $lastMessageSentTime = $chat->messages()->orderBy('created_at', 'desc')->first()->created_at;
 
-            if (Carbon::create($lastMessageSentTime)->addDays(2) < now()) {
+            if (!empty($lastMessageSentTime) && Carbon::create($lastMessageSentTime)->addDays(2) < now()) {
                 Mailer::create()
                     ->to($chat->order->customer->login)
                     ->send(new ChatNotInUseNotificationEmail($chat));
