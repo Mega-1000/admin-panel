@@ -135,7 +135,7 @@ class OrderWarehouseNotificationController extends Controller
 
             $order = $notification->order;
 
-            $order->labels()->detach([77]);
+            $order->labels()->detach([77, 300]);
 
             $arr = [];
             AddLabelService::addLabels($order, [53], $arr, []);

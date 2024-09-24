@@ -121,6 +121,7 @@ return [
         "remove" => [
             $labels['wyslana do awizacji'],
             $labels['awizacja brak odpowiedzi'],
+            300
         ],
     ],
     "warehouse-notification-denied" => [ //23

@@ -40,7 +40,10 @@ class AvisationAcceptanceCheck implements ShouldQueue
 
         if (!$this->order->labels->has(53)) {
             $arr = [];
-            AddLabelService::addLabels($this->order, [77], $arr, []);
+            if (!$this->order->labels->has(300)) {
+                AddLabelService::addLabels($this->order, [77], $arr, []);
+            }
+
             $this->order->labels()->detach(53);
         }
 
@@ -51,6 +54,7 @@ class AvisationAcceptanceCheck implements ShouldQueue
             $notification?->delayed_to > now()
         ) {
             $this->order->labels()->detach(77);
+            $this->order->labels()->detach(300);
             $this->order->labels()->attach(52);
 
             self::dispatch($this->order)->delay($notification->delayed_to);
