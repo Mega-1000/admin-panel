@@ -265,7 +265,7 @@ class OrderWarehouseNotificationController extends Controller
                         {
                             \"invoice_type\": \"VAT\" or \"proforma\" if it is \"order\" or somethink like this clasify it as ptoforma if you are not sure if it is vat just make it proforma,
                             \"invoice_name\": \"The invoice number or name, or null if not found\",
-                            \"invoice_value\": \"The total invoice value including VAT in format '111111.11' no other thinks than this format\"
+                            \"invoice_value\": \"The totatzl invoice value including VAT in format '111111.11' no other thinks than this format\"
                             \"analysis\": \"Short analysis in polish language with will be relevant to consultant handling this order\"
                         }
 
