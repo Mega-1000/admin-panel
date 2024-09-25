@@ -9,6 +9,7 @@
     $hasLabel276 = $labels->contains('id', 276);
     $hasLabel279 = $labels->contains('id', 279);
     $hasLabel77 = $labels->contains('id', 77);
+    $hasLabel77 = $labels->contains('id', 300);
     $hasLabel270 = $labels->contains('id', 270);
     $hasLabel275 = $labels->contains('id', 275);
     $hasLabel243 = $labels->contains('id', 243);
@@ -230,7 +231,7 @@
         @if($warehouseMail)
             {{ strstr($warehouseMail ?? '', '@', true) }}@
             @php($amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count())
-            @if($amountOfMonits > 0 && $hasLabel77)
+            @if($amountOfMonits > 0 && $hasLabel77 && $hasLabel300)
                 <hr />
                 <div style="color: red; margin-top: 20px">
                     Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
