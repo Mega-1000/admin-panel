@@ -1921,6 +1921,7 @@ class OrdersController extends Controller
                 $item->net_selling_price_basic_unit = (float)$data['net_selling_price_basic_unit'][$id];
                 $item->net_selling_price_calculated_unit = (float)$data['net_selling_price_calculated_unit'][$id];
                 $item->net_selling_price_aggregate_unit = (float)$data['net_selling_price_aggregate_unit'][$id];
+                $item->gross_selling_price_commercial_unit = 2115;
                 $item->order_id = $newOrder->id;
                 $item->product_id = $data['product_id'][$id];
                 $item->quantity = $quantity;
