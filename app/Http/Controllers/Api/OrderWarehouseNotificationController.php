@@ -606,6 +606,23 @@ make sure Document type is ZK!
 
             $order->labels()->detach([244, 245, 74, 243, 256, 270]);
 
+            $order->shipped_at = now();
+            $order->save();
+
+            if ($order->preferred_invoice_date === null) {
+                $order->preferred_invoice_date = now();
+                $order->save();
+
+                $order->labels()->attach(41);
+            }
+
+            $order->labels()->detach(288);
+
+            if (!$order->labels()->where('label_id', 42)->exists()) {
+                !$order->labels()->where('label_id', 41)->exists() ? $order->labels()->attach(41) : null;
+                !$order->labels()->where('label_id', 195)->exists() ? $order->labels()->attach(195) : null;
+            }
+
             dispatch(new DispatchLabelEventByNameJob($order, "all-shipments-went-out"));
 
             return $this->okResponse();

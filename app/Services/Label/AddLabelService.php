@@ -64,7 +64,7 @@ class AddLabelService
             }
 
 
-            if ($labelId === 66) {
+            if ($labelId == 66) {
                 $order->shipped_at = now();
                 $order->save();
 
