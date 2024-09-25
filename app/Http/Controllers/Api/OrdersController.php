@@ -154,7 +154,7 @@ class OrdersController extends Controller
 
         $customer = Customer::where('login', $data['customer_login'])->first();
 
-        if (!$customer && array_key_exists('customer_login', $data) && array_key_exists('phone', $data)) {
+        if (!$customer && array_key_exists('customer_login', $data) && !empty($data['customer_login']) && array_key_exists('phone', $data)) {
             $customer = Customer::create([
                 'login' => $data['customer_login'],
                 'status' => 'ACTIVE',
