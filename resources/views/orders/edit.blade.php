@@ -2121,19 +2121,26 @@
                                                value="{{ $item->product->weight_trade_unit ?? 0 }}">
                                     </td>
                                     <td colspan="3"></td>
-                                    <td class="firstOrder"><input
+                                    <td class="firstOrder">
+                                        <input
                                             name="firstOrderQuantity[{{$item->id}}]"
                                             type="text" data-item-id="{{$item->id}}"
                                             data-order-type="first"
                                             class="form-control splitQuantity"
                                             id="firstOrderQuantity[{{$item->id}}]">
+                                        Pieniądze przypisane do tego zamówienia
+                                        <input
+                                            name="firstOrderMoney[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="first"
+                                            class="form-control money"
+                                            id="firstOrderMoney[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="first">{{ $item->quantity }}</span>
                                             <button type="button"
                                                     onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'first' )">
                                                 <
                                             </button>
-                                        </p>
                                         </p>
                                         <p>Zostało: <span
                                                 name="left[{{$item->id}}]">{{ $item->quantity }}</span>
@@ -2154,13 +2161,19 @@
                                             data-order-type="second"
                                             class="form-control splitQuantity"
                                             id="secondOrderQuantity[{{$item->id}}]">
+                                        Pieniądze przypisane do tego zamówienia
+                                        <input
+                                            name="secondOrderMoney[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="first"
+                                            class="form-control money"
+                                            id="secondOrderMoney[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="second">{{ $item->quantity }}</span>
                                             <button type="button"
                                                     onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'second' )">
                                                 <
                                             </button>
-                                        </p>
                                         </p>
                                         <p>Zostało: <span
                                                 name="left[{{$item->id}}]">{{ $item->quantity }}</span>
@@ -2181,6 +2194,13 @@
                                             data-order-type="third"
                                             class="form-control splitQuantity"
                                             id="thirdOrderQuantity[{{$item->id}}]">
+                                        Pieniądze przypisane do tego zamówienia
+                                        <input
+                                            name="thirdOrderMoney[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="first"
+                                            class="form-control money"
+                                            id="thirdOrderMoney[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="third">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2207,6 +2227,13 @@
                                             data-order-type="fourth"
                                             class="form-control splitQuantity"
                                             id="fourthOrderQuantity[{{$item->id}}]">
+                                        Pieniądze przypisane do tego zamówienia
+                                        <input
+                                            name="fourthOrderMoney[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="first"
+                                            class="form-control money"
+                                            id="fourthOrderMoney[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="fourth">{{ $item->quantity }}</span>
                                             <button type="button"
@@ -2233,6 +2260,13 @@
                                             data-order-type="fifth"
                                             class="form-control splitQuantity"
                                             id="fifthOrderQuantity[{{$item->id}}]">
+                                        Pieniądze przypisane do tego zamówienia
+                                        <input
+                                            name="fifthOrderMoney[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="first"
+                                            class="form-control money"
+                                            id="fifthOrderMoney[{{$item->id}}]">
                                         <p>Ilość startowa: <span name="base[{{$item->id}}]"
                                                                  data-order-type="fifth">{{ $item->quantity }}</span>
                                             <button type="button"
