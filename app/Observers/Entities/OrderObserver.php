@@ -83,6 +83,7 @@ readonly class OrderObserver
 
     public function updating(Order $order): void
     {
+        dd('okej');
         if (!$order->isDirty()) {
             return;
         }
