@@ -146,12 +146,7 @@ readonly class OrderObserver
         }
         $this->labelService->removeLabel($order->id, [133]);
         AddLabelService::addLabels($order, [134], $arr, [], Auth::user()?->id);
-    }
 
-    public function updated(Order $order): void
-    {
-        RecalculateBuyingLabels::recalculate($order);
-        CalculateSubjectInvoiceBilansLabels::handle($order);
         $order->labels()->detach(240);
         $order->labels()->detach(39);
 
@@ -181,5 +176,11 @@ readonly class OrderObserver
         } else {
             $order->labels()->detach(39);
         }
+    }
+
+    public function updated(Order $order): void
+    {
+        RecalculateBuyingLabels::recalculate($order);
+        CalculateSubjectInvoiceBilansLabels::handle($order);
     }
 }
