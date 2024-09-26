@@ -83,11 +83,6 @@ readonly class OrderObserver
 
     public function updating(Order $order): void
     {
-        dd('okej');
-        if (!$order->isDirty()) {
-            return;
-        }
-
         if (!empty($order->getDirty()['status_id'])) {
             $statusId = $order->getDirty()['status_id'];
             /** @var Status $status */
