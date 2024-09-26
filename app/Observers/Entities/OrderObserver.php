@@ -119,6 +119,7 @@ readonly class OrderObserver
             }
         }
 
+        dd('okej');
 
         $relatedPaymentsValue = round($this->orderRepository->getAllRelatedOrderPaymentsValue($order), 2);
         $relatedOrdersValue = round($this->orderRepository->getAllRelatedOrdersValue($order), 2);
