@@ -66,8 +66,6 @@ class Orders
      */
     public static function getAllRelatedOrderPaymentsValue(Order $order): float
     {
-        dd('here');
-
         $payments = self::getAllRelatedOrderPayments($order);
         $paymentsValue = 0;
 

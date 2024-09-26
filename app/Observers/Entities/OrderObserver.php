@@ -129,7 +129,7 @@ readonly class OrderObserver
         $relatedPaymentsValue -= $orderReturnGoods;
 
 
-        if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
+        if (count(dd($this->orderRepository->getAllRelatedOrderPayments($order))) === 0) {
             $this->labelService->removeLabel($order->id, [134]);
             return;
         }
