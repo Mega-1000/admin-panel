@@ -83,6 +83,37 @@ readonly class OrderObserver
 
     public function updating(Order $order): void
     {
+        $order->labels()->detach(240);
+        $order->labels()->detach(39);
+
+        $arr = [];
+        $futurePayments = OrderPayment::where('order_id', $order->id)
+            ->where('declared_sum', '!=', null)
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', 'Deklaracja wpłaty');
+            })
+            ->where('promise_date', '>', now())
+            ->sum('declared_sum');
+
+        $pastPayments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where(function ($query) {$query->whereNull('status')->orWhere('status', 'Deklaracja wpłaty');})->where('promise_date', '<', now())->sum('declared_sum');
+
+        if ($futurePayments > 0) {
+            AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
+            $order->labels()->detach(39);
+        } else {
+            $order->labels()->detach(240);
+        }
+
+        if ($pastPayments > 0 && !$order->labels->contains('id', 240)) {
+            AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
+        } else {
+            $order->labels()->detach(39);
+        }
+        if (!$order->isDirty()) {
+            return;
+        }
+
         if (!empty($order->getDirty()['status_id'])) {
             $statusId = $order->getDirty()['status_id'];
             /** @var Status $status */
@@ -137,46 +168,17 @@ readonly class OrderObserver
         if (round($relatedOrdersValue, 2) === round($relatedPaymentsValue, 2)) {
             $this->labelService->removeLabel($order->id, [134]);
             AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
-dd('okej');
+
             return;
         }
         $this->labelService->removeLabel($order->id, [133]);
         AddLabelService::addLabels($order, [134], $arr, [], Auth::user()?->id);
-        dd('okej');
-        $order->labels()->detach(240);
-        $order->labels()->detach(39);
-
-        $arr = [];
-        $futurePayments = OrderPayment::where('order_id', $order->id)
-            ->where('declared_sum', '!=', null)
-            ->where(function ($query) {
-                $query->whereNull('status')
-                    ->orWhere('status', 'Deklaracja wpłaty');
-            })
-            ->where('promise_date', '>', now())
-            ->sum('declared_sum');
-
-        dd($futurePayments);
-
-        $pastPayments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where(function ($query) {$query->whereNull('status')->orWhere('status', 'Deklaracja wpłaty');})->where('promise_date', '<', now())->sum('declared_sum');
-
-        if ($futurePayments > 0) {
-            AddLabelService::addLabels($order, [240], $arr, [], Auth::user()?->id);
-            $order->labels()->detach(39);
-        } else {
-            $order->labels()->detach(240);
-        }
-
-        if ($pastPayments > 0 && !$order->labels->contains('id', 240)) {
-            AddLabelService::addLabels($order, [39], $arr, [], Auth::user()?->id);
-        } else {
-            $order->labels()->detach(39);
-        }
     }
 
     public function updated(Order $order): void
     {
         RecalculateBuyingLabels::recalculate($order);
         CalculateSubjectInvoiceBilansLabels::handle($order);
+        OrdersRecalculatorBasedOnPeriod::recalculateOrdersBasedOnPeriod($order);
     }
 }
