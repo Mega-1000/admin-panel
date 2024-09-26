@@ -14,6 +14,7 @@ use App\Services\AllegroPaymentsReturnService;
 use App\Services\WorkingEventsService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\TimedLabelJob;
 use App\Services\EmailSendingService;
@@ -67,6 +68,8 @@ class AddLabelService
             if ($labelId == 66) {
                 $order->shipped_at = now();
                 $order->save();
+
+                AddLabelService::addLabels($order, [195], $arr, [], Auth::user()?->id);
 
                 if ($order->preferred_invoice_date === null) {
                     $order->preferred_invoice_date = now();
