@@ -129,7 +129,7 @@ readonly class OrderObserver
         $relatedPaymentsValue -= $orderReturnGoods;
 
 
-        if (count(dd($this->orderRepository->getAllRelatedOrderPayments($order))) === 0) {
+        if (count($this->orderRepository->getAllRelatedOrderPayments($order)) === 0) {
             $this->labelService->removeLabel($order->id, [134]);
             return;
         }
@@ -137,7 +137,7 @@ readonly class OrderObserver
         if (round($relatedOrdersValue, 2) === round($relatedPaymentsValue, 2)) {
             $this->labelService->removeLabel($order->id, [134]);
             AddLabelService::addLabels($order, [133], $arr, [], Auth::user()?->id);
-
+dd('okej');
             return;
         }
         $this->labelService->removeLabel($order->id, [133]);
