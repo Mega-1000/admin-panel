@@ -146,7 +146,7 @@ readonly class OrderObserver
         }
         $this->labelService->removeLabel($order->id, [133]);
         AddLabelService::addLabels($order, [134], $arr, [], Auth::user()?->id);
-
+dd('okej');
         $order->labels()->detach(240);
         $order->labels()->detach(39);
 
