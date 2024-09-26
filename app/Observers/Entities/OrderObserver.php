@@ -165,6 +165,8 @@ readonly class OrderObserver
             ->where('promise_date', '>', now())
             ->sum('declared_sum');
 
+        dd($futurePayments);
+
         $pastPayments = OrderPayment::where('order_id', $order->id)->where('declared_sum', '!=', null)->where(function ($query) {$query->whereNull('status')->orWhere('status', 'Deklaracja wpłaty');})->where('promise_date', '<', now())->sum('declared_sum');
 
         if ($futurePayments > 0) {
