@@ -40,10 +40,10 @@
     <p>Nr oferty: {{$order->id}}</p>
     <h3>Dane do dostawy:</h3>
     <p>
-        {{$order->addresses->first->id->firstname}} {{$order->addresses->first->id->lastname}}<br>
-        {{$order->addresses->first->id->address}} {{$order->addresses->first->id->flat_number}}<br>
-        {{$order->addresses->first->id->postal_code}} {{$order->addresses->first->id->city}}<br>
-        Tel: {{$order->addresses->first->id->phone}}
+        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->id->firstname}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->id->lastname}}<br>
+        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->id->address}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->id->flat_number}}<br>
+        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->id->postal_code}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->id->city}}<br>
+        Tel: {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->id->phone}}
     </p>
 </div>
 
