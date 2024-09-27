@@ -69,7 +69,7 @@ class AddLabelService
                 $order->shipped_at = now();
                 $order->save();
 
-                AddLabelService::addLabels($order, [195], $arr, [], Auth::user()?->id);
+                $order->labels()->attach(195);
 
                 if ($order->preferred_invoice_date === null) {
                     $order->preferred_invoice_date = now();
