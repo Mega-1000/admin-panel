@@ -231,7 +231,7 @@
         @if($warehouseMail)
             {{ strstr($warehouseMail ?? '', '@', true) }}@
             @php($amountOfMonits = App\MailReport::where('subject', 'like', '%Ponownie prosimy o potwierdzenie awizacji do%')->where('body', 'like', '%' . $or->id . '%')->count())
-            @if($amountOfMonits > 0 && $hasLabel77 && $hasLabel300)
+            @if($amountOfMonits > 0 && ($hasLabel77 || $hasLabel300))
                 <hr />
                 <div style="color: red; margin-top: 20px">
                     Wysłano {{ $amountOfMonits }} ponagleń w sprawie awizacji
