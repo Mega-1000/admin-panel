@@ -21,7 +21,7 @@ class ControllSubjectInvoiceBuyingService
     {
         foreach ($data as $orderNotes) {
             if ($orderNotes->notes == 86564) {
-                dd($orderNotes->notes);            
+                dd($orderNotes);            
             }
     
             $this->handleSingle($orderNotes);
