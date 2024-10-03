@@ -20,10 +20,6 @@ class ControllSubjectInvoiceBuyingService
     public function handle(array $data): void
     {
         foreach ($data as $orderNotes) {
-            if ($orderNotes->notes == 86564) {
-                dd($orderNotes);            
-            }
-    
             $this->handleSingle($orderNotes);
         }
 
@@ -51,6 +47,9 @@ class ControllSubjectInvoiceBuyingService
 
         if (!$order) {
             return;
+        }
+        if ($order->id == 86564) {
+            dd('plek');
         }
 
         if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('analized_by_claute', false)->exists()) {
