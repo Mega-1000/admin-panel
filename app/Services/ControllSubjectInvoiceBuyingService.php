@@ -48,12 +48,13 @@ class ControllSubjectInvoiceBuyingService
         if (!$order) {
             return;
         }
-        if ($order->id == 86564) {
-            dd('plek');
-        }
+    
 
         if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('analized_by_claute', false)->exists()) {
             return;
+        }
+        if ($order->id == 86564) {
+            dd('plek');
         }
 
 
