@@ -50,12 +50,12 @@ class ControllSubjectInvoiceBuyingService
         }
     
 
-        if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('analized_by_claute', false)->exists()) {
-            return;
-        }
-        if ($order->id == 86564) {
-            dd('plek');
-        }
+        // if (BuyingInvoice::where('invoice_number', $orderNotes->number)->where('analized_by_claute', false)->exists()) {
+        //     return;
+        // }
+        // if ($order->id == 86564) {
+        //     dd('plek');
+        // }
 
 
         if ($analizedInvoice = BuyingInvoice::where('invoice_number', $orderNotes->original)->where('analized_by_claute', true)->first()) {
