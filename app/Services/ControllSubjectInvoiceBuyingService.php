@@ -20,7 +20,10 @@ class ControllSubjectInvoiceBuyingService
     public function handle(array $data): void
     {
         foreach ($data as $orderNotes) {
-            dd($orderNotes->notes == 86564);
+            if ($orderNotes->notes == 86564) {
+                dd($orderNotes->notes);            
+            }
+    
             $this->handleSingle($orderNotes);
         }
 
