@@ -24,18 +24,29 @@ readonly class MessageService
      */
     public static function createNewCustomerOrEmployee($chat, Request $request, $user): int
     {
-        $chatUser = new ChatUser();
-        $chatUser->chat()->associate($chat);
-        if ($user instanceof Customer) {
-            $chatUser->customer_id = $user->id;
+        $chatUser = ChatUser::where('chat_id', $chat->id)
+        ->where(function ($query) use ($user) {
+            if ($user instanceof Customer) {
+                $query->where('customer_id', $user->id);
+            } elseif ($user instanceof Employee) {
+                $query->where('employee_id', $user->id);
+            }
+        })
+        ->first();
+    
+        if (!$chatUser) {
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            
+            if ($user instanceof Customer) {
+                $chatUser->customer_id = $user->id;
+            } elseif ($user instanceof Employee) {
+                $chatUser->employee_id = $user->id;
+            }
+        
+            $chatUser->save();
         }
-
-        if ($user instanceof Employee) {
-            $chatUser->employee_id = $user->id;
-        }
-
-        $chatUser->save();
-
+    
         return $chatUser->id;
     }
 
