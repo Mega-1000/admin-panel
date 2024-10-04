@@ -43,7 +43,7 @@
         {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->firstname}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->lastname}}<br>
         {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->address}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->flat_number}}<br>
         {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->postal_code}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->city}}<br>
-        Tel: {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()-->phone}}
+        Tel: {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->phone}}
     </p>
 </div>
 
