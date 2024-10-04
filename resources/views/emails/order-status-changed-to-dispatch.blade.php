@@ -40,10 +40,10 @@
     <p>Nr oferty: {{$order->id}}</p>
     <h3>Dane do dostawy:</h3>
     <p>
-        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->id->firstname}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->id->lastname}}<br>
-        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->id->address}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->id->flat_number}}<br>
-        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->id->postal_code}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->id->city}}<br>
-        Tel: {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->id->phone}}
+        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->firstname}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->lastname}}<br>
+        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->address}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->flat_number}}<br>
+        {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->postal_code}} {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()->city}}<br>
+        Tel: {{$order->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first()-->phone}}
     </p>
 </div>
 
