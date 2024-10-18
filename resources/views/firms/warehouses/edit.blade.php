@@ -64,7 +64,7 @@
                                 <div class="form-group">
                                     <label for="shipment-after-pay-email">Email odziału zajmującego się logistyką po wpłacie</label>
                                     <input type="email" class="form-control" id="shipment-after-pay-email" name="shipment-after-pay-email"
-                                           value="{{ $warehouse->shipment_after_pay_email ?? '' }}">
+                                           value="{{ $warehouse?->shipment_after_pay_email ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="shipment-after-pay-phone">Nr telefonu odziału zajmującego się logistyką po wpłacie</label>

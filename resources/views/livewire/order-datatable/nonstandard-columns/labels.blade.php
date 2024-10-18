@@ -161,7 +161,7 @@
             </div>
         @endif
         Numer telefonu do działu spedycji: {{ $or->warehouse->shipment_after_pay_phone ?? '' }}
-        Email do działu spedycji: {{ $or->warehouse->shipment_after_pay_email ?? '' }}
+        Email do działu spedycji: {{ $or->warehouse?->shipment_after_pay_email ?? '' }}
         <hr>
     @endif
 
