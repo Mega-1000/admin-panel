@@ -164,6 +164,9 @@ class OrderWarehouseNotificationController extends Controller
         try {
             $order = Order::findOrFail($request->orderId);
 
+            $arr = [];
+            AddLabelService::addLabels($order, [63], $arr, []);
+
             $file = $request->file('file');
             if ($file !== null) {
                 $filename = \Illuminate\Support\Str::random(32) . '.' . $file->getClientOriginalExtension();
@@ -176,9 +179,6 @@ class OrderWarehouseNotificationController extends Controller
                 Log::info('File stored successfully', ['path' => $path]);
 
 //                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path, $order);
-
-                $arr = [];
-                AddLabelService::addLabels($order, [63], $arr, []);
                 try {
                     $order->invoices()->create([
                         'invoice_type' => 'buy',
