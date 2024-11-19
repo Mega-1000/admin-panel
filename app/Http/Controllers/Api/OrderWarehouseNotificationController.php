@@ -177,6 +177,8 @@ class OrderWarehouseNotificationController extends Controller
 
 //                $invoiceInfo = $this->analyzeInvoiceWithClaudeAI($path, $order);
 
+                $arr = [];
+                AddLabelService::addLabels($order, [63], $arr, []);
                 try {
                     $order->invoices()->create([
                         'invoice_type' => 'buy',
