@@ -21,6 +21,7 @@ class ControllSubjectInvoiceBuyingService
     {
         foreach ($data as $orderNotes) {
             $this->handleSingle($orderNotes);
+            echo $orderNotes->notes;
         }
 
         $orders = Order::whereHas('labels', function ($query) {$query->where('labels.id', 263);})->get();
