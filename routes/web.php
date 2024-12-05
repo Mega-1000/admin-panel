@@ -107,6 +107,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('orderPackages/duplicate/{packageId}', 'OrdersPackagesController@duplicate')->name('order_packages.duplicate');
 
     Route::group(['middleware' => 'admin'], function () {
+        Route::post('invoices/clear', 'InvoicesController@clearInvoices')->name('invoices.clear');
         Route::post('shipmentCostFilterCookie', ShipmentCostFilterCookieController::class)->name('shipmentCostFilterCookie');
         Route::get('/allegro-api/auth/device/{code?}', 'AllegroApiController@auth_device');
         Route::get('/allegro-api/auth/oauth2', 'AllegroApiController@auth_oauth2');

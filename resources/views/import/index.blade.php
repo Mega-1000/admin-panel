@@ -271,5 +271,52 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-bordered">
+                <div class="panel-body">
+                    <h3>Czyszczenie faktur</h3>
+                    
+                    <form action="{{ route('invoices.clear') }}" method="POST" class="form-horizontal">
+                        @csrf
+                        
+                        <div class="form-group">
+                            <label for="month" class="col-sm-2 control-label">Miesiąc</label>
+                            <div class="col-sm-4">
+                                <input type="month" class="form-control" id="month" name="month" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="invoice_type" class="col-sm-2 control-label">Typ faktury</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="invoice_type" name="invoice_type" required>
+                                    <option value="">Wybierz typ faktury</option>
+                                    <option value="sales">Faktury sprzedażowe</option>
+                                    <option value="purchase">Faktury zakupowe</option>
+                                    <option value="both">Oba typy faktur</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-4">
+                                <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">
+                                    <i class="voyager-trash"></i> Usuń faktury
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
+
+<script>
+function confirmDelete() {
+    return confirm('Czy na pewno chcesz usunąć wszystkie wybrane faktury z tego miesiąca? Ta operacja jest nieodwracalna.');
+}
+</script>
