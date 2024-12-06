@@ -38,15 +38,13 @@ class InvoicesController extends Controller
             if ($request->invoice_type === 'sales' || $request->invoice_type === 'both') {
                 DB::table('buying_invoices')
                     ->whereBetween('created_at', [$startDate, $endDate])
-                    ->whereNull('deleted_at')
-                    ->update(['deleted_at' => now()]);
+                    ->delete();
             }
 
             if ($request->invoice_type === 'purchase' || $request->invoice_type === 'both') {
                 DB::table('order_invoice_values')
                     ->whereBetween('created_at', [$startDate, $endDate])
-                    ->whereNull('deleted_at') 
-                    ->update(['deleted_at' => now()]);
+                    ->delete();
             }
 
             return redirect()->back()->with([
