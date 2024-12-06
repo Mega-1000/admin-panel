@@ -35,17 +35,19 @@ class InvoicesController extends Controller
             $startDate = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
             $endDate = Carbon::createFromFormat('Y-m', $request->month)->endOfMonth();
 
-            DB::beginTransaction();
-
             if ($request->invoice_type === 'sales' || $request->invoice_type === 'both') {
-                BuyingInvoice::whereBetween('created_at', [$startDate, $endDate])->delete();
+                DB::table('buying_invoices')
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->whereNull('deleted_at')
+                    ->update(['deleted_at' => now()]);
             }
 
             if ($request->invoice_type === 'purchase' || $request->invoice_type === 'both') {
-                OrderInvoiceValue::whereBetween('issue_date', [$startDate, $endDate])->delete();
+                DB::table('order_invoice_values')
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->whereNull('deleted_at') 
+                    ->update(['deleted_at' => now()]);
             }
-
-            DB::commit();
 
             return redirect()->back()->with([
                 'message' => 'Faktury zostały pomyślnie usunięte',
