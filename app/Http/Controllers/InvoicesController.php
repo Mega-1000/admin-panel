@@ -16,46 +16,47 @@ use Illuminate\Http\RedirectResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Spatie\PdfToText\Pdf;
 use App\Entities\OrderInvoiceValue;
+use Illuminate\Http\Request;
 
 class InvoicesController extends Controller
 {
 
     public function clearInvoices(Request $request)
-{
-    $request->validate([
-        'month' => 'required|date_format:Y-m',
-        'invoice_type' => 'required|in:sales,purchase,both'
-    ]);
-
-    try {
-        $startDate = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
-        $endDate = Carbon::createFromFormat('Y-m', $request->month)->endOfMonth();
-
-        DB::beginTransaction();
-
-        if ($request->invoice_type === 'sales' || $request->invoice_type === 'both') {
-            BuyingInvoice::whereBetween('created_at', [$startDate, $endDate])->delete();
-        }
-
-        if ($request->invoice_type === 'purchase' || $request->invoice_type === 'both') {
-            OrderInvoiceValue::whereBetween('issue_date', [$startDate, $endDate])->delete();
-        }
-
-        DB::commit();
-
-        return redirect()->back()->with([
-            'message' => 'Faktury zostały pomyślnie usunięte',
-            'alert-type' => 'success'
+    {
+        $request->validate([
+            'month' => 'required|date_format:Y-m',
+            'invoice_type' => 'required|in:sales,purchase,both'
         ]);
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with([
-            'message' => 'Wystąpił błąd podczas usuwania faktur: ' . $e->getMessage(),
-            'alert-type' => 'error'
-        ]);
+        try {
+            $startDate = Carbon::createFromFormat('Y-m', $request->month)->startOfMonth();
+            $endDate = Carbon::createFromFormat('Y-m', $request->month)->endOfMonth();
+
+            DB::beginTransaction();
+
+            if ($request->invoice_type === 'sales' || $request->invoice_type === 'both') {
+                BuyingInvoice::whereBetween('created_at', [$startDate, $endDate])->delete();
+            }
+
+            if ($request->invoice_type === 'purchase' || $request->invoice_type === 'both') {
+                OrderInvoiceValue::whereBetween('issue_date', [$startDate, $endDate])->delete();
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with([
+                'message' => 'Faktury zostały pomyślnie usunięte',
+                'alert-type' => 'success'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with([
+                'message' => 'Wystąpił błąd podczas usuwania faktur: ' . $e->getMessage(),
+                'alert-type' => 'error'
+            ]);
+        }
     }
-}
 
     public function getSubiektInvoice($id): BinaryFileResponse|RedirectResponse
     {

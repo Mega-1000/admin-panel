@@ -171,7 +171,7 @@ class OrderWarehouseNotificationController extends Controller
             if ($file !== null) {
                 $filename = \Illuminate\Support\Str::random(32) . '.' . $file->getClientOriginalExtension();
                 $path = Storage::disk('public')->putFileAs('invoices', $file, $filename);
-
+                
                 if (!$path) {
                     throw new Exception("Failed to store the file");
                 }
