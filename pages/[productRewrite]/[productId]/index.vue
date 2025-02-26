@@ -245,7 +245,7 @@ const goToPage = async (val: number) => {
         :category="currentProduct"
         class="hidden md:block mt-10"
       />
-<!-- 
+<!-- asd
       <a href="/styropiany" target="__blank" class="rounded bg-green-500 p-8 text-white my-5 block font-bold mx-6" v-if="isMainStyrofoamLobby">
         <div class="font-bold text-3xl">
           Kliknij aby zobaczyć porady dotyczące zakupu styropianu w najniższych cenach
