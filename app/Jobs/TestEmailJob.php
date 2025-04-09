@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Facades\Mailer;
+use App\Http\Controllers\Auth\LoginController;
 use App\Mail\TestMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -10,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
+use Illuminate\Support\Facades\Log;
 
 class TestEmailJob implements ShouldQueue
 {
@@ -17,8 +19,10 @@ class TestEmailJob implements ShouldQueue
 
     public function handle()
     {
+        Log::info('TestEmailJob started');
         Mailer::notification()
             ->to('bartosz.woszczak@gmail.com')
             ->send(new TestMail());
+        Log::info('TestEmailJob send');
     }
 }
