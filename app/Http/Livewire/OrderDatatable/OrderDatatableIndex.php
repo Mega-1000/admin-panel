@@ -48,7 +48,7 @@ class OrderDatatableIndex extends Component
     public function render(): View
     {
         /** @var User $user */
-        $this->user = User::find(auth()->id());
+        $this->user = auth()->user();
 
         $this->orders = (new OrderDatatableRetrievingService())->getOrders(
             $this->getPageLengthProperty(), $this->user->grid_settings ?? '[]'

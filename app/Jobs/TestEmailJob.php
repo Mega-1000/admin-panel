@@ -17,7 +17,7 @@ class TestEmailJob implements ShouldQueue
     public function handle()
     {
         \Mailer::create()
-            ->to('paweljar@gmail.com')
+            ->to('bartosz.woszczak@gmail.com')
             ->send(new TestMail());
     }
 }
