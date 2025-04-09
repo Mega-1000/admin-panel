@@ -42,9 +42,8 @@ class MessagesController extends Controller
      * @param Request $request
      * @param bool $all
      * @param int $orderId
-     * @return Response
      */
-    public static function index(Request $request, bool $all = false, int $orderId = 0): Response
+    public static function index(Request $request, bool $all = false, int $orderId = 0)
     {
         $chats = self::getChatView($all, $orderId, $request->user()->id);
 
