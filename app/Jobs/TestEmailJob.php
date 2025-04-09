@@ -17,7 +17,7 @@ class TestEmailJob implements ShouldQueue
 
     public function handle()
     {
-        Mailer::create()
+        Mailer::notification()
             ->to('bartosz.woszczak@gmail.com')
             ->send(new TestMail());
     }
