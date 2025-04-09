@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Facades\Mailer;
 use App\Mail\TestMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -16,7 +17,7 @@ class TestEmailJob implements ShouldQueue
 
     public function handle()
     {
-        \Mailer::create()
+        Mailer::create()
             ->to('bartosz.woszczak@gmail.com')
             ->send(new TestMail());
     }
