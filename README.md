@@ -42,3 +42,4 @@ Testowanie kody:
 2. Instrukcja obsługi PHPStan https://phpstan.org/user-guide/getting-started
 
 ### !!! Bez sprawdzenia kodu w swoich zmianach, proszę nie wrzucać nic na repozytorium.
+testowanie
