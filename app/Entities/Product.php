@@ -111,6 +111,7 @@ class Product extends Model implements Transformable
         'automatic_email_messages_14_column',
         'automatic_email_messages_15_column',
         'order',
+        'youtube'
     ];
 
     public array $customColumnsVisibilities = [
@@ -190,6 +191,7 @@ class Product extends Model implements Transformable
     protected $casts = [
         'stock_product' => 'boolean',
         'employees_ids' => 'json',
+        'youtube' => 'json',
     ];
 
     /**

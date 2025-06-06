@@ -50,6 +50,17 @@ class CategoriesController extends Controller
         $data = $request->validated();
         $data['description'] = nl2br($data['description']);
 
+        if($data['youtube']){
+            $data['youtube'] = array_filter(array_map('array_filter', $data['youtube'])); 
+            // if($data['youtube']){
+            //     for($i = 0; $i < count($data['youtube']); $i++){
+            //         if(isset($data['youtube'][$i]['description'])){
+            //             $data['youtube'][$i]['description'] = nl2br($data['youtube'][$i]['description']);
+            //         }
+            //     }
+            // }
+        }
+    
         $category = Category::findorfail($request->validated('category'));
         $category->update($data);
 

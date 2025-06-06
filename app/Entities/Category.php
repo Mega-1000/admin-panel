@@ -35,14 +35,16 @@ class Category extends Model
         'save_description',
         'save_image',
         'rewrite',
+        'youtube'
     ];
 
     protected $casts = [
         'save_name' => 'boolean',
         'save_description' => 'boolean',
         'save_image' => 'boolean',
+        'youtube' => 'json',
     ];
-
+    
     /**
      * @return HasMany
      */
