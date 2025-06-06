@@ -191,6 +191,8 @@ class Product extends Model implements Transformable
     protected $casts = [
         'stock_product' => 'boolean',
         'employees_ids' => 'json',
+        'save_name' => 'boolean',
+        'save_image' => 'boolean',
         'youtube' => 'json',
     ];
 

@@ -17,6 +17,7 @@ class Categories
             ->orWhere('save_description','!=', true)
             ->orWhere('save_image','!=', true)
             ->orWhere('artificially_created','!=', false)
+            ->orWhereNotNull('youtube')
             ->get();
     }
 
@@ -27,6 +28,7 @@ class Categories
             ->orWhere('save_description','=', true)
             ->orWhere('save_image','=', true)
             ->orWhere('artificially_created','=', false)
+            ->orWhereNull('youtube')
             ->each(function (Category $category) {
                 $category->delete();
             });
