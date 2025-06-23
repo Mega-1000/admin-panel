@@ -151,11 +151,11 @@ class OrderService
             ]);
 
             OrderAddress::create([
-                'firmname' => 'Elektroniczna Platforma handlowa Sp. z o.o.',
-                'address' => 'Jaracz',
-                'postal_code' => '50-305',
+                'firmname' => 'ELEKTRONICZNA PLATFORMA HANDLOWA PL Sp. z o.o.',
+                'address' => 'UL. ks.Piotra Wawrzyniaka 41',
+                'postal_code' => '53-022',
                 'city' => 'Wrocław',
-                'nip' => '9121945342',
+                'nip' => '8993023676',
                 'type' => 'INVOICE_ADDRESS',
                 'order_id' => $order->id,
                 'email' => 'info@ephpolska.pl',

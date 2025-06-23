@@ -28,10 +28,10 @@
 <div class="info">
     <h2>Fakturę prosimy wystawić na:</h2>
     <p>
-        ELEKTRONICZNA PLATFORMA HANDLOWA EU SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ<br>
-        ul. Norwida 31<br>
-        55-200 Oława<br>
-        NIP: 9121945342
+        ELEKTRONICZNA PLATFORMA HANDLOWA PL Sp. z o.o.<br>
+        ul. UL. ks.Piotra Wawrzyniaka 41<br>
+        53-022 Wrocław<br>
+        NIP: 8993023676
     </p>
 </div>
 

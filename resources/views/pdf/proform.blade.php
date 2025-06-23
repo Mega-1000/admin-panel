@@ -65,12 +65,12 @@
 
                         <div class="h3">
                             !!!!!!!!!!  ZMIANA NUMERU KONTA ORAZ NAZWY FIRMY !!!!!!!!!!!!!<br/>
-                            ELETKRONICZNA PLATFORMA HANDLOWA EU SPOLKA Z O O <br/>
+                            ELETKRONICZNA PLATFORMA HANDLOWA PL SPOLKA Z O. O. <br/>
                         </div>
-                        NORWIDA 31 <br/>
-                        55-200 OŁAWA <br/>
-                        NIP 9121945342 <br/>
-                        numer konta 51 1140 2004 0000 3102 8491 5362 mBank S A<br/><br/>
+                        ul.Ks. Piotra Wawrzyniaka <br/>
+                        53-022 Wrocław <br/>
+                        NIP 8993023676 <br/>
+                        numer konta 58 1140 2004 0000 3802 8575 6174 mBank S A<br/><br/>
                         Telefony: www.ephpolska.pl w zakładce <b>kontakt</b><br/>
                         E-mail ogólny: info@ephpolska.pl<br/>
                         Sklep: www.ephpolska.pl<br/>

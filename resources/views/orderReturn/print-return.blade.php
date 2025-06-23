@@ -58,10 +58,10 @@
     @endif
     <div style="position:absolute; right:40px; top:0px;">
         <h2 style="display: inline-block">
-            ELEKTRONICZNA PLATFORMA HANDLOWA<br/>
-            UL. IWASZKIEWICZA 15A<br/>
-            55-200 OŁAWA<br/>
-            NIP: 9121027907
+            ELEKTRONICZNA PLATFORMA HANDLOWA PL Sp. z o.o.<br/>
+            UL. ks.Piotra Wawrzyniaka 41<br/>
+            53-022 Wrocław<br/>
+            NIP: 8993023676
         </h2>
     </div>
 

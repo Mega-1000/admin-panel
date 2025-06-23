@@ -39,4 +39,4 @@ Cieszymy się na współpracę i jesteśmy przekonani, że nasz system przetargo
 <br>
 Z wyrazami szacunku,
 <br>
-ELEKTRONICZNA PLATFORMA HANDLOWA EU sp. z o.o <br>
+ELEKTRONICZNA PLATFORMA HANDLOWA PL Sp. z o.o. <br>

@@ -164,18 +164,18 @@
 
         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">Nazwa</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">ELEKTRONICZNA PLATFORMA HANDLOWA EU SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ</dd>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">ELEKTRONICZNA PLATFORMA HANDLOWA PL Sp. z o.o.</dd>
         </div>
         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">Ulica</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">Norwida 31</dd>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">ks.Piotra Wawrzyniaka 41</dd>
         </div>                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">Miasto</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">55-200 Oława</dd>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">53-022 Wrocław</dd>
         </div>
         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">NIP</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">9121945342</dd>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">8993023676</dd>
         </div>
 
         <div class="px-4 py-5 sm:px-6">

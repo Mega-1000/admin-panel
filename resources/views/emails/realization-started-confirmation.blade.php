@@ -114,8 +114,8 @@
     </div>
 
     <div class="footer">
-        <p>&copy; 2024 ELEKTRONICZNA PLATFORMA HANDLOWA EU Sp. z o.o. Wszelkie prawa zastrzeżone.</p>
-        <p>Cypriana Kamila Norwida 31, 55-200 Oława, Polska | NIP: 9121945342</p>
+        <p>&copy; 2025 ELEKTRONICZNA PLATFORMA HANDLOWA PL Sp. z o.o. Wszelkie prawa zastrzeżone.</p>
+        <p>UL. ks.Piotra Wawrzyniaka 41, 53-022 Wrocław, Polska | NIP: 8993023676</p>
         <div class="social-icons">
             <a href="https://www.facebook.com/profile.php?id=61559753676464" title="Facebook">FB</a>
             <a href="https://www.linkedin.com/company/103011628/admin/dashboard/" title="LinkedIn">IN</a>

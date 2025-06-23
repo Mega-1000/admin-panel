@@ -40,7 +40,7 @@
     @endif
     <div style="position:absolute; right:40px; top:0px;">
         <h2 style="display: inline-block">
-            ELEKTRONICZNA PLATFORMA HANDLOWA<br/>
+            ELEKTRONICZNA PLATFORMA HANDLOWA PL Sp. z o.o.<br/>
             EPH POLSKA
             <br>
             <br>
