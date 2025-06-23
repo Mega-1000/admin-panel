@@ -113,7 +113,7 @@ class ImportCsvFileJob implements ShouldQueue
                     }
 
                     /** @var Product $existingProducts */
-                    $existingProduct = $this->existingProducts->where('symbol', $array['symbol'])->where('save_name', false)->first();
+                    $existingProduct = $this->existingProducts->where('symbol', $array['symbol'])->first();
 
                     $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
@@ -126,7 +126,8 @@ class ImportCsvFileJob implements ShouldQueue
 
                     $product->update([
                         'save_name' => $existingProduct?->save_name ?? true,
-                        'name' => $existingProduct?->name ?? $product->name,
+                        'name' => ($existingProduct?->name && !$existingProduct?->save_name) ? $existingProduct?->name : $product->name,
+                        'youtube' => $existingProduct?->youtube,
                     ]);
                 }
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
@@ -144,7 +145,8 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function clearTables()
     {
-        $this->existingProducts = Product::where('save_name', false)->get();
+        $this->existingProducts = Product::where('save_name', false)->orWhereNotNull('youtube')->get();
+
         Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
         Product::withTrashed()->update([
             'category_id' => null,
@@ -220,6 +222,7 @@ class ImportCsvFileJob implements ShouldQueue
             'save_description' => $existingCategory?->save_description ?? true,
             'save_image' => $existingCategory?->save_image ?? true,
             'parent_id' => $parent['id'],
+            'youtube' => $existingCategory?->youtube
         ]);
 
         $parent['children'][$category->name] = ['id' => $category->id, 'children' => []];

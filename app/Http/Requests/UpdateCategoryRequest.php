@@ -30,6 +30,7 @@ class UpdateCategoryRequest extends FormRequest
             'save_name' => 'required|boolean',
             'save_description' => 'required|boolean',
             'save_image' => 'required|boolean',
+            'youtube' => 'nullable',
         ];
     }
 
