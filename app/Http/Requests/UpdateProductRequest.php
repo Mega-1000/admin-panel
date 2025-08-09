@@ -38,7 +38,7 @@ class UpdateProductRequest extends FormRequest
         $validated = parent::validated();
         $validated['save_name'] = $validated['save_name'] === 'true';
         $validated['save_image'] = $validated['save_image'] === 'true';
-        if($validated['youtube']){
+        if(isset($validated['youtube']) && $validated['youtube']){
             $validated['youtube'] = array_filter(array_map('array_filter', json_decode($validated['youtube'], true)));
         }
         
