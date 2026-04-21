@@ -49,14 +49,14 @@ class AutheticationController extends Controller
     {
         try {
             $request->validate([
-                'code' => 'required|string|max:128|alpha_num',
+                'user_code' => 'required|string|max:128|alpha_num',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['message' => 'Nieprawidłowy lub wygasły kod.'], 401);
         }
 
         try {
-            $authCode = Auth_code::where('token', $request->code)
+            $authCode = Auth_code::where('token', $request->user_code)
                 ->where('created_at', '>=', Carbon::now()->subDay())
                 ->first();
 
