@@ -273,15 +273,10 @@
             .map(function (k) { return subgroup[k]; })
             .sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
 
-        // Show column if it has a label OR if any product in the group has a non-zero value for it
-        var defaultLabels = { first: 'Cena netto', second: 'Wartość 2', third: 'Wartość 3', fourth: 'Wartość 4' };
+        // 'first' always visible; second/third/fourth only when the firm has a label configured
         var cols = ['first', 'second', 'third', 'fourth'].filter(function (c) {
-            if (header['text_price_change_data_' + c]) return true;
-            return products.some(function (p) {
-                return parseFloat(p['value_of_price_change_data_' + c] || 0) > 0;
-            });
+            return c === 'first' || !!header['text_price_change_data_' + c];
         });
-        if (cols.length === 0) cols = ['first'];
 
         var panel = document.createElement('div');
         panel.className = 'panel panel-bordered pl-panel';
@@ -311,7 +306,7 @@
             '<th>Data zmiany ceny</th>' +
             '<th>Obowiązuje od</th>' +
             cols.map(function (c) {
-                var label = header['text_price_change_data_' + c] || defaultLabels[c] || c;
+                var label = header['text_price_change_data_' + c] || (c === 'first' ? 'Cena netto (PLN / j.p.)' : c);
                 return '<th class="price-wrap">' + escHtml(label) + '</th>';
             }).join('');
         thead.appendChild(trH);
@@ -360,8 +355,8 @@
                 if (c === 'first') {
                     var brutto = (parseFloat(current) * vatMult).toFixed(2);
                     bruttoHtml = ' <span class="brutto-preview text-muted" style="font-size:12px;white-space:nowrap;">' +
-                        '→ brutto: <strong class="brutto-val">' + brutto + '</strong>' +
-                        ' <small>(' + (p.vat || 23) + '%)</small></span>';
+                        '= <strong class="brutto-val">' + brutto + '</strong> PLN brutto' +
+                        ' <small>(VAT ' + (p.vat || 23) + '%)</small></span>';
                 }
                 return '<td class="price-wrap">' +
                     '<span class="price-was">poprzednio: ' + current + '</span>' +
