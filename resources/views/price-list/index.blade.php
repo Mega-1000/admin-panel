@@ -19,16 +19,24 @@
             <div class="row">
                 <div class="col-md-5">
                     <div class="form-group" style="margin-bottom:0;">
-                        <label for="firm-select"><strong>Wybierz firmę / dostawcę</strong></label>
-                        <select id="firm-select" class="form-control">
-                            <option value="">— wybierz firmę —</option>
-                            @foreach($firms as $firm)
-                                <option value="{{ $firm->id }}">
-                                    {{ $firm->name }}
-                                    @if($firm->symbol) ({{ $firm->symbol }}) @endif
-                                </option>
-                            @endforeach
-                        </select>
+                        <label for="firm-search"><strong>Wybierz firmę / dostawcę</strong>
+                            <small class="text-muted">({{ $firms->count() }} firm z produktami)</small>
+                        </label>
+                        <div style="position:relative;">
+                            <input type="text" id="firm-search" class="form-control"
+                                   placeholder="Wpisz nazwę lub symbol firmy..."
+                                   autocomplete="off">
+                            <div id="firm-dropdown" style="
+                                display:none; position:absolute; top:100%; left:0; right:0;
+                                background:#fff; border:1px solid #ccc; border-top:none;
+                                max-height:320px; overflow-y:auto; z-index:1000;
+                                box-shadow:0 4px 8px rgba(0,0,0,.15);">
+                            </div>
+                        </div>
+                        <div id="firm-selected-info" style="display:none; margin-top:6px;">
+                            <span class="label label-info" id="firm-selected-label"></span>
+                            <a href="#" id="firm-clear" style="margin-left:8px; font-size:12px;">zmień</a>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-3" style="padding-top:25px;">
@@ -68,30 +76,88 @@
 (function () {
     'use strict';
 
-    var CSRF_TOKEN = '{{ csrf_token() }}';
+    var CSRF_TOKEN  = '{{ csrf_token() }}';
+    var FIRMS_DATA  = @json($firms);
     var currentFirmId = null;
-    // Flat list of all product rows keyed by product id for easy collection on save
-    var productRows = {};
+    var productRows   = {};
 
-    var firmSelect      = document.getElementById('firm-select');
-    var loadingIndicator= document.getElementById('loading-indicator');
-    var productsArea    = document.getElementById('products-area');
-    var groupsContainer = document.getElementById('groups-container');
-    var alertArea       = document.getElementById('alert-area');
-    var saveBtn         = document.getElementById('save-btn');
-    var saveIndicator   = document.getElementById('save-indicator');
+    var firmSearchInput  = document.getElementById('firm-search');
+    var firmDropdown     = document.getElementById('firm-dropdown');
+    var firmSelectedInfo = document.getElementById('firm-selected-info');
+    var firmSelectedLabel= document.getElementById('firm-selected-label');
+    var firmClear        = document.getElementById('firm-clear');
+    var loadingIndicator = document.getElementById('loading-indicator');
+    var productsArea     = document.getElementById('products-area');
+    var groupsContainer  = document.getElementById('groups-container');
+    var alertArea        = document.getElementById('alert-area');
+    var saveBtn          = document.getElementById('save-btn');
+    var saveIndicator    = document.getElementById('save-indicator');
 
-    // ── Firm selector ──────────────────────────────────────────────
-    firmSelect.addEventListener('change', function () {
-        currentFirmId = this.value;
-        if (!currentFirmId) {
-            productsArea.style.display = 'none';
-            groupsContainer.innerHTML  = '';
-            productRows = {};
-            return;
-        }
-        loadProducts(currentFirmId);
+    // ── Firm search ────────────────────────────────────────────────
+    firmSearchInput.addEventListener('input', function () {
+        var q = this.value.trim().toLowerCase();
+        if (!q) { firmDropdown.style.display = 'none'; return; }
+
+        var matches = FIRMS_DATA.filter(function (f) {
+            return f.name.toLowerCase().indexOf(q) !== -1 ||
+                   (f.symbol && f.symbol.toLowerCase().indexOf(q) !== -1);
+        }).slice(0, 10);
+
+        if (!matches.length) { firmDropdown.style.display = 'none'; return; }
+
+        firmDropdown.innerHTML = matches.map(function (f) {
+            return '<div class="firm-option" data-id="' + f.id + '" style="' +
+                'padding:8px 12px; cursor:pointer; border-bottom:1px solid #eee;">' +
+                '<strong>' + escHtml(f.name) + '</strong>' +
+                (f.symbol ? ' <small class="text-muted">(' + escHtml(f.symbol) + ')</small>' : '') +
+                '</div>';
+        }).join('');
+        firmDropdown.style.display = '';
     });
+
+    firmDropdown.addEventListener('click', function (e) {
+        var opt = e.target.closest('.firm-option');
+        if (!opt) return;
+        selectFirm(parseInt(opt.dataset.id, 10));
+    });
+
+    firmClear.addEventListener('click', function (e) {
+        e.preventDefault();
+        currentFirmId = null;
+        firmSearchInput.value        = '';
+        firmSelectedInfo.style.display = 'none';
+        firmSearchInput.style.display  = '';
+        productsArea.style.display     = 'none';
+        groupsContainer.innerHTML      = '';
+        productRows = {};
+        showAlert('');
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!firmDropdown.contains(e.target) && e.target !== firmSearchInput) {
+            firmDropdown.style.display = 'none';
+        }
+    });
+
+    firmDropdown.addEventListener('mouseover', function (e) {
+        var opt = e.target.closest('.firm-option');
+        if (opt) opt.style.background = '#f5f5f5';
+    });
+    firmDropdown.addEventListener('mouseout', function (e) {
+        var opt = e.target.closest('.firm-option');
+        if (opt) opt.style.background = '';
+    });
+
+    function selectFirm(id) {
+        var firm = FIRMS_DATA.find(function (f) { return f.id === id; });
+        if (!firm) return;
+        currentFirmId = id;
+        firmDropdown.style.display     = 'none';
+        firmSearchInput.style.display  = 'none';
+        firmSelectedLabel.textContent  = firm.name + (firm.symbol ? ' (' + firm.symbol + ')' : '');
+        firmSelectedInfo.style.display = '';
+        loadProducts(currentFirmId);
+    }
 
     // ── Fetch products ─────────────────────────────────────────────
     function loadProducts(firmId) {

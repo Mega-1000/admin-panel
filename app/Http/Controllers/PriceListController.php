@@ -16,7 +16,7 @@ class PriceListController extends Controller
 {
     public function index(): View
     {
-        $firms = Firm::orderBy('name')->get(['id', 'name', 'symbol']);
+        $firms = Firm::whereHas('products')->orderBy('name')->get(['id', 'name', 'symbol']);
 
         return view('price-list.index', compact('firms'));
     }
