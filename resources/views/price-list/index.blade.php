@@ -96,16 +96,16 @@
             <div class="panel-body" style="padding:12px 16px;">
                 <div class="global-dates-row">
                     <div class="gd-group">
-                        <label for="global-date-change">Data zmiany ceny</label>
-                        <input type="date" id="global-date-change" class="form-control">
-                        <button class="btn btn-default btn-sm" id="apply-date-change">
+                        <label for="global-date-new">Obowiązuje od <small class="text-muted">(nowa cena aktywna od)</small></label>
+                        <input type="date" id="global-date-new" class="form-control">
+                        <button class="btn btn-default btn-sm" id="apply-date-new">
                             <i class="fa fa-arrow-down"></i> Ustaw wszystkim
                         </button>
                     </div>
                     <div class="gd-group">
-                        <label for="global-date-new">Obowiązuje od</label>
-                        <input type="date" id="global-date-new" class="form-control">
-                        <button class="btn btn-default btn-sm" id="apply-date-new">
+                        <label for="global-date-change">Następna zmiana ceny <small class="text-muted">(do kiedy cena obowiązuje)</small></label>
+                        <input type="date" id="global-date-change" class="form-control">
+                        <button class="btn btn-default btn-sm" id="apply-date-change">
                             <i class="fa fa-arrow-down"></i> Ustaw wszystkim
                         </button>
                     </div>
@@ -303,8 +303,8 @@
         trH.innerHTML =
             '<th class="td-product">Produkt</th>' +
             '<th>Symbol</th>' +
-            '<th>Data zmiany ceny</th>' +
             '<th>Obowiązuje od</th>' +
+            '<th>Następna zmiana ceny</th>' +
             cols.map(function (c) {
                 var label = header['text_price_change_data_' + c] || (c === 'first' ? 'Cena netto (PLN / j.p.)' : c);
                 return '<th class="price-wrap">' + escHtml(label) + '</th>';
@@ -340,12 +340,12 @@
             '</td>' +
             '<td><code>' + escHtml(p.symbol) + '</code></td>' +
             '<td>' +
-                '<input type="date" class="form-control input-sm date-input date-change" ' +
-                    'data-field="date_of_price_change" value="' + escHtml(dateChange) + '">' +
-            '</td>' +
-            '<td>' +
                 '<input type="date" class="form-control input-sm date-input date-new" ' +
                     'data-field="date_of_the_new_prices" value="' + escHtml(dateNew) + '">' +
+            '</td>' +
+            '<td>' +
+                '<input type="date" class="form-control input-sm date-input date-change" ' +
+                    'data-field="date_of_price_change" value="' + escHtml(dateChange) + '">' +
             '</td>' +
             activeCols.map(function (c) {
                 var field   = 'value_of_price_change_data_' + c;
@@ -383,8 +383,10 @@
 
         var dateChangeInput = tr.querySelector('.date-change');
         var dateNewInput    = tr.querySelector('.date-new');
-        dateNewInput.addEventListener('change', function () {
-            validateDates(dateChangeInput, dateNewInput);
+        [dateNewInput, dateChangeInput].forEach(function (inp) {
+            inp.addEventListener('change', function () {
+                validateDates(dateNewInput, dateChangeInput);
+            });
         });
 
         return tr;
@@ -406,10 +408,10 @@
             var firstInput = tr.querySelector('[data-required="1"]');
             var firstVal   = firstInput ? parseFloat(firstInput.value.replace(',', '.')) : 0;
 
-            if (!dateChange) errors.push('Produkt ID ' + pid + ': brak daty zmiany ceny.');
-            if (!dateNew)    errors.push('Produkt ID ' + pid + ': brak daty obowiązywania.');
-            if (dateChange && dateNew && dateNew < dateChange)
-                errors.push('Produkt ID ' + pid + ': "Obowiązuje od" musi być ≥ dacie zmiany.');
+            if (!dateNew)    errors.push('Produkt ID ' + pid + ': brak daty "Obowiązuje od".');
+            if (!dateChange) errors.push('Produkt ID ' + pid + ': brak daty następnej zmiany ceny.');
+            if (dateNew && dateChange && dateNew > dateChange)
+                errors.push('Produkt ID ' + pid + ': "Obowiązuje od" nie może być późniejsze niż następna zmiana.');
             if (firstInput && (isNaN(firstVal) || firstVal < 0))
                 errors.push('Produkt ID ' + pid + ': cena nie może być ujemna.');
 
@@ -460,13 +462,14 @@
     });
 
     // ── Helpers ────────────────────────────────────────────────────
-    function validateDates(changeInput, newInput) {
-        if (changeInput.value && newInput.value && newInput.value < changeInput.value) {
-            newInput.setCustomValidity('Data obowiązywania musi być >= dacie zmiany.');
-            newInput.style.borderColor = '#e74c3c';
+    function validateDates(dateNewInput, dateChangeInput) {
+        // "Obowiązuje od" must be <= "Następna zmiana ceny"
+        if (dateNewInput.value && dateChangeInput.value && dateNewInput.value > dateChangeInput.value) {
+            dateNewInput.setCustomValidity('"Obowiązuje od" nie może być późniejsze niż data następnej zmiany.');
+            dateNewInput.style.borderColor = '#e74c3c';
         } else {
-            newInput.setCustomValidity('');
-            newInput.style.borderColor = '';
+            dateNewInput.setCustomValidity('');
+            dateNewInput.style.borderColor = '';
         }
     }
 
