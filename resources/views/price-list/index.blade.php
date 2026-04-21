@@ -268,9 +268,17 @@
         var mainText = (subgroup.mainText && subgroup.mainText.text_price_change) || (groupName + ' – ' + subNum);
         var header   = subgroup.header || {};
 
+        // Show column if it has a label OR if any product in the group has a non-zero value for it
+        var defaultLabels = { first: 'Cena netto', second: 'Wartość 2', third: 'Wartość 3', fourth: 'Wartość 4' };
         var cols = ['first', 'second', 'third', 'fourth'].filter(function (c) {
-            return !!header['text_price_change_data_' + c];
+            if (header['text_price_change_data_' + c]) return true;
+            // fallback: show if any product has a value set
+            return products.some(function (p) {
+                return parseFloat(p['value_of_price_change_data_' + c] || 0) > 0;
+            });
         });
+        // Always show at least 'first'
+        if (cols.length === 0) cols = ['first'];
 
         var products = Object.keys(subgroup)
             .filter(function (k) { return subgroup[k] && typeof subgroup[k] === 'object' && 'id' in subgroup[k]; })
@@ -305,8 +313,8 @@
             '<th>Data zmiany ceny</th>' +
             '<th>Obowiązuje od</th>' +
             cols.map(function (c) {
-                var label = escHtml(header['text_price_change_data_' + c] || c);
-                return '<th class="price-wrap">' + label + '</th>';
+                var label = header['text_price_change_data_' + c] || defaultLabels[c] || c;
+                return '<th class="price-wrap">' + escHtml(label) + '</th>';
             }).join('');
         thead.appendChild(trH);
         table.appendChild(thead);
@@ -409,8 +417,8 @@
             if (!dateNew)    errors.push('Produkt ID ' + pid + ': brak daty obowiązywania.');
             if (dateChange && dateNew && dateNew < dateChange)
                 errors.push('Produkt ID ' + pid + ': "Obowiązuje od" musi być ≥ dacie zmiany.');
-            if (firstInput && (isNaN(firstVal) || firstVal <= 0))
-                errors.push('Produkt ID ' + pid + ': cena musi być większa od 0.');
+            if (firstInput && (isNaN(firstVal) || firstVal < 0))
+                errors.push('Produkt ID ' + pid + ': cena nie może być ujemna.');
 
             var item = { id: pid, date_of_price_change: dateChange, date_of_the_new_prices: dateNew };
             tr.querySelectorAll('.price-input').forEach(function (input) {
