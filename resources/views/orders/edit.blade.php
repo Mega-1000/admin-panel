@@ -1360,6 +1360,7 @@
             @endforeach
             </tbody>
         </table>
+        @if( $order->customer->login != "info@ephpolska.pl")
         <table style="width: 100%; float: left;" id="paymentsTable" class="table table-hover">
             <thead>
             <h3>Nadpłaty / zwroty użytkownika {{ $order->customer->login }}</h3>
@@ -1459,6 +1460,9 @@
 
             </tbody>
         </table>
+        @else
+        <h5>Tabelka wyłączona dla użytkownika info@ephpolska.pl</h5>
+        @endif
     </div>
     <!-- Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModal"

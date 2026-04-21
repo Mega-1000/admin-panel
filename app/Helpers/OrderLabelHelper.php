@@ -17,7 +17,11 @@ class OrderLabelHelper {
         if ($hasYellow) {
             $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
         }
-        $chat->order->labels()->attach(MessagesHelper::MESSAGE_RED_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+
+        if ($chat?->order?->labels) {
+          $chat->order->labels()->attach(MessagesHelper::MESSAGE_RED_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+        }
+
         $chat->save();
     }
 
@@ -28,8 +32,11 @@ class OrderLabelHelper {
         if ($hasRed || $hasYellow) {
             return;
         }
-        $chat->order->labels()->detach(MessagesHelper::MESSAGE_BLUE_LABEL_ID);
-        $chat->order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+        if ($chat?->order?->label) {
+          $chat->order->labels()->detach(MessagesHelper::MESSAGE_BLUE_LABEL_ID);
+          $chat->order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+        }
+
         $chat->save();
     }
 

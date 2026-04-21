@@ -21,7 +21,7 @@ class TestEmailJob implements ShouldQueue
     {
         Log::info('TestEmailJob started');
         Mailer::notification()
-            ->to('bartosz.woszczak@gmail.com')
+            ->to('support@dnavi.pl')
             ->send(new TestMail());
         Log::info('TestEmailJob send');
     }
