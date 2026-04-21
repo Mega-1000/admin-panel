@@ -242,6 +242,11 @@ Route::group(['prefix' => 'admin'], function () {
             }
         });
 
+        Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+        Route::get('price-list', [\App\Http\Controllers\PriceListController::class, 'index'])->name('price-list.index');
+        Route::get('price-list/products/{firmId}', [\App\Http\Controllers\PriceListController::class, 'getProducts'])->name('price-list.products');
+        Route::post('price-list/products/{firmId}', [\App\Http\Controllers\PriceListController::class, 'saveProducts'])->name('price-list.save');
+
         Route::get('firms', 'FirmsController@index')->name('firms.index');
         Route::get('firms/datatable', 'FirmsController@datatable')->name('firms.datatable');
         Route::get('firms/create', 'FirmsController@create')->name('firms.create');
@@ -930,11 +935,6 @@ Route::post('/store-represents/{firm}/{email}', [FirmRepresentController::class,
 Route::get('/represents', [FirmRepresentController::class, 'index'])->name('represents.index');
 Route::post('/representatives/{id}', [FirmRepresentController::class, 'create'])->name('representatives.create');
 Route::delete('/representatives/{id}', [FirmRepresentController::class, 'delete'])->name('representatives.delete');
-
-Route::resource('categories', \App\Http\Controllers\CategoryController::class);
-Route::get('price-list', [\App\Http\Controllers\PriceListController::class, 'index'])->name('price-list.index');
-Route::get('price-list/products/{firmId}', [\App\Http\Controllers\PriceListController::class, 'getProducts'])->name('price-list.products');
-Route::post('price-list/products/{firmId}', [\App\Http\Controllers\PriceListController::class, 'saveProducts'])->name('price-list.save');
 
 Route::get('styroLeads', [\App\Http\Controllers\StyroLeadController::class, 'index'])->name('styro-lead.index');
 Route::get('styroLeads/get-tracking-img/{id}', [\App\Http\Controllers\StyroLeadController::class, 'getLogoWithTracker'])->name('styro-lead.tracking-img');
