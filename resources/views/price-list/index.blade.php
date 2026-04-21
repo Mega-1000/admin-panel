@@ -268,22 +268,20 @@
         var mainText = (subgroup.mainText && subgroup.mainText.text_price_change) || (groupName + ' – ' + subNum);
         var header   = subgroup.header || {};
 
-        // Show column if it has a label OR if any product in the group has a non-zero value for it
-        var defaultLabels = { first: 'Cena netto', second: 'Wartość 2', third: 'Wartość 3', fourth: 'Wartość 4' };
-        var cols = ['first', 'second', 'third', 'fourth'].filter(function (c) {
-            if (header['text_price_change_data_' + c]) return true;
-            // fallback: show if any product has a value set
-            return products.some(function (p) {
-                return parseFloat(p['value_of_price_change_data_' + c] || 0) > 0;
-            });
-        });
-        // Always show at least 'first'
-        if (cols.length === 0) cols = ['first'];
-
         var products = Object.keys(subgroup)
             .filter(function (k) { return subgroup[k] && typeof subgroup[k] === 'object' && 'id' in subgroup[k]; })
             .map(function (k) { return subgroup[k]; })
             .sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+
+        // Show column if it has a label OR if any product in the group has a non-zero value for it
+        var defaultLabels = { first: 'Cena netto', second: 'Wartość 2', third: 'Wartość 3', fourth: 'Wartość 4' };
+        var cols = ['first', 'second', 'third', 'fourth'].filter(function (c) {
+            if (header['text_price_change_data_' + c]) return true;
+            return products.some(function (p) {
+                return parseFloat(p['value_of_price_change_data_' + c] || 0) > 0;
+            });
+        });
+        if (cols.length === 0) cols = ['first'];
 
         var panel = document.createElement('div');
         panel.className = 'panel panel-bordered pl-panel';
