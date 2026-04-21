@@ -54,6 +54,35 @@
     {{-- Product groups area --}}
     <div id="products-area" style="display:none;">
 
+        {{-- Global date fill --}}
+        <div class="panel panel-bordered">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-calendar"></i> Ustaw daty dla wszystkich produktów</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-addon">Data zmiany</span>
+                            <input type="date" id="global-date-change" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" id="apply-date-change">Ustaw wszystkim</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-addon">Obowiązuje od</span>
+                            <input type="date" id="global-date-new" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" id="apply-date-new">Ustaw wszystkim</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="groups-container"></div>
 
         <div class="panel panel-bordered">
@@ -90,8 +119,25 @@
     var productsArea     = document.getElementById('products-area');
     var groupsContainer  = document.getElementById('groups-container');
     var alertArea        = document.getElementById('alert-area');
-    var saveBtn          = document.getElementById('save-btn');
-    var saveIndicator    = document.getElementById('save-indicator');
+    var saveBtn           = document.getElementById('save-btn');
+    var saveIndicator     = document.getElementById('save-indicator');
+    var globalDateChange  = document.getElementById('global-date-change');
+    var globalDateNew     = document.getElementById('global-date-new');
+    var applyDateChange   = document.getElementById('apply-date-change');
+    var applyDateNew      = document.getElementById('apply-date-new');
+
+    // ── Global date fill ───────────────────────────────────────────
+    applyDateChange.addEventListener('click', function () {
+        var val = globalDateChange.value;
+        if (!val) return;
+        document.querySelectorAll('.date-change').forEach(function (inp) { inp.value = val; });
+    });
+
+    applyDateNew.addEventListener('click', function () {
+        var val = globalDateNew.value;
+        if (!val) return;
+        document.querySelectorAll('.date-new').forEach(function (inp) { inp.value = val; });
+    });
 
     // ── Firm search ────────────────────────────────────────────────
     firmSearchInput.addEventListener('input', function () {
@@ -101,7 +147,7 @@
         var matches = FIRMS_DATA.filter(function (f) {
             return f.name.toLowerCase().indexOf(q) !== -1 ||
                    (f.symbol && f.symbol.toLowerCase().indexOf(q) !== -1);
-        }).slice(0, 10);
+        });
 
         if (!matches.length) { firmDropdown.style.display = 'none'; return; }
 
@@ -238,13 +284,15 @@
         var thead = document.createElement('thead');
         var trH   = document.createElement('tr');
         trH.innerHTML =
-            '<th style="width:25%">Produkt</th>' +
-            '<th style="width:13%">Symbol</th>' +
-            '<th style="width:13%">Data zmiany</th>' +
-            '<th style="width:13%">Obowiązuje od</th>' +
+            '<th style="width:22%">Produkt</th>' +
+            '<th style="width:10%">Symbol</th>' +
+            '<th style="width:11%">Data zmiany</th>' +
+            '<th style="width:11%">Obowiązuje od</th>' +
             cols.map(function(c) {
                 return '<th>' + escHtml(header['text_price_change_data_' + c] || c) + '</th>';
-            }).join('');
+            }).join('') +
+            '<th class="text-info">Brutto/opak.<br><small>(podgląd)</small></th>' +
+            '<th class="text-info">Netto/opak.<br><small>(podgląd)</small></th>';
         thead.appendChild(trH);
         table.appendChild(thead);
 
@@ -265,9 +313,14 @@
         var tr = document.createElement('tr');
         tr.dataset.productId = p.id;
 
-        var today = formatDate(new Date());
+        var packUnits  = p.numbers_of_basic_commercial_units_in_pack || 1;
+        var today      = formatDate(new Date());
         var dateChange = p.date_of_price_change || today;
         var dateNew    = p.date_of_the_new_prices || '';
+        var priceFirst = parseFloat(p.value_of_price_change_data_first || 0);
+
+        function calcGross(v) { return (v * packUnits * 1.23).toFixed(2); }
+        function calcNet(v)   { return (v * packUnits).toFixed(2); }
 
         tr.innerHTML =
             '<td>' +
@@ -284,18 +337,38 @@
                     'data-field="date_of_the_new_prices" value="' + escHtml(dateNew) + '" required>' +
             '</td>' +
             activeCols.map(function(c) {
-                var field = 'value_of_price_change_data_' + c;
-                var val   = parseFloat(p[field] || 0).toFixed(2);
+                var field   = 'value_of_price_change_data_' + c;
+                var current = parseFloat(p[field] || 0).toFixed(2);
                 var required = c === 'first' ? 'data-required="1"' : '';
-                return '<td><input type="number" class="form-control input-sm price-input" ' +
-                    'data-field="' + field + '" ' + required + ' ' +
-                    'value="' + val + '" step="0.01" min="0" style="width:90px;"></td>';
-            }).join('');
+                return '<td>' +
+                    '<small class="text-muted" style="display:block;white-space:nowrap;">było: ' + current + '</small>' +
+                    '<input type="number" class="form-control input-sm price-input" ' +
+                        'data-field="' + field + '" ' + required +
+                        ' value="' + current + '" step="0.01" min="0" style="width:90px;">' +
+                    '</td>';
+            }).join('') +
+            '<td class="text-info" style="white-space:nowrap;">' +
+                '<strong class="preview-gross">' + calcGross(priceFirst) + '</strong> PLN' +
+                (packUnits !== 1 ? '<br><small class="text-muted">(' + packUnits + ' szt.)</small>' : '') +
+            '</td>' +
+            '<td style="white-space:nowrap;">' +
+                '<span class="preview-net">' + calcNet(priceFirst) + '</span> PLN' +
+            '</td>';
 
         // Store reference keyed by product id
         productRows[p.id] = { row: tr, product: p };
 
-        // Cross-validate date_new >= date_change on blur
+        // Live preview update on first price input
+        var firstInput = tr.querySelector('[data-required="1"]');
+        if (firstInput) {
+            firstInput.addEventListener('input', function () {
+                var v = parseFloat(this.value.replace(',', '.')) || 0;
+                tr.querySelector('.preview-gross').textContent = calcGross(v);
+                tr.querySelector('.preview-net').textContent   = calcNet(v);
+            });
+        }
+
+        // Cross-validate date_new >= date_change
         var dateChangeInput = tr.querySelector('.date-change');
         var dateNewInput    = tr.querySelector('.date-new');
         dateNewInput.addEventListener('change', function() {

@@ -25,7 +25,7 @@ class PriceListController extends Controller
     {
         $firm = Firm::findOrFail($firmId);
 
-        $products = Product::where('product_name_supplier', $firm->symbol)->get();
+        $products = Product::with('packing')->where('product_name_supplier', $firm->symbol)->get();
 
         $result = [];
 
@@ -58,18 +58,19 @@ class PriceListController extends Controller
             }
 
             $result[$groupExp][$numberGroup][] = [
-                'id'                                  => $product->id,
-                'name'                                => $product->name,
-                'symbol'                              => $product->symbol,
-                'product_name_supplier'               => $product->product_name_supplier,
-                'product_name_supplier_on_documents'  => $product->product_name_supplier_on_documents,
-                'date_of_price_change'                => $dateOfPriceChange,
-                'date_of_the_new_prices'              => null,
-                'value_of_price_change_data_first'    => $product->value_of_price_change_data_first  ?: 0,
-                'value_of_price_change_data_second'   => $product->value_of_price_change_data_second ?: 0,
-                'value_of_price_change_data_third'    => $product->value_of_price_change_data_third  ?: 0,
-                'value_of_price_change_data_fourth'   => $product->value_of_price_change_data_fourth ?: 0,
-                'order'                               => $product->order ?: 0,
+                'id'                                          => $product->id,
+                'name'                                        => $product->name,
+                'symbol'                                      => $product->symbol,
+                'product_name_supplier'                       => $product->product_name_supplier,
+                'product_name_supplier_on_documents'          => $product->product_name_supplier_on_documents,
+                'date_of_price_change'                        => $dateOfPriceChange,
+                'date_of_the_new_prices'                      => null,
+                'value_of_price_change_data_first'            => $product->value_of_price_change_data_first  ?: 0,
+                'value_of_price_change_data_second'           => $product->value_of_price_change_data_second ?: 0,
+                'value_of_price_change_data_third'            => $product->value_of_price_change_data_third  ?: 0,
+                'value_of_price_change_data_fourth'           => $product->value_of_price_change_data_fourth ?: 0,
+                'numbers_of_basic_commercial_units_in_pack'   => $product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1,
+                'order'                                       => $product->order ?: 0,
             ];
         }
 
@@ -129,6 +130,12 @@ class PriceListController extends Controller
                     'gross_purchase_price_aggregate_unit_after_discounts'   => $priceFirst * $packUnits,
                     'gross_purchase_price_commercial_unit_after_discounts'  => $priceFirst * $packUnits,
                     'gross_purchase_price_the_largest_unit_after_discounts' => $priceFirst * $packUnits,
+                    'gross_price_of_packing'                                => $priceFirst * $packUnits * 1.23,
+                    'net_selling_price_commercial_unit'                     => $priceFirst * $packUnits,
+                    'net_selling_price_calculated_unit'                     => $priceFirst,
+                    'net_selling_price_aggregate_unit'                      => $priceFirst * $packUnits,
+                    'net_selling_price_the_largest_unit'                    => $priceFirst * $packUnits,
+                    'table_price'                                           => $priceFirst * $packUnits * 1.23,
                 ]);
 
                 Product::whereIn('id', $relatedIds)->update([
