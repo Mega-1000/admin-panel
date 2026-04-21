@@ -104,7 +104,7 @@ class PriceListController extends Controller
                     continue;
                 }
 
-                $product = Product::find($item['id']);
+                $product = Product::with('packing')->find($item['id']);
                 if (!$product) {
                     continue;
                 }
@@ -116,7 +116,7 @@ class PriceListController extends Controller
                     ->all();
 
                 $priceFirst = (float) str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
-                $packUnits  = $product->packing->numbers_of_basic_commercial_units_in_pack ?? 1;
+                $packUnits  = $product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1;
 
                 ProductPrice::whereIn('product_id', $relatedIds)->update([
                     'gross_selling_price_basic_unit'                        => $priceFirst * 1.23,
