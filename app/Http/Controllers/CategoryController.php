@@ -14,7 +14,9 @@ class CategoryController extends Controller
     public function index(): View
     {
         $roots = Category::with(['children.children'])
-            ->whereNull('parent_id')
+            ->where(function ($q) {
+                $q->whereNull('parent_id')->orWhere('parent_id', 0);
+            })
             ->orderBy('priority')
             ->orderBy('name')
             ->get();
@@ -89,7 +91,9 @@ class CategoryController extends Controller
     private function getSelectableParents(?Category $exclude = null): array
     {
         $query = Category::with('children')
-            ->whereNull('parent_id')
+            ->where(function ($q) {
+                $q->whereNull('parent_id')->orWhere('parent_id', 0);
+            })
             ->orderBy('name');
 
         if ($exclude) {

@@ -101,7 +101,7 @@
         groupsContainer.innerHTML      = '';
         productRows = {};
 
-        fetch('{{ url('price-list/products') }}/' + firmId)
+        fetch('{{ route('price-list.products', ['firmId' => '_ID_']) }}'.replace('_ID_', firmId))
             .then(function (res) {
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 return res.json();
@@ -285,7 +285,7 @@
         saveBtn.disabled          = true;
         saveIndicator.style.display = '';
 
-        fetch('{{ url('price-list/products') }}/' + currentFirmId, {
+        fetch('{{ route('price-list.products', ['firmId' => '_ID_']) }}'.replace('_ID_', currentFirmId), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
