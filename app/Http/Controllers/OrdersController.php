@@ -2942,7 +2942,7 @@ class OrdersController extends Controller
                 'reloadCart' => 'true',
             ]);
 
-            $frontUrl = config('app.front_url') . '/koszyk.html?' . $query;
+            $frontUrl = config('app.front_url') . '/wczytaj-koszyk?' . $query;
 
             return redirect($frontUrl);
         } catch (Exception $exception) {

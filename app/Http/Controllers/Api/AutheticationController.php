@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class AutheticationController extends Controller
 {
@@ -41,6 +42,42 @@ class AutheticationController extends Controller
             }
 
             return response()->json('Something went wrong', 403);
+        }
+    }
+
+    public function loginByCode(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'code' => 'required|string|max:128|alpha_num',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Nieprawidłowy lub wygasły kod.'], 401);
+        }
+
+        try {
+            $authCode = Auth_code::where('token', $request->code)
+                ->where('created_at', '>=', Carbon::now()->subDay())
+                ->first();
+
+            if (!$authCode) {
+                Log::warning('Failed login attempt via user_code', ['ip' => $request->ip()]);
+                return response()->json(['message' => 'Nieprawidłowy lub wygasły kod.'], 401);
+            }
+
+            $customer = $authCode->customer;
+            $authCode->delete();
+
+            $tokenResult = $customer->createToken('cart-restore');
+
+            return response()->json([
+                'token_type'   => 'Bearer',
+                'expires_in'   => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE,
+                'access_token' => $tokenResult->accessToken,
+            ]);
+        } catch (Exception $e) {
+            Log::error('Error in loginByCode', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['message' => 'Nieprawidłowy lub wygasły kod.'], 401);
         }
     }
 

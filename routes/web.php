@@ -927,6 +927,8 @@ Route::get('/represents', [FirmRepresentController::class, 'index'])->name('repr
 Route::post('/representatives/{id}', [FirmRepresentController::class, 'create'])->name('representatives.create');
 Route::delete('/representatives/{id}', [FirmRepresentController::class, 'delete'])->name('representatives.delete');
 
+Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+
 Route::get('styroLeads', [\App\Http\Controllers\StyroLeadController::class, 'index'])->name('styro-lead.index');
 Route::get('styroLeads/get-tracking-img/{id}', [\App\Http\Controllers\StyroLeadController::class, 'getLogoWithTracker'])->name('styro-lead.tracking-img');
 Route::post('styroLeads/import-csv', [\App\Http\Controllers\StyroLeadController::class, 'importCSV'])->name('styro-lead.load-csv');

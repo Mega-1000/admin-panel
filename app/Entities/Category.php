@@ -28,21 +28,23 @@ class Category extends Model
         'description',
         'parent_id',
         'img',
-        'slug',
-        'is_active',
-        'is_deleted',
+        'rewrite',
+        'is_visible',
+        'priority',
         'save_name',
         'save_description',
         'save_image',
-        'rewrite',
-        'youtube'
+        'artificially_created',
+        'youtube',
     ];
 
     protected $casts = [
-        'save_name' => 'boolean',
+        'is_visible'       => 'boolean',
+        'save_name'        => 'boolean',
         'save_description' => 'boolean',
-        'save_image' => 'boolean',
-        'youtube' => 'json',
+        'save_image'       => 'boolean',
+        'artificially_created' => 'boolean',
+        'youtube'          => 'array',
     ];
     
     /**

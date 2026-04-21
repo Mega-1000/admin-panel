@@ -98,6 +98,8 @@ Route::get('order/invoice/{order}', 'Api\InvoiceController@getInvoicesForOrder')
 
 Route::post('oauth/token/from-email/{email}', 'Api\CustomersController@getTokenFromEmail')->name('api.customers.get-token-from-email');
 
+Route::middleware('throttle:10,1')->post('oauth/token/from-user-code', 'Api\AutheticationController@loginByCode')->name('api.authenticate.login-by-code');
+
 Route::post('/register', 'Api\CustomersController@register')->name('api.customers.register');
 
 Route::group(['prefix' => 'faqs'], function () {
