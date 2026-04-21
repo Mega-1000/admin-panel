@@ -49,25 +49,40 @@ class AutheticationController extends Controller
     {
         try {
             $request->validate([
-                'user_code' => 'required|string|max:128|alpha_num',
+                'code' => 'required|string|max:128|alpha_num',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['message' => 'Nieprawidłowy lub wygasły kod.'], 401);
         }
 
         try {
-            $authCode = Auth_code::where('token', $request->user_code)
-                ->where('created_at', '>=', Carbon::now()->subDay())
-                ->first();
+            $code = $request->code;
+            Log::info('loginByCode attempt', ['code_prefix' => substr($code, 0, 8), 'ip' => $request->ip()]);
+
+            $authCode = Auth_code::where('token', $code)->first();
 
             if (!$authCode) {
-                Log::warning('Failed login attempt via user_code', ['ip' => $request->ip()]);
+                Log::warning('loginByCode: token not found in DB', ['code_prefix' => substr($code, 0, 8)]);
                 return response()->json(['message' => 'Nieprawidłowy lub wygasły kod.'], 401);
             }
 
-            $customer = $authCode->customer;
-            $authCode->delete();
+            Log::info('loginByCode: token found', ['created_at' => $authCode->created_at, 'customer_id' => $authCode->customer_id]);
 
+            if ($authCode->created_at < Carbon::now()->subDay()) {
+                Log::warning('loginByCode: token expired', ['created_at' => $authCode->created_at]);
+                $authCode->delete();
+                return response()->json(['message' => 'Kod wygasł.'], 401);
+            }
+
+            $customer = $authCode->customer;
+
+            if (!$customer) {
+                Log::error('loginByCode: customer not found', ['customer_id' => $authCode->customer_id]);
+                $authCode->delete();
+                return response()->json(['message' => 'Nieprawidłowy lub wygasły kod.'], 401);
+            }
+
+            $authCode->delete();
             $tokenResult = $customer->createToken('cart-restore');
 
             return response()->json([
@@ -76,8 +91,8 @@ class AutheticationController extends Controller
                 'access_token' => $tokenResult->accessToken,
             ]);
         } catch (Exception $e) {
-            Log::error('Error in loginByCode', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return response()->json(['message' => 'Nieprawidłowy lub wygasły kod.'], 401);
+            Log::error('loginByCode exception', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['message' => 'Błąd serwera: ' . $e->getMessage()], 500);
         }
     }
 
