@@ -62,6 +62,8 @@ use App\Http\Controllers\RecalculateLabelsInOrdersBasedOnPeriod;
 use App\Http\Controllers\ShipmentCostFilterCookieController;
 use App\Http\Controllers\ShippingPayInReportController;
 use App\Http\Controllers\SmsController;
+use App\Http\Controllers\DevController;
+
 use App\Http\Controllers\TableOfShipmentPaymentsErrorsController;
 use App\Http\Middleware\FilterOrderInvoiceValue;
 use App\Jobs\DispatchLabelEventByNameJob;
@@ -105,6 +107,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::queueMonitor();
     });
     Route::post('orderPackages/duplicate/{packageId}', 'OrdersPackagesController@duplicate')->name('order_packages.duplicate');
+
+    Route::get('dev/test', 'DevController@test');
 
     Route::group(['middleware' => 'admin'], function () {
         Route::post('invoices/clear', 'InvoicesController@clearInvoices')->name('invoices.clear');
