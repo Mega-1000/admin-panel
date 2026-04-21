@@ -7,6 +7,37 @@
 @endsection
 
 @section('app-content')
+<style>
+    .pl-panel .panel-heading { background: #f5f7fa; border-bottom: 1px solid #e0e4ea; padding: 10px 16px; }
+    .pl-panel .panel-title   { font-size: 14px; font-weight: 600; color: #444; }
+    .pl-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .pl-table thead th {
+        background: #eceff4; color: #555; font-size: 12px; font-weight: 600;
+        padding: 8px 10px; border-bottom: 2px solid #d0d5de; white-space: nowrap;
+        vertical-align: bottom;
+    }
+    .pl-table tbody tr:nth-child(even) { background: #fafbfc; }
+    .pl-table tbody tr:hover           { background: #f0f4ff; }
+    .pl-table td { padding: 7px 10px; vertical-align: middle; border-bottom: 1px solid #eaecf0; }
+    .pl-table .td-product { min-width: 200px; }
+    .pl-table .product-main  { font-weight: 600; color: #2c3e50; font-size: 13px; }
+    .pl-table .product-alias { font-size: 11px; color: #999; display: block; margin-bottom: 2px; }
+    .pl-table code { font-size: 12px; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; color: #c0392b; }
+    .pl-table .date-input { width: 138px; font-size: 12px; }
+    .pl-table .price-wrap { min-width: 110px; }
+    .pl-table .price-was  { font-size: 10px; color: #bbb; display: block; margin-bottom: 2px; }
+    .pl-table .price-input { width: 100px !important; font-size: 13px; font-weight: 600; }
+
+    #firm-search { font-size: 14px; }
+    .firm-option { padding: 8px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    .firm-option:hover { background: #f0f4ff; }
+
+    .global-dates-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+    .global-dates-row .gd-group { display: flex; align-items: center; gap: 8px; }
+    .global-dates-row label { margin: 0; font-size: 12px; font-weight: 600; color: #555; white-space: nowrap; }
+    .global-dates-row .form-control { width: 148px; font-size: 13px; }
+</style>
+
 <div class="container-fluid">
 
     @if(session('message'))
@@ -14,34 +45,37 @@
     @endif
 
     {{-- Firm selector --}}
-    <div class="panel panel-bordered">
+    <div class="panel panel-bordered pl-panel">
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-5">
                     <div class="form-group" style="margin-bottom:0;">
-                        <label for="firm-search"><strong>Wybierz firmę / dostawcę</strong>
-                            <small class="text-muted">({{ $firms->count() }} firm z produktami)</small>
+                        <label for="firm-search">
+                            <strong>Firma / dostawca</strong>
+                            <small class="text-muted">&nbsp;{{ $firms->count() }} firm z produktami</small>
                         </label>
                         <div style="position:relative;">
                             <input type="text" id="firm-search" class="form-control"
-                                   placeholder="Wpisz nazwę lub symbol firmy..."
-                                   autocomplete="off">
+                                   placeholder="Wpisz nazwę lub symbol firmy…" autocomplete="off">
                             <div id="firm-dropdown" style="
                                 display:none; position:absolute; top:100%; left:0; right:0;
                                 background:#fff; border:1px solid #ccc; border-top:none;
-                                max-height:320px; overflow-y:auto; z-index:1000;
-                                box-shadow:0 4px 8px rgba(0,0,0,.15);">
+                                max-height:340px; overflow-y:auto; z-index:1000;
+                                box-shadow:0 4px 12px rgba(0,0,0,.12);">
                             </div>
                         </div>
-                        <div id="firm-selected-info" style="display:none; margin-top:6px;">
-                            <span class="label label-info" id="firm-selected-label"></span>
-                            <a href="#" id="firm-clear" style="margin-left:8px; font-size:12px;">zmień</a>
+                        <div id="firm-selected-info" style="display:none; margin-top:7px;">
+                            <i class="fa fa-building-o text-muted"></i>
+                            <strong id="firm-selected-label" style="margin-left:5px;"></strong>
+                            <a href="#" id="firm-clear" style="margin-left:12px; font-size:12px; color:#e74c3c;">
+                                <i class="fa fa-times"></i> zmień
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3" style="padding-top:25px;">
-                    <span id="loading-indicator" style="display:none;">
-                        <i class="fa fa-spinner fa-spin"></i> Wczytuję produkty...
+                <div class="col-md-4" style="padding-top:26px;">
+                    <span id="loading-indicator" style="display:none; color:#888;">
+                        <i class="fa fa-spinner fa-spin"></i> Wczytuję produkty…
                     </span>
                 </div>
             </div>
@@ -55,29 +89,25 @@
     <div id="products-area" style="display:none;">
 
         {{-- Global date fill --}}
-        <div class="panel panel-bordered">
+        <div class="panel panel-bordered pl-panel">
             <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-calendar"></i> Ustaw daty dla wszystkich produktów</h3>
+                <h3 class="panel-title"><i class="fa fa-calendar-o"></i> Wypełnij daty dla wszystkich produktów</h3>
             </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <span class="input-group-addon">Data zmiany</span>
-                            <input type="date" id="global-date-change" class="form-control">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" id="apply-date-change">Ustaw wszystkim</button>
-                            </span>
-                        </div>
+            <div class="panel-body" style="padding:12px 16px;">
+                <div class="global-dates-row">
+                    <div class="gd-group">
+                        <label for="global-date-change">Data zmiany ceny</label>
+                        <input type="date" id="global-date-change" class="form-control">
+                        <button class="btn btn-default btn-sm" id="apply-date-change">
+                            <i class="fa fa-arrow-down"></i> Ustaw wszystkim
+                        </button>
                     </div>
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <span class="input-group-addon">Obowiązuje od</span>
-                            <input type="date" id="global-date-new" class="form-control">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" id="apply-date-new">Ustaw wszystkim</button>
-                            </span>
-                        </div>
+                    <div class="gd-group">
+                        <label for="global-date-new">Obowiązuje od</label>
+                        <input type="date" id="global-date-new" class="form-control">
+                        <button class="btn btn-default btn-sm" id="apply-date-new">
+                            <i class="fa fa-arrow-down"></i> Ustaw wszystkim
+                        </button>
                     </div>
                 </div>
             </div>
@@ -90,8 +120,8 @@
                 <button id="save-btn" class="btn btn-success btn-lg">
                     <i class="fa fa-save"></i> Zapisz wszystkie ceny
                 </button>
-                <span id="save-indicator" style="display:none; margin-left:15px;">
-                    <i class="fa fa-spinner fa-spin"></i> Zapisuję...
+                <span id="save-indicator" style="display:none; margin-left:15px; color:#888;">
+                    <i class="fa fa-spinner fa-spin"></i> Zapisuję…
                 </span>
             </div>
         </div>
@@ -119,12 +149,12 @@
     var productsArea     = document.getElementById('products-area');
     var groupsContainer  = document.getElementById('groups-container');
     var alertArea        = document.getElementById('alert-area');
-    var saveBtn           = document.getElementById('save-btn');
-    var saveIndicator     = document.getElementById('save-indicator');
-    var globalDateChange  = document.getElementById('global-date-change');
-    var globalDateNew     = document.getElementById('global-date-new');
-    var applyDateChange   = document.getElementById('apply-date-change');
-    var applyDateNew      = document.getElementById('apply-date-new');
+    var saveBtn          = document.getElementById('save-btn');
+    var saveIndicator    = document.getElementById('save-indicator');
+    var globalDateChange = document.getElementById('global-date-change');
+    var globalDateNew    = document.getElementById('global-date-new');
+    var applyDateChange  = document.getElementById('apply-date-change');
+    var applyDateNew     = document.getElementById('apply-date-new');
 
     // ── Global date fill ───────────────────────────────────────────
     applyDateChange.addEventListener('click', function () {
@@ -152,10 +182,9 @@
         if (!matches.length) { firmDropdown.style.display = 'none'; return; }
 
         firmDropdown.innerHTML = matches.map(function (f) {
-            return '<div class="firm-option" data-id="' + f.id + '" style="' +
-                'padding:8px 12px; cursor:pointer; border-bottom:1px solid #eee;">' +
+            return '<div class="firm-option" data-id="' + f.id + '">' +
                 '<strong>' + escHtml(f.name) + '</strong>' +
-                (f.symbol ? ' <small class="text-muted">(' + escHtml(f.symbol) + ')</small>' : '') +
+                (f.symbol ? ' <span style="color:#999;font-size:12px;">(' + escHtml(f.symbol) + ')</span>' : '') +
                 '</div>';
         }).join('');
         firmDropdown.style.display = '';
@@ -170,7 +199,7 @@
     firmClear.addEventListener('click', function (e) {
         e.preventDefault();
         currentFirmId = null;
-        firmSearchInput.value        = '';
+        firmSearchInput.value          = '';
         firmSelectedInfo.style.display = 'none';
         firmSearchInput.style.display  = '';
         productsArea.style.display     = 'none';
@@ -183,15 +212,6 @@
         if (!firmDropdown.contains(e.target) && e.target !== firmSearchInput) {
             firmDropdown.style.display = 'none';
         }
-    });
-
-    firmDropdown.addEventListener('mouseover', function (e) {
-        var opt = e.target.closest('.firm-option');
-        if (opt) opt.style.background = '#f5f5f5';
-    });
-    firmDropdown.addEventListener('mouseout', function (e) {
-        var opt = e.target.closest('.firm-option');
-        if (opt) opt.style.background = '';
     });
 
     function selectFirm(id) {
@@ -235,12 +255,10 @@
 
     // ── Render all groups ──────────────────────────────────────────
     function renderGroups(data) {
-        // data = { groupName: { subgroupNum: { mainText, header, 0:{}, 1:{}, ... } } }
         Object.keys(data).sort().forEach(function (groupName) {
             var subgroups = data[groupName];
-            Object.keys(subgroups).sort(function(a,b){ return a - b; }).forEach(function (subNum) {
-                var subgroup = subgroups[subNum];
-                groupsContainer.appendChild(renderSubgroup(groupName, subNum, subgroup));
+            Object.keys(subgroups).sort(function (a, b) { return a - b; }).forEach(function (subNum) {
+                groupsContainer.appendChild(renderSubgroup(groupName, subNum, subgroups[subNum]));
             });
         });
     }
@@ -250,61 +268,55 @@
         var mainText = (subgroup.mainText && subgroup.mainText.text_price_change) || (groupName + ' – ' + subNum);
         var header   = subgroup.header || {};
 
-        // Which value columns are active (non-null header)?
-        var cols = ['first','second','third','fourth'].filter(function(c) {
+        var cols = ['first', 'second', 'third', 'fourth'].filter(function (c) {
             return !!header['text_price_change_data_' + c];
         });
 
-        // Collect product rows (entries that have an 'id' key), sort by 'order'
         var products = Object.keys(subgroup)
             .filter(function (k) { return subgroup[k] && typeof subgroup[k] === 'object' && 'id' in subgroup[k]; })
             .map(function (k) { return subgroup[k]; })
             .sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
 
         var panel = document.createElement('div');
-        panel.className = 'panel panel-bordered';
+        panel.className = 'panel panel-bordered pl-panel';
 
-        // Panel heading
         var heading = document.createElement('div');
         heading.className = 'panel-heading';
-        heading.innerHTML = '<h3 class="panel-title"><i class="fa fa-list"></i> ' + escHtml(mainText) +
-            ' <small class="text-muted">(' + products.length + ' produktów)</small></h3>';
+        heading.innerHTML =
+            '<h3 class="panel-title">' +
+            '<i class="fa fa-list" style="margin-right:6px;color:#7f8c8d;"></i>' +
+            escHtml(mainText) +
+            ' <span class="text-muted" style="font-weight:400;font-size:12px;">— ' + products.length + ' produktów</span>' +
+            '</h3>';
         panel.appendChild(heading);
 
-        // Panel body → table
         var body = document.createElement('div');
         body.className = 'panel-body';
         body.style.padding = '0';
 
         var table = document.createElement('table');
-        table.className = 'table table-hover table-condensed';
-        table.style.marginBottom = '0';
+        table.className = 'pl-table';
 
-        // Table header
         var thead = document.createElement('thead');
         var trH   = document.createElement('tr');
         trH.innerHTML =
-            '<th style="width:22%">Produkt</th>' +
-            '<th style="width:10%">Symbol</th>' +
-            '<th style="width:11%">Data zmiany</th>' +
-            '<th style="width:11%">Obowiązuje od</th>' +
-            cols.map(function(c) {
-                return '<th>' + escHtml(header['text_price_change_data_' + c] || c) + '</th>';
-            }).join('') +
-            '<th class="text-info">Brutto/opak.<br><small>(podgląd)</small></th>' +
-            '<th class="text-info">Netto/opak.<br><small>(podgląd)</small></th>';
+            '<th class="td-product">Produkt</th>' +
+            '<th>Symbol</th>' +
+            '<th>Data zmiany ceny</th>' +
+            '<th>Obowiązuje od</th>' +
+            cols.map(function (c) {
+                var label = escHtml(header['text_price_change_data_' + c] || c);
+                return '<th class="price-wrap">' + label + '</th>';
+            }).join('');
         thead.appendChild(trH);
         table.appendChild(thead);
 
-        // Table body
         var tbody = document.createElement('tbody');
-        products.forEach(function (p) {
-            tbody.appendChild(renderProductRow(p, cols));
-        });
+        products.forEach(function (p) { tbody.appendChild(renderProductRow(p, cols)); });
         table.appendChild(tbody);
+
         body.appendChild(table);
         panel.appendChild(body);
-
         return panel;
     }
 
@@ -313,65 +325,64 @@
         var tr = document.createElement('tr');
         tr.dataset.productId = p.id;
 
-        var packUnits  = p.numbers_of_basic_commercial_units_in_pack || 1;
         var today      = formatDate(new Date());
         var dateChange = p.date_of_price_change || today;
         var dateNew    = p.date_of_the_new_prices || '';
-        var priceFirst = parseFloat(p.value_of_price_change_data_first || 0);
-
-        function calcGross(v) { return (v * packUnits * 1.23).toFixed(2); }
-        function calcNet(v)   { return (v * packUnits).toFixed(2); }
+        var vatMult    = 1 + (p.vat || 23) / 100;
 
         tr.innerHTML =
-            '<td>' +
-                '<span class="text-muted" style="font-size:11px;">' + escHtml(p.product_name_supplier_on_documents || '') + '</span><br>' +
-                '<strong>' + escHtml(p.name) + '</strong>' +
+            '<td class="td-product">' +
+                (p.product_name_supplier_on_documents
+                    ? '<span class="product-alias">' + escHtml(p.product_name_supplier_on_documents) + '</span>'
+                    : '') +
+                '<span class="product-main">' + escHtml(p.name) + '</span>' +
             '</td>' +
             '<td><code>' + escHtml(p.symbol) + '</code></td>' +
             '<td>' +
-                '<input type="date" class="form-control input-sm date-change" ' +
-                    'data-field="date_of_price_change" value="' + escHtml(dateChange) + '" required>' +
+                '<input type="date" class="form-control input-sm date-input date-change" ' +
+                    'data-field="date_of_price_change" value="' + escHtml(dateChange) + '">' +
             '</td>' +
             '<td>' +
-                '<input type="date" class="form-control input-sm date-new" ' +
-                    'data-field="date_of_the_new_prices" value="' + escHtml(dateNew) + '" required>' +
+                '<input type="date" class="form-control input-sm date-input date-new" ' +
+                    'data-field="date_of_the_new_prices" value="' + escHtml(dateNew) + '">' +
             '</td>' +
-            activeCols.map(function(c) {
+            activeCols.map(function (c) {
                 var field   = 'value_of_price_change_data_' + c;
                 var current = parseFloat(p[field] || 0).toFixed(2);
                 var required = c === 'first' ? 'data-required="1"' : '';
-                return '<td>' +
-                    '<small class="text-muted" style="display:block;white-space:nowrap;">było: ' + current + '</small>' +
-                    '<input type="number" class="form-control input-sm price-input" ' +
-                        'data-field="' + field + '" ' + required +
-                        ' value="' + current + '" step="0.01" min="0" style="width:90px;">' +
+                var bruttoHtml = '';
+                if (c === 'first') {
+                    var brutto = (parseFloat(current) * vatMult).toFixed(2);
+                    bruttoHtml = ' <span class="brutto-preview text-muted" style="font-size:12px;white-space:nowrap;">' +
+                        '→ brutto: <strong class="brutto-val">' + brutto + '</strong>' +
+                        ' <small>(' + (p.vat || 23) + '%)</small></span>';
+                }
+                return '<td class="price-wrap">' +
+                    '<span class="price-was">poprzednio: ' + current + '</span>' +
+                    '<div style="display:flex;align-items:center;gap:8px;">' +
+                        '<input type="number" class="form-control price-input" ' +
+                            'data-field="' + field + '" ' + required +
+                            ' value="' + current + '" step="0.01" min="0">' +
+                        bruttoHtml +
+                    '</div>' +
                     '</td>';
-            }).join('') +
-            '<td class="text-info" style="white-space:nowrap;">' +
-                '<strong class="preview-gross">' + calcGross(priceFirst) + '</strong> PLN' +
-                (packUnits !== 1 ? '<br><small class="text-muted">(' + packUnits + ' szt.)</small>' : '') +
-            '</td>' +
-            '<td style="white-space:nowrap;">' +
-                '<span class="preview-net">' + calcNet(priceFirst) + '</span> PLN' +
-            '</td>';
+            }).join('');
 
-        // Store reference keyed by product id
         productRows[p.id] = { row: tr, product: p };
 
-        // Live preview update on first price input
+        // Live brutto preview for first price col
         var firstInput = tr.querySelector('[data-required="1"]');
         if (firstInput) {
             firstInput.addEventListener('input', function () {
                 var v = parseFloat(this.value.replace(',', '.')) || 0;
-                tr.querySelector('.preview-gross').textContent = calcGross(v);
-                tr.querySelector('.preview-net').textContent   = calcNet(v);
+                var el = tr.querySelector('.brutto-val');
+                if (el) el.textContent = (v * vatMult).toFixed(2);
             });
         }
 
-        // Cross-validate date_new >= date_change
         var dateChangeInput = tr.querySelector('.date-change');
         var dateNewInput    = tr.querySelector('.date-new');
-        dateNewInput.addEventListener('change', function() {
+        dateNewInput.addEventListener('change', function () {
             validateDates(dateChangeInput, dateNewInput);
         });
 
@@ -392,36 +403,32 @@
             var dateChange = tr.querySelector('[data-field="date_of_price_change"]').value;
             var dateNew    = tr.querySelector('[data-field="date_of_the_new_prices"]').value;
             var firstInput = tr.querySelector('[data-required="1"]');
-            var firstVal   = firstInput ? parseFloat(firstInput.value) : 0;
+            var firstVal   = firstInput ? parseFloat(firstInput.value.replace(',', '.')) : 0;
 
-            if (!dateChange) {
-                errors.push('Produkt ID ' + pid + ': brak daty zmiany ceny.');
-            }
-            if (!dateNew) {
-                errors.push('Produkt ID ' + pid + ': brak daty obowiązywania nowych cen.');
-            }
-            if (dateChange && dateNew && dateNew < dateChange) {
-                errors.push('Produkt ID ' + pid + ': data obowiązywania musi być >= dacie zmiany.');
-            }
-            if (firstInput && (isNaN(firstVal) || firstVal <= 0)) {
-                errors.push('Produkt ID ' + pid + ': główna cena musi być większa od 0.');
-            }
+            if (!dateChange) errors.push('Produkt ID ' + pid + ': brak daty zmiany ceny.');
+            if (!dateNew)    errors.push('Produkt ID ' + pid + ': brak daty obowiązywania.');
+            if (dateChange && dateNew && dateNew < dateChange)
+                errors.push('Produkt ID ' + pid + ': "Obowiązuje od" musi być ≥ dacie zmiany.');
+            if (firstInput && (isNaN(firstVal) || firstVal <= 0))
+                errors.push('Produkt ID ' + pid + ': cena musi być większa od 0.');
 
             var item = { id: pid, date_of_price_change: dateChange, date_of_the_new_prices: dateNew };
-            tr.querySelectorAll('.price-input').forEach(function(input) {
-                item[input.dataset.field] = parseFloat(input.value) || 0;
+            tr.querySelectorAll('.price-input').forEach(function (input) {
+                item[input.dataset.field] = parseFloat(input.value.replace(',', '.')) || 0;
             });
             payload.push(item);
         });
 
         if (errors.length) {
-            showAlert('<strong>Popraw błędy:</strong><ul>' + errors.map(function(e){ return '<li>' + escHtml(e) + '</li>'; }).join('') + '</ul>', 'danger');
+            showAlert('<strong>Popraw błędy przed zapisem:</strong><ul style="margin:8px 0 0;">' +
+                errors.map(function (e) { return '<li>' + escHtml(e) + '</li>'; }).join('') +
+                '</ul>', 'danger');
             window.scrollTo(0, 0);
             return;
         }
 
         showAlert('');
-        saveBtn.disabled          = true;
+        saveBtn.disabled            = true;
         saveIndicator.style.display = '';
 
         fetch('{{ route('price-list.products', ['firmId' => '_ID_']) }}'.replace('_ID_', currentFirmId), {
@@ -433,29 +440,29 @@
             },
             body: JSON.stringify(payload),
         })
-            .then(function (res) {
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                return res.text();
-            })
-            .then(function () {
-                showAlert('Ceny zostały zapisane pomyślnie.', 'success');
-                window.scrollTo(0, 0);
-            })
-            .catch(function (err) {
-                showAlert('Błąd zapisu: ' + err.message + '. Sprawdź logi serwera.', 'danger');
-                window.scrollTo(0, 0);
-            })
-            .finally(function () {
-                saveBtn.disabled           = false;
-                saveIndicator.style.display = 'none';
-            });
+        .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.text();
+        })
+        .then(function () {
+            showAlert('Ceny zostały zapisane pomyślnie.', 'success');
+            window.scrollTo(0, 0);
+        })
+        .catch(function (err) {
+            showAlert('Błąd zapisu: ' + err.message + '. Sprawdź logi serwera.', 'danger');
+            window.scrollTo(0, 0);
+        })
+        .finally(function () {
+            saveBtn.disabled            = false;
+            saveIndicator.style.display = 'none';
+        });
     });
 
     // ── Helpers ────────────────────────────────────────────────────
     function validateDates(changeInput, newInput) {
         if (changeInput.value && newInput.value && newInput.value < changeInput.value) {
             newInput.setCustomValidity('Data obowiązywania musi być >= dacie zmiany.');
-            newInput.style.borderColor = '#d9534f';
+            newInput.style.borderColor = '#e74c3c';
         } else {
             newInput.setCustomValidity('');
             newInput.style.borderColor = '';
@@ -470,10 +477,8 @@
 
     function escHtml(str) {
         return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function showAlert(msg, type) {

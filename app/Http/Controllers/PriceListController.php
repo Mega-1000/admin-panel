@@ -25,7 +25,7 @@ class PriceListController extends Controller
     {
         $firm = Firm::findOrFail($firmId);
 
-        $products = Product::with('packing')->where('product_name_supplier', $firm->symbol)->get();
+        $products = Product::with('packing', 'price')->where('product_name_supplier', $firm->symbol)->get();
 
         $result = [];
 
@@ -70,6 +70,7 @@ class PriceListController extends Controller
                 'value_of_price_change_data_third'            => $product->value_of_price_change_data_third  ?: 0,
                 'value_of_price_change_data_fourth'           => $product->value_of_price_change_data_fourth ?: 0,
                 'numbers_of_basic_commercial_units_in_pack'   => $product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1,
+                'vat'                                         => $product->price?->vat ?? 23,
                 'order'                                       => $product->order ?: 0,
             ];
         }
