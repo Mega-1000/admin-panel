@@ -25,6 +25,8 @@ class PriceListController extends Controller
     {
         $firm = Firm::findOrFail($firmId);
 
+        $styrofoamCategoryIds = $this->getDescendantCategoryIds(42);
+
         $products = Product::with('packing', 'price')->where('product_name_supplier', $firm->symbol)->get();
 
         $result = [];
@@ -72,6 +74,7 @@ class PriceListController extends Controller
                 'numbers_of_basic_commercial_units_in_pack'   => $product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1,
                 'vat'                                         => $product->price?->vat ?? 23,
                 'additional_payment_for_milling'              => $product->price?->additional_payment_for_milling ?? 0,
+                'show_milling'                                => in_array($product->category_id, $styrofoamCategoryIds),
                 'order'                                       => $product->order ?: 0,
             ];
         }
@@ -162,5 +165,25 @@ class PriceListController extends Controller
 
             return response()->json(['message' => 'Błąd serwera. Sprawdź logi.'], 500);
         }
+    }
+
+    private function getDescendantCategoryIds(int $rootId): array
+    {
+        $all = \App\Entities\Category::select('id', 'parent_id')->get()->keyBy('id');
+
+        $ids     = [$rootId];
+        $queue   = [$rootId];
+
+        while (!empty($queue)) {
+            $parentId = array_shift($queue);
+            foreach ($all as $cat) {
+                if ((int) $cat->parent_id === $parentId) {
+                    $ids[]   = $cat->id;
+                    $queue[] = $cat->id;
+                }
+            }
+        }
+
+        return $ids;
     }
 }

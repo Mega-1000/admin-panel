@@ -278,6 +278,8 @@
             return c === 'first' || !!header['text_price_change_data_' + c];
         });
 
+        var showMilling = products.some(function (p) { return !!p.show_milling; });
+
         var panel = document.createElement('div');
         panel.className = 'panel panel-bordered pl-panel';
 
@@ -309,12 +311,12 @@
                 var label = header['text_price_change_data_' + c] || (c === 'first' ? 'Cena netto (PLN / j.p.)' : c);
                 return '<th class="price-wrap">' + escHtml(label) + '</th>';
             }).join('') +
-            '<th class="price-wrap">Dopłata za frezowanie<br><small class="text-muted">(PLN/m³)</small></th>';
+            (showMilling ? '<th class="price-wrap">Dopłata za frezowanie<br><small class="text-muted">(PLN/m³)</small></th>' : '');
         thead.appendChild(trH);
         table.appendChild(thead);
 
         var tbody = document.createElement('tbody');
-        products.forEach(function (p) { tbody.appendChild(renderProductRow(p, cols)); });
+        products.forEach(function (p) { tbody.appendChild(renderProductRow(p, cols, showMilling)); });
         table.appendChild(tbody);
 
         body.appendChild(table);
@@ -323,7 +325,7 @@
     }
 
     // ── Render one product row ─────────────────────────────────────
-    function renderProductRow(p, activeCols) {
+    function renderProductRow(p, activeCols, showMilling) {
         var tr = document.createElement('tr');
         tr.dataset.productId = p.id;
 
@@ -369,7 +371,7 @@
                     '</div>' +
                     '</td>';
             }).join('') +
-            (function () {
+            (showMilling ? (function () {
                 var millingVal = parseFloat(p.additional_payment_for_milling || 0).toFixed(2);
                 return '<td class="price-wrap">' +
                     '<span class="price-was">poprzednio: ' + millingVal + '</span>' +
@@ -377,7 +379,7 @@
                         'data-field="additional_payment_for_milling" ' +
                         'value="' + millingVal + '" step="0.01" min="0">' +
                     '</td>';
-            })();
+            })() : '');
 
         productRows[p.id] = { row: tr, product: p };
 
