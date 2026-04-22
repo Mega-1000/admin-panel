@@ -308,7 +308,8 @@
             cols.map(function (c) {
                 var label = header['text_price_change_data_' + c] || (c === 'first' ? 'Cena netto (PLN / j.p.)' : c);
                 return '<th class="price-wrap">' + escHtml(label) + '</th>';
-            }).join('');
+            }).join('') +
+            '<th class="price-wrap">Dopłata za frezowanie<br><small class="text-muted">(PLN/m³)</small></th>';
         thead.appendChild(trH);
         table.appendChild(thead);
 
@@ -367,7 +368,16 @@
                         bruttoHtml +
                     '</div>' +
                     '</td>';
-            }).join('');
+            }).join('') +
+            (function () {
+                var millingVal = parseFloat(p.additional_payment_for_milling || 0).toFixed(2);
+                return '<td class="price-wrap">' +
+                    '<span class="price-was">poprzednio: ' + millingVal + '</span>' +
+                    '<input type="number" class="form-control price-input" ' +
+                        'data-field="additional_payment_for_milling" ' +
+                        'value="' + millingVal + '" step="0.01" min="0">' +
+                    '</td>';
+            })();
 
         productRows[p.id] = { row: tr, product: p };
 

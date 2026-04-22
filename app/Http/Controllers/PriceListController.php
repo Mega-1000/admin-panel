@@ -71,6 +71,7 @@ class PriceListController extends Controller
                 'value_of_price_change_data_fourth'           => $product->value_of_price_change_data_fourth ?: 0,
                 'numbers_of_basic_commercial_units_in_pack'   => $product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1,
                 'vat'                                         => $product->price?->vat ?? 23,
+                'additional_payment_for_milling'              => $product->price?->additional_payment_for_milling ?? 0,
                 'order'                                       => $product->order ?: 0,
             ];
         }
@@ -137,6 +138,7 @@ class PriceListController extends Controller
                     'net_selling_price_aggregate_unit'                      => $priceFirst * $packUnits,
                     'net_selling_price_the_largest_unit'                    => $priceFirst * $packUnits,
                     'table_price'                                           => $priceFirst * $packUnits * 1.23,
+                    'additional_payment_for_milling'                        => (float) str_replace(',', '.', $item['additional_payment_for_milling'] ?? 0),
                 ]);
 
                 Product::whereIn('id', $relatedIds)->update([
