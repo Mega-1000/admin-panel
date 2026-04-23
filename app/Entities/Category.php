@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property boolean $save_name
  * @property boolean $save_description
  * @property boolean $save_image
+ * @property array $youtube
  *
  * @package namespace App\Entities;
  */

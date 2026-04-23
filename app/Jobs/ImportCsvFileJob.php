@@ -158,20 +158,21 @@ class ImportCsvFileJob implements ShouldQueue
             'deleted_at' => Carbon::now()
         ]);
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // Load ALL existing categories for name+parent_id matching in saveCategory()
+        $this->currentCategories = Category::all();
 
-        $this->currentCategories = Categories::getElementsForCsvReloadJob();
-        Categories::deleteElementsForCsvReloadJob();
-
-        DB::statement("TRUNCATE product_media");
-        DB::statement("TRUNCATE product_trade_groups");
-        DB::statement("TRUNCATE chimney_replacements");
-        DB::statement("TRUNCATE chimney_products");
-        DB::statement("TRUNCATE chimney_attribute_options");
-        DB::statement("TRUNCATE chimney_attributes");
-        DB::statement("TRUNCATE jpg_data");
-        DB::statement("TRUNCATE categories");
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        try {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            DB::statement("TRUNCATE product_media");
+            DB::statement("TRUNCATE product_trade_groups");
+            DB::statement("TRUNCATE chimney_replacements");
+            DB::statement("TRUNCATE chimney_products");
+            DB::statement("TRUNCATE chimney_attribute_options");
+            DB::statement("TRUNCATE chimney_attributes");
+            DB::statement("TRUNCATE jpg_data");
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        }
     }
 
     private function getUrl($url): array|string
@@ -200,31 +201,51 @@ class ImportCsvFileJob implements ShouldQueue
     {
         $parent = &$this->getCategoryParent($categoryTree);
 
-        /** @var Category $existingCategory */
-        $existingCategory = $this->currentCategories->filter(function ($category) use ($categoryTree) {
-            return $category->name === end($categoryTree);
-        })->first();
+        // Match by name + parent_id — stable now that categories are not truncated.
+        $parentId = $parent['id'] ?: null;
+        /** @var Category|null $existingCategory */
+        $existingCategory = $this->currentCategories->first(
+            fn($c) => $c->name === end($categoryTree) && (int) $c->parent_id === (int) $parentId
+        );
 
-        $image = $existingCategory?->save_image === false ? $existingCategory?->img : $line[303] ?? 'https://via.placeholder.com/300';
+        $name = ($existingCategory?->save_name === false && $existingCategory->name)
+            ? $existingCategory->name
+            : end($categoryTree);
+
+        $description = ($existingCategory?->save_description === false && $existingCategory->description)
+            ? $existingCategory->description
+            : $line[310];
+
+        $image = $existingCategory?->save_image === false
+            ? $existingCategory->img
+            : $line[303] ?? 'https://via.placeholder.com/300';
         if (strpos($image, "\\")) {
             $image = $this->getUrl($image);
         }
 
-        /** @var Category $category */
-        $category = Category::query()->create([
-            'name' => end($categoryTree),
-            'description' => $existingCategory?->description ?? $line[310],
-            'img' => $image,
-            'rewrite' => $this->rewrite(end($categoryTree)),
-            'is_visible' => $this->getShowOnPageParameter($line, $categoryColumn),
-            'priority' => $this->getProductsOrder($line, $categoryColumn),
-            'save_name' => $existingCategory?->save_name ?? true,
+        $categoryData = [
+            'name'             => $name,
+            'description'      => $description,
+            'img'              => $image,
+            'rewrite'          => $this->rewrite($name),
+            'is_visible'       => $this->getShowOnPageParameter($line, $categoryColumn),
+            'priority'         => $this->getProductsOrder($line, $categoryColumn),
+            'parent_id'        => $parentId,
+            'youtube'          => $existingCategory?->youtube,
+            'save_name'        => $existingCategory?->save_name ?? true,
             'save_description' => $existingCategory?->save_description ?? true,
-            'save_image' => $existingCategory?->save_image ?? true,
-            'parent_id' => $parent['id'],
-            'youtube' => $existingCategory?->youtube
-        ]);
+            'save_image'       => $existingCategory?->save_image ?? true,
+        ];
 
+        /** @var Category $category */
+        if ($existingCategory) {
+            $existingCategory->update($categoryData);
+            $category = $existingCategory;
+        } else {
+            $category = Category::query()->create($categoryData);
+        }
+
+        $this->seenCategoryIds[] = $category->id;
         $parent['children'][$category->name] = ['id' => $category->id, 'children' => []];
 
         $replacements = $this->getChimneyReplacements($line);
@@ -866,6 +887,26 @@ class ImportCsvFileJob implements ShouldQueue
         }
 
         JpgDatum::insert($data);
+    }
+
+    private function cleanupObsoleteCategories(): void
+    {
+        if (empty($this->seenCategoryIds)) {
+            return;
+        }
+
+        // Delete from deepest leaf upward: repeat until nothing is removed.
+        // A category is obsolete when it was not seen in the CSV AND has no products.
+        // We restrict each pass to leaf nodes (not a parent_id of another category)
+        // so that orphaned parents are cleaned up in subsequent passes.
+        do {
+            $usedParentIds = Category::whereNotNull('parent_id')->pluck('parent_id')->unique()->all();
+
+            $deleted = Category::whereNotIn('id', $this->seenCategoryIds)
+                ->whereNotIn('id', $usedParentIds)
+                ->whereDoesntHave('products')
+                ->delete();
+        } while ($deleted > 0);
     }
 
     private function log($text)
