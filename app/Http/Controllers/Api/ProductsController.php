@@ -203,8 +203,8 @@ class ProductsController extends Controller
                 ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
                 ->select([
                     'products.*',
-                    'product_prices.price',
-                    'product_packings.type',
+                    'product_prices.*',
+                    'product_packings.*',
                 ])
                 ->orderBy('products.priority')
                 ->orderBy('products.name')
