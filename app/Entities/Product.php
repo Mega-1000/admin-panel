@@ -204,7 +204,7 @@ class Product extends Model implements Transformable
         if (isset($this->attributes['net_purchase_price_basic_unit_after_discounts'])) {
             $basicUnitPrice = (float) $this->attributes['net_purchase_price_basic_unit_after_discounts'];
             $millingCost    = (float) ($this->attributes['additional_payment_for_milling'] ?? 0);
-            $unitsInPack    = max(1, (int) ($this->attributes['numbers_of_basic_commercial_units_in_pack'] ?? 1));
+            $unitsInPack    = $this->attributes['numbers_of_basic_commercial_units_in_pack'] ?? 1;
         } else {
             $price   = $this->relationLoaded('price')   ? $this->price   : null;
             $packing = $this->relationLoaded('packing') ? $this->packing : null;
