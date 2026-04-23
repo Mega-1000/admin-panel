@@ -12,6 +12,7 @@ use App\Entities\PostalCodeLatLon;
 use App\Entities\Product;
 use App\Entities\ProductTradeGroup;
 use App\Entities\Warehouse;
+use App\Mail\ImportSummaryMail;
 use App\Repositories\Categories;
 use DateTime;
 use Exception;
@@ -25,6 +26,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
@@ -46,9 +48,24 @@ class ImportCsvFileJob implements ShouldQueue
     private array $categories = ['id' => 0, 'children' => []];
     private array $productsRelated = [];
     private array $jpgData = [];
+    private array $seenCategoryIds = [];
 
     private $currentLine;
     private $existingProducts;
+
+    // Pre-loaded lookup caches — populated once before the main loop
+    private array $firmsCache       = [];
+    private array $postalCodesCache = [];
+    private array $rolesCache       = [];
+    private array $warehousesCache  = [];
+    private array $employeesCache   = [];
+
+    // Import summary counters
+    private int $productsCreated    = 0;
+    private int $productsUpdated    = 0;
+    private int $categoriesCreated  = 0;
+    private int $categoriesUpdated  = 0;
+    private int $categoriesDeleted  = 0;
 
     /**
      * @throws FileNotFoundException
@@ -74,13 +91,23 @@ class ImportCsvFileJob implements ShouldQueue
         $this->clearTables();
         $this->log('123' . '123' . 'Clear tables end');
 
+        $this->log('123' . '123' . 'Loading caches');
+        $this->loadCaches();
+
         $time = microtime(true);
+        $batchSize = 500;
+        DB::beginTransaction();
 
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
             if ($i % 100 === 0) {
                 $this->log('123' . '123' . $i . ' - time ' . round(microtime(true) - $time, 3));
                 $time = microtime(true);
+            }
+
+            if ($i % $batchSize === 0) {
+                DB::commit();
+                DB::beginTransaction();
             }
 
             // intentional variable assigning here, not an error
@@ -91,14 +118,14 @@ class ImportCsvFileJob implements ShouldQueue
             $array = $this->getProductArray($line, $categoryColumn);
             $categoryTree = $this->getCategoryTree($line, $categoryColumn);
 
-            $array = $this->attachEmployeesToProduct($line, $array);
-
             try {
+                $product = null;
                 $multiCalcBase = trim($line[$categoryColumn + 12]);
                 $multiCalcCurrent = trim($line[$categoryColumn + 8]);
                 if (empty($array['symbol']) && empty($multiCalcBase) && empty($multiCalcCurrent)) {
                     $this->saveCategory($line, $categoryTree, $categoryColumn);
                 } elseif ($line[6] == 1) {
+                    $array = $this->attachEmployeesToProduct($line, $array);
                     $product = $this->saveProduct($array, $categoryTree, !empty($multiCalcCurrent));
                     $media = $this->getProductsMedia($line);
                     if ($media) {
@@ -110,10 +137,11 @@ class ImportCsvFileJob implements ShouldQueue
                         $productAnalyze->product_id = $product->id;
                         $productAnalyze->parse_service = 'allegro';
                         $productAnalyze->parse_url = $line[500];
+                        $productAnalyze->save();
                     }
 
-                    /** @var Product $existingProducts */
-                    $existingProduct = $this->existingProducts->where('symbol', $array['symbol'])->first();
+                    /** @var Product|null $existingProduct */
+                    $existingProduct = $this->existingProducts->get($array['symbol']);
 
                     $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
@@ -135,17 +163,45 @@ class ImportCsvFileJob implements ShouldQueue
                 $this->log('123' . '123' . "Row $i EXCEPTION: " . $e->getMessage() . ", File: " . $e->getFile() . ", Line: " . $e->getLine());
             }
         }
+
+        DB::commit();
         $this->saveJpgData();
+        $this->cleanupObsoleteCategories();
 
         $this->updateImportTable();
         $this->makeBackups();
 
         $this->log('123' . '123' . 'Import end: ' . Carbon::now());
+        $this->sendSummaryEmail();
+    }
+
+    private function loadCaches(): void
+    {
+        $this->firmsCache = DB::table('firms')
+            ->select('id', 'symbol')
+            ->get()->keyBy('symbol')->all();
+
+        $this->postalCodesCache = DB::table('postal_code_lat_lon')
+            ->select('postal_code', 'latitude', 'longitude')
+            ->get()->keyBy('postal_code')->all();
+
+        $this->rolesCache = DB::table('employee_roles')
+            ->select('id', 'symbol')
+            ->get()->keyBy('symbol')->all();
+
+        $this->warehousesCache = DB::table('warehouses')
+            ->select('id', 'symbol')
+            ->get()->keyBy('symbol')->all();
+
+        // 241 employees — full Eloquent so we can call save()/sync() directly on them
+        $this->employeesCache = Employee::all()->keyBy(
+            fn($e) => $e->firstname . '||' . $e->lastname . '||' . $e->email
+        )->all();
     }
 
     private function clearTables()
     {
-        $this->existingProducts = Product::where('save_name', false)->orWhereNotNull('youtube')->get();
+        $this->existingProducts = Product::where('save_name', false)->orWhereNotNull('youtube')->get()->keyBy('symbol');
 
         Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
         Product::withTrashed()->update([
@@ -158,8 +214,10 @@ class ImportCsvFileJob implements ShouldQueue
             'deleted_at' => Carbon::now()
         ]);
 
-        // Load ALL existing categories for name+parent_id matching in saveCategory()
-        $this->currentCategories = Category::all();
+        // Load ALL existing categories keyed by "name||parent_id" for O(1) lookup in saveCategory()
+        $this->currentCategories = Category::all()->keyBy(
+            fn($c) => $c->name . '||' . (int) $c->parent_id
+        );
 
         try {
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
@@ -204,9 +262,7 @@ class ImportCsvFileJob implements ShouldQueue
         // Match by name + parent_id — stable now that categories are not truncated.
         $parentId = $parent['id'] ?: null;
         /** @var Category|null $existingCategory */
-        $existingCategory = $this->currentCategories->first(
-            fn($c) => $c->name === end($categoryTree) && (int) $c->parent_id === (int) $parentId
-        );
+        $existingCategory = $this->currentCategories->get(end($categoryTree) . '||' . (int) $parentId);
 
         $name = ($existingCategory?->save_name === false && $existingCategory->name)
             ? $existingCategory->name
@@ -241,8 +297,10 @@ class ImportCsvFileJob implements ShouldQueue
         if ($existingCategory) {
             $existingCategory->update($categoryData);
             $category = $existingCategory;
+            $this->categoriesUpdated++;
         } else {
             $category = Category::query()->create($categoryData);
+            $this->categoriesCreated++;
         }
 
         $this->seenCategoryIds[] = $category->id;
@@ -395,7 +453,8 @@ class ImportCsvFileJob implements ShouldQueue
             $product = Entities\Product::withTrashed()->where('symbol', $array['symbol'])->first();
         }
 
-        if (!$product) {
+        $isNewProduct = !$product;
+        if ($isNewProduct) {
             $product = new Entities\Product();
         }
 
@@ -471,6 +530,12 @@ class ImportCsvFileJob implements ShouldQueue
         $product->stock()->update([
             'number_on_a_layer' => $array['number_on_a_layer'] ?? null
         ]);
+
+        if ($isNewProduct) {
+            $this->productsCreated++;
+        } else {
+            $this->productsUpdated++;
+        }
 
         return $product;
     }
@@ -655,78 +720,61 @@ class ImportCsvFileJob implements ShouldQueue
         $employeesRows = array_chunk($employeesLines, $employeesColumns);
 
         foreach ($employeesRows as $row) {
-            // missing firstname, lastname or email
-            $firstName = $row[0];
-            $lastName = $row[2];
-            $email = $row[4];
+            $firstName  = $row[0];
+            $lastName   = $row[2];
+            $email      = $row[4];
             $postalCode = $row[14];
             if (!$firstName || !$lastName || !$email || !$postalCode) continue;
 
-            $employee = Employee::where([
-                'firstname' => $firstName,
-                'lastname' => $lastName,
-                'email' => $email,
-            ])->first();
+            $cacheKey = $firstName . '||' . $lastName . '||' . $email;
+            $employee  = $this->employeesCache[$cacheKey] ?? null;
 
             if (!$employee) {
                 $employee = new Employee();
-                $postal = PostalCodeLatLon::where('postal_code', $postalCode)->first();
+                $postal = $this->postalCodesCache[$postalCode] ?? null;
                 if (!$postal) continue;
-                $employee->latitude = $postal->latitude;
+                $employee->latitude  = $postal->latitude;
                 $employee->longitude = $postal->longitude;
             }
 
-            $firmSymbol = $line[20];
-            $firm = Firm::where('symbol', trim($firmSymbol))->first();
-
-            if (isset($firm->id)) {
+            $firm = $this->firmsCache[trim($line[20])] ?? null;
+            if ($firm) {
                 $employee->firm_id = $firm->id;
             }
-            $employee->firstname = $firstName;
-            $employee->firstname_visibility = !empty($row[1]);
-            $employee->lastName = $lastName;
-            $employee->lastname_visibility = !empty($row[3]);
-            $employee->email = $email;
-            $employee->email_visibility = !empty($row[5]);
-            $employee->phone = $row[6];
-            $employee->phone_visibility = !empty($row[7]);
-            $employee->comments = $row[10];
-            $employee->comments_visibility = !empty($row[11]);
-            $employee->additional_comments = $row[12];
-            $employee->faq = $row[13];
-            $employee->postal_code = $postalCode;
-            $employee->radius = intval($row[15]);
-            $employee->status = ($row[16] == 1) ? 'ACTIVE' : 'PENDING';
+            $employee->firstname             = $firstName;
+            $employee->firstname_visibility  = !empty($row[1]);
+            $employee->lastName              = $lastName;
+            $employee->lastname_visibility   = !empty($row[3]);
+            $employee->email                 = $email;
+            $employee->email_visibility      = !empty($row[5]);
+            $employee->phone                 = $row[6];
+            $employee->phone_visibility      = !empty($row[7]);
+            $employee->comments              = $row[10];
+            $employee->comments_visibility   = !empty($row[11]);
+            $employee->additional_comments   = $row[12];
+            $employee->faq                   = $row[13];
+            $employee->postal_code           = $postalCode;
+            $employee->radius                = intval($row[15]);
+            $employee->status                = ($row[16] == 1) ? 'ACTIVE' : 'PENDING';
 
             $employee->save();
+            // Keep cache up to date for newly created employees
+            $this->employeesCache[$cacheKey] = $employee;
 
-            $roles = explode(',', $row[8]);
-            $warehouses = explode(',', $row[9]);
-
-            // attach roles
-            if (!empty($roles)) {
-                $rolesToAttach = [];
-                foreach ($roles as $roleSymbol) {
-
-                    $employeeRole = EmployeeRole::where('symbol', trim($roleSymbol))->first();
-                    if (!empty($employeeRole)) {
-                        $rolesToAttach[] = $employeeRole->id;
-                    }
-                }
-                if (!empty($rolesToAttach)) $employee->employeeRoles()->sync($rolesToAttach);
+            $rolesToAttach = [];
+            foreach (explode(',', $row[8]) as $roleSymbol) {
+                $cached = $this->rolesCache[trim($roleSymbol)] ?? null;
+                if ($cached) $rolesToAttach[] = $cached->id;
             }
-            // attach warehouses
-            if (!empty($warehouses)) {
-                $warehousesToAttach = [];
-                foreach ($warehouses as $warehouseSymbol) {
+            if (!empty($rolesToAttach)) $employee->employeeRoles()->sync($rolesToAttach);
 
-                    $warehouse = Warehouse::where('symbol', trim($warehouseSymbol))->first();
-                    if (!empty($warehouse)) {
-                        $warehousesToAttach[] = $warehouse->id;
-                    }
-                }
-                if (!empty($warehousesToAttach)) $employee->warehouses()->sync($warehousesToAttach);
+            $warehousesToAttach = [];
+            foreach (explode(',', $row[9]) as $warehouseSymbol) {
+                $cached = $this->warehousesCache[trim($warehouseSymbol)] ?? null;
+                if ($cached) $warehousesToAttach[] = $cached->id;
             }
+            if (!empty($warehousesToAttach)) $employee->warehouses()->sync($warehousesToAttach);
+
             $employeesIds[] = $employee->id;
         }
         $array['employees_ids'] = json_encode($employeesIds);
@@ -906,7 +954,36 @@ class ImportCsvFileJob implements ShouldQueue
                 ->whereNotIn('id', $usedParentIds)
                 ->whereDoesntHave('products')
                 ->delete();
+
+            $this->categoriesDeleted += $deleted;
         } while ($deleted > 0);
+    }
+
+    private function sendSummaryEmail(): void
+    {
+        $summary = [
+            'products_created'   => $this->productsCreated,
+            'products_updated'   => $this->productsUpdated,
+            'categories_created' => $this->categoriesCreated,
+            'categories_updated' => $this->categoriesUpdated,
+            'categories_deleted' => $this->categoriesDeleted,
+            'imported_at'        => Carbon::now()->format('Y-m-d H:i:s'),
+        ];
+
+        $this->log('123123Import summary: ' . json_encode($summary));
+
+        $recipients = array_filter(array_map(
+            'trim',
+            explode(',', env('IMPORT_NOTIFY_EMAILS', 'bartosz.woszczak@gmail.com'))
+        ));
+
+        foreach ($recipients as $email) {
+            try {
+                Mail::to($email)->send(new ImportSummaryMail($summary));
+            } catch (Exception $e) {
+                $this->log('123123Failed to send summary email to ' . $email . ': ' . $e->getMessage());
+            }
+        }
     }
 
     private function log($text)

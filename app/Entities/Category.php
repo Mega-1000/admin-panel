@@ -47,7 +47,7 @@ class Category extends Model
         'artificially_created' => 'boolean',
         'youtube'          => 'array',
     ];
-    
+
     /**
      * @return HasMany
      */
