@@ -214,7 +214,7 @@ class Product extends Model implements Transformable
             $unitsInPack    = max(1, (int) ($packing?->numbers_of_basic_commercial_units_in_pack ?? 1));
         }
 
-        return round(($basicUnitPrice + $millingCost) / $unitsInPack, 4);
+        return round(($basicUnitPrice + $millingCost) * $unitsInPack, 4);
     }
 
     /**
