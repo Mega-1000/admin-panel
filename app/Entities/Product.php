@@ -201,19 +201,19 @@ class Product extends Model implements Transformable
     public function getCalculatedNetPriceAttribute(): float
     {
         // Join-based queries expose price/packing columns directly as raw attributes
-        if (isset($this->attributes['net_purchase_price_basic_unit_after_discounts'])) {
-            $basicUnitPrice = (float) $this->attributes['net_purchase_price_basic_unit_after_discounts'];
+        if (isset($this->attributes['net_purchase_price_basic_unit'])) {
+            $basicUnitPrice = (float) $this->attributes['net_purchase_price_basic_unit'];
             $millingCost    = (float) ($this->attributes['additional_payment_for_milling'] ?? 0);
             $unitsInPack    = $this->attributes['numbers_of_basic_commercial_units_in_pack'] ?? 1;
         } else {
             $price   = $this->relationLoaded('price')   ? $this->price   : null;
             $packing = $this->relationLoaded('packing') ? $this->packing : null;
 
-            $basicUnitPrice = (float) ($price?->net_purchase_price_basic_unit_after_discounts ?? 0);
+            $basicUnitPrice = (float) ($price?->net_purchase_price_basic_unit ?? 0);
             $millingCost    = (float) ($price?->additional_payment_for_milling ?? 0);
             $unitsInPack    = $packing?->numbers_of_basic_commercial_units_in_pack ?? 1;
         }
-        dd($basicUnitPrice, $millingCost, $unitsInPack);
+
         return round(($basicUnitPrice + $millingCost) * $unitsInPack, 4);
     }
 
