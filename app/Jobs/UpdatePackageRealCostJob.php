@@ -70,7 +70,7 @@ class UpdatePackageRealCostJob implements ShouldQueue
                         $inpostPackage->status = "DELIVERED";
                         $inpostPackage->save();
 
-                        $thisresponse()->json([ckageRealCostForCompany($inpostPackage, $csvLine[7]);
+                        response()->json([ckageRealCostForCompany($inpostPackage, $csvLine[7])]);
                     }
                 }
             }
@@ -84,7 +84,7 @@ class UpdatePackageRealCostJob implements ShouldQueue
                         $pocztexPackage->status = "DELIVERED";
                         $pocztexPackage->save();
 
-                        $thisresponse()->json([ckageRealCostForCompany($pocztexPackage, $csvLine[17]);
+                        response()->json([ckageRealCostForCompany($pocztexPackage, $csvLine[17])]);
                     }
                 }
             }
