@@ -447,6 +447,27 @@ class ProductsController extends Controller
         return response()->json($products);
     }
 
+    public function getCalculatedNetPrice(Product $product): JsonResponse
+    {
+        $product->loadMissing('price', 'packing');
+
+        $basicUnitPrice = (float) ($product->price?->net_purchase_price_basic_unit_after_discounts ?? 0);
+        $millingCost    = (float) ($product->price?->additional_payment_for_milling ?? 0);
+        $unitsInPack    = (int)   ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1);
+
+        $calculatedNetPrice = $unitsInPack > 0
+            ? ($basicUnitPrice + $millingCost) / $unitsInPack
+            : 0;
+
+        return response()->json([
+            'product_id'                                 => $product->id,
+            'net_purchase_price_basic_unit_after_discounts' => $basicUnitPrice,
+            'additional_payment_for_milling'             => $millingCost,
+            'numbers_of_basic_commercial_units_in_pack'  => $unitsInPack,
+            'calculated_net_price'                       => round($calculatedNetPrice, 4),
+        ]);
+    }
+
     public function searchProduct(string $query): JsonResponse
     {
         $query = strtolower($query);
@@ -454,7 +475,7 @@ class ProductsController extends Controller
         return response()->json(
             Product::where('name', 'like', '%' . $query .'%')
 //                ->whereHas('children')
-                ->with(['price', 'opinions']) // Eager load 'price' and 'opinions' relationships
+                ->with(['price', 'packing', 'opinions'])
                 ->limit(5)
                 ->get()
                 ->each(function ($product) {
