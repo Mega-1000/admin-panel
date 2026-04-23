@@ -93,6 +93,9 @@ class AddLabelService
 
             /** @var Label $label */
             $label = Label::where('id', $labelId)->first();
+            if (!$label) {
+                continue;
+            }
             // init timed labels
             if ($time !== null) {
                 $preLabelId = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->first()?->label_to_add_id;
