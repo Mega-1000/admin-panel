@@ -211,7 +211,7 @@ class Product extends Model implements Transformable
 
             $basicUnitPrice = (float) ($price?->net_purchase_price_basic_unit_after_discounts ?? 0);
             $millingCost    = (float) ($price?->additional_payment_for_milling ?? 0);
-            $unitsInPack    = max(1, (int) ($packing?->numbers_of_basic_commercial_units_in_pack ?? 1));
+            $unitsInPack    = $packing?->numbers_of_basic_commercial_units_in_pack ?? 1;
         }
 
         return round(($basicUnitPrice + $millingCost) * $unitsInPack, 4);
