@@ -198,18 +198,20 @@ class ProductsController extends Controller
 
     public function getHiddenProducts(GetHiddenProductsRequest $request): JsonResponse
     {
-        $parent = Product::with(['children' => function ($q) {
-            $q->join('product_prices', 'products.id', '=', 'product_prices.product_id')
-                ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-                ->select([
-                    'products.*',
-                    'product_prices.*',
-                    'product_packings.*',
-                ])
-                ->orderBy('products.priority')
-                ->orderBy('products.name')
-                ->distinct();
-        }])->find((int)$request->product);
+        $parent = Product::with(['children.prices', 'children.product_packings'])
+            ->where('id', (int)$request->product)->first();
+//        $parent = Product::with(['children' => function ($q) {
+//            $q->join('product_prices', 'products.id', '=', 'product_prices.product_id')
+//                ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+//                ->select([
+//                    'products.*',
+//                    'product_prices.*',
+//                    'product_packings.*',
+//                ])
+//                ->orderBy('products.priority')
+//                ->orderBy('products.name')
+//                ->distinct();
+//        }])->find((int)$request->product);
 
         return response()->json($parent?->children ?? []);
     }
