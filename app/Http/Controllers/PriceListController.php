@@ -21,20 +21,24 @@ class PriceListController extends Controller
         return view('price-list.index', compact('firms'));
     }
 
-    public function getProducts(int $firmId): JsonResponse
+    public function getProducts(int $firmId, Request $request): JsonResponse
     {
-        $firm = Firm::findOrFail($firmId);
+        $firm    = Firm::findOrFail($firmId);
+        $page    = max(1, (int) $request->query('page', 1));
+        $perPage = 50;
 
         $styrofoamCategoryIds = $this->getDescendantCategoryIds(42);
 
-        $products = Product::with(['packing', 'price', 'children.packing', 'children.price'])
+        $paginator = Product::with(['packing', 'price', 'children.packing', 'children.price'])
             ->whereNull('parent_id')
             ->where('product_name_supplier', $firm->symbol)
-            ->get();
+            ->orderBy('order')
+            ->orderBy('name')
+            ->paginate($perPage, ['*'], 'page', $page);
 
         $result = [];
 
-        foreach ($products as $product) {
+        foreach ($paginator->items() as $product) {
             $group = $product->product_group_for_change_price;
 
             if ($group === null) {
@@ -47,15 +51,9 @@ class PriceListController extends Controller
                 }
             }
 
-            $dateOfPriceChange = $product->date_of_price_change
-                ? Carbon::parse($product->date_of_price_change)->addDay()->toDateString()
-                : '';
-
             if ($product->text_price_change_data_first !== null) {
-                $result[$groupExp][$numberGroup]['mainText'] = [
-                    'text_price_change' => $product->text_price_change,
-                ];
-                $result[$groupExp][$numberGroup]['header'] = [
+                $result[$groupExp][$numberGroup]['mainText'] = ['text_price_change' => $product->text_price_change];
+                $result[$groupExp][$numberGroup]['header']   = [
                     'text_price_change_data_first'  => $product->text_price_change_data_first,
                     'text_price_change_data_second' => $product->text_price_change_data_second,
                     'text_price_change_data_third'  => $product->text_price_change_data_third,
@@ -63,32 +61,20 @@ class PriceListController extends Controller
                 ];
             }
 
+            // Parent first, then its variants — order preserved from eager load
             $result[$groupExp][$numberGroup][] = $this->buildProductData($product, $styrofoamCategoryIds, false);
-
-            foreach ($product->children as $child) {
+            foreach ($product->children->sortBy('order') as $child) {
                 $result[$groupExp][$numberGroup][] = $this->buildProductData($child, $styrofoamCategoryIds, true);
             }
         }
 
-        // Sort product entries by 'order' within each subgroup
-        foreach ($result as $groupName => &$subgroups) {
-            foreach ($subgroups as $subNum => &$entries) {
-                $products = [];
-                $meta     = [];
-                foreach ($entries as $key => $entry) {
-                    if (is_array($entry) && isset($entry['id'])) {
-                        $products[] = $entry;
-                    } else {
-                        $meta[$key] = $entry;
-                    }
-                }
-                usort($products, fn($a, $b) => ($a['order'] ?? 0) <=> ($b['order'] ?? 0));
-                $entries = $meta + array_values($products);
-            }
-        }
-        unset($subgroups, $entries);
-
-        return response()->json($result);
+        return response()->json([
+            'groups'       => $result,
+            'current_page' => $paginator->currentPage(),
+            'last_page'    => $paginator->lastPage(),
+            'total'        => $paginator->total(),
+            'per_page'     => $perPage,
+        ]);
     }
 
     public function saveProducts(Request $request, int $firmId): JsonResponse
