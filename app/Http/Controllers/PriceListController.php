@@ -27,7 +27,10 @@ class PriceListController extends Controller
 
         $styrofoamCategoryIds = $this->getDescendantCategoryIds(42);
 
-        $products = Product::with('packing', 'price')->where('product_name_supplier', $firm->symbol)->get();
+        $products = Product::with(['packing', 'price', 'children.packing', 'children.price'])
+            ->whereNull('parent_id')
+            ->where('product_name_supplier', $firm->symbol)
+            ->get();
 
         $result = [];
 
@@ -60,33 +63,11 @@ class PriceListController extends Controller
                 ];
             }
 
-            $basicUnitPrice     = (float) ($product->price?->net_purchase_price_basic_unit_after_discounts ?? 0);
-            $millingCost        = (float) ($product->price?->additional_payment_for_milling ?? 0);
-            $unitsInPack        = max(1, (int) ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1));
-            $calculatedNetPrice = round(($basicUnitPrice + $millingCost) / $unitsInPack, 4);
+            $result[$groupExp][$numberGroup][] = $this->buildProductData($product, $styrofoamCategoryIds, false);
 
-            $result[$groupExp][$numberGroup][] = [
-                'id'                                              => $product->id,
-                'name'                                            => $product->name,
-                'symbol'                                          => $product->symbol,
-                'product_name_supplier'                           => $product->product_name_supplier,
-                'product_name_supplier_on_documents'              => $product->product_name_supplier_on_documents,
-                'date_of_price_change'                            => $dateOfPriceChange,
-                'date_of_the_new_prices'                          => null,
-                'value_of_price_change_data_first'                => $product->value_of_price_change_data_first  ?: 0,
-                'value_of_price_change_data_second'               => $product->value_of_price_change_data_second ?: 0,
-                'value_of_price_change_data_third'                => $product->value_of_price_change_data_third  ?: 0,
-                'value_of_price_change_data_fourth'               => $product->value_of_price_change_data_fourth ?: 0,
-                'numbers_of_basic_commercial_units_in_pack'       => $unitsInPack,
-                'vat'                                             => $product->price?->vat ?? 23,
-                'additional_payment_for_milling'                  => $millingCost,
-                'show_milling'                                    => in_array($product->category_id, $styrofoamCategoryIds),
-                'order'                                           => $product->order ?: 0,
-                'show_on_page'                                    => (bool) $product->show_on_page,
-                'pattern_to_set_the_price'                        => $product->pattern_to_set_the_price ?? '',
-                'products_related_to_the_automatic_price_change'  => $product->products_related_to_the_automatic_price_change ?? '',
-                'calculated_net_price'                            => $calculatedNetPrice,
-            ];
+            foreach ($product->children as $child) {
+                $result[$groupExp][$numberGroup][] = $this->buildProductData($child, $styrofoamCategoryIds, true);
+            }
         }
 
         // Sort product entries by 'order' within each subgroup
@@ -175,6 +156,40 @@ class PriceListController extends Controller
 
             return response()->json(['message' => 'Błąd serwera. Sprawdź logi.'], 500);
         }
+    }
+
+    private function buildProductData(Product $product, array $styrofoamCategoryIds, bool $isVariant): array
+    {
+        $basicUnitPrice     = (float) ($product->price?->net_purchase_price_basic_unit_after_discounts ?? 0);
+        $millingCost        = (float) ($product->price?->additional_payment_for_milling ?? 0);
+        $unitsInPack        = max(1, (int) ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1));
+        $calculatedNetPrice = round(($basicUnitPrice + $millingCost) / $unitsInPack, 2);
+
+        $dateOfPriceChange = $product->date_of_price_change
+            ? Carbon::parse($product->date_of_price_change)->addDay()->toDateString()
+            : '';
+
+        return [
+            'id'                               => $product->id,
+            'name'                             => $product->name,
+            'symbol'                           => $product->symbol,
+            'product_name_supplier'            => $product->product_name_supplier,
+            'product_name_supplier_on_documents' => $product->product_name_supplier_on_documents,
+            'date_of_price_change'             => $dateOfPriceChange,
+            'date_of_the_new_prices'           => null,
+            'value_of_price_change_data_first' => $product->value_of_price_change_data_first  ?: 0,
+            'value_of_price_change_data_second'=> $product->value_of_price_change_data_second ?: 0,
+            'value_of_price_change_data_third' => $product->value_of_price_change_data_third  ?: 0,
+            'value_of_price_change_data_fourth'=> $product->value_of_price_change_data_fourth ?: 0,
+            'numbers_of_basic_commercial_units_in_pack' => $unitsInPack,
+            'vat'                              => $product->price?->vat ?? 23,
+            'additional_payment_for_milling'   => $millingCost,
+            'show_milling'                     => in_array($product->category_id, $styrofoamCategoryIds),
+            'order'                            => $product->order ?: 0,
+            'pattern_to_set_the_price'         => $product->pattern_to_set_the_price ?? '',
+            'calculated_net_price'             => $calculatedNetPrice,
+            'is_variant'                       => $isVariant,
+        ];
     }
 
     private function getDescendantCategoryIds(int $rootId): array

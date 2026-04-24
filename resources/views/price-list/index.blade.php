@@ -30,19 +30,17 @@
     .pl-table .readonly-val { font-size: 13px; color: #555; white-space: nowrap; }
     .pl-table .pattern-val  { font-size: 11px; color: #888; font-family: monospace; white-space: nowrap; }
 
-    /* Hidden (show_on_page=0) product rows */
-    .tr-hidden { background: #f0f0f0 !important; }
-    .tr-hidden:hover { background: #e8eaf0 !important; }
-    .tr-hidden .product-main { color: #666; font-style: italic; }
-    .tr-hidden .name-indent { padding-left: 0; }
-    .badge-hidden {
-        display: inline-block; font-size: 10px; font-weight: 700; line-height: 1;
+    /* Variant (child) product rows */
+    .tr-variant { background: #f7f8fa !important; }
+    .tr-variant:hover { background: #eef0f7 !important; }
+    .tr-variant .td-product { padding-left: 28px; }
+    .tr-variant .product-main { font-size: 12px; }
+    .variant-arrow { color: #bbb; margin-right: 5px; font-size: 11px; }
+    .badge-variant {
+        display: inline-block; font-size: 10px; font-weight: 600; line-height: 1;
         padding: 2px 5px; border-radius: 3px; margin-right: 5px;
-        background: #bdc3c7; color: #fff; vertical-align: middle; letter-spacing: .3px;
+        background: #95a5a6; color: #fff; vertical-align: middle;
     }
-    /* Visible product rows that are children of a hidden parent */
-    .tr-child .td-product { padding-left: 28px; }
-    .tr-child .child-arrow { color: #bbb; margin-right: 4px; font-size: 11px; }
 
     #firm-search { font-size: 14px; }
     .firm-option { padding: 8px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
@@ -287,19 +285,7 @@
         var products = Object.keys(subgroup)
             .filter(function (k) { return subgroup[k] && typeof subgroup[k] === 'object' && 'id' in subgroup[k]; })
             .map(function (k) { return subgroup[k]; })
-            .sort(function (a, b) {
-                // hidden products (show_on_page=false) first, then by order
-                var hiddenA = a.show_on_page === false ? 0 : 1;
-                var hiddenB = b.show_on_page === false ? 0 : 1;
-                if (hiddenA !== hiddenB) return hiddenA - hiddenB;
-                return (a.order || 0) - (b.order || 0);
-            });
-
-        // Build set of hidden product symbols so we can indent their children
-        var hiddenSymbols = {};
-        products.forEach(function (p) {
-            if (p.show_on_page === false) hiddenSymbols[p.symbol] = true;
-        });
+            .sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
 
         // 'first' always visible; second/third/fourth only when the firm has a label configured
         var cols = ['first', 'second', 'third', 'fourth'].filter(function (c) {
@@ -346,7 +332,7 @@
         table.appendChild(thead);
 
         var tbody = document.createElement('tbody');
-        products.forEach(function (p) { tbody.appendChild(renderProductRow(p, cols, showMilling, hiddenSymbols)); });
+        products.forEach(function (p) { tbody.appendChild(renderProductRow(p, cols, showMilling)); });
         table.appendChild(tbody);
 
         body.appendChild(table);
@@ -355,30 +341,28 @@
     }
 
     // ── Render one product row ─────────────────────────────────────
-    function renderProductRow(p, activeCols, showMilling, hiddenSymbols) {
-        var isHidden  = p.show_on_page === false;
-        var isChild   = !isHidden && p.products_related_to_the_automatic_price_change &&
-                        hiddenSymbols[p.products_related_to_the_automatic_price_change];
+    function renderProductRow(p, activeCols, showMilling) {
+        var isVariant = !!p.is_variant;
 
         var tr = document.createElement('tr');
         tr.dataset.productId = p.id;
-        if (isHidden) tr.classList.add('tr-hidden');
-        if (isChild)  tr.classList.add('tr-child');
+        if (isVariant) tr.classList.add('tr-variant');
 
         var today      = formatDate(new Date());
         var dateChange = p.date_of_price_change || today;
         var dateNew    = p.date_of_the_new_prices || '';
         var vatMult    = 1 + (p.vat || 23) / 100;
 
-        var nameBadge  = isHidden ? '<span class="badge-hidden">UKRYTY</span>' : '';
-        var childArrow = isChild  ? '<span class="child-arrow">↳</span>' : '';
+        var variantPrefix = isVariant
+            ? '<span class="variant-arrow">↳</span><span class="badge-variant">wariant</span>'
+            : '';
 
         tr.innerHTML =
             '<td class="td-product">' +
                 (p.product_name_supplier_on_documents
                     ? '<span class="product-alias">' + escHtml(p.product_name_supplier_on_documents) + '</span>'
                     : '') +
-                nameBadge + childArrow +
+                variantPrefix +
                 '<span class="product-main">' + escHtml(p.name) + '</span>' +
             '</td>' +
             '<td><code>' + escHtml(p.symbol) + '</code></td>' +
@@ -422,7 +406,7 @@
             })() : '') +
             '<td><span class="pattern-val">' + escHtml(p.pattern_to_set_the_price || '—') + '</span></td>' +
             '<td class="price-wrap"><span class="readonly-val">' +
-                parseFloat(p.calculated_net_price || 0).toFixed(4) +
+                parseFloat(p.calculated_net_price || 0).toFixed(2) +
                 ' <small class="text-muted">PLN</small>' +
             '</span></td>';
 
