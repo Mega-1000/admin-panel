@@ -78,20 +78,20 @@ class ImportCsvFileJob implements ShouldQueue
             return;
         }
 
-        $this->log('123' . '123' . 'Import start: ' . Carbon::now());
+        $this->log('[IMPORT] Start: ' . Carbon::now());
 
         $handle = fopen($path, 'rb');
         if (!$handle) {
             $msg = 'CSV file not found';
-            $this->log('123' . '123' . $msg);
+            $this->log('[IMPORT] ERROR: CSV file not found at path: ' . $path);
             throw new FileNotFoundException($msg);
         }
 
-        $this->log('123' . '123' . 'Clear tables start');
+        $this->log('[IMPORT] Clearing tables...');
         $this->clearTables();
-        $this->log('123' . '123' . 'Clear tables end');
+        $this->log('[IMPORT] Tables cleared.');
 
-        $this->log('123' . '123' . 'Loading caches');
+        $this->log('[IMPORT] Loading lookup caches...');
         $this->loadCaches();
 
         $time = microtime(true);
@@ -100,8 +100,8 @@ class ImportCsvFileJob implements ShouldQueue
 
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
-            if ($i % 100 === 0) {
-                $this->log('123' . '123' . $i . ' - time ' . round(microtime(true) - $time, 3));
+            if ($i % $batchSize === 0) {
+                $this->log("[IMPORT] Progress: row $i — batch time " . round(microtime(true) - $time, 3) . 's');
                 $time = microtime(true);
             }
 
@@ -160,7 +160,9 @@ class ImportCsvFileJob implements ShouldQueue
                 }
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
             } catch (Exception $e) {
-                $this->log('123' . '123' . "Row $i EXCEPTION: " . $e->getMessage() . ", File: " . $e->getFile() . ", Line: " . $e->getLine());
+                $symbol = $array['symbol'] ?? '(brak symbolu)';
+                $category = implode(' > ', $categoryTree ?? []) ?: '(brak kategorii)';
+                $this->log("[IMPORT] BŁĄD wiersz $i | symbol: $symbol | kategoria: $category | {$e->getMessage()} | {$e->getFile()}:{$e->getLine()}");
             }
         }
 
@@ -171,7 +173,7 @@ class ImportCsvFileJob implements ShouldQueue
         $this->updateImportTable();
         $this->makeBackups();
 
-        $this->log('123' . '123' . 'Import end: ' . Carbon::now());
+        $this->log('[IMPORT] Koniec: ' . Carbon::now() . " | produkty: +{$this->productsCreated} upd:{$this->productsUpdated} | kategorie: +{$this->categoriesCreated} upd:{$this->categoriesUpdated} del:{$this->categoriesDeleted}");
         $this->sendSummaryEmail();
     }
 
@@ -321,16 +323,19 @@ class ImportCsvFileJob implements ShouldQueue
         $iMax = count($categoryTree) - ($isProduct ? 0 : 1);
         foreach ($categoryTree as $i => $cat) {
             if (isset($current['children'][$cat])) {
+                if ($i == $iMax && !$isProduct) {
+                    // Duplicate category row in CSV — return parent so saveCategory() can upsert
+                    return $current;
+                }
                 $current = &$current['children'][$cat];
                 if ($i == $iMax) {
-                    if ($isProduct) {
-                        if (empty($current['children'])) {
-                            return $current;
-                        }
-                        $this->log('123' . '123' . "Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
-                        return $this->categories;
+                    // isProduct: $current is now the deepest category node
+                    if (empty($current['children'])) {
+                        return $current;
                     }
-                    throw new Exception("Category already exists");
+                    $path = implode(' > ', $categoryTree);
+                    $this->log("[IMPORT] UWAGA wiersz {$this->currentLine}: produkt przypisany do kategorii z podkategoriami (niedozwolone) — ścieżka: $path");
+                    return $this->categories;
                 }
                 continue;
             } elseif ($i < $iMax) {
@@ -338,7 +343,8 @@ class ImportCsvFileJob implements ShouldQueue
                     if (empty($current['children'])) {
                         return $current;
                     }
-                    $this->log('123' . '123' . "Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                    $path = implode(' > ', $categoryTree);
+                    $this->log("[IMPORT] UWAGA wiersz {$this->currentLine}: produkt przypisany do kategorii z podkategoriami (niedozwolone) — ścieżka: $path");
                     return $this->categories;
                 }
                 throw new Exception("Missing category parent");
@@ -970,7 +976,7 @@ class ImportCsvFileJob implements ShouldQueue
             'imported_at'        => Carbon::now()->format('Y-m-d H:i:s'),
         ];
 
-        $this->log('123123Import summary: ' . json_encode($summary));
+        $this->log('[IMPORT] Podsumowanie: ' . json_encode($summary));
 
         $recipients = array_filter(array_map(
             'trim',
@@ -981,7 +987,7 @@ class ImportCsvFileJob implements ShouldQueue
             try {
                 Mail::to($email)->send(new ImportSummaryMail($summary));
             } catch (Exception $e) {
-                $this->log('123123Failed to send summary email to ' . $email . ': ' . $e->getMessage());
+                $this->log('[IMPORT] ERROR: Nie udało się wysłać e-mail podsumowania na ' . $email . ': ' . $e->getMessage());
             }
         }
     }
