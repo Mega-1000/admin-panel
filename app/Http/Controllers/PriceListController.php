@@ -36,24 +36,12 @@ class PriceListController extends Controller
             ->orderBy('name')
             ->paginate($perPage, ['*'], 'page', $page);
 
-        $result = [];
+        $products = [];
+        $header   = [];
 
         foreach ($paginator->items() as $product) {
-            $group = $product->product_group_for_change_price;
-
-            if ($group === null) {
-                $groupExp    = '(Pomocnicze)';
-                $numberGroup = '0';
-            } else {
-                [$numberGroup, $groupExp] = array_pad(explode('-', $group, 2), 2, '');
-                if (empty($groupExp)) {
-                    continue;
-                }
-            }
-
-            if ($product->text_price_change_data_first !== null) {
-                $result[$groupExp][$numberGroup]['mainText'] = ['text_price_change' => $product->text_price_change];
-                $result[$groupExp][$numberGroup]['header']   = [
+            if (empty($header) && $product->text_price_change_data_first !== null) {
+                $header = [
                     'text_price_change_data_first'  => $product->text_price_change_data_first,
                     'text_price_change_data_second' => $product->text_price_change_data_second,
                     'text_price_change_data_third'  => $product->text_price_change_data_third,
@@ -61,15 +49,15 @@ class PriceListController extends Controller
                 ];
             }
 
-            // Parent first, then its variants — order preserved from eager load
-            $result[$groupExp][$numberGroup][] = $this->buildProductData($product, $styrofoamCategoryIds, false);
+            $products[] = $this->buildProductData($product, $styrofoamCategoryIds, false);
             foreach ($product->children->sortBy('order') as $child) {
-                $result[$groupExp][$numberGroup][] = $this->buildProductData($child, $styrofoamCategoryIds, true);
+                $products[] = $this->buildProductData($child, $styrofoamCategoryIds, true);
             }
         }
 
         return response()->json([
-            'groups'       => $result,
+            'products'     => $products,
+            'header'       => $header,
             'current_page' => $paginator->currentPage(),
             'last_page'    => $paginator->lastPage(),
             'total'        => $paginator->total(),

@@ -264,13 +264,13 @@
             })
             .then(function (data) {
                 loadingIndicator.style.display = 'none';
-                if (!data.groups || Object.keys(data.groups).length === 0) {
+                if (!data.products || data.products.length === 0) {
                     showAlert('Brak produktów przypisanych do tej firmy.', 'warning');
                     return;
                 }
                 currentPage = data.current_page;
                 lastPage    = data.last_page;
-                renderGroups(data.groups);
+                renderProductsTable(data.products, data.header || {});
                 renderPagination(data);
                 productsArea.style.display = '';
             })
@@ -335,27 +335,8 @@
         productsArea.insertBefore(bar, productsArea.firstChild);
     }
 
-    // ── Render all groups ──────────────────────────────────────────
-    function renderGroups(data) {
-        Object.keys(data).sort().forEach(function (groupName) {
-            var subgroups = data[groupName];
-            Object.keys(subgroups).sort(function (a, b) { return a - b; }).forEach(function (subNum) {
-                groupsContainer.appendChild(renderSubgroup(groupName, subNum, subgroups[subNum]));
-            });
-        });
-    }
-
-    // ── Render one subgroup panel ──────────────────────────────────
-    function renderSubgroup(groupName, subNum, subgroup) {
-        var mainText = (subgroup.mainText && subgroup.mainText.text_price_change) || (groupName + ' – ' + subNum);
-        var header   = subgroup.header || {};
-
-        var products = Object.keys(subgroup)
-            .filter(function (k) { return subgroup[k] && typeof subgroup[k] === 'object' && 'id' in subgroup[k]; })
-            .map(function (k) { return subgroup[k]; })
-            .sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
-
-        // 'first' always visible; second/third/fourth only when the firm has a label configured
+    // ── Render flat products table ─────────────────────────────────
+    function renderProductsTable(products, header) {
         var cols = ['first', 'second', 'third', 'fourth'].filter(function (c) {
             return c === 'first' || !!header['text_price_change_data_' + c];
         });
@@ -364,16 +345,6 @@
 
         var panel = document.createElement('div');
         panel.className = 'panel panel-bordered pl-panel';
-
-        var heading = document.createElement('div');
-        heading.className = 'panel-heading';
-        heading.innerHTML =
-            '<h3 class="panel-title">' +
-            '<i class="fa fa-list" style="margin-right:6px;color:#7f8c8d;"></i>' +
-            escHtml(mainText) +
-            ' <span class="text-muted" style="font-weight:400;font-size:12px;">— ' + products.length + ' produktów</span>' +
-            '</h3>';
-        panel.appendChild(heading);
 
         var body = document.createElement('div');
         body.className = 'panel-body';
@@ -405,7 +376,7 @@
 
         body.appendChild(table);
         panel.appendChild(body);
-        return panel;
+        groupsContainer.appendChild(panel);
     }
 
     // ── Render one product row ─────────────────────────────────────
