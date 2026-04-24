@@ -33,14 +33,15 @@ class PriceListController extends Controller
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
+
             if ($group === null) {
-                continue;
-            }
-
-            [$numberGroup, $groupExp] = array_pad(explode('-', $group, 2), 2, '');
-
-            if (empty($groupExp)) {
-                continue;
+                $groupExp    = '(Pomocnicze)';
+                $numberGroup = '0';
+            } else {
+                [$numberGroup, $groupExp] = array_pad(explode('-', $group, 2), 2, '');
+                if (empty($groupExp)) {
+                    continue;
+                }
             }
 
             $dateOfPriceChange = $product->date_of_price_change
@@ -59,23 +60,32 @@ class PriceListController extends Controller
                 ];
             }
 
+            $basicUnitPrice     = (float) ($product->price?->net_purchase_price_basic_unit_after_discounts ?? 0);
+            $millingCost        = (float) ($product->price?->additional_payment_for_milling ?? 0);
+            $unitsInPack        = max(1, (int) ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1));
+            $calculatedNetPrice = round(($basicUnitPrice + $millingCost) / $unitsInPack, 4);
+
             $result[$groupExp][$numberGroup][] = [
-                'id'                                          => $product->id,
-                'name'                                        => $product->name,
-                'symbol'                                      => $product->symbol,
-                'product_name_supplier'                       => $product->product_name_supplier,
-                'product_name_supplier_on_documents'          => $product->product_name_supplier_on_documents,
-                'date_of_price_change'                        => $dateOfPriceChange,
-                'date_of_the_new_prices'                      => null,
-                'value_of_price_change_data_first'            => $product->value_of_price_change_data_first  ?: 0,
-                'value_of_price_change_data_second'           => $product->value_of_price_change_data_second ?: 0,
-                'value_of_price_change_data_third'            => $product->value_of_price_change_data_third  ?: 0,
-                'value_of_price_change_data_fourth'           => $product->value_of_price_change_data_fourth ?: 0,
-                'numbers_of_basic_commercial_units_in_pack'   => $product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1,
-                'vat'                                         => $product->price?->vat ?? 23,
-                'additional_payment_for_milling'              => $product->price?->additional_payment_for_milling ?? 0,
-                'show_milling'                                => in_array($product->category_id, $styrofoamCategoryIds),
-                'order'                                       => $product->order ?: 0,
+                'id'                                              => $product->id,
+                'name'                                            => $product->name,
+                'symbol'                                          => $product->symbol,
+                'product_name_supplier'                           => $product->product_name_supplier,
+                'product_name_supplier_on_documents'              => $product->product_name_supplier_on_documents,
+                'date_of_price_change'                            => $dateOfPriceChange,
+                'date_of_the_new_prices'                          => null,
+                'value_of_price_change_data_first'                => $product->value_of_price_change_data_first  ?: 0,
+                'value_of_price_change_data_second'               => $product->value_of_price_change_data_second ?: 0,
+                'value_of_price_change_data_third'                => $product->value_of_price_change_data_third  ?: 0,
+                'value_of_price_change_data_fourth'               => $product->value_of_price_change_data_fourth ?: 0,
+                'numbers_of_basic_commercial_units_in_pack'       => $unitsInPack,
+                'vat'                                             => $product->price?->vat ?? 23,
+                'additional_payment_for_milling'                  => $millingCost,
+                'show_milling'                                    => in_array($product->category_id, $styrofoamCategoryIds),
+                'order'                                           => $product->order ?: 0,
+                'show_on_page'                                    => (bool) $product->show_on_page,
+                'pattern_to_set_the_price'                        => $product->pattern_to_set_the_price ?? '',
+                'products_related_to_the_automatic_price_change'  => $product->products_related_to_the_automatic_price_change ?? '',
+                'calculated_net_price'                            => $calculatedNetPrice,
             ];
         }
 
