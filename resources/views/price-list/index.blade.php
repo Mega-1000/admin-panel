@@ -285,52 +285,51 @@
         var existing = document.getElementById('pagination-bar');
         if (existing) existing.remove();
 
-        if (data.last_page <= 1) return;
-
         var bar = document.createElement('div');
         bar.id = 'pagination-bar';
-        bar.style.cssText = 'display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:1px solid #e0e4ea;border-radius:4px;margin-bottom:16px;';
+        bar.style.cssText = 'display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:1px solid #e0e4ea;border-radius:4px;margin-bottom:16px;flex-wrap:wrap;';
 
         var info = document.createElement('span');
-        info.style.cssText = 'flex:1;font-size:13px;color:#666;';
-        info.textContent = 'Strona ' + data.current_page + ' z ' + data.last_page + ' (' + data.total + ' produktów)';
+        info.style.cssText = 'flex:1;font-size:13px;color:#666;min-width:180px;';
+        info.textContent = 'Strona ' + data.current_page + ' z ' + data.last_page + ' (' + data.total + ' produktów nadrzędnych)';
         bar.appendChild(info);
 
-        var prevBtn = document.createElement('button');
-        prevBtn.className = 'btn btn-default btn-sm';
-        prevBtn.innerHTML = '<i class="fa fa-chevron-left"></i> Poprzednia';
-        prevBtn.disabled  = data.current_page <= 1;
-        prevBtn.addEventListener('click', function () {
-            loadProducts(currentFirmId, currentPage - 1);
-            window.scrollTo(0, 0);
-        });
-        bar.appendChild(prevBtn);
+        if (data.last_page > 1) {
+            var prevBtn = document.createElement('button');
+            prevBtn.className = 'btn btn-default btn-sm';
+            prevBtn.innerHTML = '<i class="fa fa-chevron-left"></i> Poprzednia';
+            prevBtn.disabled  = data.current_page <= 1;
+            prevBtn.addEventListener('click', function () {
+                loadProducts(currentFirmId, currentPage - 1);
+                window.scrollTo(0, 0);
+            });
+            bar.appendChild(prevBtn);
 
-        // Page number buttons (show up to 7 around current)
-        var start = Math.max(1, data.current_page - 3);
-        var end   = Math.min(data.last_page, data.current_page + 3);
-        for (var p = start; p <= end; p++) {
-            (function (pageNum) {
-                var btn = document.createElement('button');
-                btn.className = 'btn btn-sm ' + (pageNum === data.current_page ? 'btn-primary' : 'btn-default');
-                btn.textContent = pageNum;
-                btn.addEventListener('click', function () {
-                    loadProducts(currentFirmId, pageNum);
-                    window.scrollTo(0, 0);
-                });
-                bar.appendChild(btn);
-            })(p);
+            var start = Math.max(1, data.current_page - 3);
+            var end   = Math.min(data.last_page, data.current_page + 3);
+            for (var p = start; p <= end; p++) {
+                (function (pageNum) {
+                    var btn = document.createElement('button');
+                    btn.className = 'btn btn-sm ' + (pageNum === data.current_page ? 'btn-primary' : 'btn-default');
+                    btn.textContent = pageNum;
+                    btn.addEventListener('click', function () {
+                        loadProducts(currentFirmId, pageNum);
+                        window.scrollTo(0, 0);
+                    });
+                    bar.appendChild(btn);
+                })(p);
+            }
+
+            var nextBtn = document.createElement('button');
+            nextBtn.className = 'btn btn-default btn-sm';
+            nextBtn.innerHTML = 'Następna <i class="fa fa-chevron-right"></i>';
+            nextBtn.disabled  = data.current_page >= data.last_page;
+            nextBtn.addEventListener('click', function () {
+                loadProducts(currentFirmId, currentPage + 1);
+                window.scrollTo(0, 0);
+            });
+            bar.appendChild(nextBtn);
         }
-
-        var nextBtn = document.createElement('button');
-        nextBtn.className = 'btn btn-default btn-sm';
-        nextBtn.innerHTML = 'Następna <i class="fa fa-chevron-right"></i>';
-        nextBtn.disabled  = data.current_page >= data.last_page;
-        nextBtn.addEventListener('click', function () {
-            loadProducts(currentFirmId, currentPage + 1);
-            window.scrollTo(0, 0);
-        });
-        bar.appendChild(nextBtn);
 
         productsArea.insertBefore(bar, productsArea.firstChild);
     }

@@ -206,7 +206,7 @@ class Product extends Model implements Transformable
             $millingCost    = (float) ($this->attributes['additional_payment_for_milling'] ?? 0);
             $unitsInPack    = $this->attributes['numbers_of_basic_commercial_units_in_pack'] ?? 1;
             $calculationType = ($this->attributes['pattern_to_set_the_price'] ?? '' ) === '[125]+[126]' ? 'frez' : 'simple';
-
+            dd($this->attributes);
         } else {
             $price   = $this->relationLoaded('price')   ? $this->price   : null;
             $packing = $this->relationLoaded('packing') ? $this->packing : null;

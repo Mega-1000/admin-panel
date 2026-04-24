@@ -40,6 +40,15 @@ class PriceListController extends Controller
         $header   = [];
 
         foreach ($paginator->items() as $product) {
+            // Skip products whose group code has no '-' separator (numeric-only codes are not valid groups)
+            $group = $product->product_group_for_change_price;
+            if ($group !== null) {
+                [, $groupExp] = array_pad(explode('-', $group, 2), 2, '');
+                if (empty($groupExp)) {
+                    continue;
+                }
+            }
+
             if (empty($header) && $product->text_price_change_data_first !== null) {
                 $header = [
                     'text_price_change_data_first'  => $product->text_price_change_data_first,
