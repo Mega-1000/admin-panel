@@ -26,7 +26,7 @@ Przypominamy o tym, że przedział dat wysyłki dla zamówienia o id {{ $order->
 <br>
 
 Jeśli zamówienie juź wyjechało, prosimy o potwierdzenie tego faktu klikając w przycisk poniżej:
-<a href="{{ rtrim(config('app.front_nuxt_url'), '/') . "/magazyn/awizacja/{$order->orderWarehouseNotifications->first()->id}/{$order->warehouse_id}/{$order->id}/wyslij-fakture" }}">
+<a href="{{ rtrim(config('app.front_nuxt_url'), '/') . "/magazyn/awizacja/{$order->orderWarehouseNotifications->first()?->id}/{$order->warehouse_id}/{$order->id}/wyslij-fakture" }}">
     <button style="background-color: #4CAF50; /* Green */
     border: none;
     color: white;
@@ -44,10 +44,10 @@ Potrzebujesz przełożyć daty zamówienia? Skontaktuj się z klientem po czym z
 
 @php
     $lowestDistance = PHP_INT_MAX;
-    $company = $order->warehouse->firm;
+    $company = $order->warehouse?->firm;
     $closestEmployee = null;
 
-    foreach ($company->employees as $employee) {
+    foreach (($company?->employees ?? []) as $employee) {
     $employee->distance = App\Helpers\LocationHelper::getDistanceOfClientToEmployee($employee, $order->customer);
 
     if ($employee->distance < $lowestDistance) {
@@ -63,11 +63,11 @@ Potrzebujesz przełożyć daty zamówienia? Skontaktuj się z klientem po czym z
     App\Services\MessageService::createNewCustomerOrEmployee($order->chat, new Illuminate\Http\Request(['type' => 'Employee']), $closestEmployee);
 
 
-    $token = app(\App\Helpers\MessagesHelper::class)->getChatToken(
+    $token = $closestEmployee ? app(\App\Helpers\MessagesHelper::class)->getChatToken(
         $order->id,
         $closestEmployee->id,
         'e',
-    );
+    ) : null;
 @endphp
 <a href="https://admin.mega1000.pl/chat/{{ $token }}">Zmień daty dostawy</a>
 
