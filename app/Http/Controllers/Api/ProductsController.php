@@ -454,7 +454,7 @@ class ProductsController extends Controller
         $unitsInPack    = (int)   ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1);
 
         $calculatedNetPrice = $unitsInPack > 0
-            ? ($basicUnitPrice + $millingCost) / $unitsInPack
+            ? ($basicUnitPrice + ($product->pattern_to_set_the_price === '[125]+[126]' ? $millingCost : 0)) / $unitsInPack
             : 0;
 
         return response()->json([
