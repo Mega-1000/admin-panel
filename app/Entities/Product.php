@@ -216,7 +216,9 @@ class Product extends Model implements Transformable
             $millingCost    = (float) ($price?->additional_payment_for_milling ?? 0);
             $unitsInPack    = $packing?->numbers_of_basic_commercial_units_in_pack ?? 1;
         }
-        dd($basicUnitPrice, $millingCost, $unitsInPack, $calculationType, round(($basicUnitPrice + ($calculationType === 'frez' ? $millingCost : 0)) * $unitsInPack, 4));
+        if($calculationType === 'frez' ) {
+            dd($basicUnitPrice, $millingCost, $unitsInPack, $calculationType, round(($basicUnitPrice + ($calculationType === 'frez' ? $millingCost : 0)) * $unitsInPack, 4));
+        }
         return round(($basicUnitPrice + ($calculationType === 'frez' ? $millingCost : 0)) * $unitsInPack, 4);
     }
 
