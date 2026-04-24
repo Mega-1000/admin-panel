@@ -364,7 +364,7 @@
             '<th style="text-align:center;">Szt.<br><small class="text-muted">w opak.</small></th>' +
             '<th class="price-wrap">Cena netto<br><small class="text-muted">/ opak.</small></th>' +
             '<th style="text-align:center;">VAT</th>' +
-            '<th class="price-wrap">Cena brutto<br><small class="text-muted">(wyliczona)</small></th>';
+            '<th class="price-wrap">Cena brutto<br><small class="text-muted">/ opak.</small></th>';
         thead.appendChild(trH);
         table.appendChild(thead);
 
@@ -393,7 +393,7 @@
         var firstPrice = parseFloat(p.value_of_price_change_data_first || 0);
         var milling    = parseFloat(p.additional_payment_for_milling || 0);
         var calcNet    = firstPrice + milling;
-        var calcBrutto = calcNet * (1 + vatRate);
+        var calcBrutto = (firstPrice * pack) * (1 + vatRate);
 
         var variantPrefix = isVariant
             ? '<span class="variant-arrow">↳</span><span class="badge-variant">wariant</span>'
@@ -453,7 +453,7 @@
                 var net = v + m;
                 tr.querySelector('.calc-net-val').innerHTML   = net.toFixed(2)           + ' <small class="text-muted">PLN</small>';
                 tr.querySelector('.pack-price-val').innerHTML = (v * pack).toFixed(2)    + ' <small class="text-muted">PLN</small>';
-                tr.querySelector('.calc-brutto-val').innerHTML= (net*(1+vatRate)).toFixed(2) + ' <small class="text-muted">PLN</small>';
+                tr.querySelector('.calc-brutto-val').innerHTML= (v * pack * (1+vatRate)).toFixed(2) + ' <small class="text-muted">PLN</small>';
             }
 
             if (firstInput)   firstInput.addEventListener('input', updateCalc);
