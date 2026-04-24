@@ -18,16 +18,16 @@ class PackageController extends Controller
 
         $prodIds = [];
         foreach ($responseArray as $items) {
-            if (!isset($items['id'])) {
+            if (!isset($items['symbol'])) {
                 continue;
             }
-            $prodIds[] = $items['id'];
+            $prodIds[] = $items['symbol'];
         }
 
-        $prodList = Product::whereIn('id', $prodIds)->with('tradeGroups')->with('price')->get();
+        $prodList = Product::whereIn('symbol', $prodIds)->with('tradeGroups')->with('price')->get();
 
         $prodList->map(function ($item) use ($responseArray) {
-            $product = $responseArray->where('id', $item->id)->first();
+            $product = $responseArray->where('symbol', $item->symbol)->first();
             $item->quantity = $product['amount'];
         });
 
