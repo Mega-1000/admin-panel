@@ -68,7 +68,7 @@ class Categories
             ->orderBy('name');
     }
 
-    public static function getCategoryWithAllChimneyAttributesOptions(int $id): Model
+    public static function getCategoryWithAllChimneyAttributesOptions(int $id): ?Model
     {
         return Category::with([
             'chimneyAttributes' => function ($q) {
