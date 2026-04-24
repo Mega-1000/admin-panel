@@ -336,9 +336,7 @@
 
     // ── Render flat products table ─────────────────────────────────
     function renderProductsTable(products, header) {
-        var cols = ['first', 'second', 'third', 'fourth'].filter(function (c) {
-            return c === 'first' || !!header['text_price_change_data_' + c];
-        });
+        var cols = ['first'];
 
         var showMilling = products.some(function (p) { return !!p.show_milling; });
 
@@ -364,6 +362,7 @@
                 return '<th class="price-wrap">' + escHtml(label) + '</th>';
             }).join('') +
             (showMilling ? '<th class="price-wrap">Dopłata za frezowanie<br><small class="text-muted">(PLN/m³)</small></th>' : '') +
+            '<th style="white-space:nowrap;">Szt. w opak.</th>' +
             '<th>Metoda wyliczenia</th>' +
             '<th class="price-wrap">Cena netto<br><small class="text-muted">(wyliczona)</small></th>';
         thead.appendChild(trH);
@@ -442,6 +441,7 @@
                         'value="' + millingVal + '" step="0.01" min="0">' +
                     '</td>';
             })() : '') +
+            '<td style="text-align:center;"><span class="readonly-val">' + (p.numbers_of_basic_commercial_units_in_pack || 1) + '</span></td>' +
             '<td><span class="pattern-val">' + escHtml(p.pattern_to_set_the_price || '—') + '</span></td>' +
             '<td class="price-wrap"><span class="readonly-val">' +
                 parseFloat(p.calculated_net_price || 0).toFixed(2) +
