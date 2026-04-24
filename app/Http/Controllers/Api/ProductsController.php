@@ -200,8 +200,8 @@ class ProductsController extends Controller
     {
         $parent = Product::with(['children' => function ($q) {
                 $q->select('product_prices.*', 'product_packings.*', 'products.*');
-                $q->join('product_prices', 'product.id', '=', 'product_prices.product_id');
-                $q->join('product_packings', 'product.id', '=', 'product_packings.product_id');
+                $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
+                $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
                 $q->orderBy('priority');
                 $q->orderBy('name');
             }])
