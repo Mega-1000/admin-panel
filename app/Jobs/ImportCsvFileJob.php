@@ -644,7 +644,7 @@ class ImportCsvFileJob implements ShouldQueue
             'per_package_factor' => $line[371],
             'trade_group_name' => $tradeGroup,
             'displayed_group_name' => $tradeGroupDisplay,
-            'additional_payment_for_milling' => $line[473],
+            'additional_payment_for_milling' => ($line[129] === '[125]+[126]' ? $line[473] : 0),
             'date_of_price_change' => $this->getDateOrNull($line[106]),
             'date_of_the_new_prices' => $this->getDateOrNull($line[107]),
             'product_group_for_change_price' => $line[108],
