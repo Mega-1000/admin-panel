@@ -147,7 +147,8 @@ class PriceListController extends Controller
         $millingCost        = (float) ($product->price?->additional_payment_for_milling ?? 0);
         $rawUnits    = (float) ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 0);
         $unitsInPack = $rawUnits > 0 ? $rawUnits : 1;
-        $calculatedNetPrice = round($basicUnitPrice + $millingCost, 2);
+        $usesMilling        = str_contains((string) ($product->pattern_to_set_the_price ?? ''), '[125]+[126]');
+        $calculatedNetPrice = round($basicUnitPrice + ($usesMilling ? $millingCost : 0), 2);
 
         $dateOfPriceChange = $product->date_of_price_change
             ? Carbon::parse($product->date_of_price_change)->addDay()->toDateString()
