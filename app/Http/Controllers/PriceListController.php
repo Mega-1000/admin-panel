@@ -145,7 +145,8 @@ class PriceListController extends Controller
     {
         $basicUnitPrice     = (float) ($product->price?->net_purchase_price_basic_unit_after_discounts ?? 0);
         $millingCost        = (float) ($product->price?->additional_payment_for_milling ?? 0);
-        $unitsInPack        = max(1, (float) ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1));
+        $rawUnits    = (float) ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 0);
+        $unitsInPack = $rawUnits > 0 ? $rawUnits : 1;
         $calculatedNetPrice = round(($basicUnitPrice + $millingCost) / $unitsInPack, 2);
 
         $dateOfPriceChange = $product->date_of_price_change
