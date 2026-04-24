@@ -357,15 +357,14 @@
             '<th>Symbol</th>' +
             '<th>Obowiązuje od</th>' +
             '<th>Następna zmiana ceny</th>' +
-            cols.map(function (c) {
-                var label = header['text_price_change_data_' + c] || (c === 'first' ? 'Cena netto (PLN / j.p.)' : c);
-                return '<th class="price-wrap">' + escHtml(label) + '</th>';
-            }).join('') +
-            (showMilling ? '<th class="price-wrap">Dopłata za frezowanie<br><small class="text-muted">(PLN/m³)</small></th>' : '') +
-            '<th style="white-space:nowrap;">Szt.<br><small class="text-muted">w opak.</small></th>' +
-            '<th class="price-wrap">Cena netto<br><small class="text-muted">/ opak. (PLN)</small></th>' +
+            '<th class="price-wrap">Cena netto<br><small class="text-muted">(PLN / j.p.)</small></th>' +
+            (showMilling ? '<th class="price-wrap">Dopłata za frez.<br><small class="text-muted">(PLN/m³)</small></th>' : '') +
             '<th>Metoda wyliczenia</th>' +
-            '<th class="price-wrap">Cena netto<br><small class="text-muted">(wyliczona)</small></th>';
+            '<th class="price-wrap">Cena netto<br><small class="text-muted">(wyliczona)</small></th>' +
+            '<th style="text-align:center;">Szt.<br><small class="text-muted">w opak.</small></th>' +
+            '<th class="price-wrap">Cena netto<br><small class="text-muted">/ opak.</small></th>' +
+            '<th style="text-align:center;">VAT</th>' +
+            '<th class="price-wrap">Cena brutto<br><small class="text-muted">(wyliczona)</small></th>';
         thead.appendChild(trH);
         table.appendChild(thead);
 
@@ -380,100 +379,92 @@
 
     // ── Render one product row ─────────────────────────────────────
     function renderProductRow(p, activeCols, showMilling) {
-        var isVariant = !!p.is_variant;
-
-        var tr = document.createElement('tr');
+        var isVariant  = !!p.is_variant;
+        var tr         = document.createElement('tr');
         tr.dataset.productId = p.id;
         if (isVariant) tr.classList.add('tr-variant');
 
         var today      = formatDate(new Date());
         var dateChange = p.date_of_price_change || today;
         var dateNew    = p.date_of_the_new_prices || '';
-        var vatMult    = 1 + (p.vat || 23) / 100;
+        var vat        = p.vat || 23;
+        var vatRate    = vat / 100;
+        var pack       = p.numbers_of_basic_commercial_units_in_pack || 1;
+        var firstPrice = parseFloat(p.value_of_price_change_data_first || 0);
+        var milling    = parseFloat(p.additional_payment_for_milling || 0);
+        var calcNet    = firstPrice + milling;
+        var calcBrutto = calcNet * (1 + vatRate);
 
         var variantPrefix = isVariant
             ? '<span class="variant-arrow">↳</span><span class="badge-variant">wariant</span>'
             : '';
 
+        // Date cells
+        var tdDates = isVariant
+            ? '<td><span class="readonly-val text-muted" style="font-size:12px;">' + escHtml(dateNew || '—') + '</span></td>' +
+              '<td><span class="readonly-val text-muted" style="font-size:12px;">' + escHtml(dateChange || '—') + '</span></td>'
+            : '<td><input type="date" class="form-control input-sm date-input date-new" data-field="date_of_the_new_prices" value="' + escHtml(dateNew) + '"></td>' +
+              '<td><input type="date" class="form-control input-sm date-input date-change" data-field="date_of_price_change" value="' + escHtml(dateChange) + '"></td>';
+
+        // First price cell
+        var tdFirstPrice = isVariant
+            ? '<td class="price-wrap"><span class="readonly-val">' + firstPrice.toFixed(2) + ' <small class="text-muted">PLN</small></span></td>'
+            : '<td class="price-wrap">' +
+                  '<span class="price-was">poprzednio: ' + firstPrice.toFixed(2) + '</span>' +
+                  '<input type="number" class="form-control price-input" data-field="value_of_price_change_data_first" data-required="1" value="' + firstPrice.toFixed(2) + '" step="0.01" min="0">' +
+              '</td>';
+
+        // Milling cell
+        var tdMilling = showMilling
+            ? (isVariant
+                ? '<td class="price-wrap"><span class="readonly-val">' + milling.toFixed(2) + ' <small class="text-muted">PLN</small></span></td>'
+                : '<td class="price-wrap">' +
+                      '<span class="price-was">poprzednio: ' + milling.toFixed(2) + '</span>' +
+                      '<input type="number" class="form-control price-input" data-field="additional_payment_for_milling" value="' + milling.toFixed(2) + '" step="0.01" min="0">' +
+                  '</td>')
+            : '';
+
         tr.innerHTML =
             '<td class="td-product">' +
-                (p.product_name_supplier_on_documents
-                    ? '<span class="product-alias">' + escHtml(p.product_name_supplier_on_documents) + '</span>'
-                    : '') +
+                (p.product_name_supplier_on_documents ? '<span class="product-alias">' + escHtml(p.product_name_supplier_on_documents) + '</span>' : '') +
                 variantPrefix +
                 '<span class="product-main">' + escHtml(p.name) + '</span>' +
             '</td>' +
             '<td><code>' + escHtml(p.symbol) + '</code></td>' +
-            '<td>' +
-                '<input type="date" class="form-control input-sm date-input date-new" ' +
-                    'data-field="date_of_the_new_prices" value="' + escHtml(dateNew) + '">' +
-            '</td>' +
-            '<td>' +
-                '<input type="date" class="form-control input-sm date-input date-change" ' +
-                    'data-field="date_of_price_change" value="' + escHtml(dateChange) + '">' +
-            '</td>' +
-            activeCols.map(function (c) {
-                var field   = 'value_of_price_change_data_' + c;
-                var current = parseFloat(p[field] || 0).toFixed(2);
-                var required = c === 'first' ? 'data-required="1"' : '';
-                var bruttoHtml = '';
-                if (c === 'first') {
-                    var brutto = (parseFloat(current) * vatMult).toFixed(2);
-                    bruttoHtml = ' <span class="brutto-preview text-muted" style="font-size:12px;white-space:nowrap;">' +
-                        '= <strong class="brutto-val">' + brutto + '</strong> PLN brutto' +
-                        ' <small>(VAT ' + (p.vat || 23) + '%)</small></span>';
-                }
-                return '<td class="price-wrap">' +
-                    '<span class="price-was">poprzednio: ' + current + '</span>' +
-                    '<div style="display:flex;align-items:center;gap:8px;">' +
-                        '<input type="number" class="form-control price-input" ' +
-                            'data-field="' + field + '" ' + required +
-                            ' value="' + current + '" step="0.01" min="0">' +
-                        bruttoHtml +
-                    '</div>' +
-                    '</td>';
-            }).join('') +
-            (showMilling ? (function () {
-                var millingVal = parseFloat(p.additional_payment_for_milling || 0).toFixed(2);
-                return '<td class="price-wrap">' +
-                    '<span class="price-was">poprzednio: ' + millingVal + '</span>' +
-                    '<input type="number" class="form-control price-input" ' +
-                        'data-field="additional_payment_for_milling" ' +
-                        'value="' + millingVal + '" step="0.01" min="0">' +
-                    '</td>';
-            })() : '') +
-            '<td style="text-align:center;"><span class="readonly-val">' + (p.numbers_of_basic_commercial_units_in_pack || 1) + '</span></td>' +
-            '<td class="price-wrap"><span class="readonly-val pack-price-val">' +
-                (parseFloat(p.value_of_price_change_data_first || 0) * (p.numbers_of_basic_commercial_units_in_pack || 1)).toFixed(2) +
-                ' <small class="text-muted">PLN</small></span></td>' +
+            tdDates +
+            tdFirstPrice +
+            tdMilling +
             '<td><span class="pattern-val">' + escHtml(p.pattern_to_set_the_price || '—') + '</span></td>' +
-            '<td class="price-wrap"><span class="readonly-val">' +
-                parseFloat(p.calculated_net_price || 0).toFixed(2) +
-                ' <small class="text-muted">PLN</small>' +
-            '</span></td>';
+            '<td class="price-wrap"><span class="readonly-val calc-net-val">' + calcNet.toFixed(2) + ' <small class="text-muted">PLN</small></span></td>' +
+            '<td style="text-align:center;"><span class="readonly-val">' + pack + '</span></td>' +
+            '<td class="price-wrap"><span class="readonly-val pack-price-val">' + (firstPrice * pack).toFixed(2) + ' <small class="text-muted">PLN</small></span></td>' +
+            '<td style="text-align:center;"><span class="readonly-val">' + vat + '%</span></td>' +
+            '<td class="price-wrap"><span class="readonly-val calc-brutto-val">' + calcBrutto.toFixed(2) + ' <small class="text-muted">PLN</small></span></td>';
 
-        productRows[p.id] = { row: tr, product: p };
+        if (!isVariant) {
+            productRows[p.id] = { row: tr, product: p };
 
-        // Live brutto preview for first price col
-        var firstInput = tr.querySelector('[data-required="1"]');
-        if (firstInput) {
-            firstInput.addEventListener('input', function () {
-                var v    = parseFloat(this.value.replace(',', '.')) || 0;
-                var pack = p.numbers_of_basic_commercial_units_in_pack || 1;
-                var el = tr.querySelector('.brutto-val');
-                if (el) el.textContent = (v * vatMult).toFixed(2);
-                var packEl = tr.querySelector('.pack-price-val');
-                if (packEl) packEl.innerHTML = (v * pack).toFixed(2) + ' <small class="text-muted">PLN</small>';
+            var firstInput   = tr.querySelector('[data-required="1"]');
+            var millingInput = tr.querySelector('[data-field="additional_payment_for_milling"]');
+
+            function updateCalc() {
+                var v   = parseFloat(firstInput ? firstInput.value.replace(',', '.') : 0) || 0;
+                var m   = parseFloat(millingInput ? millingInput.value.replace(',', '.') : 0) || 0;
+                var net = v + m;
+                tr.querySelector('.calc-net-val').innerHTML   = net.toFixed(2)           + ' <small class="text-muted">PLN</small>';
+                tr.querySelector('.pack-price-val').innerHTML = (v * pack).toFixed(2)    + ' <small class="text-muted">PLN</small>';
+                tr.querySelector('.calc-brutto-val').innerHTML= (net*(1+vatRate)).toFixed(2) + ' <small class="text-muted">PLN</small>';
+            }
+
+            if (firstInput)   firstInput.addEventListener('input', updateCalc);
+            if (millingInput) millingInput.addEventListener('input', updateCalc);
+
+            var dateChangeInput = tr.querySelector('.date-change');
+            var dateNewInput    = tr.querySelector('.date-new');
+            [dateNewInput, dateChangeInput].forEach(function (inp) {
+                inp.addEventListener('change', function () { validateDates(dateNewInput, dateChangeInput); });
             });
         }
-
-        var dateChangeInput = tr.querySelector('.date-change');
-        var dateNewInput    = tr.querySelector('.date-new');
-        [dateNewInput, dateChangeInput].forEach(function (inp) {
-            inp.addEventListener('change', function () {
-                validateDates(dateNewInput, dateChangeInput);
-            });
-        });
 
         return tr;
     }
