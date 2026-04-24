@@ -143,7 +143,7 @@ class PriceListController extends Controller
 
     private function buildProductData(Product $product, array $styrofoamCategoryIds, bool $isVariant): array
     {
-        $basicUnitPrice     = (float) ($product->price?->value_of_price_change_data_first ?? 0);
+        $basicUnitPrice     = (float) ($product->price?->net_purchase_price_basic_unit_after_discounts ?? 0);
         $millingCost        = (float) ($product->price?->additional_payment_for_milling ?? 0);
         $rawUnits    = (float) ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 0);
         $unitsInPack = $rawUnits > 0 ? $rawUnits : 1;
