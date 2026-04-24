@@ -201,8 +201,8 @@ class Product extends Model implements Transformable
     public function getCalculatedNetPriceAttribute(): float
     {
         // Join-based queries expose price/packing columns directly as raw attributes
-        if (isset($this->attributes['net_selling_price_basic_unit'])) {
-            $basicUnitPrice = (float) $this->attributes['net_selling_price_basic_unit'];
+        if (isset($this->attributes['value_of_price_change_data_first'])) {
+            $basicUnitPrice = (float) $this->attributes['value_of_price_change_data_first'];
             $millingCost    = (float) ($this->attributes['additional_payment_for_milling'] ?? 0);
             $unitsInPack    = $this->attributes['numbers_of_basic_commercial_units_in_pack'] ?? 1;
             $calculationType = ($this->attributes['pattern_to_set_the_price'] ?? '' ) === '[125]+[126]' ? 'frez' : 'simple';
@@ -213,7 +213,7 @@ class Product extends Model implements Transformable
             $calculationType = $this->pattern_to_set_the_price === '[125]+[126]' ? 'frez' : 'simple';
 
 
-            $basicUnitPrice = (float) ($price?->net_selling_price_basic_unit ?? 0);
+            $basicUnitPrice = (float) ($price?->value_of_price_change_data_first ?? 0);
             $millingCost    = (float) ($price?->additional_payment_for_milling ?? 0);
             $unitsInPack    = $packing?->numbers_of_basic_commercial_units_in_pack ?? 1;
         }
