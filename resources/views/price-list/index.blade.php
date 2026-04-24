@@ -392,7 +392,8 @@
         var pack       = p.numbers_of_basic_commercial_units_in_pack || 1;
         var firstPrice = parseFloat(p.value_of_price_change_data_first || 0);
         var milling    = parseFloat(p.additional_payment_for_milling || 0);
-        var calcNet    = firstPrice + milling;
+        var hasMilling = (p.pattern_to_set_the_price || '').indexOf('[125]+[126]') !== -1;
+        var calcNet    = parseFloat(p.calculated_net_price || 0);
         var calcBrutto = (firstPrice * pack) * (1 + vatRate);
 
         var variantPrefix = isVariant
@@ -450,7 +451,7 @@
             function updateCalc() {
                 var v   = parseFloat(firstInput ? firstInput.value.replace(',', '.') : 0) || 0;
                 var m   = parseFloat(millingInput ? millingInput.value.replace(',', '.') : 0) || 0;
-                var net = v + m;
+                var net = v + (hasMilling ? m : 0);
                 tr.querySelector('.calc-net-val').innerHTML   = net.toFixed(2)           + ' <small class="text-muted">PLN</small>';
                 tr.querySelector('.pack-price-val').innerHTML = (v * pack).toFixed(2)    + ' <small class="text-muted">PLN</small>';
                 tr.querySelector('.calc-brutto-val').innerHTML= (v * pack * (1+vatRate)).toFixed(2) + ' <small class="text-muted">PLN</small>';
