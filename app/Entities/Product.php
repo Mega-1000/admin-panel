@@ -217,7 +217,7 @@ class Product extends Model implements Transformable
             $unitsInPack    = $packing?->numbers_of_basic_commercial_units_in_pack ?? 1;
         }
 
-        return round($basicUnitPrice + ($calculationType === 'frez' ? $millingCost : 0)) * $unitsInPack, 2);
+        return round((($basicUnitPrice + ($calculationType === 'frez' ? $millingCost : 0)) * $unitsInPack), 2);
     }
 
     /**
