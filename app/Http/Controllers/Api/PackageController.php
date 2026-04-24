@@ -18,7 +18,10 @@ class PackageController extends Controller
 
         $prodIds = [];
         foreach ($responseArray as $items) {
-            $prodIds [] = $items['symbol'];
+            if (!isset($items['symbol'])) {
+                continue;
+            }
+            $prodIds[] = $items['symbol'];
         }
 
         $prodList = Product::whereIn('symbol', $prodIds)->with('tradeGroups')->with('price')->get();
