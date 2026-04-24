@@ -362,7 +362,8 @@
                 return '<th class="price-wrap">' + escHtml(label) + '</th>';
             }).join('') +
             (showMilling ? '<th class="price-wrap">Dopłata za frezowanie<br><small class="text-muted">(PLN/m³)</small></th>' : '') +
-            '<th style="white-space:nowrap;">Szt. w opak.</th>' +
+            '<th style="white-space:nowrap;">Szt.<br><small class="text-muted">w opak.</small></th>' +
+            '<th class="price-wrap">Cena netto<br><small class="text-muted">/ opak. (PLN)</small></th>' +
             '<th>Metoda wyliczenia</th>' +
             '<th class="price-wrap">Cena netto<br><small class="text-muted">(wyliczona)</small></th>';
         thead.appendChild(trH);
@@ -442,6 +443,9 @@
                     '</td>';
             })() : '') +
             '<td style="text-align:center;"><span class="readonly-val">' + (p.numbers_of_basic_commercial_units_in_pack || 1) + '</span></td>' +
+            '<td class="price-wrap"><span class="readonly-val pack-price-val">' +
+                (parseFloat(p.value_of_price_change_data_first || 0) * (p.numbers_of_basic_commercial_units_in_pack || 1)).toFixed(2) +
+                ' <small class="text-muted">PLN</small></span></td>' +
             '<td><span class="pattern-val">' + escHtml(p.pattern_to_set_the_price || '—') + '</span></td>' +
             '<td class="price-wrap"><span class="readonly-val">' +
                 parseFloat(p.calculated_net_price || 0).toFixed(2) +
@@ -454,9 +458,12 @@
         var firstInput = tr.querySelector('[data-required="1"]');
         if (firstInput) {
             firstInput.addEventListener('input', function () {
-                var v = parseFloat(this.value.replace(',', '.')) || 0;
+                var v    = parseFloat(this.value.replace(',', '.')) || 0;
+                var pack = p.numbers_of_basic_commercial_units_in_pack || 1;
                 var el = tr.querySelector('.brutto-val');
                 if (el) el.textContent = (v * vatMult).toFixed(2);
+                var packEl = tr.querySelector('.pack-price-val');
+                if (packEl) packEl.innerHTML = (v * pack).toFixed(2) + ' <small class="text-muted">PLN</small>';
             });
         }
 
