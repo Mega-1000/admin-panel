@@ -27,7 +27,7 @@ class PackageController extends Controller
         $prodList = Product::whereIn('id', $prodIds)->with('tradeGroups')->with('price')->get();
 
         $prodList->map(function ($item) use ($responseArray) {
-            $product = $responseArray->where('symbol', $item->symbol)->first();
+            $product = $responseArray->where('id', $item->id)->first();
             $item->quantity = $product['amount'];
         });
 
