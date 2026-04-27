@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Entities\Firm;
 use App\Entities\Product;
 use App\Entities\ProductPrice;
+use App\Services\ProductPriceCalculator;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -78,54 +79,53 @@ class PriceListController extends Controller
     {
         Firm::findOrFail($firmId);
 
+        $calculator = new ProductPriceCalculator();
+
         try {
             foreach ($request->json()->all() as $item) {
                 if (!array_key_exists('id', $item)) {
                     continue;
                 }
 
-                $product = Product::with('packing')->find($item['id']);
+                $product = Product::with(['packing', 'price', 'parentProduct'])->find($item['id']);
                 if (!$product) {
                     continue;
                 }
 
-                $relatedIds   = Product::where('products_related_to_the_automatic_price_change', $product->symbol)
+                $relatedIds = Product::where('products_related_to_the_automatic_price_change', $product->symbol)
                     ->pluck('id')
                     ->push($product->id)
                     ->unique()
                     ->all();
 
-                $priceFirst = (float) str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
-                $packUnits  = $product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1;
+                $millingCost = (float) str_replace(',', '.', $item['additional_payment_for_milling'] ?? 0);
 
-                ProductPrice::whereIn('product_id', $relatedIds)->update([
-                    'gross_selling_price_basic_unit'                        => $priceFirst * 1.23,
-                    'net_selling_price_basic_unit'                          => $priceFirst,
-                    'net_purchase_price_basic_unit_after_discounts'         => $priceFirst,
-                    'gross_purchase_price_basic_unit_after_discounts'       => $priceFirst * 1.23,
-                    'gross_selling_price_aggregate_unit'                    => $priceFirst * $packUnits,
-                    'gross_selling_price_commercial_unit'                   => $priceFirst * $packUnits,
-                    'gross_selling_price_the_largest_unit'                  => $priceFirst * $packUnits,
-                    'gross_purchase_price_aggregate_unit_after_discounts'   => $priceFirst * $packUnits,
-                    'gross_purchase_price_commercial_unit_after_discounts'  => $priceFirst * $packUnits,
-                    'gross_purchase_price_the_largest_unit_after_discounts' => $priceFirst * $packUnits,
-                    'gross_price_of_packing'                                => $priceFirst * $packUnits * 1.23,
-                    'net_selling_price_commercial_unit'                     => $priceFirst * $packUnits,
-                    'net_selling_price_calculated_unit'                     => $priceFirst,
-                    'net_selling_price_aggregate_unit'                      => $priceFirst * $packUnits,
-                    'net_selling_price_the_largest_unit'                    => $priceFirst * $packUnits,
-                    'table_price'                                           => $priceFirst * $packUnits * 1.23,
-                    'additional_payment_for_milling'                        => (float) str_replace(',', '.', $item['additional_payment_for_milling'] ?? 0),
-                ]);
-
+                // Replicate parameter values and dates to all related products
                 Product::whereIn('id', $relatedIds)->update([
                     'date_of_price_change'              => Carbon::parse($item['date_of_price_change'])->toDateString(),
                     'date_of_the_new_prices'            => Carbon::parse($item['date_of_the_new_prices'])->toDateString(),
-                    'value_of_price_change_data_first'  => $priceFirst,
+                    'value_of_price_change_data_first'  => (float) str_replace(',', '.', $item['value_of_price_change_data_first']  ?? 0),
                     'value_of_price_change_data_second' => (float) str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0),
                     'value_of_price_change_data_third'  => (float) str_replace(',', '.', $item['value_of_price_change_data_third']  ?? 0),
                     'value_of_price_change_data_fourth' => (float) str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0),
                 ]);
+
+                // Reload product with fresh parameter values for cascade calculation
+                $product->refresh();
+
+                // Override milling in the model so the calculator sees the new value
+                if ($product->price) {
+                    $product->price->additional_payment_for_milling = $millingCost;
+                }
+
+                // Calculate full price cascade using main product's packing/discounts/coating
+                $prices = $calculator->buildFullPriceArray($product);
+
+                // Apply milling cost from the form (overrides whatever buildFullPriceArray set)
+                $prices['additional_payment_for_milling'] = $millingCost;
+
+                // Replicate resulting prices to all related products
+                ProductPrice::whereIn('product_id', $relatedIds)->update($prices);
             }
 
             return response()->json(['message' => 'Ceny zostały zaktualizowane.'], 200);
@@ -173,6 +173,7 @@ class PriceListController extends Controller
             'order'                            => $product->order ?: 0,
             'pattern_to_set_the_price'         => $product->pattern_to_set_the_price ?? '',
             'calculated_net_price'             => $calculatedNetPrice,
+            'unit_type'                        => (new ProductPriceCalculator())->extractUnitType($product),
             'is_variant'                       => $isVariant,
         ];
     }

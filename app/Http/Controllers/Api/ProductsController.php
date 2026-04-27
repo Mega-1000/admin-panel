@@ -19,6 +19,7 @@ use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\Products;
 use App\Repositories\WarehouseRepository;
+use App\Services\ProductPriceCalculator;
 use App\Services\ProductsService;
 use App\Traits\Paginatable;
 use Carbon\Carbon;
@@ -117,54 +118,54 @@ class ProductsController extends Controller
 
     public function updateProductsPrice(Request $request)
     {
+        $calculator = new ProductPriceCalculator();
+
         try {
             foreach ($request->all() as $item) {
                 if (!array_key_exists('id', $item)) {
                     continue;
                 }
 
-                $product = Product::find($item['id']);
-                if (empty($product)) {
+                $product = Product::with(['packing', 'price', 'parentProduct'])->find($item['id']);
+                if (!$product) {
                     continue;
                 }
-                $productsRelatedIds = Product::where('products_related_to_the_automatic_price_change', $product->symbol)->pluck('id');
-                $productsRelatedIds[] = $product->id;
 
-                $array['date_of_price_change'] = (new Carbon($item['date_of_price_change']))->toDateString();
-                $array['date_of_the_new_prices'] = (new Carbon($item['date_of_the_new_prices']))->toDateString();
-                $array['value_of_price_change_data_first'] = (float)str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
-                $array['value_of_price_change_data_second'] = (float)str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0);
-                $array['value_of_price_change_data_third'] = (float)str_replace(',', '.', $item['value_of_price_change_data_third'] ?? 0);
-                $array['value_of_price_change_data_fourth'] = (float)str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0);
+                $relatedIds = Product::where('products_related_to_the_automatic_price_change', $product->symbol)
+                    ->pluck('id')
+                    ->push($product->id)
+                    ->unique()
+                    ->all();
 
-                $array['value_of_price_change_data_first'] = (float)str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
+                $millingCost = (float) str_replace(',', '.', $item['additional_payment_for_milling'] ?? 0);
 
-                Log::notice($array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack);
-                ProductPrice::whereIn('product_id', $productsRelatedIds)->update([
-                    'gross_selling_price_basic_unit' => $array['value_of_price_change_data_first'] * 1.23,
-                    'net_purchase_price_basic_unit_after_discounts' => $array['value_of_price_change_data_first'],
-                    'gross_purchase_price_basic_unit_after_discounts' => $array['value_of_price_change_data_first'] * 1.23,
-                    'net_selling_price_basic_unit' => $array['value_of_price_change_data_first'],
-
-                    'gross_purchase_price_aggregate_unit_after_discounts' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_purchase_price_commercial_unit_after_discounts' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_purchase_price_the_largest_unit_after_discounts' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_selling_price_aggregate_unit' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_selling_price_commercial_unit' => $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
-                    'gross_selling_price_the_largest_unit' =>  $array['value_of_price_change_data_first'] * $product->packing->numbers_of_basic_commercial_units_in_pack,
+                Product::whereIn('id', $relatedIds)->update([
+                    'date_of_price_change'              => Carbon::parse($item['date_of_price_change'])->toDateString(),
+                    'date_of_the_new_prices'            => Carbon::parse($item['date_of_the_new_prices'])->toDateString(),
+                    'value_of_price_change_data_first'  => (float) str_replace(',', '.', $item['value_of_price_change_data_first']  ?? 0),
+                    'value_of_price_change_data_second' => (float) str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0),
+                    'value_of_price_change_data_third'  => (float) str_replace(',', '.', $item['value_of_price_change_data_third']  ?? 0),
+                    'value_of_price_change_data_fourth' => (float) str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0),
                 ]);
 
-                Product::whereIn('id', $productsRelatedIds)->update($array);
-            }
+                $product->refresh();
 
-//            dispatch_now(new \App\Jobs\CheckDateOfProductNewPriceJob());
+                if ($product->price) {
+                    $product->price->additional_payment_for_milling = $millingCost;
+                }
+
+                $prices = $calculator->buildFullPriceArray($product);
+                $prices['additional_payment_for_milling'] = $millingCost;
+
+                ProductPrice::whereIn('product_id', $relatedIds)->update($prices);
+            }
 
             return $this->createdResponse();
         } catch (Exception $e) {
             Log::error('Problem with update product prices.',
                 ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
-            die();
+            return response()->json(['message' => 'Błąd serwera. Sprawdź logi.'], 500);
         }
     }
 
@@ -447,22 +448,14 @@ class ProductsController extends Controller
 
     public function getCalculatedNetPrice(Product $product): JsonResponse
     {
-        $product->loadMissing('price', 'packing');
+        $product->loadMissing('price');
 
-        $basicUnitPrice = (float) ($product->price?->net_purchase_price_basic_unit_after_discounts ?? 0);
-        $millingCost    = (float) ($product->price?->additional_payment_for_milling ?? 0);
-        $unitsInPack    = (int)   ($product->packing?->numbers_of_basic_commercial_units_in_pack ?? 1);
-
-        $calculatedNetPrice = $unitsInPack > 0
-            ? ($basicUnitPrice + ($product->pattern_to_set_the_price === '[125]+[126]' ? $millingCost : 0)) / $unitsInPack
-            : 0;
+        $netSellingPrice = (float) ($product->price?->net_selling_price_commercial_unit ?? 0);
 
         return response()->json([
-            'product_id'                                 => $product->id,
-            'net_purchase_price_basic_unit_after_discounts' => $basicUnitPrice,
-            'additional_payment_for_milling'             => $millingCost,
-            'numbers_of_basic_commercial_units_in_pack'  => $unitsInPack,
-            'calculated_net_price'                       => round($calculatedNetPrice, 4),
+            'product_id'                        => $product->id,
+            'net_selling_price_commercial_unit' => $netSellingPrice,
+            'calculated_net_price'              => $netSellingPrice,
         ]);
     }
 
