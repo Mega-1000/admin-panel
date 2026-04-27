@@ -390,7 +390,7 @@
         var vat        = p.vat || 23;
         var vatRate    = vat / 100;
         var pack       = p.numbers_of_basic_commercial_units_in_pack || 1;
-        var firstPrice = parseFloat((p.calculated_net_price || 0) * vat);
+        var firstPrice = parseFloat(p.value_of_price_change_data_first || 0);
         var milling    = parseFloat(p.additional_payment_for_milling || 0);
         var hasMilling = (p.pattern_to_set_the_price || '').indexOf('[125]+[126]') !== -1;
         var calcNet    = parseFloat(p.calculated_net_price || 0);
