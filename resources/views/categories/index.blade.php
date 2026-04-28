@@ -42,9 +42,9 @@
                                 <td>
                                     <strong>{{ $root->name }}</strong>
                                     @if($root->children->count())
-                                        <button class="btn btn-xs btn-default toggle-children" data-id="{{ $root->id }}" style="margin-left:6px;">
-                                            <i class="fa fa-chevron-down"></i> {{ $root->children->count() }}
-                                        </button>
+                                        <span class="expand-toggle" data-id="{{ $root->id }}">
+                                            <i class="fa fa-chevron-right"></i> {{ $root->children->count() }} podkategori{{ $root->children->count() === 1 ? 'a' : ($root->children->count() < 5 ? 'e' : 'i') }}
+                                        </span>
                                     @endif
                                 </td>
                                 <td>
@@ -81,9 +81,9 @@
                                         <i class="fa fa-angle-right text-muted"></i>
                                         {{ $child->name }}
                                         @if($child->children->count())
-                                            <button class="btn btn-xs btn-default toggle-children" data-id="{{ $child->id }}" style="margin-left:6px;">
-                                                <i class="fa fa-chevron-down"></i> {{ $child->children->count() }}
-                                            </button>
+                                            <span class="expand-toggle" data-id="{{ $child->id }}">
+                                                <i class="fa fa-chevron-right"></i> {{ $child->children->count() }} podkategori{{ $child->children->count() === 1 ? 'a' : ($child->children->count() < 5 ? 'e' : 'i') }}
+                                            </span>
                                         @endif
                                     </td>
                                     <td>
@@ -178,6 +178,40 @@
 }
 .cat-id:hover { background: #dde2f0; border-color: #3a5bd9; color: #3a5bd9; }
 .cat-id.copied { background: #d4edda; border-color: #28a745; color: #28a745; }
+
+.expand-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding: 2px 9px;
+    font-size: 12px;
+    color: #666;
+    background: #f0f2f7;
+    border: 1px solid #d0d4de;
+    border-radius: 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s, color .15s, border-color .15s;
+    vertical-align: middle;
+}
+.expand-toggle:hover {
+    background: #e2e6f3;
+    border-color: #a0a8c8;
+    color: #333;
+}
+.expand-toggle.open {
+    background: #3a5bd9;
+    border-color: #2a4bbf;
+    color: #fff;
+}
+.expand-toggle .fa {
+    font-size: 10px;
+    transition: transform .2s;
+}
+.expand-toggle.open .fa {
+    transform: rotate(90deg);
+}
 </style>
 @endsection
 
@@ -195,29 +229,28 @@
         });
     });
 
-    document.querySelectorAll('.toggle-children').forEach(function(btn) {
-        btn.addEventListener('click', function() {
+    document.querySelectorAll('.expand-toggle').forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
             var id = this.dataset.id;
             var rows = document.querySelectorAll('.children-of-' + id);
-            var icon = this.querySelector('i');
-            var visible = rows[0] && rows[0].style.display !== 'none';
+            var isOpen = this.classList.contains('open');
 
-            rows.forEach(function(row) {
-                row.style.display = visible ? 'none' : '';
-            });
-
-            icon.className = visible ? 'fa fa-chevron-down' : 'fa fa-chevron-up';
-
-            if (visible) {
-                document.querySelectorAll('[class*="children-of-"]').forEach(function(row) {
-                    var parentId = row.className.match(/children-of-(\d+)/);
-                    if (parentId) {
-                        var parentRow = document.querySelector('.children-of-' + id + '.level-2');
-                        if (parentRow && row.classList.contains('level-3')) {
-                            row.style.display = 'none';
-                        }
-                    }
+            if (isOpen) {
+                // collapse: hide this level AND any deeper levels that were open inside it
+                rows.forEach(function(row) {
+                    row.style.display = 'none';
+                    // also collapse any open toggles inside these rows
+                    row.querySelectorAll('.expand-toggle.open').forEach(function(inner) {
+                        inner.classList.remove('open');
+                        document.querySelectorAll('.children-of-' + inner.dataset.id).forEach(function(r) {
+                            r.style.display = 'none';
+                        });
+                    });
                 });
+                this.classList.remove('open');
+            } else {
+                rows.forEach(function(row) { row.style.display = ''; });
+                this.classList.add('open');
             }
         });
     });
