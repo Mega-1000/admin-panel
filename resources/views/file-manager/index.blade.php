@@ -127,7 +127,7 @@
                          @click="selectItem(item)"
                          @dblclick="item.is_dir && navigate(item.path)">
                         <template x-if="!item.is_dir && isImage(item.ext)">
-                            <img :src="item.url" class="fm-item-thumb" :alt="item.name" @error="$el.src='/uploads/file-manager/.placeholder.png'" loading="lazy">
+                            <img :src="item.url" class="fm-item-thumb" :alt="item.name" onerror="this.style.display='none'" loading="lazy">
                         </template>
                         <template x-if="item.is_dir">
                             <div class="fm-item-icon dir"><i class="fa fa-folder"></i></div>
