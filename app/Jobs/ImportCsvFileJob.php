@@ -262,7 +262,8 @@ class ImportCsvFileJob implements ShouldQueue
         }
 
         if (!$isChildProduct) {
-            $array['category_id'] = (int)trim($line[$categoryColumn + 1]) ?: null;
+            $categoryTree = $this->getCategoryTreeNames($line, $categoryColumn);
+            $array['category_id'] = $this->findCategoryId($categoryTree);
         } else {
             $array['category_id'] = null;
         }
@@ -710,6 +711,31 @@ class ImportCsvFileJob implements ShouldQueue
         }
 
         JpgDatum::insert($data);
+    }
+
+    private function getCategoryTreeNames($line, $categoryColumn): array
+    {
+        $names = [];
+        for ($j = 1; $j <= 6; $j++) {
+            $value = trim($line[$categoryColumn + $j]);
+            if (empty($value)) {
+                break;
+            }
+            $names[] = $value;
+        }
+        return $names;
+    }
+
+    private function findCategoryId(array $tree): ?int
+    {
+        foreach (array_reverse($tree) as $name) {
+            $category = Category::where('name', $name)->first();
+            if ($category) {
+                $this->seenCategoryIds[] = $category->id;
+                return $category->id;
+            }
+        }
+        return null;
     }
 
     private function cleanupObsoleteCategories(): void
