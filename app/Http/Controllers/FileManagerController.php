@@ -95,7 +95,7 @@ class FileManagerController extends Controller
 
     public function createFolder(Request $request): JsonResponse
     {
-        $request->validate(['name' => 'required|string|max:100|regex:/^[^\/\\\\<>:"|?*]+$/']);
+        $request->validate(['name' => ['required', 'string', 'max:100', 'regex:/^[^\\/\\\\<>:"|?*]+$/']]);
 
         $rel  = $this->sanitizePath($request->input('path', ''));
         $name = trim($request->input('name'));
@@ -138,7 +138,7 @@ class FileManagerController extends Controller
     {
         $request->validate([
             'path' => 'required|string',
-            'name' => 'required|string|max:255|regex:/^[^\/\\\\<>:"|?*]+$/',
+            'name' => ['required', 'string', 'max:255', 'regex:/^[^\\/\\\\<>:"|?*]+$/'],
         ]);
 
         $rel = $this->sanitizePath($request->input('path'));

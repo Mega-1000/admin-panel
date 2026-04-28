@@ -109,6 +109,16 @@
                 <button class="btn btn-danger" :disabled="!selected" @click="confirmDelete()" x-show="selected"><i class="fa fa-trash"></i> Usuń</button>
                 <div style="flex:1"></div>
                 <span x-show="toast" x-text="toast" style="font-size:12px;color:#28a745;font-weight:600"></span>
+                <div style="position:relative;display:flex;align-items:center">
+                    <i class="fa fa-search" style="position:absolute;left:9px;color:#aaa;font-size:12px;pointer-events:none"></i>
+                    <input type="text" x-model="search" placeholder="Szukaj pliku…"
+                           @keydown.escape="search=''"
+                           style="padding:5px 28px 5px 28px;font-size:12px;border:1px solid #ccc;border-radius:4px;width:200px;outline:none"
+                           @focus="$el.style.borderColor='#3a5bd9'" @blur="$el.style.borderColor='#ccc'">
+                    <template x-if="search">
+                        <button @click="search=''" style="position:absolute;right:7px;background:none;border:none;color:#aaa;cursor:pointer;font-size:14px;padding:0;line-height:1">&times;</button>
+                    </template>
+                </div>
             </div>
 
             {{-- Navigation bar (drill-down) --}}
@@ -128,7 +138,7 @@
                         <span x-text="isFavorite(currentPath) ? 'W ulubionych' : 'Dodaj do ulubionych'"></span>
                     </button>
                 </template>
-                <span class="fm-count" x-text="items.length + ' elementów'"></span>
+                <span class="fm-count" x-text="search ? filteredItems.length + '/' + items.length + ' elementów' : items.length + ' elementów'"></span>
             </div>
 
             {{-- Selected file info bar --}}
@@ -177,7 +187,7 @@
                 <template x-if="!loading && !errorMsg && items.length===0">
                     <div class="fm-empty"><i class="fa fa-folder-open-o fa-3x" style="display:block;margin-bottom:10px"></i>Folder jest pusty</div>
                 </template>
-                <template x-for="item in items" :key="item.path">
+                <template x-for="item in filteredItems" :key="item.path">
                     <div class="fm-item"
                          :class="{selected: selected && selected.path===item.path}"
                          @click="item.is_dir ? navigate(item.path) : selectItem(item)">
@@ -283,6 +293,7 @@ function fileManager() {
         previewItem: null,
         toast: '',
         errorMsg: '',
+        search: '',
         _toastTimer: null,
 
         get parentPath() {
@@ -297,8 +308,14 @@ function fileManager() {
             return this.currentPath.split('/').pop()
         },
 
+        get filteredItems() {
+            if (!this.search.trim()) return this.items
+            const q = this.search.trim().toLowerCase()
+            return this.items.filter(i => i.name.toLowerCase().includes(q))
+        },
+
         get previewImages() {
-            return this.items.filter(i => !i.is_dir && this.isImage(i.ext))
+            return this.filteredItems.filter(i => !i.is_dir && this.isImage(i.ext))
         },
 
         get previewIndex() {
@@ -314,6 +331,7 @@ function fileManager() {
             this.loading = true
             this.errorMsg = ''
             this.selected = null
+            this.search = ''
             fetch(`{{ route('file-manager.list') }}?path=${encodeURIComponent(path)}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
@@ -445,13 +463,13 @@ function fileManager() {
         },
 
         prevImage() {
-            if (!this.previewImages.length) return
+            if (!this.previewItem || !this.previewImages.length) return
             const idx = this.previewIndex
             this.previewItem = this.previewImages[(idx - 1 + this.previewImages.length) % this.previewImages.length]
         },
 
         nextImage() {
-            if (!this.previewImages.length) return
+            if (!this.previewItem || !this.previewImages.length) return
             const idx = this.previewIndex
             this.previewItem = this.previewImages[(idx + 1) % this.previewImages.length]
         },
