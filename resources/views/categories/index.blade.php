@@ -26,6 +26,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th style="width:55px">ID</th>
                             <th style="width:40%">Nazwa</th>
                             <th>Widoczna</th>
                             <th>Priorytet</th>
@@ -37,9 +38,9 @@
                     <tbody>
                         @forelse($roots as $root)
                             <tr class="category-row level-1">
+                                <td><span class="cat-id">{{ $root->id }}</span></td>
                                 <td>
                                     <strong>{{ $root->name }}</strong>
-                                    <small class="text-muted">#{{ $root->id }}</small>
                                     @if($root->children->count())
                                         <button class="btn btn-xs btn-default toggle-children" data-id="{{ $root->id }}" style="margin-left:6px;">
                                             <i class="fa fa-chevron-down"></i> {{ $root->children->count() }}
@@ -75,10 +76,10 @@
 
                             @foreach($root->children as $child)
                                 <tr class="category-row level-2 children-of-{{ $root->id }}" style="display:none; background:#fafafa;">
+                                    <td><span class="cat-id">{{ $child->id }}</span></td>
                                     <td style="padding-left:30px;">
                                         <i class="fa fa-angle-right text-muted"></i>
                                         {{ $child->name }}
-                                        <small class="text-muted">#{{ $child->id }}</small>
                                         @if($child->children->count())
                                             <button class="btn btn-xs btn-default toggle-children" data-id="{{ $child->id }}" style="margin-left:6px;">
                                                 <i class="fa fa-chevron-down"></i> {{ $child->children->count() }}
@@ -114,10 +115,10 @@
 
                                 @foreach($child->children as $grandchild)
                                     <tr class="category-row level-3 children-of-{{ $child->id }}" style="display:none; background:#f4f4f4;">
+                                        <td><span class="cat-id">{{ $grandchild->id }}</span></td>
                                         <td style="padding-left:60px;">
                                             <i class="fa fa-angle-double-right text-muted"></i>
                                             {{ $grandchild->name }}
-                                            <small class="text-muted">#{{ $grandchild->id }}</small>
                                         </td>
                                         <td>
                                             @if($grandchild->is_visible)
@@ -159,8 +160,41 @@
     </div>
 @endsection
 
+@section('css')
+<style>
+.cat-id {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #555;
+    background: #eef0f5;
+    border: 1px solid #d5d8e0;
+    border-radius: 3px;
+    padding: 1px 6px;
+    cursor: pointer;
+    user-select: all;
+    white-space: nowrap;
+}
+.cat-id:hover { background: #dde2f0; border-color: #3a5bd9; color: #3a5bd9; }
+.cat-id.copied { background: #d4edda; border-color: #28a745; color: #28a745; }
+</style>
+@endsection
+
 @section('scripts')
 <script>
+    document.querySelectorAll('.cat-id').forEach(function(el) {
+        el.title = 'Kliknij aby skopiować ID';
+        el.addEventListener('click', function() {
+            navigator.clipboard.writeText(this.textContent.trim()).then(() => {
+                this.classList.add('copied');
+                var orig = this.textContent;
+                this.textContent = '✓ ' + orig;
+                setTimeout(() => { this.textContent = orig; this.classList.remove('copied'); }, 1200);
+            });
+        });
+    });
+
     document.querySelectorAll('.toggle-children').forEach(function(btn) {
         btn.addEventListener('click', function() {
             var id = this.dataset.id;

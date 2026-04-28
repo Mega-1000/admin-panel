@@ -43,9 +43,6 @@ class ImportCsvFileJob implements ShouldQueue
         SerializesModels,
         IsMonitored;
 
-    public $currentCategories;
-
-    private array $categories = ['id' => 0, 'children' => []];
     private array $productsRelated = [];
     private array $jpgData = [];
     private array $seenCategoryIds = [];
@@ -116,17 +113,16 @@ class ImportCsvFileJob implements ShouldQueue
             }
 
             $array = $this->getProductArray($line, $categoryColumn);
-            $categoryTree = $this->getCategoryTree($line, $categoryColumn);
 
             try {
                 $product = null;
                 $multiCalcBase = trim($line[$categoryColumn + 12]);
                 $multiCalcCurrent = trim($line[$categoryColumn + 8]);
                 if (empty($array['symbol']) && empty($multiCalcBase) && empty($multiCalcCurrent)) {
-                    $this->saveCategory($line, $categoryTree, $categoryColumn);
+                    // category rows are skipped — categories are managed independently
                 } elseif ($line[6] == 1) {
                     $array = $this->attachEmployeesToProduct($line, $array);
-                    $product = $this->saveProduct($array, $categoryTree, !empty($multiCalcCurrent));
+                    $product = $this->saveProduct($array, $line, $categoryColumn, !empty($multiCalcCurrent));
                     $media = $this->getProductsMedia($line);
                     if ($media) {
                         $this->createProductMedia($media, $product);
@@ -165,8 +161,7 @@ class ImportCsvFileJob implements ShouldQueue
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
             } catch (Exception $e) {
                 $symbol = $array['symbol'] ?? '(brak symbolu)';
-                $category = implode(' > ', $categoryTree ?? []) ?: '(brak kategorii)';
-                $this->log("[IMPORT] BŁĄD wiersz $i | symbol: $symbol | kategoria: $category | {$e->getMessage()} | {$e->getFile()}:{$e->getLine()}");
+                $this->log("[IMPORT] BŁĄD wiersz $i | symbol: $symbol | {$e->getMessage()} | {$e->getFile()}:{$e->getLine()}");
             }
         }
 
@@ -220,11 +215,6 @@ class ImportCsvFileJob implements ShouldQueue
             'deleted_at' => Carbon::now()
         ]);
 
-        // Load ALL existing categories keyed by "name||parent_id" for O(1) lookup in saveCategory()
-        $this->currentCategories = Category::all()->keyBy(
-            fn($c) => $c->name . '||' . (int) $c->parent_id
-        );
-
         try {
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             DB::statement("TRUNCATE product_media");
@@ -258,205 +248,8 @@ class ImportCsvFileJob implements ShouldQueue
         return ((int)$line[$columnIterator + 7]) ?: 1000000;
     }
 
-    /**
-     * @throws Exception
-     */
-    private function saveCategory(array $line, array $categoryTree, int $categoryColumn)
-    {
-        $parent = &$this->getCategoryParent($categoryTree);
 
-        // Match by name + parent_id — stable now that categories are not truncated.
-        $parentId = $parent['id'] ?: null;
-        /** @var Category|null $existingCategory */
-        $existingCategory = $this->currentCategories->get(end($categoryTree) . '||' . (int) $parentId);
-
-        $name = ($existingCategory?->save_name === false && $existingCategory->name)
-            ? $existingCategory->name
-            : end($categoryTree);
-
-        $description = ($existingCategory?->save_description === false && $existingCategory->description)
-            ? $existingCategory->description
-            : $line[310];
-
-        $image = $existingCategory?->save_image === false
-            ? $existingCategory->img
-            : $line[303] ?? 'https://via.placeholder.com/300';
-        if (strpos($image, "\\")) {
-            $image = $this->getUrl($image);
-        }
-
-        $categoryData = [
-            'name'             => $name,
-            'description'      => $description,
-            'img'              => $image,
-            'rewrite'          => $this->rewrite($name),
-            'is_visible'       => $this->getShowOnPageParameter($line, $categoryColumn),
-            'priority'         => $this->getProductsOrder($line, $categoryColumn),
-            'parent_id'        => $parentId,
-            'youtube'          => $existingCategory?->youtube,
-            'save_name'        => $existingCategory?->save_name ?? true,
-            'save_description' => $existingCategory?->save_description ?? true,
-            'save_image'       => $existingCategory?->save_image ?? true,
-        ];
-
-        /** @var Category $category */
-        if ($existingCategory) {
-            $existingCategory->update($categoryData);
-            $category = $existingCategory;
-            $this->categoriesUpdated++;
-        } else {
-            $category = Category::query()->create($categoryData);
-            $this->categoriesCreated++;
-        }
-
-        $this->seenCategoryIds[] = $category->id;
-        $parent['children'][$category->name] = ['id' => $category->id, 'children' => []];
-
-        $replacements = $this->getChimneyReplacements($line);
-        $this->appendChimneyAttributes($category, $line);
-        $this->appendChimneyProducts($category, $line, 422, 40, false, $replacements);
-        $this->appendChimneyProducts($category, $line, 518, 38, true);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function &getCategoryParent($categoryTree, $isProduct = false)
-    {
-        $current = &$this->categories;
-        $iMax = count($categoryTree) - ($isProduct ? 0 : 1);
-        foreach ($categoryTree as $i => $cat) {
-            if (isset($current['children'][$cat])) {
-                if ($i == $iMax && !$isProduct) {
-                    // Duplicate category row in CSV — return parent so saveCategory() can upsert
-                    return $current;
-                }
-                $current = &$current['children'][$cat];
-                if ($i == $iMax) {
-                    // isProduct: $current is now the deepest category node
-                    if (empty($current['children'])) {
-                        return $current;
-                    }
-                    $path = implode(' > ', $categoryTree);
-                    $this->log("[IMPORT] UWAGA wiersz {$this->currentLine}: produkt przypisany do kategorii z podkategoriami (niedozwolone) — ścieżka: $path");
-                    return $this->categories;
-                }
-                continue;
-            } elseif ($i < $iMax) {
-                if ($isProduct) {
-                    if (empty($current['children'])) {
-                        return $current;
-                    }
-                    $path = implode(' > ', $categoryTree);
-                    $this->log("[IMPORT] UWAGA wiersz {$this->currentLine}: produkt przypisany do kategorii z podkategoriami (niedozwolone) — ścieżka: $path");
-                    return $this->categories;
-                }
-                throw new Exception("Missing category parent");
-            }
-        }
-        return $current;
-    }
-
-    private function appendChimneyAttributes($category, $line)
-    {
-        $start = 407;
-        for ($i = $start; $i < 422; $i++) {
-            if (empty($line[$i])) {
-                continue;
-            }
-            $arr = explode('||', $line[$i]);
-            if (count($arr) != 2) {
-                continue;
-            }
-            $attribute = $category->chimneyAttributes()->create([
-                'name' => $arr[0],
-                'column_number' => $i - $start + 1
-            ]);
-            $options = explode('|', $arr[1]);
-            $array = [];
-            foreach ($options as $opt) {
-                $opt = trim($opt);
-                if (!$opt) {
-                    continue;
-                }
-                $array[] = [
-                    'name' => $opt,
-                    'chimney_attribute_id' => $attribute->id,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ];
-            }
-            Entities\ChimneyAttributeOption::insert($array);
-        }
-    }
-
-    private function appendChimneyProducts($category, $line, $start, $count, $optional, $replacements = [])
-    {
-        for ($i = $start; $i < $start + $count; $i = $i + ($optional ? 2 : 1)) {
-            if (empty($line[$i])) {
-                continue;
-            }
-            $arr = explode('||', $line[$i]);
-            if (count($arr) != 2) {
-                continue;
-            }
-            $product = new Entities\ChimneyProduct([
-                'product_code' => $arr[0],
-                'formula' => $arr[1],
-                'column_number' => $optional ? 0 : $i - $start + 1,
-                'optional' => $optional ? 1 : 0
-            ]);
-            if (isset($replacements[$product->column_number])) {
-                $product->replacement_description = $replacements[$product->column_number]['description'];
-                $product->replacement_img = $replacements[$product->column_number]['img'];
-            }
-            $category->chimneyProducts()->save($product);
-
-
-
-            if (isset($replacements[$product->column_number])) {
-                $array = $replacements[$product->column_number]['products'];
-                foreach ($array as $key => $value) {
-                    $array[$key]['chimney_product_id'] = $product->id;
-                    $array[$key]['created_at'] = Carbon::now();
-                    $array[$key]['updated_at'] = Carbon::now();
-                }
-                Entities\ChimneyReplacement::insert($array);
-            }
-        }
-    }
-
-    private function getChimneyReplacements($line): array
-    {
-        $replacements = [];
-        $start = 462;
-        for ($i = $start; $i < 518; $i += 4) {
-            if (empty($line[$i]) || empty($line[$i + 1]) || empty($line[$i + 2]) || empty($line[$i + 3])) {
-                continue;
-            }
-            $arrs = explode('//', $line[$i + 2]);
-            foreach ($arrs as $arr) {
-                $arr = explode('||', $arr);
-                if (count($arr) != 2) {
-                    continue;
-                }
-                $productNumber = trim($line[$i + 1], "[]");
-                if (!isset($replacements[$productNumber])) {
-                    $replacements[$productNumber] = [
-                        'img' => $this->getUrl($line[$i + 3]),
-                        'products' => []
-                    ];
-                }
-                $replacements[$productNumber]['products'][] = [
-                    'product' => $arr[0],
-                    'quantity' => $arr[1],
-                ];
-            }
-        }
-        return $replacements;
-    }
-
-    private function saveProduct($array, $categoryTree, $isChildProduct)
+    private function saveProduct($array, $line, $categoryColumn, $isChildProduct)
     {
         $product = null;
         if (!empty($array['symbol'])) {
@@ -469,8 +262,7 @@ class ImportCsvFileJob implements ShouldQueue
         }
 
         if (!$isChildProduct) {
-            $category = $this->getCategoryParent($categoryTree, $array);
-            $array['category_id'] = $category['id'] ?: null;
+            $array['category_id'] = (int)trim($line[$categoryColumn + 1]) ?: null;
         } else {
             $array['category_id'] = null;
         }
@@ -800,34 +592,6 @@ class ImportCsvFileJob implements ShouldQueue
             }
         }
         return null;
-    }
-
-    private function getCategoryTree($line, $categoryColumn): array
-    {
-        $category = [];
-        for ($j = 1; $j <= 6; $j++) {
-            $value = trim($line[$categoryColumn + $j]);
-            if (empty($value)) {
-                break;
-            }
-            $category[] = $value;
-        }
-        return $category;
-    }
-
-    private function rewrite($string): string
-    {
-        return strtolower(
-            str_replace(
-                ["'", "\"", ".", ",", "!", "?", ":", ";", "\\", "[", "]", "(", ")", "<", ">", "@", "#", "$", "%", "^", "*", "+", "=", "/", "&", "#", ":", "."],
-                '',
-                str_replace(
-                    ['ą', 'ę', 'ó', 'ś', 'ż', 'ź', 'ć', 'ł', 'ń', 'Ś', 'Ą', 'Ę', 'Ó', 'Ż', 'Ź', 'Ć', 'Ł', 'Ń', ' ', "\xc2\xa0", "\t", "\n", "\r"],
-                    ['a', 'e', 'o', 's', 'z', 'z', 'c', 'l', 'n', 's', 'a', 'e', 'o', 'z', 'z', 'c', 'l', 'n', '-', '-', '-', '', ''],
-                    $string
-                )
-            )
-        );
     }
 
     public function getProductsMedia($line): array
