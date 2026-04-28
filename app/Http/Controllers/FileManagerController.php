@@ -134,6 +134,37 @@ class FileManagerController extends Controller
         return response()->json(['deleted' => true]);
     }
 
+    public function rename(Request $request): JsonResponse
+    {
+        $request->validate([
+            'path' => 'required|string',
+            'name' => 'required|string|max:255|regex:/^[^\/\\\\<>:"|?*]+$/',
+        ]);
+
+        $rel = $this->sanitizePath($request->input('path'));
+        if (!$rel) {
+            return response()->json(['error' => 'Nieprawidłowa ścieżka.'], 422);
+        }
+
+        $full = $this->basePath . DIRECTORY_SEPARATOR . $rel;
+        if (!file_exists($full) && !is_dir($full)) {
+            return response()->json(['error' => 'Plik/folder nie istnieje.'], 404);
+        }
+
+        $newName = trim($request->input('name'));
+        $newFull = dirname($full) . DIRECTORY_SEPARATOR . $newName;
+
+        if (file_exists($newFull)) {
+            return response()->json(['error' => 'Plik/folder o tej nazwie już istnieje.'], 409);
+        }
+
+        if (!rename($full, $newFull)) {
+            return response()->json(['error' => 'Nie można zmienić nazwy.'], 500);
+        }
+
+        return response()->json(['renamed' => true, 'name' => $newName]);
+    }
+
     public function favorites(): JsonResponse
     {
         return response()->json($this->getFavoritesList());

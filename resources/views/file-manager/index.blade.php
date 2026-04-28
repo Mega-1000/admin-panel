@@ -18,10 +18,15 @@
 .fm-main        { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 .fm-toolbar     { display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid #eee; flex-wrap:wrap; }
 .fm-toolbar .btn { padding:5px 12px; font-size:12px; }
-.fm-breadcrumb  { display:flex; align-items:center; gap:4px; padding:6px 14px; font-size:13px; background:#fafbfc; border-bottom:1px solid #eee; flex-wrap:wrap; }
-.fm-breadcrumb span  { color:#3a5bd9; cursor:pointer; }
-.fm-breadcrumb span:hover { text-decoration:underline; }
-.fm-breadcrumb .sep  { color:#bbb; }
+.btn-fm-outline { background:#fff; border:1px solid #555; color:#333; border-radius:4px; padding:5px 12px; font-size:12px; cursor:pointer; transition:all .15s; display:inline-flex; align-items:center; gap:5px; line-height:1.4; }
+.btn-fm-outline:hover { background:#f5f5f5; border-color:#222; color:#222; }
+.fm-nav         { display:flex; align-items:center; gap:8px; padding:7px 14px; background:#fafbfc; border-bottom:1px solid #eee; min-height:42px; }
+.fm-nav-back    { background:#fff; border:1px solid #aaa; color:#444; border-radius:4px; padding:4px 11px; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all .15s; line-height:1.4; }
+.fm-nav-back:hover { background:#f0f3ff; border-color:#3a5bd9; color:#3a5bd9; }
+.fm-nav-title   { font-size:14px; font-weight:600; color:#333; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fm-nav-fav     { background:#fff; border:1px solid #ccc; border-radius:4px; padding:4px 9px; font-size:12px; color:#aaa; cursor:pointer; transition:all .15s; line-height:1.4; display:inline-flex; align-items:center; gap:5px; }
+.fm-nav-fav:hover  { border-color:#f5a623; color:#f5a623; }
+.fm-nav-fav.active { border-color:#e6a010; color:#e6a010; background:#fff9e6; }
 .fm-grid        { flex:1; overflow-y:auto; padding:12px; display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; align-content:start; }
 .fm-item        { display:flex; flex-direction:column; align-items:center; padding:8px 6px 6px; border:1px solid transparent; border-radius:6px; cursor:pointer; transition:all .15s; position:relative; min-width:0; }
 .fm-item:hover  { background:#f0f3ff; border-color:#c5ceee; }
@@ -50,6 +55,15 @@
 .fm-modal input { width:100%; padding:7px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; margin-bottom:14px; }
 .fm-copy-url    { font-size:12px; padding:3px 8px; }
 .fm-empty       { grid-column:1/-1; text-align:center; color:#bbb; padding:60px 0; font-size:14px; }
+.fm-preview-bg  { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:2000; display:flex; align-items:center; justify-content:center; }
+.fm-preview-img { max-width:90vw; max-height:88vh; border-radius:6px; box-shadow:0 4px 32px rgba(0,0,0,.6); display:block; }
+.fm-preview-close { position:fixed; top:18px; right:24px; font-size:28px; color:#fff; cursor:pointer; line-height:1; opacity:.8; background:none; border:none; z-index:2001; }
+.fm-preview-close:hover { opacity:1; }
+.fm-preview-nav { position:fixed; top:50%; transform:translateY(-50%); font-size:32px; color:#fff; cursor:pointer; opacity:.6; background:none; border:none; padding:12px 18px; z-index:2001; }
+.fm-preview-nav:hover { opacity:1; }
+.fm-preview-nav.prev { left:12px; }
+.fm-preview-nav.next { right:12px; }
+.fm-preview-name { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); color:#fff; font-size:13px; opacity:.75; white-space:nowrap; }
 </style>
 
 <div id="fm-app"
@@ -91,34 +105,41 @@
                     <i class="fa fa-upload"></i> Wgraj pliki
                     <input type="file" multiple style="display:none" @change="uploadFiles($event.target.files)" accept="*">
                 </label>
-                <button class="btn btn-default" @click="showNewFolder=true"><i class="fa fa-folder-o"></i> Nowy folder</button>
+                <button class="btn-fm-outline" @click="showNewFolder=true"><i class="fa fa-folder-o"></i> Nowy folder</button>
                 <button class="btn btn-danger" :disabled="!selected" @click="confirmDelete()" x-show="selected"><i class="fa fa-trash"></i> Usuń</button>
                 <div style="flex:1"></div>
                 <span x-show="toast" x-text="toast" style="font-size:12px;color:#28a745;font-weight:600"></span>
             </div>
 
-            {{-- Breadcrumb --}}
-            <div class="fm-breadcrumb">
-                <span @click="navigate('')"><i class="fa fa-home"></i> Główny</span>
-                <template x-for="(seg, idx) in breadcrumbs" :key="idx">
-                    <span>
-                        <span class="sep">/</span>
-                        <span @click="navigate(seg.path)" x-text="seg.name"></span>
-                    </span>
-                </template>
+            {{-- Navigation bar (drill-down) --}}
+            <div class="fm-nav">
                 <template x-if="currentPath">
-                    <button class="btn btn-xs btn-default" style="margin-left:8px" @click="toggleFavorite(currentPath)">
-                        <i class="fa" :class="isFavorite(currentPath)?'fa-star':'fa-star-o'"></i>
-                        <span x-text="isFavorite(currentPath)?'Usuń z ulubionych':'Dodaj do ulubionych'"></span>
+                    <button class="fm-nav-back" @click="navigate(parentPath)">
+                        <i class="fa fa-arrow-left"></i> Wróć
+                    </button>
+                </template>
+                <span class="fm-nav-title">
+                    <i class="fa" :class="currentPath ? 'fa-folder-open' : 'fa-home'" style="margin-right:6px;color:#f5a623"></i>
+                    <span x-text="currentFolderName"></span>
+                </span>
+                <template x-if="currentPath">
+                    <button class="fm-nav-fav" :class="{active: isFavorite(currentPath)}" @click="toggleFavorite(currentPath)">
+                        <i class="fa" :class="isFavorite(currentPath) ? 'fa-star' : 'fa-star-o'"></i>
+                        <span x-text="isFavorite(currentPath) ? 'W ulubionych' : 'Dodaj do ulubionych'"></span>
                     </button>
                 </template>
                 <span class="fm-count" x-text="items.length + ' elementów'"></span>
             </div>
 
-            {{-- Selected file info bar (sticky under breadcrumb) --}}
+            {{-- Selected file info bar --}}
             <div class="fm-selected-bar" x-show="selected" style="display:none">
                 <template x-if="selected && selected.is_dir">
-                    <span><i class="fa fa-folder" style="color:#f5a623;margin-right:5px"></i><span class="fm-sel-name" x-text="selected && selected.name"></span></span>
+                    <span style="display:contents">
+                        <i class="fa fa-folder" style="color:#f5a623;margin-right:5px"></i>
+                        <span class="fm-sel-name" x-text="selected && selected.name"></span>
+                        <span class="fm-sel-sep">·</span>
+                        <a href="#" @click.prevent="startRename()"><i class="fa fa-pencil"></i> Zmień nazwę</a>
+                    </span>
                 </template>
                 <template x-if="selected && !selected.is_dir">
                     <span style="display:contents">
@@ -127,9 +148,17 @@
                         <span class="fm-sel-sep">·</span>
                         <span x-text="selected && formatSize(selected.size)"></span>
                         <span class="fm-sel-sep">·</span>
+                        <template x-if="selected && isImage(selected.ext)">
+                            <span style="display:contents">
+                                <a href="#" @click.prevent="openPreview(selected)"><i class="fa fa-search-plus"></i> Podgląd</a>
+                                <span class="fm-sel-sep">·</span>
+                            </span>
+                        </template>
                         <a :href="selected && selected.url" target="_blank"><i class="fa fa-external-link"></i> Otwórz</a>
                         <span class="fm-sel-sep">·</span>
                         <a href="#" @click.prevent="copyUrl(selected.url)"><i class="fa fa-copy"></i> Kopiuj URL</a>
+                        <span class="fm-sel-sep">·</span>
+                        <a href="#" @click.prevent="startRename()"><i class="fa fa-pencil"></i> Zmień nazwę</a>
                     </span>
                 </template>
             </div>
@@ -151,10 +180,10 @@
                 <template x-for="item in items" :key="item.path">
                     <div class="fm-item"
                          :class="{selected: selected && selected.path===item.path}"
-                         @click="selectItem(item)"
-                         @dblclick="item.is_dir && navigate(item.path)">
+                         @click="item.is_dir ? navigate(item.path) : selectItem(item)">
                         <template x-if="!item.is_dir && isImage(item.ext)">
-                            <img :src="item.url" class="fm-item-thumb" :alt="item.name" onerror="this.style.display='none'" loading="lazy">
+                            <img :src="item.url" class="fm-item-thumb" :alt="item.name" onerror="this.style.display='none'" loading="lazy"
+                                 @dblclick.stop="openPreview(item)" style="cursor:zoom-in" title="Podwójne kliknięcie = podgląd">
                         </template>
                         <template x-if="item.is_dir">
                             <div class="fm-item-icon dir"><i class="fa fa-folder"></i></div>
@@ -203,6 +232,37 @@
             </div>
         </div>
     </div>
+
+    {{-- Rename modal --}}
+    <div class="fm-modal-bg" x-show="showRename" @click.self="showRename=false">
+        <div class="fm-modal">
+            <h4><i class="fa fa-pencil"></i> Zmień nazwę</h4>
+            <input type="text" x-model="renameName" placeholder="Nowa nazwa"
+                   @keydown.enter="doRename()" @keydown.escape="showRename=false"
+                   x-ref="renameInput">
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-default" @click="showRename=false">Anuluj</button>
+                <button class="btn btn-primary" @click="doRename()">Zmień</button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Image preview lightbox --}}
+    <div class="fm-preview-bg" x-show="previewItem" @click.self="previewItem=null" @keydown.escape.window="previewItem=null" @keydown.arrow-left.window="prevImage()" @keydown.arrow-right.window="nextImage()">
+        <button class="fm-preview-close" @click="previewItem=null">&times;</button>
+        <template x-if="previewImages.length > 1">
+            <button class="fm-preview-nav prev" @click="prevImage()"><i class="fa fa-chevron-left"></i></button>
+        </template>
+        <template x-if="previewItem">
+            <img :src="previewItem.url" class="fm-preview-img" :alt="previewItem.name">
+        </template>
+        <template x-if="previewImages.length > 1">
+            <button class="fm-preview-nav next" @click="nextImage()"><i class="fa fa-chevron-right"></i></button>
+        </template>
+        <template x-if="previewItem">
+            <span class="fm-preview-name" x-text="previewItem.name + (previewImages.length > 1 ? ' (' + (previewIndex+1) + '/' + previewImages.length + ')' : '')"></span>
+        </template>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
@@ -218,14 +278,32 @@ function fileManager() {
         showNewFolder: false,
         newFolderName: '',
         showDelete: false,
+        showRename: false,
+        renameName: '',
+        previewItem: null,
         toast: '',
         errorMsg: '',
         _toastTimer: null,
 
-        get breadcrumbs() {
-            if (!this.currentPath) return []
+        get parentPath() {
+            if (!this.currentPath) return ''
             const parts = this.currentPath.split('/')
-            return parts.map((p, i) => ({ name: p, path: parts.slice(0, i+1).join('/') }))
+            parts.pop()
+            return parts.join('/')
+        },
+
+        get currentFolderName() {
+            if (!this.currentPath) return 'Główny'
+            return this.currentPath.split('/').pop()
+        },
+
+        get previewImages() {
+            return this.items.filter(i => !i.is_dir && this.isImage(i.ext))
+        },
+
+        get previewIndex() {
+            if (!this.previewItem) return -1
+            return this.previewImages.findIndex(i => i.path === this.previewItem.path)
         },
 
         init() {
@@ -331,6 +409,51 @@ function fileManager() {
                 this.load(this.currentPath)
                 this.showToast('Usunięto')
             })
+        },
+
+        startRename() {
+            if (!this.selected) return
+            this.renameName = this.selected.name
+            this.showRename = true
+            this.$nextTick(() => { if (this.$refs.renameInput) this.$refs.renameInput.select() })
+        },
+
+        doRename() {
+            if (!this.selected || !this.renameName.trim()) return
+            const oldPath = this.selected.path
+            fetch('{{ route('file-manager.rename') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ path: oldPath, name: this.renameName.trim() })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { alert(data.error); return }
+                this.showRename = false
+                this.renameName = ''
+                this.load(this.currentPath)
+                this.showToast('Zmieniono nazwę')
+            })
+        },
+
+        openPreview(item) {
+            this.previewItem = item
+        },
+
+        prevImage() {
+            if (!this.previewImages.length) return
+            const idx = this.previewIndex
+            this.previewItem = this.previewImages[(idx - 1 + this.previewImages.length) % this.previewImages.length]
+        },
+
+        nextImage() {
+            if (!this.previewImages.length) return
+            const idx = this.previewIndex
+            this.previewItem = this.previewImages[(idx + 1) % this.previewImages.length]
         },
 
         toggleFavorite(path) {
