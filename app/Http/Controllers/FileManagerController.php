@@ -17,8 +17,8 @@ class FileManagerController extends Controller
 
     public function __construct()
     {
-        $this->basePath = public_path('uploads/file-manager');
-        $this->baseUrl  = url('uploads/file-manager');
+        $this->basePath = public_path('storage');
+        $this->baseUrl  = url('storage');
     }
 
     public function index(): View
