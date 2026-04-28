@@ -41,6 +41,12 @@
         padding: 2px 5px; border-radius: 3px; margin-right: 5px;
         background: #95a5a6; color: #fff; vertical-align: middle;
     }
+    .btn-variants {
+        margin-left: 8px; font-size: 11px; padding: 1px 7px; vertical-align: middle;
+        border-radius: 10px; border: 1px solid #bdc3c7; background: #ecf0f1;
+        color: #555; cursor: pointer; white-space: nowrap;
+    }
+    .btn-variants:hover { background: #dfe6e9; }
 
     #firm-search { font-size: 14px; }
     .firm-option { padding: 8px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
@@ -340,6 +346,18 @@
 
         var showMilling = products.some(function (p) { return !!p.show_milling; });
 
+        // Count variants per parent (products come ordered: parent, its children, next parent…)
+        var variantCounts = {};
+        var lastParentId  = null;
+        products.forEach(function (p) {
+            if (!p.is_variant) {
+                lastParentId = p.id;
+                variantCounts[p.id] = 0;
+            } else if (lastParentId !== null) {
+                variantCounts[lastParentId] = (variantCounts[lastParentId] || 0) + 1;
+            }
+        });
+
         var panel = document.createElement('div');
         panel.className = 'panel panel-bordered pl-panel';
 
@@ -369,7 +387,11 @@
         table.appendChild(thead);
 
         var tbody = document.createElement('tbody');
-        products.forEach(function (p) { tbody.appendChild(renderProductRow(p, cols, showMilling)); });
+        lastParentId = null;
+        products.forEach(function (p) {
+            if (!p.is_variant) lastParentId = p.id;
+            tbody.appendChild(renderProductRow(p, cols, showMilling, lastParentId, variantCounts));
+        });
         table.appendChild(tbody);
 
         body.appendChild(table);
@@ -378,11 +400,15 @@
     }
 
     // ── Render one product row ─────────────────────────────────────
-    function renderProductRow(p, activeCols, showMilling) {
+    function renderProductRow(p, activeCols, showMilling, currentParentId, variantCounts) {
         var isVariant  = !!p.is_variant;
         var tr         = document.createElement('tr');
         tr.dataset.productId = p.id;
-        if (isVariant) tr.classList.add('tr-variant');
+        if (isVariant) {
+            tr.classList.add('tr-variant');
+            tr.dataset.variantGroup = currentParentId;
+            tr.style.display = 'none';
+        }
 
         var today      = formatDate(new Date());
         var dateChange = p.date_of_price_change || today;
@@ -398,6 +424,13 @@
 
         var variantPrefix = isVariant
             ? '<span class="variant-arrow">↳</span><span class="badge-variant">wariant</span>'
+            : '';
+
+        var variantCount  = !isVariant && variantCounts ? (variantCounts[p.id] || 0) : 0;
+        var variantToggle = (!isVariant && variantCount > 0)
+            ? '<button type="button" class="btn-variants" data-parent-id="' + p.id + '">' +
+                  '<i class="fa fa-caret-right"></i> Pokaż warianty (' + variantCount + ')' +
+              '</button>'
             : '';
 
         // Date cells
@@ -430,6 +463,7 @@
                 (p.product_name_supplier_on_documents ? '<span class="product-alias">' + escHtml(p.product_name_supplier_on_documents) + '</span>' : '') +
                 variantPrefix +
                 '<span class="product-main">' + escHtml(p.name) + '</span>' +
+                variantToggle +
             '</td>' +
             '<td><code>' + escHtml(p.symbol) + '</code></td>' +
             tdDates +
@@ -441,6 +475,20 @@
             '<td class="price-wrap"><span class="readonly-val pack-price-val">' + (firstPrice * pack).toFixed(2) + ' <small class="text-muted">PLN</small></span></td>' +
             '<td style="text-align:center;"><span class="readonly-val">' + vat + '%</span></td>' +
             '<td class="price-wrap"><span class="readonly-val calc-brutto-val">' + calcBrutto.toFixed(2) + ' <small class="text-muted">PLN</small></span></td>';
+
+        if (!isVariant && variantCount > 0) {
+            var toggleBtn = tr.querySelector('.btn-variants');
+            toggleBtn.addEventListener('click', function () {
+                var parentId = this.getAttribute('data-parent-id');
+                var rows     = document.querySelectorAll('[data-variant-group="' + parentId + '"]');
+                var open     = this.getAttribute('data-open') === '1';
+                rows.forEach(function (r) { r.style.display = open ? 'none' : ''; });
+                this.setAttribute('data-open', open ? '0' : '1');
+                this.innerHTML = open
+                    ? '<i class="fa fa-caret-right"></i> Pokaż warianty (' + variantCount + ')'
+                    : '<i class="fa fa-caret-down"></i> Ukryj warianty (' + variantCount + ')';
+            });
+        }
 
         if (!isVariant) {
             productRows[p.id] = { row: tr, product: p };

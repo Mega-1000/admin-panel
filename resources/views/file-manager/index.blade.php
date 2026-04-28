@@ -38,8 +38,12 @@
 .fm-item-fav:hover  { opacity:1; }
 .fm-item-fav.active { opacity:1; color:#f5a623; }
 .fm-drop-overlay{ position:absolute; inset:0; background:rgba(58,91,217,.12); border:2px dashed #3a5bd9; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#3a5bd9; font-weight:600; pointer-events:none; z-index:10; }
-.fm-info-bar    { padding:6px 14px; font-size:12px; color:#888; border-top:1px solid #eee; display:flex; align-items:center; gap:12px; }
-.fm-info-bar span { font-weight:600; color:#444; }
+.fm-selected-bar { display:flex; align-items:center; gap:10px; padding:5px 14px; background:#fff9e6; border-bottom:1px solid #f0d98a; font-size:12px; flex-wrap:wrap; min-height:32px; }
+.fm-selected-bar .fm-sel-name { font-weight:700; color:#333; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fm-selected-bar .fm-sel-sep  { color:#ccc; }
+.fm-selected-bar a            { color:#3a5bd9; text-decoration:none; }
+.fm-selected-bar a:hover      { text-decoration:underline; }
+.fm-count { margin-left:auto; color:#aaa; font-size:11px; }
 .fm-modal-bg    { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1000; display:flex; align-items:center; justify-content:center; }
 .fm-modal       { background:#fff; border-radius:8px; padding:24px 28px; min-width:320px; box-shadow:0 8px 32px rgba(0,0,0,.18); }
 .fm-modal h4    { margin:0 0 16px; font-size:16px; }
@@ -90,9 +94,6 @@
                 <button class="btn btn-default" @click="showNewFolder=true"><i class="fa fa-folder-o"></i> Nowy folder</button>
                 <button class="btn btn-danger" :disabled="!selected" @click="confirmDelete()" x-show="selected"><i class="fa fa-trash"></i> Usuń</button>
                 <div style="flex:1"></div>
-                <template x-if="selected && !selected.is_dir">
-                    <button class="btn btn-default fm-copy-url" @click="copyUrl(selected.url)"><i class="fa fa-copy"></i> Kopiuj URL</button>
-                </template>
                 <span x-show="toast" x-text="toast" style="font-size:12px;color:#28a745;font-weight:600"></span>
             </div>
 
@@ -110,6 +111,26 @@
                         <i class="fa" :class="isFavorite(currentPath)?'fa-star':'fa-star-o'"></i>
                         <span x-text="isFavorite(currentPath)?'Usuń z ulubionych':'Dodaj do ulubionych'"></span>
                     </button>
+                </template>
+                <span class="fm-count" x-text="items.length + ' elementów'"></span>
+            </div>
+
+            {{-- Selected file info bar (sticky under breadcrumb) --}}
+            <div class="fm-selected-bar" x-show="selected" style="display:none">
+                <template x-if="selected && selected.is_dir">
+                    <span><i class="fa fa-folder" style="color:#f5a623;margin-right:5px"></i><span class="fm-sel-name" x-text="selected && selected.name"></span></span>
+                </template>
+                <template x-if="selected && !selected.is_dir">
+                    <span style="display:contents">
+                        <i class="fa fa-file-o" style="color:#888;margin-right:5px"></i>
+                        <span class="fm-sel-name" x-text="selected && selected.name"></span>
+                        <span class="fm-sel-sep">·</span>
+                        <span x-text="selected && formatSize(selected.size)"></span>
+                        <span class="fm-sel-sep">·</span>
+                        <a :href="selected && selected.url" target="_blank"><i class="fa fa-external-link"></i> Otwórz</a>
+                        <span class="fm-sel-sep">·</span>
+                        <a href="#" @click.prevent="copyUrl(selected.url)"><i class="fa fa-copy"></i> Kopiuj URL</a>
+                    </span>
                 </template>
             </div>
 
@@ -151,27 +172,6 @@
                 </template>
             </div>
 
-            {{-- Info bar --}}
-            <div class="fm-info-bar">
-                <template x-if="selected">
-                    <span>
-                        <span x-text="selected.name"></span>
-                        <template x-if="!selected.is_dir">
-                            &nbsp;·&nbsp;<span x-text="formatSize(selected.size)"></span>
-                            &nbsp;·&nbsp;
-                            <a :href="selected.url" target="_blank" style="color:#3a5bd9">Otwórz</a>
-                            &nbsp;·&nbsp;
-                            <a href="#" @click.prevent="copyUrl(selected.url)" style="color:#3a5bd9">Kopiuj URL</a>
-                        </template>
-                        <template x-if="selected.is_dir">
-                            &nbsp;· Folder
-                        </template>
-                    </span>
-                </template>
-                <template x-if="!selected">
-                    <span x-text="items.length + ' elementów'"></span>
-                </template>
-            </div>
         </div>
     </div>
 

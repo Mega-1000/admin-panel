@@ -169,9 +169,9 @@ class FileManagerController extends Controller
 
     // ── helpers ─────────────────────────────────────────────────────────────
 
-    private function sanitizePath(string $path): string
+    private function sanitizePath(?string $path): string
     {
-        // Strip leading slash, resolve .., keep only safe chars
+        $path = $path ?? '';
         $path = str_replace('\\', '/', $path);
         $path = trim($path, '/');
         $parts = array_filter(explode('/', $path), fn($p) => $p !== '' && $p !== '..' && $p !== '.');
