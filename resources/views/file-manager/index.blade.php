@@ -118,7 +118,13 @@
                 <template x-if="loading">
                     <div class="fm-empty"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
                 </template>
-                <template x-if="!loading && items.length===0">
+                <template x-if="!loading && errorMsg">
+                    <div class="fm-empty" style="color:#c0392b">
+                        <i class="fa fa-exclamation-triangle fa-2x" style="display:block;margin-bottom:10px"></i>
+                        <span x-text="errorMsg"></span>
+                    </div>
+                </template>
+                <template x-if="!loading && !errorMsg && items.length===0">
                     <div class="fm-empty"><i class="fa fa-folder-open-o fa-3x" style="display:block;margin-bottom:10px"></i>Folder jest pusty</div>
                 </template>
                 <template x-for="item in items" :key="item.path">
@@ -213,6 +219,7 @@ function fileManager() {
         newFolderName: '',
         showDelete: false,
         toast: '',
+        errorMsg: '',
         _toastTimer: null,
 
         get breadcrumbs() {
@@ -227,18 +234,27 @@ function fileManager() {
 
         load(path) {
             this.loading = true
+            this.errorMsg = ''
             this.selected = null
             fetch(`{{ route('file-manager.list') }}?path=${encodeURIComponent(path)}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(r => r.json())
             .then(data => {
-                this.items = data.items || []
-                this.favorites = data.favorites || []
-                this.currentPath = path
+                if (data.error) {
+                    this.errorMsg = data.error
+                    this.items = []
+                } else {
+                    this.items = data.items || []
+                    this.favorites = data.favorites || []
+                    this.currentPath = path
+                }
                 this.loading = false
             })
-            .catch(() => { this.loading = false })
+            .catch((e) => {
+                this.errorMsg = 'Błąd połączenia: ' + e.message
+                this.loading = false
+            })
         },
 
         navigate(path) {

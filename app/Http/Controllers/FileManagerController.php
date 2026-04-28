@@ -32,11 +32,16 @@ class FileManagerController extends Controller
         $full = $this->basePath . ($rel ? DIRECTORY_SEPARATOR . $rel : '');
 
         if (!is_dir($full)) {
-            return response()->json(['error' => 'Folder nie istnieje.'], 404);
+            return response()->json(['error' => "Folder nie istnieje: {$full}"], 404);
+        }
+
+        $entries = @scandir($full);
+        if ($entries === false) {
+            return response()->json(['error' => "Brak uprawnień do odczytu folderu: {$full}"], 500);
         }
 
         $items = [];
-        foreach (scandir($full) as $entry) {
+        foreach ($entries as $entry) {
             if ($entry === '.' || $entry === '..') continue;
 
             $entryFull = $full . DIRECTORY_SEPARATOR . $entry;
