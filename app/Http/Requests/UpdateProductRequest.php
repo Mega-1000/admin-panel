@@ -27,7 +27,8 @@ class UpdateProductRequest extends FormRequest
             'name' => 'required|string',
             'save_name' => 'required',
             'save_image' => 'required',
-            'image' => 'nullable',
+            'image' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp',
+            'url_for_website' => 'nullable|string|max:500',
             'description' => 'nullable|string',
             'youtube' => 'nullable',
         ];

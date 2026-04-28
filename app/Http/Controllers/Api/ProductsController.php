@@ -399,20 +399,31 @@ class ProductsController extends Controller
 
     public function update(Product $product, UpdateProductRequest $request)
     {
-        $product->update($request->validated());
+        $validated = $request->validated();
+        unset($validated['url_for_website']); // handled separately below
+        $product->update($validated);
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = Str::random(10);
-            $image->move(public_path('images/products'), $imageName);
-            $product->update(['url_for_website' => '/images/products/' . $imageName]);
+            $image   = $request->file('image');
+            $ext     = $image->getClientOriginalExtension() ?: 'jpg';
+            $imgName = Str::random(10) . '.' . $ext;
+            $destDir = public_path('images/products');
 
-            return Product::find($product->id)->url_for_website;
+            if (!is_dir($destDir)) {
+                mkdir($destDir, 0775, true);
+            }
+
+            $image->move($destDir, $imgName);
+            $product->update(['url_for_website' => '/images/products/' . $imgName]);
+
+            return response()->json(['url_for_website' => $product->fresh()->url_for_website]);
         }
 
-        return response()->json([
-            'message' => 'success'
-        ]);
+        if ($request->filled('url_for_website')) {
+            $product->update(['url_for_website' => $request->input('url_for_website')]);
+        }
+
+        return response()->json(['message' => 'success']);
     }
 
     public function getSingleProduct(Product $product): JsonResponse

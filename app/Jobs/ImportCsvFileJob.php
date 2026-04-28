@@ -153,9 +153,13 @@ class ImportCsvFileJob implements ShouldQueue
                     }
 
                     $product->update([
-                        'save_name' => $existingProduct?->save_name ?? true,
-                        'name' => ($existingProduct?->name && !$existingProduct?->save_name) ? $existingProduct?->name : $product->name,
-                        'youtube' => $existingProduct?->youtube,
+                        'save_name'       => $existingProduct?->save_name ?? true,
+                        'name'            => ($existingProduct?->name && !$existingProduct?->save_name) ? $existingProduct?->name : $product->name,
+                        'save_image'      => $existingProduct?->save_image ?? true,
+                        'url_for_website' => ($existingProduct?->save_image === false && $existingProduct?->url_for_website)
+                                             ? $existingProduct->url_for_website
+                                             : $product->url_for_website,
+                        'youtube'         => $existingProduct?->youtube,
                     ]);
                 }
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
@@ -203,7 +207,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function clearTables()
     {
-        $this->existingProducts = Product::where('save_name', false)->orWhereNotNull('youtube')->get()->keyBy('symbol');
+        $this->existingProducts = Product::where('save_name', false)->orWhere('save_image', false)->orWhereNotNull('youtube')->get()->keyBy('symbol');
 
         Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
         Product::withTrashed()->update([
@@ -616,6 +620,7 @@ class ImportCsvFileJob implements ShouldQueue
             'additional_info1' => $line[289],
             'additional_info2' => $line[290],
             'url' => $line[303],
+            'url_for_website' => !empty($line[303]) ? $this->getUrl($line[303]) : null,
             'manufacturer_url' => $line[304],
             'video_url' => $line[305],
             'calculator_type' => $line[306],
