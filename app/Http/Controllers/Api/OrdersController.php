@@ -1245,4 +1245,60 @@ class OrdersController extends Controller
 
         return response()->json();
     }
+
+    public function updateOrderItems(Request $request, int $orderId): JsonResponse
+    {
+        $customer = auth()->guard('api')->user();
+        $order = Order::where('id', $orderId)
+            ->whereHas('customer', fn($q) => $q->where('login', $customer->login))
+            ->with(['items', 'items.product'])
+            ->first();
+
+        if (!$order) {
+            return response()->json(['error_message' => 'Zamówienie nie istnieje lub brak dostępu.'], 404);
+        }
+
+        $rawItems = $request->input('order_items', []);
+        if (empty($rawItems)) {
+            return response()->json(['error_message' => 'Brak pozycji zamówienia.'], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $items = array_map(function (array $item) {
+                $product = Product::where('symbol', $item['symbol'])->first();
+                if (!$product) {
+                    throw new Exception('product_not_found');
+                }
+                return ['id' => $product->id, 'amount' => $item['amount']];
+            }, $rawItems);
+
+            $productService = app(ProductService::class);
+
+            $builder = (new OrderBuilder())
+                ->setPackageGenerator(new BackPackPackageDivider())
+                ->setPriceCalculator(new OrderPriceCalculator())
+                ->setProductService($productService);
+
+            $builder->assignItemsToOrder($order, $items, true);
+
+            $orderPackagesCalculator = app(OrderPackagesCalculator::class);
+            $order->updateQuietly(['packages_values' => $orderPackagesCalculator->calculate($order)]);
+
+            $fullCost = OrderPackagesCalculator::getFullCost($order);
+            $order->updateQuietly([
+                'shipment_price_for_client_automatic' => $fullCost,
+                'shipment_price_for_client'           => $fullCost,
+            ]);
+
+            DB::commit();
+
+            return response()->json(['id' => $order->id, 'updated' => true]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('updateOrderItems failed', ['orderId' => $orderId, 'error' => $e->getMessage()]);
+            return response()->json(['error_message' => 'Błąd aktualizacji zamówienia.'], 500);
+        }
+    }
 }

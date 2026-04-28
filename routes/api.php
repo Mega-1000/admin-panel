@@ -66,6 +66,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('update-order-addresses');
         Route::post('move-to-unactive/{order}', 'Api\OrdersController@moveToUnactive')->name('moveToUnactive');
         Route::post('remind-about-offer/{order}', 'Api\OrdersController@scheduleOrderReminder')->name('remindAboutOffer');
+        Route::post('{orderId}/update-items', 'Api\OrdersController@updateOrderItems')->name('update-items');
     });
     Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
     Route::get('invoices/get/{id}', 'Api\InvoicesController@getInvoice')->name('api.invoices.get');

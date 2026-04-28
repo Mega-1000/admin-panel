@@ -243,6 +243,14 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
         Route::resource('categories', \App\Http\Controllers\CategoryController::class);
+        Route::get('file-manager', [\App\Http\Controllers\FileManagerController::class, 'index'])->name('file-manager.index');
+        Route::get('file-manager/list', [\App\Http\Controllers\FileManagerController::class, 'list'])->name('file-manager.list');
+        Route::post('file-manager/upload', [\App\Http\Controllers\FileManagerController::class, 'upload'])->name('file-manager.upload');
+        Route::post('file-manager/folder', [\App\Http\Controllers\FileManagerController::class, 'createFolder'])->name('file-manager.folder');
+        Route::delete('file-manager/delete', [\App\Http\Controllers\FileManagerController::class, 'delete'])->name('file-manager.delete');
+        Route::get('file-manager/favorites', [\App\Http\Controllers\FileManagerController::class, 'favorites'])->name('file-manager.favorites');
+        Route::post('file-manager/favorite', [\App\Http\Controllers\FileManagerController::class, 'toggleFavorite'])->name('file-manager.favorite');
+
         Route::get('price-list', [\App\Http\Controllers\PriceListController::class, 'index'])->name('price-list.index');
         Route::get('price-list/products/{firmId}', [\App\Http\Controllers\PriceListController::class, 'getProducts'])->name('price-list.products');
         Route::post('price-list/products/{firmId}', [\App\Http\Controllers\PriceListController::class, 'saveProducts'])->name('price-list.save');

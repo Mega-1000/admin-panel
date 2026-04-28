@@ -1,0 +1,379 @@
+@extends('layouts.app')
+
+@section('app-header')
+    <h1 class="page-title">
+        <i class="fa fa-folder-open"></i> Menedżer plików
+    </h1>
+@endsection
+
+@section('app-content')
+<style>
+.fm-wrap        { display:flex; gap:0; height:calc(100vh - 180px); min-height:500px; background:#fff; border:1px solid #dde1e7; border-radius:6px; overflow:hidden; }
+.fm-sidebar     { width:220px; flex-shrink:0; background:#f8f9fb; border-right:1px solid #dde1e7; display:flex; flex-direction:column; overflow-y:auto; }
+.fm-sidebar-sec { padding:10px 12px 4px; font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:.05em; }
+.fm-fav-item    { display:flex; align-items:center; gap:6px; padding:5px 14px; font-size:13px; color:#444; cursor:pointer; border-radius:4px; margin:1px 6px; transition:background .15s; }
+.fm-fav-item:hover  { background:#eef0f5; }
+.fm-fav-item.active { background:#e6eaf5; color:#3a5bd9; font-weight:600; }
+.fm-fav-item i  { font-size:12px; color:#aaa; }
+.fm-main        { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.fm-toolbar     { display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid #eee; flex-wrap:wrap; }
+.fm-toolbar .btn { padding:5px 12px; font-size:12px; }
+.fm-breadcrumb  { display:flex; align-items:center; gap:4px; padding:6px 14px; font-size:13px; background:#fafbfc; border-bottom:1px solid #eee; flex-wrap:wrap; }
+.fm-breadcrumb span  { color:#3a5bd9; cursor:pointer; }
+.fm-breadcrumb span:hover { text-decoration:underline; }
+.fm-breadcrumb .sep  { color:#bbb; }
+.fm-grid        { flex:1; overflow-y:auto; padding:12px; display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; align-content:start; }
+.fm-item        { display:flex; flex-direction:column; align-items:center; padding:8px 6px 6px; border:1px solid transparent; border-radius:6px; cursor:pointer; transition:all .15s; position:relative; min-width:0; }
+.fm-item:hover  { background:#f0f3ff; border-color:#c5ceee; }
+.fm-item.selected { background:#e6eaf5; border-color:#3a5bd9; }
+.fm-item-thumb  { width:72px; height:60px; object-fit:cover; border-radius:4px; margin-bottom:6px; border:1px solid #eee; }
+.fm-item-icon   { width:72px; height:60px; display:flex; align-items:center; justify-content:center; font-size:36px; margin-bottom:6px; }
+.fm-item-icon.dir  { color:#f5a623; }
+.fm-item-icon.pdf  { color:#e04040; }
+.fm-item-icon.xls  { color:#1a7a4a; }
+.fm-item-icon.doc  { color:#2b5fbd; }
+.fm-item-icon.other{ color:#888; }
+.fm-item-name   { font-size:11px; text-align:center; color:#333; word-break:break-all; line-height:1.3; max-height:32px; overflow:hidden; }
+.fm-item-fav    { position:absolute; top:3px; right:4px; font-size:11px; cursor:pointer; opacity:.4; }
+.fm-item-fav:hover  { opacity:1; }
+.fm-item-fav.active { opacity:1; color:#f5a623; }
+.fm-drop-overlay{ position:absolute; inset:0; background:rgba(58,91,217,.12); border:2px dashed #3a5bd9; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#3a5bd9; font-weight:600; pointer-events:none; z-index:10; }
+.fm-info-bar    { padding:6px 14px; font-size:12px; color:#888; border-top:1px solid #eee; display:flex; align-items:center; gap:12px; }
+.fm-info-bar span { font-weight:600; color:#444; }
+.fm-modal-bg    { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1000; display:flex; align-items:center; justify-content:center; }
+.fm-modal       { background:#fff; border-radius:8px; padding:24px 28px; min-width:320px; box-shadow:0 8px 32px rgba(0,0,0,.18); }
+.fm-modal h4    { margin:0 0 16px; font-size:16px; }
+.fm-modal input { width:100%; padding:7px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; margin-bottom:14px; }
+.fm-copy-url    { font-size:12px; padding:3px 8px; }
+.fm-empty       { grid-column:1/-1; text-align:center; color:#bbb; padding:60px 0; font-size:14px; }
+</style>
+
+<div id="fm-app"
+     x-data="fileManager()"
+     x-init="init()"
+     @dragover.prevent="dragging=true"
+     @dragleave="dragging=false"
+     @drop.prevent="handleDrop($event)"
+     style="position:relative">
+
+    {{-- Drop overlay --}}
+    <div x-show="dragging" class="fm-drop-overlay"><i class="fa fa-cloud-upload"></i>&nbsp; Upuść pliki tutaj</div>
+
+    <div class="fm-wrap">
+        {{-- Sidebar --}}
+        <div class="fm-sidebar">
+            <div class="fm-sidebar-sec">Ulubione</div>
+            <template x-if="favorites.length === 0">
+                <div style="padding:8px 14px;font-size:12px;color:#bbb">Brak ulubionych</div>
+            </template>
+            <template x-for="fav in favorites" :key="fav">
+                <div class="fm-fav-item" :class="{active: currentPath===fav}" @click="navigate(fav)">
+                    <i class="fa fa-folder"></i>
+                    <span x-text="fav.split('/').pop() || fav"></span>
+                </div>
+            </template>
+
+            <div class="fm-sidebar-sec" style="margin-top:12px">Katalogi</div>
+            <div class="fm-fav-item" :class="{active: currentPath===''}" @click="navigate('')">
+                <i class="fa fa-home"></i> Główny
+            </div>
+        </div>
+
+        {{-- Main --}}
+        <div class="fm-main">
+            {{-- Toolbar --}}
+            <div class="fm-toolbar">
+                <label class="btn btn-primary" style="margin:0;cursor:pointer">
+                    <i class="fa fa-upload"></i> Wgraj pliki
+                    <input type="file" multiple style="display:none" @change="uploadFiles($event.target.files)" accept="*">
+                </label>
+                <button class="btn btn-default" @click="showNewFolder=true"><i class="fa fa-folder-o"></i> Nowy folder</button>
+                <button class="btn btn-danger" :disabled="!selected" @click="confirmDelete()" x-show="selected"><i class="fa fa-trash"></i> Usuń</button>
+                <div style="flex:1"></div>
+                <template x-if="selected && !selected.is_dir">
+                    <button class="btn btn-default fm-copy-url" @click="copyUrl(selected.url)"><i class="fa fa-copy"></i> Kopiuj URL</button>
+                </template>
+                <span x-show="toast" x-text="toast" style="font-size:12px;color:#28a745;font-weight:600"></span>
+            </div>
+
+            {{-- Breadcrumb --}}
+            <div class="fm-breadcrumb">
+                <span @click="navigate('')"><i class="fa fa-home"></i> Główny</span>
+                <template x-for="(seg, idx) in breadcrumbs" :key="idx">
+                    <span>
+                        <span class="sep">/</span>
+                        <span @click="navigate(seg.path)" x-text="seg.name"></span>
+                    </span>
+                </template>
+                <template x-if="currentPath">
+                    <button class="btn btn-xs btn-default" style="margin-left:8px" @click="toggleFavorite(currentPath)">
+                        <i class="fa" :class="isFavorite(currentPath)?'fa-star':'fa-star-o'"></i>
+                        <span x-text="isFavorite(currentPath)?'Usuń z ulubionych':'Dodaj do ulubionych'"></span>
+                    </button>
+                </template>
+            </div>
+
+            {{-- Grid --}}
+            <div class="fm-grid" @click.self="selected=null">
+                <template x-if="loading">
+                    <div class="fm-empty"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                </template>
+                <template x-if="!loading && items.length===0">
+                    <div class="fm-empty"><i class="fa fa-folder-open-o fa-3x" style="display:block;margin-bottom:10px"></i>Folder jest pusty</div>
+                </template>
+                <template x-for="item in items" :key="item.path">
+                    <div class="fm-item"
+                         :class="{selected: selected && selected.path===item.path}"
+                         @click="selectItem(item)"
+                         @dblclick="item.is_dir && navigate(item.path)">
+                        <template x-if="!item.is_dir && isImage(item.ext)">
+                            <img :src="item.url" class="fm-item-thumb" :alt="item.name" @error="$el.src='/uploads/file-manager/.placeholder.png'" loading="lazy">
+                        </template>
+                        <template x-if="item.is_dir">
+                            <div class="fm-item-icon dir"><i class="fa fa-folder"></i></div>
+                        </template>
+                        <template x-if="!item.is_dir && !isImage(item.ext)">
+                            <div class="fm-item-icon" :class="iconClass(item.ext)"><i class="fa" :class="iconFa(item.ext)"></i></div>
+                        </template>
+                        <span class="fm-item-name" x-text="item.name"></span>
+                        <template x-if="item.is_dir">
+                            <span class="fm-item-fav" :class="{active: isFavorite(item.path)}" @click.stop="toggleFavorite(item.path)" title="Dodaj do ulubionych">
+                                <i class="fa fa-star"></i>
+                            </span>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            {{-- Info bar --}}
+            <div class="fm-info-bar">
+                <template x-if="selected">
+                    <span>
+                        <span x-text="selected.name"></span>
+                        <template x-if="!selected.is_dir">
+                            &nbsp;·&nbsp;<span x-text="formatSize(selected.size)"></span>
+                            &nbsp;·&nbsp;
+                            <a :href="selected.url" target="_blank" style="color:#3a5bd9">Otwórz</a>
+                            &nbsp;·&nbsp;
+                            <a href="#" @click.prevent="copyUrl(selected.url)" style="color:#3a5bd9">Kopiuj URL</a>
+                        </template>
+                        <template x-if="selected.is_dir">
+                            &nbsp;· Folder
+                        </template>
+                    </span>
+                </template>
+                <template x-if="!selected">
+                    <span x-text="items.length + ' elementów'"></span>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    {{-- New folder modal --}}
+    <div class="fm-modal-bg" x-show="showNewFolder" @click.self="showNewFolder=false">
+        <div class="fm-modal">
+            <h4><i class="fa fa-folder-o"></i> Nowy folder</h4>
+            <input type="text" x-model="newFolderName" placeholder="Nazwa folderu" @keydown.enter="createFolder()" @keydown.escape="showNewFolder=false" x-ref="folderInput">
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-default" @click="showNewFolder=false">Anuluj</button>
+                <button class="btn btn-primary" @click="createFolder()">Utwórz</button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete confirm modal --}}
+    <div class="fm-modal-bg" x-show="showDelete" @click.self="showDelete=false">
+        <div class="fm-modal">
+            <h4><i class="fa fa-trash text-danger"></i> Potwierdź usunięcie</h4>
+            <p style="font-size:13px;margin-bottom:16px">
+                Czy na pewno chcesz usunąć <strong x-text="selected && selected.name"></strong>?
+                <template x-if="selected && selected.is_dir">
+                    <span style="color:#c0392b"> (wraz z całą zawartością)</span>
+                </template>
+            </p>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-default" @click="showDelete=false">Anuluj</button>
+                <button class="btn btn-danger" @click="deleteItem()">Usuń</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+<script>
+function fileManager() {
+    return {
+        currentPath: '',
+        items: [],
+        favorites: [],
+        selected: null,
+        loading: false,
+        dragging: false,
+        showNewFolder: false,
+        newFolderName: '',
+        showDelete: false,
+        toast: '',
+        _toastTimer: null,
+
+        get breadcrumbs() {
+            if (!this.currentPath) return []
+            const parts = this.currentPath.split('/')
+            return parts.map((p, i) => ({ name: p, path: parts.slice(0, i+1).join('/') }))
+        },
+
+        init() {
+            this.load('')
+        },
+
+        load(path) {
+            this.loading = true
+            this.selected = null
+            fetch(`{{ route('file-manager.list') }}?path=${encodeURIComponent(path)}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                this.items = data.items || []
+                this.favorites = data.favorites || []
+                this.currentPath = path
+                this.loading = false
+            })
+            .catch(() => { this.loading = false })
+        },
+
+        navigate(path) {
+            this.load(path)
+        },
+
+        selectItem(item) {
+            this.selected = this.selected && this.selected.path === item.path ? null : item
+        },
+
+        uploadFiles(files) {
+            if (!files || files.length === 0) return
+            const fd = new FormData()
+            for (const f of files) fd.append('files[]', f)
+            fd.append('path', this.currentPath)
+            fd.append('_token', document.querySelector('meta[name=csrf-token]').content)
+            fetch('{{ route('file-manager.upload') }}', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) { alert(data.error); return }
+                    this.load(this.currentPath)
+                    this.showToast('Wgrano ' + data.uploaded.length + ' plik(ów)')
+                })
+                .catch(() => alert('Błąd wgrywania'))
+        },
+
+        handleDrop(e) {
+            this.dragging = false
+            if (e.dataTransfer.files.length) this.uploadFiles(e.dataTransfer.files)
+        },
+
+        createFolder() {
+            if (!this.newFolderName.trim()) return
+            fetch('{{ route('file-manager.folder') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ path: this.currentPath, name: this.newFolderName.trim() })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { alert(data.error); return }
+                this.newFolderName = ''
+                this.showNewFolder = false
+                this.load(this.currentPath)
+                this.showToast('Folder utworzony')
+            })
+        },
+
+        confirmDelete() {
+            if (!this.selected) return
+            this.showDelete = true
+        },
+
+        deleteItem() {
+            if (!this.selected) return
+            fetch('{{ route('file-manager.delete') }}', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ path: this.selected.path })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { alert(data.error); return }
+                this.showDelete = false
+                this.selected = null
+                this.load(this.currentPath)
+                this.showToast('Usunięto')
+            })
+        },
+
+        toggleFavorite(path) {
+            fetch('{{ route('file-manager.favorite') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ path })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.favorited) {
+                    if (!this.favorites.includes(path)) this.favorites.push(path)
+                } else {
+                    this.favorites = this.favorites.filter(f => f !== path)
+                }
+            })
+        },
+
+        isFavorite(path) { return this.favorites.includes(path) },
+
+        copyUrl(url) {
+            navigator.clipboard.writeText(url).then(() => this.showToast('URL skopiowany!'))
+        },
+
+        showToast(msg) {
+            this.toast = msg
+            clearTimeout(this._toastTimer)
+            this._toastTimer = setTimeout(() => { this.toast = '' }, 2500)
+        },
+
+        isImage(ext) { return ['jpg','jpeg','png','gif','webp','svg','bmp'].includes(ext) },
+
+        iconClass(ext) {
+            if (['pdf'].includes(ext)) return 'pdf'
+            if (['xls','xlsx','csv'].includes(ext)) return 'xls'
+            if (['doc','docx'].includes(ext)) return 'doc'
+            return 'other'
+        },
+
+        iconFa(ext) {
+            if (ext === 'pdf') return 'fa-file-pdf-o'
+            if (['xls','xlsx','csv'].includes(ext)) return 'fa-file-excel-o'
+            if (['doc','docx'].includes(ext)) return 'fa-file-word-o'
+            if (['zip','rar','7z','tar','gz'].includes(ext)) return 'fa-file-archive-o'
+            if (['mp4','avi','mov','mkv'].includes(ext)) return 'fa-file-video-o'
+            return 'fa-file-o'
+        },
+
+        formatSize(bytes) {
+            if (!bytes) return '0 B'
+            if (bytes < 1024) return bytes + ' B'
+            if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB'
+            return (bytes/1048576).toFixed(1) + ' MB'
+        }
+    }
+}
+</script>
+@endsection
