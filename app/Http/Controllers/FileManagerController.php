@@ -28,7 +28,7 @@ class FileManagerController extends Controller
 
     public function list(Request $request): JsonResponse
     {
-        $rel  = $this->sanitizePath($request->input('path', ''));
+        $rel  = $this->sanitizePath($request->input('path', '') ?? '');
         $full = $this->basePath . ($rel ? DIRECTORY_SEPARATOR . $rel : '');
 
         if (!is_dir($full)) {
