@@ -168,8 +168,6 @@
                         <span class="fm-sel-sep">·</span>
                         <a href="#" @click.prevent="copyUrl('/storage/' + selected.path)"><i class="fa fa-copy"></i> Kopiuj ścieżkę</a>
                         <span class="fm-sel-sep">·</span>
-                        <a href="#" @click.prevent="copyUrl(selected.url)"><i class="fa fa-link"></i> Kopiuj URL</a>
-                        <span class="fm-sel-sep">·</span>
                         <a href="#" @click.prevent="startRename()"><i class="fa fa-pencil"></i> Zmień nazwę</a>
                     </span>
                 </template>
