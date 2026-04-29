@@ -13,7 +13,7 @@ class CategoryController extends Controller
 {
     public function index(): View
     {
-        $roots = Category::with(['children.children'])
+        $roots = Category::with('allChildren')
             ->where(function ($q) {
                 $q->whereNull('parent_id')->orWhere('parent_id', 0);
             })

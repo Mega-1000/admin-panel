@@ -76,6 +76,11 @@ class Category extends Model
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
+    public function allChildren(): HasMany
+    {
+        return $this->children()->with('allChildren')->orderBy('priority')->orderBy('name');
+    }
+
     public function discounts(): HasManyThrough
     {
         return $this->hasManyThrough(

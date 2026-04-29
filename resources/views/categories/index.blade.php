@@ -20,8 +20,7 @@
         <div class="panel panel-bordered">
             <div class="panel-body">
                 <p class="text-muted" style="margin-bottom: 20px;">
-                    Drzewo kategorii — maksymalnie 3 poziomy.
-                    <strong>Poziom 1</strong> (pogrubiony) → <strong>Poziom 2</strong> (wcięcie 1×) → <strong>Poziom 3</strong> (wcięcie 2×).
+                    Drzewo kategorii — dowolna liczba poziomów.
                 </p>
                 <table class="table table-hover">
                     <thead>
@@ -37,120 +36,14 @@
                     </thead>
                     <tbody>
                         @forelse($roots as $root)
-                            <tr class="category-row level-1">
-                                <td><span class="cat-id">{{ $root->id }}</span></td>
-                                <td>
-                                    <strong>{{ $root->name }}</strong>
-                                    @if($root->children->count())
-                                        <span class="expand-toggle" data-id="{{ $root->id }}">
-                                            <i class="fa fa-chevron-right"></i> {{ $root->children->count() }} podkategori{{ $root->children->count() === 1 ? 'a' : ($root->children->count() < 5 ? 'e' : 'i') }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($root->is_visible)
-                                        <span class="badge badge-success">Tak</span>
-                                    @else
-                                        <span class="badge badge-danger">Nie</span>
-                                    @endif
-                                </td>
-                                <td>{{ $root->priority }}</td>
-                                <td>{{ $root->products_count ?? $root->products()->count() }}</td>
-                                <td>
-                                    @if(!empty($root->youtube))
-                                        <span class="badge badge-info">{{ count($root->youtube) }}</span>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <a href="{{ route('categories.edit', $root->id) }}" class="btn btn-sm btn-primary">
-                                        <i class="fa fa-edit"></i> Edytuj
-                                    </a>
-                                    <form action="{{ route('categories.destroy', $root->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Usunąć kategorię {{ addslashes($root->name) }}?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-
-                            @foreach($root->children as $child)
-                                <tr class="category-row level-2 children-of-{{ $root->id }}" style="display:none; background:#fafafa;">
-                                    <td><span class="cat-id">{{ $child->id }}</span></td>
-                                    <td style="padding-left:30px;">
-                                        <i class="fa fa-angle-right text-muted"></i>
-                                        {{ $child->name }}
-                                        @if($child->children->count())
-                                            <span class="expand-toggle" data-id="{{ $child->id }}">
-                                                <i class="fa fa-chevron-right"></i> {{ $child->children->count() }} podkategori{{ $child->children->count() === 1 ? 'a' : ($child->children->count() < 5 ? 'e' : 'i') }}
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($child->is_visible)
-                                            <span class="badge badge-success">Tak</span>
-                                        @else
-                                            <span class="badge badge-danger">Nie</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $child->priority }}</td>
-                                    <td>{{ $child->products()->count() }}</td>
-                                    <td>
-                                        @if(!empty($child->youtube))
-                                            <span class="badge badge-info">{{ count($child->youtube) }}</span>
-                                        @else
-                                            <span class="text-muted">—</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('categories.edit', $child->id) }}" class="btn btn-sm btn-primary">
-                                            <i class="fa fa-edit"></i> Edytuj
-                                        </a>
-                                        <form action="{{ route('categories.destroy', $child->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Usunąć kategorię {{ addslashes($child->name) }}?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                                        </form>
-                                    </td>
-                                </tr>
-
-                                @foreach($child->children as $grandchild)
-                                    <tr class="category-row level-3 children-of-{{ $child->id }}" style="display:none; background:#f4f4f4;">
-                                        <td><span class="cat-id">{{ $grandchild->id }}</span></td>
-                                        <td style="padding-left:60px;">
-                                            <i class="fa fa-angle-double-right text-muted"></i>
-                                            {{ $grandchild->name }}
-                                        </td>
-                                        <td>
-                                            @if($grandchild->is_visible)
-                                                <span class="badge badge-success">Tak</span>
-                                            @else
-                                                <span class="badge badge-danger">Nie</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $grandchild->priority }}</td>
-                                        <td>{{ $grandchild->products()->count() }}</td>
-                                        <td>
-                                            @if(!empty($grandchild->youtube))
-                                                <span class="badge badge-info">{{ count($grandchild->youtube) }}</span>
-                                            @else
-                                                <span class="text-muted">—</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <a href="{{ route('categories.edit', $grandchild->id) }}" class="btn btn-sm btn-primary">
-                                                <i class="fa fa-edit"></i> Edytuj
-                                            </a>
-                                            <form action="{{ route('categories.destroy', $grandchild->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Usunąć kategorię {{ addslashes($grandchild->name) }}?')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endforeach
+                            @include('categories._row', [
+                                'category' => $root,
+                                'depth'    => 1,
+                                'parentId' => 0,
+                            ])
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted">Brak kategorii.</td>
+                                <td colspan="7" class="text-center text-muted">Brak kategorii.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -212,6 +105,10 @@
 .expand-toggle.open .fa {
     transform: rotate(90deg);
 }
+.category-row.level-2 { background: #fafafa; }
+.category-row.level-3 { background: #f4f4f4; }
+.category-row.level-4 { background: #eef0f5; }
+.category-row.level-5 { background: #e8eaf2; }
 </style>
 @endsection
 
