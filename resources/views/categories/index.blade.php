@@ -19,9 +19,16 @@
 
         <div class="panel panel-bordered">
             <div class="panel-body">
-                <p class="text-muted" style="margin-bottom: 20px;">
-                    Drzewo kategorii — dowolna liczba poziomów.
-                </p>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                    <p class="text-muted" style="margin:0;">Drzewo kategorii — dowolna liczba poziomów.</p>
+                    <div style="margin-left:auto; position:relative;">
+                        <i class="fa fa-search" style="position:absolute; left:9px; top:50%; transform:translateY(-50%); color:#aaa; font-size:12px; pointer-events:none;"></i>
+                        <input type="text" id="cat-search" placeholder="Szukaj kategorii…"
+                               style="padding:6px 28px 6px 28px; border:1px solid #ccc; border-radius:4px; font-size:13px; width:240px; outline:none;"
+                               onfocus="this.style.borderColor='#3a5bd9'" onblur="this.style.borderColor='#ccc'">
+                        <button id="cat-search-clear" style="display:none; position:absolute; right:7px; top:50%; transform:translateY(-50%); background:none; border:none; color:#aaa; cursor:pointer; font-size:16px; padding:0; line-height:1;">&times;</button>
+                    </div>
+                </div>
                 <table class="table table-hover">
                     <thead>
                         <tr>
@@ -151,5 +158,74 @@
             }
         });
     });
+
+    // Category search
+    (function() {
+        var searchInput = document.getElementById('cat-search');
+        var clearBtn    = document.getElementById('cat-search-clear');
+
+        function getAncestorRows(row) {
+            var ancestors = [];
+            var classes = Array.from(row.classList);
+            var childrenOfClass = classes.find(function(c) { return c.startsWith('children-of-'); });
+            if (!childrenOfClass) return ancestors;
+            var parentId = childrenOfClass.replace('children-of-', '');
+            if (!parentId || parentId === '0') return ancestors;
+            var parentRow = document.querySelector('.category-row[data-id="' + parentId + '"]');
+            if (parentRow) {
+                ancestors.push(parentRow);
+                ancestors = ancestors.concat(getAncestorRows(parentRow));
+            }
+            return ancestors;
+        }
+
+        function applySearch(query) {
+            var allRows = document.querySelectorAll('.category-row');
+            clearBtn.style.display = query ? '' : 'none';
+
+            if (!query) {
+                // Restore default state: only level-1 visible, all toggles closed
+                allRows.forEach(function(row) {
+                    row.style.display = row.classList.contains('level-1') ? '' : 'none';
+                });
+                document.querySelectorAll('.expand-toggle.open').forEach(function(t) {
+                    t.classList.remove('open');
+                });
+                return;
+            }
+
+            var q = query.toLowerCase();
+            var toShow = new Set();
+
+            allRows.forEach(function(row) {
+                var nameCell = row.querySelector('td:nth-child(2)');
+                var name = nameCell ? nameCell.textContent.trim().toLowerCase() : '';
+                if (name.indexOf(q) !== -1) {
+                    toShow.add(row);
+                    getAncestorRows(row).forEach(function(a) { toShow.add(a); });
+                }
+            });
+
+            allRows.forEach(function(row) {
+                row.style.display = toShow.has(row) ? '' : 'none';
+            });
+
+            // Mark toggles as open if their children are shown
+            document.querySelectorAll('.expand-toggle').forEach(function(toggle) {
+                var id = toggle.dataset.id;
+                var hasVisibleChild = document.querySelector('.children-of-' + id + '[style*="display: ;"], .children-of-' + id + ':not([style*="none"])');
+                // Simpler: check if any shown child row has children-of-{id}
+                var anyShown = Array.from(document.querySelectorAll('.children-of-' + id)).some(function(r) { return r.style.display !== 'none'; });
+                if (anyShown) {
+                    toggle.classList.add('open');
+                } else {
+                    toggle.classList.remove('open');
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', function() { applySearch(this.value.trim()); });
+        clearBtn.addEventListener('click', function() { searchInput.value = ''; applySearch(''); searchInput.focus(); });
+    }());
 </script>
 @endsection

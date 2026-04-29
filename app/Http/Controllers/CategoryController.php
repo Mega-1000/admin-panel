@@ -90,31 +90,36 @@ class CategoryController extends Controller
 
     private function getSelectableParents(?Category $exclude = null): array
     {
-        $query = Category::with('children')
+        $roots = Category::with('allChildren')
             ->where(function ($q) {
                 $q->whereNull('parent_id')->orWhere('parent_id', 0);
             })
-            ->orderBy('name');
+            ->orderBy('priority')
+            ->orderBy('name')
+            ->get();
 
-        if ($exclude) {
-            $query->where('id', '!=', $exclude->id);
-        }
-
-        $roots = $query->get();
         $options = [];
 
         foreach ($roots as $root) {
-            $options[$root->id] = $root->name;
-
-            foreach ($root->children as $child) {
-                if ($exclude && $child->id === $exclude->id) {
-                    continue;
-                }
-                $options[$child->id] = '— ' . $child->name;
+            if ($exclude && $root->id === $exclude->id) {
+                continue;
             }
+            $options[$root->id] = $root->name;
+            $this->flattenChildrenForSelect($root->allChildren, $options, 1, $exclude);
         }
 
         return $options;
+    }
+
+    private function flattenChildrenForSelect($children, array &$options, int $depth, ?Category $exclude): void
+    {
+        foreach ($children as $child) {
+            if ($exclude && $child->id === $exclude->id) {
+                continue;
+            }
+            $options[$child->id] = str_repeat('— ', $depth) . $child->name;
+            $this->flattenChildrenForSelect($child->allChildren, $options, $depth + 1, $exclude);
+        }
     }
 
     private function filterYoutube(?array $youtube): ?array
