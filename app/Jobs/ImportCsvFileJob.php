@@ -120,8 +120,10 @@ class ImportCsvFileJob implements ShouldQueue
                 $product = null;
                 $multiCalcBase = trim($line[$categoryColumn + 12]);
                 $multiCalcCurrent = trim($line[$categoryColumn + 8]);
+                $this->log('[IMPORT] Czy sprawdzać kategorie? Symbol: ' . ($array['symbol'] ?? 'NO') . ' | multiCalcBase ' . empty($multiCalcBase) . ' | MultiCalcCurrent: ' . empty($multiCalcCurrent) );
                 if (empty($array['symbol']) && empty($multiCalcBase) && empty($multiCalcCurrent)) {
                     $categoryTree = $this->getCategoryTreeNames($line, $categoryColumn);
+                    $this->log("[IMPORT] Kategoria wiersz $i | tree: " . implode(' > ', $categoryTree));
                     $this->saveCategory($line, $categoryTree, $categoryColumn);
                 } elseif ($line[6] == 1) {
                     $array = $this->attachEmployeesToProduct($line, $array);
