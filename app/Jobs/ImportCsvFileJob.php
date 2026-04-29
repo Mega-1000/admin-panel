@@ -167,7 +167,6 @@ class ImportCsvFileJob implements ShouldQueue
 
         DB::commit();
         $this->saveJpgData();
-        $this->cleanupObsoleteCategories();
 
         $this->updateImportTable();
         $this->makeBackups();
@@ -229,14 +228,6 @@ class ImportCsvFileJob implements ShouldQueue
         }
     }
 
-    private function getUrl($url): array|string
-    {
-        $imgUrlExploded = explode('\\', $url);
-        $imgUrlExploded = end($imgUrlExploded);
-        $imgUrlWebsite = 'products' . DIRECTORY_SEPARATOR . $imgUrlExploded;
-        $imgUrlWebsite = Storage::url($imgUrlWebsite);
-        return str_replace("\\", '/', $imgUrlWebsite);
-    }
 
     private function getShowOnPageParameter(array $line, int $columnIterator): bool
     {
@@ -413,7 +404,7 @@ class ImportCsvFileJob implements ShouldQueue
             'additional_info1' => $line[289],
             'additional_info2' => $line[290],
             'url' => $line[303],
-            'url_for_website' => !empty($line[303]) ? $this->getUrl($line[303]) : null,
+            'url_for_website' => $line[303] !== '' ? trim($line[303]) : null,
             'manufacturer_url' => $line[304],
             'video_url' => $line[305],
             'calculator_type' => $line[306],
@@ -682,7 +673,7 @@ class ImportCsvFileJob implements ShouldQueue
                 'price' => (isset($product) && $product->price !== null) ? $product->price->gross_selling_price_basic_unit : $price,
                 'order' => $order,
                 'name' => $line[4],
-                'image' => $this->getUrl($line[303])
+                'image' => trim($line[303])
             ];
         }
     }
@@ -738,27 +729,6 @@ class ImportCsvFileJob implements ShouldQueue
         return null;
     }
 
-    private function cleanupObsoleteCategories(): void
-    {
-        if (empty($this->seenCategoryIds)) {
-            return;
-        }
-
-        // Delete from deepest leaf upward: repeat until nothing is removed.
-        // A category is obsolete when it was not seen in the CSV AND has no products.
-        // We restrict each pass to leaf nodes (not a parent_id of another category)
-        // so that orphaned parents are cleaned up in subsequent passes.
-        do {
-            $usedParentIds = Category::whereNotNull('parent_id')->pluck('parent_id')->unique()->all();
-
-            $deleted = Category::whereNotIn('id', $this->seenCategoryIds)
-                ->whereNotIn('id', $usedParentIds)
-                ->whereDoesntHave('products')
-                ->delete();
-
-            $this->categoriesDeleted += $deleted;
-        } while ($deleted > 0);
-    }
 
     private function sendSummaryEmail(): void
     {
