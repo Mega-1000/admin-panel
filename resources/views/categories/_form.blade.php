@@ -15,15 +15,29 @@
 
 <div class="form-group">
     <label for="parent_id">Kategoria nadrzędna</label>
-    <select class="form-control" id="parent_id" name="parent_id">
-        <option value="">— brak (kategoria główna) —</option>
+    <select class="selectpicker form-control" id="parent_id" name="parent_id"
+            data-live-search="true"
+            data-live-search-placeholder="Szukaj kategorii…"
+            data-size="12"
+            data-none-selected-text="— brak (kategoria główna) —"
+            title="— brak (kategoria główna) —">
         @foreach($parents as $pid => $pname)
-            <option value="{{ $pid }}" {{ old('parent_id', $category?->parent_id) == $pid ? 'selected' : '' }}>
-                {{ $pname }}
-            </option>
+            @php
+                $depth     = substr_count($pname, '— ');
+                $label     = e(trim(str_replace('— ', '', $pname)));
+                $pad       = str_repeat('<span style="display:inline-block;width:14px"></span>', $depth);
+                $icon      = $depth === 0
+                    ? '<i class="fa fa-folder" style="color:#3a5bd9;margin-right:6px;font-size:12px;"></i>'
+                    : str_repeat('<i class="fa fa-angle-right" style="color:#bbb;font-size:10px;margin-right:2px;"></i>', $depth)
+                      . '<span style="margin-right:4px;"></span>';
+                $dataContent = $pad . $icon . $label;
+            @endphp
+            <option value="{{ $pid }}"
+                    data-content="{{ $dataContent }}"
+                    {{ old('parent_id', $category?->parent_id) == $pid ? 'selected' : '' }}>{{ $pname }}</option>
         @endforeach
     </select>
-    <small class="text-muted">Wybierz kategorię nadrzędną lub zostaw puste, aby stworzyć kategorię główną.</small>
+    <small class="text-muted">Zostaw puste, aby stworzyć kategorię główną.</small>
 </div>
 
 <div class="row">
@@ -37,15 +51,31 @@
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="img">URL zdjęcia</label>
-            <div class="input-group">
-                <input type="text" class="form-control" id="img" name="img" maxlength="191"
-                       value="{{ old('img', $category?->img) }}" placeholder="/storage/...">
-                <span class="input-group-btn">
-                    <button type="button" id="mmBrowseBtn" class="btn btn-default">
-                        <i class="fa fa-folder-open-o"></i> Przeglądaj
+            <label>Zdjęcie kategorii</label>
+
+            {{-- Thumbnail preview --}}
+            <div id="imgPreviewBox" style="{{ old('img', $category?->img) ? '' : 'display:none;' }} margin-bottom:8px;">
+                <div style="position:relative; display:inline-block; max-width:100%;">
+                    <img id="imgPreview" src="{{ old('img', $category?->img) }}"
+                         style="max-height:90px; max-width:100%; border:1px solid #ddd; border-radius:4px; padding:3px; display:block; background:#fafafa;">
+                    <button type="button" id="imgClearBtn"
+                            title="Usuń zdjęcie"
+                            style="position:absolute; top:-7px; right:-7px; background:#c0392b; border:none; border-radius:50%; width:20px; height:20px; color:#fff; font-size:12px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; box-shadow:0 1px 4px rgba(0,0,0,.3);">
+                        &times;
                     </button>
-                </span>
+                </div>
+            </div>
+
+            {{-- Pick / URL row --}}
+            <div style="display:flex; gap:6px; align-items:stretch;">
+                <input type="text" class="form-control" id="img" name="img" maxlength="191"
+                       value="{{ old('img', $category?->img) }}" placeholder="/storage/…"
+                       style="font-size:12px; flex:1; min-width:0;">
+                <button type="button" id="mmBrowseBtn"
+                        style="flex-shrink:0; background:#3a5bd9; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:background .15s; white-space:nowrap;"
+                        onmouseover="this.style.background='#2a4bbf'" onmouseout="this.style.background='#3a5bd9'">
+                    <i class="fa fa-picture-o"></i> Wybierz
+                </button>
             </div>
         </div>
     </div>
@@ -193,6 +223,42 @@
 
 <script>
 (function () {
+    // ── Thumbnail preview ─────────────────────────────────────────────────────
+    function updateImgPreview(val) {
+        var box      = document.getElementById('imgPreviewBox');
+        var imgEl    = document.getElementById('imgPreview');
+        if (!box || !imgEl) return;
+        if (val && val.trim()) {
+            imgEl.src     = val.trim();
+            imgEl.onerror = function() { box.style.display = 'none'; };
+            imgEl.onload  = function() { box.style.display = ''; };
+            box.style.display = '';
+        } else {
+            box.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var imgInput = document.getElementById('img');
+        if (imgInput) {
+            imgInput.addEventListener('input', function () { updateImgPreview(this.value); });
+        }
+        var clearBtn = document.getElementById('imgClearBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('img').value = '';
+                updateImgPreview('');
+            });
+        }
+
+        // Bootstrap-select for parent dropdown
+        if (typeof $.fn.selectpicker !== 'undefined') {
+            $('#parent_id').selectpicker('refresh');
+        }
+    });
+
+    // ── Mini media manager ────────────────────────────────────────────────────
     var mmState = { path: '', items: [], favs: [], selected: null };
 
     function mmIsImage(ext) {
@@ -300,7 +366,9 @@
 
         // Select button
         if ((e.target.id === 'mmSelectBtn' || e.target.closest('#mmSelectBtn')) && mmState.selected) {
-            document.getElementById('img').value = '/storage/' + mmState.selected.path;
+            var val = '/storage/' + mmState.selected.path;
+            document.getElementById('img').value = val;
+            updateImgPreview(val);
             modal.style.display = 'none'; return;
         }
 
@@ -334,7 +402,9 @@
         if (gridItem && gridItem.dataset.isdir === '0' && gridItem.dataset.isimg === '1') {
             var item = mmState.items.find(function(i) { return i.path === gridItem.dataset.path; });
             if (item) {
-                document.getElementById('img').value = '/storage/' + item.path;
+                var v = '/storage/' + item.path;
+                document.getElementById('img').value = v;
+                updateImgPreview(v);
                 modal.style.display = 'none';
             }
         }
