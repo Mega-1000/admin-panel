@@ -46,7 +46,7 @@ class ImportCsvFileJob implements ShouldQueue
     private array $productsRelated = [];
     private array $jpgData = [];
     private array $seenCategoryIds = [];
-    private array $categories = ['id' => 0, 'children' => []];
+    private array $categoryPathIds = []; // path key (e.g. "180.kominy/1.kominy_u") => category_id
     public $currentCategories;
 
     private $currentLine;
@@ -270,8 +270,7 @@ class ImportCsvFileJob implements ShouldQueue
 
         if (!$isChildProduct) {
             $categoryTree = $this->getCategoryTreeNames($line, $categoryColumn);
-            $parent = $this->getCategoryParent($categoryTree, true);
-            $array['category_id'] = $parent['id'] ?: null;
+            $array['category_id'] = $this->getCategoryIdForProduct($categoryTree);
         } else {
             $array['category_id'] = null;
         }
@@ -721,20 +720,22 @@ class ImportCsvFileJob implements ShouldQueue
         JpgDatum::insert($data);
     }
 
-    /**
-     * @throws Exception
-     */
-    private function saveCategory(array $line, array $categoryTree, int $categoryColumn)
+    private function saveCategory(array $line, array $categoryTree, int $categoryColumn): void
     {
-        $parent = &$this->getCategoryParent($categoryTree);
+        if (empty($categoryTree)) {
+            return;
+        }
 
-        $parentId = $parent['id'] ?: null;
-        /** @var Category|null $existingCategory */
-        $existingCategory = $this->currentCategories->get(end($categoryTree) . '||' . (int) $parentId);
+        $pathKey  = implode('/', $categoryTree);
+        $parentKey = implode('/', array_slice($categoryTree, 0, -1));
+        $parentId  = $parentKey ? ($this->categoryPathIds[$parentKey] ?? null) : null;
+
+        $csvName          = end($categoryTree);
+        $existingCategory = $this->currentCategories->get($csvName . '||' . (int) $parentId);
 
         $name = ($existingCategory?->save_name === false && $existingCategory->name)
             ? $existingCategory->name
-            : end($categoryTree);
+            : $csvName;
 
         $description = ($existingCategory?->save_description === false && $existingCategory->description)
             ? $existingCategory->description
@@ -744,7 +745,7 @@ class ImportCsvFileJob implements ShouldQueue
             ? $existingCategory->img
             : $line[303] ?? 'https://via.placeholder.com/300';
         if (strpos($image, "\\")) {
-            $image = $image;
+            $image = $this->getUrl($image);
         }
 
         $categoryData = [
@@ -761,9 +762,8 @@ class ImportCsvFileJob implements ShouldQueue
             'save_image'       => $existingCategory?->save_image ?? true,
         ];
 
-        /** @var Category $category */
         if ($existingCategory) {
-            $existingCategory->update(['parent_id' => $parentId]);
+            $existingCategory->update($categoryData);
             $category = $existingCategory;
             $this->categoriesUpdated++;
         } else {
@@ -771,8 +771,8 @@ class ImportCsvFileJob implements ShouldQueue
             $this->categoriesCreated++;
         }
 
-        $this->seenCategoryIds[] = $category->id;
-        $parent['children'][$category->name] = ['id' => $category->id, 'children' => []];
+        $this->seenCategoryIds[]       = $category->id;
+        $this->categoryPathIds[$pathKey] = $category->id;
 
         $replacements = $this->getChimneyReplacements($line);
         $this->appendChimneyAttributes($category, $line);
@@ -780,41 +780,23 @@ class ImportCsvFileJob implements ShouldQueue
         $this->appendChimneyProducts($category, $line, 518, 38, true);
     }
 
-    /**
-     * @throws Exception
-     */
-    private function &getCategoryParent($categoryTree, $isProduct = false)
+    private function getCategoryIdForProduct(array $categoryTree): ?int
     {
-        $current = &$this->categories;
-        $iMax = count($categoryTree) - ($isProduct ? 0 : 1);
-        foreach ($categoryTree as $i => $cat) {
-            if (isset($current['children'][$cat])) {
-                if ($i == $iMax && !$isProduct) {
-                    return $current;
-                }
-                $current = &$current['children'][$cat];
-                if ($i == $iMax) {
-                    if (empty($current['children'])) {
-                        return $current;
-                    }
-                    $path = implode(' > ', $categoryTree);
-                    $this->log("[IMPORT] UWAGA wiersz {$this->currentLine}: produkt przypisany do kategorii z podkategoriami (niedozwolone) — ścieżka: $path");
-                    return $this->categories;
-                }
-                continue;
-            } elseif ($i < $iMax) {
-                if ($isProduct) {
-                    if (empty($current['children'])) {
-                        return $current;
-                    }
-                    $path = implode(' > ', $categoryTree);
-                    $this->log("[IMPORT] UWAGA wiersz {$this->currentLine}: produkt przypisany do kategorii z podkategoriami (niedozwolone) — ścieżka: $path");
-                    return $this->categories;
-                }
-                throw new Exception("Missing category parent");
+        if (empty($categoryTree)) {
+            return null;
+        }
+        $pathKey = implode('/', $categoryTree);
+        if (isset($this->categoryPathIds[$pathKey])) {
+            return $this->categoryPathIds[$pathKey];
+        }
+        // Fallback: DB lookup from deepest to shallowest
+        for ($i = count($categoryTree) - 1; $i >= 0; $i--) {
+            $cat = Category::where('name', $categoryTree[$i])->first();
+            if ($cat) {
+                return $cat->id;
             }
         }
-        return $current;
+        return null;
     }
 
     private function appendChimneyAttributes($category, $line)
