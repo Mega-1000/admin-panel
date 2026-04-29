@@ -68,6 +68,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     /**
      * @throws FileNotFoundException
+     * @throws \Throwable
      */
     public function handle()
     {
