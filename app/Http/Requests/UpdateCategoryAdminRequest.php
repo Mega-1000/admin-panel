@@ -29,18 +29,11 @@ class UpdateCategoryAdminRequest extends FormRequest
                     $parent = \App\Entities\Category::find($value);
                     if ($parent && $parent->parent_id == $categoryId) {
                         $fail('Nie można ustawić podkategorii jako kategorię nadrzędną.');
-                        return;
-                    }
-                    if ($parent && !is_null($parent->parent_id)) {
-                        $grandparent = \App\Entities\Category::find($parent->parent_id);
-                        if ($grandparent && !is_null($grandparent->parent_id)) {
-                            $fail('Dozwolone są maksymalnie 3 poziomy kategorii.');
-                        }
                     }
                 }
             ],
             'img'               => 'nullable|string|max:191',
-            'priority'          => 'nullable|integer|min:0|max:9999',
+            'priority'          => 'nullable|integer|min:0',
             'is_visible'        => 'nullable|boolean',
             'save_name'         => 'nullable|boolean',
             'save_description'  => 'nullable|boolean',

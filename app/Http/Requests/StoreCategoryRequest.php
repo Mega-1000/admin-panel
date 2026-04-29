@@ -16,18 +16,9 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name'              => 'required|string|max:191',
             'description'       => 'nullable|string',
-            'parent_id'         => ['nullable', 'integer', 'exists:categories,id', function ($attr, $value, $fail) {
-                if (!$value) return;
-                $parent = \App\Entities\Category::find($value);
-                if ($parent && !is_null($parent->parent_id)) {
-                    $grandparent = \App\Entities\Category::find($parent->parent_id);
-                    if ($grandparent && !is_null($grandparent->parent_id)) {
-                        $fail('Dozwolone są maksymalnie 3 poziomy kategorii.');
-                    }
-                }
-            }],
+            'parent_id'         => ['nullable', 'integer', 'exists:categories,id'],
             'img'               => 'nullable|string|max:191',
-            'priority'          => 'nullable|integer|min:0|max:9999',
+            'priority'          => 'nullable|integer|min:0',
             'is_visible'        => 'nullable|boolean',
             'save_name'         => 'nullable|boolean',
             'save_description'  => 'nullable|boolean',
