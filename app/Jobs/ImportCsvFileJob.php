@@ -763,7 +763,7 @@ class ImportCsvFileJob implements ShouldQueue
         ];
 
         if ($existingCategory) {
-            $existingCategory->update($categoryData);
+            $existingCategory->update(['parent_id' => $parentId]);
             $category = $existingCategory;
             $this->categoriesUpdated++;
         } else {
