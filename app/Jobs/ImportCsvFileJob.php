@@ -236,6 +236,15 @@ class ImportCsvFileJob implements ShouldQueue
     }
 
 
+    private function getUrl($url): array|string
+    {
+        $imgUrlExploded = explode('\\', $url);
+        $imgUrlExploded = end($imgUrlExploded);
+        $imgUrlWebsite = 'products' . DIRECTORY_SEPARATOR . $imgUrlExploded;
+        $imgUrlWebsite = Storage::url($imgUrlWebsite);
+        return str_replace("\\", '/', $imgUrlWebsite);
+    }
+
     private function getShowOnPageParameter(array $line, int $columnIterator): bool
     {
         return array_key_exists($columnIterator + 14, $line) && $line[$columnIterator + 14] == 1;
@@ -735,7 +744,7 @@ class ImportCsvFileJob implements ShouldQueue
             ? $existingCategory->img
             : $line[303] ?? 'https://via.placeholder.com/300';
         if (strpos($image, "\\")) {
-            $image = $this->getUrl($image);
+            $image = $image;
         }
 
         $categoryData = [
@@ -892,7 +901,7 @@ class ImportCsvFileJob implements ShouldQueue
                 $productNumber = trim($line[$i + 1], "[]");
                 if (!isset($replacements[$productNumber])) {
                     $replacements[$productNumber] = [
-                        'img' => $this->getUrl($line[$i + 3]),
+                        'img' => $line[$i + 3],
                         'products' => []
                     ];
                 }
