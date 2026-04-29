@@ -719,14 +719,23 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function findCategoryId(array $tree): ?int
     {
-        foreach (array_reverse($tree) as $name) {
-            $category = Category::where('name', $name)->first();
-            if ($category) {
-                $this->seenCategoryIds[] = $category->id;
-                return $category->id;
-            }
+        if (empty($tree)) {
+            return null;
         }
-        return null;
+
+        $parentId = null;
+        $category = null;
+
+        foreach ($tree as $name) {
+            $category = Category::firstOrCreate(
+                ['name' => $name, 'parent_id' => $parentId],
+                ['is_visible' => true, 'priority' => 0]
+            );
+            $this->seenCategoryIds[] = $category->id;
+            $parentId = $category->id;
+        }
+
+        return $category?->id;
     }
 
 
