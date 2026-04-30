@@ -252,14 +252,13 @@
                          @click="item.is_dir ? navigate(item.path) : selectItem(item)">
 
                         {{-- Checkbox (files only) --}}
-                        <template x-if="!item.is_dir">
-                            <span class="fm-item-cb"
-                                  :class="{active: isChecked(item.path)}"
-                                  @click.stop="toggleCheck(item.path)"
-                                  title="Zaznacz">
-                                <i class="fa" :class="isChecked(item.path) ? 'fa-check-square' : 'fa-square-o'"></i>
-                            </span>
-                        </template>
+                        <span class="fm-item-cb"
+                              x-show="!item.is_dir"
+                              :class="{active: isChecked(item.path)}"
+                              @click.stop="toggleCheck(item.path)"
+                              title="Zaznacz">
+                            <i class="fa" :class="isChecked(item.path) ? 'fa-check-square' : 'fa-square-o'"></i>
+                        </span>
 
                         <template x-if="!item.is_dir && isImage(item.ext)">
                             <img :src="item.url" class="fm-item-thumb" :alt="item.name" onerror="this.style.display='none'" loading="lazy"
