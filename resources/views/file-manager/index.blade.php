@@ -48,9 +48,10 @@
 .fm-item-fav.active { opacity:1; color:#f5a623; }
 
 /* ── Multi-select checkbox ───────────────────────────────────────────────── */
-.fm-item-cb     { position:absolute; top:3px; left:4px; font-size:15px; cursor:pointer; color:#ccc; opacity:.35; transition:opacity .15s, color .15s; z-index:2; line-height:1; }
-.fm-item:hover .fm-item-cb  { opacity:1; color:#888; }
-.fm-item.is-checked .fm-item-cb { opacity:1; color:#3a5bd9; }
+.fm-item-cb-row { width:100%; display:flex; align-items:center; min-height:18px; margin-bottom:2px; }
+.fm-item-cb     { font-size:15px; cursor:pointer; color:#bbb; transition:color .15s; line-height:1; padding:0 2px; }
+.fm-item:hover .fm-item-cb  { color:#888; }
+.fm-item.is-checked .fm-item-cb { color:#3a5bd9; }
 .fm-batch-bar   { display:flex; align-items:center; gap:8px; padding:6px 14px; background:#eef1fb; border-bottom:1px solid #c8d0f0; font-size:12px; }
 
 /* ── Selected-file info bar ──────────────────────────────────────────────── */
@@ -251,14 +252,15 @@
                          :class="{selected: selected && selected.path===item.path, 'is-checked': isChecked(item.path)}"
                          @click="item.is_dir ? navigate(item.path) : selectItem(item)">
 
-                        {{-- Checkbox (files only) --}}
-                        <span class="fm-item-cb"
-                              x-show="!item.is_dir"
-                              :class="{active: isChecked(item.path)}"
-                              @click.stop="toggleCheck(item.path)"
-                              title="Zaznacz">
-                            <i class="fa" :class="isChecked(item.path) ? 'fa-check-square' : 'fa-square-o'"></i>
-                        </span>
+                        {{-- Checkbox row (files only, always in flow) --}}
+                        <div class="fm-item-cb-row">
+                            <span x-show="!item.is_dir"
+                                  class="fm-item-cb"
+                                  @click.stop="toggleCheck(item.path)"
+                                  title="Zaznacz / odznacz">
+                                <i class="fa" :class="isChecked(item.path) ? 'fa-check-square' : 'fa-square-o'"></i>
+                            </span>
+                        </div>
 
                         <template x-if="!item.is_dir && isImage(item.ext)">
                             <img :src="item.url" class="fm-item-thumb" :alt="item.name" onerror="this.style.display='none'" loading="lazy"
