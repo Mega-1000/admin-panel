@@ -2940,6 +2940,7 @@ class OrdersController extends Controller
                 'cart_token' => $order->getToken(),
                 'user_code' => $code,
                 'reloadCart' => 'true',
+                'order_id' => $order->id,
             ]);
 
             $frontUrl = config('app.front_url') . '/wczytaj-koszyk?' . $query;
