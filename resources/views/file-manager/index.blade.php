@@ -48,10 +48,20 @@
 .fm-item-fav.active { opacity:1; color:#f5a623; }
 
 /* ── Multi-select checkbox ───────────────────────────────────────────────── */
-.fm-item-cb-row { width:100%; display:flex; align-items:center; min-height:18px; margin-bottom:2px; }
-.fm-item-cb     { font-size:15px; cursor:pointer; color:#bbb; transition:color .15s; line-height:1; padding:0 2px; }
-.fm-item:hover .fm-item-cb  { color:#888; }
-.fm-item.is-checked .fm-item-cb { color:#3a5bd9; }
+.fm-item-cb-row { width:100%; height:22px; display:flex; align-items:center; margin-bottom:2px; }
+.fm-item.fm-is-dir .fm-item-cb-row { visibility:hidden; pointer-events:none; }
+.fm-item-cb {
+    width:16px; height:16px;
+    min-width:16px; min-height:16px;
+    border:2px solid #bbb; border-radius:3px;
+    background:#fff; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s, background .15s;
+    box-sizing:border-box;
+}
+.fm-item:hover .fm-item-cb       { border-color:#3a5bd9; }
+.fm-item-cb.fm-cb-on             { background:#3a5bd9; border-color:#3a5bd9; }
+.fm-item-cb.fm-cb-on::after      { content:''; display:block; width:4px; height:8px; border:2px solid #fff; border-top:none; border-left:none; transform:rotate(45deg) translate(-1px,-1px); }
 .fm-batch-bar   { display:flex; align-items:center; gap:8px; padding:6px 14px; background:#eef1fb; border-bottom:1px solid #c8d0f0; font-size:12px; }
 
 /* ── Selected-file info bar ──────────────────────────────────────────────── */
@@ -249,17 +259,16 @@
                 </template>
                 <template x-for="item in filteredItems" :key="item.path">
                     <div class="fm-item"
-                         :class="{selected: selected && selected.path===item.path, 'is-checked': isChecked(item.path)}"
+                         :class="{'selected': selected && selected.path===item.path, 'is-checked': isChecked(item.path), 'fm-is-dir': item.is_dir}"
                          @click="item.is_dir ? navigate(item.path) : selectItem(item)">
 
-                        {{-- Checkbox row (files only, always in flow) --}}
+                        {{-- Checkbox: always rendered, hidden for dirs via CSS --}}
                         <div class="fm-item-cb-row">
-                            <span x-show="!item.is_dir"
-                                  class="fm-item-cb"
-                                  @click.stop="toggleCheck(item.path)"
-                                  title="Zaznacz / odznacz">
-                                <i class="fa" :class="isChecked(item.path) ? 'fa-check-square' : 'fa-square-o'"></i>
-                            </span>
+                            <div class="fm-item-cb"
+                                 :class="{'fm-cb-on': isChecked(item.path)}"
+                                 @click.stop="item.is_dir || toggleCheck(item.path)"
+                                 title="Zaznacz / odznacz">
+                            </div>
                         </div>
 
                         <template x-if="!item.is_dir && isImage(item.ext)">
