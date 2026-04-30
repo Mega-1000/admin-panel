@@ -48,8 +48,8 @@
 .fm-item-fav.active { opacity:1; color:#f5a623; }
 
 /* ── Multi-select checkbox ───────────────────────────────────────────────── */
-.fm-item-cb     { position:absolute; top:3px; left:4px; font-size:15px; cursor:pointer; color:#ccc; opacity:0; transition:opacity .15s, color .15s; z-index:2; line-height:1; }
-.fm-item:hover .fm-item-cb  { opacity:1; }
+.fm-item-cb     { position:absolute; top:3px; left:4px; font-size:15px; cursor:pointer; color:#ccc; opacity:.35; transition:opacity .15s, color .15s; z-index:2; line-height:1; }
+.fm-item:hover .fm-item-cb  { opacity:1; color:#888; }
 .fm-item.is-checked .fm-item-cb { opacity:1; color:#3a5bd9; }
 .fm-batch-bar   { display:flex; align-items:center; gap:8px; padding:6px 14px; background:#eef1fb; border-bottom:1px solid #c8d0f0; font-size:12px; }
 
