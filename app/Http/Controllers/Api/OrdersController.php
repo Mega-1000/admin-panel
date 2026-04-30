@@ -149,7 +149,14 @@ class OrdersController extends Controller
         }
 
         foreach ($data['order_items'] as &$item) {
-            $item['id'] = Product::where('symbol', $item['symbol'])->first()->id;
+            $product = Product::where('symbol', $item['symbol'])->first();
+            if (!$product) {
+                return response()->json([
+                    'error_code' => 'product_not_found',
+                    'error_message' => $this->errors['product_not_found'] . ' Symbol: ' . $item['symbol']
+                ], 400);
+            }
+            $item['id'] = $product->id;
         }
 
         $customer = Customer::where('login', $data['customer_login'])->first();
