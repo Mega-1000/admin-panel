@@ -5,10 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FileManagerController extends Controller
 {
@@ -61,17 +58,16 @@ class FileManagerController extends Controller
 
         usort($items, fn($a, $b) => $b['is_dir'] <=> $a['is_dir'] ?: strcmp($a['name'], $b['name']));
 
-        $favorites = $this->getFavoritesList();
-
-        return response()->json(['items' => $items, 'favorites' => $favorites]);
+        return response()->json(['items' => $items, 'favorites' => $this->getFavoritesList()]);
     }
 
     public function upload(Request $request): JsonResponse
     {
-        $request->validate(['files.*' => 'required|file|max:20480']);
+        $request->validate(['files.*' => 'required|file']);
 
-        $rel  = $this->sanitizePath($request->input('path', ''));
-        $full = $this->basePath . ($rel ? DIRECTORY_SEPARATOR . $rel : '');
+        $rel      = $this->sanitizePath($request->input('path', ''));
+        $full     = $this->basePath . ($rel ? DIRECTORY_SEPARATOR . $rel : '');
+        $strategy = $request->input('strategy', 'rename'); // 'replace' | 'rename'
 
         if (!is_dir($full)) {
             @mkdir($full, 0775, true);
@@ -79,18 +75,46 @@ class FileManagerController extends Controller
 
         $uploaded = [];
         foreach ($request->file('files', []) as $file) {
-            $name = $this->uniqueName($full, $file->getClientOriginalName());
+            $originalName = $file->getClientOriginalName();
+            $targetFull   = $full . DIRECTORY_SEPARATOR . $originalName;
+
+            if (file_exists($targetFull) && $strategy === 'replace') {
+                $name = $originalName;
+            } else {
+                $name = $this->uniqueName($full, $originalName);
+            }
+
             $file->move($full, $name);
-            $fileRel  = $rel ? $rel . '/' . $name : $name;
+            $fileRel    = $rel ? $rel . '/' . $name : $name;
             $uploaded[] = [
-                'name' => $name,
-                'path' => $fileRel,
-                'url'  => $this->baseUrl . '/' . str_replace('\\', '/', $fileRel),
-                'ext'  => strtolower(pathinfo($name, PATHINFO_EXTENSION)),
+                'name'     => $name,
+                'original' => $originalName,
+                'replaced' => $strategy === 'replace' && file_exists($full . DIRECTORY_SEPARATOR . $name),
+                'path'     => $fileRel,
+                'url'      => $this->baseUrl . '/' . str_replace('\\', '/', $fileRel),
+                'ext'      => strtolower(pathinfo($name, PATHINFO_EXTENSION)),
             ];
         }
 
         return response()->json(['uploaded' => $uploaded]);
+    }
+
+    public function checkConflicts(Request $request): JsonResponse
+    {
+        $request->validate(['files' => 'required|array', 'files.*' => 'string|max:255']);
+
+        $rel  = $this->sanitizePath($request->input('path', ''));
+        $full = $this->basePath . ($rel ? DIRECTORY_SEPARATOR . $rel : '');
+
+        $conflicts = [];
+        foreach ($request->input('files') as $filename) {
+            $target = $full . DIRECTORY_SEPARATOR . basename($filename);
+            if (file_exists($target)) {
+                $conflicts[] = $filename;
+            }
+        }
+
+        return response()->json(['conflicts' => $conflicts]);
     }
 
     public function createFolder(Request $request): JsonResponse
@@ -114,24 +138,43 @@ class FileManagerController extends Controller
 
     public function delete(Request $request): JsonResponse
     {
-        $rel  = $this->sanitizePath($request->input('path', ''));
-        if (!$rel) {
+        // Accept single 'path' or array 'paths'
+        $raw = $request->input('paths') ?? ($request->input('path') ? [$request->input('path')] : []);
+        if (!is_array($raw)) {
+            $raw = [$raw];
+        }
+
+        $paths = array_values(array_filter(array_map([$this, 'sanitizePath'], $raw)));
+
+        if (empty($paths)) {
             return response()->json(['error' => 'Nieprawidłowa ścieżka.'], 422);
         }
 
-        $full = $this->basePath . DIRECTORY_SEPARATOR . $rel;
+        $deleted = [];
+        $errors  = [];
 
-        if (!file_exists($full) && !is_dir($full)) {
+        foreach ($paths as $rel) {
+            $full = $this->basePath . DIRECTORY_SEPARATOR . $rel;
+
+            if (!file_exists($full) && !is_dir($full)) {
+                $errors[] = $rel;
+                continue;
+            }
+
+            if (is_dir($full)) {
+                $this->deleteDirectory($full);
+            } else {
+                unlink($full);
+            }
+
+            $deleted[] = $rel;
+        }
+
+        if (empty($deleted) && !empty($errors)) {
             return response()->json(['error' => 'Nie znaleziono pliku/folderu.'], 404);
         }
 
-        if (is_dir($full)) {
-            $this->deleteDirectory($full);
-        } else {
-            unlink($full);
-        }
-
-        return response()->json(['deleted' => true]);
+        return response()->json(['deleted' => $deleted, 'errors' => $errors]);
     }
 
     public function rename(Request $request): JsonResponse
@@ -182,9 +225,7 @@ class FileManagerController extends Controller
             ->first();
 
         if ($existing) {
-            \DB::table('file_manager_favorites')
-                ->where('id', $existing->id)
-                ->delete();
+            \DB::table('file_manager_favorites')->where('id', $existing->id)->delete();
             return response()->json(['favorited' => false]);
         }
 
@@ -202,19 +243,19 @@ class FileManagerController extends Controller
 
     private function sanitizePath(?string $path): string
     {
-        $path = $path ?? '';
-        $path = str_replace('\\', '/', $path);
-        $path = trim($path, '/');
+        $path  = $path ?? '';
+        $path  = str_replace('\\', '/', $path);
+        $path  = trim($path, '/');
         $parts = array_filter(explode('/', $path), fn($p) => $p !== '' && $p !== '..' && $p !== '.');
         return implode('/', $parts);
     }
 
     private function uniqueName(string $dir, string $original): string
     {
-        $name = pathinfo($original, PATHINFO_FILENAME);
-        $ext  = pathinfo($original, PATHINFO_EXTENSION);
+        $name      = pathinfo($original, PATHINFO_FILENAME);
+        $ext       = pathinfo($original, PATHINFO_EXTENSION);
         $candidate = $original;
-        $i = 1;
+        $i         = 1;
         while (file_exists($dir . DIRECTORY_SEPARATOR . $candidate)) {
             $candidate = $name . '_' . $i . ($ext ? '.' . $ext : '');
             $i++;

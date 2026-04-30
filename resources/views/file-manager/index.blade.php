@@ -8,6 +8,7 @@
 
 @section('app-content')
 <style>
+/* ── Layout ─────────────────────────────────────────────────────────────── */
 .fm-wrap        { display:flex; gap:0; height:calc(100vh - 180px); min-height:500px; background:#fff; border:1px solid #dde1e7; border-radius:6px; overflow:hidden; }
 .fm-sidebar     { width:220px; flex-shrink:0; background:#f8f9fb; border-right:1px solid #dde1e7; display:flex; flex-direction:column; overflow-y:auto; }
 .fm-sidebar-sec { padding:10px 12px 4px; font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:.05em; }
@@ -28,9 +29,12 @@
 .fm-nav-fav:hover  { border-color:#f5a623; color:#f5a623; }
 .fm-nav-fav.active { border-color:#e6a010; color:#e6a010; background:#fff9e6; }
 .fm-grid        { flex:1; overflow-y:auto; padding:12px; display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; align-content:start; }
+
+/* ── Grid items ──────────────────────────────────────────────────────────── */
 .fm-item        { display:flex; flex-direction:column; align-items:center; padding:8px 6px 6px; border:1px solid transparent; border-radius:6px; cursor:pointer; transition:all .15s; position:relative; min-width:0; }
 .fm-item:hover  { background:#f0f3ff; border-color:#c5ceee; }
 .fm-item.selected { background:#e6eaf5; border-color:#3a5bd9; }
+.fm-item.is-checked { background:#e8edf9; border-color:#3a5bd9 !important; box-shadow:0 0 0 2px #3a5bd940; }
 .fm-item-thumb  { width:72px; height:60px; object-fit:cover; border-radius:4px; margin-bottom:6px; border:1px solid #eee; }
 .fm-item-icon   { width:72px; height:60px; display:flex; align-items:center; justify-content:center; font-size:36px; margin-bottom:6px; }
 .fm-item-icon.dir  { color:#f5a623; }
@@ -42,19 +46,52 @@
 .fm-item-fav    { position:absolute; top:3px; right:4px; font-size:11px; cursor:pointer; opacity:.4; }
 .fm-item-fav:hover  { opacity:1; }
 .fm-item-fav.active { opacity:1; color:#f5a623; }
-.fm-drop-overlay{ position:absolute; inset:0; background:rgba(58,91,217,.12); border:2px dashed #3a5bd9; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#3a5bd9; font-weight:600; pointer-events:none; z-index:10; }
+
+/* ── Multi-select checkbox ───────────────────────────────────────────────── */
+.fm-item-cb     { position:absolute; top:3px; left:4px; font-size:15px; cursor:pointer; color:#ccc; opacity:0; transition:opacity .15s, color .15s; z-index:2; line-height:1; }
+.fm-item:hover .fm-item-cb  { opacity:1; }
+.fm-item.is-checked .fm-item-cb { opacity:1; color:#3a5bd9; }
+.fm-batch-bar   { display:flex; align-items:center; gap:8px; padding:6px 14px; background:#eef1fb; border-bottom:1px solid #c8d0f0; font-size:12px; }
+
+/* ── Selected-file info bar ──────────────────────────────────────────────── */
 .fm-selected-bar { display:flex; align-items:center; gap:10px; padding:5px 14px; background:#fff9e6; border-bottom:1px solid #f0d98a; font-size:12px; flex-wrap:wrap; min-height:32px; }
 .fm-selected-bar .fm-sel-name { font-weight:700; color:#333; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .fm-selected-bar .fm-sel-sep  { color:#ccc; }
 .fm-selected-bar a            { color:#3a5bd9; text-decoration:none; }
 .fm-selected-bar a:hover      { text-decoration:underline; }
 .fm-count { margin-left:auto; color:#aaa; font-size:11px; }
+
+/* ── Modals ───────────────────────────────────────────────────────────────── */
 .fm-modal-bg    { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1000; display:flex; align-items:center; justify-content:center; }
 .fm-modal       { background:#fff; border-radius:8px; padding:24px 28px; min-width:320px; box-shadow:0 8px 32px rgba(0,0,0,.18); }
 .fm-modal h4    { margin:0 0 16px; font-size:16px; }
 .fm-modal input { width:100%; padding:7px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; margin-bottom:14px; }
+
+/* ── Conflict modal ───────────────────────────────────────────────────────── */
+.fm-conflict-list { max-height:180px; overflow-y:auto; margin:0 0 16px; padding:0; list-style:none; border:1px solid #eee; border-radius:4px; }
+.fm-conflict-list li { display:flex; align-items:center; gap:8px; padding:6px 12px; border-bottom:1px solid #f5f5f5; font-size:13px; }
+.fm-conflict-list li:last-child { border-bottom:none; }
+.fm-conflict-list li i { color:#f5a623; }
+
+/* ── Upload progress panel ───────────────────────────────────────────────── */
+.fm-up-panel    { position:fixed; bottom:20px; right:24px; width:340px; background:#fff; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,.22); z-index:1500; overflow:hidden; transition:height .2s; }
+.fm-up-header   { padding:10px 14px; background:#3a5bd9; color:#fff; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer; user-select:none; }
+.fm-up-header .fm-up-summary { flex:1; }
+.fm-up-header button { background:none; border:none; color:#fff; cursor:pointer; font-size:16px; line-height:1; padding:0 2px; opacity:.8; }
+.fm-up-header button:hover { opacity:1; }
+.fm-up-list     { max-height:260px; overflow-y:auto; }
+.fm-up-item     { padding:8px 14px 6px; border-bottom:1px solid #f2f2f2; }
+.fm-up-item-row { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+.fm-up-item-name{ flex:1; font-size:12px; color:#333; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fm-up-pct      { font-size:11px; color:#888; width:32px; text-align:right; flex-shrink:0; }
+.fm-up-bar      { height:3px; background:#e8e8e8; border-radius:2px; overflow:hidden; }
+.fm-up-bar-fill { height:100%; border-radius:2px; transition:width .25s; }
+.fm-up-err      { font-size:11px; color:#c0392b; margin-top:2px; }
+
+/* ── Misc ────────────────────────────────────────────────────────────────── */
 .fm-copy-url    { font-size:12px; padding:3px 8px; }
 .fm-empty       { grid-column:1/-1; text-align:center; color:#bbb; padding:60px 0; font-size:14px; }
+.fm-drop-overlay{ position:absolute; inset:0; background:rgba(58,91,217,.12); border:2px dashed #3a5bd9; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#3a5bd9; font-weight:600; pointer-events:none; z-index:10; }
 .fm-preview-bg  { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:2000; display:flex; align-items:center; justify-content:center; }
 .fm-preview-img { max-width:90vw; max-height:88vh; border-radius:6px; box-shadow:0 4px 32px rgba(0,0,0,.6); display:block; }
 .fm-preview-close { position:fixed; top:18px; right:24px; font-size:28px; color:#fff; cursor:pointer; line-height:1; opacity:.8; background:none; border:none; z-index:2001; }
@@ -74,7 +111,6 @@
      @drop.prevent="handleDrop($event)"
      style="position:relative">
 
-    {{-- Drop overlay --}}
     <div x-show="dragging" class="fm-drop-overlay"><i class="fa fa-cloud-upload"></i>&nbsp; Upuść pliki tutaj</div>
 
     <div class="fm-wrap">
@@ -90,7 +126,6 @@
                     <span x-text="fav.split('/').pop() || fav"></span>
                 </div>
             </template>
-
             <div class="fm-sidebar-sec" style="margin-top:12px">Katalogi</div>
             <div class="fm-fav-item" :class="{active: currentPath===''}" @click="navigate('')">
                 <i class="fa fa-home"></i> Główny
@@ -103,10 +138,27 @@
             <div class="fm-toolbar">
                 <label class="btn btn-primary" style="margin:0;cursor:pointer">
                     <i class="fa fa-upload"></i> Wgraj pliki
-                    <input type="file" multiple style="display:none" @change="uploadFiles($event.target.files)" accept="*">
+                    <input type="file" multiple style="display:none" @change="startUploadFlow(Array.from($event.target.files)); $event.target.value=''" accept="*">
                 </label>
                 <button class="btn-fm-outline" @click="showNewFolder=true"><i class="fa fa-folder-o"></i> Nowy folder</button>
-                <button class="btn btn-danger" :disabled="!selected" @click="confirmDelete()" x-show="selected"><i class="fa fa-trash"></i> Usuń</button>
+
+                {{-- Single-file delete --}}
+                <button class="btn btn-danger" x-show="selected && !hasChecked" :disabled="!selected" @click="confirmDelete()">
+                    <i class="fa fa-trash"></i> Usuń
+                </button>
+
+                {{-- Batch delete --}}
+                <template x-if="hasChecked">
+                    <span style="display:contents">
+                        <button class="btn btn-danger" @click="confirmDeleteBatch()">
+                            <i class="fa fa-trash"></i> Usuń zaznaczone (<span x-text="checkedPaths.length"></span>)
+                        </button>
+                        <button class="btn-fm-outline" @click="checkedPaths=[]" style="border-color:#aaa;">
+                            <i class="fa fa-times"></i> Odznacz
+                        </button>
+                    </span>
+                </template>
+
                 <div style="flex:1"></div>
                 <span x-show="toast" x-text="toast" style="font-size:12px;color:#28a745;font-weight:600"></span>
                 <div style="position:relative;display:flex;align-items:center">
@@ -121,7 +173,7 @@
                 </div>
             </div>
 
-            {{-- Navigation bar (drill-down) --}}
+            {{-- Navigation bar --}}
             <div class="fm-nav">
                 <template x-if="currentPath">
                     <button class="fm-nav-back" @click="navigate(parentPath)">
@@ -142,7 +194,7 @@
             </div>
 
             {{-- Selected file info bar --}}
-            <div class="fm-selected-bar" x-show="selected" style="display:none">
+            <div class="fm-selected-bar" x-show="selected && !hasChecked" style="display:none">
                 <template x-if="selected && selected.is_dir">
                     <span style="display:contents">
                         <i class="fa fa-folder" style="color:#f5a623;margin-right:5px"></i>
@@ -173,8 +225,15 @@
                 </template>
             </div>
 
+            {{-- Batch info bar --}}
+            <div class="fm-batch-bar" x-show="hasChecked">
+                <i class="fa fa-check-square-o" style="color:#3a5bd9"></i>
+                <span>Zaznaczono <strong x-text="checkedPaths.length"></strong> plik(ów)</span>
+                <a href="#" @click.prevent="selectAllFiles()" style="margin-left:8px;font-size:12px;color:#3a5bd9;text-decoration:none;">Zaznacz wszystkie pliki</a>
+            </div>
+
             {{-- Grid --}}
-            <div class="fm-grid" @click.self="selected=null">
+            <div class="fm-grid" @click.self="selected=null; checkedPaths=[]">
                 <template x-if="loading">
                     <div class="fm-empty"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
                 </template>
@@ -189,8 +248,19 @@
                 </template>
                 <template x-for="item in filteredItems" :key="item.path">
                     <div class="fm-item"
-                         :class="{selected: selected && selected.path===item.path}"
+                         :class="{selected: selected && selected.path===item.path, 'is-checked': isChecked(item.path)}"
                          @click="item.is_dir ? navigate(item.path) : selectItem(item)">
+
+                        {{-- Checkbox (files only) --}}
+                        <template x-if="!item.is_dir">
+                            <span class="fm-item-cb"
+                                  :class="{active: isChecked(item.path)}"
+                                  @click.stop="toggleCheck(item.path)"
+                                  title="Zaznacz">
+                                <i class="fa" :class="isChecked(item.path) ? 'fa-check-square' : 'fa-square-o'"></i>
+                            </span>
+                        </template>
+
                         <template x-if="!item.is_dir && isImage(item.ext)">
                             <img :src="item.url" class="fm-item-thumb" :alt="item.name" onerror="this.style.display='none'" loading="lazy"
                                  @dblclick.stop="openPreview(item)" style="cursor:zoom-in" title="Podwójne kliknięcie = podgląd">
@@ -210,11 +280,10 @@
                     </div>
                 </template>
             </div>
-
         </div>
     </div>
 
-    {{-- New folder modal --}}
+    {{-- ── New folder modal ──────────────────────────────────────────────── --}}
     <div class="fm-modal-bg" x-show="showNewFolder" @click.self="showNewFolder=false">
         <div class="fm-modal">
             <h4><i class="fa fa-folder-o"></i> Nowy folder</h4>
@@ -226,7 +295,7 @@
         </div>
     </div>
 
-    {{-- Delete confirm modal --}}
+    {{-- ── Single delete modal ───────────────────────────────────────────── --}}
     <div class="fm-modal-bg" x-show="showDelete" @click.self="showDelete=false">
         <div class="fm-modal">
             <h4><i class="fa fa-trash text-danger"></i> Potwierdź usunięcie</h4>
@@ -243,7 +312,22 @@
         </div>
     </div>
 
-    {{-- Rename modal --}}
+    {{-- ── Batch delete modal ────────────────────────────────────────────── --}}
+    <div class="fm-modal-bg" x-show="showDeleteBatch" @click.self="showDeleteBatch=false">
+        <div class="fm-modal">
+            <h4><i class="fa fa-trash text-danger"></i> Usuń zaznaczone pliki</h4>
+            <p style="font-size:13px;margin-bottom:16px">
+                Czy na pewno chcesz trwale usunąć <strong x-text="checkedPaths.length"></strong> plik(ów)?
+                Ta operacja jest nieodwracalna.
+            </p>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-default" @click="showDeleteBatch=false">Anuluj</button>
+                <button class="btn btn-danger" @click="deleteBatch()"><i class="fa fa-trash"></i> Usuń wszystkie</button>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Rename modal ──────────────────────────────────────────────────── --}}
     <div class="fm-modal-bg" x-show="showRename" @click.self="showRename=false">
         <div class="fm-modal">
             <h4><i class="fa fa-pencil"></i> Zmień nazwę</h4>
@@ -257,8 +341,40 @@
         </div>
     </div>
 
-    {{-- Image preview lightbox --}}
-    <div class="fm-preview-bg" x-show="previewItem" @click.self="previewItem=null" @keydown.escape.window="previewItem=null" @keydown.arrow-left.window="prevImage()" @keydown.arrow-right.window="nextImage()">
+    {{-- ── Conflict resolution modal ─────────────────────────────────────── --}}
+    <div class="fm-modal-bg" x-show="showConflictModal" @click.self="showConflictModal=false">
+        <div class="fm-modal" style="max-width:440px;width:100%;">
+            <h4><i class="fa fa-exclamation-triangle" style="color:#f5a623"></i> Wykryto konflikty nazw</h4>
+            <p style="font-size:13px;margin-bottom:10px;color:#555">
+                Poniższe pliki już istnieją w tym folderze. Co chcesz zrobić?
+            </p>
+            <ul class="fm-conflict-list">
+                <template x-for="name in conflictFiles" :key="name">
+                    <li>
+                        <i class="fa fa-file-o"></i>
+                        <span x-text="name" style="flex:1;font-size:13px;word-break:break-all;"></span>
+                    </li>
+                </template>
+            </ul>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-warning" @click="resolveConflicts('replace')" style="flex:1;">
+                    <i class="fa fa-refresh"></i> Zastąp istniejące
+                </button>
+                <button class="btn btn-primary" @click="resolveConflicts('rename')" style="flex:1;">
+                    <i class="fa fa-plus-circle"></i> Dodaj jako nowe (sufiks)
+                </button>
+            </div>
+            <div style="margin-top:8px;text-align:right;">
+                <button class="btn btn-default btn-sm" @click="showConflictModal=false; pendingUploadFiles=null; conflictFiles=[]">Anuluj wgrywanie</button>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Image preview lightbox ────────────────────────────────────────── --}}
+    <div class="fm-preview-bg" x-show="previewItem" @click.self="previewItem=null"
+         @keydown.escape.window="previewItem=null"
+         @keydown.arrow-left.window="prevImage()"
+         @keydown.arrow-right.window="nextImage()">
         <button class="fm-preview-close" @click="previewItem=null">&times;</button>
         <template x-if="previewImages.length > 1">
             <button class="fm-preview-nav prev" @click="prevImage()"><i class="fa fa-chevron-left"></i></button>
@@ -273,39 +389,106 @@
             <span class="fm-preview-name" x-text="previewItem.name + (previewImages.length > 1 ? ' (' + (previewIndex+1) + '/' + previewImages.length + ')' : '')"></span>
         </template>
     </div>
+
+    {{-- ── Upload progress panel ────────────────────────────────────────── --}}
+    <div class="fm-up-panel" x-show="showUploadPanel">
+        <div class="fm-up-header" @click="uploadPanelMinimized = !uploadPanelMinimized">
+            <i class="fa fa-cloud-upload" style="flex-shrink:0;"></i>
+            <span class="fm-up-summary">
+                <template x-if="!uploadAllDone">
+                    Wgrywanie… <span x-text="uploadDoneCount + '/' + uploadQueue.length"></span>
+                </template>
+                <template x-if="uploadAllDone">
+                    Gotowe — <span x-text="uploadDoneCount + '/' + uploadQueue.length"></span> wgrano
+                </template>
+            </span>
+            <button @click.stop="uploadPanelMinimized = !uploadPanelMinimized" :title="uploadPanelMinimized ? 'Rozwiń' : 'Zwiń'">
+                <i class="fa" :class="uploadPanelMinimized ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <button @click.stop="showUploadPanel = false" title="Zamknij panel">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="fm-up-list" x-show="!uploadPanelMinimized">
+            <template x-for="(item, idx) in uploadQueue" :key="idx">
+                <div class="fm-up-item">
+                    <div class="fm-up-item-row">
+                        <i class="fa fa-fw"
+                           :class="{
+                               'fa-clock-o': item.status==='waiting',
+                               'fa-spinner fa-spin': item.status==='uploading',
+                               'fa-check-circle': item.status==='done',
+                               'fa-times-circle': item.status==='error'
+                           }"
+                           :style="'color:' + (item.status==='done' ? '#28a745' : item.status==='error' ? '#dc3545' : item.status==='uploading' ? '#3a5bd9' : '#ccc')">
+                        </i>
+                        <span class="fm-up-item-name" x-text="item.name"></span>
+                        <span class="fm-up-pct" x-show="item.status==='uploading'" x-text="item.progress + '%'"></span>
+                    </div>
+                    <template x-if="item.status !== 'waiting'">
+                        <div class="fm-up-bar">
+                            <div class="fm-up-bar-fill"
+                                 :style="'width:' + item.progress + '%;background:' + (item.status==='done' ? '#28a745' : item.status==='error' ? '#dc3545' : '#3a5bd9')">
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="item.error">
+                        <div class="fm-up-err" x-text="item.error"></div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
 <script>
 function fileManager() {
     return {
+        // ── Core state ───────────────────────────────────────────────────────
         currentPath: '',
         items: [],
         favorites: [],
         selected: null,
         loading: false,
         dragging: false,
+        errorMsg: '',
+        search: '',
+        toast: '',
+        _toastTimer: null,
+
+        // ── Modals ───────────────────────────────────────────────────────────
         showNewFolder: false,
         newFolderName: '',
         showDelete: false,
+        showDeleteBatch: false,
         showRename: false,
         renameName: '',
         previewItem: null,
-        toast: '',
-        errorMsg: '',
-        search: '',
-        _toastTimer: null,
 
+        // ── Multi-select ─────────────────────────────────────────────────────
+        checkedPaths: [],
+
+        // ── Upload ───────────────────────────────────────────────────────────
+        uploadQueue: [],
+        showUploadPanel: false,
+        uploadPanelMinimized: false,
+
+        // ── Conflict resolution ──────────────────────────────────────────────
+        showConflictModal: false,
+        conflictFiles: [],
+        pendingUploadFiles: null,
+
+        // ── Computed ─────────────────────────────────────────────────────────
         get parentPath() {
             if (!this.currentPath) return ''
-            const parts = this.currentPath.split('/')
-            parts.pop()
-            return parts.join('/')
+            const p = this.currentPath.split('/')
+            p.pop()
+            return p.join('/')
         },
 
         get currentFolderName() {
-            if (!this.currentPath) return 'Główny'
-            return this.currentPath.split('/').pop()
+            return this.currentPath ? this.currentPath.split('/').pop() : 'Główny'
         },
 
         get filteredItems() {
@@ -323,9 +506,19 @@ function fileManager() {
             return this.previewImages.findIndex(i => i.path === this.previewItem.path)
         },
 
-        init() {
-            this.load('')
+        get hasChecked() { return this.checkedPaths.length > 0 },
+
+        get uploadDoneCount() {
+            return this.uploadQueue.filter(i => i.status === 'done' || i.status === 'error').length
         },
+
+        get uploadAllDone() {
+            return this.uploadQueue.length > 0 &&
+                   this.uploadQueue.every(i => i.status === 'done' || i.status === 'error')
+        },
+
+        // ── Init / load ──────────────────────────────────────────────────────
+        init() { this.load('') },
 
         load(path) {
             this.loading = true
@@ -337,58 +530,180 @@ function fileManager() {
             })
             .then(r => r.json())
             .then(data => {
-                if (data.error) {
-                    this.errorMsg = data.error
-                    this.items = []
-                } else {
-                    this.items = data.items || []
-                    this.favorites = data.favorites || []
-                    this.currentPath = path
-                }
+                if (data.error) { this.errorMsg = data.error; this.items = [] }
+                else { this.items = data.items || []; this.favorites = data.favorites || []; this.currentPath = path }
                 this.loading = false
             })
-            .catch((e) => {
-                this.errorMsg = 'Błąd połączenia: ' + e.message
-                this.loading = false
-            })
+            .catch(e => { this.errorMsg = 'Błąd połączenia: ' + e.message; this.loading = false })
         },
 
-        navigate(path) {
-            this.load(path)
-        },
+        navigate(path) { this.checkedPaths = []; this.load(path) },
 
         selectItem(item) {
             this.selected = this.selected && this.selected.path === item.path ? null : item
         },
 
-        uploadFiles(files) {
-            if (!files || files.length === 0) return
-            const fd = new FormData()
-            for (const f of files) fd.append('files[]', f)
-            fd.append('path', this.currentPath)
-            fd.append('_token', document.querySelector('meta[name=csrf-token]').content)
-            fetch('{{ route('file-manager.upload') }}', { method: 'POST', body: fd })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.error) { alert(data.error); return }
-                    this.load(this.currentPath)
-                    this.showToast('Wgrano ' + data.uploaded.length + ' plik(ów)')
-                })
-                .catch(() => alert('Błąd wgrywania'))
+        // ── Multi-select ─────────────────────────────────────────────────────
+        isChecked(path) { return this.checkedPaths.includes(path) },
+
+        toggleCheck(path) {
+            const idx = this.checkedPaths.indexOf(path)
+            if (idx === -1) this.checkedPaths.push(path)
+            else this.checkedPaths.splice(idx, 1)
         },
 
+        selectAllFiles() {
+            this.checkedPaths = this.filteredItems.filter(i => !i.is_dir).map(i => i.path)
+        },
+
+        // ── Batch delete ─────────────────────────────────────────────────────
+        confirmDeleteBatch() { this.showDeleteBatch = true },
+
+        deleteBatch() {
+            const paths = [...this.checkedPaths]
+            fetch('{{ route('file-manager.delete') }}', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': this._csrf(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ paths })
+            })
+            .then(r => r.json())
+            .then(data => {
+                this.showDeleteBatch = false
+                this.checkedPaths = []
+                this.selected = null
+                this.load(this.currentPath)
+                this.showToast('Usunięto ' + (data.deleted || []).length + ' plik(ów)')
+            })
+            .catch(() => { this.showDeleteBatch = false; alert('Błąd usuwania') })
+        },
+
+        // ── Single delete ─────────────────────────────────────────────────────
+        confirmDelete() { if (!this.selected) return; this.showDelete = true },
+
+        deleteItem() {
+            if (!this.selected) return
+            fetch('{{ route('file-manager.delete') }}', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': this._csrf(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ paths: [this.selected.path] })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.errors && data.errors.length) { alert('Nie znaleziono pliku/folderu.'); return }
+                this.showDelete = false
+                this.selected = null
+                this.load(this.currentPath)
+                this.showToast('Usunięto')
+            })
+        },
+
+        // ── Upload flow ───────────────────────────────────────────────────────
         handleDrop(e) {
             this.dragging = false
-            if (e.dataTransfer.files.length) this.uploadFiles(e.dataTransfer.files)
+            if (e.dataTransfer.files.length) this.startUploadFlow(Array.from(e.dataTransfer.files))
         },
 
+        startUploadFlow(files) {
+            if (!files.length) return
+            const filenames = files.map(f => f.name)
+
+            fetch('{{ route('file-manager.check-conflicts') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': this._csrf(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ path: this.currentPath, files: filenames })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.conflicts && data.conflicts.length > 0) {
+                    this.conflictFiles = data.conflicts
+                    this.pendingUploadFiles = files
+                    this.showConflictModal = true
+                } else {
+                    this._doUpload(files, 'rename')
+                }
+            })
+            .catch(() => this._doUpload(files, 'rename'))
+        },
+
+        resolveConflicts(strategy) {
+            this.showConflictModal = false
+            const files = this.pendingUploadFiles
+            this.pendingUploadFiles = null
+            this.conflictFiles = []
+            this._doUpload(files, strategy)
+        },
+
+        _doUpload(files, strategy) {
+            this.uploadPanelMinimized = false
+            this.showUploadPanel = true
+            this.uploadQueue = files.map(f => ({ name: f.name, progress: 0, status: 'waiting', error: null }))
+            this._uploadNext(files, strategy, 0)
+        },
+
+        _uploadNext(files, strategy, idx) {
+            if (idx >= files.length) {
+                this.load(this.currentPath)
+                this.showToast('Wgrano ' + files.length + ' plik(ów)')
+                return
+            }
+
+            const self = this
+            self.uploadQueue.splice(idx, 1, Object.assign({}, self.uploadQueue[idx], { status: 'uploading', progress: 0 }))
+
+            const fd = new FormData()
+            fd.append('files[]', files[idx])
+            fd.append('path', self.currentPath)
+            fd.append('strategy', strategy)
+            fd.append('_token', self._csrf())
+
+            const xhr = new XMLHttpRequest()
+
+            xhr.upload.addEventListener('progress', function (e) {
+                if (!e.lengthComputable) return
+                const pct = Math.round((e.loaded / e.total) * 100)
+                self.uploadQueue.splice(idx, 1, Object.assign({}, self.uploadQueue[idx], { progress: pct }))
+            })
+
+            xhr.addEventListener('load', function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    self.uploadQueue.splice(idx, 1, Object.assign({}, self.uploadQueue[idx], { progress: 100, status: 'done' }))
+                } else {
+                    let msg = 'Błąd serwera (' + xhr.status + ')'
+                    try { const d = JSON.parse(xhr.responseText); msg = d.message || d.error || msg } catch (e) {}
+                    self.uploadQueue.splice(idx, 1, Object.assign({}, self.uploadQueue[idx], { status: 'error', error: msg }))
+                }
+                self._uploadNext(files, strategy, idx + 1)
+            })
+
+            xhr.addEventListener('error', function () {
+                self.uploadQueue.splice(idx, 1, Object.assign({}, self.uploadQueue[idx], { status: 'error', error: 'Błąd połączenia' }))
+                self._uploadNext(files, strategy, idx + 1)
+            })
+
+            xhr.open('POST', '{{ route('file-manager.upload') }}')
+            xhr.send(fd)
+        },
+
+        // ── New folder ───────────────────────────────────────────────────────
         createFolder() {
             if (!this.newFolderName.trim()) return
             fetch('{{ route('file-manager.folder') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'X-CSRF-TOKEN': this._csrf(),
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({ path: this.currentPath, name: this.newFolderName.trim() })
@@ -403,32 +718,7 @@ function fileManager() {
             })
         },
 
-        confirmDelete() {
-            if (!this.selected) return
-            this.showDelete = true
-        },
-
-        deleteItem() {
-            if (!this.selected) return
-            fetch('{{ route('file-manager.delete') }}', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ path: this.selected.path })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.error) { alert(data.error); return }
-                this.showDelete = false
-                this.selected = null
-                this.load(this.currentPath)
-                this.showToast('Usunięto')
-            })
-        },
-
+        // ── Rename ───────────────────────────────────────────────────────────
         startRename() {
             if (!this.selected) return
             this.renameName = this.selected.name
@@ -438,15 +728,14 @@ function fileManager() {
 
         doRename() {
             if (!this.selected || !this.renameName.trim()) return
-            const oldPath = this.selected.path
             fetch('{{ route('file-manager.rename') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'X-CSRF-TOKEN': this._csrf(),
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({ path: oldPath, name: this.renameName.trim() })
+                body: JSON.stringify({ path: this.selected.path, name: this.renameName.trim() })
             })
             .then(r => r.json())
             .then(data => {
@@ -458,9 +747,8 @@ function fileManager() {
             })
         },
 
-        openPreview(item) {
-            this.previewItem = item
-        },
+        // ── Preview ──────────────────────────────────────────────────────────
+        openPreview(item) { this.previewItem = item },
 
         prevImage() {
             if (!this.previewItem || !this.previewImages.length) return
@@ -470,32 +758,30 @@ function fileManager() {
 
         nextImage() {
             if (!this.previewItem || !this.previewImages.length) return
-            const idx = this.previewIndex
-            this.previewItem = this.previewImages[(idx + 1) % this.previewImages.length]
+            this.previewItem = this.previewImages[(this.previewIndex + 1) % this.previewImages.length]
         },
 
+        // ── Favorites ────────────────────────────────────────────────────────
         toggleFavorite(path) {
             fetch('{{ route('file-manager.favorite') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'X-CSRF-TOKEN': this._csrf(),
                     'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({ path })
             })
             .then(r => r.json())
             .then(data => {
-                if (data.favorited) {
-                    if (!this.favorites.includes(path)) this.favorites.push(path)
-                } else {
-                    this.favorites = this.favorites.filter(f => f !== path)
-                }
+                if (data.favorited) { if (!this.favorites.includes(path)) this.favorites.push(path) }
+                else { this.favorites = this.favorites.filter(f => f !== path) }
             })
         },
 
         isFavorite(path) { return this.favorites.includes(path) },
 
+        // ── Utilities ────────────────────────────────────────────────────────
         copyUrl(url) {
             navigator.clipboard.writeText(url).then(() => this.showToast('URL skopiowany!'))
         },
@@ -506,7 +792,7 @@ function fileManager() {
             this._toastTimer = setTimeout(() => { this.toast = '' }, 2500)
         },
 
-        isImage(ext) { return ['jpg','jpeg','png','gif','webp','svg','bmp'].includes(ext) },
+        isImage(ext) { return ['jpg','jpeg','png','gif','webp','svg','bmp'].includes((ext||'').toLowerCase()) },
 
         iconClass(ext) {
             if (['pdf'].includes(ext)) return 'pdf'
@@ -529,6 +815,11 @@ function fileManager() {
             if (bytes < 1024) return bytes + ' B'
             if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB'
             return (bytes/1048576).toFixed(1) + ' MB'
+        },
+
+        _csrf() {
+            const m = document.querySelector('meta[name=csrf-token]')
+            return m ? m.content : ''
         }
     }
 }

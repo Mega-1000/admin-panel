@@ -251,6 +251,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('file-manager/favorites', [\App\Http\Controllers\FileManagerController::class, 'favorites'])->name('file-manager.favorites');
         Route::post('file-manager/favorite', [\App\Http\Controllers\FileManagerController::class, 'toggleFavorite'])->name('file-manager.favorite');
         Route::post('file-manager/rename', [\App\Http\Controllers\FileManagerController::class, 'rename'])->name('file-manager.rename');
+        Route::post('file-manager/check-conflicts', [\App\Http\Controllers\FileManagerController::class, 'checkConflicts'])->name('file-manager.check-conflicts');
 
         Route::get('price-list', [\App\Http\Controllers\PriceListController::class, 'index'])->name('price-list.index');
         Route::get('price-list/products/{firmId}', [\App\Http\Controllers\PriceListController::class, 'getProducts'])->name('price-list.products');
