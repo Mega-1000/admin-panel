@@ -734,15 +734,15 @@ class ImportCsvFileJob implements ShouldQueue
         $csvName          = end($categoryTree);
         $existingCategory = $this->currentCategories->get($csvName . '||' . (int) $parentId);
 
-        $name = ($existingCategory?->save_name === true && $existingCategory->name)
+        $name = (bool)($existingCategory?->save_name ?? false) === false
             ? $existingCategory->name
             : $csvName;
 
-        $description = ($existingCategory?->save_description === true && $existingCategory->description)
+        $description = (bool)($existingCategory?->save_description ?? false) === false
             ? $existingCategory->description
             : $line[310];
 
-        $image = (bool)($existingCategory?->save_image ?? false) === true
+        $image = (bool)($existingCategory?->save_image ?? false) === false
             ? $existingCategory->img
             : $line[303] ?? '';
 
@@ -763,7 +763,8 @@ class ImportCsvFileJob implements ShouldQueue
         if ($existingCategory) {
             $existingCategory->update([
                 'parent_id' => $parentId,
-                'img' => $image
+                'img' => $image,
+                'name' => $name,
             ]);
             $category = $existingCategory;
             $this->categoriesUpdated++;
