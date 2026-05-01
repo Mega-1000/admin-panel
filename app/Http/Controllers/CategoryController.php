@@ -72,20 +72,39 @@ class CategoryController extends Controller
 
     public function destroy(Category $category): RedirectResponse
     {
-        if ($category->children()->exists()) {
+        if ($this->treeHasProducts($category)) {
             return redirect()->back()
-                ->with(['message' => 'Nie można usunąć kategorii posiadającej podkategorie.', 'alert-type' => 'error']);
+                ->with(['message' => 'Nie można usunąć — kategoria lub jej podkategorie posiadają produkty.', 'alert-type' => 'error']);
         }
 
+        $this->deleteTree($category);
+
+        return redirect()->route('categories.index')
+            ->with(['message' => 'Kategoria i wszystkie podkategorie zostały usunięte.', 'alert-type' => 'success']);
+    }
+
+    private function treeHasProducts(Category $category): bool
+    {
         if ($category->products()->exists()) {
-            return redirect()->back()
-                ->with(['message' => 'Nie można usunąć kategorii posiadającej produkty.', 'alert-type' => 'error']);
+            return true;
+        }
+
+        foreach ($category->children as $child) {
+            if ($this->treeHasProducts($child)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function deleteTree(Category $category): void
+    {
+        foreach ($category->children as $child) {
+            $this->deleteTree($child);
         }
 
         $category->delete();
-
-        return redirect()->route('categories.index')
-            ->with(['message' => 'Kategoria została usunięta.', 'alert-type' => 'success']);
     }
 
     private function getSelectableParents(?Category $exclude = null): array

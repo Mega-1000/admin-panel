@@ -1,6 +1,106 @@
 {{-- Shared form partial for create and edit --}}
 @php $category = $category ?? null; @endphp
 
+<style>
+/* ── Toggle switch ──────────────────────────────────────────────────────── */
+.cat-toggle {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    cursor: pointer;
+    vertical-align: middle;
+}
+.cat-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+/* Large */
+.cat-toggle--lg { width: 54px; height: 30px; }
+.cat-toggle--lg .tog-track {
+    position: absolute; inset: 0;
+    background: #c8ccd9; border-radius: 15px;
+    transition: background .2s;
+}
+.cat-toggle--lg input:checked ~ .tog-track { background: #3a5bd9; }
+.cat-toggle--lg .tog-thumb {
+    position: absolute; top: 4px; left: 4px;
+    width: 22px; height: 22px;
+    background: #fff; border-radius: 50%;
+    box-shadow: 0 1px 5px rgba(0,0,0,.22);
+    transition: transform .2s;
+}
+.cat-toggle--lg input:checked ~ .tog-thumb { transform: translateX(24px); }
+
+/* Small */
+.cat-toggle--sm { width: 38px; height: 22px; }
+.cat-toggle--sm .tog-track {
+    position: absolute; inset: 0;
+    background: #c8ccd9; border-radius: 11px;
+    transition: background .2s;
+}
+.cat-toggle--sm input:checked ~ .tog-track { background: #3a5bd9; }
+.cat-toggle--sm .tog-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px;
+    background: #fff; border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,.18);
+    transition: transform .2s;
+}
+.cat-toggle--sm input:checked ~ .tog-thumb { transform: translateX(16px); }
+
+/* ── Visibility row ─────────────────────────────────────────────────────── */
+.cat-visibility-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    background: #f5f7fd;
+    border: 1px solid #dde2f2;
+    border-radius: 10px;
+    margin-bottom: 22px;
+    cursor: pointer;
+}
+.cat-visibility-row:hover { background: #eef1fb; }
+.cat-visibility-label {
+    font-size: 15px; font-weight: 700;
+    color: #2d3352; margin: 0; cursor: pointer; user-select: none;
+}
+
+/* ── CSV fieldset ───────────────────────────────────────────────────────── */
+.cat-csv-fieldset {
+    border: 1px solid #dde2f2;
+    border-radius: 10px;
+    padding: 12px 18px 16px;
+    background: #f5f7fd;
+    margin-bottom: 20px;
+}
+.cat-csv-fieldset legend {
+    width: auto; border: none; margin-bottom: 0;
+    padding: 0 8px;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .07em;
+    color: #8891b0;
+}
+.cat-csv-items {
+    display: flex; gap: 28px; flex-wrap: wrap; margin-top: 12px;
+}
+.cat-csv-item {
+    display: flex; align-items: center; gap: 9px; cursor: pointer;
+}
+.cat-csv-item:hover .tog-track { background: #adb5cc; }
+.cat-csv-item span {
+    font-size: 13px; color: #3d4460; user-select: none;
+}
+</style>
+
+{{-- ── Widoczność kategorii ──────────────────────────────────────────────── --}}
+<input type="hidden" name="is_visible" value="0">
+<label class="cat-visibility-row" for="is_visible">
+    <label class="cat-toggle cat-toggle--lg" for="is_visible" onclick="event.stopPropagation()">
+        <input type="checkbox" id="is_visible" name="is_visible" value="1"
+               {{ old('is_visible', $category?->is_visible ?? true) ? 'checked' : '' }}>
+        <span class="tog-track"></span>
+        <span class="tog-thumb"></span>
+    </label>
+    <strong class="cat-visibility-label">Czy kategoria jest widoczna</strong>
+</label>
+
 <div class="form-group">
     <label for="name">Nazwa <span class="text-danger">*</span></label>
     <input type="text" class="form-control" id="name" name="name" maxlength="191"
@@ -81,48 +181,46 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="form-group">
-            <label>
-                <input type="hidden" name="is_visible" value="0">
-                <input type="checkbox" name="is_visible" value="1"
-                       {{ old('is_visible', $category?->is_visible ?? true) ? 'checked' : '' }}>
-                Widoczna na stronie
-            </label>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="form-group">
-            <label>
-                <input type="hidden" name="save_name" value="0">
-                <input type="checkbox" name="save_name" value="1"
+{{-- ── Nadpisywanie przy imporcie CSV ───────────────────────────────────── --}}
+<fieldset class="cat-csv-fieldset">
+    <legend>Nadpisz dane przy imporcie pliku CSV</legend>
+    <div class="cat-csv-items">
+
+        <label class="cat-csv-item" for="save_name">
+            <input type="hidden" name="save_name" value="0">
+            <label class="cat-toggle cat-toggle--sm" for="save_name" onclick="event.stopPropagation()">
+                <input type="checkbox" id="save_name" name="save_name" value="1"
                        {{ old('save_name', $category?->save_name ?? true) ? 'checked' : '' }}>
-                Zachowaj nazwę
+                <span class="tog-track"></span>
+                <span class="tog-thumb"></span>
             </label>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="form-group">
-            <label>
-                <input type="hidden" name="save_description" value="0">
-                <input type="checkbox" name="save_description" value="1"
+            <span>Nazwa</span>
+        </label>
+
+        <label class="cat-csv-item" for="save_description">
+            <input type="hidden" name="save_description" value="0">
+            <label class="cat-toggle cat-toggle--sm" for="save_description" onclick="event.stopPropagation()">
+                <input type="checkbox" id="save_description" name="save_description" value="1"
                        {{ old('save_description', $category?->save_description ?? true) ? 'checked' : '' }}>
-                Zachowaj opis
+                <span class="tog-track"></span>
+                <span class="tog-thumb"></span>
             </label>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="form-group">
-            <label>
-                <input type="hidden" name="save_image" value="0">
-                <input type="checkbox" name="save_image" value="1"
+            <span>Opis</span>
+        </label>
+
+        <label class="cat-csv-item" for="save_image">
+            <input type="hidden" name="save_image" value="0">
+            <label class="cat-toggle cat-toggle--sm" for="save_image" onclick="event.stopPropagation()">
+                <input type="checkbox" id="save_image" name="save_image" value="1"
                        {{ old('save_image', $category?->save_image ?? true) ? 'checked' : '' }}>
-                Zachowaj zdjęcie
+                <span class="tog-track"></span>
+                <span class="tog-thumb"></span>
             </label>
-        </div>
+            <span>Zdjęcie</span>
+        </label>
+
     </div>
-</div>
+</fieldset>
 
 {{-- YouTube section --}}
 <hr>

@@ -734,20 +734,17 @@ class ImportCsvFileJob implements ShouldQueue
         $csvName          = end($categoryTree);
         $existingCategory = $this->currentCategories->get($csvName . '||' . (int) $parentId);
 
-        $name = ($existingCategory?->save_name === false && $existingCategory->name)
+        $name = ($existingCategory?->save_name === true && $existingCategory->name)
             ? $existingCategory->name
             : $csvName;
 
-        $description = ($existingCategory?->save_description === false && $existingCategory->description)
+        $description = ($existingCategory?->save_description === true && $existingCategory->description)
             ? $existingCategory->description
             : $line[310];
 
-        $image = $existingCategory?->save_image === false
+        $image = (bool)($existingCategory?->save_image ?? false) === true
             ? $existingCategory->img
-            : $line[303] ?? 'https://via.placeholder.com/300';
-        if (strpos($image, "\\")) {
-            $image = $this->getUrl($image);
-        }
+            : $line[303] ?? '';
 
         $categoryData = [
             'name'             => $name,
@@ -757,14 +754,17 @@ class ImportCsvFileJob implements ShouldQueue
             'is_visible'       => $this->getShowOnPageParameter($line, $categoryColumn),
             'priority'         => $this->getProductsOrder($line, $categoryColumn),
             'parent_id'        => $parentId,
-            'youtube'          => $existingCategory?->youtube,
+            'youtube'          => $existingCategory?->youtube ?? [],
             'save_name'        => $existingCategory?->save_name ?? true,
             'save_description' => $existingCategory?->save_description ?? true,
             'save_image'       => $existingCategory?->save_image ?? true,
         ];
 
         if ($existingCategory) {
-            $existingCategory->update(['parent_id' => $parentId]);
+            $existingCategory->update([
+                'parent_id' => $parentId,
+                'img' => $image
+            ]);
             $category = $existingCategory;
             $this->categoriesUpdated++;
         } else {

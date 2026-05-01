@@ -36,9 +36,9 @@
             <i class="fa fa-edit"></i> Edytuj
         </a>
         <form action="{{ route('categories.destroy', $category->id) }}" method="POST" style="display:inline"
-              onsubmit="return confirm('Usunąć kategorię {{ addslashes($category->name) }}?')">
+              onsubmit="return confirm('Usunąć kategorię {{ addslashes($category->name) }} wraz ze wszystkimi podkategoriami?')">
             @csrf @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+            <button type="submit" class="btn btn-sm btn-danger"><i class="voyager-trash"></i></button>
         </form>
     </td>
 </tr>
