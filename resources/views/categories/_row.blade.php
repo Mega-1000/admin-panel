@@ -35,10 +35,16 @@
         <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-sm btn-primary">
             <i class="fa fa-edit"></i> Edytuj
         </a>
-        <form action="{{ route('categories.destroy', $category->id) }}" method="POST" style="display:inline"
-              onsubmit="return confirm('Usunąć kategorię {{ addslashes($category->name) }} wraz ze wszystkimi podkategoriami?')">
+        <form id="del-form-{{ $category->id }}"
+              action="{{ route('categories.destroy', $category->id) }}"
+              method="POST" style="display:inline">
             @csrf @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-danger"><i class="voyager-trash"></i></button>
+            <button type="button" class="btn btn-sm btn-danger cat-delete-btn"
+                    data-form="del-form-{{ $category->id }}"
+                    data-name="{{ addslashes($category->name) }}"
+                    data-children="{{ $category->allChildren->count() }}">
+                <i class="voyager-trash"></i>
+            </button>
         </form>
     </td>
 </tr>
