@@ -58,42 +58,40 @@
             </div>
         </div>
     </div>
-@endsection
 
-@section('app-content-additions')
-{{-- ── Modal usuwania kategorii ────────────────────────────────────────────── --}}
-<div id="cat-delete-modal" style="display:none" aria-modal="true" role="dialog">
-    <div class="cdm-backdrop"></div>
-    <div class="cdm-card">
-        <div class="cdm-icon-wrap">
-            <svg class="cdm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="12" fill="#FEE2E2"/>
-                <path d="M9 3h6l1 2H8L9 3z" fill="#EF4444"/>
-                <rect x="4" y="5" width="16" height="2" rx="1" fill="#EF4444"/>
-                <path d="M6 7h12l-1.2 13.1A1 1 0 0 1 15.8 21H8.2a1 1 0 0 1-1-0.9L6 7z" fill="#EF4444" opacity=".85"/>
-                <line x1="10" y1="11" x2="10" y2="17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
-                <line x1="14" y1="11" x2="14" y2="17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-        </div>
-        <h3 class="cdm-title">Usuń kategorię</h3>
-        <p class="cdm-body">
-            Czy na pewno chcesz usunąć kategorię<br>
-            <strong id="cdm-cat-name" class="cdm-name"></strong>?
-        </p>
-        <p id="cdm-children-note" class="cdm-note" style="display:none">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-3a1 1 0 00-1 1v.5a1 1 0 002 0V11a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-            Wraz z nią zostaną usunięte wszystkie podkategorie.
-        </p>
-        <p class="cdm-warning">Tej operacji nie można cofnąć.</p>
-        <div class="cdm-actions">
-            <button type="button" class="cdm-btn-cancel" id="cdm-cancel">Anuluj</button>
-            <button type="button" class="cdm-btn-confirm" id="cdm-confirm">
-                <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:5px;"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"/></svg>
-                Usuń kategorię
-            </button>
+    {{-- ── Modal usuwania kategorii ──────────────────────────────────────────── --}}
+    <div id="cat-delete-modal" style="display:none" aria-modal="true" role="dialog">
+        <div class="cdm-backdrop"></div>
+        <div class="cdm-card">
+            <div class="cdm-icon-wrap">
+                <svg class="cdm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="12" fill="#FEE2E2"/>
+                    <path d="M9 3h6l1 2H8L9 3z" fill="#EF4444"/>
+                    <rect x="4" y="5" width="16" height="2" rx="1" fill="#EF4444"/>
+                    <path d="M6 7h12l-1.2 13.1A1 1 0 0 1 15.8 21H8.2a1 1 0 0 1-1-0.9L6 7z" fill="#EF4444" opacity=".85"/>
+                    <line x1="10" y1="11" x2="10" y2="17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="14" y1="11" x2="14" y2="17" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h3 class="cdm-title">Usuń kategorię</h3>
+            <p class="cdm-body">
+                Czy na pewno chcesz usunąć kategorię<br>
+                <strong id="cdm-cat-name" class="cdm-name"></strong>?
+            </p>
+            <p id="cdm-children-note" class="cdm-note" style="display:none">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px;"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-3a1 1 0 00-1 1v.5a1 1 0 002 0V11a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                Wraz z nią zostaną usunięte wszystkie podkategorie.
+            </p>
+            <p class="cdm-warning">Tej operacji nie można cofnąć.</p>
+            <div class="cdm-actions">
+                <button type="button" class="cdm-btn-cancel" id="cdm-cancel">Anuluj</button>
+                <button type="button" class="cdm-btn-confirm" id="cdm-confirm">
+                    <svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:5px;"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"/></svg>
+                    Usuń kategorię
+                </button>
+            </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('css')
