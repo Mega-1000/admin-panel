@@ -166,14 +166,17 @@ class ImportCsvFileJob implements ShouldQueue
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
             } catch (Exception $e) {
                 $symbol = $array['symbol'] ?? '(brak symbolu)';
-                $msg = "[IMPORT] BŁĄD wiersz $i | symbol: $symbol | {$e->getMessage()} | {$e->getFile()}:{$e->getLine()}";
-                $this->log($msg);
+                $this->log("[IMPORT] BŁĄD wiersz $i | symbol: $symbol | {$e->getMessage()} | {$e->getFile()}:{$e->getLine()}");
                 $this->importErrors[] = [
-                    'row'     => $i,
-                    'symbol'  => $symbol,
-                    'message' => $e->getMessage(),
+                    'row'      => $i,
+                    'symbol'   => $symbol,
+                    'message'  => $e->getMessage(),
                     'location' => basename($e->getFile()) . ':' . $e->getLine(),
                 ];
+                DB::rollBack();
+                $this->log('[IMPORT] Przerwano import z powodu błędu. Rollback wykonany.');
+                $this->sendSummaryEmail();
+                return;
             }
         }
 
@@ -656,10 +659,10 @@ class ImportCsvFileJob implements ShouldQueue
         $employeesRows = array_chunk($employeesLines, $employeesColumns);
 
         foreach ($employeesRows as $row) {
-            $firstName  = $row[0];
-            $lastName   = $row[2];
-            $email      = $row[4];
-            $postalCode = $row[14];
+            $firstName  = $row[0]  ?? null;
+            $lastName   = $row[2]  ?? null;
+            $email      = $row[4]  ?? null;
+            $postalCode = $row[14] ?? null;
             if (!$firstName || !$lastName || !$email || !$postalCode) continue;
 
             $cacheKey = $firstName . '||' . $lastName . '||' . $email;
