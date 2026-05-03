@@ -290,22 +290,18 @@ class ImportCsvFileJob implements ShouldQueue
             fn($e) => $e->firstname . '||' . $e->lastname . '||' . $e->email
         )->all();
 
-        $this->currentCategories = Category::all()->keyBy(
-            fn($c) => $c->name
-        );
+        // Buduj obie mapy naraz: path→Category i path→id
+        // Klucz = pełna ścieżka ("Kominy/Ceramiczne/Kwasoodporne"), nie sama nazwa.
+        // Dzięki temu "albaterm" pod "100 elewacyjne" i "albaterm" pod "200 posadzkowe"
+        // to dwa osobne rekordy, a nie ten sam nadpisywany przy każdym trafieniu.
+        $allCats = Category::all();
+        $byId    = $allCats->keyBy('id');
 
-        // Pre-buduj categoryPathIds z bazy — bez tego lookup dziecka zależy od kolejności
-        // wierszy w CSV (rodzic musiałby być przetworzony przed dzieckiem), co nie jest gwarantowane.
-        $this->prebuildCategoryPathIds();
-    }
-
-    private function prebuildCategoryPathIds(): void
-    {
-        $byId = $this->currentCategories->values()->keyBy('id');
-
-        foreach ($this->currentCategories as $category) {
-            $pathKey = $this->resolveCategoryPathKey($category, $byId);
-            $this->categoryPathIds[$pathKey] = $category->id;
+        $this->currentCategories = collect();
+        foreach ($allCats as $cat) {
+            $pathKey = $this->resolveCategoryPathKey($cat, $byId);
+            $this->currentCategories->put($pathKey, $cat);
+            $this->categoryPathIds[$pathKey] = $cat->id;
         }
     }
 
@@ -859,7 +855,7 @@ class ImportCsvFileJob implements ShouldQueue
         $parentId  = $parentKey ? ($this->categoryPathIds[$parentKey] ?? null) : null;
 
         $csvName          = end($categoryTree);
-        $existingCategory = $this->currentCategories->get($csvName);
+        $existingCategory = $this->currentCategories->get($pathKey);
 
         $rawPriorityCell = $line[$categoryColumn + 7] ?? '';
         $csvPriority     = $rawPriorityCell !== '' ? (int) $rawPriorityCell : null;
@@ -918,7 +914,7 @@ class ImportCsvFileJob implements ShouldQueue
         } else {
             $category = Category::query()->create($categoryData);
             $this->categoriesCreated++;
-            $this->currentCategories->put($csvName, $category);
+            $this->currentCategories->put($pathKey, $category);
             $this->log(sprintf('[CAT] new id=%d "%s" parent_id=%s priority=%s', $category->id, $name, $parentId ?? 'null', $csvPriority ?? 0));
         }
 
