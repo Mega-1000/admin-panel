@@ -734,15 +734,18 @@ class ImportCsvFileJob implements ShouldQueue
         $csvName          = end($categoryTree);
         $existingCategory = $this->currentCategories->get($csvName . '||' . (int) $parentId);
 
-        $name = (bool)($existingCategory?->save_name ?? false) === false
+        // For new categories always use CSV data; for existing ones respect the save_* flags.
+        // save_name/save_description/save_image = true  → overwrite from CSV
+        //                                       = false → keep the manually-edited DB value
+        $name = ($existingCategory && !$existingCategory->save_name)
             ? $existingCategory->name
             : $csvName;
 
-        $description = (bool)($existingCategory?->save_description ?? false) === false
+        $description = ($existingCategory && !$existingCategory->save_description)
             ? $existingCategory->description
             : $line[310];
 
-        $image = (bool)($existingCategory?->save_image ?? false) === false
+        $image = ($existingCategory && !$existingCategory->save_image)
             ? $existingCategory->img
             : $line[303] ?? '';
 
@@ -762,9 +765,13 @@ class ImportCsvFileJob implements ShouldQueue
 
         if ($existingCategory) {
             $existingCategory->update([
-                'parent_id' => $parentId,
-                'img' => $image,
-                'name' => $name,
+                'parent_id'   => $parentId,
+                'name'        => $name,
+                //'description' => $description,
+                'img'         => $image,
+                'rewrite'     => $this->rewrite($name),
+                'is_visible'  => $this->getShowOnPageParameter($line, $categoryColumn),
+                'priority'    => $this->getProductsOrder($line, $categoryColumn),
             ]);
             $category = $existingCategory;
             $this->categoriesUpdated++;
@@ -885,8 +892,9 @@ class ImportCsvFileJob implements ShouldQueue
                 $productNumber = trim($line[$i + 1], "[]");
                 if (!isset($replacements[$productNumber])) {
                     $replacements[$productNumber] = [
-                        'img' => $line[$i + 3],
-                        'products' => []
+                        'description' => $line[$i],
+                        'img'         => $line[$i + 3],
+                        'products'    => [],
                     ];
                 }
                 $replacements[$productNumber]['products'][] = [
