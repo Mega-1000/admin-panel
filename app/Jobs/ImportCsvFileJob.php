@@ -811,7 +811,7 @@ class ImportCsvFileJob implements ShouldQueue
             $existingCategory ? 'TAK (id=' . $existingCategory->id . ')' : 'NIE'
         ));
         $this->log('[CAT] blok: ' . implode(' | ', $blockDump));
-        $rawPriorityCell   = (int)$line[$categoryColumn + 7] ?? '';
+        $rawPriorityCell   = (int)($line[$categoryColumn + 7] ?? 1);
 
         // For new categories always use CSV data; for existing ones respect the save_* flags.
         // save_name/save_description/save_image = true  → overwrite from CSV
