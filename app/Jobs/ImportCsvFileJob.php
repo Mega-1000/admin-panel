@@ -811,18 +811,7 @@ class ImportCsvFileJob implements ShouldQueue
             $existingCategory ? 'TAK (id=' . $existingCategory->id . ')' : 'NIE'
         ));
         $this->log('[CAT] blok: ' . implode(' | ', $blockDump));
-        $computedPriority  = $this->getProductsOrder($line, $categoryColumn);
-        $computedVisible   = $this->getShowOnPageParameter($line, $categoryColumn) ? 'TAK' : 'NIE';
-        $rawPriorityCell   = $line[$categoryColumn + 7] ?? '';
-        $this->log(sprintf(
-            '[CAT] computed: priorytet=%d (raw_col%d="%s", int_cast=%d) | is_visible=%s',
-            $computedPriority,
-            $categoryColumn + 7,
-            $rawPriorityCell,
-            (int) $rawPriorityCell,
-            $computedVisible
-        ));
-        // --- koniec logu ---
+        $rawPriorityCell   = (int)$line[$categoryColumn + 7] ?? '';
 
         // For new categories always use CSV data; for existing ones respect the save_* flags.
         // save_name/save_description/save_image = true  → overwrite from CSV
@@ -845,7 +834,7 @@ class ImportCsvFileJob implements ShouldQueue
             'img'              => $image,
             'rewrite'          => $this->rewrite($name),
             'is_visible'       => $this->getShowOnPageParameter($line, $categoryColumn),
-            'priority'         => $this->getProductsOrder($line, $categoryColumn),
+            'priority'         => $rawPriorityCell,
             'parent_id'        => $parentId,
             'youtube'          => $existingCategory?->youtube ?? [],
             'save_name'        => $existingCategory?->save_name ?? true,
@@ -861,7 +850,7 @@ class ImportCsvFileJob implements ShouldQueue
                 'img'         => $image,
                 'rewrite'     => $this->rewrite($name),
                 'is_visible'  => $this->getShowOnPageParameter($line, $categoryColumn),
-                'priority'    => $this->getProductsOrder($line, $categoryColumn),
+                'priority'    => $rawPriorityCell,
             ]);
             $category = $existingCategory;
             $this->categoriesUpdated++;
