@@ -850,6 +850,7 @@ class ImportCsvFileJob implements ShouldQueue
         if (isset($this->categoryPathIds[$pathKey])) {
             return $this->categoryPathIds[$pathKey];
         }
+
         $grandParentId = $this->ensureParentCategoryPath(array_slice($segments, 0, -1));
         $name = end($segments);
 
@@ -860,7 +861,7 @@ class ImportCsvFileJob implements ShouldQueue
                 'parent_id'        => $grandParentId,
                 'rewrite'          => $this->rewrite($name),
                 'priority'         => 0,
-                'is_visible'       => false,
+                'is_visible'       => true,
                 'save_name'        => true,
                 'save_description' => true,
                 'save_image'       => true,
@@ -885,6 +886,13 @@ class ImportCsvFileJob implements ShouldQueue
         $parentId  = $parentKey ? $this->ensureParentCategoryPath($parentSegments) : null;
 
         $csvName          = end($categoryTree);
+
+        $this->log(sprintf('Testujemy kategorię: %s. Nastepnie parent segment: %s. Parent key: %s.',
+        $csvName,
+        implode('#', $parentSegments),
+        $parentKey,
+        ));
+
         $existingCategory = Category::where('name', $csvName)
             ->where('parent_id', $parentId)
             ->first();
