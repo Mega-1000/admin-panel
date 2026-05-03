@@ -205,6 +205,45 @@ class ImportCsvFileJob implements ShouldQueue
         $this->currentCategories = Category::all()->keyBy(
             fn($c) => $c->name . '||' . (int) $c->parent_id
         );
+
+        // Pre-buduj categoryPathIds z bazy — bez tego lookup dziecka zależy od kolejności
+        // wierszy w CSV (rodzic musiałby być przetworzony przed dzieckiem), co nie jest gwarantowane.
+        $this->prebuildCategoryPathIds();
+    }
+
+    private function prebuildCategoryPathIds(): void
+    {
+        $byId = $this->currentCategories->values()->keyBy('id');
+
+        foreach ($this->currentCategories as $category) {
+            $pathKey = $this->resolveCategoryPathKey($category, $byId);
+            $this->categoryPathIds[$pathKey] = $category->id;
+        }
+    }
+
+    private function resolveCategoryPathKey($category, $byId, int $depth = 0): string
+    {
+        if ($depth > 10) {
+            return $category->name; // zabezpieczenie przed zapętleniem
+        }
+
+        $parts = [$category->name];
+        $current = $category;
+
+        while ((int) $current->parent_id > 0) {
+            $parent = $byId->get($current->parent_id);
+            if (!$parent) {
+                break;
+            }
+            array_unshift($parts, $parent->name);
+            $current = $parent;
+
+            if (++$depth > 10) {
+                break;
+            }
+        }
+
+        return implode('/', $parts);
     }
 
     private function clearTables()
@@ -778,6 +817,8 @@ class ImportCsvFileJob implements ShouldQueue
         } else {
             $category = Category::query()->create($categoryData);
             $this->categoriesCreated++;
+            // Rejestruj w cache żeby kolejne wiersze tego importu mogły ją znaleźć
+            $this->currentCategories->put($csvName . '||' . (int) $parentId, $category);
         }
 
         $this->seenCategoryIds[]       = $category->id;
