@@ -811,6 +811,17 @@ class ImportCsvFileJob implements ShouldQueue
             $existingCategory ? 'TAK (id=' . $existingCategory->id . ')' : 'NIE'
         ));
         $this->log('[CAT] blok: ' . implode(' | ', $blockDump));
+        $computedPriority  = $this->getProductsOrder($line, $categoryColumn);
+        $computedVisible   = $this->getShowOnPageParameter($line, $categoryColumn) ? 'TAK' : 'NIE';
+        $rawPriorityCell   = $line[$categoryColumn + 7] ?? '';
+        $this->log(sprintf(
+            '[CAT] computed: priorytet=%d (raw_col%d="%s", int_cast=%d) | is_visible=%s',
+            $computedPriority,
+            $categoryColumn + 7,
+            $rawPriorityCell,
+            (int) $rawPriorityCell,
+            $computedVisible
+        ));
         // --- koniec logu ---
 
         // For new categories always use CSV data; for existing ones respect the save_* flags.
