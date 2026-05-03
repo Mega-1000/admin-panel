@@ -943,8 +943,8 @@ class ImportCsvFileJob implements ShouldQueue
                 'rewrite'    => $this->rewrite($name),
                 'is_visible' => $this->getShowOnPageParameter($line, $categoryColumn),
             ];
-            // Nadpisuj priorytet tylko gdy CSV faktycznie go podaje — inaczej zostawiamy poprzednią wartość
-            if ($csvPriority !== null) {
+
+            if ($csvPriority !== null || $csvPriority > 0) {
                 $updateData['priority'] = $csvPriority;
             }
             $existingCategory->update($updateData);
