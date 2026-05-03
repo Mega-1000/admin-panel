@@ -46,8 +46,7 @@ class ImportCsvFileJob implements ShouldQueue
     private array $productsRelated = [];
     private array $jpgData = [];
     private array $seenCategoryIds = [];
-    private array $categoryPathIds = []; // path key (e.g. "180.kominy/1.kominy_u") => category_id
-    public $currentCategories;
+    private array $categoryPathIds = []; // path key => category_id, potrzebne do rozwiązywania parent_id
 
     private $currentLine;
     private $existingProducts;
@@ -290,17 +289,15 @@ class ImportCsvFileJob implements ShouldQueue
             fn($e) => $e->firstname . '||' . $e->lastname . '||' . $e->email
         )->all();
 
-        // Buduj obie mapy naraz: path→Category i path→id
-        // Klucz = pełna ścieżka ("Kominy/Ceramiczne/Kwasoodporne"), nie sama nazwa.
-        // Dzięki temu "albaterm" pod "100 elewacyjne" i "albaterm" pod "200 posadzkowe"
-        // to dwa osobne rekordy, a nie ten sam nadpisywany przy każdym trafieniu.
+        $this->prebuildCategoryPathIds();
+    }
+
+    private function prebuildCategoryPathIds(): void
+    {
         $allCats = Category::all();
         $byId    = $allCats->keyBy('id');
-
-        $this->currentCategories = collect();
         foreach ($allCats as $cat) {
             $pathKey = $this->resolveCategoryPathKey($cat, $byId);
-            $this->currentCategories->put($pathKey, $cat);
             $this->categoryPathIds[$pathKey] = $cat->id;
         }
     }
@@ -855,7 +852,9 @@ class ImportCsvFileJob implements ShouldQueue
         $parentId  = $parentKey ? ($this->categoryPathIds[$parentKey] ?? null) : null;
 
         $csvName          = end($categoryTree);
-        $existingCategory = $this->currentCategories->get($pathKey);
+        $existingCategory = Category::where('name', $csvName)
+            ->where('parent_id', $parentId)
+            ->first();
 
         $rawPriorityCell = $line[$categoryColumn + 7] ?? '';
         $csvPriority     = $rawPriorityCell !== '' ? (int) $rawPriorityCell : null;
@@ -914,7 +913,6 @@ class ImportCsvFileJob implements ShouldQueue
         } else {
             $category = Category::query()->create($categoryData);
             $this->categoriesCreated++;
-            $this->currentCategories->put($pathKey, $category);
             $this->log(sprintf('[CAT] new id=%d "%s" parent_id=%s priority=%s', $category->id, $name, $parentId ?? 'null', $csvPriority ?? 0));
         }
 
