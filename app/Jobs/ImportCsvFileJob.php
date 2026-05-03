@@ -773,6 +773,46 @@ class ImportCsvFileJob implements ShouldQueue
         $csvName          = end($categoryTree);
         $existingCategory = $this->currentCategories->get($csvName);
 
+        // --- diagnostic log ---
+        // Pełny blok 16 kolumn z opisem każdego offsetu
+        $offsetLabels = [
+            0  => 'znacznik_bloku',
+            1  => 'kat_lvl1',
+            2  => 'kat_lvl2',
+            3  => 'kat_lvl3',
+            4  => 'kat_lvl4',
+            5  => 'kat_lvl5',
+            6  => 'kat_lvl6',
+            7  => 'priorytet',
+            8  => 'multiCalcCurrent',
+            9  => 'jpg_plik_1',
+            10 => 'nieznany_10',
+            11 => 'jpg_plik_2',
+            12 => 'multiCalcBase',
+            13 => 'jpg_kolejnosc',
+            14 => 'show_on_page',
+            15 => 'nieznany_15',
+        ];
+        $blockDump = [];
+        for ($j = 0; $j <= 15; $j++) {
+            $absCol = $categoryColumn + $j;
+            $val    = $line[$absCol] ?? '';
+            $label  = $offsetLabels[$j];
+            $blockDump[] = sprintf('+%d(col%d)[%s]="%s"', $j, $absCol, $label, $val);
+        }
+        $this->log(sprintf(
+            '[CAT] wiersz=%d | blok_col=%d (poz.%d) | drzewko=%s | parent_key="%s" | parent_id=%s | w_cache=%s',
+            $this->currentLine,
+            $categoryColumn,
+            (($categoryColumn - 598) / 16) + 1,
+            '"' . implode('" / "', $categoryTree) . '"',
+            $parentKey,
+            $parentId ?? 'null',
+            $existingCategory ? 'TAK (id=' . $existingCategory->id . ')' : 'NIE'
+        ));
+        $this->log('[CAT] blok: ' . implode(' | ', $blockDump));
+        // --- koniec logu ---
+
         // For new categories always use CSV data; for existing ones respect the save_* flags.
         // save_name/save_description/save_image = true  → overwrite from CSV
         //                                       = false → keep the manually-edited DB value
@@ -814,14 +854,17 @@ class ImportCsvFileJob implements ShouldQueue
             ]);
             $category = $existingCategory;
             $this->categoriesUpdated++;
+            $this->log(sprintf('[CAT] => AKTUALIZACJA id=%d "%s" parent_id=%s', $category->id, $name, $parentId ?? 'null'));
         } else {
             $category = Category::query()->create($categoryData);
             $this->categoriesCreated++;
             $this->currentCategories->put($csvName, $category);
+            $this->log(sprintf('[CAT] => NOWA id=%d "%s" parent_id=%s', $category->id, $name, $parentId ?? 'null'));
         }
 
         $this->seenCategoryIds[]       = $category->id;
         $this->categoryPathIds[$pathKey] = $category->id;
+        $this->log(sprintf('[CAT] => path_cache["%s"] = %d', $pathKey, $category->id));
 
         $replacements = $this->getChimneyReplacements($line);
         $this->appendChimneyAttributes($category, $line);
