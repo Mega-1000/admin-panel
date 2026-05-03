@@ -203,7 +203,7 @@ class ImportCsvFileJob implements ShouldQueue
         )->all();
 
         $this->currentCategories = Category::all()->keyBy(
-            fn($c) => $c->name . '||' . (int) $c->parent_id
+            fn($c) => $c->name
         );
 
         // Pre-buduj categoryPathIds z bazy — bez tego lookup dziecka zależy od kolejności
@@ -771,7 +771,7 @@ class ImportCsvFileJob implements ShouldQueue
         $parentId  = $parentKey ? ($this->categoryPathIds[$parentKey] ?? null) : null;
 
         $csvName          = end($categoryTree);
-        $existingCategory = $this->currentCategories->get($csvName . '||' . (int) $parentId);
+        $existingCategory = $this->currentCategories->get($csvName);
 
         // For new categories always use CSV data; for existing ones respect the save_* flags.
         // save_name/save_description/save_image = true  → overwrite from CSV
@@ -817,8 +817,7 @@ class ImportCsvFileJob implements ShouldQueue
         } else {
             $category = Category::query()->create($categoryData);
             $this->categoriesCreated++;
-            // Rejestruj w cache żeby kolejne wiersze tego importu mogły ją znaleźć
-            $this->currentCategories->put($csvName . '||' . (int) $parentId, $category);
+            $this->currentCategories->put($csvName, $category);
         }
 
         $this->seenCategoryIds[]       = $category->id;
