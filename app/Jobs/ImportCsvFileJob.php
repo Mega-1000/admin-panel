@@ -65,6 +65,7 @@ class ImportCsvFileJob implements ShouldQueue
     private int $categoriesCreated  = 0;
     private int $categoriesUpdated  = 0;
     private int $categoriesDeleted  = 0;
+    private array $importErrors     = [];
 
     /**
      * @throws FileNotFoundException
@@ -165,18 +166,102 @@ class ImportCsvFileJob implements ShouldQueue
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
             } catch (Exception $e) {
                 $symbol = $array['symbol'] ?? '(brak symbolu)';
-                $this->log("[IMPORT] BŁĄD wiersz $i | symbol: $symbol | {$e->getMessage()} | {$e->getFile()}:{$e->getLine()}");
+                $msg = "[IMPORT] BŁĄD wiersz $i | symbol: $symbol | {$e->getMessage()} | {$e->getFile()}:{$e->getLine()}";
+                $this->log($msg);
+                $this->importErrors[] = [
+                    'row'     => $i,
+                    'symbol'  => $symbol,
+                    'message' => $e->getMessage(),
+                    'location' => basename($e->getFile()) . ':' . $e->getLine(),
+                ];
             }
         }
 
         DB::commit();
         $this->saveJpgData();
+        $this->pruneEmptyCategories();
 
         $this->updateImportTable();
         $this->makeBackups();
 
         $this->log('[IMPORT] Koniec: ' . Carbon::now() . " | produkty: +{$this->productsCreated} upd:{$this->productsUpdated} | kategorie: +{$this->categoriesCreated} upd:{$this->categoriesUpdated} del:{$this->categoriesDeleted}");
         $this->sendSummaryEmail();
+    }
+
+    private function pruneEmptyCategories(): void
+    {
+        // Kategorie które mają przynajmniej jeden żywy produkt
+        $withProducts = DB::table('products')
+            ->whereNotNull('category_id')
+            ->whereNull('deleted_at')
+            ->pluck('category_id')
+            ->unique()
+            ->flip() // zamień na map id=>true dla O(1) lookup
+            ->toArray();
+
+        // Wyznacz zbiór "potrzebnych": kategorie z produktami + wszyscy ich przodkowie
+        $allCategories = DB::table('categories')->select('id', 'parent_id')->get()->keyBy('id');
+
+        $needed = [];
+        foreach (array_keys($withProducts) as $catId) {
+            $current = (int) $catId;
+            while ($current && !isset($needed[$current])) {
+                $needed[$current] = true;
+                $row = $allCategories->get($current);
+                $current = $row ? (int) $row->parent_id : 0;
+            }
+        }
+
+        $toDelete = $allCategories->keys()
+            ->filter(fn($id) => !isset($needed[$id]))
+            ->values()
+            ->toArray();
+
+        if (empty($toDelete)) {
+            $this->log('[CAT PRUNE] Brak kategorii do usunięcia.');
+            return;
+        }
+
+        // Zaloguj nazwy przed usunięciem
+        $names = DB::table('categories')->whereIn('id', $toDelete)->pluck('name', 'id');
+        $this->log('[CAT PRUNE] Do usunięcia: ' . count($toDelete) . ' kategorii bez produktów.');
+        foreach ($names as $id => $name) {
+            $this->log(sprintf('[CAT PRUNE] - id=%d "%s"', $id, $name));
+        }
+
+        // Usuwaj iteracyjnie od liści w górę — w każdym przebiegu kasujemy te,
+        // które nie są rodzicem żadnej istniejącej kategorii.
+        $passes = 0;
+        do {
+            $leafIds = DB::table('categories')
+                ->whereIn('id', $toDelete)
+                ->whereNotIn('id', DB::table('categories')->select('parent_id')->whereNotNull('parent_id'))
+                ->pluck('id')
+                ->toArray();
+
+            if (empty($leafIds)) {
+                break;
+            }
+
+            foreach ($leafIds as $id) {
+                $this->log(sprintf('[CAT PRUNE] usunięto id=%d "%s"', $id, $names[$id] ?? '?'));
+            }
+
+            $deleted = DB::table('categories')->whereIn('id', $leafIds)->delete();
+            $this->categoriesDeleted += $deleted;
+            $passes++;
+
+            $toDelete = DB::table('categories')
+                ->whereIn('id', $toDelete)
+                ->pluck('id')
+                ->toArray();
+        } while (!empty($toDelete) && $passes < 20);
+
+        if (!empty($toDelete)) {
+            $this->log('[CAT PRUNE] WARN: ' . count($toDelete) . ' kategorii nie udało się usunąć po ' . $passes . ' przebiegach.');
+        } else {
+            $this->log('[CAT PRUNE] Usunięto w ' . $passes . ' przebiegach.');
+        }
     }
 
     private function loadCaches(): void
@@ -997,6 +1082,7 @@ class ImportCsvFileJob implements ShouldQueue
             'categories_updated' => $this->categoriesUpdated,
             'categories_deleted' => $this->categoriesDeleted,
             'imported_at'        => Carbon::now()->format('Y-m-d H:i:s'),
+            'errors'             => $this->importErrors,
         ];
 
         $this->log('[IMPORT] Podsumowanie: ' . json_encode($summary));
