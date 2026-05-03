@@ -841,15 +841,48 @@ class ImportCsvFileJob implements ShouldQueue
         JpgDatum::insert($data);
     }
 
+    private function ensureParentCategoryPath(array $segments): ?int
+    {
+        if (empty($segments)) {
+            return null;
+        }
+        $pathKey = implode('/', $segments);
+        if (isset($this->categoryPathIds[$pathKey])) {
+            return $this->categoryPathIds[$pathKey];
+        }
+        $grandParentId = $this->ensureParentCategoryPath(array_slice($segments, 0, -1));
+        $name = end($segments);
+
+        $cat = Category::where('name', $name)->where('parent_id', $grandParentId)->first();
+        if (!$cat) {
+            $cat = Category::create([
+                'name'             => $name,
+                'parent_id'        => $grandParentId,
+                'rewrite'          => $this->rewrite($name),
+                'priority'         => 0,
+                'is_visible'       => false,
+                'save_name'        => true,
+                'save_description' => true,
+                'save_image'       => true,
+            ]);
+            $this->categoriesCreated++;
+            $this->log(sprintf('[CAT] auto-ancestor id=%d "%s" parent_id=%s', $cat->id, $name, $grandParentId ?? 'null'));
+        }
+        $this->categoryPathIds[$pathKey] = $cat->id;
+        $this->seenCategoryIds[] = $cat->id;
+        return $cat->id;
+    }
+
     private function saveCategory(array $line, array $categoryTree, int $categoryColumn): void
     {
         if (empty($categoryTree)) {
             return;
         }
 
-        $pathKey  = implode('/', $categoryTree);
-        $parentKey = implode('/', array_slice($categoryTree, 0, -1));
-        $parentId  = $parentKey ? ($this->categoryPathIds[$parentKey] ?? null) : null;
+        $pathKey   = implode('/', $categoryTree);
+        $parentSegments = array_slice($categoryTree, 0, -1);
+        $parentKey = implode('/', $parentSegments);
+        $parentId  = $parentKey ? $this->ensureParentCategoryPath($parentSegments) : null;
 
         $csvName          = end($categoryTree);
         $existingCategory = Category::where('name', $csvName)
