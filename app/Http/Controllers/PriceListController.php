@@ -84,7 +84,7 @@ class PriceListController extends Controller
                     continue;
                 }
 
-                $product = Product::with(['packing', 'price', 'parentProduct'])->find($item['id']);
+                $product = Product::with(['packing', 'price', 'parentProduct', 'children'])->find($item['id']);
                 if (!$product) {
                     continue;
                 }
@@ -97,15 +97,17 @@ class PriceListController extends Controller
 
                 $millingCost = (float) str_replace(',', '.', $item['additional_payment_for_milling'] ?? 0);
 
-                // Replicate parameter values and dates to all related products
-                Product::whereIn('id', $relatedIds)->update([
+                $paramUpdate = [
                     'date_of_price_change'              => Carbon::parse($item['date_of_price_change'])->toDateString(),
                     'date_of_the_new_prices'            => Carbon::parse($item['date_of_the_new_prices'])->toDateString(),
                     'value_of_price_change_data_first'  => (float) str_replace(',', '.', $item['value_of_price_change_data_first']  ?? 0),
                     'value_of_price_change_data_second' => (float) str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0),
                     'value_of_price_change_data_third'  => (float) str_replace(',', '.', $item['value_of_price_change_data_third']  ?? 0),
                     'value_of_price_change_data_fourth' => (float) str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0),
-                ]);
+                ];
+
+                // Replicate parameter values and dates to all related products
+                Product::whereIn('id', $relatedIds)->update($paramUpdate);
 
                 // Reload product with fresh parameter values for cascade calculation
                 $product->refresh();
@@ -123,6 +125,21 @@ class PriceListController extends Controller
 
                 // Replicate resulting prices to all related products
                 ProductPrice::whereIn('product_id', $relatedIds)->update($prices);
+
+                // Update children (variants) — each uses its own packing for cascade
+                foreach ($product->children as $child) {
+                    $child->update($paramUpdate);
+                    $child->refresh();
+
+                    if (!$child->packing || !$child->price) {
+                        continue;
+                    }
+
+                    $child->price->additional_payment_for_milling = $millingCost;
+                    $childPrices = $calculator->buildFullPriceArray($child);
+                    $childPrices['additional_payment_for_milling'] = $millingCost;
+                    $child->price->update($childPrices);
+                }
             }
 
             return response()->json(['message' => 'Ceny zostały zaktualizowane.'], 200);
