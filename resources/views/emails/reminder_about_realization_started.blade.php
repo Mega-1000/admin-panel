@@ -108,7 +108,7 @@
 
         <p>Jeśli znaleźli Państwo lepszą ofertę niż na naszej platformie, prosimy o kontakt. Jesteśmy pewni, że znajdziemy rozwiązanie, które Państwa zadowoli.</p>
 
-        <p>Przybliżony czas realizacji zamówienia to 7 dni roboczych. W przypadku potrzeby szybszej realizacji, prosimy o kontakt pod numerem 576 205 389.</p>
+        <p>Przybliżony czas realizacji zamówienia to 7 dni roboczych. W przypadku potrzeby szybszej realizacji, prosimy o kontakt pod numerem 507926027.</p>
 
         <p>Dziękujemy za zaufanie i wybór platformy EPH Polska.</p>
 

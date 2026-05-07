@@ -53,7 +53,7 @@ class CheckForFinishedAuctions implements ShouldQueue
                         ));
 
                     SMSHelper::sendSms(
-                        576205389,
+                        507926027,
                         'EPH Polska',
                         'Przetarg na twoim koncie zostal zakonczony zobacz tabele wycen pod: https://admin.mega1000.pl/auctions/' . $auction->id . '/end'
                     );

@@ -83,7 +83,7 @@
                 </button>
             @else
                 <div style="color: red; font-weight: bolder; font-size: larger">
-                    Uwaga!!! Masz już przetarg na swoim koncie zawierający jeden z tych produktów jeśli potrzebujesz zmienić swój przetarg zadzwoń pod numer 576 205 389
+                    Uwaga!!! Masz już przetarg na swoim koncie zawierający jeden z tych produktów jeśli potrzebujesz zmienić swój przetarg zadzwoń pod numer 507926027
                 </div>
             @endif
             <div id="spinner" class="hidden">

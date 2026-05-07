@@ -113,7 +113,7 @@
             Tabela cen zaproponowanych w przetargu
         </a>
 
-        <p>Jeśli znaleźli Państwo lepszą ofertę niż nasza, prosimy o kontakt pod numerem 576 205 389. Nie tylko zrównamy się z nią, ale także wynagrodzimy Państwa dodatkową zniżką w wysokości 100 zł.</p>
+        <p>Jeśli znaleźli Państwo lepszą ofertę niż nasza, prosimy o kontakt pod numerem 507926027. Nie tylko zrównamy się z nią, ale także wynagrodzimy Państwa dodatkową zniżką w wysokości 100 zł.</p>
 
         <p>W przypadku gdy zapytanie nie jest już aktualne, prosimy o kliknięcie poniższego przycisku:</p>
 

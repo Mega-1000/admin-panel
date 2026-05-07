@@ -271,7 +271,7 @@
                     <img src="https://mega1000.pl/logo.webp" alt="" style="width: 80px; height: 80px">
                 </div>
                 <h2 class="h2 text-white">Gwarancja najniższej ceny!</h2>
-                <p class="text-lg text-white">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 576 205 389</p>
+                <p class="text-lg text-white">Gwarantujemy państwu, że ceny otrzymane po zakończeniu przetargu będą najniższe na rynku niezależnie od producenta! Znalazłeś lepszą ofertę? Zadzwoń do nas a my obniżymy cenę o dodatkowe 100zł! +48 507926027</p>
             </div>
 
             <div class="price-guarantee mb-4" style="width: 100%;">

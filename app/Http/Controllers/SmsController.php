@@ -18,7 +18,7 @@ class SmsController extends Controller
         $employee = LocationHelper::getNearestEmployeeOfFirm(Order::find($request->query('orderId'))->customer, $firm->firm);
 
         SMSHelper::sendSms(
-            576205389,
+            507926027,
             "EPH Polska",
             $request->query('message'),
         );

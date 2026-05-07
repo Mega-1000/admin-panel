@@ -47,7 +47,7 @@ class CheckChatsForNotInUse implements ShouldQueue
             // if last message more than 4 hours ago
             if ($token && $lasMessage && !empty($lasMessage->chatUser->user_id) && Carbon::create($lastMessageSentTime)->addHours(4) < now()) {
                 SMSHelper::sendSms(
-                    576205389,
+                    507926027,
                     "EPH Polska",
                     "Dzien dobry, informujemy ze na panelu klienta w EPH Polska masz nie odczytaną wiadomosc na chacie. Kliknij tutaj aby ją wyswietlic i odpisac:
 https://admin.mega1000.pl/chat/$token",

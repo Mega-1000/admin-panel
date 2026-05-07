@@ -114,7 +114,7 @@
 
         <p>Nasz zespół wsparcia jest gotowy, aby pomóc Państwu w każdej sytuacji:</p>
         <p class="contact">E-mail: styropiany@ephpolska.pl</p>
-        <p class="contact">Infolinia: +48 576 205 389</p>
+        <p class="contact">Infolinia: +48 507926027</p>
 
         <p>Dziękujemy za zaufanie i wybór platformy EPH Polska. Jesteśmy przekonani, że nasze narzędzie znacząco ułatwi Państwu proces zakupu styropianu i innych materiałów budowlanych.</p>
 

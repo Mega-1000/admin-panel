@@ -100,7 +100,7 @@
 
         <div class="highlight">
             <p><strong>Ważna informacja:</strong> Utworzyliśmy dla Państwa konto na naszej platformie, aby ułatwić proces zakupowy i zapewnić dostęp do najlepszych ofert.</p>
-            <p>Logowanie dostępne jest pod adresem: <a href="https://mega1000.pl/account?credentials={{$order->customer->login}}:{{$order->customer->phone}}">https://mega1000.pl/account</a></p>
+            <p>Logowanie dostępne jest pod adresem: <a href="https://mega1000.pl/login">https://mega1000.pl/login</a></p>
             <p>Prosimy użyć swojego adresu e-mail jako loginu, a numeru telefonu jako tymczasowego hasła.</p>
         </div>
 
@@ -117,7 +117,7 @@
         </div>
 
         <p>Nasz zespół wsparcia jest gotowy, aby pomóc Państwu w pełni wykorzystać możliwości naszej platformy:</p>
-        <p class="contact">Infolinia: 576 205 389</p>
+        <p class="contact">Infolinia: 507926027</p>
         <p>Zapewniamy wsparcie 7 dni w tygodniu, w godzinach 7:00 - 23:00.</p>
 
         <p>Dziękujemy za wybór platformy EPH Polska. Jesteśmy przekonani, że nasze narzędzie znacząco ułatwi Państwu proces zakupu styropianu i innych materiałów budowlanych.</p>

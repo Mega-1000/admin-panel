@@ -649,7 +649,7 @@ class AuctionsController extends Controller
         $order->save();
 
         SMSHelper::sendSms(
-            576205389,
+            507926027,
             "EPH Polska",
             "Dzień dobry, rozpocząłeś realizacje zamówienia na platformie eph polska. Prosimy o opłacenie faktury proformy pod następującym linkiem: https://mega1000.pl/payment?token=$order->token&total={$order->getValue()}&credentials={$order->customer->login}:{$order->customer->phone}",
         );
