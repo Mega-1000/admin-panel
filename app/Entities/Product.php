@@ -200,13 +200,23 @@ class Product extends Model implements Transformable
 
     public function getCalculatedNetPriceAttribute(): float
     {
-        // Join-based queries expose price/packing columns directly as raw attributes
-        if (isset($this->attributes['net_selling_price_commercial_unit'])) {
-            return (float) $this->attributes['net_selling_price_commercial_unit'];
+        if (isset($this->attributes['net_purchase_price_basic_unit_after_discounts'])) {
+            $basicUnitPrice = (float) $this->attributes['value_of_price_change_data_first'];
+            $millingCost    = (float) ($this->attributes['additional_payment_for_milling'] ?? 0);
+            $unitsInPack    = $this->attributes['numbers_of_basic_commercial_units_in_pack'] ?? 1;
+            $calculationType = ($this->attributes['pattern_to_set_the_price'] ?? '' ) === '[125]+[126]' ? 'frez' : 'simple';
+        } else {
+            $price   = $this->relationLoaded('price')   ? $this->price   : null;
+            $packing = $this->relationLoaded('packing') ? $this->packing : null;
+            $calculationType = $this->pattern_to_set_the_price === '[125]+[126]' ? 'frez' : 'simple';
+
+
+            $basicUnitPrice = (float) ($price?->value_of_price_change_data_first ?? 0);
+            $millingCost    = (float) ($price?->additional_payment_for_milling ?? 0);
+            $unitsInPack    = $packing?->numbers_of_basic_commercial_units_in_pack ?? 1;
         }
 
-        $price = $this->relationLoaded('price') ? $this->price : null;
-        return (float) ($price?->net_selling_price_commercial_unit ?? 0);
+        return round((($basicUnitPrice + ($calculationType === 'frez' ? $millingCost : 0)) * $unitsInPack), 2);
     }
 
     /**
