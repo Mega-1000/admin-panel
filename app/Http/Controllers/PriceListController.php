@@ -84,7 +84,7 @@ class PriceListController extends Controller
                     continue;
                 }
 
-                $product = Product::with(['packing', 'price', 'parentProduct', 'children'])->find($item['id']);
+                $product = Product::with(['packing', 'price', 'parentProduct'])->find($item['id']);
                 if (!$product) {
                     continue;
                 }
@@ -125,21 +125,6 @@ class PriceListController extends Controller
 
                 // Replicate resulting prices to all related products
                 ProductPrice::whereIn('product_id', $relatedIds)->update($prices);
-
-                // Update children (variants) — each uses its own packing for cascade
-                foreach ($product->children as $child) {
-                    $child->update($paramUpdate);
-                    $child->refresh();
-
-                    if (!$child->packing || !$child->price) {
-                        continue;
-                    }
-
-                    $child->price->additional_payment_for_milling = $millingCost;
-                    $childPrices = $calculator->buildFullPriceArray($child);
-                    $childPrices['additional_payment_for_milling'] = $millingCost;
-                    $child->price->update($childPrices);
-                }
             }
 
             return response()->json(['message' => 'Ceny zostały zaktualizowane.'], 200);
