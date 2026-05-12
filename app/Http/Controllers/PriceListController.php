@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Category;
 use App\Entities\Firm;
 use App\Entities\Product;
 use App\Entities\ProductPrice;
@@ -28,7 +29,7 @@ class PriceListController extends Controller
         $page    = max(1, (int) $request->query('page', 1));
         $perPage = 50;
 
-        $styrofoamCategoryIds = $this->getDescendantCategoryIds(42);
+        $styrofoamCategoryIds = $this->getDescendantCategoryIds(config('products.styrofoam_category'));
 
         $paginator = Product::with(['packing', 'price', 'children.packing', 'children.price'])
             ->whereNull('parent_id')
@@ -177,12 +178,17 @@ class PriceListController extends Controller
         ];
     }
 
-    private function getDescendantCategoryIds(int $rootId): array
+    private function getDescendantCategoryIds(string $rootName): array
     {
-        $all = \App\Entities\Category::select('id', 'parent_id')->get()->keyBy('id');
+        $all  = Category::select('id', 'parent_id', 'name')->get()->keyBy('id');
+        $root = $all->first(fn($c) => $c->name === $rootName);
 
-        $ids     = [$rootId];
-        $queue   = [$rootId];
+        if (!$root) {
+            return [];
+        }
+
+        $ids   = [$root->id];
+        $queue = [$root->id];
 
         while (!empty($queue)) {
             $parentId = array_shift($queue);
