@@ -56,8 +56,12 @@ class PriceListController extends Controller
         }
 
         return response()->json([
-            'products' => $products,
-            'header'   => $header,
+            'products'     => $products,
+            'header'       => $header,
+            'current_page' => 1,
+            'last_page'    => 1,
+            'total'        => count($products),
+            'per_page'     => count($products),
         ]);
     }
 
