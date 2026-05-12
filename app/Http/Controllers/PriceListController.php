@@ -25,29 +25,21 @@ class PriceListController extends Controller
 
     public function getProducts(int $firmId, Request $request): JsonResponse
     {
-        $firm    = Firm::findOrFail($firmId);
-        $page    = max(1, (int) $request->query('page', 1));
-        $perPage = 50;
+        $firm = Firm::findOrFail($firmId);
 
         $styrofoamCategoryIds = $this->getDescendantCategoryIds(config('products.styrofoam_category'));
 
-        $paginator = Product::with(['packing', 'price', 'children.packing', 'children.price'])
+        $allProducts = Product::with(['packing', 'price', 'children.packing', 'children.price'])
             ->whereNull('parent_id')
             ->where('product_name_supplier', $firm->symbol)
             ->orderBy('order')
             ->orderBy('name')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->get();
 
         $products = [];
         $header   = [];
 
-        foreach ($paginator->items() as $product) {
-            // Skip products whose group code has no '-' separator (numeric-only codes are not valid groups)
-            $group = $product->product_group_for_change_price;
-            if ($group === null || $group === '') {
-                continue;
-            }
-
+        foreach ($allProducts as $product) {
             if (empty($header) && $product->text_price_change_data_first !== null) {
                 $header = [
                     'text_price_change_data_first'  => $product->text_price_change_data_first,
@@ -64,12 +56,8 @@ class PriceListController extends Controller
         }
 
         return response()->json([
-            'products'     => $products,
-            'header'       => $header,
-            'current_page' => $paginator->currentPage(),
-            'last_page'    => $paginator->lastPage(),
-            'total'        => $paginator->total(),
-            'per_page'     => $perPage,
+            'products' => $products,
+            'header'   => $header,
         ]);
     }
 
