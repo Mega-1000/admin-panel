@@ -50,6 +50,7 @@ class CategoryController extends Controller
     {
         $parents = $this->getSelectableParents($category);
         $youtube = $category->youtube ?? [];
+        $category->load('chimneyAttributes.options');
 
         return view('categories.edit', compact('category', 'parents', 'youtube'));
     }

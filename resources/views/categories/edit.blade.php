@@ -81,6 +81,53 @@
                         @endif
                     </div>
                 </div>
+
+                {{-- ── Kalkulator kominowy — podgląd ──────────────────────── --}}
+                @php $chimneyAttrs = $category->chimneyAttributes; @endphp
+                <div class="panel panel-bordered" style="border-color:{{ $chimneyAttrs->isNotEmpty() ? '#e8a000' : '#dde2f2' }};">
+                    <div class="panel-heading" style="background:{{ $chimneyAttrs->isNotEmpty() ? '#fff8ec' : '#f5f7fd' }}; border-color:{{ $chimneyAttrs->isNotEmpty() ? '#e8a000' : '#dde2f2' }};">
+                        <h3 class="panel-title">
+                            <i class="fa fa-fire" style="color:{{ $chimneyAttrs->isNotEmpty() ? '#e8a000' : '#bbb' }};"></i>
+                            Kalkulator kominowy
+                            @if($chimneyAttrs->isNotEmpty())
+                                <span class="badge" style="background:#e8a000; margin-left:6px;">AKTYWNY</span>
+                            @else
+                                <span class="badge" style="background:#bbb; margin-left:6px;">nieaktywny</span>
+                            @endif
+                        </h3>
+                    </div>
+                    <div class="panel-body" style="font-size:13px;">
+                        @if($chimneyAttrs->isEmpty())
+                            <p class="text-muted" style="margin:0;">
+                                Brak atrybutów kominowych — kalkulator <strong>nie pojawi się</strong> na stronie kategorii.
+                            </p>
+                        @else
+                            <p style="margin-bottom:10px;">
+                                Kalkulator <strong>pojawi się</strong> na stronie tej kategorii.<br>
+                                Liczba atrybutów: <strong>{{ $chimneyAttrs->count() }}</strong>
+                            </p>
+                            @foreach($chimneyAttrs as $attr)
+                                <div style="background:#fff8ec; border:1px solid #f0d08a; border-radius:6px; padding:8px 10px; margin-bottom:8px;">
+                                    <div style="font-weight:700; color:#7a4f00; margin-bottom:4px;">
+                                        #{{ $attr->id }} — {{ $attr->name }}
+                                        <span style="font-weight:400; color:#a07030; font-size:11px; margin-left:6px;">kolumna: {{ $attr->column_number }}</span>
+                                    </div>
+                                    @if($attr->options->isNotEmpty())
+                                        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                                            @foreach($attr->options as $opt)
+                                                <span style="background:#fffbe6; border:1px solid #e8c84a; border-radius:3px; padding:1px 6px; font-size:11px; color:#5a3e00;">
+                                                    {{ $opt->name }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="text-muted" style="font-size:11px;">brak opcji</span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </div>
